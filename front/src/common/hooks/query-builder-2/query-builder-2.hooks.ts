@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
-import { QueryFilters } from "./new-query-builder.types"
+import { QueryFilters } from "./query-builder-2.types"
 import useLocalStorage from "../storage"
 
 // Get the filters defined in the url to populate the store

@@ -1,4 +1,4 @@
-import { QueryFiltersManager } from "common/hooks/new-query-builder"
+import { QueryFiltersManager } from "common/hooks/query-builder-2"
 import { Notice } from "../notice"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"

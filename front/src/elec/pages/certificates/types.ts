@@ -4,7 +4,7 @@ import {
   PathsApiSafTicketsGetParametersQueryStatus as TransferCertificateStatus,
   PathsApiElecProvisionCertificatesGetParametersQuerySource,
 } from "api-schema"
-import { QueryBuilder } from "common/hooks/new-query-builder"
+import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export { PathsApiElecProvisionCertificatesGetParametersQuerySource as ProvisionCertificateSource }

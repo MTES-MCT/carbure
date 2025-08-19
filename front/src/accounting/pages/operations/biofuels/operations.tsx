@@ -19,7 +19,7 @@ import { useUnit } from "common/hooks/unit"
 import { ActionBar } from "common/components/scaffold"
 import { ExportButton } from "common/components/export"
 import { Notice } from "common/components/notice"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()

@@ -22,7 +22,7 @@ import {
   ApplicationListQueryBuilder,
   ApplicationOrder,
 } from "double-counting-admin/types"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 type ApplicationListProps = {
   snapshot: DoubleCountingApplicationSnapshot | undefined

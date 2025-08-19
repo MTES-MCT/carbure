@@ -1,10 +1,42 @@
+/**
+ * Query Builder Hook (Refactored)
+ *
+ * This hook provides a generic and type-safe way to manage query parameters for paginated, filterable, and sortable lists.
+ * It is designed to be used with API endpoints that accept parameters such as page, limit, filters, and order.
+ *
+ * Usage Overview:
+ * 1. Define a QueryBuilder type with the appropriate generics for your use case (e.g. status, order).
+ * 2. Use this builder to type your query object for the backend (using Builder["query"]).
+ * 3. When using the hook, pass the generic typing via Builder["config"].
+ *
+ * Example (see accounting/types.ts):
+ *
+ *   // 1. Define the builder type for your resource
+ *   export type OperationsQueryBuilder = QueryBuilder<
+ *     OperationsStatus[],
+ *     OperationOrder[]
+ *   >
+ *
+ *   // 2. Type your query object for the backend
+ *   export type OperationsQuery = OperationsQueryBuilder["query"]
+ *
+ *   // 3. Use the hook in your component
+ *   const { query, state, actions } = useQueryBuilder<OperationsQueryBuilder["config"]>()
+ *
+ *   // 'query' is correctly typed and can be sent to the backend
+ *   // 'state' and 'actions' allow you to manage pagination, filters, order, etc.
+ *
+ * This approach ensures type safety and consistency between frontend and backend query parameters.
+ *
+ * See also: accounting/types.ts for concrete usage examples.
+ */
 import { useEffect, useMemo } from "react"
 import useStore from "../store"
 import {
   useFilterSearchParams,
   useLimit,
   usePage,
-} from "./new-query-builder.hooks"
+} from "./query-builder-2.hooks"
 import {
   QueryBuilderActions,
   QueryBuilderStore,
@@ -12,7 +44,7 @@ import {
   QueryConfig,
   QueryParams,
   QueryTableOrder,
-} from "./new-query-builder.types"
+} from "./query-builder-2.types"
 import useEntity from "../entity"
 
 const formatOrder = <Columns extends string[] | undefined>(

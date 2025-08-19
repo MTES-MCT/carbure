@@ -1,5 +1,5 @@
 import { Button } from "common/components/button2"
-import { QueryConfig } from "common/hooks/new-query-builder"
+import { QueryConfig } from "common/hooks/query-builder-2"
 import { useTranslation } from "react-i18next"
 export interface ExportButtonProps<Q> {
   query: Q

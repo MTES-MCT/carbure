@@ -1,5 +1,5 @@
 import { download } from "common/services/api"
-import { QUERY_RESET } from "common/hooks/new-query-builder"
+import { QUERY_RESET } from "common/hooks/query-builder-2"
 import {
   api as apiFetch,
   download as downloadFetch,

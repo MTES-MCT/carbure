@@ -27,7 +27,7 @@ import {
 import { useColumns, useFilters, useStatus, useTabs } from "./hooks"
 import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 export interface ProvisionCertificatesProps {
   year: number

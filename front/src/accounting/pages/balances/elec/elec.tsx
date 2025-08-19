@@ -9,7 +9,7 @@ import { getElecBalances } from "accounting/api/elec-balances"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
 import { Unit } from "common/types"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const BalancesElec = () => {
   const { t } = useTranslation()

@@ -13,7 +13,7 @@ import {
   PathsApiSafTicketsGetParametersQueryConsumption_type as ConsumptionType,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus,
 } from "api-schema"
-import { QueryBuilder } from "common/hooks/new-query-builder"
+import { QueryBuilder } from "common/hooks/query-builder-2"
 
 // Generated enum is EnumStatus and the name is not readable
 export {

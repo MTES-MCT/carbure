@@ -28,7 +28,7 @@ import { Pagination } from "common/components/pagination2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { Unit } from "common/types"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 export interface TicketSourcesProps {
   year: number

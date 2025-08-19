@@ -12,7 +12,7 @@ import { NoResult } from "common/components/no-result2"
 import { getBalances } from "accounting/api/balances"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const BalancesBiofuels = () => {
   const { t } = useTranslation()

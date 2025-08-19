@@ -6,7 +6,7 @@ import {
   ConsumptionType,
   SafTicketSourceQuery,
 } from "./types"
-import { QUERY_RESET } from "common/hooks/new-query-builder"
+import { QUERY_RESET } from "common/hooks/query-builder-2"
 import { EtsStatusEnum, ShippingMethodEnum } from "api-schema"
 
 export function getYears(entity_id: number) {

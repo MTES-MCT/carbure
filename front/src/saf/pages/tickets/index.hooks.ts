@@ -1,4 +1,4 @@
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { useMemo } from "react"
 import { useMatch } from "react-router-dom"
 

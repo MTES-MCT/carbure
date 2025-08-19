@@ -2,7 +2,7 @@ import {
   PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter as QualichargeFilter,
   PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by as QualichargeValidatedBy,
 } from "api-schema"
-import { QueryBuilder } from "common/hooks/new-query-builder"
+import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes, QueryParams } from "common/services/api-fetch.types"
 
 export { QualichargeValidatedBy, QualichargeFilter }

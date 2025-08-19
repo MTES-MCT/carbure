@@ -17,7 +17,7 @@ import useEntity from "common/hooks/entity"
 import useYears from "common/hooks/years-2"
 import { useMatch } from "react-router-dom"
 import { ExternalAdminPages } from "common/types"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 export const useQualichargeColumns = (status: QualichargeTab) => {
   const { t } = useTranslation()

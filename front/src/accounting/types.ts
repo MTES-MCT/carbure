@@ -19,7 +19,7 @@ import {
   PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
   ElecOperationTypeEnum as CreateElecOperationType,
 } from "api-schema"
-import { QueryBuilder } from "common/hooks/new-query-builder"
+import { QueryBuilder } from "common/hooks/query-builder-2"
 
 // Type definitions
 export type Operation = apiTypes["OperationList"] & {

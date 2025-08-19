@@ -2,7 +2,7 @@ import { MultiSelect } from "common/components/selects2/multiselect"
 import styles from "./filter-multiselect2.module.css"
 import { ShowMore } from "common/components/show-more/show-more"
 import { Normalizer } from "common/utils/normalize"
-import { QueryFilters } from "common/hooks/new-query-builder"
+import { QueryFilters } from "common/hooks/query-builder-2"
 
 export interface FilterMultiSelectProps2<
   Key extends string,

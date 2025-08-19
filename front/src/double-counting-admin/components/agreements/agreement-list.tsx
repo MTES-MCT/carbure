@@ -25,7 +25,7 @@ import {
   AgreementListQueryBuilder,
   AgreementOrder,
 } from "double-counting-admin/types"
-import { useQueryBuilder } from "common/hooks/new-query-builder"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const AgreementList = ({
   snapshot = defaultCount,
