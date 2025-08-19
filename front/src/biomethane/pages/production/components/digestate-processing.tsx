@@ -10,12 +10,12 @@ import {
   BiomethaneProductionUnit,
   BiomethaneProductionUnitPatchRequest,
   DigestateSaleType,
-} from "../../types"
+} from "../types"
 import {
   DigestateValorizationMethodsEnum as DigestateValorizationMethods,
   SpreadingManagementMethodsEnum as SpreadingManagementMethods,
 } from "api-schema"
-import { useSaveProductionUnit } from "../../production.hooks"
+import { useSaveProductionUnit } from "../production.hooks"
 
 type DigestateProcessingForm =
   DeepPartial<BiomethaneProductionUnitPatchRequest> & {
@@ -97,24 +97,24 @@ export function DigestateProcessing({
             <TextInput
               readOnly={!isEditing}
               label={t("Étapes complémentaires de traitement du digestat brut")}
-              hintText={t("Que si séparation de phase = Non")}
               {...bind("raw_digestate_treatment_steps")}
+              disabled={value.has_digestate_phase_separation}
             />
             <TextInput
               readOnly={!isEditing}
               label={t(
                 "Étape(s) complémentaire(s) de traitement de la phase liquide"
               )}
-              hintText={t("Que si séparation de phase = Oui, optionnel")}
               {...bind("liquid_phase_treatment_steps")}
+              disabled={!value.has_digestate_phase_separation}
             />
             <TextInput
               readOnly={!isEditing}
               label={t(
                 "Étape(s) complémentaire(s) de traitement de la phase solide"
               )}
-              hintText={t("Que si séparation de phase = Oui, optionnel")}
               {...bind("solid_phase_treatment_steps")}
+              disabled={!value.has_digestate_phase_separation}
             />
             <CheckboxGroup
               readOnly={!isEditing}

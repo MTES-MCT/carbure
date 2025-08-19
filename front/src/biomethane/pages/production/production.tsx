@@ -1,10 +1,10 @@
 import { Fragment } from "react"
-import { DigestateProcessing } from "./components/digestate-processing/digestate-processing"
+import { DigestateProcessing } from "./components/digestate-processing"
 import { DigestateStorage } from "./components/digestate-storage/digestate-storage"
-import { GeneralInfo } from "./components/general-info/general-info"
-import { ICPE } from "./components/icpe/icpe"
-import { ProductionSite } from "./components/production-site/production-site"
-import { SanitaryAgreement } from "./components/sanitary-agreement/sanitary-agreement"
+import { GeneralInfo } from "./components/general-info"
+import { ICPE } from "./components/icpe"
+import { ProductionSite } from "./components/production-site"
+import { SanitaryAgreement } from "./components/sanitary-agreement"
 import { useProductionUnit } from "./production.hooks"
 
 export const BiomethaneProductionPage = () => {
