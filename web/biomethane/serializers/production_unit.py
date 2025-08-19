@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneProductionUnit
+from core.serializers import NullableMixin
 
 
-class BaseBiomethaneProductionUnitSerializer(serializers.ModelSerializer):
+class BaseBiomethaneProductionUnitSerializer(NullableMixin, serializers.ModelSerializer):
     installed_meters = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneProductionUnit.INSTALLED_METERS_CHOICES),
         required=False,
