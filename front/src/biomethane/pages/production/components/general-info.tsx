@@ -9,8 +9,8 @@ import {
   BiomethaneProductionUnit,
   BiomethaneProductionUnitPatchRequest,
   UnitType,
-} from "../../types"
-import { useSaveProductionUnit } from "../../production.hooks"
+} from "../types"
+import { useSaveProductionUnit } from "../production.hooks"
 
 type GeneralInfoForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 

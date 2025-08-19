@@ -8,8 +8,8 @@ import {
   IcpeRegime,
   BiomethaneProductionUnit,
   BiomethaneProductionUnitPatchRequest,
-} from "../../types"
-import { useSaveProductionUnit } from "../../production.hooks"
+} from "../types"
+import { useSaveProductionUnit } from "../production.hooks"
 
 type ICPEForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 

@@ -15,9 +15,9 @@ import {
   BiomethaneProductionUnitPatchRequest,
   ProcessType,
   MethanizationProcess,
-} from "../../types"
+} from "../types"
 import { InstalledMetersEnum } from "api-schema"
-import { useSaveProductionUnit } from "../../production.hooks"
+import { useSaveProductionUnit } from "../production.hooks"
 
 type ProductionSiteForm = DeepPartial<BiomethaneProductionUnitPatchRequest> & {
   installed_meters?: InstalledMetersEnum[]
