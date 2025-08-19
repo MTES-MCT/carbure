@@ -1,33 +1,23 @@
 import { useQuery } from "common/hooks/async"
-
-import useEntity from "common/hooks/entity"
 import { useBalancesElecColumns } from "./elec.hooks"
 import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { Pagination } from "common/components/pagination2/pagination"
-import { ElecOperationsStatus } from "accounting/types"
+import { ElecOperationsQueryBuilder } from "accounting/types"
 import { NoResult } from "common/components/no-result2"
 import { getElecBalances } from "accounting/api/elec-balances"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
 import { Unit } from "common/types"
+import { useQueryBuilder } from "common/hooks/new-query-builder"
 
 const BalancesElec = () => {
-  const entity = useEntity()
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   const columns = useBalancesElecColumns()
 
-  const [state, actions] = useCBQueryParamsStore<
-    ElecOperationsStatus[],
-    undefined
-  >(entity)
-
-  const query = useCBQueryBuilder<[], ElecOperationsStatus[], undefined>(state)
+  const { state, actions, query } =
+    useQueryBuilder<ElecOperationsQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(getElecBalances, {
     key: "elec-balances",

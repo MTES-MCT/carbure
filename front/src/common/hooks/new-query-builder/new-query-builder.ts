@@ -27,6 +27,12 @@ const formatOrder = <Columns extends string[] | undefined>(
   return [mapping[order.direction]] as Columns
 }
 
+export const QUERY_RESET = {
+  limit: undefined,
+  page: 1,
+  order_by: undefined,
+}
+
 export const useQueryBuilderStore = <Config extends QueryConfig = QueryConfig>(
   params: QueryBuilderStoreParams<Config["status"]> = {}
 ) => {

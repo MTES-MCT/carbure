@@ -35,6 +35,10 @@ export type QueryParams<Q extends QueryConfig> = {
 
 // Filters are defined by a key and a value array of strings
 export type QueryFilters = Record<string, string[]>
+export type QueryFiltersManager = {
+  filters: QueryFilters
+  onFilter: (filters: QueryFilters) => void
+}
 
 // Params that can be passed to the query builder store
 export type QueryBuilderStoreParams<

@@ -17,21 +17,17 @@ import {
   ElecCertificateSnapshot,
   ProvisionCertificate,
   ProvisionCertificateFilter,
+  ProvisionCertificatesQueryBuilder,
 } from "../../types"
 import {
   getProvisionCertificates,
   getProvisionCertificateFilters,
   exportProvisionCertificates,
 } from "../../api"
-import {
-  useColumns,
-  useController,
-  useFilters,
-  useStatus,
-  useTabs,
-} from "./hooks"
+import { useColumns, useFilters, useStatus, useTabs } from "./hooks"
 import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
+import { useQueryBuilder } from "common/hooks/new-query-builder"
 
 export interface ProvisionCertificatesProps {
   year: number
@@ -49,7 +45,12 @@ export const ProvisionCertificates = ({
   const location = useLocation()
   const status = useStatus()
 
-  const { state, actions, query } = useController(year, status)
+  const { state, actions, query } = useQueryBuilder<
+    ProvisionCertificatesQueryBuilder["config"]
+  >({
+    year,
+    status,
+  })
 
   const tabs = useTabs(snapshot)
   const filters = useFilters()

@@ -6,7 +6,7 @@ import {
   ConsumptionType,
   SafTicketSourceQuery,
 } from "./types"
-import { CBQUERY_RESET } from "common/hooks/query-builder-2"
+import { QUERY_RESET } from "common/hooks/new-query-builder"
 import { EtsStatusEnum, ShippingMethodEnum } from "api-schema"
 
 export function getYears(entity_id: number) {
@@ -37,7 +37,7 @@ export function getTicketFilters(field: SafFilter, query: SafTicketQuery) {
         query: {
           filter: field,
           ...query,
-          ...CBQUERY_RESET,
+          ...QUERY_RESET,
         },
       },
     })
@@ -121,7 +121,7 @@ export function getTicketSourceFilters(
         query: {
           filter: field,
           ...query,
-          ...CBQUERY_RESET,
+          ...QUERY_RESET,
         },
       },
     })

@@ -3,7 +3,6 @@ import {
   ElecCertificateSnapshot,
   TransferCertificate,
   TransferCertificateFilter,
-  TransferCertificateOrder,
   TransferCertificateStatus,
 } from "../../types"
 import { formatDate, formatNumber } from "common/utils/formatters"
@@ -11,32 +10,11 @@ import { Column } from "common/components/table2"
 import { Tab } from "common/components/tabs2"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { useParams } from "react-router-dom"
 
 export function useStatus() {
   const params = useParams<"status">()
   return (params.status ?? "pending") as TransferCertificateStatus
-}
-
-export function useController(year: number, status: TransferCertificateStatus) {
-  const entity = useEntity()
-
-  const [state, actions] = useCBQueryParamsStore<
-    TransferCertificateStatus,
-    undefined
-  >(entity, year, status)
-
-  const query = useCBQueryBuilder<
-    TransferCertificateOrder[],
-    TransferCertificateStatus,
-    undefined
-  >(state)
-
-  return { state, actions, query }
 }
 
 export function useTabs(snapshot?: ElecCertificateSnapshot): Tab<string>[] {

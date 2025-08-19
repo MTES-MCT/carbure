@@ -1,16 +1,13 @@
-import { CBQueryParams } from "common/hooks/query-builder-2"
 import {
   PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by as AgreementOrder,
   PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by as ApplicationOrder,
 } from "api-schema"
+import { QueryBuilder } from "common/hooks/new-query-builder"
 
 export { AgreementOrder, ApplicationOrder }
 
-export type AgreementListQuery = CBQueryParams<
-  AgreementOrder[],
-  string,
-  undefined
->
+export type AgreementListQueryBuilder = QueryBuilder<string, AgreementOrder[]>
+export type AgreementListQuery = AgreementListQueryBuilder["query"]
 
 export type AgreementFilterSelection = Partial<
   Record<AgreementFilter, string[]>
@@ -22,8 +19,8 @@ export enum AgreementFilter {
   ProductionSites = "production_sites",
 }
 
-export type ApplicationListQuery = CBQueryParams<
-  ApplicationOrder[],
+export type ApplicationListQueryBuilder = QueryBuilder<
   string,
-  undefined
+  ApplicationOrder[]
 >
+export type ApplicationListQuery = ApplicationListQueryBuilder["query"]

@@ -1,11 +1,6 @@
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { ElecOperationsStatus, OperationsFilter } from "accounting/types"
+import { ElecOperationsQueryBuilder, OperationsFilter } from "accounting/types"
 import { useTranslation } from "react-i18next"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
-import useEntity from "common/hooks/entity"
 import * as api from "accounting/api/elec-operations"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
@@ -21,11 +16,10 @@ import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
 import { Unit } from "common/types"
-const currentYear = new Date().getFullYear()
+import { useQueryBuilder } from "common/hooks/new-query-builder"
 
 const OperationsElec = () => {
   const { t } = useTranslation()
-  const entity = useEntity()
   usePrivateNavigation(t("Comptabilité"))
   const { formatUnit } = useUnit()
   const filterLabels = {
@@ -36,12 +30,8 @@ const OperationsElec = () => {
     [OperationsFilter.from_to]: t("Destinataire"),
   }
 
-  const [state, actions] = useCBQueryParamsStore<
-    ElecOperationsStatus[],
-    undefined
-  >(entity, currentYear)
-
-  const query = useCBQueryBuilder<[], ElecOperationsStatus[], undefined>(state)
+  const { state, actions, query } =
+    useQueryBuilder<ElecOperationsQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(api.getOperations, {
     key: "elec-operations",

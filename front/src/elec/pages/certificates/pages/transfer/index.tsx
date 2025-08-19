@@ -13,22 +13,21 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { useQuery } from "common/hooks/async"
-import { ElecCertificateSnapshot, TransferCertificate } from "../../types"
+import {
+  ElecCertificateSnapshot,
+  TransferCertificate,
+  TransferCertificatesQueryBuilder,
+} from "../../types"
 import {
   getTransferCertificates,
   getTransferCertificateFilters,
   exportTransferCertificates,
 } from "../../api"
-import {
-  useColumns,
-  useController,
-  useFilters,
-  useStatus,
-  useTabs,
-} from "./hooks"
+import { useColumns, useFilters, useStatus, useTabs } from "./hooks"
 import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
 import { normalizeBoolean, normalizeMonth } from "common/utils/normalizers"
+import { useQueryBuilder } from "common/hooks/new-query-builder"
 
 export interface TransferCertificatesProps {
   year: number
@@ -46,7 +45,12 @@ export const TransferCertificates = ({
   const location = useLocation()
   const status = useStatus()
 
-  const { state, actions, query } = useController(year, status)
+  const { state, actions, query } = useQueryBuilder<
+    TransferCertificatesQueryBuilder["config"]
+  >({
+    year,
+    status,
+  })
 
   const tabs = useTabs(snapshot)
   const filters = useFilters()

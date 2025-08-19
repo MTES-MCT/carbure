@@ -1,2 +1,7 @@
-export { type QueryBuilder, type QueryConfig } from "./new-query-builder.types"
-export { useQueryBuilder } from "./new-query-builder"
+export {
+  type QueryBuilder,
+  type QueryConfig,
+  type QueryFiltersManager,
+  type QueryFilters,
+} from "./new-query-builder.types"
+export { useQueryBuilder, QUERY_RESET } from "./new-query-builder"

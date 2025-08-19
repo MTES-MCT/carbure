@@ -1,4 +1,3 @@
-import useEntity from "common/hooks/entity"
 import HashRoute from "common/components/hash-route"
 import { NoResult } from "common/components/no-result2"
 import { ActionBar, Content } from "common/components/scaffold"
@@ -17,12 +16,13 @@ import {
 import { ApplicationDetailsDialog } from "./application-details-dialog"
 import ApplicationStatus from "../../../double-counting/components/application-status"
 import { usePrivateNavigation } from "common/layouts/navigation"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { AgreementFilters } from "../../filters"
-import { AgreementFilter, ApplicationOrder } from "double-counting-admin/types"
+import {
+  AgreementFilter,
+  ApplicationListQueryBuilder,
+  ApplicationOrder,
+} from "double-counting-admin/types"
+import { useQueryBuilder } from "common/hooks/new-query-builder"
 
 type ApplicationListProps = {
   snapshot: DoubleCountingApplicationSnapshot | undefined
@@ -35,15 +35,11 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
   const [tab, setTab] = useState("pending")
   const navigate = useNavigate()
   const location = useLocation()
-  const entity = useEntity()
-  const currentYear = new Date().getFullYear()
 
-  const [state, actions] = useCBQueryParamsStore<string, undefined>(
-    entity,
-    currentYear,
-    tab
-  )
-  const query = useCBQueryBuilder<ApplicationOrder[], string, undefined>(state)
+  const { state, actions, query } = useQueryBuilder<
+    ApplicationListQueryBuilder["config"]
+  >({ status: tab })
+
   const applicationsResponse = useQuery(api.getDoubleCountingApplicationList, {
     key: "dc-applications",
     params: [query],

@@ -1,5 +1,5 @@
 import { download } from "common/services/api"
-import { CBQUERY_RESET } from "common/hooks/query-builder-2"
+import { QUERY_RESET } from "common/hooks/new-query-builder"
 import {
   api as apiFetch,
   download as downloadFetch,
@@ -33,7 +33,7 @@ export function getApplicationFilters(
         query: {
           filter: field,
           ...query,
-          ...CBQUERY_RESET,
+          ...QUERY_RESET,
         },
       },
     })
@@ -144,7 +144,7 @@ export function getAgrementFilters(field: string, query: AgreementListQuery) {
         query: {
           filter: field,
           ...query,
-          ...CBQUERY_RESET,
+          ...QUERY_RESET,
         },
       },
     })

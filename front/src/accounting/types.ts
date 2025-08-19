@@ -1,7 +1,6 @@
 /**
  * Common types used in the accounting module
  */
-import { CBQueryParams } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiTiruertOperationsGetParametersQueryStatus as OperationsStatus,
@@ -59,8 +58,8 @@ export {
 /** BALANCES */
 
 export { BalancesFilter }
-export interface BalancesQuery
-  extends Omit<CBQueryParams<[], OperationsStatus[], string[]>, "type"> {
+export type BalancesQueryBuilder = QueryBuilder<OperationsStatus[]>
+export type BalancesQuery = BalancesQueryBuilder["query"] & {
   [BalancesFilter.sector]?: OperationSector[]
   [BalancesFilter.customs_category]?: OperationBiofuelCategory[]
   [BalancesFilter.biofuel]?: string[]
@@ -79,9 +78,11 @@ export enum ElecOperationSector {
   ELEC = "ELEC",
 }
 
-export interface ElecOperationsQuery
-  extends CBQueryParams<[], ElecOperationsStatus[], string[]> {
-  [OperationsFilter.status]?: ElecOperationsStatus[]
+export type ElecOperationsQueryBuilder = QueryBuilder<
+  ElecOperationsStatus[],
+  ElecOperationOrder[]
+>
+export type ElecOperationsQuery = ElecOperationsQueryBuilder["query"] & {
   [OperationsFilter.type]?: OperationDebitOrCredit[]
   [OperationsFilter.operation]?: ElecOperationType[]
 }
