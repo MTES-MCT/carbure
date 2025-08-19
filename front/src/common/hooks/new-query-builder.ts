@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 import useLocalStorage from "./storage"
-import useStore from "./store"
+import useStore, { ActionCreators } from "./store"
 import useEntity from "./entity"
 
+// VERSION QUI OBLIGE DE DÉFINIR UN TYPAGE GENERIQUE POUR status et order
 export interface QueryTableOrder {
   column: string
   direction: "asc" | "desc"
@@ -24,14 +25,14 @@ export type QueryConfig<
 > = QueryStatus<TStatus> & QueryOrder<TOrder>
 
 // Final query params to be used in the API call
-export type QueryParams<T extends QueryConfig = QueryConfig> = {
+export type QueryParams<Q extends QueryConfig> = {
   entity_id: number
   year: number
-  status?: T["status"]
+  status?: Q["status"]
   search?: string
   page: number
   limit?: number
-  order_by?: T["order"]
+  order_by?: Q["order"]
 }
 
 // Filters are defined by a key and a value array of strings
@@ -66,6 +67,69 @@ type QueryBuilderActions<Config extends QueryConfig = QueryConfig> = {
   setLimit: (limit?: number) => Partial<QueryBuilderStore<Config>>
   setSearch: (search: string | undefined) => Partial<QueryBuilderStore<Config>>
   setSelection: (selection: number[]) => Partial<QueryBuilderStore<Config>>
+}
+
+// Type that exposes all the types related to the query builder
+export type QueryBuilder<
+  TStatus extends string | undefined,
+  TOrder extends string[] | undefined,
+> = {
+  // State of the store
+  state: QueryBuilderStore<QueryConfig<TStatus, TOrder>>
+
+  // Actions to update the store
+  actions: ActionCreators<
+    QueryBuilderStore<QueryConfig<TStatus, TOrder>>,
+    QueryBuilderActions<QueryConfig<TStatus, TOrder>>
+  >
+
+  // Final query sent to the backend
+  query: QueryParams<QueryConfig<TStatus, TOrder>>
+
+  // Config required to the useQueryBuilder to pass generic types
+  config: QueryConfig<TStatus, TOrder>
+}
+
+const useFilterSearchParams = () => {
+  const [filtersParams, setFiltersParams] = useSearchParams()
+  const filters = useMemo(() => {
+    const filters: QueryFilters = {}
+    filtersParams.forEach((value, filter) => {
+      filters[filter] = filters[filter] ?? []
+      filters[filter]!.push(value)
+    })
+    return filters
+  }, [filtersParams])
+
+  return [filters, setFiltersParams] as const
+}
+
+/**
+ * Define the number of items per page
+ */
+export const useLimit = () => {
+  return useLocalStorage<number | undefined>("carbure:limit", 10)
+}
+
+const usePage = () => {
+  const [searchParams] = useSearchParams()
+  const searchParamsPage = searchParams.get("page")
+
+  return searchParamsPage ? parseInt(searchParamsPage) : 1
+}
+
+const currentYear = new Date().getFullYear()
+
+const formatOrder = <Columns extends string[] | undefined>(
+  order: QueryTableOrder | undefined
+): Columns => {
+  if (!order) return [] as unknown as Columns
+  const mapping = {
+    asc: order.column,
+    desc: `-${order.column}`,
+  }
+
+  return [mapping[order.direction]] as Columns
 }
 
 export const useQueryBuilderStore = <Config extends QueryConfig = QueryConfig>(
@@ -159,49 +223,7 @@ export const useQueryBuilderStore = <Config extends QueryConfig = QueryConfig>(
   return [state, actions] as const
 }
 
-const useFilterSearchParams = () => {
-  const [filtersParams, setFiltersParams] = useSearchParams()
-  const filters = useMemo(() => {
-    const filters: QueryFilters = {}
-    filtersParams.forEach((value, filter) => {
-      filters[filter] = filters[filter] ?? []
-      filters[filter]!.push(value)
-    })
-    return filters
-  }, [filtersParams])
-
-  return [filters, setFiltersParams] as const
-}
-
-/**
- * Define the number of items per page
- */
-export const useLimit = () => {
-  return useLocalStorage<number | undefined>("carbure:limit", 10)
-}
-
-const usePage = () => {
-  const [searchParams] = useSearchParams()
-  const searchParamsPage = searchParams.get("page")
-
-  return searchParamsPage ? parseInt(searchParamsPage) : 1
-}
-
-const currentYear = new Date().getFullYear()
-
-const formatOrder = <Columns extends string[] | undefined>(
-  order: QueryTableOrder | undefined
-): Columns => {
-  if (!order) return [] as unknown as Columns
-  const mapping = {
-    asc: order.column,
-    desc: `-${order.column}`,
-  }
-
-  return [mapping[order.direction]] as Columns
-}
-
-export function useQueryBuilder<Config extends QueryConfig = QueryConfig>(
+export function useQueryBuilder<Config extends QueryConfig>(
   params: QueryBuilderStoreParams<Config["status"]>
 ) {
   const [state, actions] = useQueryBuilderStore<Config>(params)

@@ -1,26 +1,15 @@
 import { Button } from "common/components/button2"
-import { CBQueryParams } from "common/hooks/query-builder-2"
+import { QueryConfig } from "common/hooks/new-query-builder"
 import { useTranslation } from "react-i18next"
-
-export interface ExportButtonProps<
-  GenericType extends CBQueryParams<ParamsType, Status, Type>,
-  ParamsType extends string[],
-  Status extends string | string[] | undefined,
-  Type extends string | undefined,
-> {
-  query: GenericType
-  download: (query: GenericType) => unknown
+export interface ExportButtonProps<Q> {
+  query: Q
+  download: (query: Q) => unknown
 }
 
-export const ExportButton = <
-  GenericType extends CBQueryParams<ParamsType, Status, Type>,
-  ParamsType extends string[],
-  Status extends string | string[] | undefined,
-  Type extends string | undefined,
->({
+export const ExportButton = <Config extends QueryConfig>({
   query,
   download,
-}: ExportButtonProps<GenericType, ParamsType, Status, Type>) => {
+}: ExportButtonProps<Config>) => {
   const { t } = useTranslation()
   return (
     <Button

@@ -20,6 +20,7 @@ import {
 import useYears from "common/hooks/years-2"
 import { useMatch } from "react-router-dom"
 import { ExternalAdminPages } from "common/types"
+import { useQueryBuilder } from "common/hooks/new-query-builder"
 
 export const useQualichargeColumns = (status: QualichargeTab) => {
   const { t } = useTranslation()
@@ -92,9 +93,11 @@ export const useQualichargeQueryBuilder = () => {
   const entity = useEntity()
   const status = useStatus()
   const years = useYears("/qualicharge", getYears)
-  const [state, actions] = useCBQueryParamsStore(entity, years.selected, status)
+  // const [state, actions] = useCBQueryParamsStore(entity, years.selected, status)
 
-  const query = useCBQueryBuilder(state)
+  // const query = useCBQueryBuilder(state)
+  const q = useQueryBuilder({ status, year: years.selected })
 
-  return { state, actions, query, status, years }
+  // return { state, actions, query, status, years }
+  return { ...q, status, years }
 }

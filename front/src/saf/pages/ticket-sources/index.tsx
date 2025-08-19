@@ -50,6 +50,7 @@ export const SafTicketSources = ({ year, snapshot }: TicketSourcesProps) => {
       year,
     }
   )
+
   const ticketSourcesResponse = useQuery(api.getOperatorTicketSources, {
     key: "ticket-sources",
     params: [query],
