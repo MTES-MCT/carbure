@@ -5,9 +5,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models import BiomethaneProductionUnit
 from biomethane.serializers.production_unit import (
-    BiomethaneProductionUnitAddSerializer,
-    BiomethaneProductionUnitPatchSerializer,
     BiomethaneProductionUnitSerializer,
+    BiomethaneProductionUnitUpsertSerializer,
 )
 from core.models import Entity
 from core.permissions import HasUserRights
@@ -37,7 +36,7 @@ class BiomethaneProductionUnitViewSet(GenericViewSet):
 
     def get_serializer_class(self):
         if self.action == "upsert":
-            return BiomethaneProductionUnitPatchSerializer
+            return BiomethaneProductionUnitUpsertSerializer
         return BiomethaneProductionUnitSerializer
 
     @extend_schema(
@@ -79,7 +78,7 @@ class BiomethaneProductionUnitViewSet(GenericViewSet):
             # Try to get existing production unit
             production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
             # Update existing production unit
-            serializer = BiomethaneProductionUnitPatchSerializer(
+            serializer = BiomethaneProductionUnitUpsertSerializer(
                 production_unit, data=request.data, partial=True, context=serializer_context
             )
             if serializer.is_valid():
@@ -90,7 +89,7 @@ class BiomethaneProductionUnitViewSet(GenericViewSet):
 
         except BiomethaneProductionUnit.DoesNotExist:
             # Create new production unit
-            serializer = BiomethaneProductionUnitAddSerializer(data=request.data, context=serializer_context)
+            serializer = BiomethaneProductionUnitUpsertSerializer(data=request.data, context=serializer_context)
             if serializer.is_valid():
                 production_unit = serializer.save()
                 response_data = BiomethaneProductionUnitSerializer(production_unit, context=serializer_context).data
