@@ -36,7 +36,7 @@ const SampleDetailsAuditDoneSection = ({
           action={onDownloadSample}
         />
       </section>
-      {commentCount && commentCount > 0 && (
+      {commentCount && commentCount > 0 ? (
         <section>
           <Alert icon={Message} variant="info">
             <Trans
@@ -47,7 +47,7 @@ const SampleDetailsAuditDoneSection = ({
             />
           </Alert>
         </section>
-      )}
+      ) : null}
     </>
   )
 }
