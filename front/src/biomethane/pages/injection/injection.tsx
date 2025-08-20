@@ -60,7 +60,8 @@ export const BiomethaneInjectionPage = () => {
                 readOnly={!isEditing}
               />
             )}
-
+          </Grid>
+          <Grid cols={2} gap="lg">
             <RadioGroup
               options={yesNoOptions}
               {...bind("is_different_from_production_site")}
