@@ -64,12 +64,14 @@ export const AddDigestateStorage = ({ onClose }: AddDigestateStorageProps) => {
             {...bind("capacity")}
           />
           <RadioGroup
+            required
             label={t("Couverture du stockage")}
             options={getYesNoOptions()}
             orientation="horizontal"
             {...bind("has_cover")}
           />
           <RadioGroup
+            required
             label={t("Récupération du biogaz")}
             options={getYesNoOptions()}
             orientation="horizontal"

@@ -47,13 +47,16 @@ export function ICPE({
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <TextInput
+            required
             readOnly={!isEditing}
             label={t("N° ICPE")}
             state="info"
-            stateRelatedMessage={t("Code à 10 chiffres")}
+            pattern="\d{10}"
+            hintText={t("Code à 10 chiffres")}
             {...bind("icpe_number")}
           />
           <RadioGroup
+            required
             readOnly={!isEditing}
             label={t("Régime ICPE")}
             orientation="horizontal"
