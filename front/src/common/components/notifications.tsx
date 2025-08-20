@@ -6,6 +6,9 @@ import { usePortal } from "./portal"
 import css from "./notifications.module.css"
 import { AxiosError } from "axios"
 import { useTranslation } from "react-i18next"
+import { HttpError } from "common/services/api-fetch"
+import { useRoutes } from "common/hooks/routes"
+import { Link } from "react-router-dom"
 
 export type Notifier = (
   content: React.ReactNode,
@@ -27,19 +30,36 @@ export function useNotify(): Notifier {
 export function useNotifyError() {
   const { t } = useTranslation()
   const notify = useNotify()
+  const routes = useRoutes()
 
-  const getErrorText = (error: Error, defaultMessage?: string) => {
-    const errorCode = (error as AxiosError<{ error: string }>).response?.data
-      .error
+  const DEFAULT_MESSAGE = (
+    <>
+      {t(
+        "L'opération a échoué. Si le problème persiste, veuillez nous contacter depuis"
+      )}{" "}
+      <Link
+        to={routes.CONTACT}
+        style={{ textDecoration: "underline" }}
+        target="_blank"
+      >
+        {t("ce formulaire")}
+      </Link>
+    </>
+  )
 
-    let errorText =
-      defaultMessage ||
-      t(
-        "La demande a échoué. Réessayez ou contactez nous via le formulaire de contact."
-      )
-    if (errorCode) {
-      const customErrorText = t(errorCode, { ns: "errors" })
-      if (customErrorText !== errorCode) errorText = customErrorText
+  const getErrorText = (error: Error, defaultMessage?: React.ReactNode) => {
+    let errorText: React.ReactNode = defaultMessage ?? DEFAULT_MESSAGE
+
+    if (error instanceof AxiosError) {
+      const errorCode = error.response?.data?.error
+      if (errorCode) {
+        const customErrorText = t(errorCode, { ns: "errors" })
+        if (customErrorText !== errorCode) errorText = customErrorText
+      }
+    } else if (error instanceof HttpError) {
+      if (error.data instanceof Object) {
+        errorText = <FormErrors errors={error.data} />
+      }
     }
 
     return errorText
@@ -86,6 +106,23 @@ export const Notification = ({
         className={css.close}
       />
     </li>
+  )
+}
+
+export const FormErrors = ({
+  errors,
+}: {
+  errors: Record<string, string[]>
+}) => {
+  const { t } = useTranslation("fields")
+  return (
+    <ul>
+      {Object.entries(errors).map(([field, fieldErrors]) => (
+        <li key={field}>
+          <b>{t(field)}:</b> {fieldErrors.join(" ")}
+        </li>
+      ))}
+    </ul>
   )
 }
 

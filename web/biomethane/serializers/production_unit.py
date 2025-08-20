@@ -87,6 +87,12 @@ class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSeria
                 "Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
             )
 
+        if data.get("has_digestate_phase_separation"):
+            data["raw_digestate_treatment_steps"] = None
+        else:
+            data["liquid_phase_treatment_steps"] = None
+            data["solid_phase_treatment_steps"] = None
+
         if errors:
             raise serializers.ValidationError(errors)
 
