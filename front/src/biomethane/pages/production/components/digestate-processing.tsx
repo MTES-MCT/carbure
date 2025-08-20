@@ -115,6 +115,8 @@ export function DigestateProcessing({
                 {...bind("raw_digestate_treatment_steps")}
               />
             )}
+          </Grid>
+          <Grid cols={2} gap="lg">
             {value.has_digestate_phase_separation && (
               <TextInput
                 readOnly={!isEditing}

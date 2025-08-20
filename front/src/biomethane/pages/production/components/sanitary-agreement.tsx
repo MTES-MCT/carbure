@@ -62,6 +62,8 @@ export function SanitaryAgreement({
                 {...bind("sanitary_approval_number")}
               />
             )}
+          </Grid>
+          <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}
               label={t("Disposez vous d'une dérogation à l'hygiénisation?")}
