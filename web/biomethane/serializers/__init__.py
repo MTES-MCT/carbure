@@ -7,8 +7,7 @@ from .injection_site import BiomethaneInjectionSiteInputSerializer
 from .injection_site import BiomethaneInjectionSiteSerializer
 from .production_unit import (
     BiomethaneProductionUnitSerializer,
-    BiomethaneProductionUnitAddSerializer,
-    BiomethaneProductionUnitPatchSerializer,
+    BiomethaneProductionUnitUpsertSerializer,
 )
 from .digestate_storage import (
     BiomethaneDigestateStorageSerializer,

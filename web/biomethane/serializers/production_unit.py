@@ -1,23 +1,10 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneProductionUnit
-from core.serializers import NullableMixin
 
 
-class BaseBiomethaneProductionUnitSerializer(NullableMixin, serializers.ModelSerializer):
-    installed_meters = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.INSTALLED_METERS_CHOICES),
-        required=False,
-    )
-    digestate_valorization_methods = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.DIGESTATE_VALORIZATION_METHODS_CHOICES),
-        required=False,
-    )
-    spreading_management_methods = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.SPREADING_MANAGEMENT_METHODS_CHOICES),
-        required=False,
-    )
-
+class BaseBiomethaneProductionUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneProductionUnit
         fields = [
@@ -46,26 +33,11 @@ class BaseBiomethaneProductionUnitSerializer(NullableMixin, serializers.ModelSer
             "digestate_sale_type",
         ]
 
-    def _validate_conditional_fields(self, data):
-        errors = {}
-
-        # Conditional validation: sanitary_approval_number required when has_sanitary_approval is True
-        if data.get("has_sanitary_approval") and not data.get("sanitary_approval_number"):
-            errors["sanitary_approval_number"] = "Ce champ est obligatoire lorsque l'agrément sanitaire est activé."
-
-        # Conditional validation: hygienization_exemption_type required when has_hygienization_exemption is True
-        if data.get("has_hygienization_exemption") and not data.get("hygienization_exemption_type"):
-            errors["hygienization_exemption_type"] = (
-                "Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
-            )
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
 
 class BiomethaneProductionUnitSerializer(BaseBiomethaneProductionUnitSerializer):
     installed_meters = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.INSTALLED_METERS_CHOICES), read_only=True
+        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.INSTALLED_METERS_CHOICES),
+        read_only=True,
     )
     digestate_valorization_methods = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneProductionUnit.DIGESTATE_VALORIZATION_METHODS_CHOICES),
@@ -80,37 +52,42 @@ class BiomethaneProductionUnitSerializer(BaseBiomethaneProductionUnitSerializer)
         fields = ["id", "producer"] + BaseBiomethaneProductionUnitSerializer.Meta.fields
 
 
-class BiomethaneProductionUnitAddSerializer(BaseBiomethaneProductionUnitSerializer):
-    def validate(self, data):
-        self._validate_conditional_fields(data)
-        return data
+class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSerializer):
+    installed_meters = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.INSTALLED_METERS_CHOICES),
+        required=False,
+    )
+    digestate_valorization_methods = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.DIGESTATE_VALORIZATION_METHODS_CHOICES),
+        required=False,
+    )
+    spreading_management_methods = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.SPREADING_MANAGEMENT_METHODS_CHOICES),
+        required=False,
+    )
 
-    def create(self, validated_data):
+    def validate(self, data):
+        errors = {}
+
         entity = self.context.get("entity")
         if entity:
-            if BiomethaneProductionUnit.objects.filter(producer=entity).exists():
-                raise serializers.ValidationError({"producer": ["Une unité de production existe déjà pour cette entité."]})
-            validated_data["producer"] = entity
+            data["producer"] = entity
         else:
-            raise serializers.ValidationError({"producer": ["Entité manquante."]})
+            errors["producer"] = _("Entité manquante.")
 
-        return super().create(validated_data)
+        if not data.get("has_sanitary_approval"):
+            data["sanitary_approval_number"] = None
+        elif not data.get("sanitary_approval_number"):
+            errors["sanitary_approval_number"] = _("Ce champ est obligatoire lorsque l'agrément sanitaire est activé.")
 
+        if not data.get("has_hygienization_exemption"):
+            data["hygienization_exemption_type"] = None
+        elif not data.get("hygienization_exemption_type"):
+            errors["hygienization_exemption_type"] = _(
+                "Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
+            )
 
-class BiomethaneProductionUnitPatchSerializer(BaseBiomethaneProductionUnitSerializer):
-    def validate(self, data):
-        # For partial updates, we need to merge with existing instance data
-        if self.instance:
-            # Get current instance data
-            current_data = {}
-            for field in self.fields:
-                if hasattr(self.instance, field):
-                    current_data[field] = getattr(self.instance, field)
+        if errors:
+            raise serializers.ValidationError(errors)
 
-            # Merge with new data
-            merged_data = {**current_data, **data}
-        else:
-            merged_data = data
-
-        self._validate_conditional_fields(merged_data)
         return data

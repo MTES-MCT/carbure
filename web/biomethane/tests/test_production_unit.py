@@ -48,7 +48,7 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
 
     def test_json_field_validation(self):
         """Test validation of the new JSON fields using Django REST Framework ListField."""
-        from biomethane.serializers.production_unit import BiomethaneProductionUnitAddSerializer
+        from biomethane.serializers.production_unit import BiomethaneProductionUnitUpsertSerializer
 
         # Test valid data
         valid_data = {
@@ -60,28 +60,28 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
             "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
             "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
         }
-        serializer = BiomethaneProductionUnitAddSerializer(data=valid_data)
+        serializer = BiomethaneProductionUnitUpsertSerializer(data=valid_data)
         # Should validate successfully for valid choices
         self.assertTrue(serializer.is_valid())
 
         # Test invalid installed_meters
         invalid_data = valid_data.copy()
         invalid_data["installed_meters"] = ["INVALID_METER_TYPE"]
-        serializer = BiomethaneProductionUnitAddSerializer(data=invalid_data)
+        serializer = BiomethaneProductionUnitUpsertSerializer(data=invalid_data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("installed_meters", serializer.errors)
 
         # Test invalid digestate valorization methods
         invalid_data = valid_data.copy()
         invalid_data["digestate_valorization_methods"] = ["INVALID_VALORIZATION_METHOD"]
-        serializer = BiomethaneProductionUnitAddSerializer(data=invalid_data)
+        serializer = BiomethaneProductionUnitUpsertSerializer(data=invalid_data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("digestate_valorization_methods", serializer.errors)
 
         # Test invalid spreading management methods
         invalid_data = valid_data.copy()
         invalid_data["spreading_management_methods"] = ["INVALID_SPREADING_METHOD"]
-        serializer = BiomethaneProductionUnitAddSerializer(data=invalid_data)
+        serializer = BiomethaneProductionUnitUpsertSerializer(data=invalid_data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("spreading_management_methods", serializer.errors)
 
