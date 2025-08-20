@@ -20,7 +20,14 @@ export function GeneralInfo({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<GeneralInfoForm>(productionUnit ?? {})
+
+  const { bind, value } = useForm<GeneralInfoForm>({
+    unit_name: productionUnit?.unit_name,
+    siret_number: productionUnit?.siret_number,
+    unit_type: productionUnit?.unit_type,
+    company_address: productionUnit?.company_address,
+  })
+
   const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 
   const unitTypeOptions = [
