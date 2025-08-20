@@ -16,9 +16,7 @@ class BiomethaneDigestateSpreadingSerializer(serializers.ModelSerializer):
         ]
 
 
-class BiomethaneDigestateSerializer(serializers.ModelSerializer):
-    spreadings = BiomethaneDigestateSpreadingSerializer(many=True, read_only=True)
-
+class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneDigestate
         fields = [
@@ -44,3 +42,27 @@ class BiomethaneDigestateSerializer(serializers.ModelSerializer):
             "sold_volume",
             "spreadings",
         ]
+
+
+class BiomethaneDigestateSerializer(BaseBiomethaneDigestateSerializer):
+    spreadings = BiomethaneDigestateSpreadingSerializer(many=True, read_only=True)
+
+
+class BiomethaneDigestatePatchSerializer(BaseBiomethaneDigestateSerializer):
+    pass
+
+
+class BiomethaneDigestateAddSerializer(BaseBiomethaneDigestateSerializer):
+    def create(self, validated_data):
+        entity = self.context.get("entity")
+        year = validated_data.get("year")
+
+        if not entity:
+            raise serializers.ValidationError({"entity": ["Entité manquante."]})
+
+        if BiomethaneDigestate.objects.filter(producer=entity, year=year).exists():
+            raise serializers.ValidationError({"producer": ["Un digestat existe déjà pour cette entité."]})
+
+        validated_data["producer"] = entity
+
+        return super().create(validated_data)

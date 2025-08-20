@@ -52,6 +52,7 @@ production_unit_viewset = BiomethaneProductionUnitViewSet.as_view(
 digestate_viewset = BiomethaneDigestateViewSet.as_view(
     {
         "get": "retrieve",
+        "put": "upsert",
     }
 )
 
