@@ -4,7 +4,6 @@ import {
   BiomethaneDigestateStorageAddRequest,
   BiomethaneDigestateStoragePatchRequest,
 } from "./types"
-import { toFormData } from "common/services/api"
 
 // Production Unit API
 
@@ -30,7 +29,6 @@ export const saveProductionUnit = async (
       },
     },
     body: data,
-    bodySerializer: (data) => toFormData(data, { excludeNulls: false }),
   })
   return response.data
 }

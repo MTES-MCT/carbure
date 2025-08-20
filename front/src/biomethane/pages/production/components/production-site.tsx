@@ -29,7 +29,15 @@ export function ProductionSite({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<ProductionSiteForm>(productionUnit ?? {})
+
+  const { bind, value } = useForm<ProductionSiteForm>({
+    process_type: productionUnit?.process_type,
+    methanization_process: productionUnit?.methanization_process,
+    production_efficiency: productionUnit?.production_efficiency,
+    installed_meters: productionUnit?.installed_meters,
+    has_hygienization_unit: productionUnit?.has_hygienization_unit,
+    has_co2_valorization_process: productionUnit?.has_co2_valorization_process,
+  })
 
   const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 

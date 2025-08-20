@@ -21,7 +21,14 @@ export function SanitaryAgreement({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<SanitaryAgreementForm>(productionUnit ?? {})
+
+  const { bind, value } = useForm<SanitaryAgreementForm>({
+    has_sanitary_approval: productionUnit?.has_sanitary_approval,
+    sanitary_approval_number: productionUnit?.sanitary_approval_number,
+    has_hygienization_exemption: productionUnit?.has_hygienization_exemption,
+    hygienization_exemption_type: productionUnit?.hygienization_exemption_type,
+  })
+
   const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 
   const hygienizationExemptionOptions = [
@@ -47,12 +54,14 @@ export function SanitaryAgreement({
               orientation="horizontal"
               {...bind("has_sanitary_approval")}
             />
-            <TextInput
-              readOnly={!isEditing}
-              label={t("N° Agrément sanitaire")}
-              placeholder="FR XX-XX-XXX"
-              {...bind("sanitary_approval_number")}
-            />
+            {value.has_sanitary_approval && (
+              <TextInput
+                readOnly={!isEditing}
+                label={t("N° Agrément sanitaire")}
+                placeholder="FR XX-XX-XXX"
+                {...bind("sanitary_approval_number")}
+              />
+            )}
             <RadioGroup
               readOnly={!isEditing}
               label={t("Disposez vous d'une dérogation à l'hygiénisation?")}
@@ -60,13 +69,15 @@ export function SanitaryAgreement({
               orientation="horizontal"
               {...bind("has_hygienization_exemption")}
             />
-            <RadioGroup
-              readOnly={!isEditing}
-              label={t("Si oui, dérogation à l'hygiénisation :")}
-              options={hygienizationExemptionOptions}
-              orientation="horizontal"
-              {...bind("hygienization_exemption_type")}
-            />
+            {value.has_hygienization_exemption && (
+              <RadioGroup
+                readOnly={!isEditing}
+                label={t("Si oui, dérogation à l'hygiénisation :")}
+                options={hygienizationExemptionOptions}
+                orientation="horizontal"
+                {...bind("hygienization_exemption_type")}
+              />
+            )}
           </Grid>
           {isEditing && (
             <Button

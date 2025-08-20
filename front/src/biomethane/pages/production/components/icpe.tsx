@@ -19,7 +19,12 @@ export function ICPE({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<ICPEForm>(productionUnit ?? {})
+
+  const { bind, value } = useForm<ICPEForm>({
+    icpe_number: productionUnit?.icpe_number,
+    icpe_regime: productionUnit?.icpe_regime,
+  })
+
   const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 
   const icpeRegimeOptions = [

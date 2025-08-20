@@ -29,7 +29,19 @@ export function DigestateProcessing({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<DigestateProcessingForm>(productionUnit ?? {})
+
+  const { bind, value } = useForm<DigestateProcessingForm>({
+    has_digestate_phase_separation:
+      productionUnit?.has_digestate_phase_separation,
+    raw_digestate_treatment_steps:
+      productionUnit?.raw_digestate_treatment_steps,
+    liquid_phase_treatment_steps: productionUnit?.liquid_phase_treatment_steps,
+    solid_phase_treatment_steps: productionUnit?.solid_phase_treatment_steps,
+    digestate_valorization_methods:
+      productionUnit?.digestate_valorization_methods,
+    spreading_management_methods: productionUnit?.spreading_management_methods,
+    digestate_sale_type: productionUnit?.digestate_sale_type,
+  })
 
   const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
 
@@ -94,28 +106,33 @@ export function DigestateProcessing({
               orientation="horizontal"
               {...bind("has_digestate_phase_separation")}
             />
-            <TextInput
-              readOnly={!isEditing}
-              label={t("Étapes complémentaires de traitement du digestat brut")}
-              {...bind("raw_digestate_treatment_steps")}
-              disabled={value.has_digestate_phase_separation}
-            />
-            <TextInput
-              readOnly={!isEditing}
-              label={t(
-                "Étape(s) complémentaire(s) de traitement de la phase liquide"
-              )}
-              {...bind("liquid_phase_treatment_steps")}
-              disabled={!value.has_digestate_phase_separation}
-            />
-            <TextInput
-              readOnly={!isEditing}
-              label={t(
-                "Étape(s) complémentaire(s) de traitement de la phase solide"
-              )}
-              {...bind("solid_phase_treatment_steps")}
-              disabled={!value.has_digestate_phase_separation}
-            />
+            {!value.has_digestate_phase_separation && (
+              <TextInput
+                readOnly={!isEditing}
+                label={t(
+                  "Étapes complémentaires de traitement du digestat brut"
+                )}
+                {...bind("raw_digestate_treatment_steps")}
+              />
+            )}
+            {value.has_digestate_phase_separation && (
+              <TextInput
+                readOnly={!isEditing}
+                label={t(
+                  "Étape(s) complémentaire(s) de traitement de la phase liquide"
+                )}
+                {...bind("liquid_phase_treatment_steps")}
+              />
+            )}
+            {value.has_digestate_phase_separation && (
+              <TextInput
+                readOnly={!isEditing}
+                label={t(
+                  "Étape(s) complémentaire(s) de traitement de la phase solide"
+                )}
+                {...bind("solid_phase_treatment_steps")}
+              />
+            )}
             <CheckboxGroup
               readOnly={!isEditing}
               label={t("Mode de valorisation du digestat")}
