@@ -68,6 +68,7 @@ export function GeneralInfo({
               readOnly={!isEditing}
               label={t("SIRET")}
               required
+              pattern="(?:\d{9}|\d{14})"
               {...bind("siret_number")}
             />
             <RadioGroup

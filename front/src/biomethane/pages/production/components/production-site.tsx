@@ -105,19 +105,24 @@ export function ProductionSite({
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <RadioGroup
+            required
             readOnly={!isEditing}
             label={t("Type de voie")}
             options={processTypeOptions}
             {...bind("process_type")}
           />
           <RadioGroup
+            required
             readOnly={!isEditing}
             label={t("Procédé méthanisation")}
             options={methanizationProcessOptions}
             {...bind("methanization_process")}
           />
           <NumberInput
+            required
             readOnly={!isEditing}
+            min={0}
+            max={100}
             label={t(
               "Rendement de l'installation de production de biométhane (%)"
             )}
@@ -134,6 +139,7 @@ export function ProductionSite({
           />
           <Grid cols={2} gap="lg">
             <RadioGroup
+              required
               readOnly={!isEditing}
               label={t("Présence d'un hygiénisateur")}
               options={getYesNoOptions()}
@@ -141,6 +147,7 @@ export function ProductionSite({
               {...bind("has_hygienization_unit")}
             />
             <RadioGroup
+              required
               readOnly={!isEditing}
               label={t("Existence d'un procédé de valorisation du CO2 ?")}
               options={getYesNoOptions()}

@@ -100,6 +100,7 @@ export function DigestateProcessing({
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">
             <RadioGroup
+              required
               readOnly={!isEditing}
               label={t("Le digestat subit-il une séparation de phase?")}
               options={getYesNoOptions()}
@@ -108,6 +109,7 @@ export function DigestateProcessing({
             />
             {!value.has_digestate_phase_separation && (
               <TextInput
+                required
                 readOnly={!isEditing}
                 label={t(
                   "Étapes complémentaires de traitement du digestat brut"
@@ -136,18 +138,21 @@ export function DigestateProcessing({
               />
             )}
             <CheckboxGroup
+              required
               readOnly={!isEditing}
               label={t("Mode de valorisation du digestat")}
               options={digestateValorizationOptions}
               {...bind("digestate_valorization_methods")}
             />
             <CheckboxGroup
+              required
               readOnly={!isEditing}
               label={t("Gestion de l'épandage")}
               options={spreadingManagementOptions}
               {...bind("spreading_management_methods")}
             />
             <RadioGroup
+              required
               readOnly={!isEditing}
               label={t("En cas de vente du digestat")}
               options={digestateSaleTypeOptions}

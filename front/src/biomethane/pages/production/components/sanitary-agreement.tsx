@@ -48,6 +48,7 @@ export function SanitaryAgreement({
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">
             <RadioGroup
+              required
               readOnly={!isEditing}
               label={t("Votre site dispose-t-il d'un agrément sanitaire ?")}
               options={getYesNoOptions()}
@@ -56,6 +57,7 @@ export function SanitaryAgreement({
             />
             {value.has_sanitary_approval && (
               <TextInput
+                required
                 readOnly={!isEditing}
                 label={t("N° Agrément sanitaire")}
                 placeholder="FR XX-XX-XXX"
@@ -65,6 +67,7 @@ export function SanitaryAgreement({
           </Grid>
           <Grid cols={2} gap="lg">
             <RadioGroup
+              required
               readOnly={!isEditing}
               label={t("Disposez vous d'une dérogation à l'hygiénisation?")}
               options={getYesNoOptions()}
@@ -73,6 +76,7 @@ export function SanitaryAgreement({
             />
             {value.has_hygienization_exemption && (
               <RadioGroup
+                required
                 readOnly={!isEditing}
                 label={t("Si oui, dérogation à l'hygiénisation :")}
                 options={hygienizationExemptionOptions}
