@@ -10,6 +10,7 @@ from .views.production_unit import (
     BiomethaneDigestateStorageViewSet,
     BiomethaneProductionUnitViewSet,
 )
+from .views.digestate.digestate import BiomethaneDigestateViewSet
 from .views.production_unit import (
     BiomethaneDigestateStorageViewSet,
     BiomethaneProductionUnitViewSet,
@@ -48,9 +49,16 @@ production_unit_viewset = BiomethaneProductionUnitViewSet.as_view(
     }
 )
 
+digestate_viewset = BiomethaneDigestateViewSet.as_view(
+    {
+        "get": "retrieve",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
     path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
+    path("digestate/", digestate_viewset, name="biomethane-digestate"),
     *router.urls,
 ]

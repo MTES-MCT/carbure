@@ -11306,6 +11306,10 @@ export enum AmendmentObjectEnum {
   ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE = "ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE",
   OTHER = "OTHER",
 }
+export enum BiomethaneDigestateStatusEnum {
+  PENDING = "PENDING",
+  VALIDATED = "VALIDATED",
+}
 export enum CarbureNotificationTypeEnum {
   CORRECTION_REQUEST = "CORRECTION_REQUEST",
   CORRECTION_DONE = "CORRECTION_DONE",

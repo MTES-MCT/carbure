@@ -1,1 +1,2 @@
 from .contract_amendment import BiomethaneContractAmendmentFilter
+from .digestate import BiomethaneDigestateFilter
