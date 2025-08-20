@@ -9,6 +9,7 @@ import useEntity from "common/hooks/entity"
 import { getNavStats } from "./api"
 import { useEffect } from "react"
 import { useAccounting } from "./hooks/useAccounting"
+import { useBiomethane } from "./hooks/useBiomethane"
 
 export const usePrivateSidebar = () => {
   const entity = useEntity()
@@ -25,6 +26,7 @@ export const usePrivateSidebar = () => {
   const admin = useAdmin(result?.data)
   const doubleCount = useDoubleCount(result?.data)
   const accounting = useAccounting()
+  const biomethane = useBiomethane()
 
   useEffect(() => {
     if (entity.id !== -1) {
@@ -34,6 +36,7 @@ export const usePrivateSidebar = () => {
 
   return [
     admin,
+    biomethane,
     ...biofuels,
     ...doubleCount,
     ...elec,
