@@ -114,12 +114,12 @@ export const FormErrors = ({
 }: {
   errors: Record<string, string[]>
 }) => {
-  const { t } = useTranslation("fields")
+  const { t } = useTranslation()
   return (
     <ul>
       {Object.entries(errors).map(([field, fieldErrors]) => (
         <li key={field}>
-          <b>{t(field)}:</b> {fieldErrors.join(" ")}
+          <b>{t(field, { ns: "fields" })}:</b> {fieldErrors.join(" ")}
         </li>
       ))}
     </ul>
