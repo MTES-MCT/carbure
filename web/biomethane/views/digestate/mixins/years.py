@@ -41,4 +41,4 @@ def get_years(request, *args, **kwargs):
 
     years = BiomethaneDigestate.objects.filter(producer=entity).values_list("year", flat=True).distinct()
 
-    return Response(years)
+    return Response(sorted(years))
