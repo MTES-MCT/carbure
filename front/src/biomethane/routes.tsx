@@ -12,15 +12,18 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      <Route path=":year/digestate" element={<Digestate />} />
+      <Route path="digestate/:year" element={<Digestate />} />
 
-      <Route path=":year/energy" element={<div>energy page</div>} />
+      <Route path="energy/:year" element={<div>energy page</div>} />
 
-      <Route path=":year" element={<Navigate replace to="digestate" />} />
+      <Route
+        path="digestate"
+        element={<Navigate replace to={`digestate/${currentYear}`} />}
+      />
 
       <Route
         path=""
-        element={<Navigate replace to={`${currentYear}/digestate`} />}
+        element={<Navigate replace to={`digestate/${currentYear}`} />}
       />
     </Routes>
   )
