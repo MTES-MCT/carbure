@@ -8,3 +8,13 @@ export const getYears = (entity_id: number) =>
       },
     },
   })
+
+export const getDigestate = (entity_id: number, year: number) =>
+  api.GET("/biomethane/digestate/", {
+    params: {
+      query: {
+        entity_id,
+        year,
+      },
+    },
+  })
