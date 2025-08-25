@@ -241,6 +241,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/injection-site/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieve the injection site for the current entity. Returns a single object. */
+        get: operations["biomethane_injection_site_retrieve"];
+        /** @description Create or update injection site using upsert logic. */
+        put: operations["biomethane_injection_site_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/double-counting/agreements/": {
         parameters: {
             query?: never;
@@ -2583,6 +2601,30 @@ export interface components {
             specific_conditions_file?: File | null;
             is_red_ii?: boolean;
         };
+        BiomethaneInjectionSite: {
+            readonly id: number;
+            unique_identification_number: string;
+            is_shared_injection_site?: boolean;
+            meter_number?: string | null;
+            is_different_from_production_site?: boolean;
+            company_address?: string;
+            city?: string;
+            postal_code?: string;
+            network_type?: components["schemas"]["NetworkTypeEnum"] | null;
+            network_manager_name?: string | null;
+            entity: number;
+        };
+        BiomethaneInjectionSiteInputRequest: {
+            unique_identification_number: string;
+            is_shared_injection_site?: boolean;
+            meter_number?: string | null;
+            is_different_from_production_site?: boolean;
+            company_address?: string;
+            city?: string;
+            postal_code?: string;
+            network_type?: components["schemas"]["NetworkTypeEnum"] | null;
+            network_manager_name?: string | null;
+        };
         CarbureLotPublic: {
             readonly id: number;
             year: number;
@@ -3547,6 +3589,12 @@ export interface components {
             audits?: number;
             tickets?: number;
         };
+        /**
+         * @description * `TRANSPORT` - Transport
+         *     * `DISTRIBUTION` - Dristribution
+         * @enum {string}
+         */
+        NetworkTypeEnum: NetworkTypeEnum;
         NotificationRequest: {
             notification_ids: number[];
         };
@@ -5043,6 +5091,64 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BiomethaneContractAmendment"];
+                };
+            };
+        };
+    };
+    biomethane_injection_site_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Injection site details for the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneInjectionSite"];
+                };
+            };
+            /** @description Injection site not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_injection_site_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneInjectionSiteInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneInjectionSiteInputRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneInjectionSiteInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneInjectionSite"];
                 };
             };
         };
@@ -10414,6 +10520,10 @@ export enum LotStatusEnum {
     REJECTED = "REJECTED",
     FROZEN = "FROZEN",
     DELETED = "DELETED"
+}
+export enum NetworkTypeEnum {
+    TRANSPORT = "TRANSPORT",
+    DISTRIBUTION = "DISTRIBUTION"
 }
 export enum OperationTypeEnum {
     INCORPORATION = "INCORPORATION",
