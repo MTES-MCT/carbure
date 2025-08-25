@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneInjectionSite
@@ -30,20 +31,30 @@ class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
         return fields
 
     def validate(self, data):
-        if data.get("is_shared_injection_site") and not data.get("unique_identification_number"):
-            raise serializers.ValidationError({"unique_identification_number": ["Ce champ est obligatoire."]})
-        if data.get("is_different_from_production_site"):
-            required_fields = ["company_address", "city", "postal_code"]
-            errors = {["Ce champ est obligatoire."] for field in required_fields if not data.get(field)}
-            if errors:
-                raise serializers.ValidationError(errors)
-        return super().validate(data)
+        errors = {}
 
-    def create(self, validated_data):
         entity = self.context.get("entity")
         if entity:
-            if BiomethaneInjectionSite.objects.filter(entity=entity).exists():
-                raise serializers.ValidationError({"entity": ["Un site d'injection existe déjà pour cette entité."]})
-            validated_data["entity"] = entity
+            data["entity"] = entity
+        else:
+            errors["entity"] = [_("Entité manquante.")]
 
-        return super().create(validated_data)
+        if data.get("is_shared_injection_site") and not data.get("meter_number"):
+            errors["meter_number"] = [_("Ce champ est obligatoire.")]
+        elif not data.get("is_shared_injection_site"):
+            data["meter_number"] = None
+
+        if data.get("is_different_from_production_site"):
+            required_fields = ["company_address", "city", "postal_code"]
+            for field in required_fields:
+                if not data.get(field):
+                    errors[field] = [_("Ce champ est obligatoire.")]
+        elif not data.get("is_different_from_production_site"):
+            data["company_address"] = None
+            data["city"] = None
+            data["postal_code"] = None
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return super().validate(data)
