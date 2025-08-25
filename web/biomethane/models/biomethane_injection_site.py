@@ -7,6 +7,11 @@ class BiomethaneInjectionSite(models.Model):
     TRANSPORT = "TRANSPORT"
     DISTRIBUTION = "DISTRIBUTION"
 
+    NETWORK_TYPE_CHOICES = [
+        (TRANSPORT, "Transport"),
+        (DISTRIBUTION, "Dristribution"),
+    ]
+
     entity = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_injection_site")
 
     # Numéro d'identifiant unique du poste d'injection
@@ -26,10 +31,7 @@ class BiomethaneInjectionSite(models.Model):
     # Type de réseau
     network_type = models.CharField(
         max_length=32,
-        choices=[
-            (TRANSPORT, "Transport"),
-            (DISTRIBUTION, "Dristribution"),
-        ],
+        choices=NETWORK_TYPE_CHOICES,
         blank=True,
         null=True,
     )
