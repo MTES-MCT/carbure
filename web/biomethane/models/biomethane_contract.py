@@ -62,7 +62,7 @@ class BiomethaneContract(models.Model):
     )
 
     class Meta:
-        db_table = "biomethane_entity_config_contract"
+        db_table = "biomethane_contract"
         verbose_name = "Biométhane - Contrat d'achat"
 
     def does_contract_exist(self):
