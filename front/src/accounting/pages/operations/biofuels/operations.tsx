@@ -1,11 +1,7 @@
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { OperationsFilter, OperationsStatus } from "accounting/types"
+import { OperationsFilter, OperationsQueryBuilder } from "accounting/types"
 import { useTranslation } from "react-i18next"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
-import useEntity from "common/hooks/entity"
+
 import * as api from "accounting/api/operations"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
@@ -23,11 +19,10 @@ import { useUnit } from "common/hooks/unit"
 import { ActionBar } from "common/components/scaffold"
 import { ExportButton } from "common/components/export"
 import { Notice } from "common/components/notice"
-const currentYear = new Date().getFullYear()
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
-  const entity = useEntity()
   usePrivateNavigation(t("Comptabilité"))
   const { formatUnit } = useUnit()
   const filterLabels = {
@@ -41,13 +36,8 @@ const OperationsBiofuels = () => {
     [OperationsFilter.type]: t("Débit / Crédit"),
     [OperationsFilter.from_to]: t("Destinataire"),
   }
-
-  const [state, actions] = useCBQueryParamsStore<OperationsStatus[], undefined>(
-    entity,
-    currentYear
-  )
-
-  const query = useCBQueryBuilder<[], OperationsStatus[], undefined>(state)
+  const { state, actions, query } =
+    useQueryBuilder<OperationsQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(api.getOperations, {
     key: "operations",
