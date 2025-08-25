@@ -22,9 +22,9 @@ import { Button } from "common/components/button2"
 import {
   BiomethaneContract,
   BiomethaneContractPatchRequest,
-} from "biomethane/types"
+} from "biomethane/pages/contract/types"
 import { Notice } from "common/components/notice"
-import { findBuyerBiomethaneEntities } from "biomethane/api"
+import { findBuyerBiomethaneEntities } from "biomethane/pages/contract/api"
 import useEntity from "common/hooks/entity"
 import { useState } from "react"
 import { usePortal } from "common/components/portal"

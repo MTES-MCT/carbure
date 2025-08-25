@@ -5,14 +5,14 @@ import { DateInput, FileInput, TextArea } from "common/components/inputs2"
 import { CheckboxGroup } from "common/components/inputs2/checkbox/checkbox"
 import { Box, Grid } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
-import { addAmendment } from "biomethane/api"
+import { addAmendment } from "biomethane/pages/contract/api"
 import { useMutation } from "common/hooks/async"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { AmendmentObjectEnum } from "api-schema"
 import { useAddAmendmentObjectOptions } from "./add-amendment.hooks"
 import { EditableCard } from "common/molecules/editable-card"
-import { BiomethaneAmendmentAddRequest } from "biomethane/types"
+import { BiomethaneAmendmentAddRequest } from "biomethane/pages/contract/types"
 
 type AddAmendmentForm = Partial<BiomethaneAmendmentAddRequest>
 

@@ -1,6 +1,6 @@
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { getContract } from "../api"
+import { getContract } from "../pages/contract/api"
 
 export const useGetContractInfos = () => {
   const entity = useEntity()

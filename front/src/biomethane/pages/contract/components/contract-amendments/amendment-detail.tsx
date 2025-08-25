@@ -1,7 +1,7 @@
 import { useQuery } from "common/hooks/async"
 import { AddAmendment } from "./add-amendment"
 import useEntity from "common/hooks/entity"
-import { getAmendment } from "biomethane/api"
+import { getAmendment } from "biomethane/pages/contract/api"
 import { useHashMatch } from "common/components/hash-route"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useNavigate } from "react-router-dom"
