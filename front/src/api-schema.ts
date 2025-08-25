@@ -241,6 +241,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/digestate-storage/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_digestate_storage_list"];
+        put?: never;
+        post: operations["biomethane_digestate_storage_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/digestate-storage/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_digestate_storage_retrieve"];
+        put: operations["biomethane_digestate_storage_update"];
+        post?: never;
+        delete: operations["biomethane_digestate_storage_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["biomethane_digestate_storage_partial_update"];
+        trace?: never;
+    };
     "/api/biomethane/injection-site/": {
         parameters: {
             query?: never;
@@ -252,6 +284,24 @@ export interface paths {
         get: operations["biomethane_injection_site_retrieve"];
         /** @description Create or update injection site using upsert logic. */
         put: operations["biomethane_injection_site_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/production-unit/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieve the production unit for the current entity. Returns a single production unit object. */
+        get: operations["biomethane_production_unit_retrieve"];
+        /** @description Create or update the production unit for the current entity (upsert operation). */
+        put: operations["biomethane_production_unit_update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2601,15 +2651,52 @@ export interface components {
             specific_conditions_file?: File | null;
             is_red_ii?: boolean;
         };
+        BiomethaneDigestateStorage: {
+            readonly id: number;
+            producer: number;
+            type: string;
+            /** Format: double */
+            capacity: number;
+            has_cover?: boolean;
+            has_biogas_recovery?: boolean;
+        };
+        BiomethaneDigestateStorageAdd: {
+            type: string;
+            /** Format: double */
+            capacity: number;
+            has_cover?: boolean;
+            has_biogas_recovery?: boolean;
+        };
+        BiomethaneDigestateStorageAddRequest: {
+            type: string;
+            /** Format: double */
+            capacity: number;
+            has_cover?: boolean;
+            has_biogas_recovery?: boolean;
+        };
+        BiomethaneDigestateStoragePatch: {
+            type: string;
+            /** Format: double */
+            capacity: number;
+            has_cover?: boolean;
+            has_biogas_recovery?: boolean;
+        };
+        BiomethaneDigestateStoragePatchRequest: {
+            type: string;
+            /** Format: double */
+            capacity: number;
+            has_cover?: boolean;
+            has_biogas_recovery?: boolean;
+        };
         BiomethaneInjectionSite: {
             readonly id: number;
             unique_identification_number: string;
             is_shared_injection_site?: boolean;
             meter_number?: string | null;
             is_different_from_production_site?: boolean;
-            company_address?: string;
-            city?: string;
-            postal_code?: string;
+            company_address?: string | null;
+            city?: string | null;
+            postal_code?: string | null;
             network_type?: components["schemas"]["NetworkTypeEnum"] | null;
             network_manager_name?: string | null;
             entity: number;
@@ -2619,11 +2706,65 @@ export interface components {
             is_shared_injection_site?: boolean;
             meter_number?: string | null;
             is_different_from_production_site?: boolean;
-            company_address?: string;
-            city?: string;
-            postal_code?: string;
+            company_address?: string | null;
+            city?: string | null;
+            postal_code?: string | null;
             network_type?: components["schemas"]["NetworkTypeEnum"] | null;
             network_manager_name?: string | null;
+        };
+        BiomethaneProductionUnit: {
+            readonly id: number;
+            producer: number;
+            unit_name?: string | null;
+            siret_number?: string | null;
+            company_address?: string | null;
+            unit_type?: components["schemas"]["UnitTypeEnum"] | null;
+            has_sanitary_approval?: boolean;
+            sanitary_approval_number?: string | null;
+            has_hygienization_exemption?: boolean;
+            hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
+            icpe_number?: string | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+            process_type?: components["schemas"]["ProcessTypeEnum"] | null;
+            methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
+            /** Format: double */
+            production_efficiency?: number | null;
+            readonly installed_meters: components["schemas"]["InstalledMetersEnum"][];
+            has_hygienization_unit?: boolean;
+            has_co2_valorization_process?: boolean;
+            has_digestate_phase_separation?: boolean;
+            raw_digestate_treatment_steps?: string | null;
+            liquid_phase_treatment_steps?: string | null;
+            solid_phase_treatment_steps?: string | null;
+            readonly digestate_valorization_methods: components["schemas"]["DigestateValorizationMethodsEnum"][];
+            readonly spreading_management_methods: components["schemas"]["SpreadingManagementMethodsEnum"][];
+            digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
+        };
+        BiomethaneProductionUnitUpsertRequest: {
+            unit_name?: string | null;
+            siret_number?: string | null;
+            company_address?: string | null;
+            unit_type?: components["schemas"]["UnitTypeEnum"] | null;
+            has_sanitary_approval?: boolean;
+            sanitary_approval_number?: string | null;
+            has_hygienization_exemption?: boolean;
+            hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
+            icpe_number?: string | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+            process_type?: components["schemas"]["ProcessTypeEnum"] | null;
+            methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
+            /** Format: double */
+            production_efficiency?: number | null;
+            installed_meters?: components["schemas"]["InstalledMetersEnum"][];
+            has_hygienization_unit?: boolean;
+            has_co2_valorization_process?: boolean;
+            has_digestate_phase_separation?: boolean;
+            raw_digestate_treatment_steps?: string | null;
+            liquid_phase_treatment_steps?: string | null;
+            solid_phase_treatment_steps?: string | null;
+            digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
+            spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
+            digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
         CarbureLotPublic: {
             readonly id: number;
@@ -2945,6 +3086,20 @@ export interface components {
             city?: string;
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
+        /**
+         * @description * `DIG_AGRI_SPECIFICATIONS` - Cahier de charges DIG Agri
+         *     * `HOMOLOGATION` - Homologation
+         *     * `STANDARDIZED_PRODUCT` - Produit normé
+         * @enum {string}
+         */
+        DigestateSaleTypeEnum: DigestateSaleTypeEnum;
+        /**
+         * @description * `SPREADING` - Épandage
+         *     * `COMPOSTING` - Compostage
+         *     * `INCINERATION_LANDFILLING` - Incinération / Enfouissement
+         * @enum {string}
+         */
+        DigestateValorizationMethodsEnum: DigestateValorizationMethodsEnum;
         DirectDeliveriesRequest: {
             /** @default false */
             has_direct_deliveries: boolean;
@@ -3531,12 +3686,35 @@ export interface components {
             assigned_tickets_count: number;
         };
         /**
+         * @description * `TOTAL` - Totale
+         *     * `PARTIAL` - Partielle
+         * @enum {string}
+         */
+        HygienizationExemptionTypeEnum: HygienizationExemptionTypeEnum;
+        /**
+         * @description * `AUTHORIZATION` - Autorisation
+         *     * `REGISTRATION` - Enregistrement
+         *     * `DECLARATION_PERIODIC_CONTROLS` - Déclaration (avec contrôles périodiques)
+         * @enum {string}
+         */
+        IcpeRegimeEnum: IcpeRegimeEnum;
+        /**
          * @description * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
          *     * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
          *     * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
          * @enum {string}
          */
         InstallationCategoryEnum: InstallationCategoryEnum;
+        /**
+         * @description * `BIOGAS_PRODUCTION_FLOWMETER` - Débitmètre dédié à la production de biogaz
+         *     * `PURIFICATION_FLOWMETER` - Débitmètre dédié au volume de biogaz traité en épuration
+         *     * `FLARING_FLOWMETER` - Débitmètre dédié au volume de biogaz torché
+         *     * `HEATING_FLOWMETER` - Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur
+         *     * `PURIFICATION_ELECTRICAL_METER` - Compteur dédié à la consommation électrique au système d'épuration et traitement des évents
+         *     * `GLOBAL_ELECTRICAL_METER` - Compteur dédié à la consommation électrique de l'ensemble de l'unité de production
+         * @enum {string}
+         */
+        InstalledMetersEnum: InstalledMetersEnum;
         InviteUserRequest: {
             /** Format: email */
             email: string;
@@ -3578,6 +3756,13 @@ export interface components {
             /** Format: double */
             energy_basis: number;
         };
+        /**
+         * @description * `CONTINUOUS_INFINITELY_MIXED` - Continu (infiniment mélangé)
+         *     * `PLUG_FLOW_SEMI_CONTINUOUS` - En piston (semi-continu)
+         *     * `BATCH_SILOS` - En silos (batch)
+         * @enum {string}
+         */
+        MethanizationProcessEnum: MethanizationProcessEnum;
         NavStats: {
             total_pending_action_for_admin?: number;
             pending_draft_lots?: number;
@@ -3928,6 +4113,13 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
+        PatchedBiomethaneDigestateStoragePatchRequest: {
+            type?: string;
+            /** Format: double */
+            capacity?: number;
+            has_cover?: boolean;
+            has_biogas_recovery?: boolean;
+        };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
             credited_entity?: number | null;
@@ -3952,6 +4144,12 @@ export interface components {
          * @enum {string}
          */
         PreferredUnitEnum: PathsApiTiruertOperationsGetParametersQueryUnit;
+        /**
+         * @description * `LIQUID_PROCESS` - Voie liquide
+         *     * `DRY_PROCESS` - Voie sèche
+         * @enum {string}
+         */
+        ProcessTypeEnum: ProcessTypeEnum;
         ProductionSite: {
             readonly id: number;
             readonly producer: components["schemas"]["Entity"];
@@ -4390,6 +4588,14 @@ export interface components {
          * @enum {string}
          */
         SourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
+        /**
+         * @description * `DIRECT_SPREADING` - Épandage direct
+         *     * `SPREADING_VIA_PROVIDER` - Épandage via un prestataire
+         *     * `TRANSFER` - Cession
+         *     * `SALE` - Vente
+         * @enum {string}
+         */
+        SpreadingManagementMethodsEnum: SpreadingManagementMethodsEnum;
         StatsResponse: {
             metabase_iframe_url: string;
         };
@@ -4431,6 +4637,15 @@ export interface components {
             /** @default l */
             unit: components["schemas"]["PreferredUnitEnum"];
         };
+        /**
+         * @description * `AGRICULTURAL_AUTONOMOUS` - Agricole autonome
+         *     * `AGRICULTURAL_TERRITORIAL` - Agricole territorial
+         *     * `INDUSTRIAL_TERRITORIAL` - Industriel territorial
+         *     * `HOUSEHOLD_WASTE_BIOWASTE` - Déchets ménagers et biodéchets
+         *     * `ISDND` - ISDND
+         * @enum {string}
+         */
+        UnitTypeEnum: UnitTypeEnum;
         UpdateCertificateRequest: {
             old_certificate_id: string;
             old_certificate_type: string;
@@ -5095,6 +5310,171 @@ export interface operations {
             };
         };
     };
+    biomethane_digestate_storage_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestateStorage"][];
+                };
+            };
+        };
+    };
+    biomethane_digestate_storage_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneDigestateStorageAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateStorageAddRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateStorageAddRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestateStorageAdd"];
+                };
+            };
+        };
+    };
+    biomethane_digestate_storage_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Stockage de Digestat. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestateStorage"];
+                };
+            };
+        };
+    };
+    biomethane_digestate_storage_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Stockage de Digestat. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneDigestateStoragePatchRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateStoragePatchRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateStoragePatchRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestateStoragePatch"];
+                };
+            };
+        };
+    };
+    biomethane_digestate_storage_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Stockage de Digestat. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_digestate_storage_partial_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Stockage de Digestat. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedBiomethaneDigestateStoragePatchRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneDigestateStoragePatchRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneDigestateStoragePatchRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestateStoragePatch"];
+                };
+            };
+        };
+    };
     biomethane_injection_site_retrieve: {
         parameters: {
             query: {
@@ -5149,6 +5529,74 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BiomethaneInjectionSite"];
+                };
+            };
+        };
+    };
+    biomethane_production_unit_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Production unit details for the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneProductionUnit"];
+                };
+            };
+            /** @description Production unit not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_production_unit_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
+            };
+        };
+        responses: {
+            /** @description Production unit updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneProductionUnit"];
+                };
+            };
+            /** @description Production unit created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneProductionUnit"];
                 };
             };
         };
@@ -10451,6 +10899,16 @@ export enum DeliveryTypeEnum {
     FLUSHED = "FLUSHED",
     CONSUMPTION = "CONSUMPTION"
 }
+export enum DigestateSaleTypeEnum {
+    DIG_AGRI_SPECIFICATIONS = "DIG_AGRI_SPECIFICATIONS",
+    HOMOLOGATION = "HOMOLOGATION",
+    STANDARDIZED_PRODUCT = "STANDARDIZED_PRODUCT"
+}
+export enum DigestateValorizationMethodsEnum {
+    SPREADING = "SPREADING",
+    COMPOSTING = "COMPOSTING",
+    INCINERATION_LANDFILLING = "INCINERATION_LANDFILLING"
+}
 export enum DoubleCountingAgreementStatus {
     ACTIVE = "ACTIVE",
     EXPIRED = "EXPIRED",
@@ -10508,10 +10966,27 @@ export enum GesOptionEnum {
     Actual = "Actual",
     NUTS2 = "NUTS2"
 }
+export enum HygienizationExemptionTypeEnum {
+    TOTAL = "TOTAL",
+    PARTIAL = "PARTIAL"
+}
+export enum IcpeRegimeEnum {
+    AUTHORIZATION = "AUTHORIZATION",
+    REGISTRATION = "REGISTRATION",
+    DECLARATION_PERIODIC_CONTROLS = "DECLARATION_PERIODIC_CONTROLS"
+}
 export enum InstallationCategoryEnum {
     INSTALLATION_CATEGORY_1 = "INSTALLATION_CATEGORY_1",
     INSTALLATION_CATEGORY_2 = "INSTALLATION_CATEGORY_2",
     INSTALLATION_CATEGORY_3 = "INSTALLATION_CATEGORY_3"
+}
+export enum InstalledMetersEnum {
+    BIOGAS_PRODUCTION_FLOWMETER = "BIOGAS_PRODUCTION_FLOWMETER",
+    PURIFICATION_FLOWMETER = "PURIFICATION_FLOWMETER",
+    FLARING_FLOWMETER = "FLARING_FLOWMETER",
+    HEATING_FLOWMETER = "HEATING_FLOWMETER",
+    PURIFICATION_ELECTRICAL_METER = "PURIFICATION_ELECTRICAL_METER",
+    GLOBAL_ELECTRICAL_METER = "GLOBAL_ELECTRICAL_METER"
 }
 export enum LotStatusEnum {
     DRAFT = "DRAFT",
@@ -10520,6 +10995,11 @@ export enum LotStatusEnum {
     REJECTED = "REJECTED",
     FROZEN = "FROZEN",
     DELETED = "DELETED"
+}
+export enum MethanizationProcessEnum {
+    CONTINUOUS_INFINITELY_MIXED = "CONTINUOUS_INFINITELY_MIXED",
+    PLUG_FLOW_SEMI_CONTINUOUS = "PLUG_FLOW_SEMI_CONTINUOUS",
+    BATCH_SILOS = "BATCH_SILOS"
 }
 export enum NetworkTypeEnum {
     TRANSPORT = "TRANSPORT",
@@ -10540,6 +11020,10 @@ export enum OwnershipTypeEnum {
     OWN = "OWN",
     THIRD_PARTY = "THIRD_PARTY",
     PROCESSING = "PROCESSING"
+}
+export enum ProcessTypeEnum {
+    LIQUID_PROCESS = "LIQUID_PROCESS",
+    DRY_PROCESS = "DRY_PROCESS"
 }
 export enum RoleEnum {
     ReadOnly = "RO",
@@ -10566,6 +11050,12 @@ export enum SiteTypeEnum {
     EFCA = "EFCA",
     AIRPORT = "AIRPORT"
 }
+export enum SpreadingManagementMethodsEnum {
+    DIRECT_SPREADING = "DIRECT_SPREADING",
+    SPREADING_VIA_PROVIDER = "SPREADING_VIA_PROVIDER",
+    TRANSFER = "TRANSFER",
+    SALE = "SALE"
+}
 export enum TariffReferenceEnum {
     Value2011 = "2011",
     Value2020 = "2020",
@@ -10579,6 +11069,13 @@ export enum TransportDocumentTypeEnum {
     DSAC = "DSAC",
     DSP = "DSP",
     OTHER = "OTHER"
+}
+export enum UnitTypeEnum {
+    AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS",
+    AGRICULTURAL_TERRITORIAL = "AGRICULTURAL_TERRITORIAL",
+    INDUSTRIAL_TERRITORIAL = "INDUSTRIAL_TERRITORIAL",
+    HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE",
+    ISDND = "ISDND"
 }
 export enum UserRightsRequestsStatusEnum {
     Pending = "PENDING",

@@ -163,6 +163,7 @@ Each new detected key will be added to the translation files of each locale, and
 
 - On the french translation file, find each key where `count` was used ([https://www.i18next.com/translation-function/plurals]()), and adapt the value for each case (`{key}_one`, `{key}_many`, `{key}_other`)
 - Once the french side is done, run the following command `npm run translate-missing`: it will find all the untranslated keys inside the english translation file, and translate them automatically using the free DeepL API
+- To get better translations, you can specify a translation context to deepl by typing `npm run translate-missing -- "my context"`. "my context" should be a list of words or a sentence that explains what we're talking about in general in the French version.
 - Double-check that the new english translations are correct before committing.
 
 > [!NOTE]

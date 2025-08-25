@@ -620,6 +620,203 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneContractAmendment"
           description: ""
+  /api/biomethane/digestate-storage/:
+    get:
+      operationId: biomethane_digestate_storage_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BiomethaneDigestateStorage"
+          description: ""
+    post:
+      operationId: biomethane_digestate_storage_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateStorageAddRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateStorageAddRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateStorageAddRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestateStorageAdd"
+          description: ""
+  /api/biomethane/digestate-storage/{id}/:
+    get:
+      operationId: biomethane_digestate_storage_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Stockage de Digestat.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestateStorage"
+          description: ""
+    put:
+      operationId: biomethane_digestate_storage_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Stockage de Digestat.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateStoragePatchRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateStoragePatchRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateStoragePatchRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestateStoragePatch"
+          description: ""
+    patch:
+      operationId: biomethane_digestate_storage_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Stockage de Digestat.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneDigestateStoragePatchRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneDigestateStoragePatchRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneDigestateStoragePatchRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestateStoragePatch"
+          description: ""
+    delete:
+      operationId: biomethane_digestate_storage_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Stockage de Digestat.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
@@ -680,6 +877,72 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneInjectionSite"
           description: ""
+  /api/biomethane/production-unit/:
+    get:
+      operationId: biomethane_production_unit_retrieve
+      description: Retrieve the production unit for the current entity. Returns a
+        single production unit object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneProductionUnit"
+          description: Production unit details for the entity
+        "404":
+          description: Production unit not found for this entity.
+    put:
+      operationId: biomethane_production_unit_update
+      description: Create or update the production unit for the current entity (upsert
+        operation).
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneProductionUnitUpsertRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneProductionUnitUpsertRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneProductionUnitUpsertRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneProductionUnit"
+          description: Production unit updated successfully
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneProductionUnit"
+          description: Production unit created successfully
   /api/double-counting/agreements/:
     get:
       operationId: double_counting_agreements_list
@@ -9481,6 +9744,95 @@ components:
       required:
         - buyer
         - tariff_reference
+    BiomethaneDigestateStorage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        producer:
+          type: integer
+        type:
+          type: string
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
+      required:
+        - capacity
+        - id
+        - producer
+        - type
+    BiomethaneDigestateStorageAdd:
+      type: object
+      properties:
+        type:
+          type: string
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
+      required:
+        - capacity
+        - type
+    BiomethaneDigestateStorageAddRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
+      required:
+        - capacity
+        - type
+    BiomethaneDigestateStoragePatch:
+      type: object
+      properties:
+        type:
+          type: string
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
+      required:
+        - capacity
+        - type
+    BiomethaneDigestateStoragePatchRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
+      required:
+        - capacity
+        - type
     BiomethaneInjectionSite:
       type: object
       properties:
@@ -9500,12 +9852,15 @@ components:
           type: boolean
         company_address:
           type: string
+          nullable: true
           maxLength: 255
         city:
           type: string
+          nullable: true
           maxLength: 100
         postal_code:
           type: string
+          nullable: true
           maxLength: 10
         network_type:
           allOf:
@@ -9538,12 +9893,15 @@ components:
           type: boolean
         company_address:
           type: string
+          nullable: true
           maxLength: 255
         city:
           type: string
+          nullable: true
           maxLength: 100
         postal_code:
           type: string
+          nullable: true
           maxLength: 10
         network_type:
           allOf:
@@ -9555,6 +9913,190 @@ components:
           maxLength: 100
       required:
         - unique_identification_number
+    BiomethaneProductionUnit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        producer:
+          type: integer
+        unit_name:
+          type: string
+          nullable: true
+          maxLength: 128
+        siret_number:
+          type: string
+          nullable: true
+          maxLength: 16
+        company_address:
+          type: string
+          nullable: true
+          maxLength: 256
+        unit_type:
+          allOf:
+            - $ref: "#/components/schemas/UnitTypeEnum"
+          nullable: true
+        has_sanitary_approval:
+          type: boolean
+        sanitary_approval_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        has_hygienization_exemption:
+          type: boolean
+        hygienization_exemption_type:
+          allOf:
+            - $ref: "#/components/schemas/HygienizationExemptionTypeEnum"
+          nullable: true
+        icpe_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
+        process_type:
+          allOf:
+            - $ref: "#/components/schemas/ProcessTypeEnum"
+          nullable: true
+        methanization_process:
+          allOf:
+            - $ref: "#/components/schemas/MethanizationProcessEnum"
+          nullable: true
+        production_efficiency:
+          type: number
+          format: double
+          nullable: true
+        installed_meters:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstalledMetersEnum"
+          readOnly: true
+        has_hygienization_unit:
+          type: boolean
+        has_co2_valorization_process:
+          type: boolean
+        has_digestate_phase_separation:
+          type: boolean
+        raw_digestate_treatment_steps:
+          type: string
+          nullable: true
+          maxLength: 128
+        liquid_phase_treatment_steps:
+          type: string
+          nullable: true
+          maxLength: 128
+        solid_phase_treatment_steps:
+          type: string
+          nullable: true
+          maxLength: 128
+        digestate_valorization_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
+          readOnly: true
+        spreading_management_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+          readOnly: true
+        digestate_sale_type:
+          allOf:
+            - $ref: "#/components/schemas/DigestateSaleTypeEnum"
+          nullable: true
+      required:
+        - digestate_valorization_methods
+        - id
+        - installed_meters
+        - producer
+        - spreading_management_methods
+    BiomethaneProductionUnitUpsertRequest:
+      type: object
+      properties:
+        unit_name:
+          type: string
+          nullable: true
+          maxLength: 128
+        siret_number:
+          type: string
+          nullable: true
+          maxLength: 16
+        company_address:
+          type: string
+          nullable: true
+          maxLength: 256
+        unit_type:
+          allOf:
+            - $ref: "#/components/schemas/UnitTypeEnum"
+          nullable: true
+        has_sanitary_approval:
+          type: boolean
+        sanitary_approval_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        has_hygienization_exemption:
+          type: boolean
+        hygienization_exemption_type:
+          allOf:
+            - $ref: "#/components/schemas/HygienizationExemptionTypeEnum"
+          nullable: true
+        icpe_number:
+          type: string
+          nullable: true
+          maxLength: 32
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
+        process_type:
+          allOf:
+            - $ref: "#/components/schemas/ProcessTypeEnum"
+          nullable: true
+        methanization_process:
+          allOf:
+            - $ref: "#/components/schemas/MethanizationProcessEnum"
+          nullable: true
+        production_efficiency:
+          type: number
+          format: double
+          nullable: true
+        installed_meters:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstalledMetersEnum"
+        has_hygienization_unit:
+          type: boolean
+        has_co2_valorization_process:
+          type: boolean
+        has_digestate_phase_separation:
+          type: boolean
+        raw_digestate_treatment_steps:
+          type: string
+          nullable: true
+          maxLength: 128
+        liquid_phase_treatment_steps:
+          type: string
+          nullable: true
+          maxLength: 128
+        solid_phase_treatment_steps:
+          type: string
+          nullable: true
+          maxLength: 128
+        digestate_valorization_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
+        spreading_management_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+        digestate_sale_type:
+          allOf:
+            - $ref: "#/components/schemas/DigestateSaleTypeEnum"
+          nullable: true
     CarbureLotPublic:
       type: object
       properties:
@@ -10316,6 +10858,26 @@ components:
         - country
         - id
         - name
+    DigestateSaleTypeEnum:
+      enum:
+        - DIG_AGRI_SPECIFICATIONS
+        - HOMOLOGATION
+        - STANDARDIZED_PRODUCT
+      type: string
+      description: |-
+        * `DIG_AGRI_SPECIFICATIONS` - Cahier de charges DIG Agri
+        * `HOMOLOGATION` - Homologation
+        * `STANDARDIZED_PRODUCT` - Produit normé
+    DigestateValorizationMethodsEnum:
+      enum:
+        - SPREADING
+        - COMPOSTING
+        - INCINERATION_LANDFILLING
+      type: string
+      description: |-
+        * `SPREADING` - Épandage
+        * `COMPOSTING` - Compostage
+        * `INCINERATION_LANDFILLING` - Incinération / Enfouissement
     DirectDeliveriesRequest:
       type: object
       properties:
@@ -11871,6 +12433,27 @@ components:
           type: integer
       required:
         - assigned_tickets_count
+    HygienizationExemptionTypeEnum:
+      enum:
+        - TOTAL
+        - PARTIAL
+      type: string
+      description: |-
+        * `TOTAL` - Totale
+        * `PARTIAL` - Partielle
+    IcpeRegimeEnum:
+      enum:
+        - AUTHORIZATION
+        - REGISTRATION
+        - DECLARATION_PERIODIC_CONTROLS
+      type: string
+      description: >-
+        * `AUTHORIZATION` - Autorisation
+
+        * `REGISTRATION` - Enregistrement
+
+        * `DECLARATION_PERIODIC_CONTROLS` - Déclaration (avec contrôles
+        périodiques)
     InstallationCategoryEnum:
       enum:
         - INSTALLATION_CATEGORY_1
@@ -11881,6 +12464,32 @@ components:
         * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
         * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
         * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
+    InstalledMetersEnum:
+      enum:
+        - BIOGAS_PRODUCTION_FLOWMETER
+        - PURIFICATION_FLOWMETER
+        - FLARING_FLOWMETER
+        - HEATING_FLOWMETER
+        - PURIFICATION_ELECTRICAL_METER
+        - GLOBAL_ELECTRICAL_METER
+      type: string
+      description: >-
+        * `BIOGAS_PRODUCTION_FLOWMETER` - Débitmètre dédié à la production de
+        biogaz
+
+        * `PURIFICATION_FLOWMETER` - Débitmètre dédié au volume de biogaz traité
+        en épuration
+
+        * `FLARING_FLOWMETER` - Débitmètre dédié au volume de biogaz torché
+
+        * `HEATING_FLOWMETER` - Débitmètre dédié au volume de biogaz ou
+        biométhane utilisé pour le chauffage du digesteur
+
+        * `PURIFICATION_ELECTRICAL_METER` - Compteur dédié à la consommation
+        électrique au système d'épuration et traitement des évents
+
+        * `GLOBAL_ELECTRICAL_METER` - Compteur dédié à la consommation
+        électrique de l'ensemble de l'unité de production
     InviteUserRequest:
       type: object
       properties:
@@ -11960,6 +12569,16 @@ components:
         - target
         - target_percent
         - unit
+    MethanizationProcessEnum:
+      enum:
+        - CONTINUOUS_INFINITELY_MIXED
+        - PLUG_FLOW_SEMI_CONTINUOUS
+        - BATCH_SILOS
+      type: string
+      description: |-
+        * `CONTINUOUS_INFINITELY_MIXED` - Continu (infiniment mélangé)
+        * `PLUG_FLOW_SEMI_CONTINUOUS` - En piston (semi-continu)
+        * `BATCH_SILOS` - En silos (batch)
     NavStats:
       type: object
       properties:
@@ -12651,6 +13270,20 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedBiomethaneDigestateStoragePatchRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
@@ -12701,6 +13334,14 @@ components:
         * `l` - litres
         * `kg` - kg
         * `MJ` - MJ
+    ProcessTypeEnum:
+      enum:
+        - LIQUID_PROCESS
+        - DRY_PROCESS
+      type: string
+      description: |-
+        * `LIQUID_PROCESS` - Voie liquide
+        * `DRY_PROCESS` - Voie sèche
     ProductionSite:
       type: object
       properties:
@@ -13861,6 +14502,18 @@ components:
         * `MANUAL` - MANUAL
         * `METER_READINGS` - METER_READINGS
         * `QUALICHARGE` - QUALICHARGE
+    SpreadingManagementMethodsEnum:
+      enum:
+        - DIRECT_SPREADING
+        - SPREADING_VIA_PROVIDER
+        - TRANSFER
+        - SALE
+      type: string
+      description: |-
+        * `DIRECT_SPREADING` - Épandage direct
+        * `SPREADING_VIA_PROVIDER` - Épandage via un prestataire
+        * `TRANSFER` - Cession
+        * `SALE` - Vente
     StatsResponse:
       type: object
       properties:
@@ -13927,6 +14580,20 @@ components:
           allOf:
             - $ref: "#/components/schemas/PreferredUnitEnum"
           default: l
+    UnitTypeEnum:
+      enum:
+        - AGRICULTURAL_AUTONOMOUS
+        - AGRICULTURAL_TERRITORIAL
+        - INDUSTRIAL_TERRITORIAL
+        - HOUSEHOLD_WASTE_BIOWASTE
+        - ISDND
+      type: string
+      description: |-
+        * `AGRICULTURAL_AUTONOMOUS` - Agricole autonome
+        * `AGRICULTURAL_TERRITORIAL` - Agricole territorial
+        * `INDUSTRIAL_TERRITORIAL` - Industriel territorial
+        * `HOUSEHOLD_WASTE_BIOWASTE` - Déchets ménagers et biodéchets
+        * `ISDND` - ISDND
     UpdateCertificateRequest:
       type: object
       properties:
