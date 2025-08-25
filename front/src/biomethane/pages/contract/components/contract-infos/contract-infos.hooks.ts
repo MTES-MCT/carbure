@@ -1,7 +1,10 @@
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
-import { InstallationCategory, TariffReference } from "biomethane/types"
-import { saveContract } from "biomethane/api"
+import {
+  InstallationCategory,
+  TariffReference,
+} from "biomethane/pages/contract/types"
+import { saveContract } from "biomethane/pages/contract/api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 

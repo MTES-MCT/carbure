@@ -1,4 +1,4 @@
-import { saveContract } from "biomethane/api"
+import { saveContract } from "biomethane/pages/contract/api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"

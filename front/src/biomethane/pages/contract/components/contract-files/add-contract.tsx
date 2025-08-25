@@ -7,7 +7,7 @@ import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
 import { ReplaceNullWithUndefined } from "common/types"
 import { useTranslation } from "react-i18next"
 import { useAddContract } from "./add-contract.hooks"
-import { BiomethaneContractPatchRequest } from "biomethane/types"
+import { BiomethaneContractPatchRequest } from "biomethane/pages/contract/types"
 
 type AddContractForm = ReplaceNullWithUndefined<
   Pick<

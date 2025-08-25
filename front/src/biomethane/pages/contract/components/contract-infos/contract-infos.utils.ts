@@ -1,5 +1,8 @@
 import { REDII_CMAX_THRESHOLD, REDII_PAP_THRESHOLD } from "biomethane/config"
-import { TariffReference, BiomethaneContract } from "biomethane/types"
+import {
+  TariffReference,
+  BiomethaneContract,
+} from "biomethane/pages/contract/types"
 
 export const isTariffReference2011Or2020 = (
   tariff_reference?: TariffReference

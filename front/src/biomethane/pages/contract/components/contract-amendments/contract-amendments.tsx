@@ -6,7 +6,7 @@ import { EditableCard } from "common/molecules/editable-card"
 import {
   BiomethaneContractAmendment,
   BiomethaneContract,
-} from "biomethane/types"
+} from "biomethane/pages/contract/types"
 import { usePortal } from "common/components/portal"
 import { AddAmendment } from "./add-amendment"
 import HashRoute from "common/components/hash-route"
