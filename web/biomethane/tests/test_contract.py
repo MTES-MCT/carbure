@@ -44,7 +44,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             "cmax_annualized": False,
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(BiomethaneContract.objects.filter(entity=self.producer_entity).exists())
 
@@ -60,7 +60,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             "pap_contracted": 50.0,
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         contract = BiomethaneContract.objects.get(entity=self.producer_entity)
@@ -74,7 +74,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             # Missing: installation_category, cmax, cmax_annualized
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("installation_category", response.data)
         self.assertIn("cmax", response.data)
@@ -90,7 +90,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             # Missing: cmax_annualized_value
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("cmax_annualized_value", response.data)
 
@@ -112,7 +112,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
 
         data = {"pap_contracted": 75.0}
 
-        response = self.client.patch(self.contract_url, data, content_type="application/json")
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         contract.refresh_from_db()
         self.assertEqual(contract.pap_contracted, 75.0)
@@ -132,7 +132,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             "effective_date": date(2025, 1, 1),
         }
 
-        response = self.client.patch(self.contract_url, data, content_type="application/json")
+        response = self.client.put(self.contract_url, data, content_type="application/json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("signature_date", response.data)
@@ -158,10 +158,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         response = self.client.get(contract_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        response = self.client.post(contract_url, {})
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        response = self.client.patch(contract_url, {}, content_type="application/json")
+        response = self.client.put(contract_url, {}, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_red_ii_status_cmax_above_threshold(self):
@@ -175,7 +172,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             "cmax_annualized": False,
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.producer_entity.refresh_from_db()
@@ -190,7 +187,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             "pap_contracted": 25.0,  # > 19.5
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.producer_entity.refresh_from_db()
@@ -207,7 +204,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             "cmax_annualized": False,
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.producer_entity.refresh_from_db()
@@ -223,7 +220,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
             "pap_contracted": 15.0,  # <= 19.5
         }
 
-        response = self.client.post(self.contract_url, data)
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.producer_entity.refresh_from_db()
@@ -243,7 +240,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         self.assertFalse(self.producer_entity.is_red_ii)
 
         data = {"cmax": 300.0}  # > 200
-        response = self.client.patch(self.contract_url, data, content_type="application/json")
+        response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.producer_entity.refresh_from_db()

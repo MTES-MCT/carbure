@@ -77,8 +77,8 @@ export const BiomethaneInjectionPage = () => {
                 <TextInput
                   label={t("Adresse de la société (Numéro et rue)")}
                   {...bind("company_address")}
-                  required
                   readOnly={!isEditing}
+                  required
                 />
                 <TextInput
                   label={t("Code postal")}
@@ -92,22 +92,24 @@ export const BiomethaneInjectionPage = () => {
                   required
                   readOnly={!isEditing}
                 />
-                <RadioGroup
-                  options={networkTypesOptions}
-                  {...bind("network_type")}
-                  label={t("Type de réseau")}
-                  required
-                  readOnly={!isEditing}
-                  orientation="horizontal"
-                />
-                <TextInput
-                  label={t("Nom du gestionnaire de réseau")}
-                  {...bind("network_manager_name")}
-                  required
-                  readOnly={!isEditing}
-                />
               </>
             )}
+          </Grid>
+          <Grid cols={2} gap="lg">
+            <RadioGroup
+              options={networkTypesOptions}
+              {...bind("network_type")}
+              label={t("Type de réseau")}
+              required
+              readOnly={!isEditing}
+              orientation="horizontal"
+            />
+            <TextInput
+              label={t("Nom du gestionnaire de réseau")}
+              {...bind("network_manager_name")}
+              required
+              readOnly={!isEditing}
+            />
           </Grid>
           {isEditing && (
             <Button
