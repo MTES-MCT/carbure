@@ -97,12 +97,3 @@ class DoubleCountAgreementsTest(TestCase):
         assert application1["quotas_progression"] is None
         assert application2["quotas_progression"] == 0
         assert application3["quotas_progression"] is None
-
-    def test_get_agreements_quotas(self):
-        # check quotas
-        print("TODO")
-
-    def test_get_agreement_details_and_quotas(self):
-        # pending application without agreement
-        # agreement without application and quotas
-        print("TODO")
