@@ -60,7 +60,8 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
             "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
             "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
         }
-        serializer = BiomethaneProductionUnitUpsertSerializer(data=valid_data)
+        serializer = BiomethaneProductionUnitUpsertSerializer(data=valid_data, context={"entity": self.producer_entity})
+
         # Should validate successfully for valid choices
         self.assertTrue(serializer.is_valid())
 
