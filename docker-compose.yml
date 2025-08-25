@@ -21,8 +21,6 @@ services:
     <<: *common-settings
     volumes:
       - carbureredis:/data
-    ports:
-      - 6379:6379
 
   carbure-frontend:
     image: carbure_frontend:local
