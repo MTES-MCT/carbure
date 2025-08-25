@@ -56,5 +56,5 @@ class BiomethaneContractAmendment(models.Model):
     amendment_details = models.TextField(blank=True, null=True)
 
     class Meta:
-        db_table = "biomethane_entity_config_amendment"
-        verbose_name = "Biométhane - Avenant"
+        db_table = "biomethane_contract_amendment"
+        verbose_name = "Biométhane - Avenant au contrat"

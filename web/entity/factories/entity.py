@@ -10,8 +10,12 @@ class EntityFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Entity
 
-    name = factory.Faker("company")
+    class Params:
+        company_name = factory.Faker("first_name")
+
     entity_type = factory.Iterator([choice[0] for choice in Entity.ENTITY_TYPES])
+
+    name = factory.LazyAttribute(lambda obj: f"{dict(Entity.ENTITY_TYPES)[obj.entity_type]} - {obj.company_name}")
     parent_entity = None
 
     # Boolean capabilities

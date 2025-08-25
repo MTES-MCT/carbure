@@ -98,3 +98,13 @@ class BiomethaneEntityConfigAmendmentFactory(factory.django.DjangoModelFactory):
     amendment_details = factory.LazyAttribute(
         lambda obj: "Details pour l'avenant OTHER" if BiomethaneContractAmendment.OTHER in obj.amendment_object else None
     )
+
+
+def create_contract_with_amendments(entity):
+    contract = BiomethaneSignedContractFactory(entity=entity)
+    BiomethaneEntityConfigAmendmentFactory.create_batch(
+        2,
+        contract=contract,
+    )
+
+    return contract
