@@ -77,6 +77,7 @@ export const SelectDsfr = <T, V = T>({
       nativeSelectProps={{
         value: selectedOption?.value,
         onChange: onChange ? (e) => onChange(e.target.value as V) : undefined,
+        required: props.required,
       }}
       options={normalizedOptions}
       label={
