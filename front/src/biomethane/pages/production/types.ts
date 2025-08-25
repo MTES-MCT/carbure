@@ -25,7 +25,7 @@ export {
 
 export type BiomethaneProductionUnit = apiTypes["BiomethaneProductionUnit"]
 export type BiomethaneProductionUnitPatchRequest =
-  apiTypes["BiomethaneProductionUnitPatchRequest"]
+  apiTypes["BiomethaneProductionUnitUpsertRequest"]
 
 // Digestate Storage
 
