@@ -10070,7 +10070,7 @@ components:
         - amendment_object
         - effective_date
         - signature_date
-    BiomethaneContractPatch:
+    BiomethaneContractPatchRequest:
       type: object
       properties:
         tariff_reference:
@@ -10106,12 +10106,14 @@ components:
           nullable: true
         general_conditions_file:
           type: string
-          format: uri
+          format: binary
           nullable: true
         specific_conditions_file:
           type: string
-          format: uri
+          format: binary
           nullable: true
+        is_red_ii:
+          type: boolean
       required:
         - buyer
         - tariff_reference
