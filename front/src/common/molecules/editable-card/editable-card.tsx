@@ -11,7 +11,7 @@ import { Form, FormProps } from "common/components/form2"
 
 interface EditableCardProps {
   title: string
-  description?: string
+  description?: ReactNode
 
   /**
    * Children can be a function that receives the editing state and a function to set it.

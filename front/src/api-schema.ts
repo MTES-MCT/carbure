@@ -291,6 +291,22 @@ export interface paths {
         patch: operations["biomethane_digestate_storage_partial_update"];
         trace?: never;
     };
+    "/api/biomethane/digestate/spreading/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["biomethane_digestate_spreading_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/digestate/years/": {
         parameters: {
             query?: never;
@@ -2870,8 +2886,13 @@ export interface components {
             spreadings: number[];
         };
         BiomethaneDigestateSpreading: {
-            readonly id: number;
-            digestate: number;
+            spreading_department: string;
+            /** Format: double */
+            spread_quantity: number;
+            /** Format: double */
+            spread_parcels_area: number;
+        };
+        BiomethaneDigestateSpreadingRequest: {
             spreading_department: string;
             /** Format: double */
             spread_quantity: number;
@@ -5855,6 +5876,36 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BiomethaneDigestateStoragePatch"];
+                };
+            };
+        };
+    };
+    biomethane_digestate_spreading_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Year. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneDigestateSpreadingRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateSpreadingRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateSpreadingRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestateSpreading"];
                 };
             };
         };

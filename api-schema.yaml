@@ -890,6 +890,46 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/biomethane/digestate/spreading/:
+    post:
+      operationId: biomethane_digestate_spreading_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateSpreadingRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateSpreadingRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateSpreadingRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestateSpreading"
+          description: ""
   /api/biomethane/digestate/years/:
     get:
       operationId: biomethane_digestate_years_retrieve
@@ -10390,11 +10430,6 @@ components:
     BiomethaneDigestateSpreading:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        digestate:
-          type: integer
         spreading_department:
           type: string
           maxLength: 3
@@ -10405,8 +10440,23 @@ components:
           type: number
           format: double
       required:
-        - digestate
-        - id
+        - spread_parcels_area
+        - spread_quantity
+        - spreading_department
+    BiomethaneDigestateSpreadingRequest:
+      type: object
+      properties:
+        spreading_department:
+          type: string
+          minLength: 1
+          maxLength: 3
+        spread_quantity:
+          type: number
+          format: double
+        spread_parcels_area:
+          type: number
+          format: double
+      required:
         - spread_parcels_area
         - spread_quantity
         - spreading_department

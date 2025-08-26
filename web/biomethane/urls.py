@@ -6,12 +6,9 @@ from .views import (
     BiomethaneContractViewSet,
     BiomethaneInjectionSiteViewSet,
 )
-from .views.production_unit import (
-    BiomethaneDigestateStorageViewSet,
-    BiomethaneProductionUnitViewSet,
-)
 from .views.digestate.digestate import BiomethaneDigestateViewSet
 from .views.digestate.mixins.years import get_years
+from .views.digestate.spreading import BiomethaneDigestateSpreadingViewSet
 from .views.production_unit import (
     BiomethaneDigestateStorageViewSet,
     BiomethaneProductionUnitViewSet,
@@ -27,6 +24,11 @@ router.register(
     "digestate-storage",
     BiomethaneDigestateStorageViewSet,
     basename="biomethane-digestate-storage",
+)
+router.register(
+    "digestate/spreading",
+    BiomethaneDigestateSpreadingViewSet,
+    basename="biomethane-digestate-spreading",
 )
 
 contract_viewset = BiomethaneContractViewSet.as_view(

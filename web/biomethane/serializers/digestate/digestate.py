@@ -1,19 +1,7 @@
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneDigestate
-from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
-
-
-class BiomethaneDigestateSpreadingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BiomethaneDigestateSpreading
-        fields = [
-            "id",
-            "digestate",
-            "spreading_department",
-            "spread_quantity",
-            "spread_parcels_area",
-        ]
+from biomethane.serializers.digestate.spreading import BiomethaneDigestateSpreadingSerializer
 
 
 class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):

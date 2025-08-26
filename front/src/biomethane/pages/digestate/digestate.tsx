@@ -6,6 +6,10 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { InjectionSite } from "./components/injection-site"
 import { SpreadingDistance } from "./components/spreading-distance"
+import { useProductionUnit } from "../production/production.hooks"
+import { DigestateValorizationMethods } from "../production/types"
+import { Spreading } from "./components/spreading"
+import { DigestateProvider } from "./digestate.hooks"
 
 enum BiomethaneDigestateStatus {
   PENDING = "pending",
@@ -20,15 +24,25 @@ export const Digestate = () => {
     key: "digestate",
     params: [entity.id, years.selected],
   })
+  const { result: productionUnit } = useProductionUnit()
 
   return (
-    <BiomethanePageHeader
-      selectedYear={parseInt(year!)}
-      yearsOptions={years.options}
-      status={BiomethaneDigestateStatus.PENDING}
-    >
-      <InjectionSite digestate={digestate?.data} />
-      <SpreadingDistance digestate={digestate?.data} />
-    </BiomethanePageHeader>
+    <DigestateProvider year={years.selected}>
+      <BiomethanePageHeader
+        selectedYear={parseInt(year!)}
+        yearsOptions={years.options}
+        status={BiomethaneDigestateStatus.PENDING}
+      >
+        <InjectionSite digestate={digestate?.data} />
+        {productionUnit?.digestate_valorization_methods?.includes(
+          DigestateValorizationMethods.SPREADING
+        ) && (
+          <>
+            <SpreadingDistance digestate={digestate?.data} />
+            <Spreading digestate={digestate?.data} year={years.selected} />
+          </>
+        )}
+      </BiomethanePageHeader>
+    </DigestateProvider>
   )
 }

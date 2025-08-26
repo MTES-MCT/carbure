@@ -33,11 +33,6 @@ class BiomethaneDigestateStorageViewSet(ModelViewSet):
             return BiomethaneDigestateStorage.objects.none()
         return BiomethaneDigestateStorage.objects.filter(producer=self.request.entity)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["entity"] = getattr(self.request, "entity", None)
-        return context
-
     def get_serializer_class(self):
         if self.action == "create":
             return BiomethaneDigestateStorageAddSerializer

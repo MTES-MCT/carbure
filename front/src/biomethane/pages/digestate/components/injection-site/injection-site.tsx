@@ -9,6 +9,7 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestatePatchRequest,
 } from "../../types"
+import { useDigestateContext } from "../../digestate.hooks"
 
 type InjectionSiteForm = DeepPartial<
   Pick<
@@ -27,11 +28,9 @@ export function InjectionSite({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<InjectionSiteForm>(digestate ?? {})
+  const { saveDigestate } = useDigestateContext()
 
-  const handleSave = async () => {
-    // TODO: Implémenter la sauvegarde
-    console.log("Sauvegarde des données d'injection:", value)
-  }
+  const handleSave = async () => saveDigestate(value)
 
   return (
     <EditableCard title={t("Site d'injection")}>
@@ -48,6 +47,8 @@ export function InjectionSite({
               readOnly={!isEditing}
               label={t("Taux de MS du digestat brut (%)")}
               type="number"
+              min={0}
+              max={100}
               {...bind("raw_digestate_dry_matter_rate")}
             />
             <NumberInput
