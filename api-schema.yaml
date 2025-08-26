@@ -606,7 +606,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Avenant.
+          description: A unique integer value identifying this Biométhane - Avenant au
+            contrat.
           required: true
       tags:
         - biomethane
@@ -2320,7 +2321,7 @@ paths:
           schema:
             type: integer
           description: A unique integer value identifying this Certificat de Fourniture
-            intermédiaire (elec).
+            Qualicharge (elec).
           required: true
       tags:
         - elec
@@ -5518,10 +5519,6 @@ paths:
     get:
       operationId: saf_clients_list
       parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: string
         - name: ordering
           required: false
           in: query
@@ -5565,8 +5562,7 @@ paths:
         - in: path
           name: id
           schema:
-            type: integer
-          description: A unique integer value identifying this Entity.
+            type: string
           required: true
       tags:
         - saf
@@ -15013,6 +15009,18 @@ components:
         * `MANUAL` - MANUAL
         * `METER_READINGS` - METER_READINGS
         * `QUALICHARGE` - QUALICHARGE
+    SpreadingManagementMethodsEnum:
+      enum:
+        - DIRECT_SPREADING
+        - SPREADING_VIA_PROVIDER
+        - TRANSFER
+        - SALE
+      type: string
+      description: |-
+        * `DIRECT_SPREADING` - Épandage direct
+        * `SPREADING_VIA_PROVIDER` - Épandage via un prestataire
+        * `TRANSFER` - Cession
+        * `SALE` - Vente
     StationRequest:
       type: object
       properties:
