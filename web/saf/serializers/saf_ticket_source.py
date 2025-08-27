@@ -5,6 +5,7 @@ from core.models import CarbureLot
 from core.serializers import CarbureLotPublicSerializer, EntityPreviewSerializer, ProductionSiteSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from saf.models import SafTicket, SafTicketSource
+from saf.serializers.schema import SiteSerializer
 
 
 class SafParentLotSerializer(serializers.ModelSerializer):
@@ -96,8 +97,12 @@ class SafTicketSourceSerializer(SafTicketSourcePreviewSerializer):
             "eee",
             "ghg_reduction",
             "ghg_total",
+            "origin_lot",
+            "origin_lot_site",
         ]
 
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     parent_lot = CarbureLotPublicSerializer(required=False)
+    origin_lot = SafParentLotSerializer(required=False)
+    origin_lot_site = SiteSerializer(required=False)
