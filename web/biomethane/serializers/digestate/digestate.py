@@ -5,6 +5,11 @@ from biomethane.serializers.digestate.spreading import BiomethaneDigestateSpread
 
 
 class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
+    composting_locations = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneDigestate.COMPOSTING_LOCATIONS),
+        read_only=True,
+    )
+
     class Meta:
         model = BiomethaneDigestate
         fields = [
@@ -14,8 +19,7 @@ class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
             "solid_digestate_tonnage",
             "liquid_digestate_quantity",
             "average_spreading_valorization_distance",
-            "composting_on_site",
-            "composting_external_platform",
+            "composting_locations",
             "external_platform_name",
             "external_platform_digestate_volume",
             "external_platform_department",
@@ -41,6 +45,11 @@ class BiomethaneDigestatePatchSerializer(BaseBiomethaneDigestateSerializer):
 
 
 class BiomethaneDigestateAddSerializer(BaseBiomethaneDigestateSerializer):
+    composting_locations = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneDigestate.COMPOSTING_LOCATIONS),
+        required=False,
+    )
+
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")

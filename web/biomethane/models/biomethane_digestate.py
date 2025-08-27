@@ -31,11 +31,12 @@ class BiomethaneDigestate(models.Model):
     average_spreading_valorization_distance = models.FloatField(null=True, blank=True)
 
     ## Compostage
-
-    # Compostage sur site
-    composting_on_site = models.BooleanField(default=False)
-    # Compostage sur plateforme externe
-    composting_external_platform = models.BooleanField(default=False)
+    COMPOSTING_LOCATIONS = [
+        ("ON_SITE", "Sur site"),
+        ("EXTERNAL_PLATFORM", "Plateforme externe"),
+    ]
+    # Lieux de compostage
+    composting_locations = models.JSONField(default=list)
     # Nom de la plateforme externe
     external_platform_name = models.CharField(max_length=255, null=True, blank=True)
     # Volume de digestat composté sur la plateforme externe (t)

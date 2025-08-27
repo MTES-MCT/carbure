@@ -120,7 +120,7 @@ export function getDepartmentName(code: string): string | undefined {
 
 export function getDepartmentOptions() {
   return Object.entries(DEPARTMENTS).map(([code, name]) => ({
-    value: code,
+    value: code as DepartmentCode,
     label: `${code} - ${name}`,
   }))
 }

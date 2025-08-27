@@ -12,6 +12,7 @@ import { Spreading } from "./components/spreading"
 import { DigestateProvider } from "./digestate.hooks"
 import { LoaderOverlay } from "common/components/scaffold"
 import { SettingsNotFilled } from "biomethane/layouts/settings-not-filled"
+import { Composting } from "./components/composting"
 
 enum BiomethaneDigestateStatus {
   PENDING = "pending",
@@ -55,6 +56,10 @@ export const Digestate = () => {
             <Spreading digestate={digestate?.data} year={years.selected} />
           </>
         )}
+
+        {productionUnit?.digestate_valorization_methods?.includes(
+          DigestateValorizationMethods.COMPOSTING
+        ) && <Composting digestate={digestate?.data} />}
       </BiomethanePageHeader>
     </DigestateProvider>
   )

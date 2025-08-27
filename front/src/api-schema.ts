@@ -2848,8 +2848,7 @@ export interface components {
             liquid_digestate_quantity?: number | null;
             /** Format: double */
             average_spreading_valorization_distance?: number | null;
-            composting_on_site?: boolean;
-            composting_external_platform?: boolean;
+            readonly composting_locations: components["schemas"]["CompostingLocationsEnum"][];
             external_platform_name?: string | null;
             /** Format: double */
             external_platform_digestate_volume?: number | null;
@@ -2880,8 +2879,7 @@ export interface components {
             liquid_digestate_quantity?: number | null;
             /** Format: double */
             average_spreading_valorization_distance?: number | null;
-            composting_on_site?: boolean;
-            composting_external_platform?: boolean;
+            composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
             external_platform_name?: string | null;
             /** Format: double */
             external_platform_digestate_volume?: number | null;
@@ -3203,6 +3201,12 @@ export interface components {
             registered_zipcode: string;
             registered_country: components["schemas"]["RegistrationCountry"];
         };
+        /**
+         * @description * `ON_SITE` - Sur site
+         *     * `EXTERNAL_PLATFORM` - Plateforme externe
+         * @enum {string}
+         */
+        CompostingLocationsEnum: CompostingLocationsEnum;
         ConfirmEmailChangeError: {
             /** @description Message d'erreur général */
             message?: string;
@@ -11620,6 +11624,10 @@ export enum CertificateTypeEnum {
     ISCC = "ISCC",
     REDCERT = "REDCERT",
     Value2BS = "2BS"
+}
+export enum CompostingLocationsEnum {
+    ON_SITE = "ON_SITE",
+    EXTERNAL_PLATFORM = "EXTERNAL_PLATFORM"
 }
 export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",
