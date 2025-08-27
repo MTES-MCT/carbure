@@ -4,16 +4,10 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestatePatchRequest,
-} from "../../types"
+import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
 
 type SpreadingDistanceForm = DeepPartial<
-  Pick<
-    BiomethaneDigestatePatchRequest,
-    "average_spreading_valorization_distance"
-  >
+  Pick<BiomethaneDigestateAddRequest, "average_spreading_valorization_distance">
 >
 
 export function SpreadingDistance({
@@ -42,6 +36,7 @@ export function SpreadingDistance({
             readOnly={!isEditing}
             label={t("Distance moyenne de valorisation d'épandage (km)")}
             {...bind("average_spreading_valorization_distance")}
+            required
           />
           {isEditing && (
             <Button type="submit" iconId="ri-save-line" asideX>

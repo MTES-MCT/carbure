@@ -2822,8 +2822,6 @@ export interface components {
         };
         BiomethaneDigestate: {
             readonly id: number;
-            year: number;
-            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
             /** Format: double */
             raw_digestate_tonnage_produced?: number | null;
             /** Format: double */
@@ -2851,11 +2849,11 @@ export interface components {
             acquiring_companies?: string | null;
             /** Format: double */
             sold_volume?: number | null;
+            year: number;
+            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
             readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
         };
-        BiomethaneDigestatePatchRequest: {
-            year: number;
-            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
+        BiomethaneDigestateAddRequest: {
             /** Format: double */
             raw_digestate_tonnage_produced?: number | null;
             /** Format: double */
@@ -2883,7 +2881,6 @@ export interface components {
             acquiring_companies?: string | null;
             /** Format: double */
             sold_volume?: number | null;
-            spreadings: number[];
         };
         BiomethaneDigestateSpreading: {
             spreading_department: string;
@@ -2892,7 +2889,14 @@ export interface components {
             /** Format: double */
             spread_parcels_area: number;
         };
-        BiomethaneDigestateSpreadingRequest: {
+        BiomethaneDigestateSpreadingAdd: {
+            spreading_department: string;
+            /** Format: double */
+            spread_quantity: number;
+            /** Format: double */
+            spread_parcels_area: number;
+        };
+        BiomethaneDigestateSpreadingAddRequest: {
             spreading_department: string;
             /** Format: double */
             spread_quantity: number;
@@ -5682,16 +5686,18 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Authorised entity ID. */
+                year: number;
             };
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["BiomethaneDigestatePatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestatePatchRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneDigestatePatchRequest"];
+                "application/json": components["schemas"]["BiomethaneDigestateAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateAddRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateAddRequest"];
             };
         };
         responses: {
@@ -5894,9 +5900,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BiomethaneDigestateSpreadingRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateSpreadingRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneDigestateSpreadingRequest"];
+                "application/json": components["schemas"]["BiomethaneDigestateSpreadingAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateSpreadingAddRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateSpreadingAddRequest"];
             };
         };
         responses: {
@@ -5905,7 +5911,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneDigestateSpreading"];
+                    "application/json": components["schemas"]["BiomethaneDigestateSpreadingAdd"];
                 };
             };
         };

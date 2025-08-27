@@ -23,6 +23,11 @@ export const Spreading = ({
     portal((close) => <AddSpreadingDepartment onClose={close} year={year} />)
   }
 
+  const totalSpreadedArea = digestate?.spreadings.reduce(
+    (acc, spreading) => acc + spreading.spread_parcels_area,
+    0
+  )
+
   return (
     <EditableCard
       title={t("Épandage")}
@@ -49,8 +54,8 @@ export const Spreading = ({
         <>
           <Table columns={columns} rows={digestate.spreadings} />
           <Notice>
-            {t("Surface totale épandue en digestat (ha) : {value}", {
-              value: 30,
+            {t("Surface totale épandue en digestat (ha) : {{value}}", {
+              value: totalSpreadedArea ?? 0,
             })}
           </Notice>
         </>

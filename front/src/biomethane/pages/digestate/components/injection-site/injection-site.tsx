@@ -5,15 +5,12 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestatePatchRequest,
-} from "../../types"
+import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 
 type InjectionSiteForm = DeepPartial<
   Pick<
-    BiomethaneDigestatePatchRequest,
+    BiomethaneDigestateAddRequest,
     | "raw_digestate_tonnage_produced"
     | "raw_digestate_dry_matter_rate"
     | "solid_digestate_tonnage"
@@ -30,7 +27,7 @@ export function InjectionSite({
   const { bind, value } = useForm<InjectionSiteForm>(digestate ?? {})
   const { saveDigestate } = useDigestateContext()
 
-  const handleSave = async () => saveDigestate(value)
+  const handleSave = async () => saveDigestate.execute(value)
 
   return (
     <EditableCard title={t("Site d'injection")}>
@@ -42,6 +39,7 @@ export function InjectionSite({
               label={t("Tonnage digestat brut produit (t)")}
               type="number"
               {...bind("raw_digestate_tonnage_produced")}
+              required
             />
             <NumberInput
               readOnly={!isEditing}
@@ -50,22 +48,30 @@ export function InjectionSite({
               min={0}
               max={100}
               {...bind("raw_digestate_dry_matter_rate")}
+              required
             />
             <NumberInput
               readOnly={!isEditing}
               label={t("Tonnage de digestat solide (t)")}
               type="number"
               {...bind("solid_digestate_tonnage")}
+              required
             />
             <NumberInput
               readOnly={!isEditing}
               label={t("Quantité digestat liquide (en m3)")}
               type="number"
               {...bind("liquid_digestate_quantity")}
+              required
             />
           </Grid>
           {isEditing && (
-            <Button type="submit" iconId="ri-save-line" asideX>
+            <Button
+              type="submit"
+              iconId="ri-save-line"
+              asideX
+              loading={saveDigestate.loading}
+            >
               {t("Sauvegarder")}
             </Button>
           )}

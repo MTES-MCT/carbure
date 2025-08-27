@@ -24,6 +24,13 @@ from core.permissions import HasUserRights
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
     ]
 )
 class BiomethaneDigestateViewSet(ModelViewSet):
@@ -36,7 +43,7 @@ class BiomethaneDigestateViewSet(ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
-        context["year"] = getattr(self.request, "year", None)
+        context["year"] = self.request.query_params.get("year")
         return context
 
     def get_serializer_class(self):
@@ -84,6 +91,7 @@ class BiomethaneDigestateViewSet(ModelViewSet):
                 description="Digestate created successfully",
             ),
         },
+        request=BiomethaneDigestateAddSerializer,
         description="Create or update the digestate for the current entity (upsert operation).",
     )
     def upsert(self, request, *args, **kwargs):
