@@ -7,6 +7,7 @@ import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
+import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 
 type InjectionSiteForm = DeepPartial<
   Pick<
@@ -20,8 +21,10 @@ type InjectionSiteForm = DeepPartial<
 
 export function InjectionSite({
   digestate,
+  productionUnit,
 }: {
   digestate?: BiomethaneDigestate
+  productionUnit: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<InjectionSiteForm>(digestate ?? {})
@@ -34,36 +37,44 @@ export function InjectionSite({
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("Tonnage digestat brut produit (t)")}
-              type="number"
-              {...bind("raw_digestate_tonnage_produced")}
-              required
-            />
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("Taux de MS du digestat brut (%)")}
-              type="number"
-              min={0}
-              max={100}
-              {...bind("raw_digestate_dry_matter_rate")}
-              required
-            />
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("Tonnage de digestat solide (t)")}
-              type="number"
-              {...bind("solid_digestate_tonnage")}
-              required
-            />
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("Quantité digestat liquide (en m3)")}
-              type="number"
-              {...bind("liquid_digestate_quantity")}
-              required
-            />
+            {!productionUnit.has_digestate_phase_separation && (
+              <>
+                <NumberInput
+                  readOnly={!isEditing}
+                  label={t("Tonnage digestat brut produit (t)")}
+                  type="number"
+                  {...bind("raw_digestate_tonnage_produced")}
+                  required
+                />
+                <NumberInput
+                  readOnly={!isEditing}
+                  label={t("Taux de MS du digestat brut (%)")}
+                  type="number"
+                  min={0}
+                  max={100}
+                  {...bind("raw_digestate_dry_matter_rate")}
+                  required
+                />
+              </>
+            )}
+            {productionUnit.has_digestate_phase_separation && (
+              <>
+                <NumberInput
+                  readOnly={!isEditing}
+                  label={t("Tonnage de digestat solide (t)")}
+                  type="number"
+                  {...bind("solid_digestate_tonnage")}
+                  required
+                />
+                <NumberInput
+                  readOnly={!isEditing}
+                  label={t("Quantité digestat liquide (en m3)")}
+                  type="number"
+                  {...bind("liquid_digestate_quantity")}
+                  required
+                />
+              </>
+            )}
           </Grid>
           {isEditing && (
             <Button

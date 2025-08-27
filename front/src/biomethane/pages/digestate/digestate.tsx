@@ -11,6 +11,7 @@ import { DigestateValorizationMethods } from "../production/types"
 import { Spreading } from "./components/spreading"
 import { DigestateProvider } from "./digestate.hooks"
 import { LoaderOverlay } from "common/components/scaffold"
+import { SettingsNotFilled } from "biomethane/layouts/settings-not-filled"
 
 enum BiomethaneDigestateStatus {
   PENDING = "pending",
@@ -29,6 +30,9 @@ export const Digestate = () => {
 
   if (loading) return <LoaderOverlay />
 
+  if (!loading && !productionUnit?.id) {
+    return <SettingsNotFilled />
+  }
   return (
     <DigestateProvider year={years.selected}>
       <BiomethanePageHeader
@@ -36,7 +40,13 @@ export const Digestate = () => {
         yearsOptions={years.options}
         status={BiomethaneDigestateStatus.PENDING}
       >
-        <InjectionSite digestate={digestate?.data} />
+        {productionUnit && (
+          <InjectionSite
+            digestate={digestate?.data}
+            productionUnit={productionUnit}
+          />
+        )}
+
         {productionUnit?.digestate_valorization_methods?.includes(
           DigestateValorizationMethods.SPREADING
         ) && (
