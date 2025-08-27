@@ -50,5 +50,6 @@ export const TextArea = ({
       ref: inputRef,
     }}
     readOnly={readOnly}
+    required={required}
   />
 )

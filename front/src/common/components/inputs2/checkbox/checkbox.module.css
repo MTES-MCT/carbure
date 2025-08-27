@@ -130,3 +130,7 @@
 .checkbox--small[type="checkbox"] {
   --checkbox-size: 16px;
 }
+
+.checkbox-group:global(.fr-fieldset) {
+  margin-bottom: 0;
+}

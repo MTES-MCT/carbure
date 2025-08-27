@@ -1,0 +1,97 @@
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
+from biomethane.models import BiomethaneProductionUnit
+from biomethane.serializers.production_unit import (
+    BiomethaneProductionUnitSerializer,
+    BiomethaneProductionUnitUpsertSerializer,
+)
+from core.models import Entity
+from core.permissions import HasUserRights
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ]
+)
+class BiomethaneProductionUnitViewSet(GenericViewSet):
+    queryset = BiomethaneProductionUnit.objects.all()
+    serializer_class = BiomethaneProductionUnitSerializer
+    permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
+    pagination_class = None
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["entity"] = getattr(self.request, "entity", None)
+        return context
+
+    def get_serializer_class(self):
+        if self.action == "upsert":
+            return BiomethaneProductionUnitUpsertSerializer
+        return BiomethaneProductionUnitSerializer
+
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=BiomethaneProductionUnitSerializer,
+                description="Production unit details for the entity",
+            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Production unit not found for this entity."),
+        },
+        description="Retrieve the production unit for the current entity. Returns a single production unit object.",
+    )
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
+            data = self.get_serializer(production_unit, many=False).data
+            return Response(data)
+
+        except BiomethaneProductionUnit.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=BiomethaneProductionUnitSerializer,
+                description="Production unit updated successfully",
+            ),
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response=BiomethaneProductionUnitSerializer,
+                description="Production unit created successfully",
+            ),
+        },
+        description="Create or update the production unit for the current entity (upsert operation).",
+    )
+    def upsert(self, request, *args, **kwargs):
+        """Create or update production unit using upsert logic."""
+        serializer_context = self.get_serializer_context()
+        try:
+            # Try to get existing production unit
+            production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
+            # Update existing production unit
+            serializer = BiomethaneProductionUnitUpsertSerializer(
+                production_unit, data=request.data, partial=True, context=serializer_context
+            )
+            if serializer.is_valid():
+                serializer.save()
+                response_data = BiomethaneProductionUnitSerializer(production_unit, context=serializer_context).data
+                return Response(response_data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except BiomethaneProductionUnit.DoesNotExist:
+            # Create new production unit
+            serializer = BiomethaneProductionUnitUpsertSerializer(data=request.data, context=serializer_context)
+            if serializer.is_valid():
+                production_unit = serializer.save()
+                response_data = BiomethaneProductionUnitSerializer(production_unit, context=serializer_context).data
+                return Response(response_data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

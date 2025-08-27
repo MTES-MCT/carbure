@@ -79,9 +79,11 @@ const EditableCardContent = ({
           <Title className={css["editable-card__title"]} is="p" as="h6">
             {title}
           </Title>
-          <Text className={css["editable-card__description"]} size="sm">
-            {description}
-          </Text>
+          {description ? (
+            <Text className={css["editable-card__description"]} size="sm">
+              {description}
+            </Text>
+          ) : null}
         </div>
 
         {headerActions}
