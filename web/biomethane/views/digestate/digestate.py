@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from biomethane.decorators.check_declaration_period import check_declaration_period
 from biomethane.filters.digestate import BiomethaneDigestateFilter
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.serializers.digestate import (
@@ -94,6 +95,7 @@ class BiomethaneDigestateViewSet(ModelViewSet):
         request=BiomethaneDigestateAddSerializer,
         description="Create or update the digestate for the current entity (upsert operation).",
     )
+    @check_declaration_period()
     def upsert(self, request, *args, **kwargs):
         serializer_context = self.get_serializer_context()
         try:

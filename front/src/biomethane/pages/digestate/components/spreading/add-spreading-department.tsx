@@ -4,12 +4,16 @@ import { Box } from "common/components/scaffold"
 import { SelectDsfr } from "common/components/selects2"
 import { getDepartmentOptions } from "common/utils/geography"
 import { useTranslation } from "react-i18next"
-import { BiomethaneDigestateSpreadingAddRequest } from "../../types"
+import {
+  BiomethaneDigestateSpreading,
+  BiomethaneDigestateSpreadingAddRequest,
+} from "../../types"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { addSpreadingDepartment } from "../../api"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
+import { useMemo } from "react"
 
 const departmentOptions = getDepartmentOptions()
 
@@ -19,9 +23,11 @@ type AddSpreadingDepartmentForm =
 export const AddSpreadingDepartment = ({
   onClose,
   year,
+  spreadings,
 }: {
   onClose: () => void
   year: number
+  spreadings: BiomethaneDigestateSpreading[]
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -41,6 +47,15 @@ export const AddSpreadingDepartment = ({
     })
   }
 
+  const options = useMemo(() => {
+    const departmentIds = spreadings.map(
+      (spreading) => spreading.spreading_department
+    )
+    return departmentOptions.filter(
+      (option) => !departmentIds.includes(option.value)
+    )
+  }, [spreadings])
+
   return (
     <Dialog
       header={<Dialog.Title>{t("Ajouter un département")}</Dialog.Title>}
@@ -59,20 +74,23 @@ export const AddSpreadingDepartment = ({
       <Box>
         <Form id="add-spreading-department-form" onSubmit={handleSubmit}>
           <SelectDsfr
-            options={departmentOptions}
+            options={options}
             label={t("Département")}
             placeholder={t("Sélectionner un département")}
             {...bind("spreading_department")}
+            required
           />
           <NumberInput
             label={t("Quantité épandue (t)")}
             placeholder={t("Quantité épandue (t)")}
             {...bind("spread_quantity")}
+            required
           />
           <NumberInput
             label={t("Superficie des parcelles épandues (ha)")}
             placeholder={t("Superficie des parcelles épandues (ha)")}
             {...bind("spread_parcels_area")}
+            required
           />
         </Form>
       </Box>

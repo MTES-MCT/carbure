@@ -20,7 +20,7 @@ export const useSpreadingColumns = () => {
     {
       header: t("Département"),
       cell: (spreadingData) =>
-        getDepartmentName(spreadingData.spreading_department),
+        `${spreadingData.spreading_department} - ${getDepartmentName(spreadingData.spreading_department)}`,
     },
     {
       header: t("Quantité épandue (t)"),
@@ -75,6 +75,6 @@ export const useDeleteSpreading = () => {
         variant: "success",
       })
     },
-    onError: (e) => notifyError(e),
+    onError: () => notifyError(),
   })
 }

@@ -58,6 +58,7 @@ export function useNotifyError() {
       }
     } else if (error instanceof HttpError) {
       if (error.data instanceof Object) {
+        console.log("error.data", error.data)
         errorText = <FormErrors errors={error.data} />
       }
     }
@@ -65,8 +66,12 @@ export function useNotifyError() {
     return errorText
   }
 
-  const notifyError = useCallback((error: Error, defaultMessage?: string) => {
-    return notify(getErrorText(error, defaultMessage), { variant: "danger" })
+  const notifyError = useCallback((error?: Error, defaultMessage?: string) => {
+    // If no error is provided, use the default message
+    const errorText = error
+      ? getErrorText(error, defaultMessage)
+      : DEFAULT_MESSAGE
+    return notify(errorText, { variant: "danger" })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

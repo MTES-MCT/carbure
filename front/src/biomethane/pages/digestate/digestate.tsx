@@ -10,6 +10,7 @@ import { useProductionUnit } from "../production/production.hooks"
 import { DigestateValorizationMethods } from "../production/types"
 import { Spreading } from "./components/spreading"
 import { DigestateProvider } from "./digestate.hooks"
+import { LoaderOverlay } from "common/components/scaffold"
 
 enum BiomethaneDigestateStatus {
   PENDING = "pending",
@@ -20,11 +21,13 @@ export const Digestate = () => {
   const entity = useEntity()
   const { year } = useParams<{ year: string }>()
   const years = useYears("biomethane/digestate", getYears)
-  const { result: digestate } = useQuery(getDigestate, {
+  const { result: digestate, loading } = useQuery(getDigestate, {
     key: "digestate",
     params: [entity.id, years.selected],
   })
   const { result: productionUnit } = useProductionUnit()
+
+  if (loading) return <LoaderOverlay />
 
   return (
     <DigestateProvider year={years.selected}>

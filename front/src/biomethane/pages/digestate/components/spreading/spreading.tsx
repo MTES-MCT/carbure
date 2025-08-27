@@ -20,7 +20,13 @@ export const Spreading = ({
   const portal = usePortal()
 
   const openAddSpreadingDepartmentDialog = () => {
-    portal((close) => <AddSpreadingDepartment onClose={close} year={year} />)
+    portal((close) => (
+      <AddSpreadingDepartment
+        onClose={close}
+        year={year}
+        spreadings={digestate?.spreadings ?? []}
+      />
+    ))
   }
 
   const totalSpreadedArea = digestate?.spreadings.reduce(

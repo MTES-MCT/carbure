@@ -36,9 +36,7 @@ export function DigestateProvider({ children, year }: DigestateProviderProps) {
       onSuccess: () => {
         notify(t("Le digestat a bien été mis à jour."), { variant: "success" })
       },
-      onError: (e) => {
-        notifyError(e)
-      },
+      onError: () => notifyError(),
     }
   )
 

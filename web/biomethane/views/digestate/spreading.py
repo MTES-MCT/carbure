@@ -3,6 +3,7 @@ from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.decorators.check_declaration_period import CheckDeclarationPeriod
 from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
 from biomethane.serializers.digestate.spreading import (
     BiomethaneDigestateSpreadingAddSerializer,
@@ -45,7 +46,11 @@ from core.permissions import HasUserRights
 class BiomethaneDigestateSpreadingViewSet(GenericViewSet, CreateModelMixin, DestroyModelMixin):
     queryset = BiomethaneDigestateSpreading.objects.all()
     serializer_class = BiomethaneDigestateSpreadingAddSerializer
-    permission_classes = [IsAuthenticated, HasUserRights(UserRights.RW, [Entity.BIOMETHANE_PRODUCER])]
+    permission_classes = [
+        IsAuthenticated,
+        HasUserRights(UserRights.RW, [Entity.BIOMETHANE_PRODUCER]),
+        CheckDeclarationPeriod,
+    ]
     http_method_names = ["post", "delete"]
 
     def get_serializer_context(self):
