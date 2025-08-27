@@ -159,16 +159,14 @@ class ExcelMeterReadingValidator(Validator):
         if len(lines) > 1:
             self.add_error(
                 "charge_point_id",
-                _("Ce point de recharge a été défini {count} fois (lignes {lines})").format(
-                    {"count": len(lines), "lines": ", ".join(str(num) for num in lines)}
-                ),
+                _(f"Ce point de recharge a été défini {len(lines)} fois (lignes {', '.join(str(num) for num in lines)})"),
             )
 
         if reading_date < previous_reading_date:
             self.add_error(
                 "reading_date",
-                _("Un relevé plus récent est déjà enregistré pour ce point de recharge: {energy}skWh, {date}").format(
-                    {"energy": previous_extracted_energy, "date": previous_reading_date.strftime("%d/%m/%Y")}
+                _(
+                    f"Un relevé plus récent est déjà enregistré pour ce point de recharge: {previous_extracted_energy}kWh, {previous_reading_date:%d/%m/%Y}"  # noqa
                 ),
             )
 
@@ -176,7 +174,7 @@ class ExcelMeterReadingValidator(Validator):
             self.add_error(
                 "extracted_energy",
                 _(
-                    "Le facteur de charge estimé depuis le dernier relevé enregistré est supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la puissance de votre point de recharge, renseignée sur TDG."  # noqa: E501
+                    f"Le facteur de charge estimé depuis le dernier relevé enregistré est supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la puissance de votre point de recharge, renseignée sur TDG."  # noqa
                 ),
             )
 
