@@ -1,7 +1,7 @@
 import { api } from "common/services/api-fetch"
 import {
   BiomethaneDigestateAddRequest,
-  BiomethaneDigestateSpreading,
+  BiomethaneDigestateSpreadingAddRequest,
 } from "./types"
 
 export const getYears = (entity_id: number) =>
@@ -41,7 +41,7 @@ export const saveDigestate = (
 export const addSpreadingDepartment = (
   entity_id: number,
   year: number,
-  body: BiomethaneDigestateSpreading
+  body: BiomethaneDigestateSpreadingAddRequest
 ) =>
   api.POST("/biomethane/digestate/spreading/", {
     params: {
@@ -51,4 +51,19 @@ export const addSpreadingDepartment = (
       },
     },
     body,
+  })
+
+export const deleteSpreadingDepartment = (
+  entity_id: number,
+  spreading_id: number
+) =>
+  api.DELETE("/biomethane/digestate/spreading/{id}/", {
+    params: {
+      query: {
+        entity_id,
+      },
+      path: {
+        id: spreading_id,
+      },
+    },
   })

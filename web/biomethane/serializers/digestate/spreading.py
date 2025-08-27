@@ -4,7 +4,7 @@ from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
 
 
-class BiomethaneDigestateSpreadingSerializer(serializers.ModelSerializer):
+class BaseBiomethaneDigestateSpreadingSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneDigestateSpreading
         fields = [
@@ -14,7 +14,12 @@ class BiomethaneDigestateSpreadingSerializer(serializers.ModelSerializer):
         ]
 
 
-class BiomethaneDigestateSpreadingAddSerializer(BiomethaneDigestateSpreadingSerializer):
+class BiomethaneDigestateSpreadingSerializer(BaseBiomethaneDigestateSpreadingSerializer):
+    class Meta(BaseBiomethaneDigestateSpreadingSerializer.Meta):
+        fields = BaseBiomethaneDigestateSpreadingSerializer.Meta.fields + ["id"]
+
+
+class BiomethaneDigestateSpreadingAddSerializer(BaseBiomethaneDigestateSpreadingSerializer):
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")

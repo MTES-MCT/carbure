@@ -935,6 +935,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneDigestateSpreadingAdd"
           description: ""
+  /api/biomethane/digestate/spreading/{id}/:
+    delete:
+      operationId: biomethane_digestate_spreading_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Données d'épandage du
+            digestat.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
   /api/biomethane/digestate/years/:
     get:
       operationId: biomethane_digestate_years_retrieve
@@ -10430,7 +10455,11 @@ components:
         spread_parcels_area:
           type: number
           format: double
+        id:
+          type: integer
+          readOnly: true
       required:
+        - id
         - spread_parcels_area
         - spread_quantity
         - spreading_department

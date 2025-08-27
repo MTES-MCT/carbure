@@ -4,7 +4,7 @@ import { Box } from "common/components/scaffold"
 import { SelectDsfr } from "common/components/selects2"
 import { getDepartmentOptions } from "common/utils/geography"
 import { useTranslation } from "react-i18next"
-import { BiomethaneDigestateSpreading } from "../../types"
+import { BiomethaneDigestateSpreadingAddRequest } from "../../types"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { addSpreadingDepartment } from "../../api"
@@ -13,7 +13,8 @@ import useEntity from "common/hooks/entity"
 
 const departmentOptions = getDepartmentOptions()
 
-type AddSpreadingDepartmentForm = Partial<BiomethaneDigestateSpreading>
+type AddSpreadingDepartmentForm =
+  Partial<BiomethaneDigestateSpreadingAddRequest>
 
 export const AddSpreadingDepartment = ({
   onClose,

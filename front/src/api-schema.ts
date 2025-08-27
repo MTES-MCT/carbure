@@ -307,6 +307,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/digestate/spreading/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["biomethane_digestate_spreading_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/digestate/years/": {
         parameters: {
             query?: never;
@@ -2888,6 +2904,7 @@ export interface components {
             spread_quantity: number;
             /** Format: double */
             spread_parcels_area: number;
+            readonly id: number;
         };
         BiomethaneDigestateSpreadingAdd: {
             spreading_department: string;
@@ -5913,6 +5930,30 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneDigestateSpreadingAdd"];
                 };
+            };
+        };
+    };
+    biomethane_digestate_spreading_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Données d'épandage du digestat. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
