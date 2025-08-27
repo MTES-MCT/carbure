@@ -26,7 +26,8 @@ class BiomethaneDigestateYearsTests(TestCase):
             [BiomethaneDigestate(producer=self.entity, year=year) for year in self.years]
         )
 
-    def test_get_years(self):
+    # Checks that the get_years endpoint returns the distinct years of digestate objects sorted in ascending order
+    def test_years(self):
         response = self.client.get(reverse("biomethane-digestate-years"), {"entity_id": self.entity.id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, [2015, 2024, 2025])
