@@ -159,17 +159,15 @@ class ExcelMeterReadingValidator(Validator):
         if len(lines) > 1:
             self.add_error(
                 "charge_point_id",
-                _("Ce point de recharge a été défini {count} fois (lignes {lines})").format(
-                    {"count": len(lines), "lines": ", ".join(str(num) for num in lines)}
-                ),
+                _("Ce point de recharge a été défini %(count)d fois (lignes %(lines)s)")
+                % {"count": len(lines), "lines": ", ".join(str(num) for num in lines)},
             )
 
         if reading_date < previous_reading_date:
             self.add_error(
                 "reading_date",
-                _("Un relevé plus récent est déjà enregistré pour ce point de recharge: {energy}skWh, {date}").format(
-                    {"energy": previous_extracted_energy, "date": previous_reading_date.strftime("%d/%m/%Y")}
-                ),
+                _("Un relevé plus récent est déjà enregistré pour ce point de recharge: %(energy)skWh, %(date)s")
+                % {"energy": previous_extracted_energy, "date": previous_reading_date.strftime("%d/%m/%Y")},
             )
 
         if facteur_de_charge > 1:

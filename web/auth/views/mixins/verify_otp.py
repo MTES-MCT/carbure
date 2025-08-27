@@ -50,8 +50,10 @@ class VerifyOTPAction:
 
             raise ValidationError(
                 {
-                    "message": _("Trop de tentatives incorrectes (%d échecs). Prochaine tentative possible à partir de %s.")
-                    % (failure_count, formatted_time)
+                    "message": _(
+                        "Trop de tentatives incorrectes (%(failures)d échecs). Prochaine tentative possible à partir de %(time)s."  # noqa: E501
+                    )
+                    % {"failures": failure_count, "time": formatted_time}
                 }
             )
 

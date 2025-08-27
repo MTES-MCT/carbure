@@ -95,9 +95,8 @@ class ExcelElecAuditReportValidator(Validator):
         if charge_point_id not in expected_ids:
             self.add_error(
                 "charge_point_id",
-                _(
-                    "Le point de charge {charge_point_id} ne fait pas partie de l'échantillon sélectionné pour cet audit."
-                ).format(charge_point_id=charge_point_id),
+                _("Le point de charge %(charge_point_id)s ne fait pas partie de l'échantillon sélectionné pour cet audit.")
+                % {"charge_point_id": charge_point_id},
             )
 
         # Check if at least one audit field is filled
@@ -115,7 +114,6 @@ class ExcelElecAuditReportValidator(Validator):
         if not has_audit_data:
             self.add_error(
                 "charge_point_id",
-                _("Les informations relatives au point de charge {charge_point_id} sont incomplètes ou absentes.").format(
-                    charge_point_id=charge_point_id
-                ),
+                _("Les informations relatives au point de charge %(charge_point_id)s sont incomplètes ou absentes.")
+                % {"charge_point_id": charge_point_id},
             )
