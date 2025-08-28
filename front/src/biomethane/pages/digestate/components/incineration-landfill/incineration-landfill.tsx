@@ -7,6 +7,10 @@ import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
+import {
+  BiomethaneContract,
+  InstallationCategory,
+} from "biomethane/pages/contract/types"
 
 type IncinerationLandfillForm = DeepPartial<
   Pick<
@@ -19,8 +23,10 @@ type IncinerationLandfillForm = DeepPartial<
 
 export function IncinerationLandfill({
   digestate,
+  contract,
 }: {
   digestate?: BiomethaneDigestate
+  contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<IncinerationLandfillForm>(digestate ?? {})
@@ -54,15 +60,19 @@ export function IncinerationLandfill({
               required
             />
           </Grid>
-          <NumberInput
-            readOnly={!isEditing}
-            label={t(
-              "Quantité de matières totales traitées par la STEP allant en incinération (t)"
-            )}
-            type="number"
-            {...bind("wwtp_materials_to_incineration")}
-            required
-          />
+          {contract?.installation_category ==
+            InstallationCategory.INSTALLATION_CATEGORY_2 && (
+            <NumberInput
+              readOnly={!isEditing}
+              label={t(
+                "Quantité de matières totales traitées par la STEP allant en incinération (t)"
+              )}
+              type="number"
+              {...bind("wwtp_materials_to_incineration")}
+              required
+            />
+          )}
+
           {isEditing && (
             <Button
               type="submit"

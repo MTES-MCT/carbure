@@ -1,7 +1,7 @@
 import { ContractAmendments } from "./components/contract-amendments/contract-amendments"
 import { ContractFiles } from "./components/contract-files"
 import { ContractInfos } from "./components/contract-infos"
-import { useGetContractInfos } from "biomethane/hooks/contract.hooks"
+import { useGetContractInfos } from "./contract.hooks"
 
 export const BiomethaneContractPage = () => {
   const { result: contractInfos, loading } = useGetContractInfos()

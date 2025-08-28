@@ -18,6 +18,7 @@ import { SettingsNotFilled } from "biomethane/layouts/settings-not-filled"
 import { Composting } from "./components/composting"
 import { IncinerationLandfill } from "./components/incineration-landfill"
 import { Sale } from "./components/sale"
+import { useGetContractInfos } from "../contract/contract.hooks"
 
 enum BiomethaneDigestateStatus {
   PENDING = "pending",
@@ -33,6 +34,7 @@ export const Digestate = () => {
     params: [entity.id, years.selected],
   })
   const { result: productionUnit } = useProductionUnit()
+  const { result: contract } = useGetContractInfos()
 
   if (loading) return <LoaderOverlay />
 
@@ -68,7 +70,12 @@ export const Digestate = () => {
 
         {productionUnit?.digestate_valorization_methods?.includes(
           DigestateValorizationMethods.INCINERATION_LANDFILLING
-        ) && <IncinerationLandfill digestate={digestate?.data} />}
+        ) && (
+          <IncinerationLandfill
+            digestate={digestate?.data}
+            contract={contract}
+          />
+        )}
 
         {productionUnit?.spreading_management_methods?.includes(
           SpreadingManagementMethods.SALE
