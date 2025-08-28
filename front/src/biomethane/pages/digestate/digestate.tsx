@@ -1,8 +1,8 @@
 import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { useParams } from "react-router-dom"
-import { getDigestate, getYears } from "./api"
+import { getDigestate, getYears, validateDigestate } from "./api"
 import useYears from "common/hooks/years-2"
-import { useQuery } from "common/hooks/async"
+import { useMutation, useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { InjectionSite } from "./components/injection-site"
 import { SpreadingDistance } from "./components/spreading-distance"
@@ -21,21 +21,30 @@ import { Sale } from "./components/sale"
 import { useGetContractInfos } from "../contract/contract.hooks"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-
-enum BiomethaneDigestateStatus {
-  PENDING = "pending",
-  VALIDATED = "validated",
-}
+import { useNotify } from "common/components/notifications"
 
 export const Digestate = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { year } = useParams<{ year: string }>()
+  const notify = useNotify()
   const years = useYears("biomethane/digestate", getYears)
   const { result: digestate, loading } = useQuery(getDigestate, {
     key: "digestate",
     params: [entity.id, years.selected],
   })
+  const validateDigestateMutation = useMutation(
+    () => validateDigestate(entity.id),
+    {
+      invalidates: ["digestate"],
+      onSuccess: () => {
+        notify(t("Les informations ont bien été validées."), {
+          variant: "success",
+        })
+      },
+    }
+  )
+
   const { result: productionUnit } = useProductionUnit()
   const { result: contract } = useGetContractInfos()
   usePrivateNavigation(t("Digestat"))
@@ -51,9 +60,9 @@ export const Digestate = () => {
       <BiomethanePageHeader
         selectedYear={parseInt(year!)}
         yearsOptions={years.options}
-        status={BiomethaneDigestateStatus.PENDING}
+        status={digestate?.data?.status}
         onChangeYear={years.setYear}
-        onConfirm={() => Promise.resolve()}
+        onConfirm={validateDigestateMutation.execute}
       >
         {productionUnit && (
           <InjectionSite

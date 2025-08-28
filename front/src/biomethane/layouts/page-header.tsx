@@ -13,7 +13,7 @@ import { Confirm } from "common/components/dialog2"
 export interface BiomethanePageHeaderProps extends PropsWithChildren {
   selectedYear?: number
   yearsOptions: { label: string; value: number }[]
-  status: "pending" | "validated"
+  status?: "PENDING" | "VALIDATED"
   onChangeYear: (year?: number) => void
   onConfirm: () => Promise<any>
 }
@@ -45,7 +45,7 @@ export const BiomethanePageHeader = ({
             <br />
             {selectedYear &&
               t(
-                "Ces informations seront encore modifiables jusqu'au {{date}}.",
+                "Ces informations seront encore modifiables jusqu'au {{date}}",
                 {
                   date: `31/03/${selectedYear + 1}`,
                 }
@@ -67,7 +67,7 @@ export const BiomethanePageHeader = ({
           onClick={openValidateDeclarationDialog}
           iconId="ri-file-text-line"
           asideX
-          disabled={!selectedYearIsInCurrentInterval || status === "validated"}
+          disabled={!selectedYearIsInCurrentInterval || status === "VALIDATED"}
         >
           {t("Valider mes informations annuelles")}
         </Button>
@@ -85,8 +85,8 @@ export const BiomethanePageHeader = ({
         >
           {t("Récapitulatif de vos informations")}
         </Title>
-        <Badge severity={status === "pending" ? "info" : "success"}>
-          {status === "pending" ? t("En cours") : t("Validé")}
+        <Badge severity={status === "PENDING" ? "info" : "success"}>
+          {status === "PENDING" ? t("En cours") : t("Validé")}
         </Badge>
       </Row>
       {selectedYearIsInCurrentInterval && (

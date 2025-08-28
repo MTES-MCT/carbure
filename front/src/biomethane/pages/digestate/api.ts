@@ -67,3 +67,12 @@ export const deleteSpreadingDepartment = (
       },
     },
   })
+
+export const validateDigestate = (entity_id: number) =>
+  api.POST("/biomethane/digestate/validate/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+  })
