@@ -7,12 +7,17 @@ import useEntity from "common/hooks/entity"
 import { InjectionSite } from "./components/injection-site"
 import { SpreadingDistance } from "./components/spreading-distance"
 import { useProductionUnit } from "../production/production.hooks"
-import { DigestateValorizationMethods } from "../production/types"
+import {
+  DigestateValorizationMethods,
+  SpreadingManagementMethods,
+} from "../production/types"
 import { Spreading } from "./components/spreading"
 import { DigestateProvider } from "./digestate.hooks"
 import { LoaderOverlay } from "common/components/scaffold"
 import { SettingsNotFilled } from "biomethane/layouts/settings-not-filled"
 import { Composting } from "./components/composting"
+import { IncinerationLandfill } from "./components/incineration-landfill"
+import { Sale } from "./components/sale"
 
 enum BiomethaneDigestateStatus {
   PENDING = "pending",
@@ -60,6 +65,14 @@ export const Digestate = () => {
         {productionUnit?.digestate_valorization_methods?.includes(
           DigestateValorizationMethods.COMPOSTING
         ) && <Composting digestate={digestate?.data} />}
+
+        {productionUnit?.digestate_valorization_methods?.includes(
+          DigestateValorizationMethods.INCINERATION_LANDFILLING
+        ) && <IncinerationLandfill digestate={digestate?.data} />}
+
+        {productionUnit?.spreading_management_methods?.includes(
+          SpreadingManagementMethods.SALE
+        ) && <Sale digestate={digestate?.data} />}
       </BiomethanePageHeader>
     </DigestateProvider>
   )
