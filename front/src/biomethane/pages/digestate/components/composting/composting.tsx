@@ -33,7 +33,7 @@ type CompostingForm = DeepPartial<
 export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<CompostingForm>(digestate ?? {})
-  const { saveDigestate } = useDigestateContext()
+  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)
 
@@ -62,6 +62,7 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
       description={t(
         "Que si compostage est sélectionné dans Production (paramètres)"
       )}
+      readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

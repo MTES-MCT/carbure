@@ -960,6 +960,24 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/biomethane/digestate/validate/:
+    post:
+      operationId: biomethane_digestate_validate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
   /api/biomethane/digestate/years/:
     get:
       operationId: biomethane_digestate_years_retrieve

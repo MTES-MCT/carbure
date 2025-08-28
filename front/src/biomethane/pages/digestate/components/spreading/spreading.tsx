@@ -7,6 +7,7 @@ import { BiomethaneDigestate } from "../../types"
 import { Notice } from "common/components/notice"
 import { usePortal } from "common/components/portal"
 import { AddSpreadingDepartment } from "./add-spreading-department"
+import { useDigestateContext } from "../../digestate.hooks"
 
 export const Spreading = ({
   digestate,
@@ -18,6 +19,7 @@ export const Spreading = ({
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
   const portal = usePortal()
+  const { isInDeclarationPeriod } = useDigestateContext()
 
   const openAddSpreadingDepartmentDialog = () => {
     portal((close) => (
@@ -50,11 +52,12 @@ export const Spreading = ({
         <Button
           iconId="ri-add-line"
           onClick={openAddSpreadingDepartmentDialog}
-          disabled={!digestate}
+          disabled={!digestate || !isInDeclarationPeriod}
         >
           {t("Ajouter un département")}
         </Button>
       }
+      readOnly={!isInDeclarationPeriod}
     >
       {digestate && digestate?.spreadings.length > 0 ? (
         <>

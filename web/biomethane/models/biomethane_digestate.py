@@ -4,10 +4,9 @@ from core.models import Entity
 
 
 class BiomethaneDigestate(models.Model):
-    DIGESTATE_STATUS = [
-        ("PENDING", "PENDING"),
-        ("VALIDATED", "VALIDATED"),
-    ]
+    PENDING = "PENDING"
+    VALIDATED = "VALIDATED"
+    DIGESTATE_STATUS = [(PENDING, "PENDING"), (VALIDATED, "VALIDATED")]
 
     # Propriétaire du digestat
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_digestates")

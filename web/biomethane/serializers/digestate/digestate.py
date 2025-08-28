@@ -41,7 +41,9 @@ class BiomethaneDigestateSerializer(BaseBiomethaneDigestateSerializer):
 
 
 class BiomethaneDigestatePatchSerializer(BaseBiomethaneDigestateSerializer):
-    pass
+    def update(self, instance, validated_data):
+        validated_data["status"] = BiomethaneDigestate.PENDING
+        return super().update(instance, validated_data)
 
 
 class BiomethaneDigestateAddSerializer(BaseBiomethaneDigestateSerializer):

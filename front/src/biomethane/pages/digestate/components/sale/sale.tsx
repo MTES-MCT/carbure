@@ -15,7 +15,7 @@ type SaleForm = DeepPartial<
 export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<SaleForm>(digestate ?? {})
-  const { saveDigestate } = useDigestateContext()
+  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)
 
@@ -25,6 +25,7 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
       description={t(
         "Que si Vente est sélectionné dans Production (Paramètres)"
       )}
+      readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

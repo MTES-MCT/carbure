@@ -1,1 +1,0 @@
-from .test_check_declaration_period import CheckDeclarationPeriodTest

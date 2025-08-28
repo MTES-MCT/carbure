@@ -30,6 +30,7 @@ interface EditableCardProps {
   onEdit?: (isEditing: boolean) => void
   onCancel?: () => void
   className?: string
+  readOnly?: boolean
 }
 
 // Internal component that uses the context
@@ -45,6 +46,7 @@ const EditableCardContent = ({
   headerActions,
   className,
   isEditing: controlledIsEditing,
+  readOnly,
   onEdit: controlledOnEdit,
   onCancel: controlledOnCancel,
 }: EditableCardProps) => {
@@ -88,7 +90,7 @@ const EditableCardContent = ({
 
         {headerActions}
 
-        {headerActions === undefined ? (
+        {headerActions === undefined && !readOnly ? (
           <>
             {!currentIsEditing && (
               <Button

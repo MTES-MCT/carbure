@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
+import { useDigestateContext } from "../../digestate.hooks"
 
 type SpreadingDistanceForm = DeepPartial<
   Pick<BiomethaneDigestateAddRequest, "average_spreading_valorization_distance">
@@ -18,10 +19,9 @@ export function SpreadingDistance({
   const { t } = useTranslation()
   const { bind, value } = useForm<SpreadingDistanceForm>(digestate ?? {})
 
-  const handleSave = async () => {
-    // TODO: Implémenter la sauvegarde
-    console.log("Sauvegarde des données de distance d'épandage:", value)
-  }
+  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+
+  const handleSave = async () => saveDigestate.execute(value)
 
   return (
     <EditableCard
@@ -29,6 +29,7 @@ export function SpreadingDistance({
       description={t(
         "Données par département, Que si Épandage déclaré (dans paramètres)"
       )}
+      readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

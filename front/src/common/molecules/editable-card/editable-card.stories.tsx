@@ -85,3 +85,10 @@ export const NoHeaderActions: Story = {
     headerActions: null,
   },
 }
+
+export const ReadOnly: Story = {
+  args: {
+    children: <div>children</div>,
+    readOnly: true,
+  },
+}

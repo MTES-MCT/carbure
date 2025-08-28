@@ -28,12 +28,15 @@ export function InjectionSite({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<InjectionSiteForm>(digestate ?? {})
-  const { saveDigestate } = useDigestateContext()
+  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
-    <EditableCard title={t("Site d'injection")}>
+    <EditableCard
+      title={t("Site d'injection")}
+      readOnly={!isInDeclarationPeriod}
+    >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">

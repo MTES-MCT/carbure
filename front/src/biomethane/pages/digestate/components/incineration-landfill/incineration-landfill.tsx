@@ -30,7 +30,7 @@ export function IncinerationLandfill({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<IncinerationLandfillForm>(digestate ?? {})
-  const { saveDigestate } = useDigestateContext()
+  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)
 
@@ -40,6 +40,7 @@ export function IncinerationLandfill({
       description={t(
         "Que si Incinération est sélectionné dans Production (Paramètres)"
       )}
+      readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

@@ -9,6 +9,7 @@ import { Button } from "common/components/button2"
 import { usePortal } from "common/components/portal"
 import { Confirm } from "common/components/dialog2"
 import useEntity from "common/hooks/entity"
+import Tag from "@codegouvfr/react-dsfr/Tag"
 
 export const useSpreadingColumns = () => {
   const { t } = useTranslation()
@@ -19,8 +20,11 @@ export const useSpreadingColumns = () => {
   const columns: Column<BiomethaneDigestateSpreading>[] = [
     {
       header: t("Département"),
-      cell: (spreadingData) =>
-        `${spreadingData.spreading_department} - ${getDepartmentName(spreadingData.spreading_department)}`,
+      cell: (spreadingData) => (
+        <Tag
+          small
+        >{`${spreadingData.spreading_department} - ${getDepartmentName(spreadingData.spreading_department)}`}</Tag>
+      ),
     },
     {
       header: t("Quantité épandue (t)"),

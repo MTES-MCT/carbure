@@ -19,6 +19,8 @@ import { Composting } from "./components/composting"
 import { IncinerationLandfill } from "./components/incineration-landfill"
 import { Sale } from "./components/sale"
 import { useGetContractInfos } from "../contract/contract.hooks"
+import { usePrivateNavigation } from "common/layouts/navigation"
+import { useTranslation } from "react-i18next"
 
 enum BiomethaneDigestateStatus {
   PENDING = "pending",
@@ -26,6 +28,7 @@ enum BiomethaneDigestateStatus {
 }
 
 export const Digestate = () => {
+  const { t } = useTranslation()
   const entity = useEntity()
   const { year } = useParams<{ year: string }>()
   const years = useYears("biomethane/digestate", getYears)
@@ -35,18 +38,22 @@ export const Digestate = () => {
   })
   const { result: productionUnit } = useProductionUnit()
   const { result: contract } = useGetContractInfos()
+  usePrivateNavigation(t("Digestat"))
 
   if (loading) return <LoaderOverlay />
 
   if (!loading && !productionUnit?.id) {
     return <SettingsNotFilled />
   }
+
   return (
     <DigestateProvider year={years.selected}>
       <BiomethanePageHeader
         selectedYear={parseInt(year!)}
         yearsOptions={years.options}
         status={BiomethaneDigestateStatus.PENDING}
+        onChangeYear={years.setYear}
+        onConfirm={() => Promise.resolve()}
       >
         {productionUnit && (
           <InjectionSite

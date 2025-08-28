@@ -7,11 +7,15 @@ import { Title } from "common/components/title"
 import { PropsWithChildren } from "react"
 import { useTranslation } from "react-i18next"
 import { declarationInterval } from "biomethane/utils"
+import { usePortal } from "common/components/portal"
+import { Confirm } from "common/components/dialog2"
 
 export interface BiomethanePageHeaderProps extends PropsWithChildren {
   selectedYear?: number
   yearsOptions: { label: string; value: number }[]
   status: "pending" | "validated"
+  onChangeYear: (year?: number) => void
+  onConfirm: () => Promise<any>
 }
 
 export const BiomethanePageHeader = ({
@@ -19,17 +23,48 @@ export const BiomethanePageHeader = ({
   yearsOptions,
   children,
   status,
+  onChangeYear,
+  onConfirm,
 }: BiomethanePageHeaderProps) => {
   const { t } = useTranslation()
+  const portal = usePortal()
+
   const selectedYearIsInCurrentInterval =
     selectedYear === declarationInterval.year
 
+  const openValidateDeclarationDialog = () => {
+    portal((close) => (
+      <Confirm
+        onClose={close}
+        confirm={t("Valider")}
+        onConfirm={onConfirm}
+        title={t("Valider mes informations annuelles")}
+        description={
+          <>
+            {t("Voulez-vous valider vos informations annuelles ?")}
+            <br />
+            {selectedYear &&
+              t(
+                "Ces informations seront encore modifiables jusqu'au {{date}}.",
+                {
+                  date: `31/03/${selectedYear + 1}`,
+                }
+              )}
+          </>
+        }
+      />
+    ))
+  }
   return (
     <Main>
       <Row>
-        <Select options={yearsOptions} value={selectedYear} />
+        <Select
+          options={yearsOptions}
+          value={selectedYear}
+          onChange={onChangeYear}
+        />
         <Button
-          onClick={() => {}}
+          onClick={openValidateDeclarationDialog}
           iconId="ri-file-text-line"
           asideX
           disabled={!selectedYearIsInCurrentInterval || status === "validated"}
