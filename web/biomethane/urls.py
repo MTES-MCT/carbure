@@ -7,7 +7,6 @@ from .views import (
     BiomethaneInjectionSiteViewSet,
 )
 from .views.digestate.digestate import BiomethaneDigestateViewSet
-from .views.digestate.mixins import get_years, validate
 from .views.digestate.spreading import BiomethaneDigestateSpreadingViewSet
 from .views.production_unit import (
     BiomethaneDigestateStorageViewSet,
@@ -59,12 +58,24 @@ digestate_viewset = BiomethaneDigestateViewSet.as_view(
     }
 )
 
+digestate_years_viewset = BiomethaneDigestateViewSet.as_view(
+    {
+        "get": "get_years",
+    }
+)
+
+digestate_validate_viewset = BiomethaneDigestateViewSet.as_view(
+    {
+        "post": "validate_digestate",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
     path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
     path("digestate/", digestate_viewset, name="biomethane-digestate"),
-    path("digestate/years/", get_years, name="biomethane-digestate-years"),
-    path("digestate/validate/", validate, name="biomethane-digestate-validate"),
+    path("digestate/years/", digestate_years_viewset, name="biomethane-digestate-years"),
+    path("digestate/validate/", digestate_validate_viewset, name="biomethane-digestate-validate"),
     *router.urls,
 ]
