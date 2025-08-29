@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from biomethane.decorators.check_declaration_period import check_declaration_period
 from biomethane.filters.digestate import BiomethaneDigestateFilter
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.serializers.digestate import (
@@ -12,6 +11,7 @@ from biomethane.serializers.digestate import (
     BiomethaneDigestatePatchSerializer,
     BiomethaneDigestateSerializer,
 )
+from biomethane.utils import get_declaration_period
 from core.models import Entity
 from core.permissions import HasUserRights
 
@@ -20,13 +20,6 @@ from core.permissions import HasUserRights
     parameters=[
         OpenApiParameter(
             name="entity_id",
-            type=OpenApiTypes.INT,
-            location=OpenApiParameter.QUERY,
-            description="Authorised entity ID.",
-            required=True,
-        ),
-        OpenApiParameter(
-            name="year",
             type=OpenApiTypes.INT,
             location=OpenApiParameter.QUERY,
             description="Authorised entity ID.",
@@ -41,10 +34,15 @@ class BiomethaneDigestateViewSet(ModelViewSet):
     filterset_class = BiomethaneDigestateFilter
     pagination_class = None
 
+    def initialize_request(self, request, *args, **kwargs):
+        request = super().initialize_request(request, *args, **kwargs)
+        setattr(request, "year", get_declaration_period())
+        return request
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
-        context["year"] = self.request.query_params.get("year")
+        context["year"] = getattr(self.request, "year", None)
         return context
 
     def get_serializer_class(self):
@@ -53,15 +51,6 @@ class BiomethaneDigestateViewSet(ModelViewSet):
         return BiomethaneDigestateSerializer
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "year",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Year",
-                required=True,
-            ),
-        ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 response=BiomethaneDigestateSerializer,
@@ -72,9 +61,8 @@ class BiomethaneDigestateViewSet(ModelViewSet):
         description="Retrieve the digestate for the current entity and the current year. Returns a single digestate object.",
     )
     def retrieve(self, request, *args, **kwargs):
-        year = request.query_params.get("year")
         try:
-            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=year)
+            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
             data = self.get_serializer(digestate, many=False).data
             return Response(data)
 
@@ -95,12 +83,11 @@ class BiomethaneDigestateViewSet(ModelViewSet):
         request=BiomethaneDigestateAddSerializer,
         description="Create or update the digestate for the current entity (upsert operation).",
     )
-    @check_declaration_period()
     def upsert(self, request, *args, **kwargs):
         serializer_context = self.get_serializer_context()
         try:
             # Try to get existing digestate
-            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.query_params.get("year"))
+            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
             # Update existing digestate
             serializer = BiomethaneDigestatePatchSerializer(
                 digestate, data=request.data, partial=True, context=serializer_context
