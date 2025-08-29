@@ -80,25 +80,15 @@ class BiomethaneProductionUnitViewSet(GenericViewSet):
     )
     def upsert(self, request, *args, **kwargs):
         """Create or update production unit using upsert logic."""
-        serializer_context = self.get_serializer_context()
         try:
-            # Try to get existing production unit
             production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
-            # Update existing production unit
-            serializer = BiomethaneProductionUnitUpsertSerializer(
-                production_unit, data=request.data, partial=True, context=serializer_context
-            )
-            if serializer.is_valid():
-                serializer.save()
-                response_data = BiomethaneProductionUnitSerializer(production_unit, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            serializer = self.get_serializer(production_unit, data=request.data, partial=True)
+            status_code = status.HTTP_200_OK
         except BiomethaneProductionUnit.DoesNotExist:
-            # Create new production unit
-            serializer = BiomethaneProductionUnitUpsertSerializer(data=request.data, context=serializer_context)
-            if serializer.is_valid():
-                production_unit = serializer.save()
-                response_data = BiomethaneProductionUnitSerializer(production_unit, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(data=request.data)
+            status_code = status.HTTP_201_CREATED
+
+        if serializer.is_valid():
+            production_unit = serializer.save()
+            return Response(status=status_code)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

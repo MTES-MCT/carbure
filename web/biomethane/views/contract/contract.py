@@ -79,24 +79,18 @@ class BiomethaneContractViewSet(GenericViewSet):
     def upsert(self, request, *args, **kwargs):
         """Create or update contract using upsert logic."""
         serializer_context = self.get_serializer_context()
+
         try:
-            # Try to get existing contract
             contract = BiomethaneContract.objects.get(entity=request.entity)
-            # Update existing contract
             serializer = BiomethaneContractPatchSerializer(
                 contract, data=request.data, partial=True, context=serializer_context
             )
-            if serializer.is_valid():
-                serializer.save()
-                response_data = BiomethaneContractSerializer(contract, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            status_code = status.HTTP_200_OK
         except BiomethaneContract.DoesNotExist:
-            # Create new contract
             serializer = BiomethaneContractAddSerializer(data=request.data, context=serializer_context)
-            if serializer.is_valid():
-                contract = serializer.save()
-                response_data = BiomethaneContractSerializer(contract, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            status_code = status.HTTP_201_CREATED
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status_code)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

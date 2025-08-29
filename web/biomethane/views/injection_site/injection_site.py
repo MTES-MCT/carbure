@@ -65,30 +65,27 @@ class BiomethaneInjectionSiteViewSet(GenericViewSet):
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 response=BiomethaneInjectionSiteSerializer,
+                description="Injection site updated successfully",
+            ),
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response=BiomethaneInjectionSiteSerializer,
+                description="Injection site created successfully",
             ),
         },
         request=BiomethaneInjectionSiteInputSerializer,
+        description="Create or update the injection site for the current entity (upsert operation).",
     )
     def upsert(self, request, *args, **kwargs):
         """Create or update injection site using upsert logic."""
-        serializer_context = self.get_serializer_context()
         try:
-            # Try to get existing injection site
             injection_site = BiomethaneInjectionSite.objects.get(entity=request.entity)
-            # Update existing injection site
             serializer = self.get_serializer(injection_site, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                response_data = BiomethaneInjectionSiteSerializer(injection_site, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_200_OK)
-
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            status_code = status.HTTP_200_OK
         except BiomethaneInjectionSite.DoesNotExist:
-            # Create new injection site
             serializer = self.get_serializer(data=request.data)
-            if serializer.is_valid():
-                injection_site = serializer.save()
-                response_data = BiomethaneInjectionSiteSerializer(injection_site, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            status_code = status.HTTP_201_CREATED
+
+        if serializer.is_valid():
+            injection_site = serializer.save()
+            return Response(status=status_code)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

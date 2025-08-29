@@ -54,11 +54,6 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         context["year"] = getattr(self.request, "year", None)
         return context
 
-    def get_serializer_class(self):
-        if self.action == "upsert":
-            return BiomethaneDigestatePatchSerializer
-        return BiomethaneDigestateSerializer
-
     @extend_schema(
         responses={
             status.HTTP_200_OK: OpenApiResponse(
@@ -94,24 +89,18 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
     )
     def upsert(self, request, *args, **kwargs):
         serializer_context = self.get_serializer_context()
+
         try:
-            # Try to get existing digestate
             digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
-            # Update existing digestate
             serializer = BiomethaneDigestatePatchSerializer(
                 digestate, data=request.data, partial=True, context=serializer_context
             )
-            if serializer.is_valid():
-                serializer.save()
-                response_data = BiomethaneDigestateSerializer(digestate, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            status_code = status.HTTP_200_OK
         except BiomethaneDigestate.DoesNotExist:
-            # Create new digestate
             serializer = BiomethaneDigestateAddSerializer(data=request.data, context=serializer_context)
-            if serializer.is_valid():
-                digestate = serializer.save()
-                response_data = BiomethaneDigestateSerializer(digestate, context=serializer_context).data
-                return Response(response_data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            status_code = status.HTTP_201_CREATED
+
+        if serializer.is_valid():
+            digestate = serializer.save()
+            return Response(status=status_code)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
