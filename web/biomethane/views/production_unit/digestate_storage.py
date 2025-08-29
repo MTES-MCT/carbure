@@ -28,6 +28,11 @@ class BiomethaneDigestateStorageViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["entity"] = getattr(self.request, "entity", None)
+        return context
+
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return BiomethaneDigestateStorage.objects.none()
