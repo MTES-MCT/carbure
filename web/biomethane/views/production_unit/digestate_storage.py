@@ -1,5 +1,4 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from biomethane.models import BiomethaneDigestateStorage
@@ -8,7 +7,7 @@ from biomethane.serializers.digestate_storage import (
     BiomethaneDigestateStoragePatchSerializer,
     BiomethaneDigestateStorageSerializer,
 )
-from core.models import Entity
+from core.models import Entity, UserRights
 from core.permissions import HasUserRights
 
 
@@ -25,8 +24,18 @@ from core.permissions import HasUserRights
 )
 class BiomethaneDigestateStorageViewSet(ModelViewSet):
     serializer_class = BiomethaneDigestateStorageSerializer
-    permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
+    permission_classes = [HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
+
+    def get_permissions(self):
+        if self.action in [
+            "create",
+            "destroy",
+            "update",
+            "partial_update",
+        ]:
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
+        return super().get_permissions()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

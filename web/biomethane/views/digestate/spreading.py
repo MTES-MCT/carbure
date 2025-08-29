@@ -1,6 +1,5 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
@@ -26,11 +25,7 @@ from core.permissions import HasUserRights
 class BiomethaneDigestateSpreadingViewSet(GenericViewSet, CreateModelMixin, DestroyModelMixin):
     queryset = BiomethaneDigestateSpreading.objects.all()
     serializer_class = BiomethaneDigestateSpreadingAddSerializer
-    permission_classes = [
-        IsAuthenticated,
-        HasUserRights(UserRights.RW, [Entity.BIOMETHANE_PRODUCER]),
-    ]
-    http_method_names = ["post", "delete"]
+    permission_classes = [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)

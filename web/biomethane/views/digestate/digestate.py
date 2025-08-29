@@ -2,7 +2,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.digestate import BiomethaneDigestateFilter
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
@@ -12,7 +12,8 @@ from biomethane.serializers.digestate import (
     BiomethaneDigestateSerializer,
 )
 from biomethane.utils import get_declaration_period
-from core.models import Entity
+from biomethane.views.digestate.mixins import ValidateActionMixin, YearsActionMixin
+from core.models import Entity, UserRights
 from core.permissions import HasUserRights
 
 
@@ -27,12 +28,20 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneDigestateViewSet(ModelViewSet):
+class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin):
     queryset = BiomethaneDigestate.objects.all()
     serializer_class = BiomethaneDigestateSerializer
     permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
     filterset_class = BiomethaneDigestateFilter
     pagination_class = None
+
+    def get_permissions(self):
+        if self.action in [
+            "upsert",
+            "validate_digestate",
+        ]:
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
+        return super().get_permissions()
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)

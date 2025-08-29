@@ -1,11 +1,10 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet, mixins
 
 from biomethane.filters import BiomethaneContractAmendmentFilter
 from biomethane.models import BiomethaneContractAmendment
 from biomethane.serializers import BiomethaneContractAmendmentAddSerializer, BiomethaneContractAmendmentSerializer
-from core.models import Entity
+from core.models import Entity, UserRights
 from core.permissions import HasUserRights
 
 
@@ -28,8 +27,15 @@ class BiomethaneContractAmendmentViewSet(
 ):
     queryset = BiomethaneContractAmendment.objects.all()
     serializer_class = BiomethaneContractAmendmentSerializer
-    permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
+    permission_classes = [HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     filterset_class = BiomethaneContractAmendmentFilter
+
+    def get_permissions(self):
+        if self.action in [
+            "create",
+        ]:
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
+        return super().get_permissions()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

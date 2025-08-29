@@ -8,7 +8,7 @@ from biomethane.serializers.production_unit import (
     BiomethaneProductionUnitSerializer,
     BiomethaneProductionUnitUpsertSerializer,
 )
-from core.models import Entity
+from core.models import Entity, UserRights
 from core.permissions import HasUserRights
 
 
@@ -28,6 +28,13 @@ class BiomethaneProductionUnitViewSet(GenericViewSet):
     serializer_class = BiomethaneProductionUnitSerializer
     permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
+
+    def get_permissions(self):
+        if self.action in [
+            "upsert",
+        ]:
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
+        return super().get_permissions()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

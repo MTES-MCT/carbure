@@ -1,6 +1,5 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -10,7 +9,7 @@ from biomethane.serializers.contract import (
     BiomethaneContractPatchSerializer,
     BiomethaneContractSerializer,
 )
-from core.models import Entity
+from core.models import Entity, UserRights
 from core.permissions import HasUserRights
 
 # from .mixins import ActionMixin
@@ -30,8 +29,15 @@ from core.permissions import HasUserRights
 class BiomethaneContractViewSet(GenericViewSet):
     queryset = BiomethaneContract.objects.all()
     serializer_class = BiomethaneContractSerializer
-    permission_classes = [IsAuthenticated, HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
+    permission_classes = [HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
+
+    def get_permissions(self):
+        if self.action in [
+            "upsert",
+        ]:
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
+        return super().get_permissions()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
