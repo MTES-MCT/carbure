@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
+from biomethane.utils import get_declaration_period
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data, setup_current_user
 
@@ -24,7 +25,7 @@ class BiomethaneDigestateSpreadingTests(TestCase):
 
         self.digestate = BiomethaneDigestate.objects.create(
             producer=self.entity,
-            year=2024,
+            year=get_declaration_period(),
         )
 
         self.digestate_spreading_url = reverse("biomethane-digestate-spreading-list")
@@ -40,8 +41,9 @@ class BiomethaneDigestateSpreadingTests(TestCase):
             self.digestate_spreading_url,
             data,
             content_type="application/json",
-            query_params={"entity_id": self.entity.id, "year": self.digestate.year},
+            query_params={"entity_id": self.entity.id},
         )
+        print(self.digestate_spreading_url)
 
         self.assertEqual(response.status_code, 201)
 

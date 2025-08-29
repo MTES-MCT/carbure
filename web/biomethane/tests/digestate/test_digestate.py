@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
+from biomethane.utils import get_declaration_period
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data, setup_current_user
 
@@ -23,23 +24,17 @@ class BiomethaneDigestateTests(TestCase):
 
         self.digestate = BiomethaneDigestate.objects.create(
             producer=self.entity,
-            year=2024,
+            year=get_declaration_period(),
         )
 
         self.digestate_url = reverse("biomethane-digestate")
 
     def test_retrieve_digestate_for_current_year(self):
         """Test that digestate data can be retrieved for the current year"""
-        response = self.client.get(self.digestate_url, {"entity_id": self.entity.id, "year": self.digestate.year})
+        response = self.client.get(self.digestate_url, {"entity_id": self.entity.id})
 
         self.assertEqual(self.digestate.id, response.data["id"])
         self.assertEqual(self.digestate.year, response.data["year"])
-
-    def test_retrieve_digestate_for_wrong_year(self):
-        """Test that a 404 error is returned when trying to retrieve digestate for a non-existent year"""
-        response = self.client.get(self.digestate_url, {"entity_id": self.entity.id, "year": 2023})
-
-        self.assertEqual(response.status_code, 404)
 
     def test_create_digestate(self):
         """Test that a new digestate record can be created with valid data"""
@@ -53,10 +48,10 @@ class BiomethaneDigestateTests(TestCase):
             self.digestate_url,
             data,
             content_type="application/json",
-            query_params={"entity_id": self.entity.id, "year": 2024},
+            query_params={"entity_id": self.entity.id},
         )
 
-        digestate = BiomethaneDigestate.objects.get(producer=self.entity, year=2024)
+        digestate = BiomethaneDigestate.objects.get(producer=self.entity, year=2025)
 
         assert_object_contains_data(self, digestate, data)
 
