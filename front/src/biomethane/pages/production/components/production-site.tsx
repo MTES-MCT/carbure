@@ -15,12 +15,12 @@ import {
   BiomethaneProductionUnitPatchRequest,
   ProcessType,
   MethanizationProcess,
+  InstalledMeters,
 } from "../types"
-import { InstalledMetersEnum } from "api-schema"
 import { useSaveProductionUnit } from "../production.hooks"
 
 type ProductionSiteForm = DeepPartial<BiomethaneProductionUnitPatchRequest> & {
-  installed_meters?: InstalledMetersEnum[]
+  installed_meters?: InstalledMeters[]
 }
 
 export function ProductionSite({
@@ -69,31 +69,31 @@ export function ProductionSite({
 
   const installedMetersOptions = [
     {
-      value: InstalledMetersEnum.BIOGAS_PRODUCTION_FLOWMETER,
+      value: InstalledMeters.BIOGAS_PRODUCTION_FLOWMETER,
       label: t("Débitmètre dédié à la production de biogaz"),
     },
     {
-      value: InstalledMetersEnum.PURIFICATION_FLOWMETER,
+      value: InstalledMeters.PURIFICATION_FLOWMETER,
       label: t("Débitmètre dédié au volume de biogaz traité en épuration"),
     },
     {
-      value: InstalledMetersEnum.FLARING_FLOWMETER,
+      value: InstalledMeters.FLARING_FLOWMETER,
       label: t("Débitmètre dédié au volume de biogaz torché"),
     },
     {
-      value: InstalledMetersEnum.HEATING_FLOWMETER,
+      value: InstalledMeters.HEATING_FLOWMETER,
       label: t(
         "Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur"
       ),
     },
     {
-      value: InstalledMetersEnum.PURIFICATION_ELECTRICAL_METER,
+      value: InstalledMeters.PURIFICATION_ELECTRICAL_METER,
       label: t(
         "Compteur dédié à la consommation électrique au système d'épuration et traitement des évents"
       ),
     },
     {
-      value: InstalledMetersEnum.GLOBAL_ELECTRICAL_METER,
+      value: InstalledMeters.GLOBAL_ELECTRICAL_METER,
       label: t(
         "Compteur dédié à la consommation électrique de l'ensemble de l'unité de production"
       ),

@@ -12,6 +12,8 @@ import { EnergyProvider } from "./energy.hooks"
 import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { useGetContractInfos } from "../contract/contract.hooks"
 import { InjectedBiomethane } from "./components/injected-biomethane"
+import { BiogasProduction } from "./components/biogas-production"
+import { useProductionUnit } from "../production/production.hooks"
 
 export const Energy = () => {
   const { t } = useTranslation()
@@ -20,6 +22,7 @@ export const Energy = () => {
   const notify = useNotify()
   const years = useYears("biomethane/energy", getYears)
   const { result: contract } = useGetContractInfos()
+  const { result: productionUnit } = useProductionUnit()
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "digestate",
     params: [entity.id, years.selected],
@@ -50,6 +53,7 @@ export const Energy = () => {
         onConfirm={validateEnergyMutation.execute}
       >
         <InjectedBiomethane energy={energy} contract={contract} />
+        <BiogasProduction energy={energy} productionUnit={productionUnit} />
       </BiomethanePageHeader>
     </EnergyProvider>
   )
