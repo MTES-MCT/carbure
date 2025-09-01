@@ -4,7 +4,7 @@ import { getDigestate, getYears, validateDigestate } from "./api"
 import useYears from "common/hooks/years-2"
 import { useMutation, useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { InjectionSite } from "./components/injection-site"
+import { Production } from "./components/production"
 import { SpreadingDistance } from "./components/spreading-distance"
 import { useProductionUnit } from "../production/production.hooks"
 import {
@@ -65,7 +65,7 @@ export const Digestate = () => {
         onConfirm={validateDigestateMutation.execute}
       >
         {productionUnit && (
-          <InjectionSite
+          <Production
             digestate={digestate?.data}
             productionUnit={productionUnit}
           />

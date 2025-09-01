@@ -9,7 +9,7 @@ import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 
-type InjectionSiteForm = DeepPartial<
+type ProductionForm = DeepPartial<
   Pick<
     BiomethaneDigestateAddRequest,
     | "raw_digestate_tonnage_produced"
@@ -19,7 +19,7 @@ type InjectionSiteForm = DeepPartial<
   >
 >
 
-export function InjectionSite({
+export function Production({
   digestate,
   productionUnit,
 }: {
@@ -27,14 +27,14 @@ export function InjectionSite({
   productionUnit: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<InjectionSiteForm>(digestate ?? {})
+  const { bind, value } = useForm<ProductionForm>(digestate ?? {})
   const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
     <EditableCard
-      title={t("Site d'injection")}
+      title={t("Production de digestat")}
       readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (

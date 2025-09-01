@@ -59,9 +59,6 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
   return (
     <EditableCard
       title={t("Lieu du compostage")}
-      description={t(
-        "Que si compostage est sélectionné dans Production (paramètres)"
-      )}
       readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (

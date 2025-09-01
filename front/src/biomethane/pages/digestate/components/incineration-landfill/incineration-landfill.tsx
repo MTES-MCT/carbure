@@ -37,9 +37,6 @@ export function IncinerationLandfill({
   return (
     <EditableCard
       title={t("Incinération / Enfouissement")}
-      description={t(
-        "Que si Incinération est sélectionné dans Production (Paramètres)"
-      )}
       readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (

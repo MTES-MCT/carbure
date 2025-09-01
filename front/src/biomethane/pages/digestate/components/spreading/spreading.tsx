@@ -41,8 +41,6 @@ export const Spreading = ({
           {t(
             "Données du plan d'épandage de l'installation à renseigner par département"
           )}
-          <br />
-          {t("Que si épandage déclaré (dans paramètres)")}
         </>
       }
       headerActions={

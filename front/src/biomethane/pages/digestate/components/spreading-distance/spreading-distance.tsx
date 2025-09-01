@@ -26,9 +26,7 @@ export function SpreadingDistance({
   return (
     <EditableCard
       title={t("Distance d'épandage")}
-      description={t(
-        "Données par département, Que si Épandage déclaré (dans paramètres)"
-      )}
+      description={t("Données par département")}
       readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (

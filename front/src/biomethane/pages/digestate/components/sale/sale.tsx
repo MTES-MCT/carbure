@@ -20,13 +20,7 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
-    <EditableCard
-      title={t("Vente")}
-      description={t(
-        "Que si Vente est sélectionné dans Production (Paramètres)"
-      )}
-      readOnly={!isInDeclarationPeriod}
-    >
+    <EditableCard title={t("Vente")} readOnly={!isInDeclarationPeriod}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
