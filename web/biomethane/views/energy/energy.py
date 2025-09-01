@@ -4,14 +4,15 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters.digestate import BiomethaneDigestateFilter
-from biomethane.models.biomethane_digestate import BiomethaneDigestate
-from biomethane.serializers.digestate import (
-    BiomethaneDigestateInputSerializer,
-    BiomethaneDigestateSerializer,
+from biomethane.models.biomethane_energy import BiomethaneEnergy
+from biomethane.serializers.energy.energy import (
+    BiomethaneEnergyAddSerializer,
+    BiomethaneEnergyPatchSerializer,
+    BiomethaneEnergySerializer,
 )
 from biomethane.utils import get_declaration_period
-from biomethane.views.digestate.mixins import ValidateActionMixin, YearsActionMixin
+from biomethane.views.energy.mixins.validate import ValidateActionMixin
+from biomethane.views.energy.mixins.years import YearsActionMixin
 from core.models import Entity, UserRights
 from core.permissions import HasUserRights
 
@@ -27,17 +28,16 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin):
-    queryset = BiomethaneDigestate.objects.all()
-    serializer_class = BiomethaneDigestateSerializer
+class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin):
+    queryset = BiomethaneEnergy.objects.all()
+    # serializer_class = BiomethaneEnergySerializer
     permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
-    filterset_class = BiomethaneDigestateFilter
     pagination_class = None
 
     def get_permissions(self):
         if self.action in [
             "upsert",
-            "validate_digestate",
+            "validate_energy",
         ]:
             return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
         return super().get_permissions()
@@ -53,11 +53,6 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         context["year"] = getattr(self.request, "year", None)
         return context
 
-    def get_serializer_class(self):
-        if self.action == "upsert":
-            return BiomethaneDigestateInputSerializer
-        return super().get_serializer_class()
-
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -70,43 +65,47 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneDigestateSerializer,
-                description="Digestate details for the entity",
+                response=BiomethaneEnergySerializer,
+                description="Energy details for the entity",
             ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Digestate not found for this entity."),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Energy not found for this entity."),
         },
-        description="Retrieve the digestate for the current entity and the current year. Returns a single digestate object.",
+        description="Retrieve the energy for the current entity and the current year. Returns a single energy object.",
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
-            data = self.get_serializer(digestate, many=False).data
+            energy = BiomethaneEnergy.objects.get(producer=request.entity, year=request.year)
+            data = self.get_serializer(energy, many=False).data
             return Response(data)
 
-        except BiomethaneDigestate.DoesNotExist:
+        except BiomethaneEnergy.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     @extend_schema(
         responses={
             status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneDigestateSerializer,
+                response=BiomethaneEnergySerializer,
                 description="Digestate updated successfully",
             ),
             status.HTTP_201_CREATED: OpenApiResponse(
-                response=BiomethaneDigestateSerializer,
+                response=BiomethaneEnergySerializer,
                 description="Digestate created successfully",
             ),
         },
-        request=BiomethaneDigestateInputSerializer,
+        request=BiomethaneEnergyAddSerializer,
         description="Create or update the digestate for the current entity (upsert operation).",
     )
     def upsert(self, request, *args, **kwargs):
+        serializer_context = self.get_serializer_context()
+
         try:
-            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
-            serializer = self.get_serializer(digestate, data=request.data, partial=True)
+            digestate = BiomethaneEnergy.objects.get(producer=request.entity, year=request.year)
+            serializer = BiomethaneEnergyPatchSerializer(
+                digestate, data=request.data, partial=True, context=serializer_context
+            )
             status_code = status.HTTP_200_OK
-        except BiomethaneDigestate.DoesNotExist:
-            serializer = self.get_serializer(data=request.data)
+        except BiomethaneEnergy.DoesNotExist:
+            serializer = BiomethaneEnergyAddSerializer(data=request.data, context=serializer_context)
             status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid():

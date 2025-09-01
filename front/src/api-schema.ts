@@ -355,6 +355,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/energy/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieve the energy for the current entity and the current year. Returns a single energy object. */
+        get: operations["biomethane_energy_retrieve"];
+        /** @description Create or update the digestate for the current entity (upsert operation). */
+        put: operations["biomethane_energy_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/energy/validate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["biomethane_energy_validate_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/energy/years/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_energy_years_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/injection-site/": {
         parameters: {
             query?: never;
@@ -2976,6 +3026,85 @@ export interface components {
             capacity: number;
             has_cover?: boolean;
             has_biogas_recovery?: boolean;
+        };
+        BiomethaneEnergy: {
+            readonly id: number;
+            /** Format: double */
+            injected_biomethane_gwh_pcs_per_year?: number | null;
+            /** Format: double */
+            injected_biomethane_nm3_per_year?: number | null;
+            /** Format: double */
+            injected_biomethane_ch4_rate_percent?: number | null;
+            /** Format: double */
+            injected_biomethane_pcs_kwh_per_nm3?: number | null;
+            /** Format: double */
+            operating_hours?: number | null;
+            /** Format: double */
+            produced_biogas_nm3_per_year?: number | null;
+            /** Format: double */
+            flared_biogas_nm3_per_year?: number | null;
+            /** Format: double */
+            flaring_operating_hours?: number | null;
+            attest_no_fossil_for_digester_heating_and_purification?: boolean;
+            energy_used_for_digester_heating?: string | null;
+            fossil_details_for_digester_heating?: string | null;
+            attest_no_fossil_for_installation_needs?: boolean;
+            energy_used_for_installation_needs?: string | null;
+            fossil_details_for_installation_needs?: string | null;
+            /** Format: double */
+            purified_biogas_quantity_nm3?: number | null;
+            /** Format: double */
+            purification_electric_consumption_kwe?: number | null;
+            /** Format: double */
+            self_consumed_biogas_nm3?: number | null;
+            /** Format: double */
+            total_unit_electric_consumption_kwe?: number | null;
+            /** Format: double */
+            butane_or_propane_addition?: number | null;
+            /** Format: double */
+            fossil_fuel_consumed_kwh?: number | null;
+            has_opposition_or_complaints_acceptability?: boolean;
+            estimated_work_days_acceptability?: number | null;
+            year: number;
+            status?: components["schemas"]["BiomethaneDigestateStatusEnum"];
+        };
+        BiomethaneEnergyAddRequest: {
+            /** Format: double */
+            injected_biomethane_gwh_pcs_per_year?: number | null;
+            /** Format: double */
+            injected_biomethane_nm3_per_year?: number | null;
+            /** Format: double */
+            injected_biomethane_ch4_rate_percent?: number | null;
+            /** Format: double */
+            injected_biomethane_pcs_kwh_per_nm3?: number | null;
+            /** Format: double */
+            operating_hours?: number | null;
+            /** Format: double */
+            produced_biogas_nm3_per_year?: number | null;
+            /** Format: double */
+            flared_biogas_nm3_per_year?: number | null;
+            /** Format: double */
+            flaring_operating_hours?: number | null;
+            attest_no_fossil_for_digester_heating_and_purification?: boolean;
+            energy_used_for_digester_heating?: string | null;
+            fossil_details_for_digester_heating?: string | null;
+            attest_no_fossil_for_installation_needs?: boolean;
+            energy_used_for_installation_needs?: string | null;
+            fossil_details_for_installation_needs?: string | null;
+            /** Format: double */
+            purified_biogas_quantity_nm3?: number | null;
+            /** Format: double */
+            purification_electric_consumption_kwe?: number | null;
+            /** Format: double */
+            self_consumed_biogas_nm3?: number | null;
+            /** Format: double */
+            total_unit_electric_consumption_kwe?: number | null;
+            /** Format: double */
+            butane_or_propane_addition?: number | null;
+            /** Format: double */
+            fossil_fuel_consumed_kwh?: number | null;
+            has_opposition_or_complaints_acceptability?: boolean;
+            estimated_work_days_acceptability?: number | null;
         };
         BiomethaneInjectionSite: {
             readonly id: number;
@@ -5699,6 +5828,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Declaration year. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6001,6 +6132,119 @@ export interface operations {
         };
     };
     biomethane_digestate_years_retrieve: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": number[];
+                };
+            };
+        };
+    };
+    biomethane_energy_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Declaration year. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Energy details for the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEnergy"];
+                };
+            };
+            /** @description Energy not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_energy_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneEnergyAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneEnergyAddRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneEnergyAddRequest"];
+            };
+        };
+        responses: {
+            /** @description Digestate updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEnergy"];
+                };
+            };
+            /** @description Digestate created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEnergy"];
+                };
+            };
+        };
+    };
+    biomethane_energy_validate_create: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_energy_years_retrieve: {
         parameters: {
             query: {
                 /** @description Entity ID */

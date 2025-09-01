@@ -1,6 +1,8 @@
 from django.urls import path
 from rest_framework_nested.routers import SimpleRouter
 
+from biomethane.views.energy.energy import BiomethaneEnergyViewSet
+
 from .views import (
     BiomethaneContractAmendmentViewSet,
     BiomethaneContractViewSet,
@@ -70,6 +72,25 @@ digestate_validate_viewset = BiomethaneDigestateViewSet.as_view(
     }
 )
 
+energy_viewset = BiomethaneEnergyViewSet.as_view(
+    {
+        "get": "retrieve",
+        "put": "upsert",
+    }
+)
+
+energy_years_viewset = BiomethaneEnergyViewSet.as_view(
+    {
+        "get": "get_years",
+    }
+)
+
+energy_validate_viewset = BiomethaneEnergyViewSet.as_view(
+    {
+        "post": "validate_energy",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
@@ -77,5 +98,8 @@ urlpatterns = [
     path("digestate/", digestate_viewset, name="biomethane-digestate"),
     path("digestate/years/", digestate_years_viewset, name="biomethane-digestate-years"),
     path("digestate/validate/", digestate_validate_viewset, name="biomethane-digestate-validate"),
+    path("energy/", energy_viewset, name="biomethane-energy"),
+    path("energy/years/", energy_years_viewset, name="biomethane-energy-years"),
+    path("energy/validate/", energy_validate_viewset, name="biomethane-energy-validate"),
     *router.urls,
 ]
