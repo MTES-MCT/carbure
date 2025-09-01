@@ -633,6 +633,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Declaration year.
+          required: true
       tags:
         - biomethane
       security:
@@ -963,6 +969,128 @@ paths:
   /api/biomethane/digestate/years/:
     get:
       operationId: biomethane_digestate_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
+  /api/biomethane/energy/:
+    get:
+      operationId: biomethane_energy_retrieve
+      description: Retrieve the energy for the current entity and the current year.
+        Returns a single energy object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Declaration year.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEnergy"
+          description: Energy details for the entity
+        "404":
+          description: Energy not found for this entity.
+    put:
+      operationId: biomethane_energy_update
+      description: Create or update the digestate for the current entity (upsert operation).
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEnergyAddRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEnergyAddRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEnergyAddRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEnergy"
+          description: Digestate updated successfully
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEnergy"
+          description: Digestate created successfully
+  /api/biomethane/energy/validate/:
+    post:
+      operationId: biomethane_energy_validate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/biomethane/energy/years/:
+    get:
+      operationId: biomethane_energy_years_retrieve
       parameters:
         - in: query
           name: entity_id
@@ -10602,6 +10730,186 @@ components:
       required:
         - capacity
         - type
+    BiomethaneEnergy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        injected_biomethane_gwh_pcs_per_year:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_ch4_rate_percent:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_pcs_kwh_per_nm3:
+          type: number
+          format: double
+          nullable: true
+        operating_hours:
+          type: number
+          format: double
+          nullable: true
+        produced_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flared_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flaring_operating_hours:
+          type: number
+          format: double
+          nullable: true
+        attest_no_fossil_for_digester_heating_and_purification:
+          type: boolean
+        energy_used_for_digester_heating:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_digester_heating:
+          type: string
+          nullable: true
+        attest_no_fossil_for_installation_needs:
+          type: boolean
+        energy_used_for_installation_needs:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_installation_needs:
+          type: string
+          nullable: true
+        purified_biogas_quantity_nm3:
+          type: number
+          format: double
+          nullable: true
+        purification_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        self_consumed_biogas_nm3:
+          type: number
+          format: double
+          nullable: true
+        total_unit_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        butane_or_propane_addition:
+          type: number
+          format: double
+          nullable: true
+        fossil_fuel_consumed_kwh:
+          type: number
+          format: double
+          nullable: true
+        has_opposition_or_complaints_acceptability:
+          type: boolean
+        estimated_work_days_acceptability:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
+      required:
+        - id
+        - year
+    BiomethaneEnergyAddRequest:
+      type: object
+      properties:
+        injected_biomethane_gwh_pcs_per_year:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_ch4_rate_percent:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_pcs_kwh_per_nm3:
+          type: number
+          format: double
+          nullable: true
+        operating_hours:
+          type: number
+          format: double
+          nullable: true
+        produced_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flared_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flaring_operating_hours:
+          type: number
+          format: double
+          nullable: true
+        attest_no_fossil_for_digester_heating_and_purification:
+          type: boolean
+        energy_used_for_digester_heating:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_digester_heating:
+          type: string
+          nullable: true
+        attest_no_fossil_for_installation_needs:
+          type: boolean
+        energy_used_for_installation_needs:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_installation_needs:
+          type: string
+          nullable: true
+        purified_biogas_quantity_nm3:
+          type: number
+          format: double
+          nullable: true
+        purification_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        self_consumed_biogas_nm3:
+          type: number
+          format: double
+          nullable: true
+        total_unit_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        butane_or_propane_addition:
+          type: number
+          format: double
+          nullable: true
+        fossil_fuel_consumed_kwh:
+          type: number
+          format: double
+          nullable: true
+        has_opposition_or_complaints_acceptability:
+          type: boolean
+        estimated_work_days_acceptability:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
     BiomethaneInjectionSite:
       type: object
       properties:
