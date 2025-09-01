@@ -11,6 +11,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { EnergyProvider } from "./energy.hooks"
 import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { useGetContractInfos } from "../contract/contract.hooks"
+import { InjectedBiomethane } from "./components/injected-biomethane"
 
 export const Energy = () => {
   const { t } = useTranslation()
@@ -48,7 +49,7 @@ export const Energy = () => {
         onChangeYear={years.setYear}
         onConfirm={validateEnergyMutation.execute}
       >
-        <div>Energy</div>
+        <InjectedBiomethane energy={energy} contract={contract} />
       </BiomethanePageHeader>
     </EnergyProvider>
   )

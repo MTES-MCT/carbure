@@ -30,7 +30,7 @@ from core.permissions import HasUserRights
 )
 class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin):
     queryset = BiomethaneEnergy.objects.all()
-    # serializer_class = BiomethaneEnergySerializer
+    serializer_class = BiomethaneEnergySerializer
     permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
