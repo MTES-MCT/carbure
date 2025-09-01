@@ -40,17 +40,44 @@ class BiomethaneDigestateSerializer(BaseBiomethaneDigestateSerializer):
     spreadings = BiomethaneDigestateSpreadingSerializer(many=True, read_only=True)
 
 
-class BiomethaneDigestatePatchSerializer(BaseBiomethaneDigestateSerializer):
-    def update(self, instance, validated_data):
-        validated_data["status"] = BiomethaneDigestate.PENDING
-        return super().update(instance, validated_data)
-
-
-class BiomethaneDigestateAddSerializer(BaseBiomethaneDigestateSerializer):
+class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
     composting_locations = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneDigestate.COMPOSTING_LOCATIONS),
         required=False,
     )
+
+    def validate(self, data):
+        errors = {}
+
+        # Always set status to PENDING on update and creation by default
+        data["status"] = self.instance.PENDING
+
+        ## Compostage
+        if data.get("composting_locations"):
+            # If composting_locations contains EXTERNAL_PLATFORM, the related fields are required
+            if BiomethaneDigestate.EXTERNAL_PLATFORM in data["composting_locations"]:
+                external_platform_fields = [
+                    ("external_platform_name", "external_platform_name"),
+                    ("external_platform_digestate_volume", "external_platform_digestate_volume"),
+                    ("external_platform_department", "external_platform_department"),
+                    ("external_platform_municipality", "external_platform_municipality"),
+                ]
+
+                for field_name, error_field in external_platform_fields:
+                    if not data.get(field_name):
+                        errors[error_field] = ["Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné."]
+
+            # If composting_locations contains ON_SITE, the related field is required
+            if BiomethaneDigestate.ON_SITE in data["composting_locations"]:
+                if not data.get("on_site_composted_digestate_volume"):
+                    errors["on_site_composted_digestate_volume"] = [
+                        "Ce champ est obligatoire lorsque 'Sur site' est sélectionné."
+                    ]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return data
 
     def create(self, validated_data):
         entity = self.context.get("entity")

@@ -1,2 +1,2 @@
-from .digestate import BiomethaneDigestateSerializer, BiomethaneDigestatePatchSerializer, BiomethaneDigestateAddSerializer
+from .digestate import BiomethaneDigestateSerializer, BiomethaneDigestateInputSerializer
 from .spreading import BiomethaneDigestateSpreadingSerializer

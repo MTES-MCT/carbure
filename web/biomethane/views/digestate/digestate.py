@@ -7,8 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 from biomethane.filters.digestate import BiomethaneDigestateFilter
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.serializers.digestate import (
-    BiomethaneDigestateAddSerializer,
-    BiomethaneDigestatePatchSerializer,
+    BiomethaneDigestateInputSerializer,
     BiomethaneDigestateSerializer,
 )
 from biomethane.utils import get_declaration_period
@@ -54,6 +53,11 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         context["year"] = getattr(self.request, "year", None)
         return context
 
+    def get_serializer_class(self):
+        if self.action == "upsert":
+            return BiomethaneDigestateInputSerializer
+        return super().get_serializer_class()
+
     @extend_schema(
         responses={
             status.HTTP_200_OK: OpenApiResponse(
@@ -84,20 +88,16 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
                 description="Digestate created successfully",
             ),
         },
-        request=BiomethaneDigestateAddSerializer,
+        request=BiomethaneDigestateInputSerializer,
         description="Create or update the digestate for the current entity (upsert operation).",
     )
     def upsert(self, request, *args, **kwargs):
-        serializer_context = self.get_serializer_context()
-
         try:
             digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
-            serializer = BiomethaneDigestatePatchSerializer(
-                digestate, data=request.data, partial=True, context=serializer_context
-            )
+            serializer = self.get_serializer(digestate, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneDigestate.DoesNotExist:
-            serializer = BiomethaneDigestateAddSerializer(data=request.data, context=serializer_context)
+            serializer = self.get_serializer(data=request.data)
             status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid():

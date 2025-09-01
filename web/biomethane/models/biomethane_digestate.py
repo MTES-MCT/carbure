@@ -1,5 +1,8 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
+from biomethane.models import BiomethaneProductionUnit
 from core.models import Entity
 
 
@@ -16,7 +19,7 @@ class BiomethaneDigestate(models.Model):
 
     status = models.CharField(choices=DIGESTATE_STATUS, max_length=28)
 
-    ## Site d'injection
+    ## Production de digestat
 
     # Tonnage digestat brut produit (t)
     raw_digestate_tonnage_produced = models.FloatField(null=True, blank=True)
@@ -30,9 +33,12 @@ class BiomethaneDigestate(models.Model):
     average_spreading_valorization_distance = models.FloatField(null=True, blank=True)
 
     ## Compostage
+    ON_SITE = "ON_SITE"
+    EXTERNAL_PLATFORM = "EXTERNAL_PLATFORM"
+
     COMPOSTING_LOCATIONS = [
-        ("ON_SITE", "Sur site"),
-        ("EXTERNAL_PLATFORM", "Plateforme externe"),
+        (ON_SITE, "Sur site"),
+        (EXTERNAL_PLATFORM, "Plateforme externe"),
     ]
     # Lieux de compostage
     composting_locations = models.JSONField(default=list)
@@ -66,3 +72,88 @@ class BiomethaneDigestate(models.Model):
     class Meta:
         db_table = "biomethane_digestate"
         verbose_name = "Digestat"
+
+
+@receiver(post_save, sender=BiomethaneDigestate)
+@receiver(post_save, sender=BiomethaneProductionUnit)
+def empty_fields(sender, instance, **kwargs):
+    fields_to_clear = []
+
+    if sender == BiomethaneDigestate:
+        digestate_instance = instance
+        production_unit = instance.producer.biomethane_production_unit
+    elif sender == BiomethaneProductionUnit:
+        production_unit = instance
+        try:
+            digestate_instance = BiomethaneDigestate.objects.get(producer=instance.producer)
+        except BiomethaneDigestate.DoesNotExist:
+            return
+    else:
+        return
+
+    ## Production de digestat
+    if production_unit.has_digestate_phase_separation:
+        fields_to_clear += [
+            "raw_digestate_tonnage_produced",
+            "raw_digestate_dry_matter_rate",
+        ]
+    else:
+        fields_to_clear += [
+            "solid_digestate_tonnage",
+            "liquid_digestate_quantity",
+        ]
+
+    ## Epandage
+    valorization_methods = production_unit.digestate_valorization_methods
+    if not valorization_methods or BiomethaneProductionUnit.SPREADING not in valorization_methods:
+        fields_to_clear += [
+            "average_spreading_valorization_distance",
+        ]
+
+    ## Compostage
+    if not valorization_methods or BiomethaneProductionUnit.COMPOSTING not in valorization_methods:
+        fields_to_clear += [
+            "external_platform_name",
+            "external_platform_digestate_volume",
+            "external_platform_department",
+            "external_platform_municipality",
+            "on_site_composted_digestate_volume",
+            "composting_locations",
+        ]
+
+    else:
+        if BiomethaneDigestate.ON_SITE not in digestate_instance.composting_locations:
+            fields_to_clear += [
+                "on_site_composted_digestate_volume",
+            ]
+
+        if BiomethaneDigestate.EXTERNAL_PLATFORM not in digestate_instance.composting_locations:
+            fields_to_clear += [
+                "external_platform_name",
+                "external_platform_digestate_volume",
+                "external_platform_department",
+                "external_platform_municipality",
+            ]
+
+    ## Incinération / Enfouissement
+    if not valorization_methods or BiomethaneProductionUnit.INCINERATION_LANDFILLING not in valorization_methods:
+        fields_to_clear += [
+            "annual_eliminated_volume",
+            "incinerator_landfill_center_name",
+            "wwtp_materials_to_incineration",
+        ]
+
+    ## Vente
+    spreading_management_methods = production_unit.spreading_management_methods
+    if not spreading_management_methods or BiomethaneProductionUnit.SALE not in spreading_management_methods:
+        fields_to_clear += [
+            "sold_volume",
+            "acquiring_companies",
+        ]
+
+    if fields_to_clear:
+        update_data = {}
+        for field in fields_to_clear:
+            new_value = None if field != "composting_locations" else {}
+            update_data[field] = new_value
+        BiomethaneDigestate.objects.filter(pk=digestate_instance.pk).update(**update_data)

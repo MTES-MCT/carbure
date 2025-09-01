@@ -15,21 +15,6 @@ class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
         model = BiomethaneInjectionSite
         exclude = ["entity"]
 
-    def get_fields(self):
-        fields = super().get_fields()
-        request = self.context.get("request")
-
-        if request and hasattr(request, "data"):
-            data = request.data
-
-            if data.get("is_different_from_production_site") == "false":
-                address_fields = ["company_address", "city", "postal_code"]
-                for field_name in address_fields:
-                    if field_name in fields:
-                        fields[field_name].required = False
-
-        return fields
-
     def validate(self, data):
         errors = {}
 
