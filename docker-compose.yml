@@ -43,7 +43,7 @@ services:
       carbure-django
     environment:
       TEST: 1
-    command: "pipenv run python3 web/manage.py test web --keepdb"
+    command: "pipenv run test web"
 
   carbure-django:
     image: carbure_app:local
