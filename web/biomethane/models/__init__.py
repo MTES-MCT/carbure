@@ -5,3 +5,4 @@ from .biomethane_production_unit import BiomethaneProductionUnit
 from .biomethane_digestate_storage import BiomethaneDigestateStorage
 from .biomethane_digestate import BiomethaneDigestate
 from .biomethane_digestate_spreading import BiomethaneDigestateSpreading
+from .biomethane_energy import BiomethaneEnergy
