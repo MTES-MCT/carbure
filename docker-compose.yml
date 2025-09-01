@@ -12,8 +12,8 @@ services:
     volumes:
       - carburedb:/var/lib/mysql
     ports:
-      - 3306:3306
-      - 33060:33060
+      - 127.0.0.1:3306:3306
+      - 127.0.0.1:33060:33060
 
   carbure-redis:
     image: redis:latest
