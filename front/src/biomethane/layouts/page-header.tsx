@@ -67,7 +67,11 @@ export const BiomethanePageHeader = ({
           onClick={openValidateDeclarationDialog}
           iconId="ri-file-text-line"
           asideX
-          disabled={!selectedYearIsInCurrentInterval || status === "VALIDATED"}
+          disabled={
+            !selectedYearIsInCurrentInterval ||
+            status === "VALIDATED" ||
+            !status
+          }
         >
           {t("Valider mes informations annuelles")}
         </Button>
@@ -85,8 +89,8 @@ export const BiomethanePageHeader = ({
         >
           {t("Récapitulatif de vos informations")}
         </Title>
-        <Badge severity={status === "PENDING" ? "info" : "success"}>
-          {status === "PENDING" ? t("En cours") : t("Validé")}
+        <Badge severity={status === "VALIDATED" ? "success" : "info"}>
+          {status === "VALIDATED" ? t("Validé") : t("En cours")}
         </Badge>
       </Row>
       {selectedYearIsInCurrentInterval && (
