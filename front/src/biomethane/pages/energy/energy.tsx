@@ -14,6 +14,7 @@ import { useGetContractInfos } from "../contract/contract.hooks"
 import { InjectedBiomethane } from "./components/injected-biomethane"
 import { BiogasProduction } from "./components/biogas-production"
 import { useProductionUnit } from "../production/production.hooks"
+import { EnergyEfficiency } from "./components/energy-efficiency"
 
 export const Energy = () => {
   const { t } = useTranslation()
@@ -54,6 +55,7 @@ export const Energy = () => {
       >
         <InjectedBiomethane energy={energy} contract={contract} />
         <BiogasProduction energy={energy} productionUnit={productionUnit} />
+        <EnergyEfficiency energy={energy} contract={contract} />
       </BiomethanePageHeader>
     </EnergyProvider>
   )
