@@ -14,12 +14,11 @@ import css from "./checkbox.module.css"
 import { Label, LabelProps } from "../base-input"
 
 type CheckboxProps = Omit<CheckboxDSFRProps, "options" | "name"> & {
-  label?: string
   value?: boolean
   captive?: boolean
   onChange?: (value: boolean) => void
   name?: string
-}
+} & LabelProps
 
 export const Checkbox = ({
   label,
@@ -28,19 +27,32 @@ export const Checkbox = ({
   captive = false,
   small,
   name,
+  title,
+  hasTooltip,
+  readOnly,
   ...props
 }: CheckboxProps) => {
   const generatedId = useId()
   const id = props.id ?? generatedId
   const options: CheckboxDSFRProps["options"] = [
     {
-      label: label ?? "",
+      label: label ? (
+        <Label
+          label={label}
+          readOnly={readOnly}
+          hasTooltip={hasTooltip}
+          required={props.required}
+          title={title}
+        />
+      ) : (
+        ""
+      ),
       nativeInputProps: {
         checked: value,
         onChange: (e: ChangeEvent<HTMLInputElement>) =>
           onChange?.(e.target.checked),
         onClick: captive ? (e) => e.stopPropagation() : undefined,
-        disabled: props.disabled,
+        disabled: props.disabled || readOnly,
       },
     },
   ]

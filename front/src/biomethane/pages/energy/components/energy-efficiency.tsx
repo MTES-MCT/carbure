@@ -38,8 +38,9 @@ export function EnergyEfficiency({
 
   const handleSubmit = async () => saveEnergy.execute(value)
 
-  const tariffReferenceIs2023 =
+  const isTariffReference2023 =
     contract?.tariff_reference === TariffReference.Value2023
+
   return (
     <EditableCard
       title={t("Efficacité énergétique")}
@@ -51,7 +52,7 @@ export function EnergyEfficiency({
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSubmit}>
           <Grid cols={1} gap="lg">
-            {!tariffReferenceIs2023 && (
+            {!isTariffReference2023 && (
               <>
                 <NumberInput
                   readOnly={!isEditing}
@@ -74,7 +75,7 @@ export function EnergyEfficiency({
                 />
               </>
             )}
-            {tariffReferenceIs2023 && (
+            {isTariffReference2023 && (
               <>
                 <NumberInput
                   readOnly={!isEditing}
