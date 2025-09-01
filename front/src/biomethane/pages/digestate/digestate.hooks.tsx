@@ -34,8 +34,7 @@ export function DigestateProvider({ children, year }: DigestateProviderProps) {
   const isInDeclarationPeriod = year === declarationInterval.year
 
   const saveDigestateMutation = useMutation(
-    (data: BiomethaneDigestateAddRequest) =>
-      saveDigestate(entity.id, year, data),
+    (data: BiomethaneDigestateAddRequest) => saveDigestate(entity.id, data),
     {
       invalidates: ["digestate"],
       onSuccess: () => {

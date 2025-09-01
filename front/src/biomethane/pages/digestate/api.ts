@@ -25,14 +25,12 @@ export const getDigestate = (entity_id: number, year: number) =>
 
 export const saveDigestate = (
   entity_id: number,
-  year: number,
   body: BiomethaneDigestateAddRequest
 ) =>
   api.PUT("/biomethane/digestate/", {
     params: {
       query: {
         entity_id,
-        year,
       },
     },
     body,
@@ -40,14 +38,12 @@ export const saveDigestate = (
 
 export const addSpreadingDepartment = (
   entity_id: number,
-  year: number,
   body: BiomethaneDigestateSpreadingAddRequest
 ) =>
   api.POST("/biomethane/digestate/spreading/", {
     params: {
       query: {
         entity_id,
-        year,
       },
     },
     body,

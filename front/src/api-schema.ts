@@ -364,7 +364,7 @@ export interface paths {
         };
         /** @description Retrieve the injection site for the current entity. Returns a single object. */
         get: operations["biomethane_injection_site_retrieve"];
-        /** @description Create or update injection site using upsert logic. */
+        /** @description Create or update the injection site for the current entity (upsert operation). */
         put: operations["biomethane_injection_site_update"];
         post?: never;
         delete?: never;
@@ -5691,8 +5691,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Year */
-                year: number;
             };
             header?: never;
             path?: never;
@@ -5723,8 +5721,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Authorised entity ID. */
-                year: number;
             };
             header?: never;
             path?: never;
@@ -5928,8 +5924,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Year. */
-                year: number;
             };
             header?: never;
             path?: never;
@@ -6068,7 +6062,17 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Injection site updated successfully */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneInjectionSite"];
+                };
+            };
+            /** @description Injection site created successfully */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

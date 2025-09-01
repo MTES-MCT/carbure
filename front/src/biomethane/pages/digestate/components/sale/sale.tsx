@@ -39,9 +39,8 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
             />
             <NumberInput
               readOnly={!isEditing}
-              label={t("Volume vendu (tonnes)")}
+              label={t("Volume vendu (t)")}
               type="number"
-              hintText=" "
               {...bind("sold_volume")}
               required
             />

@@ -76,7 +76,7 @@ export const Digestate = () => {
         ) && (
           <>
             <SpreadingDistance digestate={digestate?.data} />
-            <Spreading digestate={digestate?.data} year={years.selected} />
+            <Spreading digestate={digestate?.data} />
           </>
         )}
 

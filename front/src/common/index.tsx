@@ -125,6 +125,7 @@ const Org = () => {
     isCPO,
     isPowerOrHeatProducer,
     isSafTrader,
+    isBiomethaneProducer,
     has_saf,
     accise_number,
   } = entity
@@ -256,7 +257,13 @@ const Org = () => {
       {isSafAdmin && (
         <Route path="*" element={<Navigate replace to="entities" />} />
       )}
-      <Route path="biomethane/*" element={<BiomethaneRoutes />} />
+
+      {isBiomethaneProducer && (
+        <>
+          <Route path="biomethane/*" element={<BiomethaneRoutes />} />
+          <Route path="*" element={<Navigate replace to="biomethane" />} />
+        </>
+      )}
     </Routes>
   )
 }

@@ -11,10 +11,8 @@ import { useDigestateContext } from "../../digestate.hooks"
 
 export const Spreading = ({
   digestate,
-  year,
 }: {
   digestate?: BiomethaneDigestate
-  year: number
 }) => {
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
@@ -25,7 +23,6 @@ export const Spreading = ({
     portal((close) => (
       <AddSpreadingDepartment
         onClose={close}
-        year={year}
         spreadings={digestate?.spreadings ?? []}
       />
     ))
