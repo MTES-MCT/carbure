@@ -94,7 +94,8 @@ class BiomethaneContractAddSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        return handle_fields_requirement(data)
+        validated_data = super().validate(data)
+        return handle_fields_requirement(validated_data)
 
     def create(self, validated_data):
         entity = self.context.get("entity")
