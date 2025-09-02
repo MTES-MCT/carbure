@@ -83,9 +83,6 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
         entity = self.context.get("entity")
         year = self.context.get("year")
 
-        if not entity:
-            raise serializers.ValidationError({"entity": ["Entité manquante."]})
-
         if BiomethaneDigestate.objects.filter(producer=entity, year=year).exists():
             raise serializers.ValidationError({"producer": ["Un digestat existe déjà pour cette entité."]})
 

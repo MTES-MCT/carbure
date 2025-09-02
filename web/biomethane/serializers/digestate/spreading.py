@@ -24,9 +24,6 @@ class BiomethaneDigestateSpreadingAddSerializer(BaseBiomethaneDigestateSpreading
         entity = self.context.get("entity")
         year = self.context.get("year")
 
-        if not entity:
-            raise serializers.ValidationError({"entity": ["Entité manquante."]})
-
         if not year:
             raise serializers.ValidationError({"year": ["Année manquante."]})
 

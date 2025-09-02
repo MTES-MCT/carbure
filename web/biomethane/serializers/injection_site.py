@@ -18,12 +18,6 @@ class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
     def validate(self, data):
         errors = {}
 
-        entity = self.context.get("entity")
-        if entity:
-            data["entity"] = entity
-        else:
-            errors["entity"] = [_("Entité manquante.")]
-
         if data.get("is_shared_injection_site") and not data.get("meter_number"):
             errors["meter_number"] = [_("Ce champ est obligatoire.")]
         elif not data.get("is_shared_injection_site"):
@@ -34,7 +28,7 @@ class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
             for field in required_fields:
                 if not data.get(field):
                     errors[field] = [_("Ce champ est obligatoire.")]
-        elif not data.get("is_different_from_production_site"):
+        else:
             data["company_address"] = None
             data["city"] = None
             data["postal_code"] = None
