@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.text import slugify
 
 from core import private_storage
@@ -68,14 +70,33 @@ class BiomethaneContract(models.Model):
     def does_contract_exist(self):
         return bool(self.signature_date)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self._update_red_ii_status()
 
-    def _update_red_ii_status(self):
-        if self.entity.is_red_ii:
-            return
+@receiver(post_save, sender=BiomethaneContract)
+def update_red_ii_status(sender, instance, **kwargs):
+    if instance.entity.is_red_ii:
+        return
 
-        if (self.cmax and self.cmax > 200) or (self.pap_contracted and self.pap_contracted > 19.5):
-            self.entity.is_red_ii = True
-            self.entity.save()
+    should_be_red_ii = (instance.cmax and instance.cmax > 200) or (
+        instance.pap_contracted and instance.pap_contracted > 19.5
+    )
+
+    if should_be_red_ii:
+        instance.entity.is_red_ii = True
+        instance.entity.save(update_fields=["is_red_ii"])
+
+
+@receiver(post_save, sender=BiomethaneContract)
+def clear_fields(sender, instance, **kwargs):
+    """If tariff_reference changed, reset certain fields"""
+    fields_to_clear = []
+
+    if instance.tariff_reference in BiomethaneContract.TARIFF_RULE_1:
+        fields_to_clear = ["pap_contracted"]
+    elif instance.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
+        fields_to_clear = ["cmax_annualized", "cmax_annualized_value", "cmax"]
+
+    update_data = {}
+    for field in fields_to_clear:
+        new_value = None if field != "cmax_annualized" else False
+        update_data[field] = new_value
+    BiomethaneContract.objects.filter(pk=instance.pk).update(**update_data)

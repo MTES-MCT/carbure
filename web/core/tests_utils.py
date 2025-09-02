@@ -28,7 +28,10 @@ def setup_current_user(test, email, name, password, entity_rights=None, is_staff
 
 def assert_object_contains_data(test, obj, data, object_name="objet"):
     for field_name, expected_value in data.items():
-        actual_value = getattr(obj, field_name)
+        if isinstance(obj, dict):
+            actual_value = obj.get(field_name)
+        else:
+            actual_value = getattr(obj, field_name)
         test.assertEqual(
             actual_value,
             expected_value,

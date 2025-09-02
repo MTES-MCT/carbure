@@ -241,6 +241,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/digestate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieve the digestate for the current entity and the current year. Returns a single digestate object. */
+        get: operations["biomethane_digestate_retrieve"];
+        /** @description Create or update the digestate for the current entity (upsert operation). */
+        put: operations["biomethane_digestate_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/digestate-storage/": {
         parameters: {
             query?: never;
@@ -273,6 +291,70 @@ export interface paths {
         patch: operations["biomethane_digestate_storage_partial_update"];
         trace?: never;
     };
+    "/api/biomethane/digestate/spreading/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["biomethane_digestate_spreading_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/digestate/spreading/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["biomethane_digestate_spreading_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/digestate/validate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["biomethane_digestate_validate_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/digestate/years/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_digestate_years_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/injection-site/": {
         parameters: {
             query?: never;
@@ -282,7 +364,7 @@ export interface paths {
         };
         /** @description Retrieve the injection site for the current entity. Returns a single object. */
         get: operations["biomethane_injection_site_retrieve"];
-        /** @description Create or update injection site using upsert logic. */
+        /** @description Create or update the injection site for the current entity (upsert operation). */
         put: operations["biomethane_injection_site_update"];
         post?: never;
         delete?: never;
@@ -2770,6 +2852,94 @@ export interface components {
             specific_conditions_file?: File | null;
             is_red_ii?: boolean;
         };
+        BiomethaneDigestate: {
+            readonly id: number;
+            /** Format: double */
+            raw_digestate_tonnage_produced?: number | null;
+            /** Format: double */
+            raw_digestate_dry_matter_rate?: number | null;
+            /** Format: double */
+            solid_digestate_tonnage?: number | null;
+            /** Format: double */
+            liquid_digestate_quantity?: number | null;
+            /** Format: double */
+            average_spreading_valorization_distance?: number | null;
+            readonly composting_locations: components["schemas"]["CompostingLocationsEnum"][];
+            external_platform_name?: string | null;
+            /** Format: double */
+            external_platform_digestate_volume?: number | null;
+            external_platform_department?: string | null;
+            external_platform_municipality?: string | null;
+            /** Format: double */
+            on_site_composted_digestate_volume?: number | null;
+            /** Format: double */
+            annual_eliminated_volume?: number | null;
+            incinerator_landfill_center_name?: string | null;
+            /** Format: double */
+            wwtp_materials_to_incineration?: number | null;
+            acquiring_companies?: string | null;
+            /** Format: double */
+            sold_volume?: number | null;
+            year: number;
+            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
+            readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
+        };
+        BiomethaneDigestateInputRequest: {
+            /** Format: double */
+            raw_digestate_tonnage_produced?: number | null;
+            /** Format: double */
+            raw_digestate_dry_matter_rate?: number | null;
+            /** Format: double */
+            solid_digestate_tonnage?: number | null;
+            /** Format: double */
+            liquid_digestate_quantity?: number | null;
+            /** Format: double */
+            average_spreading_valorization_distance?: number | null;
+            composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
+            external_platform_name?: string | null;
+            /** Format: double */
+            external_platform_digestate_volume?: number | null;
+            external_platform_department?: string | null;
+            external_platform_municipality?: string | null;
+            /** Format: double */
+            on_site_composted_digestate_volume?: number | null;
+            /** Format: double */
+            annual_eliminated_volume?: number | null;
+            incinerator_landfill_center_name?: string | null;
+            /** Format: double */
+            wwtp_materials_to_incineration?: number | null;
+            acquiring_companies?: string | null;
+            /** Format: double */
+            sold_volume?: number | null;
+        };
+        BiomethaneDigestateSpreading: {
+            spreading_department: string;
+            /** Format: double */
+            spread_quantity: number;
+            /** Format: double */
+            spread_parcels_area: number;
+            readonly id: number;
+        };
+        BiomethaneDigestateSpreadingAdd: {
+            spreading_department: string;
+            /** Format: double */
+            spread_quantity: number;
+            /** Format: double */
+            spread_parcels_area: number;
+        };
+        BiomethaneDigestateSpreadingAddRequest: {
+            spreading_department: string;
+            /** Format: double */
+            spread_quantity: number;
+            /** Format: double */
+            spread_parcels_area: number;
+        };
+        /**
+         * @description * `PENDING` - PENDING
+         *     * `VALIDATED` - VALIDATED
+         * @enum {string}
+         */
+        BiomethaneDigestateStatusEnum: BiomethaneDigestateStatusEnum;
         BiomethaneDigestateStorage: {
             readonly id: number;
             producer: number;
@@ -3047,6 +3217,12 @@ export interface components {
             registered_zipcode: string;
             registered_country: components["schemas"]["RegistrationCountry"];
         };
+        /**
+         * @description * `ON_SITE` - Sur site
+         *     * `EXTERNAL_PLATFORM` - Plateforme externe
+         * @enum {string}
+         */
+        CompostingLocationsEnum: CompostingLocationsEnum;
         ConfirmEmailChangeError: {
             /** @description Message d'erreur général */
             message?: string;
@@ -4537,6 +4713,8 @@ export interface components {
             readonly parent_ticket_source: components["schemas"]["SafRelatedTicketSource"];
             shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
             readonly child_ticket_sources: components["schemas"]["SafRelatedTicketSource"][];
+            origin_lot?: components["schemas"]["SafParentLot"];
+            origin_lot_site?: components["schemas"]["Site"];
         };
         SafTicketPreview: {
             readonly id: number;
@@ -4607,6 +4785,8 @@ export interface components {
             eee?: number;
             /** Format: double */
             ghg_total?: number;
+            origin_lot?: components["schemas"]["SafParentLot"];
+            origin_lot_site?: components["schemas"]["Site"];
         };
         SafTicketSourceAssignment: {
             client_id: number;
@@ -4737,6 +4917,10 @@ export interface components {
             selected_lots: components["schemas"]["SimulationLotOutput"][];
             /** Format: double */
             fun: number;
+        };
+        Site: {
+            id: number;
+            name: string;
         };
         /**
          * @description * `OTHER` - Autre
@@ -5510,6 +5694,74 @@ export interface operations {
             };
         };
     };
+    biomethane_digestate_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Digestate details for the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestate"];
+                };
+            };
+            /** @description Digestate not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_digestate_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneDigestateInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateInputRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateInputRequest"];
+            };
+        };
+        responses: {
+            /** @description Digestate updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestate"];
+                };
+            };
+            /** @description Digestate created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestate"];
+                };
+            };
+        };
+    };
     biomethane_digestate_storage_list: {
         parameters: {
             query: {
@@ -5675,6 +5927,101 @@ export interface operations {
             };
         };
     };
+    biomethane_digestate_spreading_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneDigestateSpreadingAddRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateSpreadingAddRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateSpreadingAddRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneDigestateSpreadingAdd"];
+                };
+            };
+        };
+    };
+    biomethane_digestate_spreading_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Données d'épandage du digestat. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_digestate_validate_create: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_digestate_years_retrieve: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": number[];
+                };
+            };
+        };
+    };
     biomethane_injection_site_retrieve: {
         parameters: {
             query: {
@@ -5723,7 +6070,17 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Injection site updated successfully */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneInjectionSite"];
+                };
+            };
+            /** @description Injection site created successfully */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11287,6 +11644,10 @@ export enum AmendmentObjectEnum {
     ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE = "ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE",
     OTHER = "OTHER"
 }
+export enum BiomethaneDigestateStatusEnum {
+    PENDING = "PENDING",
+    VALIDATED = "VALIDATED"
+}
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",
     CORRECTION_DONE = "CORRECTION_DONE",
@@ -11312,6 +11673,10 @@ export enum CertificateTypeEnum {
     ISCC = "ISCC",
     REDCERT = "REDCERT",
     Value2BS = "2BS"
+}
+export enum CompostingLocationsEnum {
+    ON_SITE = "ON_SITE",
+    EXTERNAL_PLATFORM = "EXTERNAL_PLATFORM"
 }
 export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",

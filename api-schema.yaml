@@ -621,6 +621,71 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneContractAmendment"
           description: ""
+  /api/biomethane/digestate/:
+    get:
+      operationId: biomethane_digestate_retrieve
+      description: Retrieve the digestate for the current entity and the current year.
+        Returns a single digestate object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestate"
+          description: Digestate details for the entity
+        "404":
+          description: Digestate not found for this entity.
+    put:
+      operationId: biomethane_digestate_update
+      description: Create or update the digestate for the current entity (upsert operation).
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateInputRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestate"
+          description: Digestate updated successfully
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestate"
+          description: Digestate created successfully
   /api/biomethane/digestate-storage/:
     get:
       operationId: biomethane_digestate_storage_list
@@ -818,6 +883,116 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/biomethane/digestate/spreading/:
+    post:
+      operationId: biomethane_digestate_spreading_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateSpreadingAddRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateSpreadingAddRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneDigestateSpreadingAddRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneDigestateSpreadingAdd"
+          description: ""
+  /api/biomethane/digestate/spreading/{id}/:
+    delete:
+      operationId: biomethane_digestate_spreading_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Données d'épandage du
+            digestat.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/biomethane/digestate/validate/:
+    post:
+      operationId: biomethane_digestate_validate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/biomethane/digestate/years/:
+    get:
+      operationId: biomethane_digestate_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
@@ -846,7 +1021,8 @@ paths:
           description: Injection site not found for this entity.
     put:
       operationId: biomethane_injection_site_update
-      description: Create or update injection site using upsert logic.
+      description: Create or update the injection site for the current entity (upsert
+        operation).
       parameters:
         - in: query
           name: entity_id
@@ -877,7 +1053,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneInjectionSite"
-          description: ""
+          description: Injection site updated successfully
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneInjectionSite"
+          description: Injection site created successfully
   /api/biomethane/production-unit/:
     get:
       operationId: biomethane_production_unit_retrieve
@@ -10117,6 +10299,220 @@ components:
       required:
         - buyer
         - tariff_reference
+    BiomethaneDigestate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        raw_digestate_tonnage_produced:
+          type: number
+          format: double
+          nullable: true
+        raw_digestate_dry_matter_rate:
+          type: number
+          format: double
+          nullable: true
+        solid_digestate_tonnage:
+          type: number
+          format: double
+          nullable: true
+        liquid_digestate_quantity:
+          type: number
+          format: double
+          nullable: true
+        average_spreading_valorization_distance:
+          type: number
+          format: double
+          nullable: true
+        composting_locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompostingLocationsEnum"
+          readOnly: true
+        external_platform_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        external_platform_digestate_volume:
+          type: number
+          format: double
+          nullable: true
+        external_platform_department:
+          type: string
+          nullable: true
+          maxLength: 3
+        external_platform_municipality:
+          type: string
+          nullable: true
+          maxLength: 255
+        on_site_composted_digestate_volume:
+          type: number
+          format: double
+          nullable: true
+        annual_eliminated_volume:
+          type: number
+          format: double
+          nullable: true
+        incinerator_landfill_center_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        wwtp_materials_to_incineration:
+          type: number
+          format: double
+          nullable: true
+        acquiring_companies:
+          type: string
+          nullable: true
+        sold_volume:
+          type: number
+          format: double
+          nullable: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
+        spreadings:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneDigestateSpreading"
+          readOnly: true
+      required:
+        - composting_locations
+        - id
+        - spreadings
+        - status
+        - year
+    BiomethaneDigestateInputRequest:
+      type: object
+      properties:
+        raw_digestate_tonnage_produced:
+          type: number
+          format: double
+          nullable: true
+        raw_digestate_dry_matter_rate:
+          type: number
+          format: double
+          nullable: true
+        solid_digestate_tonnage:
+          type: number
+          format: double
+          nullable: true
+        liquid_digestate_quantity:
+          type: number
+          format: double
+          nullable: true
+        average_spreading_valorization_distance:
+          type: number
+          format: double
+          nullable: true
+        composting_locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompostingLocationsEnum"
+        external_platform_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        external_platform_digestate_volume:
+          type: number
+          format: double
+          nullable: true
+        external_platform_department:
+          type: string
+          nullable: true
+          maxLength: 3
+        external_platform_municipality:
+          type: string
+          nullable: true
+          maxLength: 255
+        on_site_composted_digestate_volume:
+          type: number
+          format: double
+          nullable: true
+        annual_eliminated_volume:
+          type: number
+          format: double
+          nullable: true
+        incinerator_landfill_center_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        wwtp_materials_to_incineration:
+          type: number
+          format: double
+          nullable: true
+        acquiring_companies:
+          type: string
+          nullable: true
+        sold_volume:
+          type: number
+          format: double
+          nullable: true
+    BiomethaneDigestateSpreading:
+      type: object
+      properties:
+        spreading_department:
+          type: string
+          maxLength: 3
+        spread_quantity:
+          type: number
+          format: double
+        spread_parcels_area:
+          type: number
+          format: double
+        id:
+          type: integer
+          readOnly: true
+      required:
+        - id
+        - spread_parcels_area
+        - spread_quantity
+        - spreading_department
+    BiomethaneDigestateSpreadingAdd:
+      type: object
+      properties:
+        spreading_department:
+          type: string
+          maxLength: 3
+        spread_quantity:
+          type: number
+          format: double
+        spread_parcels_area:
+          type: number
+          format: double
+      required:
+        - spread_parcels_area
+        - spread_quantity
+        - spreading_department
+    BiomethaneDigestateSpreadingAddRequest:
+      type: object
+      properties:
+        spreading_department:
+          type: string
+          minLength: 1
+          maxLength: 3
+        spread_quantity:
+          type: number
+          format: double
+        spread_parcels_area:
+          type: number
+          format: double
+      required:
+        - spread_parcels_area
+        - spread_quantity
+        - spreading_department
+    BiomethaneDigestateStatusEnum:
+      enum:
+        - PENDING
+        - VALIDATED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `VALIDATED` - VALIDATED
     BiomethaneDigestateStorage:
       type: object
       properties:
@@ -10877,6 +11273,14 @@ components:
         - registered_country
         - registered_zipcode
         - registration_id
+    CompostingLocationsEnum:
+      enum:
+        - ON_SITE
+        - EXTERNAL_PLATFORM
+      type: string
+      description: |-
+        * `ON_SITE` - Sur site
+        * `EXTERNAL_PLATFORM` - Plateforme externe
     ConfirmEmailChangeError:
       type: object
       properties:
@@ -14416,6 +14820,10 @@ components:
           items:
             $ref: "#/components/schemas/SafRelatedTicketSource"
           readOnly: true
+        origin_lot:
+          $ref: "#/components/schemas/SafParentLot"
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
       required:
         - assignment_period
         - biofuel
@@ -14616,6 +15024,10 @@ components:
         ghg_total:
           type: number
           format: double
+        origin_lot:
+          $ref: "#/components/schemas/SafParentLot"
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets
@@ -14973,6 +15385,16 @@ components:
       required:
         - fun
         - selected_lots
+    Site:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     SiteTypeEnum:
       enum:
         - OTHER

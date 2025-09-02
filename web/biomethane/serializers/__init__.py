@@ -14,3 +14,4 @@ from .digestate_storage import (
     BiomethaneDigestateStorageAddSerializer,
     BiomethaneDigestateStoragePatchSerializer,
 )
+from .digestate import BiomethaneDigestateSerializer

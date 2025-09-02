@@ -8,6 +8,7 @@ import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { YearsProvider } from "common/providers/years-provider"
 import { NewNavigationDialog } from "carbure/components/new-navigation-dialog"
 import { lazy, Suspense } from "react"
+import { BiomethaneRoutes } from "biomethane/routes"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -124,6 +125,7 @@ const Org = () => {
     isCPO,
     isPowerOrHeatProducer,
     isSafTrader,
+    isBiomethaneProducer,
     has_saf,
     accise_number,
   } = entity
@@ -254,6 +256,13 @@ const Org = () => {
       )}
       {isSafAdmin && (
         <Route path="*" element={<Navigate replace to="entities" />} />
+      )}
+
+      {isBiomethaneProducer && (
+        <>
+          <Route path="biomethane/*" element={<BiomethaneRoutes />} />
+          <Route path="*" element={<Navigate replace to="biomethane" />} />
+        </>
       )}
     </Routes>
   )

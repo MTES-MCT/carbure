@@ -78,7 +78,9 @@ export const ContractInfos = ({
         />
       ))
     } else {
-      updateContract(value)
+      updateContract(value).then(() => {
+        setIsEditing(false)
+      })
     }
   }
 

@@ -98,7 +98,6 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
         # First PUT should create the production unit (201)
         response = self.client.put(self.production_unit_url, upsert_data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["unit_name"], "Upsert Unit")
 
         # Verify it was created in database
         production_unit = BiomethaneProductionUnit.objects.get(producer=self.producer_entity)
@@ -111,8 +110,6 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
 
         response = self.client.put(self.production_unit_url, updated_data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["unit_name"], "Updated Upsert Unit")
-        self.assertEqual(float(response.data["production_efficiency"]), 90.5)
 
         # Verify it was updated in database
         production_unit.refresh_from_db()

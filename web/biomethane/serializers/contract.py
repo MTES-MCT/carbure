@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneContract
@@ -48,7 +49,9 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
             cmax_annualized_value = instance.cmax_annualized_value
 
         if cmax_annualized and not cmax_annualized_value:
-            errors["cmax_annualized_value"] = ["Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai."]
+            errors["cmax_annualized_value"] = [
+                _("Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai.")
+            ]
 
     elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
         required_fields.append("pap_contracted")
@@ -66,7 +69,7 @@ def handle_fields_requirement(data, required_fields=None, errors=None, instance=
             missing_fields.append(field)
 
     for field in missing_fields:
-        errors[field] = [f"Le champ {field} est obligatoire."]
+        errors[field] = [_(f"Le champ {field} est obligatoire.")]
 
     if errors:
         raise serializers.ValidationError(errors)
@@ -97,7 +100,7 @@ class BiomethaneContractAddSerializer(serializers.ModelSerializer):
         entity = self.context.get("entity")
         if entity:
             if BiomethaneContract.objects.filter(entity=entity).exists():
-                raise serializers.ValidationError({"entity": ["Un site contract existe déjà pour cette entité."]})
+                raise serializers.ValidationError({"entity": [_("Un site contract existe déjà pour cette entité.")]})
             validated_data["entity"] = entity
 
         if validated_data.get("cmax_annualized") is None:
@@ -144,7 +147,7 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
         if self.instance.does_contract_exist():
             not_updatable_fields = [field for field in contract_fields if field in data]
             for field in not_updatable_fields:
-                errors[field] = [f"Le champ {field} ne peut pas être modifié une fois le contrat signé."]
+                errors[field] = [_(f"Le champ {field} ne peut pas être modifié une fois le contrat signé.")]
         else:
             # If the contract does not exist, check if any of the contract fields are provided
             for field in contract_fields:
@@ -155,19 +158,9 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
         return handle_fields_requirement(data, required_fields, errors, self.instance)
 
     def update(self, instance, validated_data):
-        tariff_reference = validated_data.get("tariff_reference")
         is_red_ii = validated_data.get("is_red_ii")
         cmax = validated_data.get("cmax")
         pap_contracted = validated_data.get("pap_contracted")
-
-        if tariff_reference is not None and tariff_reference != instance.tariff_reference:
-            # If tariff_reference is changed, reset certain fields
-            if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-                validated_data["pap_contracted"] = None
-            elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-                validated_data["cmax_annualized"] = False
-                validated_data["cmax_annualized_value"] = None
-                validated_data["cmax"] = None
 
         # If cmax or pap_contracted is below the threshold and
         # the user does not want to be subject to RED II, then is_red_ii is set to False
