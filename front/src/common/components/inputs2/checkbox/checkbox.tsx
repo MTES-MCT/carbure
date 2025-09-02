@@ -30,6 +30,7 @@ export const Checkbox = ({
   title,
   hasTooltip,
   readOnly,
+  className,
   ...props
 }: CheckboxProps) => {
   const generatedId = useId()
@@ -76,7 +77,14 @@ export const Checkbox = ({
       />
     )
   }
-  return <CheckboxDSFR {...props} options={options} small={small} />
+  return (
+    <CheckboxDSFR
+      {...props}
+      options={options}
+      small={small}
+      className={cl(className, css["checkbox-group"])}
+    />
+  )
 }
 
 export type CheckboxGroupProps<T, V> = Omit<

@@ -1,7 +1,7 @@
 import { Button } from "common/components/button2"
 import { Checkbox, TextInput } from "common/components/inputs2"
 import { EditableCard } from "common/molecules/editable-card"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../types"
@@ -53,29 +53,13 @@ export function InstallationEnergyNeeds({
             <>
               <Checkbox
                 readOnly={!isEditing}
-                legend={t(
-                  "Besoins en énergie liés au chauffage du digesteur pour une installation de méthanisation ainsi qu’à l’épuration du biogaz et à l’oxydation des évents"
+                hintText={t(
+                  "Pour une installation de méthanisation ainsi qu’à l’épuration du biogaz et à l’oxydation des évents"
                 )}
+                legend={t("Besoins en énergie liés au chauffage du digesteur")}
                 label={t(
                   "J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d’origine fossile."
                 )}
-                {...bind(
-                  "attest_no_fossil_for_digester_heating_and_purification"
-                )}
-              />
-              <Checkbox
-                readOnly={!isEditing}
-                label={
-                  <span>
-                    <Trans components={{ b: <b /> }}>
-                      J'atteste que les besoins en énergie liés au chauffage du
-                      digesteur pour une installation de méthanisation ainsi
-                      qu’à l’épuration du biogaz et à l’oxydation des évents{" "}
-                      <b>ne sont pas satisfaits</b> par une énergie d’origine
-                      fossile.
-                    </Trans>
-                  </span>
-                }
                 {...bind(
                   "attest_no_fossil_for_digester_heating_and_purification"
                 )}
@@ -86,15 +70,23 @@ export function InstallationEnergyNeeds({
                 {...bind("energy_used_for_digester_heating")}
                 required
               />
+              {!value.attest_no_fossil_for_digester_heating_and_purification && (
+                <TextInput
+                  readOnly={!isEditing}
+                  label={t(
+                    "Précisions (si utilisation d’énergie d’origine fossile)"
+                  )}
+                  {...bind("fossil_details_for_digester_heating")}
+                  required
+                />
+              )}
               <TextInput
                 readOnly={!isEditing}
                 label={t(
                   "Précisions (si utilisation d’énergie d’origine fossile)"
                 )}
                 {...bind("fossil_details_for_digester_heating")}
-                required={
-                  !value.attest_no_fossil_for_digester_heating_and_purification
-                }
+                required
               />
             </>
           )}
@@ -102,8 +94,11 @@ export function InstallationEnergyNeeds({
             <>
               <Checkbox
                 readOnly={!isEditing}
+                hintText={t(
+                  "Notamment liés à la pasteurisation, l’hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz"
+                )}
                 legend={t(
-                  "Besoins en énergie de l’installation de production de biométhane (notamment liés à la pasteurisation, l’hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz)"
+                  "Besoins en énergie de l’installation de production de biométhane"
                 )}
                 label={t(
                   "J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d’origine fossile."
@@ -118,14 +113,16 @@ export function InstallationEnergyNeeds({
                 {...bind("energy_used_for_installation_needs")}
                 required
               />
-              <TextInput
-                readOnly={!isEditing}
-                label={t(
-                  "Précisions (si utilisation d’énergie d’origine fossile)"
-                )}
-                {...bind("fossil_details_for_installation_needs")}
-                required={!value.fossil_details_for_installation_needs}
-              />
+              {!value.attest_no_fossil_for_installation_needs && (
+                <TextInput
+                  readOnly={!isEditing}
+                  label={t(
+                    "Précisions (si utilisation d’énergie d’origine fossile)"
+                  )}
+                  {...bind("fossil_details_for_installation_needs")}
+                  required
+                />
+              )}
             </>
           )}
 

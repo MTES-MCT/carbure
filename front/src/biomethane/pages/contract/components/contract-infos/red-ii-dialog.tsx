@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
-import { getRediiThresholdLabel } from "./contract-infos.utils"
+import { getRediiThresholdLabel } from "../../contract.utils"
 import { TariffReference } from "biomethane/pages/contract/types"
 
 interface RedIIDialogProps {
