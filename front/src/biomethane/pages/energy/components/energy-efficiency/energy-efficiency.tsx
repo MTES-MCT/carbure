@@ -1,16 +1,17 @@
 import { Button } from "common/components/button2"
-import { NumberInput } from "common/components/inputs2"
+import { NumberInput, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../types"
-import { useEnergyContext } from "../energy.hooks"
+import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../../types"
+import { useEnergyContext } from "../../energy.hooks"
 import {
   BiomethaneContract,
   TariffReference,
 } from "biomethane/pages/contract/types"
+import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -41,6 +42,17 @@ export function EnergyEfficiency({
   const isTariffReference2023 =
     contract?.tariff_reference === TariffReference.Value2023
 
+  const energyEfficiencyCoefficient = useEnergyEfficiencyCoefficient({
+    purified_biogas_quantity_nm3: value.purified_biogas_quantity_nm3 ?? 0,
+    purification_electric_consumption_kwe:
+      value.purification_electric_consumption_kwe ?? 0,
+    total_unit_electric_consumption_kwe:
+      value.total_unit_electric_consumption_kwe ?? 0,
+    tariff_reference: contract?.tariff_reference,
+    injected_biomethane_gwh_pcs_per_year:
+      energy?.injected_biomethane_gwh_pcs_per_year ?? 0,
+  })
+  console.log("energyEfficiencyCoefficient", energyEfficiencyCoefficient)
   return (
     <EditableCard
       title={t("Efficacité énergétique")}
@@ -115,6 +127,17 @@ export function EnergyEfficiency({
                 required
               />
             </Grid>
+
+            {energyEfficiencyCoefficient.value > 0 && (
+              <TextInput
+                label={t("Coefficient d'efficacité énergétique")}
+                readOnly={!isEditing}
+                disabled
+                value={energyEfficiencyCoefficient.label}
+                state={energyEfficiencyCoefficient.error ? "error" : "default"}
+                stateRelatedMessage={energyEfficiencyCoefficient.error}
+              />
+            )}
           </Grid>
 
           {isEditing && (
