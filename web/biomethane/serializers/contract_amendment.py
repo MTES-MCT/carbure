@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
@@ -46,7 +47,7 @@ class BiomethaneContractAmendmentAddSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if BiomethaneContractAmendment.OTHER in data.get("amendment_object") and not data.get("amendment_details"):
             raise serializers.ValidationError(
-                {"amendment_details": ["Ce champ est obligatoire si amendment_object contient 'OTHER'."]}
+                {"amendment_details": [_("Ce champ est obligatoire si amendment_object contient 'OTHER'.")]}
             )
         return super().validate(data)
 
@@ -57,6 +58,6 @@ class BiomethaneContractAmendmentAddSerializer(serializers.ModelSerializer):
             contract = BiomethaneContract.objects.get(entity=entity)
             validated_data["contract_id"] = contract.id
         except BiomethaneContract.DoesNotExist:
-            raise serializers.ValidationError({"contract": ["Cette entité n'a pas de contrat associé."]})
+            raise serializers.ValidationError({"contract": [_("Cette entité n'a pas de contrat associé.")]})
 
         return super().create(validated_data)

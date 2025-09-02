@@ -81,12 +81,15 @@ def clear_fields(sender, instance, **kwargs):
 
     if sender == BiomethaneDigestate:
         digestate_instance = instance
-        production_unit = instance.producer.biomethane_production_unit
+        producer = instance.producer
+        if not hasattr(producer, "biomethane_production_unit"):
+            return
+        production_unit = producer.biomethane_production_unit
     elif sender == BiomethaneProductionUnit:
         production_unit = instance
-        try:
-            digestate_instance = BiomethaneDigestate.objects.get(producer=instance.producer)
-        except BiomethaneDigestate.DoesNotExist:
+        producer = instance.producer
+        digestate_instance = producer.biomethane_digestates.last()  # get the most recent one
+        if not digestate_instance:
             return
     else:
         return
