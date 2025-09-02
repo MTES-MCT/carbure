@@ -67,7 +67,7 @@ export const Checkbox = ({
         checked={value ?? false}
         id={id}
         className={cl(
-          props.className,
+          className,
           css["checkbox"],
           small && css["checkbox--small"]
         )}

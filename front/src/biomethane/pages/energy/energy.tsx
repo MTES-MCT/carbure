@@ -16,6 +16,8 @@ import { BiogasProduction } from "./components/biogas-production"
 import { useProductionUnit } from "../production/production.hooks"
 import { EnergyEfficiency } from "./components/energy-efficiency"
 import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
+import { MonthlyBiomethaneInjection } from "./components/monthy-biomethane-injection/monthly-biomethane-injection"
+import { isTariffReference2011Or2020 } from "../contract"
 
 export const Energy = () => {
   const { t } = useTranslation()
@@ -58,6 +60,9 @@ export const Energy = () => {
         <BiogasProduction energy={energy} productionUnit={productionUnit} />
         <InstallationEnergyNeeds energy={energy} contract={contract} />
         <EnergyEfficiency energy={energy} contract={contract} />
+        {isTariffReference2011Or2020(contract?.tariff_reference) && (
+          <MonthlyBiomethaneInjection />
+        )}
       </BiomethanePageHeader>
     </EnergyProvider>
   )
