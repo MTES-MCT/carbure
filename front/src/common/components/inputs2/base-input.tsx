@@ -85,8 +85,9 @@ export const BaseInput = ({
 
 export type LabelProps = Pick<
   BaseInputProps,
-  "label" | "hasTooltip" | "required" | "title" | "readOnly"
->
+  "hasTooltip" | "required" | "title" | "readOnly"
+> & { label?: ReactNode }
+
 export const Label = ({
   label,
   hasTooltip,
@@ -95,6 +96,8 @@ export const Label = ({
   readOnly,
 }: LabelProps) => {
   let baseLabel = label
+
+  if (!label) return ""
 
   // Add an icon if the input is required
   if (!readOnly && required) {

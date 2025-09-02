@@ -1,1 +1,1 @@
-export * from "./monthy-biomethane-injection"
+export * from "./monthly-biomethane-injection"
