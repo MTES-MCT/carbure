@@ -6,8 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.serializers.energy.energy import (
-    BiomethaneEnergyAddSerializer,
-    BiomethaneEnergyPatchSerializer,
+    BiomethaneEnergyInputSerializer,
     BiomethaneEnergySerializer,
 )
 from biomethane.utils import get_declaration_period
@@ -53,6 +52,11 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
         context["year"] = getattr(self.request, "year", None)
         return context
 
+    def get_serializer_class(self):
+        if self.action == "upsert":
+            return BiomethaneEnergyInputSerializer
+        return super().get_serializer_class()
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -92,20 +96,16 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
                 description="Digestate created successfully",
             ),
         },
-        request=BiomethaneEnergyAddSerializer,
+        request=BiomethaneEnergyInputSerializer,
         description="Create or update the digestate for the current entity (upsert operation).",
     )
     def upsert(self, request, *args, **kwargs):
-        serializer_context = self.get_serializer_context()
-
         try:
             digestate = BiomethaneEnergy.objects.get(producer=request.entity, year=request.year)
-            serializer = BiomethaneEnergyPatchSerializer(
-                digestate, data=request.data, partial=True, context=serializer_context
-            )
+            serializer = self.get_serializer(digestate, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneEnergy.DoesNotExist:
-            serializer = BiomethaneEnergyAddSerializer(data=request.data, context=serializer_context)
+            serializer = self.get_serializer(data=request.data)
             status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid():

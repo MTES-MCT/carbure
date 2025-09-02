@@ -98,6 +98,47 @@ class BiomethaneEnergy(models.Model):
     # Nombre de jour travail estimé pour l'activité de méthanisation sur l'année
     estimated_work_days_acceptability = models.IntegerField(null=True, blank=True)
 
+    ## Dysfonctionnements
+
+    # Y a-t-il eu des dysfonctionnements ?
+    has_malfunctions = models.BooleanField(default=False)
+
+    # Durée cumulée du dysfonctionnement (en jours)
+    malfunction_cumulative_duration_days = models.IntegerField(null=True, blank=True)
+
+    # Types de dysfonctionnement
+    MALFUNCTION_TYPE_CONCEPTION = "CONCEPTION"
+    MALFUNCTION_TYPE_MAINTENANCE = "MAINTENANCE"
+    MALFUNCTION_TYPE_BIOLOGICAL = "BIOLOGICAL"
+    MALFUNCTION_TYPE_ACCIDENT = "ACCIDENT"
+    MALFUNCTION_TYPE_PURIFIER = "PURIFIER"
+    MALFUNCTION_TYPE_INJECTION_POST = "INJECTION_POST"
+    MALFUNCTION_TYPE_INPUTS = "INPUTS"
+    MALFUNCTION_TYPE_OTHER = "OTHER"
+
+    MALFUNCTION_TYPES = [
+        (MALFUNCTION_TYPE_CONCEPTION, "Conception"),
+        (MALFUNCTION_TYPE_MAINTENANCE, "Entretien/Maintenance"),
+        (MALFUNCTION_TYPE_BIOLOGICAL, "Biologique"),
+        (MALFUNCTION_TYPE_ACCIDENT, "Accident deversement"),
+        (MALFUNCTION_TYPE_PURIFIER, "Épurateur"),
+        (MALFUNCTION_TYPE_INJECTION_POST, "Poste d'injection (autre que problématiques de saturation des réseaux)"),
+        (MALFUNCTION_TYPE_INPUTS, "Intrants"),
+        (MALFUNCTION_TYPE_OTHER, "Autres (à préciser)"),
+    ]
+
+    # Types de dysfonctionnement
+    malfunction_types = models.CharField(max_length=32, choices=MALFUNCTION_TYPES, null=True, blank=True)
+
+    # Précisions sur les dysfonctionnements
+    malfunction_details = models.TextField(null=True, blank=True)
+
+    # Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux
+    has_injection_difficulties_due_to_network_saturation = models.BooleanField(default=False)
+
+    # Nombre d'heures d'impossibilité d'injection (h)
+    injection_impossibility_hours = models.IntegerField(null=True, blank=True)
+
     class Meta:
         db_table = "biomethane_energy"
         verbose_name = "Biométhane - Énergie"
