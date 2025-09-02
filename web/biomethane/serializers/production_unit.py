@@ -69,17 +69,22 @@ class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSeria
     def validate(self, data):
         errors = {}
 
-        if "has_sanitary_approval" in data and not data["has_sanitary_approval"]:
-            data["sanitary_approval_number"] = None
-        elif not data.get("sanitary_approval_number"):
-            errors["sanitary_approval_number"] = _("Ce champ est obligatoire lorsque l'agrément sanitaire est activé.")
+        entity = self.context.get("entity")
+        data["producer"] = entity
 
-        if "has_hygienization_exemption" in data and not data.get("has_hygienization_exemption"):
-            data["hygienization_exemption_type"] = None
-        elif not data.get("hygienization_exemption_type"):
-            errors["hygienization_exemption_type"] = _(
-                "Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
-            )
+        if "has_sanitary_approval" in data:
+            if not data["has_sanitary_approval"]:
+                data["sanitary_approval_number"] = None
+            elif not data.get("sanitary_approval_number"):
+                errors["sanitary_approval_number"] = _("Ce champ est obligatoire lorsque l'agrément sanitaire est activé.")
+
+        if "has_hygienization_exemption" in data:
+            if not data.get("has_hygienization_exemption"):
+                data["hygienization_exemption_type"] = None
+            elif not data.get("hygienization_exemption_type"):
+                errors["hygienization_exemption_type"] = _(
+                    "Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
+                )
 
         if data.get("has_digestate_phase_separation"):
             data["raw_digestate_treatment_steps"] = None
