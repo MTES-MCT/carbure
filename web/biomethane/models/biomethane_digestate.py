@@ -76,7 +76,7 @@ class BiomethaneDigestate(models.Model):
 
 @receiver(post_save, sender=BiomethaneDigestate)
 @receiver(post_save, sender=BiomethaneProductionUnit)
-def empty_fields(sender, instance, **kwargs):
+def clear_fields(sender, instance, **kwargs):
     fields_to_clear = []
 
     if sender == BiomethaneDigestate:
