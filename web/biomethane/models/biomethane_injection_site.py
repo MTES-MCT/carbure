@@ -12,7 +12,7 @@ class BiomethaneInjectionSite(models.Model):
         (DISTRIBUTION, "Dristribution"),
     ]
 
-    entity = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_injection_site")
+    producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_injection_site")
 
     # Numéro d'identifiant unique du poste d'injection
     unique_identification_number = models.CharField(max_length=32, unique=True)

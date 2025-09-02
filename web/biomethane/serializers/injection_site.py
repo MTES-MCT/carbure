@@ -13,13 +13,13 @@ class BiomethaneInjectionSiteSerializer(serializers.ModelSerializer):
 class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneInjectionSite
-        exclude = ["entity"]
+        exclude = ["producer"]
 
     def validate(self, data):
         errors = {}
 
         entity = self.context.get("entity")
-        data["entity"] = entity
+        data["producer"] = entity
 
         if data.get("is_shared_injection_site") and not data.get("meter_number"):
             errors["meter_number"] = [_("Ce champ est obligatoire.")]

@@ -34,7 +34,7 @@ class BiomethaneEntityConfigAmendmentViewSetTests(TestCase):
         )
 
         self.contract = BiomethaneContract.objects.create(
-            entity=self.producer_entity,
+            producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2021",
             pap_contracted=50.0,

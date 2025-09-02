@@ -23,7 +23,7 @@ class BiomethaneContractSerializer(serializers.ModelSerializer):
             "general_conditions_file",
             "specific_conditions_file",
             "amendments",
-            "entity",
+            "producer",
         ]
 
 
@@ -98,10 +98,10 @@ class BiomethaneContractAddSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         entity = self.context.get("entity")
-        if entity:
-            if BiomethaneContract.objects.filter(entity=entity).exists():
-                raise serializers.ValidationError({"entity": [_("Un site contract existe déjà pour cette entité.")]})
-            validated_data["entity"] = entity
+
+        if BiomethaneContract.objects.filter(producer=entity).exists():
+            raise serializers.ValidationError({"producer": [_("Un site contract existe déjà pour cette entité.")]})
+        validated_data["producer"] = entity
 
         if validated_data.get("cmax_annualized") is None:
             validated_data["cmax_annualized"] = False
@@ -165,7 +165,7 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
         # If cmax or pap_contracted is below the threshold and
         # the user does not want to be subject to RED II, then is_red_ii is set to False
         if is_red_ii is False and ((cmax and cmax <= 200) or (pap_contracted and pap_contracted <= 19.5)):
-            instance.entity.is_red_ii = is_red_ii
-            instance.entity.save()
+            instance.producer.is_red_ii = is_red_ii
+            instance.producer.save()
 
         return super().update(instance, validated_data)

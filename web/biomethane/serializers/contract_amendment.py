@@ -55,7 +55,7 @@ class BiomethaneContractAmendmentAddSerializer(serializers.ModelSerializer):
         entity = self.context.get("entity")
 
         try:
-            contract = BiomethaneContract.objects.get(entity=entity)
+            contract = BiomethaneContract.objects.get(producer=entity)
             validated_data["contract_id"] = contract.id
         except BiomethaneContract.DoesNotExist:
             raise serializers.ValidationError({"contract": [_("Cette entité n'a pas de contrat associé.")]})

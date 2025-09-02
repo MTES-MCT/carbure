@@ -10,12 +10,12 @@ from core.models import Entity
 
 
 def rename_general_conditions_file(instance, filename):
-    base_filename = f"{instance.pk}_CG_{slugify(instance.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    base_filename = f"{instance.pk}_CG_{slugify(instance.producer.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     return rename_file(instance, filename, base_filename)
 
 
 def rename_specific_conditions_file(instance, filename):
-    base_filename = f"{instance.pk}_CP_{slugify(instance.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    base_filename = f"{instance.pk}_CP_{slugify(instance.producer.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     return rename_file(instance, filename, base_filename)
 
 
@@ -48,7 +48,7 @@ class BiomethaneContract(models.Model):
 
     tariff_reference = models.CharField(choices=TARIFF_REFERENCE_CHOICES, max_length=28)
     buyer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="buyer")
-    entity = models.OneToOneField(Entity, on_delete=models.CASCADE)
+    producer = models.OneToOneField(Entity, on_delete=models.CASCADE)
     installation_category = models.CharField(choices=INSTALLATION_CATEGORIES, max_length=32, null=True, blank=True)
     cmax = models.FloatField(null=True, blank=True)
     cmax_annualized = models.BooleanField(default=False)
@@ -73,7 +73,7 @@ class BiomethaneContract(models.Model):
 
 @receiver(post_save, sender=BiomethaneContract)
 def update_red_ii_status(sender, instance, **kwargs):
-    if instance.entity.is_red_ii:
+    if instance.producer.is_red_ii:
         return
 
     should_be_red_ii = (instance.cmax and instance.cmax > 200) or (
@@ -81,8 +81,8 @@ def update_red_ii_status(sender, instance, **kwargs):
     )
 
     if should_be_red_ii:
-        instance.entity.is_red_ii = True
-        instance.entity.save(update_fields=["is_red_ii"])
+        instance.producer.is_red_ii = True
+        instance.producer.save(update_fields=["is_red_ii"])
 
 
 @receiver(post_save, sender=BiomethaneContract)

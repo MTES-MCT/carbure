@@ -81,7 +81,7 @@ class BiomethaneInjectionSiteTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        injection_site = BiomethaneInjectionSite.objects.get(entity=self.producer_entity)
+        injection_site = BiomethaneInjectionSite.objects.get(producer=self.producer_entity)
 
         assert_object_contains_data(self, injection_site, self.valid_data)
 
@@ -108,7 +108,7 @@ class BiomethaneInjectionSiteTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        injection_site = BiomethaneInjectionSite.objects.get(entity=self.producer_entity)
+        injection_site = BiomethaneInjectionSite.objects.get(producer=self.producer_entity)
         assert_object_contains_data(self, injection_site, updated_data)
 
         for field in ["meter_number", "company_address", "city", "postal_code"]:

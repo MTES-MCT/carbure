@@ -11,7 +11,7 @@ class BiomethaneInjectionSiteFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneInjectionSite
 
-    entity = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
+    producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
 
     unique_identification_number = factory.Faker("lexify", text="?????")
     is_shared_injection_site = factory.Faker("boolean")
@@ -34,4 +34,4 @@ class BiomethaneInjectionSiteFactory(factory.django.DjangoModelFactory):
 
 
 def create_injection_site(entity):
-    BiomethaneInjectionSiteFactory.create(entity=entity)
+    BiomethaneInjectionSiteFactory.create(producer=entity)
