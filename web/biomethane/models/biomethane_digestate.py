@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from biomethane.models import BiomethaneProductionUnit
+from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
 from core.models import Entity
 
 
@@ -76,38 +76,52 @@ class BiomethaneDigestate(models.Model):
 
 @receiver(post_save, sender=BiomethaneDigestate)
 @receiver(post_save, sender=BiomethaneProductionUnit)
+@receiver(post_save, sender=BiomethaneContract)
 def clear_fields(sender, instance, **kwargs):
     fields_to_clear = []
 
     if sender == BiomethaneDigestate:
         digestate_instance = instance
         producer = instance.producer
-        if not hasattr(producer, "biomethane_production_unit"):
-            return
-        production_unit = producer.biomethane_production_unit
+        production_unit = producer.biomethane_production_unit if hasattr(producer, "biomethane_production_unit") else None
+        contract = producer.biomethane_contract if hasattr(producer, "biomethane_contract") else None
     elif sender == BiomethaneProductionUnit:
         production_unit = instance
         producer = instance.producer
         digestate_instance = producer.biomethane_digestates.last()  # get the most recent one
-        if not digestate_instance:
-            return
+        contract = producer.biomethane_contract if hasattr(producer, "biomethane_contract") else None
+    elif sender == BiomethaneContract:
+        contract = instance
+        producer = contract.producer
+        production_unit = producer.biomethane_production_unit if hasattr(producer, "biomethane_production_unit") else None
+        digestate_instance = producer.biomethane_digestates.last()  # get the most recent one
     else:
         return
 
+    if not digestate_instance:
+        return
+
     ## Production de digestat
-    if production_unit.has_digestate_phase_separation:
+    if production_unit and production_unit.has_digestate_phase_separation:
         fields_to_clear += [
             "raw_digestate_tonnage_produced",
             "raw_digestate_dry_matter_rate",
         ]
+    elif production_unit and not production_unit.has_digestate_phase_separation:
+        fields_to_clear += [
+            "solid_digestate_tonnage",
+            "liquid_digestate_quantity",
+        ]
     else:
         fields_to_clear += [
+            "raw_digestate_tonnage_produced",
+            "raw_digestate_dry_matter_rate",
             "solid_digestate_tonnage",
             "liquid_digestate_quantity",
         ]
 
     ## Epandage
-    valorization_methods = production_unit.digestate_valorization_methods
+    valorization_methods = production_unit.digestate_valorization_methods if production_unit else []
     if not valorization_methods or BiomethaneProductionUnit.SPREADING not in valorization_methods:
         fields_to_clear += [
             "average_spreading_valorization_distance",
@@ -146,8 +160,13 @@ def clear_fields(sender, instance, **kwargs):
             "wwtp_materials_to_incineration",
         ]
 
+    if contract is None or contract.installation_category != BiomethaneContract.INSTALLATION_CATEGORY_2:
+        fields_to_clear += [
+            "wwtp_materials_to_incineration",
+        ]
+
     ## Vente
-    spreading_management_methods = production_unit.spreading_management_methods
+    spreading_management_methods = production_unit.spreading_management_methods if production_unit else []
     if not spreading_management_methods or BiomethaneProductionUnit.SALE not in spreading_management_methods:
         fields_to_clear += [
             "sold_volume",
