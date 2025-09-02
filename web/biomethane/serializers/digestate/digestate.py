@@ -49,14 +49,15 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
 
     def validate(self, data):
         errors = {}
+        validated_data = super().validate(data)
 
         # Always set status to PENDING on update and creation by default
-        data["status"] = BiomethaneDigestate.PENDING
+        validated_data["status"] = BiomethaneDigestate.PENDING
 
         ## Compostage
-        if data.get("composting_locations"):
+        if validated_data.get("composting_locations"):
             # If composting_locations contains EXTERNAL_PLATFORM, the related fields are required
-            if BiomethaneDigestate.EXTERNAL_PLATFORM in data["composting_locations"]:
+            if BiomethaneDigestate.EXTERNAL_PLATFORM in validated_data["composting_locations"]:
                 external_platform_fields = [
                     ("external_platform_name", "external_platform_name"),
                     ("external_platform_digestate_volume", "external_platform_digestate_volume"),
@@ -65,12 +66,12 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
                 ]
 
                 for field_name, error_field in external_platform_fields:
-                    if not data.get(field_name):
+                    if not validated_data.get(field_name):
                         errors[error_field] = [_("Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné.")]
 
             # If composting_locations contains ON_SITE, the related field is required
-            if BiomethaneDigestate.ON_SITE in data["composting_locations"]:
-                if not data.get("on_site_composted_digestate_volume"):
+            if BiomethaneDigestate.ON_SITE in validated_data["composting_locations"]:
+                if not validated_data.get("on_site_composted_digestate_volume"):
                     errors["on_site_composted_digestate_volume"] = [
                         _("Ce champ est obligatoire lorsque 'Sur site' est sélectionné.")
                     ]
@@ -78,7 +79,7 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
         if errors:
             raise serializers.ValidationError(errors)
 
-        return data
+        return validated_data
 
     def create(self, validated_data):
         entity = self.context.get("entity")
