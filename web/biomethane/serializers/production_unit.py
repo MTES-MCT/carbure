@@ -69,18 +69,12 @@ class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSeria
     def validate(self, data):
         errors = {}
 
-        entity = self.context.get("entity")
-        if entity:
-            data["producer"] = entity
-        else:
-            errors["producer"] = _("Entité manquante.")
-
-        if not data.get("has_sanitary_approval"):
+        if "has_sanitary_approval" in data and not data["has_sanitary_approval"]:
             data["sanitary_approval_number"] = None
         elif not data.get("sanitary_approval_number"):
             errors["sanitary_approval_number"] = _("Ce champ est obligatoire lorsque l'agrément sanitaire est activé.")
 
-        if not data.get("has_hygienization_exemption"):
+        if "has_hygienization_exemption" in data and not data.get("has_hygienization_exemption"):
             data["hygienization_exemption_type"] = None
         elif not data.get("hygienization_exemption_type"):
             errors["hygienization_exemption_type"] = _(
