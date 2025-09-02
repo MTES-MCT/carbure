@@ -52,7 +52,7 @@ export function EnergyEfficiency({
     injected_biomethane_gwh_pcs_per_year:
       energy?.injected_biomethane_gwh_pcs_per_year ?? 0,
   })
-  console.log("energyEfficiencyCoefficient", energyEfficiencyCoefficient)
+
   return (
     <EditableCard
       title={t("Efficacité énergétique")}
@@ -100,7 +100,7 @@ export function EnergyEfficiency({
                 <NumberInput
                   readOnly={!isEditing}
                   label={t(
-                    "Consommation électrique soutirée pour l'ensemble de l'unité (kWe-)"
+                    "Consommation électrique soutirée pour l'ensemble de l'unité (kWe)"
                   )}
                   hintText={t(
                     "Consommation d’électricité soutirée sur le réseau public d’électricité d’une installation de production de biométhane, cumulée le cas échéant avec la consommation de l’installation d’injection associée"
@@ -128,16 +128,16 @@ export function EnergyEfficiency({
               />
             </Grid>
 
-            {energyEfficiencyCoefficient.value > 0 && (
-              <TextInput
-                label={t("Coefficient d'efficacité énergétique")}
-                readOnly={!isEditing}
-                disabled
-                value={energyEfficiencyCoefficient.label}
-                state={energyEfficiencyCoefficient.error ? "error" : "default"}
-                stateRelatedMessage={energyEfficiencyCoefficient.error}
-              />
-            )}
+            <TextInput
+              label={t("Coefficient d'efficacité énergétique")}
+              readOnly={!isEditing}
+              disabled
+              value={energyEfficiencyCoefficient.label}
+              state={energyEfficiencyCoefficient.error ? "error" : "default"}
+              stateRelatedMessage={energyEfficiencyCoefficient.error}
+              hasTooltip
+              title={energyEfficiencyCoefficient.tooltip}
+            />
           </Grid>
 
           {isEditing && (
@@ -146,6 +146,7 @@ export function EnergyEfficiency({
               iconId="ri-save-line"
               asideX
               loading={saveEnergy.loading}
+              disabled={Boolean(energyEfficiencyCoefficient.error)}
             >
               {t("Sauvegarder")}
             </Button>
