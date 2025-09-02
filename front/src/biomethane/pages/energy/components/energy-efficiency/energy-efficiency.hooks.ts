@@ -14,6 +14,17 @@ type CalculateEnergyEfficiencyCoefficientData = {
   tariff_reference?: TariffReference
   injected_biomethane_gwh_pcs_per_year: number
 }
+
+/**
+ * Selon la valeur de la référence tarifaire (défini dans le contrat), on calcule l'efficacité énergétique
+ * en fonction de différents paramètres.
+ * Si tariff_reference = 2023, le coefficient d'efficacité énergétique est calculé en fonction de :
+ *    - la consommation électrique soutirée pour l'ensemble de l'unité (kWe)
+ *    - la quantité de biométhane injecté (GWhPCS/an)
+ * Si tariff_reference = 2021, le coefficient d'efficacité énergétique est calculé en fonction de :
+ *    - la consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
+ *    - la quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
+ */
 export function calculateEnergyEfficiencyCoefficient({
   purified_biogas_quantity_nm3,
   purification_electric_consumption_kwe,
@@ -21,14 +32,16 @@ export function calculateEnergyEfficiencyCoefficient({
   tariff_reference,
   injected_biomethane_gwh_pcs_per_year,
 }: CalculateEnergyEfficiencyCoefficientData) {
-  if (
-    !tariff_reference ||
-    purified_biogas_quantity_nm3 === 0 ||
-    injected_biomethane_gwh_pcs_per_year === 0
-  )
-    return 0
+  if (!tariff_reference) return 0
 
   const isTariffReference2023 = tariff_reference === TariffReference.Value2023
+
+  // Handle divide by 0
+  if (purified_biogas_quantity_nm3 === 0 && !isTariffReference2023) return 0
+
+  // Handle divide by 0
+  if (injected_biomethane_gwh_pcs_per_year === 0 && isTariffReference2023)
+    return 0
 
   if (isTariffReference2023) {
     return (
@@ -71,6 +84,9 @@ export const useEnergyEfficiencyCoefficient = ({
                 }
               )
             : undefined,
+        tooltip: t(
+          "Le coefficient d'efficacité énergétique est calculé en fonction de la consommation électrique soutirée pour l'ensemble de l'unité (kWe) divisé par la quantité de biométhane injecté (GWhPCS/an)."
+        ),
       }
     }
 
@@ -86,6 +102,9 @@ export const useEnergyEfficiencyCoefficient = ({
               }
             )
           : undefined,
+      tooltip: t(
+        "Le coefficient d'efficacité énergétique est calculé en fonction de la consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe) divisé par la quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)."
+      ),
     }
   }, [
     purified_biogas_quantity_nm3,
