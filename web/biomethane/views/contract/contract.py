@@ -61,7 +61,7 @@ class BiomethaneContractViewSet(GenericViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            contract = BiomethaneContract.objects.get(entity=request.entity)
+            contract = BiomethaneContract.objects.get(producer=request.entity)
             data = self.get_serializer(contract, many=False).data
             return Response(data)
 
@@ -81,7 +81,7 @@ class BiomethaneContractViewSet(GenericViewSet):
         serializer_context = self.get_serializer_context()
 
         try:
-            contract = BiomethaneContract.objects.get(entity=request.entity)
+            contract = BiomethaneContract.objects.get(producer=request.entity)
             serializer = BiomethaneContractPatchSerializer(
                 contract, data=request.data, partial=True, context=serializer_context
             )
