@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
@@ -25,11 +26,11 @@ class BiomethaneDigestateSpreadingAddSerializer(BaseBiomethaneDigestateSpreading
         year = self.context.get("year")
 
         if not year:
-            raise serializers.ValidationError({"year": ["Année manquante."]})
+            raise serializers.ValidationError({"year": [_("Année manquante.")]})
 
         digestate = BiomethaneDigestate.objects.filter(producer=entity, year=year).first()
         if not digestate:
-            raise serializers.ValidationError({"year": ["Digestat manquant."]})
+            raise serializers.ValidationError({"year": [_("Digestat manquant.")]})
 
         validated_data["digestate"] = digestate
 

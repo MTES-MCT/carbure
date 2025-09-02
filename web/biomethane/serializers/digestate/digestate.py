@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneDigestate
@@ -65,13 +66,13 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
 
                 for field_name, error_field in external_platform_fields:
                     if not data.get(field_name):
-                        errors[error_field] = ["Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné."]
+                        errors[error_field] = [_("Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné.")]
 
             # If composting_locations contains ON_SITE, the related field is required
             if BiomethaneDigestate.ON_SITE in data["composting_locations"]:
                 if not data.get("on_site_composted_digestate_volume"):
                     errors["on_site_composted_digestate_volume"] = [
-                        "Ce champ est obligatoire lorsque 'Sur site' est sélectionné."
+                        _("Ce champ est obligatoire lorsque 'Sur site' est sélectionné.")
                     ]
 
         if errors:
@@ -84,7 +85,7 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
         year = self.context.get("year")
 
         if BiomethaneDigestate.objects.filter(producer=entity, year=year).exists():
-            raise serializers.ValidationError({"producer": ["Un digestat existe déjà pour cette entité."]})
+            raise serializers.ValidationError({"producer": [_("Un digestat existe déjà pour cette entité.")]})
 
         validated_data["producer"] = entity
         validated_data["year"] = year
