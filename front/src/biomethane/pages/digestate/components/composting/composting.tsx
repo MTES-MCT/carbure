@@ -11,7 +11,7 @@ import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import {
   BiomethaneDigestate,
-  BiomethaneDigestateAddRequest,
+  BiomethaneDigestateInputRequest,
   BiomethaneDigestateCompostingLocation,
 } from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
@@ -20,7 +20,7 @@ import { DepartmentCode } from "common/utils/geography"
 
 type CompostingForm = DeepPartial<
   Pick<
-    BiomethaneDigestateAddRequest,
+    BiomethaneDigestateInputRequest,
     | "external_platform_name"
     | "external_platform_department"
     | "external_platform_municipality"
@@ -28,7 +28,7 @@ type CompostingForm = DeepPartial<
     | "external_platform_digestate_volume"
   >
 > &
-  Pick<BiomethaneDigestateAddRequest, "composting_locations">
+  Pick<BiomethaneDigestateInputRequest, "composting_locations">
 
 export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
   const { t } = useTranslation()

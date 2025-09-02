@@ -1,6 +1,6 @@
 import { api } from "common/services/api-fetch"
 import {
-  BiomethaneDigestateAddRequest,
+  BiomethaneDigestateInputRequest,
   BiomethaneDigestateSpreadingAddRequest,
 } from "./types"
 
@@ -25,7 +25,7 @@ export const getDigestate = (entity_id: number, year: number) =>
 
 export const saveDigestate = (
   entity_id: number,
-  body: BiomethaneDigestateAddRequest
+  body: BiomethaneDigestateInputRequest
 ) =>
   api.PUT("/biomethane/digestate/", {
     params: {

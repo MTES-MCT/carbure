@@ -5,13 +5,16 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
+import {
+  BiomethaneDigestate,
+  BiomethaneDigestateInputRequest,
+} from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 
 type ProductionForm = DeepPartial<
   Pick<
-    BiomethaneDigestateAddRequest,
+    BiomethaneDigestateInputRequest,
     | "raw_digestate_tonnage_produced"
     | "raw_digestate_dry_matter_rate"
     | "solid_digestate_tonnage"

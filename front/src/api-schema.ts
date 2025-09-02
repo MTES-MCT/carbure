@@ -2884,7 +2884,7 @@ export interface components {
             status: components["schemas"]["BiomethaneDigestateStatusEnum"];
             readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
         };
-        BiomethaneDigestateAddRequest: {
+        BiomethaneDigestateInputRequest: {
             /** Format: double */
             raw_digestate_tonnage_produced?: number | null;
             /** Format: double */
@@ -4713,6 +4713,8 @@ export interface components {
             readonly parent_ticket_source: components["schemas"]["SafRelatedTicketSource"];
             shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
             readonly child_ticket_sources: components["schemas"]["SafRelatedTicketSource"][];
+            origin_lot?: components["schemas"]["SafParentLot"];
+            origin_lot_site?: components["schemas"]["Site"];
         };
         SafTicketPreview: {
             readonly id: number;
@@ -4783,6 +4785,8 @@ export interface components {
             eee?: number;
             /** Format: double */
             ghg_total?: number;
+            origin_lot?: components["schemas"]["SafParentLot"];
+            origin_lot_site?: components["schemas"]["Site"];
         };
         SafTicketSourceAssignment: {
             client_id: number;
@@ -4913,6 +4917,10 @@ export interface components {
             selected_lots: components["schemas"]["SimulationLotOutput"][];
             /** Format: double */
             fun: number;
+        };
+        Site: {
+            id: number;
+            name: string;
         };
         /**
          * @description * `OTHER` - Autre
@@ -5728,9 +5736,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["BiomethaneDigestateAddRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateAddRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneDigestateAddRequest"];
+                "application/json": components["schemas"]["BiomethaneDigestateInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateInputRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateInputRequest"];
             };
         };
         responses: {

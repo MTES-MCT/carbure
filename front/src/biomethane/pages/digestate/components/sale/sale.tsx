@@ -5,11 +5,14 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
+import {
+  BiomethaneDigestate,
+  BiomethaneDigestateInputRequest,
+} from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 
 type SaleForm = DeepPartial<
-  Pick<BiomethaneDigestateAddRequest, "acquiring_companies" | "sold_volume">
+  Pick<BiomethaneDigestateInputRequest, "acquiring_companies" | "sold_volume">
 >
 
 export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {

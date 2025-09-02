@@ -663,13 +663,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateAddRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateAddRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateAddRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateInputRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -10386,7 +10386,7 @@ components:
         - spreadings
         - status
         - year
-    BiomethaneDigestateAddRequest:
+    BiomethaneDigestateInputRequest:
       type: object
       properties:
         raw_digestate_tonnage_produced:
@@ -14820,6 +14820,10 @@ components:
           items:
             $ref: "#/components/schemas/SafRelatedTicketSource"
           readOnly: true
+        origin_lot:
+          $ref: "#/components/schemas/SafParentLot"
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
       required:
         - assignment_period
         - biofuel
@@ -15020,6 +15024,10 @@ components:
         ghg_total:
           type: number
           format: double
+        origin_lot:
+          $ref: "#/components/schemas/SafParentLot"
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets
@@ -15377,6 +15385,16 @@ components:
       required:
         - fun
         - selected_lots
+    Site:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     SiteTypeEnum:
       enum:
         - OTHER

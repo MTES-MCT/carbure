@@ -4,7 +4,7 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import { saveDigestate } from "./api"
-import { BiomethaneDigestateAddRequest } from "./types"
+import { BiomethaneDigestateInputRequest } from "./types"
 import { declarationInterval } from "biomethane/utils"
 
 interface DigestateContextValue {
@@ -12,7 +12,7 @@ interface DigestateContextValue {
   saveDigestate: ReturnType<
     typeof useMutation<
       Awaited<ReturnType<typeof saveDigestate>>,
-      [BiomethaneDigestateAddRequest]
+      [BiomethaneDigestateInputRequest]
     >
   >
   isInDeclarationPeriod: boolean
@@ -34,7 +34,7 @@ export function DigestateProvider({ children, year }: DigestateProviderProps) {
   const isInDeclarationPeriod = year === declarationInterval.year
 
   const saveDigestateMutation = useMutation(
-    (data: BiomethaneDigestateAddRequest) => saveDigestate(entity.id, data),
+    (data: BiomethaneDigestateInputRequest) => saveDigestate(entity.id, data),
     {
       invalidates: ["digestate"],
       onSuccess: () => {

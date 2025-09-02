@@ -4,11 +4,17 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
+import {
+  BiomethaneDigestate,
+  BiomethaneDigestateInputRequest,
+} from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 
 type SpreadingDistanceForm = DeepPartial<
-  Pick<BiomethaneDigestateAddRequest, "average_spreading_valorization_distance">
+  Pick<
+    BiomethaneDigestateInputRequest,
+    "average_spreading_valorization_distance"
+  >
 >
 
 export function SpreadingDistance({

@@ -5,7 +5,10 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneDigestate, BiomethaneDigestateAddRequest } from "../../types"
+import {
+  BiomethaneDigestate,
+  BiomethaneDigestateInputRequest,
+} from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 import {
   BiomethaneContract,
@@ -14,7 +17,7 @@ import {
 
 type IncinerationLandfillForm = DeepPartial<
   Pick<
-    BiomethaneDigestateAddRequest,
+    BiomethaneDigestateInputRequest,
     | "annual_eliminated_volume"
     | "incinerator_landfill_center_name"
     | "wwtp_materials_to_incineration"
