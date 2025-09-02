@@ -155,19 +155,9 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
         return handle_fields_requirement(data, required_fields, errors, self.instance)
 
     def update(self, instance, validated_data):
-        tariff_reference = validated_data.get("tariff_reference")
         is_red_ii = validated_data.get("is_red_ii")
         cmax = validated_data.get("cmax")
         pap_contracted = validated_data.get("pap_contracted")
-
-        if tariff_reference is not None and tariff_reference != instance.tariff_reference:
-            # If tariff_reference is changed, reset certain fields
-            if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-                validated_data["pap_contracted"] = None
-            elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-                validated_data["cmax_annualized"] = False
-                validated_data["cmax_annualized_value"] = None
-                validated_data["cmax"] = None
 
         # If cmax or pap_contracted is below the threshold and
         # the user does not want to be subject to RED II, then is_red_ii is set to False
