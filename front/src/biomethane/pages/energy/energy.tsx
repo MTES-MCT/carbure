@@ -30,7 +30,7 @@ export const Energy = () => {
   const { result: contract } = useGetContractInfos()
   const { result: productionUnit } = useProductionUnit()
   const { result: energy, loading } = useQuery(getEnergy, {
-    key: "digestate",
+    key: "energy",
     params: [entity.id, years.selected],
   })
   const validateEnergyMutation = useMutation(() => validateEnergy(entity.id), {

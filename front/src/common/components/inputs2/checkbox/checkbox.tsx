@@ -30,6 +30,7 @@ export const Checkbox = ({
   title,
   hasTooltip,
   readOnly,
+  legend,
   className,
   ...props
 }: CheckboxProps) => {
@@ -37,17 +38,18 @@ export const Checkbox = ({
   const id = props.id ?? generatedId
   const options: CheckboxDSFRProps["options"] = [
     {
-      label: label ? (
-        <Label
-          label={label}
-          readOnly={readOnly}
-          hasTooltip={hasTooltip}
-          required={props.required}
-          title={title}
-        />
-      ) : (
-        ""
-      ),
+      // label: label ? (
+      //   <Label
+      //     label={label}
+      //     readOnly={readOnly}
+      //     hasTooltip={hasTooltip}
+      //     required={props.required}
+      //     title={title}
+      //   />
+      // ) : (
+      //   ""
+      // ),
+      label,
       nativeInputProps: {
         checked: value,
         onChange: (e: ChangeEvent<HTMLInputElement>) =>
@@ -82,7 +84,20 @@ export const Checkbox = ({
       {...props}
       options={options}
       small={small}
-      className={cl(className, css["checkbox-group"])}
+      className={cl(
+        className,
+        css["checkbox-group"],
+        readOnly && css["checkbox--read-only"]
+      )}
+      legend={
+        <Label
+          label={legend}
+          readOnly={readOnly}
+          hasTooltip={hasTooltip}
+          required={props.required}
+          title={title}
+        />
+      }
     />
   )
 }
@@ -150,7 +165,11 @@ export const CheckboxGroup = <T, V extends string | number>({
       <CheckboxDSFR
         {...props}
         options={optionsWithNativeInputProps}
-        className={cl(className, css["checkbox-group"])}
+        className={cl(
+          className,
+          css["checkbox-group"],
+          readOnly && css["checkbox--read-only"]
+        )}
         legend={
           <Label
             label={label}

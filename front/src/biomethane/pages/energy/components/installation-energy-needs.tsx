@@ -80,14 +80,6 @@ export function InstallationEnergyNeeds({
                   required
                 />
               )}
-              <TextInput
-                readOnly={!isEditing}
-                label={t(
-                  "Précisions (si utilisation d’énergie d’origine fossile)"
-                )}
-                {...bind("fossil_details_for_digester_heating")}
-                required
-              />
             </>
           )}
           {isTariffReference2023 && (
