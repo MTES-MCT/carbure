@@ -1047,13 +1047,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneEnergyAddRequest"
+              $ref: "#/components/schemas/BiomethaneEnergyInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneEnergyAddRequest"
+              $ref: "#/components/schemas/BiomethaneEnergyInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneEnergyAddRequest"
+              $ref: "#/components/schemas/BiomethaneEnergyInputRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -10293,12 +10293,12 @@ components:
           items:
             $ref: "#/components/schemas/BiomethaneContractAmendment"
           readOnly: true
-        entity:
+        producer:
           type: integer
       required:
         - amendments
         - buyer
-        - entity
+        - producer
         - tariff_reference
     BiomethaneContractAmendment:
       type: object
@@ -10736,6 +10736,12 @@ components:
         id:
           type: integer
           readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
         injected_biomethane_gwh_pcs_per_year:
           type: number
           format: double
@@ -10817,16 +10823,34 @@ components:
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
-        year:
+        has_malfunctions:
+          type: boolean
+        malfunction_cumulative_duration_days:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
+          nullable: true
+        malfunction_types:
+          allOf:
+            - $ref: "#/components/schemas/MalfunctionTypesEnum"
+          nullable: true
+        malfunction_details:
+          type: string
+          nullable: true
+        has_injection_difficulties_due_to_network_saturation:
+          type: boolean
+        injection_impossibility_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        producer:
+          type: integer
       required:
         - id
+        - producer
         - year
-    BiomethaneEnergyAddRequest:
+    BiomethaneEnergyInputRequest:
       type: object
       properties:
         injected_biomethane_gwh_pcs_per_year:
@@ -10906,6 +10930,27 @@ components:
         has_opposition_or_complaints_acceptability:
           type: boolean
         estimated_work_days_acceptability:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        has_malfunctions:
+          type: boolean
+        malfunction_cumulative_duration_days:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        malfunction_types:
+          allOf:
+            - $ref: "#/components/schemas/MalfunctionTypesEnum"
+          nullable: true
+        malfunction_details:
+          type: string
+          nullable: true
+        has_injection_difficulties_due_to_network_saturation:
+          type: boolean
+        injection_impossibility_hours:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
@@ -10947,11 +10992,11 @@ components:
           type: string
           nullable: true
           maxLength: 100
-        entity:
+        producer:
           type: integer
       required:
-        - entity
         - id
+        - producer
         - unique_identification_number
     BiomethaneInjectionSiteInputRequest:
       type: object
@@ -10996,8 +11041,18 @@ components:
         id:
           type: integer
           readOnly: true
-        producer:
-          type: integer
+        installed_meters:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstalledMetersEnum"
+        digestate_valorization_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
+        spreading_management_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         unit_name:
           type: string
           nullable: true
@@ -11046,11 +11101,6 @@ components:
           type: number
           format: double
           nullable: true
-        installed_meters:
-          type: array
-          items:
-            $ref: "#/components/schemas/InstalledMetersEnum"
-          readOnly: true
         has_hygienization_unit:
           type: boolean
         has_co2_valorization_process:
@@ -11069,29 +11119,30 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_valorization_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
-          readOnly: true
-        spreading_management_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
-          readOnly: true
         digestate_sale_type:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
           nullable: true
+        producer:
+          type: integer
       required:
-        - digestate_valorization_methods
         - id
-        - installed_meters
         - producer
-        - spreading_management_methods
     BiomethaneProductionUnitUpsertRequest:
       type: object
       properties:
+        installed_meters:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstalledMetersEnum"
+        digestate_valorization_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
+        spreading_management_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         unit_name:
           type: string
           nullable: true
@@ -11140,10 +11191,6 @@ components:
           type: number
           format: double
           nullable: true
-        installed_meters:
-          type: array
-          items:
-            $ref: "#/components/schemas/InstalledMetersEnum"
         has_hygienization_unit:
           type: boolean
         has_co2_valorization_process:
@@ -11162,14 +11209,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_valorization_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
-        spreading_management_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         digestate_sale_type:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
@@ -13712,6 +13751,34 @@ components:
         - target
         - target_percent
         - unit
+    MalfunctionTypesEnum:
+      enum:
+        - CONCEPTION
+        - MAINTENANCE
+        - BIOLOGICAL
+        - ACCIDENT
+        - PURIFIER
+        - INJECTION_POST
+        - INPUTS
+        - OTHER
+      type: string
+      description: >-
+        * `CONCEPTION` - Conception
+
+        * `MAINTENANCE` - Entretien/Maintenance
+
+        * `BIOLOGICAL` - Biologique
+
+        * `ACCIDENT` - Accident deversement
+
+        * `PURIFIER` - Épurateur
+
+        * `INJECTION_POST` - Poste d'injection (autre que problématiques de
+        saturation des réseaux)
+
+        * `INPUTS` - Intrants
+
+        * `OTHER` - Autres (à préciser)
     MethanizationProcessEnum:
       enum:
         - CONTINUOUS_INFINITELY_MIXED

@@ -1,6 +1,6 @@
 import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
-import { BiomethaneEnergy } from "../types"
+import { BiomethaneEnergy, MalfunctionTypes } from "../types"
 import { useForm } from "common/components/form2"
 import { useEnergyContext } from "../energy.hooks"
 import { Button } from "common/components/button2"
@@ -8,8 +8,20 @@ import { Grid } from "common/components/scaffold"
 import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useMemo } from "react"
+import { DeepPartial } from "common/types"
+import { BiomethaneEnergyInputRequest } from "../types"
 
-type MalfunctionForm = {}
+type MalfunctionForm = DeepPartial<
+  Pick<
+    BiomethaneEnergyInputRequest,
+    | "has_malfunctions"
+    | "malfunction_cumulative_duration_days"
+    | "malfunction_types"
+    | "malfunction_details"
+    | "has_injection_difficulties_due_to_network_saturation"
+    | "injection_impossibility_hours"
+  >
+>
 
 export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
   const { t } = useTranslation()
@@ -18,19 +30,22 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
 
   const dysfunctionOptions = useMemo(
     () => [
-      { value: "conception", label: t("Conception") },
-      { value: "maintenance", label: t("Entretien/Maintenance") },
-      { value: "biological", label: t("Biologique") },
-      { value: "equipment_failure", label: t("Accident déversement") },
-      { value: "purifier", label: t("Épurateur") },
+      { value: MalfunctionTypes.CONCEPTION, label: t("Conception") },
       {
-        value: "injection",
+        value: MalfunctionTypes.MAINTENANCE,
+        label: t("Entretien/Maintenance"),
+      },
+      { value: MalfunctionTypes.BIOLOGICAL, label: t("Biologique") },
+      { value: MalfunctionTypes.ACCIDENT, label: t("Accident déversement") },
+      { value: MalfunctionTypes.PURIFIER, label: t("Épurateur") },
+      {
+        value: MalfunctionTypes.INJECTION_POST,
         label: t(
           "Poste d'injection (autre que problématiques de saturation des réseaux)"
         ),
       },
-      { value: "intrants", label: t("Intrants") },
-      { value: "other", label: t("Autres (à préciser)") },
+      { value: MalfunctionTypes.INPUTS, label: t("Intrants") },
+      { value: MalfunctionTypes.OTHER, label: t("Autres (à préciser)") },
     ],
     [t]
   )
@@ -41,7 +56,7 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
       readOnly={!isInDeclarationPeriod}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveEnergy()}>
+        <EditableCard.Form onSubmit={() => saveEnergy.execute(value)}>
           <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}
@@ -49,37 +64,57 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
               options={getYesNoOptions()}
               orientation="horizontal"
               required
+              {...bind("has_malfunctions")}
             />
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("Durée cumulée du dysfonctionnement (en jours)")}
-              required
-            />
-            <RadioGroup
-              readOnly={!isEditing}
-              label={t("Types de dysfonctionnement")}
-              options={dysfunctionOptions}
-              orientation="horizontal"
-              required
-            />
-            <TextInput readOnly={!isEditing} label={t("Précisions")} required />
+            {value.has_malfunctions && (
+              <NumberInput
+                readOnly={!isEditing}
+                label={t("Durée cumulée du dysfonctionnement (en jours)")}
+                required
+                {...bind("malfunction_cumulative_duration_days")}
+              />
+            )}
           </Grid>
-          <Grid cols={2} gap="lg">
-            <RadioGroup
-              readOnly={!isEditing}
-              label={t(
-                "Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux"
+          {value.has_malfunctions && (
+            <>
+              <RadioGroup
+                readOnly={!isEditing}
+                label={t("Types de dysfonctionnement")}
+                options={dysfunctionOptions}
+                required
+                {...bind("malfunction_types")}
+              />
+              {value.malfunction_types === MalfunctionTypes.OTHER && (
+                <TextInput
+                  readOnly={!isEditing}
+                  label={t("Précisions")}
+                  required
+                  {...bind("malfunction_details")}
+                />
               )}
-              options={getYesNoOptions()}
-              orientation="horizontal"
-              required
-            />
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("Nombre d’heures d’impossibilité d’injection (h)")}
-              required
-            />
-          </Grid>
+              <RadioGroup
+                readOnly={!isEditing}
+                label={t(
+                  "Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux"
+                )}
+                options={getYesNoOptions()}
+                orientation="horizontal"
+                required
+                {...bind(
+                  "has_injection_difficulties_due_to_network_saturation"
+                )}
+              />
+              {value.has_injection_difficulties_due_to_network_saturation && (
+                <NumberInput
+                  readOnly={!isEditing}
+                  label={t("Nombre d’heures d’impossibilité d’injection (h)")}
+                  required
+                  {...bind("injection_impossibility_hours")}
+                />
+              )}
+            </>
+          )}
+
           {isEditing && (
             <Button
               type="submit"

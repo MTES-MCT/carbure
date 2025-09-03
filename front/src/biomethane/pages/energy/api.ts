@@ -1,5 +1,5 @@
 import { api } from "common/services/api-fetch"
-import { BiomethaneEnergyAddRequest } from "./types"
+import { BiomethaneEnergyInputRequest } from "./types"
 
 export const getYears = (entity_id: number) =>
   api.GET("/biomethane/energy/years/", {
@@ -24,7 +24,7 @@ export const getEnergy = (entity_id: number, year: number) =>
 
 export const saveEnergy = (
   entity_id: number,
-  body: BiomethaneEnergyAddRequest
+  body: BiomethaneEnergyInputRequest
 ) =>
   api.PUT("/biomethane/energy/", {
     params: {

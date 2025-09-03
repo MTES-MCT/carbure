@@ -5,13 +5,13 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../types"
+import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
 import { useEnergyContext } from "../energy.hooks"
 import { getYesNoOptions } from "common/utils/normalizers"
 
 type AcceptabilityForm = DeepPartial<
   Pick<
-    BiomethaneEnergyAddRequest,
+    BiomethaneEnergyInputRequest,
     | "has_opposition_or_complaints_acceptability"
     | "estimated_work_days_acceptability"
   >

@@ -44,7 +44,7 @@ export const Energy = () => {
 
   usePrivateNavigation(t("Énergie"))
 
-  if (loading) return <LoaderOverlay />
+  if (loading && !energy) return <LoaderOverlay />
 
   if (!loading && contract === undefined) {
     return <SettingsNotFilled />
