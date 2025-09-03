@@ -18,6 +18,8 @@ import { EnergyEfficiency } from "./components/energy-efficiency"
 import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 import { MonthlyBiomethaneInjection } from "./components/monthy-biomethane-injection/monthly-biomethane-injection"
 import { isTariffReference2011Or2020 } from "../contract"
+import { Acceptability } from "./components/acceptability"
+import { Malfunction } from "./components/malfunction"
 
 export const Energy = () => {
   const { t } = useTranslation()
@@ -63,6 +65,8 @@ export const Energy = () => {
         {isTariffReference2011Or2020(contract?.tariff_reference) && (
           <MonthlyBiomethaneInjection />
         )}
+        <Acceptability energy={energy} />
+        <Malfunction energy={energy} />
       </BiomethanePageHeader>
     </EnergyProvider>
   )
