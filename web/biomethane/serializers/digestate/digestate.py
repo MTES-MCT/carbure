@@ -48,11 +48,15 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
     )
 
     def validate(self, data):
-        errors = {}
         validated_data = super().validate(data)
+        entity = self.context.get("entity")
+        year = self.context.get("year")
 
-        # Always set status to PENDING on update and creation by default
+        validated_data["producer"] = entity
+        validated_data["year"] = year
         validated_data["status"] = BiomethaneDigestate.PENDING
+
+        errors = {}
 
         ## Compostage
         if validated_data.get("composting_locations"):
@@ -80,15 +84,3 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
             raise serializers.ValidationError(errors)
 
         return validated_data
-
-    def create(self, validated_data):
-        entity = self.context.get("entity")
-        year = self.context.get("year")
-
-        if BiomethaneDigestate.objects.filter(producer=entity, year=year).exists():
-            raise serializers.ValidationError({"producer": [_("Un digestat existe déjà pour cette entité.")]})
-
-        validated_data["producer"] = entity
-        validated_data["year"] = year
-
-        return super().create(validated_data)

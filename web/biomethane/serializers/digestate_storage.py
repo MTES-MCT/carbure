@@ -28,8 +28,7 @@ class BiomethaneDigestateStorageAddSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         entity = self.context.get("entity")
-        if entity:
-            validated_data["producer"] = entity
+        validated_data["producer"] = entity
 
         return super().create(validated_data)
 
