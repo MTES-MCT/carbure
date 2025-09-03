@@ -35,7 +35,7 @@ class ValidateActionMixin:
             digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=year)
 
             digestate.status = BiomethaneDigestate.VALIDATED
-            digestate.save()
+            digestate.save(update_fields=["status"])
 
             return Response(status=status.HTTP_200_OK)
         except BiomethaneDigestate.DoesNotExist:

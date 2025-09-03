@@ -32,10 +32,10 @@ class ValidateActionMixin:
     def validate_energy(self, request, *args, **kwargs):
         try:
             year = get_declaration_period()
-            digestate = BiomethaneEnergy.objects.get(producer=request.entity, year=year)
+            energy = BiomethaneEnergy.objects.get(producer=request.entity, year=year)
 
-            digestate.status = BiomethaneEnergy.VALIDATED
-            digestate.save()
+            energy.status = BiomethaneEnergy.VALIDATED
+            energy.save(update_fields=["status"])
 
             return Response(status=status.HTTP_200_OK)
         except BiomethaneEnergy.DoesNotExist:
