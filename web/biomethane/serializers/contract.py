@@ -167,6 +167,6 @@ class BiomethaneContractPatchSerializer(serializers.ModelSerializer):
         # the user does not want to be subject to RED II, then is_red_ii is set to False
         if is_red_ii is False and ((cmax and cmax <= 200) or (pap_contracted and pap_contracted <= 19.5)):
             instance.producer.is_red_ii = is_red_ii
-            instance.producer.save()
+            instance.producer.save(update_fields=["is_red_ii"])
 
         return super().update(instance, validated_data)
