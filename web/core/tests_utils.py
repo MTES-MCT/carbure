@@ -24,3 +24,16 @@ def setup_current_user(test, email, name, password, entity_rights=None, is_staff
     assert response.status_code == 200
 
     return user
+
+
+def assert_object_contains_data(test, obj, data, object_name="objet"):
+    for field_name, expected_value in data.items():
+        if isinstance(obj, dict):
+            actual_value = obj.get(field_name)
+        else:
+            actual_value = getattr(obj, field_name)
+        test.assertEqual(
+            actual_value,
+            expected_value,
+            f"Le champ '{field_name}' de {object_name} ne correspond pas. Attendu: {expected_value}, Obtenu: {actual_value}",
+        )

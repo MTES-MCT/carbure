@@ -107,6 +107,7 @@ class SafTicketSourceDetailsTest(TestCase):
                 "id": self.entity.id,
                 "name": self.entity.name,
                 "entity_type": self.entity.entity_type,
+                "registration_id": self.entity.registration_id,
             },
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
@@ -150,6 +151,8 @@ class SafTicketSourceDetailsTest(TestCase):
             ],
             "parent_lot": None,
             "parent_ticket": None,
+            "origin_lot": None,
+            "origin_lot_site": None,
         }
 
         # do not check created_at as its automatically generated

@@ -7,7 +7,7 @@ const meta: Meta<typeof NumberInput> = {
   component: NumberInput,
   title: "common/components/inputs/NumberInput",
   render: (args) => {
-    const [value, setValue] = useState<number | undefined>(args.value)
+    const [value, setValue] = useState(args.value)
 
     return (
       <NumberInput

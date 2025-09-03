@@ -3,7 +3,6 @@ import {
   ElecCertificateSnapshot,
   ProvisionCertificate,
   ProvisionCertificateFilter,
-  ProvisionCertificateOrder,
   ProvisionCertificateStatus,
 } from "../../types"
 import { formatNumber } from "common/utils/formatters"
@@ -11,36 +10,12 @@ import { Column } from "common/components/table2"
 import { Tab } from "common/components/tabs2"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { useParams } from "react-router-dom"
 import { getSourceLabel } from "../../utils"
 
 export function useStatus() {
   const params = useParams<"status">()
   return (params.status ?? "available") as ProvisionCertificateStatus
-}
-
-export function useController(
-  year: number,
-  status: ProvisionCertificateStatus
-) {
-  const entity = useEntity()
-
-  const [state, actions] = useCBQueryParamsStore<
-    ProvisionCertificateStatus,
-    undefined
-  >(entity, year, status)
-
-  const query = useCBQueryBuilder<
-    ProvisionCertificateOrder[],
-    ProvisionCertificateStatus,
-    undefined
-  >(state)
-
-  return { state, actions, query }
 }
 
 export function useTabs(

@@ -1,3 +1,4 @@
 from .certificates import get_years, get_snapshot, get_clients
 from .provision_certificates import ProvisionCertificateViewSet
 from .transfer_certificates import TransferCertificateViewSet
+from .provision_certificate_qualicharge import ElecProvisionCertificateQualichargeViewSet

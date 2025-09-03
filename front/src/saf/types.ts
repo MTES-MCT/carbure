@@ -5,19 +5,23 @@ import {
   Feedstock,
   ProductionSite,
 } from "common/types"
-import { CBQueryParams, CBQueryStates } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiSafTicketsGetParametersQueryOrder_by,
-  PathsApiSafTicketSourcesGetParametersQueryOrder_by,
-  PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceSatus,
+  PathsApiSafTicketSourcesGetParametersQueryOrder_by as SafTicketSourceOrder,
   PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
   PathsApiSafTicketsGetParametersQueryConsumption_type as ConsumptionType,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus,
 } from "api-schema"
+import { QueryBuilder } from "common/hooks/query-builder-2"
 
 // Generated enum is EnumStatus and the name is not readable
-export { SafTicketSourceStatus, SafTicketStatus, ConsumptionType }
+export {
+  SafTicketSourceStatus,
+  SafTicketSourceOrder,
+  SafTicketStatus,
+  ConsumptionType,
+}
 
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator
 export interface SafSnapshot {
@@ -81,16 +85,29 @@ export type SafTicketsResponse = apiTypes["PaginatedSafTicketPreviewList"]
 
 export type SafTicketType = "assigned" | "received"
 
-export interface SafStates
-  extends CBQueryStates<SafTicketStatus, SafTicketType> {
-  filters: SafFilterSelection
-  snapshot?: SafSnapshot
-}
-
 export type SafTicketOrder = PathsApiSafTicketsGetParametersQueryOrder_by
 
-export interface SafTicketQuery
-  extends CBQueryParams<SafTicketOrder[], SafTicketStatus, SafTicketType> {
+// export interface SafStates
+//   extends CBQueryStates<SafTicketStatus, SafTicketType> {
+//   filters: SafFilterSelection
+//   snapshot?: SafSnapshot
+// }
+// export interface SafTicketQuery
+//   extends CBQueryParams<SafTicketOrder[], SafTicketStatus, SafTicketType> {
+//   [SafFilter.Feedstocks]?: string[]
+//   [SafFilter.Periods]?: number[]
+//   [SafFilter.Clients]?: string[]
+//   [SafFilter.ConsumptionTypes]?: ConsumptionType[]
+// }
+
+// Query type builder (exposes state, actions, query type)
+export type SafTicketQueryBuilder = QueryBuilder<
+  SafTicketStatus,
+  SafTicketOrder[]
+>
+
+export type SafTicketQuery = SafTicketQueryBuilder["query"] & {
+  type: SafTicketType
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]
@@ -112,15 +129,26 @@ export enum SafFilter {
   ConsumptionTypes = "consumption_type",
 }
 
-export type SafTicketSourceOrder =
-  PathsApiSafTicketSourcesGetParametersQueryOrder_by
+// export type SafTicketQueryBuilder = QueryBuilder<
+//   SafTicketStatus,
+//   SafTicketOrder[]
+// >
 
-export interface SafTicketSourceQuery
-  extends CBQueryParams<
-    SafTicketSourceOrder[],
-    SafTicketSourceSatus,
-    undefined
-  > {
+// export type SafTicketQuery = SafTicketQueryBuilder["query"] & {
+//   type: SafTicketType
+//   [SafFilter.Feedstocks]?: string[]
+//   [SafFilter.Periods]?: number[]
+//   [SafFilter.Clients]?: string[]
+//   [SafFilter.ConsumptionTypes]?: ConsumptionType[]
+// }
+
+export type SafTicketSourceQueryBuilder = QueryBuilder<
+  SafTicketSourceStatus,
+  SafTicketSourceOrder[]
+>
+
+// Utilisé uniquement pour typer la query qui arrive dans api.ts
+export type SafTicketSourceQuery = SafTicketSourceQueryBuilder["query"] & {
   [SafFilter.Feedstocks]?: string[]
   [SafFilter.Periods]?: number[]
   [SafFilter.Clients]?: string[]

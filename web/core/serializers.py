@@ -684,7 +684,7 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
 class EntityPreviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
-        fields = ["id", "name", "entity_type"]
+        fields = ["id", "name", "entity_type", "registration_id"]
         read_only_fields = fields
 
 
@@ -722,6 +722,7 @@ class UserEntitySerializer(serializers.ModelSerializer):
             "ext_admin_pages",
             "is_tiruert_liable",
             "accise_number",
+            "is_red_ii",
         ]
         read_only_fields = fields
 

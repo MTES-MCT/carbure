@@ -11,7 +11,7 @@ import { Form, FormProps } from "common/components/form2"
 
 interface EditableCardProps {
   title: string
-  description?: string
+  description?: ReactNode
 
   /**
    * Children can be a function that receives the editing state and a function to set it.
@@ -30,6 +30,7 @@ interface EditableCardProps {
   onEdit?: (isEditing: boolean) => void
   onCancel?: () => void
   className?: string
+  readOnly?: boolean
 }
 
 // Internal component that uses the context
@@ -45,6 +46,7 @@ const EditableCardContent = ({
   headerActions,
   className,
   isEditing: controlledIsEditing,
+  readOnly,
   onEdit: controlledOnEdit,
   onCancel: controlledOnCancel,
 }: EditableCardProps) => {
@@ -79,14 +81,16 @@ const EditableCardContent = ({
           <Title className={css["editable-card__title"]} is="p" as="h6">
             {title}
           </Title>
-          <Text className={css["editable-card__description"]} size="sm">
-            {description}
-          </Text>
+          {description ? (
+            <Text className={css["editable-card__description"]} size="sm">
+              {description}
+            </Text>
+          ) : null}
         </div>
 
         {headerActions}
 
-        {headerActions === undefined ? (
+        {headerActions === undefined && !readOnly ? (
           <>
             {!currentIsEditing && (
               <Button

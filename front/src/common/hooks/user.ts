@@ -15,6 +15,9 @@ export interface UserManager {
   getFirstEntity: () => Entity | null
   getName: () => string
   user: User | undefined
+
+  // Check if the user is admin of MTE - DGEC
+  isMTEDGEC: boolean
 }
 
 export function useUserManager(): UserManager {
@@ -70,6 +73,7 @@ export function useUserManager(): UserManager {
     hasEntities,
     getFirstEntity,
     user: res,
+    isMTEDGEC: rights.some((right) => right.entity.name === "MTE - DGEC"),
   }
 }
 

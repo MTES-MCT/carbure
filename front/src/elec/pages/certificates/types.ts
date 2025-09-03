@@ -1,14 +1,14 @@
 import {
   PathsApiElecProvisionCertificatesGetParametersQueryOrder_by,
   PathsApiElecTransferCertificatesGetParametersQueryOrder_by,
-  PathsApiSafTicketsGetParametersQueryStatus,
+  PathsApiSafTicketsGetParametersQueryStatus as TransferCertificateStatus,
   PathsApiElecProvisionCertificatesGetParametersQuerySource,
 } from "api-schema"
-import { CBQueryParams } from "common/hooks/query-builder-2"
+import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export { PathsApiElecProvisionCertificatesGetParametersQuerySource as ProvisionCertificateSource }
-export { PathsApiSafTicketsGetParametersQueryStatus as TransferCertificateStatus }
+export { TransferCertificateStatus }
 
 export type ElecCertificateSnapshot = {
   provision_certificates_available: number
@@ -30,11 +30,12 @@ export enum ProvisionCertificateFilter {
 export type ProvisionCertificateOrder =
   PathsApiElecProvisionCertificatesGetParametersQueryOrder_by
 
-export type ProvisionCertificatesQuery = CBQueryParams<
-  ProvisionCertificateOrder[],
+export type ProvisionCertificatesQueryBuilder = QueryBuilder<
   ProvisionCertificateStatus,
-  undefined
+  ProvisionCertificateOrder[]
 >
+export type ProvisionCertificatesQuery =
+  ProvisionCertificatesQueryBuilder["query"]
 
 export type ProvisionCertificate = apiTypes["ElecProvisionCertificate"]
 
@@ -48,10 +49,11 @@ export enum TransferCertificateFilter {
 export type TransferCertificateOrder =
   PathsApiElecTransferCertificatesGetParametersQueryOrder_by
 
-export type TransferCertificatesQuery = CBQueryParams<
-  TransferCertificateOrder[],
-  PathsApiSafTicketsGetParametersQueryStatus,
-  undefined
+export type TransferCertificatesQueryBuilder = QueryBuilder<
+  TransferCertificateStatus,
+  TransferCertificateOrder[]
 >
+export type TransferCertificatesQuery =
+  TransferCertificatesQueryBuilder["query"]
 
 export type TransferCertificate = apiTypes["ElecTransferCertificate"]

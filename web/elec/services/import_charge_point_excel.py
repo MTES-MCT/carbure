@@ -147,8 +147,9 @@ class ExcelChargePointValidator(Validator):
             self.add_error(
                 "charge_point_id",
                 _(
-                    "Le point de recharge {charge_point_id} n'est pas listé dans les données consolidées de transport.data.gouv.fr"  # noqa: E501
-                ).format(charge_point_id=charge_point_id),
+                    "Le point de recharge %(charge_point_id)s n'est pas listé dans les données consolidées de transport.data.gouv.fr"  # noqa: E501
+                )
+                % {"charge_point_id": charge_point_id},
             )
         else:
             if not charge_point.get("nominal_power"):

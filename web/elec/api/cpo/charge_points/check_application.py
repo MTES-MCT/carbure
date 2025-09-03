@@ -48,7 +48,11 @@ def check_application(request: HttpRequest, entity):
                 {
                     "error": "INVALID_DATA",
                     "line": line,
-                    "meta": {"charge_point_id": [_(f"Le point de recharge {charge_point_id} existe déjà")]},
+                    "meta": {
+                        "charge_point_id": [
+                            _("Le point de recharge %(charge_point_id)s existe déjà") % {"charge_point_id": charge_point_id}
+                        ]
+                    },
                 }
             )
         data["errors"] = errors

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22 15:43+0200\n"
+"POT-Creation-Date: 2025-09-02 09:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: FRENCH <LL@li.org>\n"
@@ -17,101 +17,179 @@ msgid "Email"
 msgstr "Email"
 
 #: web/auth/serializers/reset_password.py:9
-#: web/auth/serializers/user_creation.py:14
+#: web/auth/serializers/user_creation.py:16
 msgid "Password"
 msgstr ""
 
 #: web/auth/serializers/reset_password.py:10
-#: web/auth/serializers/user_creation.py:15
+#: web/auth/serializers/user_creation.py:17
 msgid "Password confirmation"
 msgstr ""
 
 #: web/auth/serializers/reset_password.py:14
-#: web/auth/serializers/user_creation.py:32
+#: web/auth/serializers/user_creation.py:38
 msgid "The two password fields didn't match."
+msgstr ""
+
+#: web/auth/validators.py:16
+msgid ""
+"Le nom ne peut contenir que des lettres, espaces, tirets (-) et apostrophes "
+"(')."
+msgstr ""
+"The name can only contain letters, spaces, hyphens (-), and apostrophes (')."
+
+#: web/auth/validators.py:22
+msgid "Le nom doit contenir au moins une lettre."
 msgstr ""
 
 #: web/auth/views/mixins/change_email.py:38
 msgid "Carbure - Confirmation de changement d'email"
 msgstr "Carbure - Email Change Confirmation"
 
-#: web/auth/views/mixins/verify_otp.py:53
+#: web/auth/views/mixins/verify_otp.py:54
 #, python-format
-msgid "Trop de tentatives incorrectes (%d échecs). Prochaine tentative possible à partir de %s."
-msgstr "Too many incorrect attempts (%d failures). Next attempt possible from %s."
+msgid ""
+"Trop de tentatives incorrectes (%(failures)d échecs). Prochaine tentative "
+"possible à partir de %(time)s."
+msgstr ""
+"Too many incorrect attempts (%(failures)d failures). Next attempt possible "
+"from %(time)s."
 
-#: web/auth/views/mixins/verify_otp.py:60
+#: web/auth/views/mixins/verify_otp.py:62
 msgid "Le code de sécurité a expiré. Veuillez demander un nouveau code."
 msgstr "The security code has expired. Please request a new code."
 
-#: web/auth/views/mixins/verify_otp.py:66
+#: web/auth/views/mixins/verify_otp.py:68
 msgid "Le code de sécurité est incorrect."
 msgstr "The security code is incorrect."
 
-#: web/core/admin.py:311
+#: web/biomethane/serializers/contract.py:53
+msgid ""
+"Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai."
+msgstr ""
+"The cmax_annualized_value field is mandatory if cmax_annualized is true."
+
+#: web/biomethane/serializers/contract.py:72
+#, python-brace-format
+msgid "Le champ {field} est obligatoire."
+msgstr "The {field} field is mandatory."
+
+#: web/biomethane/serializers/contract.py:103
+msgid "Un site contract existe déjà pour cette entité."
+msgstr "A contract site already exists for this entity."
+
+#: web/biomethane/serializers/contract.py:150
+#, python-brace-format
+msgid "Le champ {field} ne peut pas être modifié une fois le contrat signé."
+msgstr "The {field} field cannot be modified once the contract is signed."
+
+#: web/biomethane/serializers/contract_amendment.py:50
+msgid "Ce champ est obligatoire si amendment_object contient 'OTHER'."
+msgstr "This field is mandatory if amendment_object contains 'OTHER'."
+
+#: web/biomethane/serializers/contract_amendment.py:61
+msgid "Cette entité n'a pas de contrat associé."
+msgstr "This entity has no associated contract."
+
+#: web/biomethane/serializers/digestate/digestate.py:69
+msgid "Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné."
+msgstr "This field is mandatory when 'External platform' is selected."
+
+#: web/biomethane/serializers/digestate/digestate.py:75
+msgid "Ce champ est obligatoire lorsque 'Sur site' est sélectionné."
+msgstr "This field is mandatory when 'On site' is selected."
+
+#: web/biomethane/serializers/digestate/digestate.py:88
+msgid "Un digestat existe déjà pour cette entité."
+msgstr "A digestate already exists for this entity."
+
+#: web/biomethane/serializers/digestate/spreading.py:29
+msgid "Année manquante."
+msgstr "Missing year."
+
+#: web/biomethane/serializers/digestate/spreading.py:33
+msgid "Digestat manquant."
+msgstr "Missing digestate."
+
+#: web/biomethane/serializers/injection_site.py:22
+#: web/biomethane/serializers/injection_site.py:30
+msgid "Ce champ est obligatoire."
+msgstr "This field is mandatory."
+
+#: web/biomethane/serializers/production_unit.py:75
+msgid "Ce champ est obligatoire lorsque l'agrément sanitaire est activé."
+msgstr "This field is mandatory when sanitary approval is enabled."
+
+#: web/biomethane/serializers/production_unit.py:81
+msgid ""
+"Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
+msgstr "This field is mandatory when the hygienization exemption is enabled."
+
+#: web/core/admin.py:338
 msgid "Tous"
 msgstr "All"
 
-#: web/elec/api/cpo/charge_points/check_application.py:51
-#, python-brace-format
-msgid "Le point de recharge {charge_point_id} existe déjà"
-msgstr "Charge point {charge_point_id} already exists"
+#: web/elec/api/cpo/charge_points/check_application.py:53
+#, fuzzy, python-format
+msgid "Le point de recharge %(charge_point_id)s existe déjà"
+msgstr "Charge point %(charge_point_id)s already exists"
 
 #: web/elec/services/import_charge_point_excel.py:150
-#, python-brace-format
+#, fuzzy, python-format
 msgid ""
-"Le point de recharge {charge_point_id} n'est pas listé dans les données "
+"Le point de recharge %(charge_point_id)s n'est pas listé dans les données "
 "consolidées de transport.data.gouv.fr"
 msgstr ""
-"The charging point {charge_point_id} is not listed in the consolidated data "
+"The charge point %(charge_point_id)s is not listed in the consolidated data "
 "of transport.data.gouv.fr"
 
-#: web/elec/services/import_charge_point_excel.py:155
+#: web/elec/services/import_charge_point_excel.py:156
 #, fuzzy
 #| msgid "La date du dernier relevé est obligatoire."
 msgid "La puissance nominale est obligatoire"
 msgstr "The nominal power is mandatory."
 
-#: web/elec/services/import_charge_point_excel.py:161
+#: web/elec/services/import_charge_point_excel.py:162
 msgid ""
 "L'identifiant du point de mesure est obligatoire pour les stations ayant au "
 "moins un point de recharge en courant continu."
 msgstr ""
 "The identifier of the measuring point is mandatory for stations with at "
-"least one DC charging point."
+"least one DC charge point."
 
-#: web/elec/services/import_charge_point_excel.py:166
+#: web/elec/services/import_charge_point_excel.py:167
 msgid "Le numéro MID est obligatoire."
 msgstr "MID number is mandatory."
 
-#: web/elec/services/import_charge_point_excel.py:168
+#: web/elec/services/import_charge_point_excel.py:169
 msgid "La date du dernier relevé est obligatoire."
 msgstr "Date of the last reading is mandatory."
 
-#: web/elec/services/import_charge_point_excel.py:170
+#: web/elec/services/import_charge_point_excel.py:171
 msgid "L'énergie mesurée lors du dernier relevé est obligatoire."
 msgstr "Mesured energy during the last reading is mandatory."
 
-#: web/elec/services/import_elec_audit_report_excel.py:99
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "Le point de recharge {charge_point_id} n'est pas listé dans les données "
-#| "consolidées de transport.data.gouv.fr"
+#: web/elec/services/import_elec_audit_report_excel.py:98
+#, fuzzy, python-format
 msgid ""
-"Le point de charge {charge_point_id} ne fait pas partie de l'échantillon "
+"Le point de charge %(charge_point_id)s ne fait pas partie de l'échantillon "
 "sélectionné pour cet audit."
 msgstr ""
-"The charging point {charge_point_id} is not listed in the consolidated data "
+"The charge point %(charge_point_id)s is not listed in the consolidated data "
 "of transport.data.gouv.fr"
 
-#: web/elec/services/import_elec_audit_report_excel.py:118
-#, python-brace-format
-msgid "Les informations relatives au point de charge {charge_point_id} sont incomplètes ou absentes."
-msgstr "Information related to the charging point {charge_point_id} is incomplete or missing."
+#: web/elec/services/import_elec_audit_report_excel.py:117
+#, fuzzy, python-format
+msgid ""
+"Les informations relatives au point de charge %(charge_point_id)s sont "
+"incomplètes ou absentes."
+msgstr ""
+"Information related to the charge point %(charge_point_id)s is incomplete or "
+"missing."
 
 #: web/elec/services/import_meter_reading_excel.py:144
 msgid "Le point de recharge n'a pas encore été inscrit sur la plateforme."
-msgstr "The charging point has not yet been registered on the platform."
+msgstr "The charge point has not yet been registered on the platform."
 
 #: web/elec/services/import_meter_reading_excel.py:150
 #, fuzzy
@@ -119,27 +197,25 @@ msgstr "The charging point has not yet been registered on the platform."
 msgid ""
 "Ce point de recharge n'a pas de compteur associé, veuillez en ajouter un "
 "depuis la page dédiée."
-msgstr "The charging point has not yet been registered on the platform."
+msgstr "The charge point has not yet been registered on the platform."
 
 #: web/elec/services/import_meter_reading_excel.py:156
 msgid "La quantité d'énergie soutirée est inférieure au précédent relevé."
 msgstr "The amount of energy withdrawn is less than the previous reading."
 
 #: web/elec/services/import_meter_reading_excel.py:162
-msgid ""
-"Ce point de recharge a été défini {len(lines)} fois (lignes {', '."
-"join(str(num) for num in lines)})"
-msgstr ""
-"This charging point has been defined {len(lines)} times (lines {', '."
-"join(str(num) for num in lines)})"
+#, fuzzy, python-format
+msgid "Ce point de recharge a été défini %(count)d fois (lignes %(lines)s)"
+msgstr "This charge point has been defined %(count)d times (lines %(lines)s)"
 
 #: web/elec/services/import_meter_reading_excel.py:169
+#, fuzzy, python-format
 msgid ""
 "Un relevé plus récent est déjà enregistré pour ce point de recharge: "
-"{previous_extracted_energy}kWh, {previous_reading_date:%d/%m/%Y}"
+"%(energy)skWh, %(date)s"
 msgstr ""
-"A more recent reading is already recorded for this charging point: "
-"{previous_extracted_energy}kWh, {previous_reading_date:%d/%m/%Y}"
+"A more recent reading is already recorded for this charge point: "
+"%(energy)skWh, %(date)s"
 
 #: web/elec/services/import_meter_reading_excel.py:177
 msgid ""
@@ -149,7 +225,7 @@ msgid ""
 msgstr ""
 "The estimated load factor since the last recorded reading is greater than "
 "100%. Please check the values of the reading as well as the power of your "
-"charging point, entered on TDG."
+"charge point, entered on TDG."
 
 #: web/elec/services/import_meter_reading_excel.py:184
 msgid "La date du relevé ne correspond pas au trimestre traité actuellement."
@@ -162,6 +238,36 @@ msgstr "tickets"
 #: web/saf/views/ticket/mixins/export.py:86
 msgid "aeroports"
 msgstr "airports"
+
+#: web/templates/admin/otp_verify.html:4 web/templates/admin/otp_verify.html:14
+msgid "Vérification OTP"
+msgstr ""
+
+#: web/templates/admin/otp_verify.html:4
+msgid "Django site admin"
+msgstr ""
+
+#: web/templates/admin/otp_verify.html:19
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: web/templates/admin/otp_verify.html:34
+msgid ""
+"Un code de vérification a été envoyé à votre adresse email. Veuillez saisir "
+"ce code pour finaliser votre connexion."
+msgstr ""
+"A verification code has been sent to your email address. Please enter this "
+"code to complete your login."
+
+#: web/templates/admin/otp_verify.html:49
+msgid "Vérifier"
+msgstr "Verify"
+
+#: web/templates/admin/otp_verify.html:54
+msgid "Retour à la connexion"
+msgstr "Back to login"
 
 #: web/tiruert/serializers/elec_operation.py:69
 msgid "Only debit operations can be created"

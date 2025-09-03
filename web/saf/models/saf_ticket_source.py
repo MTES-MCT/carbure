@@ -69,6 +69,23 @@ class SafTicketSource(models.Model):
     parent_lot = models.ForeignKey("core.CarbureLot", null=True, blank=True, on_delete=models.CASCADE)
     parent_ticket = models.ForeignKey("saf.SafTicket", null=True, blank=True, on_delete=models.CASCADE)
 
+    origin_lot = models.ForeignKey(
+        "core.CarbureLot",
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="linked_saf_ticket_source",
+    )
+    origin_lot_site = models.ForeignKey(
+        "transactions.Site",
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="linked_saf_ticket_source",
+    )
+
     def generate_carbure_id(self):
         production_country = self.production_country.code_pays if self.production_country else None
         self.carbure_id = "TS{period}-{production_country}-{id}".format(
