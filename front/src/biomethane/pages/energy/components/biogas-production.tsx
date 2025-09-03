@@ -5,7 +5,7 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../types"
+import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
 import { useEnergyContext } from "../energy.hooks"
 import {
   BiomethaneProductionUnit,
@@ -14,7 +14,7 @@ import {
 
 type BiogasProductionForm = DeepPartial<
   Pick<
-    BiomethaneEnergyAddRequest,
+    BiomethaneEnergyInputRequest,
     | "produced_biogas_nm3_per_year"
     | "flared_biogas_nm3_per_year"
     | "flaring_operating_hours"
@@ -60,7 +60,7 @@ export function BiogasProduction({
               required
             />
           </Grid>
-          {!productionUnit?.installed_meters.includes(
+          {!productionUnit?.installed_meters?.includes(
             InstalledMeters.FLARING_FLOWMETER
           ) && (
             <NumberInput

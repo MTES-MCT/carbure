@@ -5,13 +5,13 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../types"
+import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
 import { useEnergyContext } from "../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 
 type InjectedBiomethaneForm = DeepPartial<
   Pick<
-    BiomethaneEnergyAddRequest,
+    BiomethaneEnergyInputRequest,
     | "injected_biomethane_gwh_pcs_per_year"
     | "injected_biomethane_nm3_per_year"
     | "injected_biomethane_ch4_rate_percent"

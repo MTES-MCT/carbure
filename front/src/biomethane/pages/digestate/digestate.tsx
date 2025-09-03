@@ -49,7 +49,7 @@ export const Digestate = () => {
   const { result: contract } = useGetContractInfos()
   usePrivateNavigation(t("Digestat"))
 
-  if (loading) return <LoaderOverlay />
+  if (loading && !digestate) return <LoaderOverlay />
 
   if (!loading && !productionUnit?.id) {
     return <SettingsNotFilled />

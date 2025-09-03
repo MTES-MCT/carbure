@@ -4,7 +4,7 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import { saveEnergy } from "./api"
-import { BiomethaneEnergyAddRequest } from "./types"
+import { BiomethaneEnergyInputRequest } from "./types"
 import { declarationInterval } from "biomethane/utils"
 
 interface EnergyContextValue {
@@ -12,7 +12,7 @@ interface EnergyContextValue {
   saveEnergy: ReturnType<
     typeof useMutation<
       Awaited<ReturnType<typeof saveEnergy>>,
-      [BiomethaneEnergyAddRequest]
+      [BiomethaneEnergyInputRequest]
     >
   >
   isInDeclarationPeriod: boolean
@@ -34,7 +34,7 @@ export function EnergyProvider({ children, year }: EnergyProviderProps) {
   const isInDeclarationPeriod = year === declarationInterval.year
 
   const saveEnergyMutation = useMutation(
-    (data: BiomethaneEnergyAddRequest) => saveEnergy(entity.id, data),
+    (data: BiomethaneEnergyInputRequest) => saveEnergy(entity.id, data),
     {
       invalidates: ["energy"],
       onSuccess: () => {

@@ -4,7 +4,7 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../types"
+import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
 import { useEnergyContext } from "../energy.hooks"
 import {
   BiomethaneContract,
@@ -13,7 +13,7 @@ import {
 
 type InstallationEnergyNeedsForm = DeepPartial<
   Pick<
-    BiomethaneEnergyAddRequest,
+    BiomethaneEnergyInputRequest,
     | "attest_no_fossil_for_digester_heating_and_purification"
     | "energy_used_for_digester_heating"
     | "fossil_details_for_digester_heating"

@@ -5,7 +5,7 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyAddRequest } from "../../types"
+import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../../types"
 import { useEnergyContext } from "../../energy.hooks"
 import {
   BiomethaneContract,
@@ -15,7 +15,7 @@ import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
-    BiomethaneEnergyAddRequest,
+    BiomethaneEnergyInputRequest,
     | "purified_biogas_quantity_nm3"
     | "purification_electric_consumption_kwe"
     | "self_consumed_biogas_nm3"
