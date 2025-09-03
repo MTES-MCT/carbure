@@ -36,5 +36,7 @@
 
   "producer": "Producteur",
   "sanitary_approval_number": "N° Agrément sanitaire",
-  "hygienization_exemption_type": "Dérogation à l'hygiénisation"
+  "hygienization_exemption_type": "Dérogation à l'hygiénisation",
+
+  "password2": "Mot de passe"
 }
