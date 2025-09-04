@@ -2,7 +2,7 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.viewsets import ModelViewSet
 
 from biomethane.models import BiomethaneDigestateStorage
-from biomethane.serializers.digestate_storage import (
+from biomethane.serializers import (
     BiomethaneDigestateStorageInputSerializer,
     BiomethaneDigestateStorageSerializer,
 )

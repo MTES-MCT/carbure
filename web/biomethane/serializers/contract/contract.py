@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneContract
-from biomethane.serializers import BiomethaneContractAmendmentSerializer
+from biomethane.serializers.contract.contract_amendment import BiomethaneContractAmendmentSerializer
 
 
 class BiomethaneContractSerializer(serializers.ModelSerializer):
