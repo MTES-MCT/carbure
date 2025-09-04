@@ -203,19 +203,29 @@ class BiomethaneProductionUnit(models.Model):
 
 
 @receiver(post_save, sender=BiomethaneProductionUnit)
-def clear_fields(sender, instance, **kwargs):
-    """Clear certain fields based on boolean field values"""
+def clear_production_unit_fields_on_save(sender, instance, **kwargs):
+    """
+    Clear specific BiomethaneProductionUnit fields based on boolean field values.
+
+    This signal is triggered when a BiomethaneProductionUnit is saved and clears
+    fields that should be reset based on the configuration changes.
+    """
     fields_to_clear = []
 
+    # Clear sanitary approval number if sanitary approval is not enabled
     if not instance.has_sanitary_approval:
         fields_to_clear.append("sanitary_approval_number")
 
+    # Clear hygienization exemption type if hygienization exemption is not enabled
     if not instance.has_hygienization_exemption:
         fields_to_clear.append("hygienization_exemption_type")
 
+    # Clear digestate treatment steps based on phase separation setting
     if instance.has_digestate_phase_separation:
+        # If phase separation is enabled, clear raw digestate treatment steps
         fields_to_clear.append("raw_digestate_treatment_steps")
     else:
+        # If phase separation is disabled, clear liquid and solid phase treatment steps
         fields_to_clear.extend(["liquid_phase_treatment_steps", "solid_phase_treatment_steps"])
 
     if fields_to_clear:
