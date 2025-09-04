@@ -1,1 +1,2 @@
-from .energy import BaseBiomethaneEnergySerializer, BiomethaneEnergyInputSerializer
+from .energy import BiomethaneEnergySerializer, BiomethaneEnergyInputSerializer
+from .monthly_report import BiomethaneEnergyMonthlyReportSerializer, BiomethaneEnergyMonthlyReportInputSerializer

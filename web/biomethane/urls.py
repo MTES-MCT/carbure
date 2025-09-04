@@ -10,6 +10,7 @@ from .views import (
 )
 from .views.digestate.digestate import BiomethaneDigestateViewSet
 from .views.digestate.spreading import BiomethaneDigestateSpreadingViewSet
+from .views.energy.monthly_report import BiomethaneEnergyMonthlyReportViewSet
 from .views.production_unit import (
     BiomethaneDigestateStorageViewSet,
     BiomethaneProductionUnitViewSet,
@@ -91,6 +92,13 @@ energy_validate_viewset = BiomethaneEnergyViewSet.as_view(
     }
 )
 
+energy_monthly_report_viewset = BiomethaneEnergyMonthlyReportViewSet.as_view(
+    {
+        "put": "upsert",
+        "get": "list",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
@@ -101,5 +109,6 @@ urlpatterns = [
     path("energy/", energy_viewset, name="biomethane-energy"),
     path("energy/years/", energy_years_viewset, name="biomethane-energy-years"),
     path("energy/validate/", energy_validate_viewset, name="biomethane-energy-validate"),
+    path("energy/monthly-reports/", energy_monthly_report_viewset, name="biomethane-energy-monthly-report"),
     *router.urls,
 ]
