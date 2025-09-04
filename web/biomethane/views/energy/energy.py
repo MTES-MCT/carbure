@@ -70,11 +70,11 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 response=BiomethaneEnergySerializer,
-                description="Energy details for the entity",
+                description="Energy declaration details for the entity",
             ),
             status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Energy not found for this entity."),
         },
-        description="Retrieve the energy for the current entity and the current year. Returns a single energy object.",
+        description="Retrieve the energy declaration for the current entity and year. Returns a single energy object.",
     )
     def retrieve(self, request, *args, **kwargs):
         try:
@@ -89,15 +89,15 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 response=BiomethaneEnergySerializer,
-                description="Digestate updated successfully",
+                description="Energy declaration updated successfully",
             ),
             status.HTTP_201_CREATED: OpenApiResponse(
                 response=BiomethaneEnergySerializer,
-                description="Digestate created successfully",
+                description="Digestate declaration created successfully",
             ),
         },
         request=BiomethaneEnergyInputSerializer,
-        description="Create or update the digestate for the current entity (upsert operation).",
+        description="Create or update the energy declaration for the current entity and the current year.",
     )
     def upsert(self, request, *args, **kwargs):
         try:

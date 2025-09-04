@@ -46,8 +46,8 @@ class BiomethaneContract(models.Model):
         (INSTALLATION_CATEGORY_3, INSTALLATION_CATEGORY_3),
     )
 
-    tariff_reference = models.CharField(choices=TARIFF_REFERENCE_CHOICES, max_length=28)
-    buyer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="buyer")
+    tariff_reference = models.CharField(choices=TARIFF_REFERENCE_CHOICES, max_length=28, null=True, blank=True)
+    buyer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="buyer", null=True, blank=True)
     producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_contract")
     installation_category = models.CharField(choices=INSTALLATION_CATEGORIES, max_length=32, null=True, blank=True)
     cmax = models.FloatField(null=True, blank=True)
