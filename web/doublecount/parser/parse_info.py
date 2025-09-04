@@ -1,5 +1,4 @@
-import traceback
-
+import sentry_sdk
 from openpyxl import Workbook
 
 
@@ -11,7 +10,7 @@ def parse_info(excel_file: Workbook):
         production_site = presentation[5][2].value
         producer_email = presentation[16][2].value
         try:
-            # loop through reconaissance sheet to find the base year defined in it
+            # loop through reconnaissance sheet to find the base year defined in it
             year_row_index = 0
             for i, row in enumerate(application.iter_rows()):
                 year_row_index = i
@@ -26,6 +25,6 @@ def parse_info(excel_file: Workbook):
             "producer_email": producer_email,
             "start_year": start_year,
         }
-    except Exception:
-        traceback.print_exc()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return {"production_site": None, "producer_email": None, "start_year": 0}
