@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from core.models import Entity
 
@@ -198,3 +200,24 @@ class BiomethaneProductionUnit(models.Model):
     class Meta:
         db_table = "biomethane_production_unit"
         verbose_name = "Unité de Production de Biométhane"
+
+
+@receiver(post_save, sender=BiomethaneProductionUnit)
+def clear_fields(sender, instance, **kwargs):
+    """Clear certain fields based on boolean field values"""
+    fields_to_clear = []
+
+    if not instance.has_sanitary_approval:
+        fields_to_clear.append("sanitary_approval_number")
+
+    if not instance.has_hygienization_exemption:
+        fields_to_clear.append("hygienization_exemption_type")
+
+    if instance.has_digestate_phase_separation:
+        fields_to_clear.append("raw_digestate_treatment_steps")
+    else:
+        fields_to_clear.extend(["liquid_phase_treatment_steps", "solid_phase_treatment_steps"])
+
+    if fields_to_clear:
+        update_data = {field: None for field in fields_to_clear}
+        BiomethaneProductionUnit.objects.filter(pk=instance.pk).update(**update_data)
