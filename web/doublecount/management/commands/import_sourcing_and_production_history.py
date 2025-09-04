@@ -1,6 +1,5 @@
 import os
 import time
-import traceback
 import warnings
 
 from django.core.management.base import BaseCommand
