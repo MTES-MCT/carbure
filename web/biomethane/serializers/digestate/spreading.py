@@ -8,25 +8,18 @@ from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestate
 class BaseBiomethaneDigestateSpreadingSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneDigestateSpreading
-        fields = [
-            "spreading_department",
-            "spread_quantity",
-            "spread_parcels_area",
-        ]
+        exclude = ["digestate"]
 
 
 class BiomethaneDigestateSpreadingSerializer(BaseBiomethaneDigestateSpreadingSerializer):
     class Meta(BaseBiomethaneDigestateSpreadingSerializer.Meta):
-        fields = BaseBiomethaneDigestateSpreadingSerializer.Meta.fields + ["id"]
+        exclude = []
 
 
 class BiomethaneDigestateSpreadingAddSerializer(BaseBiomethaneDigestateSpreadingSerializer):
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")
-
-        if not year:
-            raise serializers.ValidationError({"year": [_("Année manquante.")]})
 
         digestate = BiomethaneDigestate.objects.filter(producer=entity, year=year).first()
         if not digestate:

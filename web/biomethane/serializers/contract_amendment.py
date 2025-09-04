@@ -4,38 +4,14 @@ from rest_framework import serializers
 from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
 
 
-class BiomethaneContractAmendmentSerializer(serializers.ModelSerializer):
-    amendment_object = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneContractAmendment.AMENDMENT_OBJECT_CHOICES), read_only=True
-    )
-
-    class Meta:
-        model = BiomethaneContractAmendment
-        fields = [
-            "id",
-            "contract",
-            "signature_date",
-            "effective_date",
-            "amendment_object",
-            "amendment_file",
-            "amendment_details",
-        ]
-
-
-class BiomethaneContractAmendmentAddSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BiomethaneContractAmendment
-        fields = [
-            "signature_date",
-            "effective_date",
-            "amendment_object",
-            "amendment_file",
-            "amendment_details",
-        ]
-
+class BaseBiomethaneContractAmendmentSerializer(serializers.ModelSerializer):
     amendment_object = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneContractAmendment.AMENDMENT_OBJECT_CHOICES), required=True
     )
+
+    class Meta:
+        model = BiomethaneContractAmendment
+        exclude = ["contract"]
 
     def to_internal_value(self, data):
         if hasattr(data, "getlist"):
@@ -44,6 +20,13 @@ class BiomethaneContractAmendmentAddSerializer(serializers.ModelSerializer):
             data.setlist("amendment_object", amendment_objects)
         return super().to_internal_value(data)
 
+
+class BiomethaneContractAmendmentSerializer(BaseBiomethaneContractAmendmentSerializer):
+    class Meta(BaseBiomethaneContractAmendmentSerializer.Meta):
+        exclude = []
+
+
+class BiomethaneContractAmendmentAddSerializer(BaseBiomethaneContractAmendmentSerializer):
     def validate(self, data):
         if BiomethaneContractAmendment.OTHER in data.get("amendment_object") and not data.get("amendment_details"):
             raise serializers.ValidationError(

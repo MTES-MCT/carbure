@@ -5,8 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models import BiomethaneContract
 from biomethane.serializers.contract import (
-    BiomethaneContractAddSerializer,
-    BiomethaneContractPatchSerializer,
+    BiomethaneContractInputSerializer,
     BiomethaneContractSerializer,
 )
 from core.models import Entity, UserRights
@@ -46,7 +45,7 @@ class BiomethaneContractViewSet(GenericViewSet):
 
     def get_serializer_class(self):
         if self.action == "upsert":
-            return BiomethaneContractPatchSerializer
+            return BiomethaneContractInputSerializer
         return BiomethaneContractSerializer
 
     @extend_schema(
@@ -74,20 +73,16 @@ class BiomethaneContractViewSet(GenericViewSet):
                 response=BiomethaneContractSerializer,
             ),
         },
-        request=BiomethaneContractPatchSerializer,
+        request=BiomethaneContractInputSerializer,
     )
     def upsert(self, request, *args, **kwargs):
         """Create or update contract using upsert logic."""
-        serializer_context = self.get_serializer_context()
-
         try:
             contract = BiomethaneContract.objects.get(producer=request.entity)
-            serializer = BiomethaneContractPatchSerializer(
-                contract, data=request.data, partial=True, context=serializer_context
-            )
+            serializer = self.get_serializer(contract, data=request.data)
             status_code = status.HTTP_200_OK
         except BiomethaneContract.DoesNotExist:
-            serializer = BiomethaneContractAddSerializer(data=request.data, context=serializer_context)
+            serializer = self.get_serializer(data=request.data)
             status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid():

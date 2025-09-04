@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from core.models import Entity
 
@@ -41,3 +43,19 @@ class BiomethaneInjectionSite(models.Model):
     class Meta:
         db_table = "biomethane_injection_site"
         verbose_name = "Biométhane - Site d'injection"
+
+
+@receiver(post_save, sender=BiomethaneInjectionSite)
+def clear_fields(sender, instance, **kwargs):
+    """Clear certain fields based on boolean field values"""
+    fields_to_clear = []
+
+    if not instance.is_shared_injection_site:
+        fields_to_clear.append("meter_number")
+
+    if not instance.is_different_from_production_site:
+        fields_to_clear.extend(["company_address", "city", "postal_code"])
+
+    if fields_to_clear:
+        update_data = {field: None for field in fields_to_clear}
+        BiomethaneInjectionSite.objects.filter(pk=instance.pk).update(**update_data)

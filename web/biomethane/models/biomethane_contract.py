@@ -95,7 +95,11 @@ def clear_fields(sender, instance, **kwargs):
     elif instance.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
         fields_to_clear = ["cmax_annualized", "cmax_annualized_value", "cmax"]
 
+    if instance.cmax_annualized is False and "cmax_annualized_value" not in fields_to_clear:
+        fields_to_clear.append("cmax_annualized_value")
+
     update_data = {}
+
     for field in fields_to_clear:
         new_value = None if field != "cmax_annualized" else False
         update_data[field] = new_value

@@ -16,12 +16,6 @@ class BiomethaneEnergyInputSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         validated_data = super().validate(data)
-        entity = self.context.get("entity")
-        year = self.context.get("year")
-
-        validated_data["producer"] = entity
-        validated_data["year"] = year
-        validated_data["status"] = BiomethaneEnergy.PENDING
 
         errors = {}
 
@@ -29,3 +23,15 @@ class BiomethaneEnergyInputSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
 
         return validated_data
+
+    def create(self, validated_data):
+        entity = self.context.get("entity")
+        year = self.context.get("year")
+
+        validated_data["producer"] = entity
+        validated_data["year"] = year
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data["status"] = BiomethaneEnergy.PENDING
+        return super().update(instance, validated_data)
