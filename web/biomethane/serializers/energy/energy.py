@@ -14,16 +14,6 @@ class BiomethaneEnergyInputSerializer(serializers.ModelSerializer):
         model = BiomethaneEnergy
         exclude = ["year", "status", "producer"]
 
-    def validate(self, data):
-        validated_data = super().validate(data)
-
-        errors = {}
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
-        return validated_data
-
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")

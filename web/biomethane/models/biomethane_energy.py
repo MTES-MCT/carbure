@@ -1,5 +1,8 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
+from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
 from core.models import Entity
 
 
@@ -142,3 +145,73 @@ class BiomethaneEnergy(models.Model):
     class Meta:
         db_table = "biomethane_energy"
         verbose_name = "Biométhane - Énergie"
+
+
+@receiver(post_save, sender=BiomethaneEnergy)
+@receiver(post_save, sender=BiomethaneProductionUnit)
+@receiver(post_save, sender=BiomethaneContract)
+def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
+    """
+    Clear specific BiomethaneEnergy fields based on related model changes.
+
+    This signal is triggered when BiomethaneEnergy, BiomethaneProductionUnit,
+    or BiomethaneContract models are saved, and clears energy fields that
+    should be reset based on the configuration changes.
+    """
+    # Get the producer and related objects based on the sender
+    if sender == BiomethaneEnergy:
+        energy_instance = instance
+        producer = instance.producer
+    elif sender == BiomethaneProductionUnit:
+        producer = instance.producer
+        energy_instance = producer.biomethane_energies.order_by("-id").first()
+    elif sender == BiomethaneContract:
+        producer = instance.producer
+        energy_instance = producer.biomethane_energies.order_by("-id").first()
+    else:
+        return
+
+    if not energy_instance:
+        return
+
+    # Get related objects
+    production_unit = getattr(producer, "biomethane_production_unit", None)
+    contract = getattr(producer, "biomethane_contract", None)
+
+    fields_to_clear = []
+
+    # Clear flaring_operating_hours if FLARING_FLOWMETER is NOT in installed_meters
+    if (
+        production_unit
+        and production_unit.installed_meters
+        and BiomethaneProductionUnit.FLARING_FLOWMETER not in production_unit.installed_meters
+    ):
+        fields_to_clear.append("flaring_operating_hours")
+
+    # Clear fields based on tariff reference (older tariffs)
+    if contract and contract.tariff_reference not in ["2011", "2020", "2021"]:
+        fields_to_clear.extend(
+            [
+                "energy_used_for_digester_heating",
+                "purified_biogas_quantity_nm3",
+                "purification_electric_consumption_kwe",
+            ]
+        )
+
+    # Clear fields based on tariff reference (newer tariffs)
+    if contract and contract.tariff_reference not in ["2023"]:
+        fields_to_clear.extend(
+            [
+                "energy_used_for_installation_needs",
+                "self_consumed_biogas_nm3",
+                "total_unit_electric_consumption_kwe",
+            ]
+        )
+
+    # Clear malfunction_details if malfunction_types is not OTHER
+    if energy_instance.malfunction_types and energy_instance.malfunction_types != BiomethaneEnergy.MALFUNCTION_TYPE_OTHER:
+        fields_to_clear.append("malfunction_details")
+
+    if fields_to_clear:
+        update_data = {field: None for field in fields_to_clear}
+        BiomethaneEnergy.objects.filter(pk=energy_instance.pk).update(**update_data)

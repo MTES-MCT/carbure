@@ -46,13 +46,20 @@ class BiomethaneInjectionSite(models.Model):
 
 
 @receiver(post_save, sender=BiomethaneInjectionSite)
-def clear_fields(sender, instance, **kwargs):
-    """Clear certain fields based on boolean field values"""
+def clear_injection_site_fields_on_save(sender, instance, **kwargs):
+    """
+    Clear specific BiomethaneInjectionSite fields based on boolean field values.
+
+    This signal is triggered when a BiomethaneInjectionSite is saved and clears
+    fields that should be reset based on the configuration changes.
+    """
     fields_to_clear = []
 
+    # Clear meter number if injection site is not shared
     if not instance.is_shared_injection_site:
         fields_to_clear.append("meter_number")
 
+    # Clear address fields if injection site is same as production site
     if not instance.is_different_from_production_site:
         fields_to_clear.extend(["company_address", "city", "postal_code"])
 

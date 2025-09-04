@@ -86,21 +86,31 @@ def update_red_ii_status(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=BiomethaneContract)
-def clear_fields(sender, instance, **kwargs):
-    """If tariff_reference changed, reset certain fields"""
+def clear_contract_fields_on_save(sender, instance, **kwargs):
+    """
+    Clear specific BiomethaneContract fields based on tariff reference and boolean values.
+
+    This signal is triggered when a BiomethaneContract is saved and clears fields
+    that should be reset based on the tariff configuration.
+    """
     fields_to_clear = []
 
+    # Clear fields based on tariff reference rules
     if instance.tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-        fields_to_clear = ["pap_contracted"]
+        fields_to_clear.append("pap_contracted")
     elif instance.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-        fields_to_clear = ["cmax_annualized", "cmax_annualized_value", "cmax"]
+        fields_to_clear.extend(["cmax_annualized", "cmax_annualized_value", "cmax"])
 
+    # Clear cmax_annualized_value if cmax_annualized is explicitly set to False
+    # and it's not already in the list to be cleared
     if instance.cmax_annualized is False and "cmax_annualized_value" not in fields_to_clear:
         fields_to_clear.append("cmax_annualized_value")
 
-    update_data = {}
+    if fields_to_clear:
+        update_data = {}
+        for field in fields_to_clear:
+            # Special case: cmax_annualized should be set to False, not None
+            new_value = False if field == "cmax_annualized" else None
+            update_data[field] = new_value
 
-    for field in fields_to_clear:
-        new_value = None if field != "cmax_annualized" else False
-        update_data[field] = new_value
-    BiomethaneContract.objects.filter(pk=instance.pk).update(**update_data)
+        BiomethaneContract.objects.filter(pk=instance.pk).update(**update_data)
