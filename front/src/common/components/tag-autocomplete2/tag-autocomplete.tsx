@@ -103,6 +103,7 @@ export const TagAutocomplete = <T, V = T>({
               onKeyDown={autocomplete.onKeyDown}
               ref={ref}
               disabled={props.readOnly}
+              required={props.required && value.length === 0}
             />
           </div>
         </div>
