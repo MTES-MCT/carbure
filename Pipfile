@@ -3,6 +3,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[scripts]
+test="python3 web/manage.py test --keepdb"
+
 [packages]
 boto3 = "1.35.99"
 beautifulsoup4 = "4.12.3"
