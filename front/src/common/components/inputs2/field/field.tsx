@@ -18,6 +18,7 @@ export const Field = ({
   className,
   disabled,
   marginBottom = false,
+  required,
 }: FieldProps) => {
   const generatedId = useId()
   const selectId = idProps ?? generatedId
@@ -39,7 +40,7 @@ export const Field = ({
     >
       {Boolean(label || hintText) && (
         <label className={fr.cx("fr-label")} htmlFor={selectId}>
-          {label}
+          {label} {required && "*"}
           {hintText !== undefined && (
             <span className={fr.cx("fr-hint-text")}>{hintText}</span>
           )}
