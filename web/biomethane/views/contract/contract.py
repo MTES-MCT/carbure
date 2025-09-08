@@ -79,7 +79,7 @@ class BiomethaneContractViewSet(GenericViewSet):
         """Create or update contract using upsert logic."""
         try:
             contract = BiomethaneContract.objects.get(producer=request.entity)
-            serializer = self.get_serializer(contract, data=request.data)
+            serializer = self.get_serializer(contract, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneContract.DoesNotExist:
             serializer = self.get_serializer(data=request.data)

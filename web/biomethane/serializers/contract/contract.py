@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -69,6 +71,59 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
         elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
             required_fields.append("pap_contracted")
 
+        # Rules regarding contract dates
+        signature_date = validated_data.get("signature_date")
+        effective_date = validated_data.get("effective_date")
+
+        if tariff_reference is None:
+            tariff_reference = contract.tariff_reference if contract else None
+
+        if signature_date and effective_date:
+            if effective_date <= signature_date:
+                errors["effective_date"] = [_("La date d'effet doit être postérieure à la date de signature.")]
+
+            # 2011 : 23/11/2011 et 23/11/2020
+            if tariff_reference == "2011" and not (
+                signature_date >= date(2011, 11, 23) and signature_date <= date(2020, 11, 23)
+            ):
+                errors["signature_date"] = [
+                    _(
+                        (
+                            "Pour la référence tarifaire 2011, la date de signature doit être entre "
+                            "le 23/11/2011 et le 23/11/2020."
+                        )
+                    )
+                ]
+            # 2020 : 23/11/2020 et 13/12/2021
+            if tariff_reference == "2020" and not (
+                signature_date >= date(2020, 11, 23) and signature_date <= date(2021, 12, 13)
+            ):
+                errors["signature_date"] = [
+                    _(
+                        (
+                            "Pour la référence tarifaire 2020, la date de signature doit être entre "
+                            "le 23/11/2020 et le 13/12/2021."
+                        )
+                    )
+                ]
+            # 2021, 13/12/2021 et 10/06/2023
+            if tariff_reference == "2021" and not (
+                signature_date >= date(2021, 12, 13) and signature_date <= date(2023, 6, 10)
+            ):
+                errors["signature_date"] = [
+                    _(
+                        (
+                            "Pour la référence tarifaire 2021, la date de signature doit être entre "
+                            "le 13/12/2021 et le 10/06/2023."
+                        )
+                    )
+                ]
+            # 2023, date de signature > 10/06/2023
+            if tariff_reference == "2023" and not (signature_date and signature_date > date(2023, 6, 10)):
+                errors["signature_date"] = [
+                    _("Pour la référence tarifaire 2023, la date de signature doit être postérieure au 10/06/2023.")
+                ]
+
         for field in required_fields:
             if validated_data.get(field) in [None, ""]:
                 errors[field] = [_("Ce champ est obligatoire.")]
@@ -81,17 +136,20 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         entity = self.context.get("entity")
         validated_data["producer"] = entity
+        self.handle_is_red_ii(validated_data, entity)
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        is_red_ii = validated_data.get("is_red_ii")
-        cmax = validated_data.get("cmax")
-        pap_contracted = validated_data.get("pap_contracted")
+        self.handle_is_red_ii(validated_data, instance.producer)
+        return super().update(instance, validated_data)
+
+    def handle_is_red_ii(self, validated_data, producer):
+        is_red_ii = validated_data.pop("is_red_ii", None)
+        cmax = validated_data.get("cmax", None)
+        pap_contracted = validated_data.get("pap_contracted", None)
 
         # If cmax or pap_contracted is below the threshold and
         # the user does not want to be subject to RED II, then is_red_ii is set to False
         if is_red_ii is False and ((cmax and cmax <= 200) or (pap_contracted and pap_contracted <= 19.5)):
-            instance.producer.is_red_ii = is_red_ii
-            instance.producer.save(update_fields=["is_red_ii"])
-
-        return super().update(instance, validated_data)
+            producer.is_red_ii = is_red_ii
+            producer.save(update_fields=["is_red_ii"])

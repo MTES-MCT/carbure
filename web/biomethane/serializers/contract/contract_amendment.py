@@ -28,11 +28,23 @@ class BiomethaneContractAmendmentSerializer(BaseBiomethaneContractAmendmentSeria
 
 class BiomethaneContractAmendmentAddSerializer(BaseBiomethaneContractAmendmentSerializer):
     def validate(self, data):
-        if BiomethaneContractAmendment.OTHER in data.get("amendment_object") and not data.get("amendment_details"):
+        validated_data = super().validate(data)
+
+        if BiomethaneContractAmendment.OTHER in validated_data.get("amendment_object") and not validated_data.get(
+            "amendment_details"
+        ):
             raise serializers.ValidationError(
                 {"amendment_details": [_("Ce champ est obligatoire si amendment_object contient 'OTHER'.")]}
             )
-        return super().validate(data)
+
+        signature_date = validated_data.get("signature_date")
+        effective_date = validated_data.get("effective_date")
+        if signature_date and effective_date and effective_date < signature_date:
+            raise serializers.ValidationError(
+                {"effective_date": [_("La date d'effet doit être postérieure à la date de signature.")]}
+            )
+
+        return validated_data
 
     def create(self, validated_data):
         entity = self.context.get("entity")
