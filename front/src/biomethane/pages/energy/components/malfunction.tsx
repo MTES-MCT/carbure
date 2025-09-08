@@ -92,27 +92,25 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
                   {...bind("malfunction_details")}
                 />
               )}
-              <RadioGroup
-                readOnly={!isEditing}
-                label={t(
-                  "Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux"
-                )}
-                options={getYesNoOptions()}
-                orientation="horizontal"
-                required
-                {...bind(
-                  "has_injection_difficulties_due_to_network_saturation"
-                )}
-              />
-              {value.has_injection_difficulties_due_to_network_saturation && (
-                <NumberInput
-                  readOnly={!isEditing}
-                  label={t("Nombre d’heures d’impossibilité d’injection (h)")}
-                  required
-                  {...bind("injection_impossibility_hours")}
-                />
-              )}
             </>
+          )}
+          <RadioGroup
+            readOnly={!isEditing}
+            label={t(
+              "Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux"
+            )}
+            options={getYesNoOptions()}
+            orientation="horizontal"
+            required
+            {...bind("has_injection_difficulties_due_to_network_saturation")}
+          />
+          {value.has_injection_difficulties_due_to_network_saturation && (
+            <NumberInput
+              readOnly={!isEditing}
+              label={t("Nombre d’heures d’impossibilité d’injection (h)")}
+              required
+              {...bind("injection_impossibility_hours")}
+            />
           )}
 
           {isEditing && (
