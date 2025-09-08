@@ -936,6 +936,8 @@ def send_mail(request, subject, message, from_email, recipient_list, html_messag
             # If user not authenticated, we are in registration process we keep recipient_list
             pass
 
+        # Add recipient_list add the end of the message when environment is not prod or local
+        message = f"{message} \n\n {recipient_list}"
         subject = f"[TEST] {subject}"
         kwargs["cc"] = None
 
