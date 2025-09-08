@@ -1,5 +1,5 @@
 import { Button } from "common/components/button2"
-import { Checkbox, NumberInput, RadioGroup } from "common/components/inputs2"
+import { NumberInput, RadioGroup } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"

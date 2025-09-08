@@ -1,5 +1,8 @@
 import { api } from "common/services/api-fetch"
-import { BiomethaneEnergyInputRequest } from "./types"
+import {
+  BiomethaneEnergyInputRequest,
+  BiomethaneEnergyMonthlyReportDataRequest,
+} from "./types"
 
 export const getYears = (entity_id: number) =>
   api.GET("/biomethane/energy/years/", {
@@ -42,4 +45,29 @@ export const validateEnergy = (entity_id: number) =>
         entity_id,
       },
     },
+  })
+
+export const getMonthlyReports = (entity_id: number) =>
+  api
+    .GET("/biomethane/energy/monthly-reports/", {
+      params: {
+        query: {
+          entity_id,
+        },
+      },
+    })
+    .then((res) => res.data)
+
+export const saveMonthlyReports = (
+  entity_id: number,
+  body: BiomethaneEnergyMonthlyReportDataRequest[]
+) =>
+  api.PUT("/biomethane/energy/monthly-reports/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+    body,
+    bodySerializer: JSON.stringify, // Body contains array of objects, our backend could not handle it in a formData
   })
