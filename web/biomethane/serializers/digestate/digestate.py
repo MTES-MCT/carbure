@@ -51,7 +51,7 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
         errors = {}
 
         # Always set status to PENDING on update and creation by default
-        data["status"] = self.instance.PENDING
+        data["status"] = BiomethaneDigestate.PENDING
 
         ## Compostage
         if data.get("composting_locations"):
