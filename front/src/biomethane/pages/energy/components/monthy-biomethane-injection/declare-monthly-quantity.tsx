@@ -119,7 +119,9 @@ export const DeclareMonthlyQuantity = ({
         )
       }
       onClose={goToEnergyPage}
-      fitContent
+      style={{
+        width: "1000px",
+      }}
     >
       <Form id="declare-monthly-quantity-form" onSubmit={handleSubmit}>
         <Table columns={columns} rows={tableData} />
