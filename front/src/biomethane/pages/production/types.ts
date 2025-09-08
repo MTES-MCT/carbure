@@ -32,7 +32,5 @@ export type BiomethaneProductionUnitPatchRequest =
 // Digestate Storage
 
 export type BiomethaneDigestateStorage = apiTypes["BiomethaneDigestateStorage"]
-export type BiomethaneDigestateStorageAddRequest =
-  apiTypes["BiomethaneDigestateStorageAddRequest"]
-export type BiomethaneDigestateStoragePatchRequest =
-  apiTypes["PatchedBiomethaneDigestateStoragePatchRequest"]
+export type BiomethaneDigestateStorageInputRequest =
+  apiTypes["BiomethaneDigestateStorageInputRequest"]

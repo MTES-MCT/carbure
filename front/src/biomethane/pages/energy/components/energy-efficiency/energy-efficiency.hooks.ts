@@ -11,7 +11,7 @@ type CalculateEnergyEfficiencyCoefficientData = {
   purified_biogas_quantity_nm3: number
   purification_electric_consumption_kwe: number
   total_unit_electric_consumption_kwe: number
-  tariff_reference?: TariffReference
+  tariff_reference?: TariffReference | null
   injected_biomethane_gwh_pcs_per_year: number
 }
 

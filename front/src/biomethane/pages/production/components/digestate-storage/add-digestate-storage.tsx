@@ -5,11 +5,12 @@ import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
 import { Box } from "common/components/scaffold"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
-import { BiomethaneDigestateStorageAddRequest } from "../../types"
+import { BiomethaneDigestateStorageInputRequest } from "../../types"
 import { useAddDigestateStorage } from "../../production.hooks"
 import { DeepPartial } from "common/types"
 
-type AddDigestateStorageForm = DeepPartial<BiomethaneDigestateStorageAddRequest>
+type AddDigestateStorageForm =
+  DeepPartial<BiomethaneDigestateStorageInputRequest>
 
 interface AddDigestateStorageProps {
   onClose: () => void

@@ -1,51 +1,87 @@
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { Form } from "common/components/form2"
-import { NumberInput } from "common/components/inputs2"
 import { Table } from "common/components/table2"
-import { formatMonth } from "common/utils/formatters"
+import { useMutation, useQuery } from "common/hooks/async"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import useEntity from "common/hooks/entity"
+import { getMonthlyReports, saveMonthlyReports } from "../../api"
+import { BiomethaneEnergyMonthlyReportDataRequest } from "../../types"
+import { LoaderOverlay } from "common/components/scaffold"
+import { useDeclareMonthlyQuantityColumns } from "./declare-monthly-quantity.hooks"
+import { useNotify, useNotifyError } from "common/components/notifications"
+import { useNavigate } from "react-router-dom"
 
-interface DeclareMonthlyQuantityData {
+type BiomethaneEnergyMonthlyReportForm = Partial<
+  Exclude<BiomethaneEnergyMonthlyReportDataRequest, "month">
+> & {
   month: number
-  injected_volume?: number
-  average_flow?: number
-  operating_hours?: number
 }
 
 interface DeclareMonthlyQuantityProps {
-  onClose: () => void
-  data: DeclareMonthlyQuantityData[]
   isReadOnly?: boolean
 }
 
-const DEFAULT_DATA: DeclareMonthlyQuantityData[] = Array.from(
+const DEFAULT_DATA: BiomethaneEnergyMonthlyReportForm[] = Array.from(
   { length: 12 },
   (_, index) => ({
     month: index + 1, // Numéro du mois (1 à 12)
-    injected_volume: undefined,
-    average_flow: undefined,
-    operating_hours: undefined,
+    injected_volume_nm3: 0,
+    average_monthly_flow_nm3_per_hour: 0,
+    injection_hours: 0,
   })
 )
 
 export const DeclareMonthlyQuantity = ({
-  onClose,
-  data,
   isReadOnly,
 }: DeclareMonthlyQuantityProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
+  const notify = useNotify()
+  const notifyError = useNotifyError()
+  const navigate = useNavigate()
+
+  const { loading } = useQuery(getMonthlyReports, {
+    key: "monthly-reports",
+    params: [entity.id],
+    onSuccess: (data) => {
+      setTableData(data && data.length > 0 ? data : DEFAULT_DATA)
+    },
+  })
+  const {
+    execute: saveMonthlyReportsMutation,
+    loading: saveMonthlyReportsLoading,
+  } = useMutation(saveMonthlyReports, {
+    invalidates: ["monthly-reports"],
+    onSuccess: () => {
+      notify(t("Les données ont bien été mises à jour."), {
+        variant: "success",
+      })
+      goToEnergyPage()
+    },
+    onError: () => notifyError(),
+  })
+
+  const handleSubmit = () => {
+    const data = tableData.map((item) => ({
+      month: item.month,
+      injected_volume_nm3: item.injected_volume_nm3 ?? 0,
+      average_monthly_flow_nm3_per_hour:
+        item.average_monthly_flow_nm3_per_hour ?? 0,
+      injection_hours: item.injection_hours ?? 0,
+    }))
+    saveMonthlyReportsMutation(entity.id, data)
+  }
 
   // État pour stocker toutes les valeurs du tableau
-  const [tableData, setTableData] = useState<DeclareMonthlyQuantityData[]>(
-    data.length > 0 ? data : DEFAULT_DATA
-  )
+  const [tableData, setTableData] =
+    useState<BiomethaneEnergyMonthlyReportForm[]>(DEFAULT_DATA)
 
   // Fonction pour mettre à jour une valeur spécifique
   const updateCellValue = (
     month: number,
-    field: keyof DeclareMonthlyQuantityData,
+    field: keyof BiomethaneEnergyMonthlyReportForm,
     value: number | undefined
   ) => {
     setTableData((prev) =>
@@ -55,51 +91,14 @@ export const DeclareMonthlyQuantity = ({
     )
   }
 
-  const columns: Column<DeclareMonthlyQuantityData>[] = [
-    {
-      header: t("Mois"),
-      cell: (item) => formatMonth(item.month),
-    },
-    {
-      header: t("Volume injecté (Nm³)"),
-      cell: (item) => (
-        <NumberInput
-          value={item.injected_volume}
-          onChange={(value) =>
-            updateCellValue(item.month, "injected_volume", value)
-          }
-          readOnly={isReadOnly}
-          required
-        />
-      ),
-    },
-    {
-      header: t("Débit moyen mensuel (Nm³/h)"),
-      cell: (item) => (
-        <NumberInput
-          value={item.average_flow}
-          onChange={(value) =>
-            updateCellValue(item.month, "average_flow", value)
-          }
-          readOnly={isReadOnly}
-          required
-        />
-      ),
-    },
-    {
-      header: t("Heures d'injection (h)"),
-      cell: (item) => (
-        <NumberInput
-          value={item.operating_hours}
-          onChange={(value) =>
-            updateCellValue(item.month, "operating_hours", value)
-          }
-          readOnly={isReadOnly}
-          required
-        />
-      ),
-    },
-  ]
+  const columns = useDeclareMonthlyQuantityColumns({
+    isReadOnly: isReadOnly ?? false,
+    updateCellValue,
+  })
+
+  const goToEnergyPage = () => navigate({ hash: "" })
+
+  if (loading) return <LoaderOverlay />
 
   return (
     <Dialog
@@ -113,15 +112,16 @@ export const DeclareMonthlyQuantity = ({
           <Button
             type="submit"
             nativeButtonProps={{ form: "declare-monthly-quantity-form" }}
+            loading={saveMonthlyReportsLoading}
           >
             {t("Enregistrer")}
           </Button>
         )
       }
-      onClose={onClose}
+      onClose={goToEnergyPage}
       fitContent
     >
-      <Form id="declare-monthly-quantity-form">
+      <Form id="declare-monthly-quantity-form" onSubmit={handleSubmit}>
         <Table columns={columns} rows={tableData} />
       </Form>
     </Dialog>

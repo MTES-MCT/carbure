@@ -362,10 +362,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve the energy for the current entity and the current year. Returns a single energy object. */
+        /** @description Retrieve the energy declaration for the current entity and year. Returns a single energy object. */
         get: operations["biomethane_energy_retrieve"];
-        /** @description Create or update the digestate for the current entity (upsert operation). */
+        /** @description Create or update the energy declaration for the current entity and the current year. */
         put: operations["biomethane_energy_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/energy/monthly-reports/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_energy_monthly_reports_list"];
+        /** @description Create or update monthly reports for the specified energy declaration. */
+        put: operations["biomethane_energy_monthly_reports_update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2828,8 +2845,9 @@ export interface components {
             code: string;
         };
         BiomethaneContract: {
-            tariff_reference: components["schemas"]["TariffReferenceEnum"];
-            buyer: number;
+            readonly id: number;
+            readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
+            tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
@@ -2846,48 +2864,49 @@ export interface components {
             general_conditions_file?: string | null;
             /** Format: uri */
             specific_conditions_file?: string | null;
-            readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
+            buyer?: number | null;
             producer: number;
         };
         BiomethaneContractAmendment: {
             readonly id: number;
-            contract: number;
+            amendment_object: components["schemas"]["AmendmentObjectEnum"][];
             /** Format: date */
             signature_date: string;
             /** Format: date */
             effective_date: string;
-            readonly amendment_object: components["schemas"]["AmendmentObjectEnum"][];
             /** Format: uri */
             amendment_file: string;
             amendment_details?: string | null;
+            contract: number;
         };
         BiomethaneContractAmendmentAdd: {
+            readonly id: number;
+            amendment_object: components["schemas"]["AmendmentObjectEnum"][];
             /** Format: date */
             signature_date: string;
             /** Format: date */
             effective_date: string;
-            amendment_object: components["schemas"]["AmendmentObjectEnum"][];
             /** Format: uri */
             amendment_file: string;
             amendment_details?: string | null;
         };
         BiomethaneContractAmendmentAddRequest: {
+            amendment_object: components["schemas"]["AmendmentObjectEnum"][];
             /** Format: date */
             signature_date: string;
             /** Format: date */
             effective_date: string;
-            amendment_object: components["schemas"]["AmendmentObjectEnum"][];
             /** Format: binary */
             amendment_file: File;
             amendment_details?: string | null;
         };
-        BiomethaneContractPatchRequest: {
-            tariff_reference: components["schemas"]["TariffReferenceEnum"];
-            buyer: number;
+        BiomethaneContractInputRequest: {
+            cmax_annualized?: boolean | null;
+            is_red_ii?: boolean;
+            tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
-            cmax_annualized?: boolean | null;
             /** Format: double */
             cmax_annualized_value?: number | null;
             /** Format: double */
@@ -2900,10 +2919,14 @@ export interface components {
             general_conditions_file?: File | null;
             /** Format: binary */
             specific_conditions_file?: File | null;
-            is_red_ii?: boolean;
+            buyer?: number | null;
         };
         BiomethaneDigestate: {
             readonly id: number;
+            composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
+            readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
+            year: number;
+            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
             /** Format: double */
             raw_digestate_tonnage_produced?: number | null;
             /** Format: double */
@@ -2914,7 +2937,6 @@ export interface components {
             liquid_digestate_quantity?: number | null;
             /** Format: double */
             average_spreading_valorization_distance?: number | null;
-            readonly composting_locations: components["schemas"]["CompostingLocationsEnum"][];
             external_platform_name?: string | null;
             /** Format: double */
             external_platform_digestate_volume?: number | null;
@@ -2930,11 +2952,10 @@ export interface components {
             acquiring_companies?: string | null;
             /** Format: double */
             sold_volume?: number | null;
-            year: number;
-            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
-            readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
+            producer: number;
         };
         BiomethaneDigestateInputRequest: {
+            composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
             /** Format: double */
             raw_digestate_tonnage_produced?: number | null;
             /** Format: double */
@@ -2945,7 +2966,6 @@ export interface components {
             liquid_digestate_quantity?: number | null;
             /** Format: double */
             average_spreading_valorization_distance?: number | null;
-            composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
             external_platform_name?: string | null;
             /** Format: double */
             external_platform_digestate_volume?: number | null;
@@ -2963,14 +2983,16 @@ export interface components {
             sold_volume?: number | null;
         };
         BiomethaneDigestateSpreading: {
+            readonly id: number;
             spreading_department: string;
             /** Format: double */
             spread_quantity: number;
             /** Format: double */
             spread_parcels_area: number;
-            readonly id: number;
+            digestate: number;
         };
         BiomethaneDigestateSpreadingAdd: {
+            readonly id: number;
             spreading_department: string;
             /** Format: double */
             spread_quantity: number;
@@ -2992,35 +3014,22 @@ export interface components {
         BiomethaneDigestateStatusEnum: BiomethaneDigestateStatusEnum;
         BiomethaneDigestateStorage: {
             readonly id: number;
+            type: string;
+            /** Format: double */
+            capacity: number;
+            has_cover?: boolean;
+            has_biogas_recovery?: boolean;
             producer: number;
+        };
+        BiomethaneDigestateStorageInput: {
+            readonly id: number;
             type: string;
             /** Format: double */
             capacity: number;
             has_cover?: boolean;
             has_biogas_recovery?: boolean;
         };
-        BiomethaneDigestateStorageAdd: {
-            type: string;
-            /** Format: double */
-            capacity: number;
-            has_cover?: boolean;
-            has_biogas_recovery?: boolean;
-        };
-        BiomethaneDigestateStorageAddRequest: {
-            type: string;
-            /** Format: double */
-            capacity: number;
-            has_cover?: boolean;
-            has_biogas_recovery?: boolean;
-        };
-        BiomethaneDigestateStoragePatch: {
-            type: string;
-            /** Format: double */
-            capacity: number;
-            has_cover?: boolean;
-            has_biogas_recovery?: boolean;
-        };
-        BiomethaneDigestateStoragePatchRequest: {
+        BiomethaneDigestateStorageInputRequest: {
             type: string;
             /** Format: double */
             capacity: number;
@@ -3118,6 +3127,17 @@ export interface components {
             malfunction_details?: string | null;
             has_injection_difficulties_due_to_network_saturation?: boolean;
             injection_impossibility_hours?: number | null;
+        };
+        BiomethaneEnergyMonthlyReport: {
+            readonly id: number;
+            month: number;
+            /** Format: double */
+            injected_volume_nm3?: number;
+            /** Format: double */
+            average_monthly_flow_nm3_per_hour?: number;
+            /** Format: double */
+            injection_hours?: number;
+            energy: number;
         };
         BiomethaneInjectionSite: {
             readonly id: number;
@@ -4232,6 +4252,15 @@ export interface components {
          * @enum {string}
          */
         MethanizationProcessEnum: MethanizationProcessEnum;
+        MonthlyReportDataRequest: {
+            month: number;
+            /** Format: double */
+            injected_volume_nm3: number;
+            /** Format: double */
+            average_monthly_flow_nm3_per_hour: number;
+            /** Format: double */
+            injection_hours: number;
+        };
         NavStats: {
             total_pending_action_for_admin?: number;
             pending_draft_lots?: number;
@@ -4606,7 +4635,7 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
-        PatchedBiomethaneDigestateStoragePatchRequest: {
+        PatchedBiomethaneDigestateStorageInputRequest: {
             type?: string;
             /** Format: double */
             capacity?: number;
@@ -5747,11 +5776,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["BiomethaneContractPatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneContractPatchRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneContractPatchRequest"];
+                "application/json": components["schemas"]["BiomethaneContractInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneContractInputRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneContractInputRequest"];
             };
         };
         responses: {
@@ -5956,9 +5985,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BiomethaneDigestateStorageAddRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateStorageAddRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneDigestateStorageAddRequest"];
+                "application/json": components["schemas"]["BiomethaneDigestateStorageInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateStorageInputRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateStorageInputRequest"];
             };
         };
         responses: {
@@ -5967,7 +5996,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneDigestateStorageAdd"];
+                    "application/json": components["schemas"]["BiomethaneDigestateStorageInput"];
                 };
             };
         };
@@ -6012,9 +6041,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BiomethaneDigestateStoragePatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateStoragePatchRequest"];
-                "multipart/form-data": components["schemas"]["BiomethaneDigestateStoragePatchRequest"];
+                "application/json": components["schemas"]["BiomethaneDigestateStorageInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneDigestateStorageInputRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneDigestateStorageInputRequest"];
             };
         };
         responses: {
@@ -6023,7 +6052,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneDigestateStoragePatch"];
+                    "application/json": components["schemas"]["BiomethaneDigestateStorageInput"];
                 };
             };
         };
@@ -6067,9 +6096,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PatchedBiomethaneDigestateStoragePatchRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneDigestateStoragePatchRequest"];
-                "multipart/form-data": components["schemas"]["PatchedBiomethaneDigestateStoragePatchRequest"];
+                "application/json": components["schemas"]["PatchedBiomethaneDigestateStorageInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneDigestateStorageInputRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneDigestateStorageInputRequest"];
             };
         };
         responses: {
@@ -6078,7 +6107,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BiomethaneDigestateStoragePatch"];
+                    "application/json": components["schemas"]["BiomethaneDigestateStorageInput"];
                 };
             };
         };
@@ -6192,7 +6221,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Energy details for the entity */
+            /** @description Energy declaration details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6228,7 +6257,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Digestate updated successfully */
+            /** @description Energy declaration updated successfully */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6237,7 +6266,7 @@ export interface operations {
                     "application/json": components["schemas"]["BiomethaneEnergy"];
                 };
             };
-            /** @description Digestate created successfully */
+            /** @description Digestate declaration created successfully */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -6245,6 +6274,59 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneEnergy"];
                 };
+            };
+        };
+    };
+    biomethane_energy_monthly_reports_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneEnergyMonthlyReport"][];
+                };
+            };
+        };
+    };
+    biomethane_energy_monthly_reports_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MonthlyReportDataRequest"][];
+                "application/x-www-form-urlencoded": components["schemas"]["MonthlyReportDataRequest"][];
+                "multipart/form-data": components["schemas"]["MonthlyReportDataRequest"][];
+            };
+        };
+        responses: {
+            /** @description Monthly reports created or updated successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

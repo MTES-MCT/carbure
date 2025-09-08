@@ -7,7 +7,7 @@ import { TariffReference } from "biomethane/pages/contract/types"
 interface RedIIDialogProps {
   onClose: () => void
   onConfirm: (is_red_ii: boolean) => void
-  tariffReference?: TariffReference
+  tariffReference?: TariffReference | null
 }
 
 export const RedIIDialog = ({
