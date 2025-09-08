@@ -5,7 +5,7 @@ import Form, { useForm } from "common/components/form"
 import { Lock, Mail, Refresh, Return, Save } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { Container } from "./login"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { useToken } from "./activate"
@@ -108,6 +108,7 @@ export const ResetPasswordPending = () => {
 export const ResetPassword = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const notifyError = useNotifyError()
   const navigate = useNavigate()
 
   const { value, bind } = useForm({
@@ -123,10 +124,8 @@ export const ResetPassword = () => {
       navigate("../login")
     },
 
-    onError: () => {
-      notify(t("La modification du mot de passe a échoué !"), {
-        variant: "danger",
-      })
+    onError: (error) => {
+      notifyError(error)
     },
   })
 

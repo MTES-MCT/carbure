@@ -58,7 +58,6 @@ export function useNotifyError() {
       }
     } else if (error instanceof HttpError) {
       if (error.data instanceof Object) {
-        console.log("error.data", error.data)
         errorText = <FormErrors errors={error.data} />
       }
     }
