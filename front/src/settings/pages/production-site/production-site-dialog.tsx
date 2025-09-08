@@ -332,7 +332,6 @@ export const ProductionSiteForm = ({
           defaultOptions={value.certificates}
           getOptions={(search) => common.findMyCertificates(search, { entity_id: entity.id })} // prettier-ignore
           {...bind("certificates")}
-          required
         />
       </Form>
       {!readOnly && (
@@ -376,14 +375,21 @@ async function addProductionSite(
 
   const psite = res.data!
 
-  const mps = form.matieres_premieres?.map((mp) => mp.code)
-  await api.setProductionSiteFeedstock(entity.id, psite!.id, mps ?? [])
+  try {
+    const mps = form.matieres_premieres?.map((mp) => mp.code)
+    await api.setProductionSiteFeedstock(entity.id, psite!.id, mps ?? [])
 
-  const bcs = form.biocarburants?.map((bc) => bc.code)
-  await api.setProductionSiteBiofuel(entity.id, psite!.id, bcs ?? [])
+    const bcs = form.biocarburants?.map((bc) => bc.code)
+    await api.setProductionSiteBiofuel(entity.id, psite!.id, bcs ?? [])
 
-  const cs = form.certificates ?? []
-  await api.setProductionSiteCertificates(entity.id, psite!.id, cs)
+    const cs = form.certificates ?? []
+    if (cs.length > 0) {
+      await api.setProductionSiteCertificates(entity.id, psite!.id, cs)
+    }
+  } catch (error) {
+    await api.deleteProductionSite(entity.id, psite.id)
+    throw error
+  }
 }
 
 async function updateProductionSite(
@@ -416,5 +422,7 @@ async function updateProductionSite(
   await api.setProductionSiteBiofuel(entity.id, psite!.id, bcs ?? [])
 
   const cs = form.certificates ?? []
-  await api.setProductionSiteCertificates(entity.id, psite!.id, cs)
+  if (cs.length > 0) {
+    await api.setProductionSiteCertificates(entity.id, psite!.id, cs)
+  }
 }
