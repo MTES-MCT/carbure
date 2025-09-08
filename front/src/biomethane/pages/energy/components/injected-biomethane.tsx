@@ -8,6 +8,7 @@ import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
 import { useEnergyContext } from "../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
+import { isTariffReference2011Or2020 } from "biomethane/pages/contract"
 
 type InjectedBiomethaneForm = DeepPartial<
   Pick<
@@ -51,11 +52,10 @@ export function InjectedBiomethane({
             required
           />
           <Grid cols={2} gap="lg">
-            {contract && (
+            {isTariffReference2011Or2020(contract?.tariff_reference) && (
               <NumberInput
                 readOnly={!isEditing}
                 label={t("Quantité de biométhane injecté (Nm3/an)")}
-                hintText={t("Sous arrêté tarifaire 2011 ou 2020")}
                 type="number"
                 {...bind("injected_biomethane_nm3_per_year")}
                 required
