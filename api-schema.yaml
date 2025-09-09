@@ -5697,6 +5697,28 @@ paths:
                 items:
                   $ref: "#/components/schemas/ProductionSite"
           description: ""
+  /api/resources/systeme-national:
+    get:
+      operationId: resources_systeme_national_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GenericCertificate"
+          description: ""
   /api/saf/clients/:
     get:
       operationId: saf_clients_list
