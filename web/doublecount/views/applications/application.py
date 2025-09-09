@@ -1,12 +1,11 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import Entity, UserRights
-from core.permissions import HasAdminRights, HasUserRights
+from core.models import Entity
 from doublecount.filters import ApplicationFilter
 from doublecount.models import DoubleCountingApplication
+from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights, HasProducerWriteRights
 from doublecount.serializers import DoubleCountingApplicationSerializer
 from doublecount.views.applications.mixins import ActionMixin
 
@@ -17,17 +16,14 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
     pagination_class = None
     lookup_field = "id"
     filterset_class = ApplicationFilter
-    permission_classes = (
-        IsAuthenticated,
-        HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN]),
-    )
+    permission_classes = [HasProducerRights | HasDoubleCountingAdminRights]
 
     def get_permissions(self):
         # TODO fix permissions if needed
         if self.action in ["add", "upload_files", "delete_file"]:
-            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.PRODUCER])]
+            return [HasProducerWriteRights()]
         if self.action in ["list_admin", "export", "approve", "update_approved_quotas"]:
-            return [HasAdminRights()]
+            return [HasDoubleCountingAdminRights()]
 
         return super().get_permissions()
 
