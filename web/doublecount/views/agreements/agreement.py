@@ -4,6 +4,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
+from core.models import Entity
 from doublecount.filters import AgreementFilter
 from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
 from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights
@@ -11,7 +12,7 @@ from doublecount.views.agreements.mixins import ActionMixin
 
 
 class AgreementViewSet(ActionMixin, GenericViewSet):
-    queryset = applications = DoubleCountingRegistration.objects.all()
+    queryset = DoubleCountingRegistration.objects.all()
     serializer_class = DoubleCountingRegistrationDetailsSerializer
     pagination_class = None
     lookup_field = "id"
@@ -20,6 +21,10 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        entity = self.request.entity
+
+        if entity.entity_type == Entity.PRODUCER:
+            queryset = queryset.filter(production_site__created_by=entity)
 
         if self.action == "retrieve":
             queryset = queryset.select_related(
@@ -55,7 +60,7 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
     def get_permissions(self):
         if self.action == "agreements_public_list":
             return [AllowAny()]
-        elif self.action in ["agreements_admin", "export"]:
+        elif self.action in ["agreement_admin", "export"]:
             return [HasDoubleCountingAdminRights()]
 
         return super().get_permissions()

@@ -11,7 +11,7 @@ from doublecount.views.applications.mixins import ActionMixin
 
 
 class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
-    queryset = DoubleCountingApplication.objects.none()
+    queryset = DoubleCountingApplication.objects.all()
     serializer_class = DoubleCountingApplicationSerializer
     pagination_class = None
     lookup_field = "id"
@@ -28,17 +28,13 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        queryset = DoubleCountingApplication.objects.none()
-        entity_id = self.request.query_params.get("entity_id", self.request.data.get("entity_id"))
-        entity = Entity.objects.get(pk=int(entity_id))
+        queryset = super().get_queryset()
+        entity = self.request.entity
 
-        if entity.entity_type == Entity.ADMIN:
-            queryset = DoubleCountingApplication.objects.all()
-        elif entity.entity_type == Entity.PRODUCER:
+        if entity.entity_type == Entity.PRODUCER:
             queryset = DoubleCountingApplication.objects.filter(producer=entity)
 
         queryset = queryset.select_related("production_site").prefetch_related("production")
-        self.applications = queryset
         return queryset
 
     @extend_schema(
