@@ -32,7 +32,17 @@ export function IncinerationLandfill({
   contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<IncinerationLandfillForm>(digestate ?? {})
+  const { bind, value } = useForm<IncinerationLandfillForm>(
+    digestate
+      ? {
+          annual_eliminated_volume: digestate.annual_eliminated_volume,
+          incinerator_landfill_center_name:
+            digestate.incinerator_landfill_center_name,
+          wwtp_materials_to_incineration:
+            digestate.wwtp_materials_to_incineration,
+        }
+      : {}
+  )
   const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)
