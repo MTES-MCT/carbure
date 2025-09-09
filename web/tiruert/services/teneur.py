@@ -3,6 +3,7 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 import scipy.optimize
+import sentry_sdk
 from django.db.models import Q
 
 from tiruert.models import Operation
@@ -215,7 +216,7 @@ class TeneurService:
         pci = data["biofuel"].pci_litre
         volume_energy = target_volume * pci  # MJ
         target_emission = GHG_REFERENCE_RED_II - (data["target_emission"] * 1000000 / volume_energy)  # gCO2/MJ emis
-        print("volumes:", volumes)
+
         selected_lots, fun = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
@@ -267,13 +268,15 @@ class TeneurService:
         """
         Prepare data for optimization and operation creation
         """
+        debited_entity = data["debited_entity"]
+
         operations = (
             Operation.objects.filter(
                 biofuel=data["biofuel"],
                 customs_category=data["customs_category"],
                 # created_at__gte=data["date_from"],
             )
-            .filter((Q(credited_entity=data["debited_entity"]) | Q(debited_entity=data["debited_entity"])))
+            .filter((Q(credited_entity=debited_entity) | Q(debited_entity=debited_entity)))
             .distinct()
         )
 
@@ -287,7 +290,7 @@ class TeneurService:
         # Calculate balance of debited entity, for each lot, always in liters
         balance = BalanceService.calculate_balance(
             operations,
-            data["debited_entity"].id,
+            debited_entity.id,
             "lot",
             "l",
             None,
@@ -312,6 +315,14 @@ class TeneurService:
                 volume = value["available_balance"] if lot_id in data["enforced_volumes"] else 0
                 enforced_volumes = np.append(enforced_volumes, volume)
 
+        # Check for negative volumes and report to Sentry
+        if len(volumes) > 0:
+            negative_volumes = volumes[volumes < 0]
+            if len(negative_volumes) > 0:
+                TeneurService._send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes)
+                # Fix negative volumes by setting them to 0
+                volumes = np.maximum(volumes, 0)
+
         # Convert target volume into L
         target_volume = None
         if data.get("target_volume", None) is not None:
@@ -327,3 +338,27 @@ class TeneurService:
             return quantity / biofuel.masse_volumique
         else:
             return quantity
+
+    @staticmethod
+    def _send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes):
+        # Get the lot_ids corresponding to negative volumes
+        negative_indices = np.where(volumes < 0)[0]
+        negative_lot_ids = lot_ids[negative_indices].tolist()
+
+        # Log to Sentry for monitoring
+        message = (
+            f"Negative volumes detected in balance calculation: {len(negative_volumes)} lots "
+            f"with volumes ranging from {negative_volumes.min():.2f}L to {negative_volumes.max():.2f}L. "
+            f"Lot IDs: {negative_lot_ids}"
+        )
+
+        with sentry_sdk.push_scope() as scope:
+            scope.set_context(
+                "request_data",
+                {
+                    "biofuel": str(data["biofuel"]),
+                    "customs_category": data["customs_category"],
+                    "debited_entity": str(debited_entity),
+                },
+            )
+            sentry_sdk.capture_message(message, level="warning")
