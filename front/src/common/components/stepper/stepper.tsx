@@ -33,7 +33,7 @@ export const BaseStepper = ({
 
 type StepperNextButtonProps = Pick<
   ButtonProps,
-  "disabled" | "loading" | "nativeButtonProps"
+  "disabled" | "loading" | "nativeButtonProps" | "onClick" | "type"
 >
 
 const StepperNextButton = ({ loading, ...props }: StepperNextButtonProps) => {
@@ -44,12 +44,12 @@ const StepperNextButton = ({ loading, ...props }: StepperNextButtonProps) => {
 
   return (
     <Button
-      {...props}
       priority="secondary"
       iconId="ri-arrow-right-s-line"
       iconPosition="right"
       type="submit"
       loading={loading ?? mutation.loading}
+      {...props}
     >
       {t("Suivant")}
     </Button>

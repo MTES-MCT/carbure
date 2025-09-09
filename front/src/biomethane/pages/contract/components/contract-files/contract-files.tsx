@@ -56,7 +56,7 @@ export const ContractFiles = ({
   ]
 
   const openAddContractDialog = () => {
-    portal((close) => <AddContract onClose={close} />)
+    portal((close) => <AddContract onClose={close} contract={contract} />)
   }
 
   return (
