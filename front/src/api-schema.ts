@@ -3172,6 +3172,8 @@ export interface components {
             unit_name?: string | null;
             siret_number?: string | null;
             company_address?: string | null;
+            postal_code?: string | null;
+            city?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3199,6 +3201,8 @@ export interface components {
             unit_name?: string | null;
             siret_number?: string | null;
             company_address?: string | null;
+            postal_code?: string | null;
+            city?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -5032,6 +5036,8 @@ export interface components {
         };
         SeachCompanyRequest: {
             registration_id: string;
+            /** @default false */
+            siret: boolean;
         };
         SetBioFuelsRequest: {
             /** @description List of biocarburant codes. */

@@ -2,12 +2,6 @@ import { api as apiFetch } from "common/services/api-fetch"
 import { EntityType } from "common/types"
 import { CertificateTypeEnum } from "api-schema"
 
-export function searchCompanyDataBySiren(registration_id: string) {
-  return apiFetch.POST("/entities/search-company/", {
-    body: { registration_id },
-  })
-}
-
 export function registerCompany(
   activity_description: string,
   entity_type: EntityType,

@@ -11,8 +11,19 @@ import {
   UnitType,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
+import { SiretPicker } from "common/molecules/siret-picker"
 
-type GeneralInfoForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
+type GeneralInfoForm = DeepPartial<
+  Pick<
+    BiomethaneProductionUnitPatchRequest,
+    | "unit_name"
+    | "siret_number"
+    | "unit_type"
+    | "company_address"
+    | "postal_code"
+    | "city"
+  >
+>
 
 export function GeneralInfo({
   productionUnit,
@@ -21,11 +32,13 @@ export function GeneralInfo({
 }) {
   const { t } = useTranslation()
 
-  const { bind, value } = useForm<GeneralInfoForm>({
+  const { bind, value, setField } = useForm<GeneralInfoForm>({
     unit_name: productionUnit?.unit_name,
     siret_number: productionUnit?.siret_number,
     unit_type: productionUnit?.unit_type,
     company_address: productionUnit?.company_address,
+    postal_code: productionUnit?.postal_code,
+    city: productionUnit?.city,
   })
 
   const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
@@ -64,27 +77,52 @@ export function GeneralInfo({
               required
               {...bind("unit_name")}
             />
-            <TextInput
+            {/* <TextInput
               readOnly={!isEditing}
               label={t("SIRET")}
               required
               pattern="(?:\d{9}|\d{14})"
               {...bind("siret_number")}
-            />
-            <RadioGroup
-              readOnly={!isEditing}
-              label={t("Type d'installation")}
-              options={unitTypeOptions}
+            /> */}
+            <SiretPicker
+              label={t("SIRET")}
               required
-              {...bind("unit_type")}
+              onSelect={(company) => {
+                setField("company_address", company?.registered_address)
+                setField("postal_code", company?.registered_zipcode)
+                setField("city", company?.registered_city)
+              }}
+              readOnly={!isEditing}
+              {...bind("siret_number")}
+            />
+          </Grid>
+          <TextInput
+            readOnly={!isEditing}
+            label={t("Adresse de la société (Numéro et rue)")}
+            required
+            {...bind("company_address")}
+          />
+          <Grid cols={2} gap="lg">
+            <TextInput
+              readOnly={!isEditing}
+              label={t("Code postal")}
+              required
+              {...bind("postal_code")}
             />
             <TextInput
               readOnly={!isEditing}
-              label={t("Adresse de la société (Numéro et rue)")}
+              label={t("Ville")}
               required
-              {...bind("company_address")}
+              {...bind("city")}
             />
           </Grid>
+          <RadioGroup
+            readOnly={!isEditing}
+            label={t("Type d'installation")}
+            options={unitTypeOptions}
+            required
+            {...bind("unit_type")}
+          />
           {isEditing && (
             <Button
               type="submit"

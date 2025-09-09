@@ -146,8 +146,18 @@ export async function findMyCertificates(
   )
 }
 
-export function searchCompanyDataBySiren(registration_id: string) {
+const searchCompanyData = (registration_id: string, siret: boolean) => {
   return apiFetch.POST("/entities/search-company/", {
-    body: { registration_id },
+    body: {
+      registration_id,
+      siret,
+    },
   })
+}
+export function searchCompanyDataBySiren(registration_id: string) {
+  return searchCompanyData(registration_id, false)
+}
+
+export function searchCompanyDataBySiret(registration_id: string) {
+  return searchCompanyData(registration_id, true)
 }
