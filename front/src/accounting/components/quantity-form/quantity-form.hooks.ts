@@ -78,7 +78,7 @@ export const useQuantityFormStep = ({
 
   return quantityFormStep(form.value, {
     ...overrides,
-    onClick: () => {
+    onSubmit: () => {
       if (!balance) return Promise.resolve()
 
       return simulate(entity.id, {

@@ -4,7 +4,7 @@ import { Box, Main } from "common/components/scaffold"
 import { Balance, CreateOperationType } from "accounting/types"
 import { Trans, useTranslation } from "react-i18next"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
-import { useForm, Form, FormManager } from "common/components/form2"
+import { useForm, FormManager } from "common/components/form2"
 import { SessionDialogForm } from "./cession-dialog.types"
 import { Button } from "common/components/button2"
 import {
@@ -69,7 +69,7 @@ export const CessionDialogContent = ({
         footer={
           <>
             <Stepper.Previous />
-            <Stepper.Next />
+            <Stepper.Next nativeButtonProps={{ form: "cession-dialog" }} />
             {currentStep?.key === "recap" && (
               <Button
                 priority="primary"
@@ -113,7 +113,7 @@ export const CessionDialogContent = ({
           </Box>
 
           {currentStep?.key !== "recap" && (
-            <Form form={form}>
+            <Stepper.Form form={form} id="cession-dialog">
               {currentStep?.key === fromDepotRecipientToDepotStepKey && (
                 <>
                   <Box>
@@ -140,7 +140,7 @@ export const CessionDialogContent = ({
                   />
                 </Box>
               )}
-            </Form>
+            </Stepper.Form>
           )}
         </Main>
       </Dialog>

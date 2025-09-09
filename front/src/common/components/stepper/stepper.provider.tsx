@@ -1,3 +1,4 @@
+import { useMutation } from "common/hooks/async"
 import {
   createContext,
   useContext,
@@ -5,12 +6,15 @@ import {
   ReactNode,
   useState,
 } from "react"
+import { UseAsyncReturn } from "react-async-hook"
 
 export type Step<Key extends string> = {
   key: Key
   title: ReactNode
   allowNextStep?: boolean
-  onClick?: () => Promise<any>
+
+  // Function to be called when the form is submitted and valid
+  onSubmit?: () => Promise<any>
 }
 
 type StepperContextType<Steps extends Step<string>[]> = {
@@ -23,6 +27,9 @@ type StepperContextType<Steps extends Step<string>[]> = {
   nextStep: Steps[number] | null
   goToNextStep: () => void
   goToPreviousStep: () => void
+
+  // Mutation of the onSubmit function for a step
+  mutation: UseAsyncReturn<unknown, []>
 }
 
 const StepperContext = createContext<StepperContextType<any> | undefined>(
@@ -61,6 +68,10 @@ const useStepperManager = <Steps extends Step<string>[]>(steps: Steps) => {
   const hasNextStep = steps.length > currentStepIndex + 1
   const nextStep = hasNextStep ? steps[currentStepIndex + 1] : null
 
+  const mutation = useMutation(
+    currentStep?.onSubmit ?? (() => Promise.resolve())
+  )
+
   const setStep = (stepKey: Steps[number]["key"]) => {
     const stepIndex = steps.findIndex((step) => step.key === stepKey)
     if (stepIndex !== -1) {
@@ -91,5 +102,6 @@ const useStepperManager = <Steps extends Step<string>[]>(steps: Steps) => {
     goToNextStep,
     goToPreviousStep,
     steps,
+    mutation,
   }
 }
