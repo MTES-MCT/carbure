@@ -23,7 +23,14 @@ export function SpreadingDistance({
   digestate?: BiomethaneDigestate
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<SpreadingDistanceForm>(digestate ?? {})
+  const { bind, value } = useForm<SpreadingDistanceForm>(
+    digestate
+      ? {
+          average_spreading_valorization_distance:
+            digestate.average_spreading_valorization_distance,
+        }
+      : {}
+  )
 
   const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
