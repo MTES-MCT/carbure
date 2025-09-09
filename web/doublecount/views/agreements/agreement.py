@@ -1,13 +1,12 @@
 from django.db.models import Prefetch
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import GenericViewSet
 
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
-from core.models import Entity
-from core.permissions import HasAdminRights, HasUserRights
 from doublecount.filters import AgreementFilter
 from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
+from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights
 from doublecount.views.agreements.mixins import ActionMixin
 
 
@@ -17,10 +16,7 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
     pagination_class = None
     lookup_field = "id"
     filterset_class = AgreementFilter
-    permission_classes = (
-        IsAuthenticated,
-        HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN]),
-    )
+    permission_classes = [HasProducerRights | HasDoubleCountingAdminRights]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -57,12 +53,9 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
         )
 
     def get_permissions(self):
-        # TODO fix permissions if needed
-        if self.action == "list":
-            return [IsAuthenticated(), HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN])]
         if self.action == "agreements_public_list":
             return [AllowAny()]
-        if self.action in ["agreements_admin", "export"]:
-            return [HasAdminRights()]
+        elif self.action in ["agreements_admin", "export"]:
+            return [HasDoubleCountingAdminRights()]
 
         return super().get_permissions()
