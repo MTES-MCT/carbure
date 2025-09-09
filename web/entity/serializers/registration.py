@@ -2,7 +2,17 @@ from rest_framework import serializers
 
 
 class SeachCompanySerializer(serializers.Serializer):
-    registration_id = serializers.CharField(max_length=9, required=True)  # SIREN
+    registration_id = serializers.CharField(required=True)  # SIREN
+    siret = serializers.BooleanField(required=False, default=False)
+
+    def validate_registration_id(self, value):
+        siret = self.initial_data.get("siret", False)
+
+        if siret and len(value) != 14:
+            raise serializers.ValidationError("Le numéro SIRET doit être de 14 caractères")
+        elif not siret and len(value) != 9:
+            raise serializers.ValidationError("Le numéro SIREN doit être de 9 caractères")
+        return value
 
 
 class RegistrationCountrySerializer(serializers.Serializer):

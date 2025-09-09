@@ -11187,6 +11187,14 @@ components:
           type: string
           nullable: true
           maxLength: 256
+        postal_code:
+          type: string
+          nullable: true
+          maxLength: 10
+        city:
+          type: string
+          nullable: true
+          maxLength: 128
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -11277,6 +11285,14 @@ components:
           type: string
           nullable: true
           maxLength: 256
+        postal_code:
+          type: string
+          nullable: true
+          maxLength: 10
+        city:
+          type: string
+          nullable: true
+          maxLength: 128
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -15737,7 +15753,9 @@ components:
         registration_id:
           type: string
           minLength: 1
-          maxLength: 9
+        siret:
+          type: boolean
+          default: false
       required:
         - registration_id
     SetBioFuelsRequest:
