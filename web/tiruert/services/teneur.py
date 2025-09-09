@@ -1,3 +1,4 @@
+from decimal import Decimal, getcontext
 from typing import Optional
 
 import numpy as np
@@ -8,6 +9,9 @@ from django.db.models import Q
 
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
+
+# Configure decimal precision for exact calculations
+getcontext().prec = 28
 
 
 class TeneurServiceErrors:
@@ -143,14 +147,21 @@ class TeneurService:
         nonzero_indices = np.nonzero(result_array[0 : len(batches_volumes)])[0]
 
         # Create a dictionary of selected batches with their respective index and volume
-        # Clamp any tiny overshoot: selected volume can't exceed available start volume
+        # Apply intelligent rounding to handle scipy's floating point precision errors
         selected_batches_volumes = {}
         for idx in nonzero_indices:
-            val = float(result_array[idx])
-            cap = float(batches_volumes[idx])
-            if val > cap:
-                val = cap
-            selected_batches_volumes[idx] = val
+            val_float = result_array[idx]
+            cap_float = batches_volumes[idx]
+
+            # Round to reasonable precision (10 decimal places) to eliminate tiny floating point errors
+            val_rounded = round(val_float, 10)
+            cap_rounded = round(cap_float, 10)
+
+            # Clamp any tiny overshoot: selected volume can't exceed available start volume
+            if val_rounded > cap_rounded:
+                val_rounded = cap_rounded
+
+            selected_batches_volumes[idx] = val_rounded
 
         return selected_batches_volumes, res.fun
 
@@ -207,6 +218,23 @@ class TeneurService:
             )
         ) / target_volume
         return min_emissions_rate, max_emissions_rate
+
+    @staticmethod
+    def _precise_volume_calculation(volume, multiplier):
+        """
+        Perform precise volume calculations using Decimal to avoid floating point errors.
+
+        Args:
+            volume: Original volume value
+            multiplier: Multiplication factor
+
+        Returns:
+            Precise calculated volume as float
+        """
+        volume_decimal = Decimal(str(volume))
+        multiplier_decimal = Decimal(str(multiplier))
+        result = volume_decimal * multiplier_decimal
+        return float(result)
 
     @staticmethod
     def prepare_data_and_optimize(data, unit):
