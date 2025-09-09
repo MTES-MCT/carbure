@@ -151,3 +151,11 @@ export function searchCompanyDataBySiren(registration_id: string) {
     body: { registration_id },
   })
 }
+
+export async function findSystemNationalCertificates(query: string) {
+  const res = await apiFetch.GET("/resources/systeme-national", {
+    params: { query: { query } },
+  })
+
+  return res.data ?? []
+}
