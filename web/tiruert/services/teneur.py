@@ -142,7 +142,14 @@ class TeneurService:
         nonzero_indices = np.nonzero(result_array[0 : len(batches_volumes)])[0]
 
         # Create a dictionary of selected batches with their respective index and volume
-        selected_batches_volumes = {idx: result_array[idx] for idx in nonzero_indices}
+        # Clamp any tiny overshoot: selected volume can't exceed available start volume
+        selected_batches_volumes = {}
+        for idx in nonzero_indices:
+            val = float(result_array[idx])
+            cap = float(batches_volumes[idx])
+            if val > cap:
+                val = cap
+            selected_batches_volumes[idx] = val
 
         return selected_batches_volumes, res.fun
 
@@ -208,7 +215,7 @@ class TeneurService:
         pci = data["biofuel"].pci_litre
         volume_energy = target_volume * pci  # MJ
         target_emission = GHG_REFERENCE_RED_II - (data["target_emission"] * 1000000 / volume_energy)  # gCO2/MJ emis
-
+        print("volumes:", volumes)
         selected_lots, fun = TeneurService.optimize_biofuel_blending(
             volumes,
             emissions,
