@@ -7,7 +7,7 @@ from django.urls import reverse
 from docx import Document
 
 from certificates.models import DoubleCountingRegistration
-from core.models import Entity, MatierePremiere, Pays, UserRights
+from core.models import Entity, ExternalAdminRights, MatierePremiere, Pays, UserRights
 from core.tests_utils import setup_current_user
 from doublecount.factories import (
     DoubleCountingApplicationFactory,
@@ -44,8 +44,12 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
+        self.ext_admin = Entity.objects.create(name="ExternalAdminTest", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=self.ext_admin, right=ExternalAdminRights.DOUBLE_COUNTING)
 
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW"), (self.ext_admin, "RW")], True
+        )
 
         self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
@@ -93,6 +97,17 @@ class AdminDoubleCountApplicationsTest(TestCase):
         pending = data["pending"]
         application = pending[0]
 
+        assert application["producer"]["id"] == self.production_site.producer.id
+
+    def test_list_applications_for_external_admin(self):
+        self.create_application()
+
+        response = self.client.get(
+            reverse("double-counting-applications-list-admin"),
+            {"entity_id": self.ext_admin.id, "year": self.requested_start_year},
+        )
+
+        application = response.json()["pending"][0]
         assert application["producer"]["id"] == self.production_site.producer.id
 
     def test_application_details(self):

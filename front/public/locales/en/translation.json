@@ -1059,7 +1059,7 @@
   "Un agrément existe déjà sur cette periode et pour ce site de production.": "Approval already exists for this period and for this production site.",
   "La demande concerne des déchets industriels, merci de renseigner le questionnaire associé dans l'onglet 'Fichiers'.": "If your request concerns industrial waste, please complete the associated questionnaire in the 'Files' tab.",
   "Impossible d'envoyer le dossier": "Unable to send file",
-  "Envoyer la demande d'agrément": "Send request for approval",
+  "Envoyer la demande d'agrément": "Create a new application",
   "Votre fichier est valide. Vous pouvez maintenant transmettre la demande d'agrément double comptage à la DGEC pour une vérification approfondie.": "Your file is valid. You can now send the double metering approval request to the DGEC for in-depth verification.",
   "L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations de votre site de production.": "The address, town or zip code of the production site is not given. Please add it to your production site details.",
   "Editer le site de production {{productionSiteName}}": "Edit production site {{productionSiteName}}",
