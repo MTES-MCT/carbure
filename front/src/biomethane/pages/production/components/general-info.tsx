@@ -77,13 +77,6 @@ export function GeneralInfo({
               required
               {...bind("unit_name")}
             />
-            {/* <TextInput
-              readOnly={!isEditing}
-              label={t("SIRET")}
-              required
-              pattern="(?:\d{9}|\d{14})"
-              {...bind("siret_number")}
-            /> */}
             <SiretPicker
               label={t("SIRET")}
               required
@@ -111,7 +104,7 @@ export function GeneralInfo({
             />
             <TextInput
               readOnly={!isEditing}
-              label={t("Ville")}
+              label={t("Commune")}
               required
               {...bind("city")}
             />
