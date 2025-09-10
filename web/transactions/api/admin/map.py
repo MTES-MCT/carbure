@@ -9,10 +9,11 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from core.decorators import check_admin_rights
 from core.helpers import filter_lots
+from core.models import ExternalAdminRights
 from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 @csp_exempt
 @xframe_options_sameorigin
 def map(request, entity, entity_id):

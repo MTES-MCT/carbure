@@ -3,10 +3,7 @@ from django import forms
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import (
-    CarbureLot,
-    CarbureLotComment,
-)
+from core.models import CarbureLot, CarbureLotComment, ExternalAdminRights
 from core.utils import MultipleValueField
 
 
@@ -16,7 +13,7 @@ class AdminControlsLotsCommentForm(forms.Form):
     is_visible_by_auditor = forms.BooleanField(required=False)
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def add_comment(request, entity):
     form = AdminControlsLotsCommentForm(request.POST)
 

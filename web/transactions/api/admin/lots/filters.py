@@ -6,6 +6,7 @@ from core.decorators import check_admin_rights
 from core.helpers import (
     get_lots_filters_data,
 )
+from core.models import ExternalAdminRights
 from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
@@ -14,7 +15,7 @@ class AdminControlsLotsFiltersForm(forms.Form):
     field = forms.CharField()
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_lots_filters(request, entity):
     form = AdminControlsLotsFiltersForm(request.GET)
     if not form.is_valid():
