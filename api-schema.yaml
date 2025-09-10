@@ -1073,6 +1073,8 @@ paths:
   /api/biomethane/energy/monthly-reports/:
     get:
       operationId: biomethane_energy_monthly_reports_list
+      description: Retrieve the energy declaration monthly reports for the current
+        entity and year
       parameters:
         - in: query
           name: entity_id
@@ -1092,6 +1094,12 @@ paths:
           description: A search term.
           schema:
             type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Declaration year.
+          required: true
       tags:
         - biomethane
       security:
@@ -1105,7 +1113,9 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BiomethaneEnergyMonthlyReport"
-          description: ""
+          description: Energy declaration monthly reports for the year
+        "404":
+          description: Energy monthly reports not found for this entity and year.
     put:
       operationId: biomethane_energy_monthly_reports_update
       description: Create or update monthly reports for the specified energy declaration.

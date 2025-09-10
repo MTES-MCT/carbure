@@ -12,6 +12,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useDeclareMonthlyQuantityColumns } from "./declare-monthly-quantity.hooks"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useNavigate } from "react-router-dom"
+import { useEnergyContext } from "../../energy.hooks"
 
 type BiomethaneEnergyMonthlyReportForm = Partial<
   Exclude<BiomethaneEnergyMonthlyReportDataRequest, "month">
@@ -41,10 +42,11 @@ export const DeclareMonthlyQuantity = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
+  const { year } = useEnergyContext()
 
   const { loading } = useQuery(getMonthlyReports, {
     key: "monthly-reports",
-    params: [entity.id],
+    params: [entity.id, year],
     onSuccess: (data) => {
       setTableData(data && data.length > 0 ? data : DEFAULT_DATA)
     },

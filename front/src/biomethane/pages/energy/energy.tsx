@@ -63,7 +63,7 @@ export const Energy = () => {
         <InstallationEnergyNeeds energy={energy} contract={contract} />
         <EnergyEfficiency energy={energy} contract={contract} />
         {isTariffReference2011Or2020(contract?.tariff_reference) && (
-          <MonthlyBiomethaneInjection />
+          <MonthlyBiomethaneInjection energy={energy} />
         )}
         <Acceptability energy={energy} />
         <Malfunction energy={energy} />
