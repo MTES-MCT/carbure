@@ -3918,6 +3918,7 @@ export interface components {
          *     * `AIRLINE` - AIRLINE
          *     * `ELEC` - ELEC
          *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
+         *     * `BIOFUEL` - BIOFUEL
          * @enum {string}
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
@@ -11750,7 +11751,8 @@ export enum ExtAdminPagesEnum {
     TIRIB = "TIRIB",
     AIRLINE = "AIRLINE",
     ELEC = "ELEC",
-    TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
+    TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
+    BIOFUEL = "BIOFUEL"
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",
