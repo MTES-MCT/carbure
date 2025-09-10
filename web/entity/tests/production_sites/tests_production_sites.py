@@ -1,16 +1,22 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from certificates.models import ProductionSiteCertificate
 from core.models import (
-    Biocarburant,
     Entity,
-    MatierePremiere,
-    UserRights,
 )
 from core.tests_utils import setup_current_user
+from entity.factories.entity import EntityFactory
 from producers.models import ProductionSiteInput, ProductionSiteOutput
+from transactions.factories.certificate import EntityCertificateFactory
+from transactions.factories.production_site import (
+    ProductionSiteCertificateFactory,
+    ProductionSiteInputFactory,
+    ProductionSiteOutputFactory,
+)
+from transactions.factories.site import SiteFactory
 from transactions.models import ProductionSite
+from transactions.models.site import Site
 
 
 class EntityProductionSiteTest(TestCase):
@@ -18,48 +24,116 @@ class EntityProductionSiteTest(TestCase):
         "json/biofuels.json",
         "json/feedstock.json",
         "json/countries.json",
-        "json/depots.json",
-        "json/entities.json",
-        "json/productionsites.json",
-        "json/entities_sites.json",
     ]
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin: Entity = EntityFactory.create(entity_type=Entity.ADMIN)
+        cls.producer: Entity = EntityFactory.create(entity_type=Entity.PRODUCER)
+
+        cls.production_site: ProductionSite = SiteFactory.create(
+            site_type=Site.PRODUCTION_BIOLIQUID, created_by=cls.producer
+        )
+
+        cls.production_site_input = ProductionSiteInputFactory.create(production_site=cls.production_site)
+        cls.production_site_output = ProductionSiteOutputFactory.create(production_site=cls.production_site)
+
+        cls.production_site_certificate = ProductionSiteCertificateFactory.create(
+            entity=cls.producer, production_site=cls.production_site
+        )
+
     def setUp(self):
-        self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
-        self.entity1, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
-        UserRights.objects.update_or_create(user=self.user, entity=self.entity1, defaults={"role": UserRights.ADMIN})
-
-        user_model = get_user_model()
-        self.user2 = user_model.objects.create_user(
-            email="testuser1@toto.com", name="Le Super Testeur 1", password="totopouet"
+        self.user = setup_current_user(
+            self,
+            email="tester@carbure.local",
+            name="Tester",
+            password="gogogo",
+            is_staff=True,
+            entity_rights=[(self.producer, "RW"), (self.admin, "RO")],
         )
-        self.entity2, _ = Entity.objects.update_or_create(name="Le Super Operateur 1", entity_type="Opérateur")
-        UserRights.objects.update_or_create(user=self.user, entity=self.entity2, defaults={"role": UserRights.RW})
 
-    def test_production_sites_settings(self):
-        url_get = "api-entity-production-sites-list"
-        url_add = "api-entity-production-sites-list"
-        url_update = "api-entity-production-sites-update-item"
-        url_delete = "api-entity-production-sites-delete"
-        url_set_mps = "api-entity-production-sites-set-feedstocks"
-        url_set_bcs = "api-entity-production-sites-set-biofuels"
+    # API CALLS SHORTHANDS
 
-        # get - 0 sites
-        response = self.client.get(
-            reverse(url_get) + f"?entity_id={self.entity1.id}",
-            {"entity_id": self.entity1.id},
+    def list_production_sites(self, entity_id, **kwargs):
+        query_params = {"entity_id": entity_id, **kwargs}
+        url = reverse("api-entity-production-sites-list")
+        response = self.client.get(url, query_params=query_params)
+        return response.json()
+
+    def create_production_site(self, entity_id, data):
+        query_params = {"entity_id": entity_id}
+        url = reverse("api-entity-production-sites-list")
+        response = self.client.post(url, data, query_params=query_params)
+        return response.json()
+
+    def update_production_site(self, entity_id, production_site_id, data):
+        kwargs = {"id": production_site_id}
+        query_params = {"entity_id": entity_id}
+        url = reverse("api-entity-production-sites-update-item", kwargs=kwargs)
+        response = self.client.post(url, data, query_params=query_params)
+        return response.json()
+
+    def delete_production_site(self, entity_id, production_site_id):
+        kwargs = {"id": production_site_id}
+        query_params = {"entity_id": entity_id}
+        url = reverse("api-entity-production-sites-delete", kwargs=kwargs)
+        response = self.client.post(url, query_params=query_params)
+        return response.json()
+
+    def set_production_site_feedstocks(self, entity_id, production_site_id, data):
+        kwargs = {"id": production_site_id}
+        query_params = {"entity_id": entity_id}
+        url = reverse("api-entity-production-sites-set-feedstocks", kwargs=kwargs)
+        response = self.client.post(url, data, query_params=query_params)
+        return response.json()
+
+    def set_production_site_biofuels(self, entity_id, production_site_id, data):
+        kwargs = {"id": production_site_id}
+        query_params = {"entity_id": entity_id}
+        url = reverse("api-entity-production-sites-set-biofuels", kwargs=kwargs)
+        response = self.client.post(url, data, query_params=query_params)
+        return response.json()
+
+    def set_production_site_certificates(self, entity_id, production_site_id, data):
+        kwargs = {"id": production_site_id}
+        url = reverse("api-entity-production-sites-set-certificates", kwargs=kwargs)
+        query_params = {"entity_id": entity_id}
+        response = self.client.post(url, data, query_params=query_params)
+        return response.json()
+
+    # PRODUCER TESTS
+
+    def test_list_production_sites(self):
+        data = self.list_production_sites(entity_id=self.producer.pk)
+
+        psite = self.production_site
+        psite_input = self.production_site_input.matiere_premiere
+        psite_output = self.production_site_output.biocarburant
+
+        self.assertEqual(len(data), 1)
+
+        self.assertEqual(data[0]["id"], psite.pk)
+        self.assertEqual(data[0]["name"], psite.name)
+
+        self.assertEqual(len(data[0]["inputs"]), 1)
+        self.assertEqual(data[0]["inputs"][0]["code"], psite_input.code)
+
+        self.assertEqual(len(data[0]["outputs"]), 1)
+        self.assertEqual(data[0]["outputs"][0]["code"], psite_output.code)
+
+        self.assertEqual(len(data[0]["certificates"]), 1)
+        self.assertEqual(
+            data[0]["certificates"][0]["certificate_id"],
+            self.production_site_certificate.certificate.certificate.certificate_id,
         )
-        assert response.status_code == 200
-        data = response.json()
-        assert len(data) == 0
-        # add 1
-        psite = {
+
+    def test_create_production_site(self):
+        form_data = {
+            "entity_id": self.producer.pk,
             "country_code": "FR",
             "name": "Site prod 1",
             "date_mise_en_service": "2020-12-01",
             "ges_option": "Actual",
-            "entity_id": self.entity1.id,
             "eligible_dc": "true",
             "dc_reference": "DC-FR-12-493",
             "site_siret": "FR0001",
@@ -70,152 +144,103 @@ class EntityProductionSiteTest(TestCase):
             "manager_phone": "",
             "manager_email": "",
         }
-        response = self.client.post(reverse(url_add) + f"?entity_id={self.entity1.id}", psite)
-        assert response.status_code == 200
-        # check in db
-        site = ProductionSite.objects.get(site_siret="FR0001")
-        # update
-        psite["postal_code"] = "75018"
-        response = self.client.post(
-            reverse(url_update, kwargs={"id": site.id}) + f"?entity_id={self.entity1.id}",
-            psite,
-            content_type="application/json",
+
+        data = self.create_production_site(
+            entity_id=self.producer.pk,
+            data=form_data,
         )
-        assert response.status_code == 200  # update without specifying site_id
-        psite["production_site_id"] = site.id
-        psite["country_code"] = "WW"
-        response = self.client.post(
-            reverse(url_update, kwargs={"id": site.id}) + f"?entity_id={self.entity1.id}",
-            psite,
-            content_type="application/json",
+
+        psite = ProductionSite.objects.select_related("country").get(pk=data["id"])
+
+        self.assertEqual(psite.created_by_id, self.producer.pk)
+        self.assertEqual(psite.name, form_data["name"])
+        self.assertEqual(psite.country.code_pays, form_data["country_code"])
+        self.assertEqual(psite.address, form_data["address"])
+
+    def test_create_production_site_with_missing_data(self):
+        data = self.create_production_site(entity_id=self.producer.pk, data={})
+
+        self.assertEqual(data["name"], ["Ce champ est obligatoire."])
+        self.assertEqual(data["country_code"], ["Ce champ est obligatoire."])
+        self.assertEqual(data["site_siret"], ["Ce champ est obligatoire."])
+
+    def test_update_production_site(self):
+        psite: Site = self.production_site
+        initial_name = psite.name
+        initial_country = psite.country.code_pays
+
+        self.update_production_site(
+            entity_id=self.producer.pk,
+            production_site_id=psite.id,
+            data={"name": "A new name", "country_code": "ES"},
         )
-        assert response.status_code == 400  # unknown country code WW
-        psite["country_code"] = "FR"
-        response = self.client.post(
-            reverse(url_update, kwargs={"id": site.id}) + f"?entity_id={self.entity1.id}",
-            psite,
-            content_type="application/json",
+
+        psite.refresh_from_db()
+
+        self.assertNotEqual(initial_name, "A new name")
+        self.assertEqual(psite.name, "A new name")
+        self.assertNotEqual(psite.country.code_pays, initial_country)
+        self.assertEqual(psite.country.code_pays, "ES")
+
+    def test_delete_production_site(self):
+        psite = self.production_site
+
+        self.delete_production_site(
+            entity_id=self.producer.pk,
+            production_site_id=psite.pk,
         )
-        assert response.status_code == 200
-        site = ProductionSite.objects.get(site_siret="FR0001")
-        assert site.postal_code == "75018"
 
-        # set mps/bcs
-        MatierePremiere.objects.update_or_create(code="COLZA", name="Colza")
-        MatierePremiere.objects.update_or_create(code="BEETROOT", name="Betterave")
-        Biocarburant.objects.update_or_create(code="ETH", name="Ethanol")
-        Biocarburant.objects.update_or_create(code="HVO", name="HVO")
+        self.assertEqual(ProductionSite.objects.filter(pk=psite.pk).count(), 0)
+        self.assertEqual(ProductionSiteInput.objects.filter(production_site=psite).count(), 0)
+        self.assertEqual(ProductionSiteOutput.objects.filter(production_site=psite).count(), 0)
+        self.assertEqual(ProductionSiteCertificate.objects.filter(production_site=psite).count(), 0)
 
-        response = self.client.post(
-            reverse(url_set_mps, kwargs={"id": site.id}) + f"?entity_id={self.entity1.id}",
-            {
-                "entity_id": self.entity1.id,
-                "production_site_id": site.id,
-                "matiere_premiere_codes": ["COLZA", "BEETROOT"],
-            },
+    def test_set_production_site_feedstocks(self):
+        self.set_production_site_feedstocks(
+            entity_id=self.producer.pk,
+            production_site_id=self.production_site.pk,
+            data={"matiere_premiere_codes": ["COLZA", "BLE"]},
         )
-        assert response.status_code == 200
-        response = self.client.post(
-            reverse(url_set_bcs, kwargs={"id": site.id}) + f"?entity_id={self.entity1.id}",
-            {
-                "entity_id": self.entity1.id,
-                "production_site_id": site.id,
-                "biocarburant_codes": ["ETH", "HVO"],
-            },
+
+        psite_inputs = ProductionSiteInput.objects.filter(production_site=self.production_site)
+        feedstocks = psite_inputs.values_list("matiere_premiere__code", flat=True)
+
+        self.assertEqual(feedstocks.count(), 2)
+        self.assertIn("COLZA", feedstocks)
+        self.assertIn("BLE", feedstocks)
+
+    def test_set_production_site_biofuels(self):
+        self.set_production_site_biofuels(
+            entity_id=self.producer.pk,
+            production_site_id=self.production_site.pk,
+            data={"biocarburant_codes": ["ETH", "ETBE"]},
         )
-        assert response.status_code == 200
-        # check
-        inputs = ProductionSiteInput.objects.filter(production_site=site)
-        outputs = ProductionSiteOutput.objects.filter(production_site=site)
-        assert len(inputs) == 2
-        assert len(outputs) == 2
 
-        # delete
-        post = {"entity_id": self.entity1.id}
-        response = self.client.delete(reverse(url_delete, kwargs={"id": site.id + 10}) + f"?entity_id={self.entity1.id}")
-        assert response.status_code == 400  # missing production_site_id
+        psite_outputs = ProductionSiteOutput.objects.filter(production_site=self.production_site)
+        biofuels = psite_outputs.values_list("biocarburant__code", flat=True)
 
-        post["production_site_id"] = site.id
-        response = self.client.delete(reverse(url_delete, kwargs={"id": site.id}) + f"?entity_id={self.entity1.id}")
-        assert response.status_code == 200
-        # get - 0 sites
-        response = self.client.get(reverse(url_get) + f"?entity_id={self.entity1.id}", {"entity_id": self.entity1.id})
-        assert response.status_code == 200
-        data = response.json()
-        assert len(data) == 0
+        self.assertEqual(biofuels.count(), 2)
+        self.assertIn("ETH", biofuels)
+        self.assertIn("ETBE", biofuels)
 
-    def test_add_production_site(self):
-        # "entity_id": self.entity1.id
-        postdata = {}
-        url = "api-entity-production-sites-list"
+    def test_set_production_site_certificates(self):
+        entity_cert = EntityCertificateFactory.create(entity=self.producer)
 
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "name" in response.json()
-        postdata["name"] = "Site de production 007"
+        self.set_production_site_certificates(
+            entity_id=self.producer.pk,
+            production_site_id=self.production_site.pk,
+            data={"certificate_ids": [entity_cert.certificate.certificate_id]},
+        )
 
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "country_code" in response.json()
-        postdata["country_code"] = "zz"
+        psite_certs = ProductionSiteCertificate.objects.filter(production_site=self.production_site)
+        certificates = psite_certs.values_list("certificate__certificate__certificate_id", flat=True)
 
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "date_mise_en_service" in response.json()
+        self.assertEqual(certificates.count(), 1)
+        self.assertIn(entity_cert.certificate.certificate_id, certificates)
 
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "ges_option" in response.json()
-        postdata["ges_option"] = "Default"
+    # ADMIN TESTS
 
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "site_siret" in response.json()
-        postdata["site_siret"] = "FR78895468"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "postal_code" in response.json()
-        postdata["postal_code"] = "64430"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "manager_name" in response.json()
-        postdata["manager_name"] = "William Rock"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "manager_phone" in response.json()
-        postdata["manager_phone"] = "0145247000"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "manager_email" in response.json()
-        postdata["manager_email"] = "will.rock@example.com"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "city" in response.json()
-        postdata["city"] = "Guermiette"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "address" in response.json()
-        postdata["address"] = "1 rue de la paix"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-        assert "date_mise_en_service" in response.json()
-        postdata["date_mise_en_service"] = "2007-05-12"
-
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 400
-
-        postdata["country_code"] = "FR"
-
-        # response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        # assert response.status_code == 400
-        # assert response.json()["message"] == "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_PRODUCER"
-        postdata["entity_id"] = self.entity1.id
-        response = self.client.post(reverse(url) + f"?entity_id={self.entity1.id}", postdata)
-        assert response.status_code == 200
+    def test_list_production_sites_as_admin(self):
+        data = self.list_production_sites(entity_id=self.admin.pk, company_id=self.producer.pk)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["name"], self.production_site.name)
