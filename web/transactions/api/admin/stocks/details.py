@@ -6,11 +6,7 @@ from core.helpers import (
     get_lot_updates,
     get_stock_events,
 )
-from core.models import (
-    CarbureLot,
-    CarbureStock,
-    CarbureStockTransformation,
-)
+from core.models import CarbureLot, CarbureStock, CarbureStockTransformation, ExternalAdminRights
 from core.serializers import (
     CarbureLotPublicSerializer,
     CarbureStockPublicSerializer,
@@ -18,7 +14,7 @@ from core.serializers import (
 )
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_stock_details(request):
     stock_id = request.GET.get("stock_id", False)
     if not stock_id:

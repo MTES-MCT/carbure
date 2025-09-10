@@ -4,12 +4,7 @@ from django.db import transaction
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import (
-    CarbureLot,
-    CarbureLotComment,
-    CarbureLotEvent,
-    CarbureNotification,
-)
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, ExternalAdminRights
 from core.traceability import (
     LotNode,
     bulk_delete_traceability_nodes,
@@ -20,7 +15,7 @@ from core.traceability import (
 from .update_many import group_lots_by_entity, serialize_node
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def delete_many(request):
     form = DeleteManyForm(request.POST)
 

@@ -8,6 +8,7 @@ from core.decorators import check_admin_rights
 from core.helpers import (
     get_lots_with_metadata,
 )
+from core.models import ExternalAdminRights
 from transactions.repositories.admin_lots_repository import TransactionsAdminLotsRepository
 
 
@@ -21,7 +22,7 @@ class AdminControlsLotsForm(forms.Form):
     export = forms.BooleanField(required=False)
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_lots(request, entity):
     form = AdminControlsLotsForm(request.GET)
 

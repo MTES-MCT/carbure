@@ -4,12 +4,7 @@ from django.db import transaction
 from carbure.tasks import background_bulk_scoring
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import (
-    CarbureLotComment,
-    CarbureLotEvent,
-    CarbureNotification,
-    GenericError,
-)
+from core.models import CarbureLotComment, CarbureLotEvent, CarbureNotification, ExternalAdminRights, GenericError
 from core.serializers import GenericErrorSerializer
 from core.traceability import (
     LotNode,
@@ -37,7 +32,7 @@ class UpdateManyForm(forms.Form):
     dry_run = forms.BooleanField(required=False)
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def update_many(request):
     params_form = UpdateManyForm(request.POST)
     lot_form = LotForm(request.POST)

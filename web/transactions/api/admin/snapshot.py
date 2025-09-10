@@ -2,13 +2,10 @@ from django.db.models.query_utils import Q
 from django.http.response import JsonResponse
 
 from core.decorators import check_admin_rights
-from core.models import (
-    CarbureLot,
-    CarbureStock,
-)
+from core.models import CarbureLot, CarbureStock, ExternalAdminRights
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_snapshot(request, *args, **kwargs):
     year = request.GET.get("year", False)
     if year:

@@ -5,9 +5,7 @@ from django import forms
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import (
-    GenericError,
-)
+from core.models import ExternalAdminRights, GenericError
 from core.utils import MultipleValueField
 
 
@@ -17,7 +15,7 @@ class AdminControlsLotsToggleWarningForm(forms.Form):
     checked = forms.BooleanField(required=False)
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def toggle_warning(request):
     form = AdminControlsLotsToggleWarningForm(request.POST)
     if not form.is_valid():

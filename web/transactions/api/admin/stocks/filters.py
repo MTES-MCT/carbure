@@ -5,9 +5,10 @@ from core.helpers import (
     get_all_stock,
     get_stock_filters_data,
 )
+from core.models import ExternalAdminRights
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_stock_filters(request, *args, **kwargs):
     field = request.GET.get("field", False)
     if not field:

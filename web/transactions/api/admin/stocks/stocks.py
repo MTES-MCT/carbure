@@ -8,9 +8,10 @@ from core.helpers import (
     get_all_stock,
     get_stock_with_metadata,
 )
+from core.models import ExternalAdminRights
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_stocks(request, *args, **kwargs):
     try:
         stock = get_all_stock()

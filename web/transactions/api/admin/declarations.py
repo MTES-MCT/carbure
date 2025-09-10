@@ -5,11 +5,11 @@ from dateutil.relativedelta import relativedelta
 from django.http.response import JsonResponse
 
 from core.decorators import check_admin_rights
-from core.models import CarbureLot, Entity, SustainabilityDeclaration
+from core.models import CarbureLot, Entity, ExternalAdminRights, SustainabilityDeclaration
 from core.serializers import SustainabilityDeclarationSerializer
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_declarations(request):
     period = request.GET.get("period", False)
     if not period:

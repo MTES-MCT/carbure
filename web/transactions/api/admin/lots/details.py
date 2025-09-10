@@ -4,7 +4,7 @@ from core.carburetypes import CarbureError
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_transaction_distance
-from core.models import CarbureLot, CarbureStock
+from core.models import CarbureLot, CarbureStock, ExternalAdminRights
 from core.serializers import CarbureLotAdminSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
 from transactions.api.admin.helpers import get_admin_lot_comments
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerAdminSerializer
@@ -14,7 +14,7 @@ class AdminControlsLotsDetailsForm(forms.Form):
     lot_id = forms.ModelChoiceField(queryset=CarbureLot.objects.all())
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_lot_details(request, entity):
     form = AdminControlsLotsDetailsForm(request.GET)
     if not form.is_valid():
