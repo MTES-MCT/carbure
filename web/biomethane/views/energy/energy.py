@@ -97,7 +97,7 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
             ),
             status.HTTP_201_CREATED: OpenApiResponse(
                 response=BiomethaneEnergySerializer,
-                description="Digestate declaration created successfully",
+                description="Energy declaration created successfully",
             ),
         },
         request=BiomethaneEnergyInputSerializer,
@@ -105,14 +105,14 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
     )
     def upsert(self, request, *args, **kwargs):
         try:
-            digestate = BiomethaneEnergy.objects.get(producer=request.entity, year=request.year)
-            serializer = self.get_serializer(digestate, data=request.data, partial=True)
+            energy = BiomethaneEnergy.objects.get(producer=request.entity, year=request.year)
+            serializer = self.get_serializer(energy, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneEnergy.DoesNotExist:
             serializer = self.get_serializer(data=request.data)
             status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid():
-            digestate = serializer.save()
+            energy = serializer.save()
             return Response(status=status_code)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

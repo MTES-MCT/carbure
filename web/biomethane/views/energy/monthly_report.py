@@ -108,7 +108,11 @@ class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
+            reports = self.get_queryset()
+            status_code = status.HTTP_200_OK if reports.count() > 0 else status.HTTP_201_CREATED
+
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+
+            return Response(status=status_code)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
