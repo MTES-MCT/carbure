@@ -47,17 +47,13 @@ export const BaseInput = ({
     const value =
       props.nativeInputProps?.value ?? props.nativeTextAreaProps?.value
     return (
-      <div>
-        <Label
-          label={label}
-          hasTooltip={hasTooltip}
-          title={title}
-          readOnly={readOnly}
-        />
-        <Text size="sm">
-          {value !== undefined && value !== "" ? value : "-"}
-        </Text>
-      </div>
+      <ReadOnlyValue
+        label={label}
+        hasTooltip={hasTooltip}
+        title={title}
+        readOnly={readOnly}
+        value={`${value}`}
+      />
     )
   }
 
@@ -120,4 +116,24 @@ export const Label = ({
   }
 
   return baseLabel
+}
+
+export const ReadOnlyValue = ({
+  label,
+  hasTooltip,
+  title,
+  readOnly,
+  value,
+}: LabelProps & { value: string }) => {
+  return (
+    <div>
+      <Label
+        label={label}
+        hasTooltip={hasTooltip}
+        title={title}
+        readOnly={readOnly}
+      />
+      <Text size="sm">{value !== undefined && value !== "" ? value : "-"}</Text>
+    </div>
+  )
 }

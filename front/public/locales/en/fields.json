@@ -32,5 +32,11 @@
   "unknown_delivery_site": "Delivery site (unknown)",
   "delivery_site_country": "Delivery country",
   "delivery_date": "Delivery date",
-  "free_field": "Free field"
+  "free_field": "Free field",
+
+  "producer": "Producer",
+  "sanitary_approval_number": "Sanitary approval no.",
+  "hygienization_exemption_type": "Hygienization exemption",
+
+  "password2": "Password"
 }

@@ -1,0 +1,23 @@
+import { ContractAmendments } from "./components/contract-amendments/contract-amendments"
+import { ContractFiles } from "./components/contract-files"
+import { ContractInfos } from "./components/contract-infos"
+import { useGetContractInfos } from "./contract.hooks"
+
+export const BiomethaneContractPage = () => {
+  const { result: contractInfos, loading } = useGetContractInfos()
+
+  return (
+    <>
+      {/* 
+        Render ContractInfos component in two cases:
+          - When contract data is available (contractInfos exists)
+          - When no data is available AND loading is finished (!loading)
+      */}
+      {(contractInfos || (!contractInfos && !loading)) && (
+        <ContractInfos contract={contractInfos} />
+      )}
+      <ContractFiles contract={contractInfos} />
+      <ContractAmendments contract={contractInfos} />
+    </>
+  )
+}

@@ -32,5 +32,11 @@
   "unknown_delivery_site": "Site de livraison (hors CarbuRe)",
   "delivery_site_country": "Pays de livraison",
   "delivery_date": "Date de livraison",
-  "free_field": "Champ libre"
+  "free_field": "Champ libre",
+
+  "producer": "Producteur",
+  "sanitary_approval_number": "N° Agrément sanitaire",
+  "hygienization_exemption_type": "Dérogation à l'hygiénisation",
+
+  "password2": "Mot de passe"
 }

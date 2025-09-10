@@ -1,16 +1,16 @@
 import { MultiSelect } from "common/components/selects2/multiselect"
-import { CBFilterSelection } from "common/hooks/query-builder-2"
 import styles from "./filter-multiselect2.module.css"
 import { ShowMore } from "common/components/show-more/show-more"
 import { Normalizer } from "common/utils/normalize"
+import { QueryFilters } from "common/hooks/query-builder-2"
 
 export interface FilterMultiSelectProps2<
   Key extends string,
   Value extends string = Key,
 > {
   filterLabels: Record<Key, string>
-  selected: CBFilterSelection
-  onSelect: (filters: CBFilterSelection) => void
+  selected: QueryFilters
+  onSelect: (filters: QueryFilters) => void
   getFilterOptions: (filter: Key) => Promise<any[]>
   normalizers?: Record<string, Normalizer<Key, Value>>
 }

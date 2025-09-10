@@ -4,8 +4,8 @@ import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { To } from "react-router-dom"
 import {
-  SafStates,
   SafTicketPreview,
+  SafTicketQueryBuilder,
   SafTicketsResponse,
   SafTicketStatus,
 } from "saf/types"
@@ -18,8 +18,8 @@ import useEntity from "common/hooks/entity"
 
 export interface TicketsTableProps {
   loading: boolean
-  state: SafStates
-  actions: any
+  state: SafTicketQueryBuilder["state"]
+  actions: SafTicketQueryBuilder["actions"]
   status: SafTicketStatus
   ticketsData?: SafTicketsResponse
   order: Order | undefined

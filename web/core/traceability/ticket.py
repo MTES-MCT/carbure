@@ -18,6 +18,8 @@ class TicketNode(Node):
         "ghg_total": True,
         "ghg_reference": True,
         "ghg_reduction": True,
+        "origin_lot": True,
+        "origin_lot_site": True,
         **GHG_FIELDS,
     }
 

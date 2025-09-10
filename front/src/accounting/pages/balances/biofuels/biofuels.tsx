@@ -1,6 +1,4 @@
 import { useQuery } from "common/hooks/async"
-
-import useEntity from "common/hooks/entity"
 import {
   useBalancesBiofuelsColumns,
   useGetFilterOptions,
@@ -8,19 +6,15 @@ import {
 import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { Pagination } from "common/components/pagination2/pagination"
-import { OperationsStatus, BalancesFilter } from "accounting/types"
+import { BalancesFilter, BalancesQueryBuilder } from "accounting/types"
 import { NoResult } from "common/components/no-result2"
 import { getBalances } from "accounting/api/balances"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const BalancesBiofuels = () => {
-  const entity = useEntity()
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   const columns = useBalancesBiofuelsColumns()
@@ -31,11 +25,8 @@ const BalancesBiofuels = () => {
     [BalancesFilter.biofuel]: t("Biocarburants"),
   }
 
-  const [state, actions] = useCBQueryParamsStore<OperationsStatus[], undefined>(
-    entity
-  )
-
-  const query = useCBQueryBuilder<[], OperationsStatus[], undefined>(state)
+  const { state, actions, query } =
+    useQueryBuilder<BalancesQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(getBalances, {
     key: "balances",

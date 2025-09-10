@@ -8,11 +8,12 @@ class EnvelopeTest(TestCase):
     def test_knows_its_payload(self):
         message = MagicMock()
         message.id = "12345678-1234-1234-1234-1234567890ab"
+        message.original_sender = "CarbuRe_NTR"
         message.timestamp = "2025-07-15T13:00:00+00:00"
-        message.encoded.return_value = "abcdef"
         message.initiator_id.return_value = "initiator"
         message.initiator_to_XML.return_value = "<MockValue>initiator</MockValue>"
         message.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
+        message.zipped_encoded.return_value = "abcdef"
         envelope = Envelope(message)
         expected_payload = """\
 <soap:Envelope
@@ -37,13 +38,13 @@ class EnvelopeTest(TestCase):
           <eb:Action>https://union-database.ec.europa.eu/e-delivery/actions/sendRequest</eb:Action>
         </eb:CollaborationInfo>
         <eb:MessageProperties>
-          <eb:Property name="originalSender">initiator</eb:Property>
+          <eb:Property name="originalSender">CarbuRe_NTR</eb:Property>
           <eb:Property name="finalRecipient">EC</eb:Property>
         </eb:MessageProperties>
         <eb:PayloadInfo>
-          <eb:PartInfo href="cid:message">
+          <eb:PartInfo href="cid:attachment">
             <eb:PartProperties>
-              <eb:Property name="MimeType">text/xml</eb:Property>
+              <eb:Property name="MimeType">application/octet-stream</eb:Property>
             </eb:PartProperties>
           </eb:PartInfo>
         </eb:PayloadInfo>
@@ -53,7 +54,7 @@ class EnvelopeTest(TestCase):
 
   <soap:Body>
     <_1:submitRequest>
-      <payload payloadId="cid:message" contentType="text/xml">
+      <payload payloadId="cid:attachment" contentType="application/octet-stream">
         <value>abcdef</value>
       </payload>
     </_1:submitRequest>

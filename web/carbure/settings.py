@@ -89,6 +89,8 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_email",
     "django_admin_listfilter_dropdown",
     "rest_framework",
+    "rest_framework_api_key",
+    "rest_framework_simplejwt",
     "django_filters",
     "drf_spectacular",
     "authtools",
@@ -104,6 +106,7 @@ INSTALLED_APPS = [
     "simple_history",
     "tiruert",
     "user",
+    "biomethane",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -332,8 +335,6 @@ if DEBUG:
     MIDDLEWARE += ["silk.middleware.SilkyMiddleware"]
     MIDDLEWARE.remove("csp.middleware.CSPMiddleware")
 
-if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
-    MIDDLEWARE.remove("django.middleware.csrf.CsrfViewMiddleware")
 
 if env("TEST"):
     HUEY["immediate"] = True  # allow running background tasks immediately so we can have instant results in tests
@@ -420,6 +421,7 @@ SPECTACULAR_SETTINGS = {
         "ObjectiveSectorCodeEnum": "tiruert.models.Operation.SECTOR_CODE_CHOICES",
         "ElecOperationStatusEnum": "tiruert.models.ElecOperation.OPERATION_STATUSES",
         "ElecOperationTypeEnum": "tiruert.models.ElecOperation.OPERATION_TYPES",
+        "BiomethaneDigestateStatusEnum": "biomethane.models.BiomethaneDigestate.DIGESTATE_STATUS",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
@@ -436,5 +438,22 @@ if not env("TEST"):
 
 if env("TEST"):
     REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
+
+API_KEY_CUSTOM_HEADER = "HTTP_X_API_KEY"
+
+if env("IMAGE_TAG") in ("dev", "local"):
+    import factory
+
+    factory.Faker._DEFAULT_LOCALE = "fr_FR"
+
+if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
+    MIDDLEWARE.remove("django.middleware.csrf.CsrfViewMiddleware")
+
+    # Disable throtting in local
     REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}

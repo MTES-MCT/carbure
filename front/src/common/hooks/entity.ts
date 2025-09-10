@@ -19,6 +19,7 @@ export interface EntityManager extends Entity {
   isOperator: boolean
   isTrader: boolean
   isPowerOrHeatProducer: boolean
+  isBiomethaneProducer: boolean
   isIndustry: boolean
   isCPO: boolean
   isSafTrader: boolean
@@ -79,11 +80,13 @@ export function useEntityManager(
     isTrader: type === EntityType.Trader,
     isCPO: type === EntityType.CPO,
     isSafTrader: type === EntityType.SAF_Trader,
+    isBiomethaneProducer: type === EntityType.Producteur_de_biom_thane,
     isIndustry: isIndustry(type),
     canTrade: canTrade,
     website: entity?.website ?? "",
     vat_number: entity?.vat_number ?? "",
     accise_number: entity?.accise_number ?? "",
+    is_red_ii: entity?.is_red_ii ?? false,
 
     hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) =>
       entity?.ext_admin_pages?.includes(page as ExternalAdminPages) ?? false,

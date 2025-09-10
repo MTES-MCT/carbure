@@ -1,16 +1,17 @@
 from django.contrib import admin
 
 from elec.models import (
+    ElecAuditChargePoint,
+    ElecAuditSample,
     ElecChargePoint,
     ElecChargePointApplication,
+    ElecMeter,
     ElecMeterReading,
     ElecMeterReadingApplication,
     ElecProvisionCertificate,
+    ElecProvisionCertificateQualicharge,
     ElecTransferCertificate,
 )
-from elec.models.elec_audit_charge_point import ElecAuditChargePoint
-from elec.models.elec_audit_sample import ElecAuditSample
-from elec.models.elec_meter import ElecMeter
 
 
 @admin.register(ElecProvisionCertificate)
@@ -186,3 +187,23 @@ class ElecMeterAdmin(admin.ModelAdmin):
         "charge_point__cpo_name",
     ]
     autocomplete_fields = ["charge_point"]
+
+
+@admin.register(ElecProvisionCertificateQualicharge)
+class ElecProvisionCertificateQualichargeAdmin(admin.ModelAdmin):
+    list_display = [
+        "cpo",
+        "year",
+        "operating_unit",
+        "station_id",
+        "energy_amount",
+        "validated_by",
+    ]
+    list_filter = [
+        "validated_by",
+    ]
+    search_fields = [
+        "cpo__name",
+        "station_id",
+        "operating_unit",
+    ]

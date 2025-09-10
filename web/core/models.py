@@ -52,6 +52,7 @@ class Entity(models.Model):
     CPO = "Charge Point Operator"
     POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
     SAF_TRADER = "SAF Trader"
+    BIOMETHANE_PRODUCER = "Producteur de biométhane"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -64,6 +65,7 @@ class Entity(models.Model):
         (UNKNOWN, "Unknown"),
         (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
         (SAF_TRADER, "Trader de SAF"),
+        (BIOMETHANE_PRODUCER, "Producteur de biométhane"),
     )
     UNIT_CHOICE = (("l", "litres"), ("kg", "kg"), ("MJ", "MJ"))
 
@@ -91,6 +93,9 @@ class Entity(models.Model):
 
     is_enabled = models.BooleanField(default=True)
     is_tiruert_liable = models.BooleanField(default=False)
+
+    # Biomethane
+    is_red_ii = models.BooleanField(default=False)
 
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
@@ -132,6 +137,7 @@ class Entity(models.Model):
             "vat_number": self.vat_number,
             "is_enabled": self.is_enabled,
             "is_tiruert_liable": self.is_tiruert_liable,
+            "is_red_ii": self.is_red_ii,
             "accise_number": self.accise_number,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:

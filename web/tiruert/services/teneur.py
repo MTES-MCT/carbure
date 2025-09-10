@@ -1,12 +1,17 @@
+from decimal import getcontext
 from typing import Optional
 
 import numpy as np
 import numpy.typing as npt
 import scipy.optimize
+import sentry_sdk
 from django.db.models import Q
 
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
+
+# Configure decimal precision for exact calculations
+getcontext().prec = 28
 
 
 class TeneurServiceErrors:
@@ -142,7 +147,21 @@ class TeneurService:
         nonzero_indices = np.nonzero(result_array[0 : len(batches_volumes)])[0]
 
         # Create a dictionary of selected batches with their respective index and volume
-        selected_batches_volumes = {idx: result_array[idx] for idx in nonzero_indices}
+        # Apply intelligent rounding to handle scipy's floating point precision errors
+        selected_batches_volumes = {}
+        for idx in nonzero_indices:
+            val_float = result_array[idx]
+            cap_float = batches_volumes[idx]
+
+            # Round to reasonable precision (10 decimal places) to eliminate tiny floating point errors
+            val_rounded = round(val_float, 10)
+            cap_rounded = round(cap_float, 10)
+
+            # Clamp any tiny overshoot: selected volume can't exceed available start volume
+            if val_rounded > cap_rounded:
+                val_rounded = cap_rounded
+
+            selected_batches_volumes[idx] = val_rounded
 
         return selected_batches_volumes, res.fun
 
@@ -260,13 +279,15 @@ class TeneurService:
         """
         Prepare data for optimization and operation creation
         """
+        debited_entity = data["debited_entity"]
+
         operations = (
             Operation.objects.filter(
                 biofuel=data["biofuel"],
                 customs_category=data["customs_category"],
                 # created_at__gte=data["date_from"],
             )
-            .filter((Q(credited_entity=data["debited_entity"]) | Q(debited_entity=data["debited_entity"])))
+            .filter((Q(credited_entity=debited_entity) | Q(debited_entity=debited_entity)))
             .distinct()
         )
 
@@ -280,7 +301,7 @@ class TeneurService:
         # Calculate balance of debited entity, for each lot, always in liters
         balance = BalanceService.calculate_balance(
             operations,
-            data["debited_entity"].id,
+            debited_entity.id,
             "lot",
             "l",
             None,
@@ -305,6 +326,14 @@ class TeneurService:
                 volume = value["available_balance"] if lot_id in data["enforced_volumes"] else 0
                 enforced_volumes = np.append(enforced_volumes, volume)
 
+        # Check for negative volumes and report to Sentry
+        if len(volumes) > 0:
+            negative_volumes = volumes[volumes < 0]
+            if len(negative_volumes) > 0:
+                TeneurService._send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes)
+                # Fix negative volumes by setting them to 0
+                volumes = np.maximum(volumes, 0)
+
         # Convert target volume into L
         target_volume = None
         if data.get("target_volume", None) is not None:
@@ -320,3 +349,27 @@ class TeneurService:
             return quantity / biofuel.masse_volumique
         else:
             return quantity
+
+    @staticmethod
+    def _send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes):
+        # Get the lot_ids corresponding to negative volumes
+        negative_indices = np.where(volumes < 0)[0]
+        negative_lot_ids = lot_ids[negative_indices].tolist()
+
+        # Log to Sentry for monitoring
+        message = (
+            f"Negative volumes detected in balance calculation: {len(negative_volumes)} lots "
+            f"with volumes ranging from {negative_volumes.min():.2f}L to {negative_volumes.max():.2f}L. "
+            f"Lot IDs: {negative_lot_ids}"
+        )
+
+        with sentry_sdk.push_scope() as scope:
+            scope.set_context(
+                "request_data",
+                {
+                    "biofuel": str(data["biofuel"]),
+                    "customs_category": data["customs_category"],
+                    "debited_entity": str(debited_entity),
+                },
+            )
+            sentry_sdk.capture_message(message, level="warning")

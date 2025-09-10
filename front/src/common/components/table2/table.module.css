@@ -227,6 +227,14 @@
   border-right: 1px solid var(--border-default-grey);
 }
 
+.top-actions__button--success {
+  color: var(--text-default-success);
+}
+
+.top-actions__button--danger {
+  color: var(--text-default-danger);
+}
+
 /* To prevent the badge from being cut off, we need to remove max-width: 100% defined by the DSFR */
 .cell :global(.fr-badge) {
   max-width: unset;

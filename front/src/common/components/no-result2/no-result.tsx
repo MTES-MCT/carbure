@@ -1,14 +1,14 @@
-import { CBQueryFilterManager } from "common/hooks/query-builder-2"
+import { QueryFiltersManager } from "common/hooks/query-builder-2"
 import { Notice } from "../notice"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
-interface NoResultProps extends Partial<CBQueryFilterManager> {
+interface NoResultProps extends Partial<QueryFiltersManager> {
   loading?: boolean
   label?: string
 }
 
-function countFilters(filters: CBQueryFilterManager["filters"]) {
+function countFilters(filters: QueryFiltersManager["filters"]) {
   if (filters === undefined) return 0
   return Object.values(filters).reduce((total, list) => total + list.length, 0)
 }

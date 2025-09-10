@@ -19,6 +19,13 @@ import { AgreementDetailsDialog } from "double-counting/components/agreement-det
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useRoutes } from "common/hooks/routes"
 import { Navigate, Route, Routes } from "react-router-dom"
+import { lazy } from "react"
+
+const BiomethaneContractPage = lazy(() => import("biomethane/pages/contract"))
+const BiomethaneInjectionPage = lazy(() => import("biomethane/pages/injection"))
+const BiomethaneProductionPage = lazy(
+  () => import("biomethane/pages/production")
+)
 
 const Settings = () => {
   const { t } = useTranslation()
@@ -27,11 +34,16 @@ const Settings = () => {
   useTitle(`${entity.name} · ${t("Société")}`)
   usePrivateNavigation(t("Paramètres de la société"))
 
-  const { isProducer, isPowerOrHeatProducer, isIndustry } = entity
+  const {
+    isProducer,
+    isPowerOrHeatProducer,
+    isIndustry,
+    isBiomethaneProducer,
+  } = entity
 
   const hasCertificates = isIndustry
   const hasDepot = isIndustry || isPowerOrHeatProducer
-  const hasOptions = isIndustry
+  const hasOptions = isIndustry || isBiomethaneProducer
   const defaultTab = hasOptions ? "options" : "info"
   return (
     <Main>
@@ -57,6 +69,27 @@ const Settings = () => {
             label: t("Utilisateurs"),
             icon: "ri-user-line",
             iconActive: "ri-user-fill",
+          },
+          isBiomethaneProducer && {
+            path: routes.SETTINGS.BIOMETHANE.CONTRACT,
+            key: "contract",
+            label: t("Contrat"),
+            icon: "ri-file-text-line",
+            iconActive: "ri-file-text-fill",
+          },
+          isBiomethaneProducer && {
+            path: routes.SETTINGS.BIOMETHANE.PRODUCTION,
+            key: "production",
+            label: t("Production"),
+            icon: "ri-building-line",
+            iconActive: "ri-building-fill",
+          },
+          isBiomethaneProducer && {
+            path: routes.SETTINGS.BIOMETHANE.INJECTION,
+            key: "injection",
+            label: t("Injection"),
+            icon: "ri-todo-line",
+            iconActive: "ri-todo-fill",
           },
           hasCertificates && {
             path: "certificates",
@@ -112,7 +145,22 @@ const Settings = () => {
           {entity.hasRights(UserRole.Admin) && (
             <Route path="users" element={<EntityUserRights />} />
           )}
-
+          {isBiomethaneProducer && (
+            <>
+              <Route
+                path="biomethane/contract"
+                element={<BiomethaneContractPage />}
+              />
+              <Route
+                path="biomethane/production"
+                element={<BiomethaneProductionPage />}
+              />
+              <Route
+                path="biomethane/injection"
+                element={<BiomethaneInjectionPage />}
+              />
+            </>
+          )}
           <Route path="*" element={<Navigate replace to={defaultTab} />} />
         </Routes>
       </Content>

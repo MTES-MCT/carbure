@@ -1,4 +1,5 @@
 from django.contrib.auth import password_validation
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -15,7 +16,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
         try:
             password_validation.validate_password(data["password2"], self.instance)
-        except serializers.ValidationError as e:
+        except ValidationError as e:
             raise serializers.ValidationError({"password2": e.messages})
 
         return data

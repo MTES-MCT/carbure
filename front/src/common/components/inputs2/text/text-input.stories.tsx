@@ -7,7 +7,7 @@ const meta: Meta<typeof TextInput> = {
   component: TextInput,
   title: "common/components/inputs/TextInput",
   render: (args) => {
-    const [value, setValue] = useState<string | undefined>(args.value)
+    const [value, setValue] = useState(args.value)
 
     return (
       <TextInput

@@ -57,46 +57,58 @@ const CompanyOptions = () => {
       )}
       headerActions={null}
     >
-      <Autocomplete
-        label={t(
-          "Ma société préfère afficher les quantités et les opérations en :"
-        )}
-        value={entity.preferred_unit}
-        onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
-        options={[
-          {
-            value: "l",
-            label: t("litres (Éthanol à 20°, autres à 15°)"),
-          },
-          { value: "kg", label: t("kilogrammes") },
-          { value: "MJ", label: t("mégajoules") },
-        ]}
-      />
+      {entity.isBiomethaneProducer && (
+        <Checkbox
+          disabled
+          label={t("Ma production de biométhane est soumise aux exigences RED")}
+          value={entity.is_red_ii}
+        />
+      )}
+      {entity.isIndustry && (
+        <>
+          <Autocomplete
+            label={t(
+              "Ma société préfère afficher les quantités et les opérations en :"
+            )}
+            value={entity.preferred_unit}
+            onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
+            options={[
+              {
+                value: "l",
+                label: t("litres (Éthanol à 20°, autres à 15°)"),
+              },
+              { value: "kg", label: t("kilogrammes") },
+              { value: "MJ", label: t("mégajoules") },
+            ]}
+          />
 
-      <Checkbox
-        disabled={!canModify}
-        label={t("Ma société gère un stock sur CarbuRe")}
-        value={entity.has_stocks ?? false}
-        onChange={toggleStocks.execute}
-      />
-      <Checkbox
-        disabled={!canModify}
-        label={t("Ma société a une activité de négoce")}
-        value={entity.has_trading}
-        onChange={toggleTrading.execute}
-      />
-      <Checkbox
-        disabled={!canModify}
-        label={t("Ma société effectue des mises à consommation (B100 et ED95 uniquement)")} // prettier-ignore
-        value={entity.has_mac ?? false}
-        onChange={toggleMAC.execute}
-      />
-      <Checkbox
-        disabled={!canModify}
-        label={t("Ma société effectue des livraisons directes")}
-        value={entity.has_direct_deliveries}
-        onChange={toggleDirectDeliveries.execute}
-      />
+          <Checkbox
+            disabled={!canModify}
+            label={t("Ma société gère un stock sur CarbuRe")}
+            value={entity.has_stocks ?? false}
+            onChange={toggleStocks.execute}
+          />
+          <Checkbox
+            disabled={!canModify}
+            label={t("Ma société a une activité de négoce")}
+            value={entity.has_trading}
+            onChange={toggleTrading.execute}
+          />
+          <Checkbox
+            disabled={!canModify}
+            label={t("Ma société effectue des mises à consommation (B100 et ED95 uniquement)")} // prettier-ignore
+            value={entity.has_mac ?? false}
+            onChange={toggleMAC.execute}
+          />
+          <Checkbox
+            disabled={!canModify}
+            label={t("Ma société effectue des livraisons directes")}
+            value={entity.has_direct_deliveries}
+            onChange={toggleDirectDeliveries.execute}
+          />
+        </>
+      )}
+
       {entity.isOperator && (
         <Checkbox
           disabled={!canModify}

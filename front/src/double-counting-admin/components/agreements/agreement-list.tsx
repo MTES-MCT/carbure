@@ -1,10 +1,6 @@
 import useEntity from "common/hooks/entity"
 import { Button } from "common/components/button2"
 import HashRoute from "common/components/hash-route"
-import {
-  useCBQueryBuilder,
-  useCBQueryParamsStore,
-} from "common/hooks/query-builder-2"
 import { NoResult } from "common/components/no-result2"
 import { Content } from "common/components/scaffold"
 import { Cell, Column, Table } from "common/components/table2"
@@ -24,7 +20,12 @@ import AgreementStatusTag from "./agreement-status"
 import { compact } from "common/utils/collection"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { AgreementFilters } from "../../filters"
-import { AgreementFilter, AgreementOrder } from "double-counting-admin/types"
+import {
+  AgreementFilter,
+  AgreementListQueryBuilder,
+  AgreementOrder,
+} from "double-counting-admin/types"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const AgreementList = ({
   snapshot = defaultCount,
@@ -34,17 +35,15 @@ const AgreementList = ({
   const { t } = useTranslation()
   usePrivateNavigation(t("Agréments actifs"))
   const [tab, setTab] = useState("active")
-  const entity = useEntity()
+
   const navigate = useNavigate()
   const location = useLocation()
   const currentYear = new Date().getFullYear()
 
-  const [state, actions] = useCBQueryParamsStore<string, undefined>(
-    entity,
-    currentYear,
-    tab
-  )
-  const query = useCBQueryBuilder<AgreementOrder[], string, undefined>(state)
+  const { state, actions, query } = useQueryBuilder<
+    AgreementListQueryBuilder["config"]
+  >({ status: tab })
+
   const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
     params: [query],

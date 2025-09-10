@@ -1,10 +1,11 @@
+from os import environ
 from unittest import TestCase
 from unittest.mock import patch
 
 from edelivery.ebms.messages import Message
 
 
-@patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id"})
+@patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
 class MessageTest(TestCase):
     def setUp(self):
         self.patched_new_uuid = patch("edelivery.ebms.messages.new_uuid").start()
@@ -26,14 +27,22 @@ class MessageTest(TestCase):
         self.assertEqual("2025-07-15T13:00:00+00:00", message.timestamp)
 
     def test_knows_initiator(self):
+        self.assertEqual("initiator_id", environ["INITIATOR_ACCESS_POINT_ID"])
+
         message = Message("responder_id", "A request")
         self.assertEqual("initiator_id", message.initiator_id())
 
-    @patch("edelivery.ebms.messages.encode")
-    def test_encodes_its_body(self, patched_encode):
-        patched_encode.return_value = "abcdef"
+    def test_knows_original_sender(self):
+        self.assertEqual("CarbuRe_NTR", environ["CARBURE_NTR"])
+
+        message = Message("responder_id", "A request")
+        self.assertEqual("CarbuRe_NTR", message.original_sender)
+
+    @patch("edelivery.ebms.messages.zip_and_stream_udb_request")
+    def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
+        patched_zip_and_stream_udb_request.return_value = "abcdef"
         message = Message("responder_id", "A request")
 
-        encoded_message = message.encoded()
-        patched_encode.assert_called_with("A request")
+        encoded_message = message.zipped_encoded()
+        patched_zip_and_stream_udb_request.assert_called_with("A request")
         self.assertEqual("abcdef", encoded_message)

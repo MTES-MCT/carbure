@@ -1,0 +1,3 @@
+from .test_years import BiomethaneDigestateYearsTests
+from .test_digestate import BiomethaneDigestateTests
+from .test_spreading import BiomethaneDigestateSpreadingTests

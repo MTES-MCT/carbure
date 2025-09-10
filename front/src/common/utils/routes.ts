@@ -57,6 +57,15 @@ export const ROUTE_URLS = {
     }
   },
 
+  BIOMETHANE: (entity_id: number, year: number) => {
+    const baseUrl = urlWithOrgId(entity_id, `/biomethane`)
+
+    return {
+      DIGESTATE: `${baseUrl}/digestate/${year}`,
+      ENERGY: `${baseUrl}/energy/${year}`,
+    }
+  },
+
   DOUBLE_COUNTING: (entity_id: number) => {
     const baseUrl = urlWithOrgId(entity_id, "/double-counting")
 
@@ -74,6 +83,7 @@ export const ROUTE_URLS = {
           "/charge-points/meter-readings"
         ),
         LIST: urlWithOrgId(entity_id, "/charge-points/list"),
+        QUALICHARGE: urlWithOrgId(entity_id, "/charge-points/qualicharge"),
       },
     }
   },
@@ -127,6 +137,11 @@ export const ROUTE_URLS = {
       PRODUCTION: `${baseUrl}/production`,
       DEPOT: `${baseUrl}/depot`,
       USERS: `${baseUrl}/users`,
+      BIOMETHANE: {
+        CONTRACT: `${baseUrl}/biomethane/contract`,
+        PRODUCTION: `${baseUrl}/biomethane/production`,
+        INJECTION: `${baseUrl}/biomethane/injection`,
+      },
     }
   },
 
