@@ -43,7 +43,10 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
-        setattr(request, "year", get_declaration_period())
+
+        # We don't want to set the year for the retrieve action because it's already set in the request
+        if self.action != "retrieve":
+            setattr(request, "year", get_declaration_period())
         return request
 
     def get_serializer_context(self):
@@ -78,7 +81,8 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            energy = BiomethaneEnergy.objects.get(producer=request.entity, year=request.year)
+            year = request.query_params.get("year")
+            energy = BiomethaneEnergy.objects.get(producer=request.entity, year=year)
             data = self.get_serializer(energy, many=False).data
             return Response(data)
 
