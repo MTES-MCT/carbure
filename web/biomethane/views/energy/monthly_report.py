@@ -68,8 +68,32 @@ class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin):
 
     def get_queryset(self):
         entity = getattr(self.request, "entity", None)
-        year = getattr(self.request, "year", None)
+        year = getattr(self.request, "year", None) if self.action != "list" else self.request.query_params.get("year")
         return self.queryset.filter(energy__producer=entity, energy__year=year)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="year",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Declaration year.",
+                required=True,
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=BiomethaneEnergyMonthlyReportSerializer(many=True),
+                description="Energy declaration monthly reports for the year",
+            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                description="Energy monthly reports not found for this entity and year."
+            ),
+        },
+        description="Retrieve the energy declaration monthly reports for the current entity and year",
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     @extend_schema(
         responses={
