@@ -180,37 +180,55 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
 
     fields_to_clear = []
 
-    # Clear flaring_operating_hours if FLARING_FLOWMETER is NOT in installed_meters
-    if (
-        production_unit
-        and production_unit.installed_meters
-        and BiomethaneProductionUnit.FLARING_FLOWMETER not in production_unit.installed_meters
-    ):
-        fields_to_clear.append("flaring_operating_hours")
+    if sender == BiomethaneProductionUnit:
+        # Clear flaring_operating_hours if FLARING_FLOWMETER is NOT in installed_meters
+        if (
+            production_unit
+            and production_unit.installed_meters
+            and BiomethaneProductionUnit.FLARING_FLOWMETER not in production_unit.installed_meters
+        ):
+            fields_to_clear.append("flaring_operating_hours")
+    elif sender == BiomethaneContract:
+        # Clear fields based on tariff reference (older tariffs)
+        if contract and contract.tariff_reference not in ["2011", "2020", "2021"]:
+            fields_to_clear.extend(
+                [
+                    "energy_used_for_digester_heating",
+                    "purified_biogas_quantity_nm3",
+                    "purification_electric_consumption_kwe",
+                ]
+            )
 
-    # Clear fields based on tariff reference (older tariffs)
-    if contract and contract.tariff_reference not in ["2011", "2020", "2021"]:
-        fields_to_clear.extend(
-            [
-                "energy_used_for_digester_heating",
-                "purified_biogas_quantity_nm3",
-                "purification_electric_consumption_kwe",
-            ]
-        )
+        # Clear fields based on tariff reference (newer tariffs)
+        if contract and contract.tariff_reference not in ["2023"]:
+            fields_to_clear.extend(
+                [
+                    "energy_used_for_installation_needs",
+                    "self_consumed_biogas_nm3",
+                    "total_unit_electric_consumption_kwe",
+                ]
+            )
+    elif sender == BiomethaneEnergy:
+        # Clear malfunction_details if malfunction_types is not OTHER
+        if (
+            energy_instance.malfunction_types
+            and energy_instance.malfunction_types != BiomethaneEnergy.MALFUNCTION_TYPE_OTHER
+        ):
+            fields_to_clear.append("malfunction_details")
 
-    # Clear fields based on tariff reference (newer tariffs)
-    if contract and contract.tariff_reference not in ["2023"]:
-        fields_to_clear.extend(
-            [
-                "energy_used_for_installation_needs",
-                "self_consumed_biogas_nm3",
-                "total_unit_electric_consumption_kwe",
-            ]
-        )
+        # Clear malfunction fields if has_malfunctions is False
+        if not energy_instance.has_malfunctions:
+            fields_to_clear.extend(
+                [
+                    "malfunction_cumulative_duration_days",
+                    "malfunction_types",
+                    "malfunction_details",
+                ]
+            )
 
-    # Clear malfunction_details if malfunction_types is not OTHER
-    if energy_instance.malfunction_types and energy_instance.malfunction_types != BiomethaneEnergy.MALFUNCTION_TYPE_OTHER:
-        fields_to_clear.append("malfunction_details")
+        # Clear injection_impossibility_hours if has_injection_difficulties_due_to_network_saturation is False
+        if not energy_instance.has_injection_difficulties_due_to_network_saturation:
+            fields_to_clear.append("injection_impossibility_hours")
 
     if fields_to_clear:
         update_data = {field: None for field in fields_to_clear}
