@@ -13938,6 +13938,7 @@ components:
         - AIRLINE
         - ELEC
         - TRANSFERRED_ELEC
+        - BIOFUEL
       type: string
       description: |-
         * `DCA` - DCA
@@ -13946,6 +13947,7 @@ components:
         * `AIRLINE` - AIRLINE
         * `ELEC` - ELEC
         * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
+        * `BIOFUEL` - BIOFUEL
     FeedStock:
       type: object
       properties:
