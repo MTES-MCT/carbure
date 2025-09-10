@@ -1,4 +1,4 @@
-from decimal import Decimal, getcontext
+from decimal import getcontext
 from typing import Optional
 
 import numpy as np
@@ -218,23 +218,6 @@ class TeneurService:
             )
         ) / target_volume
         return min_emissions_rate, max_emissions_rate
-
-    @staticmethod
-    def _precise_volume_calculation(volume, multiplier):
-        """
-        Perform precise volume calculations using Decimal to avoid floating point errors.
-
-        Args:
-            volume: Original volume value
-            multiplier: Multiplication factor
-
-        Returns:
-            Precise calculated volume as float
-        """
-        volume_decimal = Decimal(str(volume))
-        multiplier_decimal = Decimal(str(multiplier))
-        result = volume_decimal * multiplier_decimal
-        return float(result)
 
     @staticmethod
     def prepare_data_and_optimize(data, unit):
