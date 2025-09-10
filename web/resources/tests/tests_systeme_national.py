@@ -18,7 +18,9 @@ class SystemeNationalTest(TestCase):
 
     def get_sn_certificates(self, query=""):
         url = reverse("resources-systeme-national")
-        return self.client.get(url, query_params={"query": query})
+        query_params = {"query": query} if query else {}
+        response = self.client.get(url, query_params=query_params)
+        return response.json()
 
     def test_list_sn_certificates(self):
         sn_cert: GenericCertificate = GenericCertificateFactory.create(
@@ -26,10 +28,10 @@ class SystemeNationalTest(TestCase):
             valid_until=self.active_valid_until,
         )
 
-        response = self.get_sn_certificates()
+        data = self.get_sn_certificates()
 
         self.assertEqual(
-            response.json(),
+            data,
             [
                 {
                     "certificate_id": sn_cert.certificate_id,
@@ -47,15 +49,15 @@ class SystemeNationalTest(TestCase):
             ],
         )
 
-    def test_list_only_sn_certificates(self):
+    def test_ignore_non_sn_certificates(self):
         GenericCertificateFactory.create(certificate_type=GenericCertificate.ISCC)
-        response = self.get_sn_certificates()
-        self.assertEqual(response.json(), [])
+        data = self.get_sn_certificates()
+        self.assertEqual(data, [])
 
     def test_list_only_active_sn_certificates(self):
         """
         Active certificates are the ones where their valid_from/valid_until timespan
-        covers the current date.
+        covers today's date.
         """
 
         today = date.today()
@@ -72,13 +74,12 @@ class SystemeNationalTest(TestCase):
             valid_until=today - relativedelta(years=1),
         )
 
-        response = self.get_sn_certificates()
-        data = response.json()
+        data = self.get_sn_certificates()
 
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["certificate_id"], active_cert.certificate_id)
 
-    def test_filter_system_national_certificates_by_certificate_id(self):
+    def test_search_sn_certificates_by_certificate_id(self):
         _cert_a = GenericCertificateFactory.create(
             certificate_id="ABCD",
             certificate_type=GenericCertificate.SYSTEME_NATIONAL,
@@ -91,13 +92,12 @@ class SystemeNationalTest(TestCase):
             valid_until=self.active_valid_until,
         )
 
-        response = self.get_sn_certificates(query="FG")
-        data = response.json()
+        data = self.get_sn_certificates(query="FG")
 
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["certificate_id"], cert_b.certificate_id)
 
-    def test_filter_system_national_certificates_by_certificate_holder(self):
+    def test_search_sn_certificates_by_certificate_holder(self):
         _cert_a = GenericCertificateFactory.create(
             certificate_id="ABCD",
             certificate_holder="Alice",
@@ -112,8 +112,7 @@ class SystemeNationalTest(TestCase):
             valid_until=self.active_valid_until,
         )
 
-        response = self.get_sn_certificates(query="ob")
-        data = response.json()
+        data = self.get_sn_certificates(query="ob")
 
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["certificate_id"], cert_b.certificate_id)
