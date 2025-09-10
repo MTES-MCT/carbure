@@ -59,5 +59,5 @@ const auditor = {
 }
 
 export default function pickApi(entity: EntityManager) {
-  return entity.isAdmin ? admin : auditor
+  return entity.isAdmin || entity.isExternal ? admin : auditor
 }

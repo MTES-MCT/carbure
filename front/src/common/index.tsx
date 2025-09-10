@@ -136,6 +136,7 @@ const Org = () => {
   const isTiruertAdmin = isExternal && entity.hasAdminRight("TIRIB")
   const isTransferElecAdmin =
     isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
+  const isBiofuelAdmin = isExternal && entity.hasAdminRight("BIOFUEL")
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
   )
@@ -220,7 +221,7 @@ const Org = () => {
         </>
       )}
 
-      {(isAdmin || isAuditor) && (
+      {(isAdmin || isBiofuelAdmin || isAuditor) && (
         <>
           <Route path="controls/:year/*" element={<Controls />} />
           <Route
