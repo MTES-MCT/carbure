@@ -96,12 +96,14 @@ def send_email_to_cpo(application: ElecMeterReadingApplication, request: HttpReq
     quarter = f"T{application.quarter} {application.year}"
     total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum("renewable_energy"))["total_energy"], 2)
     meter_reading_count = application.elec_meter_readings.count()
-    meter_reading_link = f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec/{application.year}/provisioned"
+    meter_reading_link = (
+        f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec-v2/certificates/{application.year}/provision"
+    )
     recipients = [
         r.user.email for r in UserRights.objects.filter(entity=application.cpo, role=UserRights.ADMIN).select_related("user")
     ]
 
-    # Send email to the first admin of the entity related to the elec application
+    # Send email to all admin of the entity related to the elec application
     recipient_list = recipients if len(recipients) > 0 else ["carbure@beta.gouv.fr"]
 
     text_message = f"""

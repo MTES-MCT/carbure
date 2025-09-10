@@ -36,5 +36,7 @@
 
   "producer": "Producer",
   "sanitary_approval_number": "Sanitary approval no.",
-  "hygienization_exemption_type": "Hygienization exemption"
+  "hygienization_exemption_type": "Hygienization exemption",
+
+  "password2": "Password"
 }

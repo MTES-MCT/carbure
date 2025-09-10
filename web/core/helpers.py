@@ -927,6 +927,8 @@ def send_email_declaration_invalidated(declaration, request):
 
 def send_mail(request, subject, message, from_email, recipient_list, html_message=None, **kwargs):
     if not CarbureEnv.is_prod and not CarbureEnv.is_local and request is not None:
+        # Add recipient_list add the end of the message when environment is not prod or local
+        message = f"{message} \n\n {recipient_list}"
         if request.user.is_authenticated:
             if request.user.email in recipient_list:
                 recipient_list = [request.user.email]

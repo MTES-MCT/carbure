@@ -58,8 +58,13 @@ export function useNotifyError() {
       }
     } else if (error instanceof HttpError) {
       if (error.data instanceof Object) {
-        console.log("error.data", error.data)
-        errorText = <FormErrors errors={error.data} />
+        // Check if error.data is a record of <string, string[]>
+        const isRecordOfStringArrays = Object.values(error.data).every(
+          (value) => Array.isArray(value)
+        )
+        if (isRecordOfStringArrays) {
+          errorText = <FormErrors errors={error.data} />
+        }
       }
     }
 
