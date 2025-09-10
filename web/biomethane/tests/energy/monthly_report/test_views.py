@@ -69,19 +69,15 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
         params = {**self.base_params, "year": self.current_year}
 
         # Create monthly reports
-        BiomethaneEnergyMonthlyReport.objects.create(
-            energy=energy,
-            **self.valid_monthly_reports_data[0],
-        )
-
-        BiomethaneEnergyMonthlyReport.objects.create(
-            energy=energy,
-            **self.valid_monthly_reports_data[1],
-        )
+        for report in self.valid_monthly_reports_data:
+            BiomethaneEnergyMonthlyReport.objects.create(
+                energy=energy,
+                **report,
+            )
 
         response = self.client.get(self.monthly_report_url, params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-        assert_object_contains_data(self, response.data[0], self.valid_monthly_reports_data[0])
-        assert_object_contains_data(self, response.data[1], self.valid_monthly_reports_data[1])
+        for i, report in enumerate(response.data):
+            assert_object_contains_data(self, report, self.valid_monthly_reports_data[i])

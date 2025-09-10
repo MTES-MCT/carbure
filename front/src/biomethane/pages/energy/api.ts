@@ -47,12 +47,13 @@ export const validateEnergy = (entity_id: number) =>
     },
   })
 
-export const getMonthlyReports = (entity_id: number) =>
+export const getMonthlyReports = (entity_id: number, year: number) =>
   api
     .GET("/biomethane/energy/monthly-reports/", {
       params: {
         query: {
           entity_id,
+          year,
         },
       },
     })

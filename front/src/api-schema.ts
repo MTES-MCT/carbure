@@ -380,6 +380,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Retrieve the energy declaration monthly reports for the current entity and year */
         get: operations["biomethane_energy_monthly_reports_list"];
         /** @description Create or update monthly reports for the specified energy declaration. */
         put: operations["biomethane_energy_monthly_reports_update"];
@@ -6286,6 +6287,8 @@ export interface operations {
                 ordering?: string;
                 /** @description A search term. */
                 search?: string;
+                /** @description Declaration year. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6293,6 +6296,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Energy declaration monthly reports for the year */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6300,6 +6304,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneEnergyMonthlyReport"][];
                 };
+            };
+            /** @description Energy monthly reports not found for this entity and year. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
