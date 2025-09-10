@@ -1,4 +1,5 @@
 from copy import copy
+from decimal import Decimal
 
 from django.db import models, transaction
 
@@ -235,12 +236,13 @@ def ep2_processing(lots):
             new_lot_conv = copy(lot)
             new_lot_conv.feedstock = copy(lot.feedstock)
             new_lot_conv.feedstock.category = MatierePremiere.CONV
-            new_lot_conv.volume = lot.volume * 0.4
+            volume_decimal = Decimal(str(lot.volume))
+            new_lot_conv.volume = float(volume_decimal * Decimal("0.4"))
 
             new_lot_ep2 = copy(lot)
             new_lot_ep2.feedstock = copy(lot.feedstock)
             new_lot_ep2.feedstock.category = MatierePremiere.EP2AM
-            new_lot_ep2.volume = lot.volume * 0.6
+            new_lot_ep2.volume = float(volume_decimal * Decimal("0.6"))
 
             result_lots.append(new_lot_conv)
             result_lots.append(new_lot_ep2)
