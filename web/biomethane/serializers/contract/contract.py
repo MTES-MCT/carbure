@@ -33,6 +33,9 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
         required_fields = []
         contract = self.instance
 
+        if not contract and "tariff_reference" not in validated_data:
+            errors["tariff_reference"] = [_("Ce champ est obligatoire pour la création d'un contrat.")]
+
         contract_fields = [
             "signature_date",
             "effective_date",
@@ -57,7 +60,7 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
 
         # Tariff rule 1
         if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-            required_fields += ["cmax", "cmax_annualized", "installation_category"]
+            required_fields += ["cmax", "cmax_annualized", "installation_category", "buyer"]
 
             cmax_annualized = validated_data.get("cmax_annualized")
             cmax_annualized_value = validated_data.get("cmax_annualized_value")
@@ -69,14 +72,11 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
 
         # Tariff rule 2
         elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-            required_fields.append("pap_contracted")
+            required_fields += ["pap_contracted", "installation_category", "buyer"]
 
         # Rules regarding contract dates
         signature_date = validated_data.get("signature_date")
         effective_date = validated_data.get("effective_date")
-
-        if tariff_reference is None:
-            tariff_reference = contract.tariff_reference if contract else None
 
         if signature_date and effective_date:
             if effective_date <= signature_date:
