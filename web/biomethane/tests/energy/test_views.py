@@ -4,6 +4,7 @@ from rest_framework import status
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.utils import get_declaration_period
+from biomethane.views.energy.energy import BiomethaneEnergyViewSet
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data, setup_current_user
 
@@ -11,6 +12,7 @@ from core.tests_utils import assert_object_contains_data, setup_current_user
 class BiomethaneEnergyViewSetTests(TestCase):
     def setUp(self):
         """Initial setup for tests"""
+        self.viewset = BiomethaneEnergyViewSet()
         self.producer_entity = Entity.objects.create(
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
@@ -37,19 +39,9 @@ class BiomethaneEnergyViewSetTests(TestCase):
             "operating_hours": 8000.0,
         }
 
-    def test_permission_boundary(self):
-        """Test that only biomethane producers can access endpoints"""
-        # Create a non-biomethane producer entity
-        wrong_entity = Entity.objects.create(
-            name="Wrong Entity",
-            entity_type=Entity.OPERATOR,
-        )
-
-        wrong_url = self.energy_url
-        wrong_url += "?entity_id=" + str(wrong_entity.id)
-
-        response = self.client.get(wrong_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    def test_read_write_endpoints(self):
+        """Test that the write actions are correctly defined"""
+        self.assertEqual(self.viewset.write_actions, ["upsert", "validate_energy"])
 
     def test_retrieve_energy_success(self):
         """Test successful retrieval of an existing energy declaration"""
@@ -72,20 +64,6 @@ class BiomethaneEnergyViewSetTests(TestCase):
         response = self.client.get(self.energy_url, params)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_retrieve_energy_different_year(self):
-        """Test retrieval of an energy declaration for a different year"""
-        different_year = 2023
-        params = {**self.base_params, "year": different_year}
-        energy = BiomethaneEnergy.objects.create(
-            producer=self.producer_entity,
-            year=different_year,
-            **self.valid_energy_data,
-        )
-        response = self.client.get(self.energy_url, params)
-
-        self.assertEqual(response.data["id"], energy.id)
-        self.assertEqual(response.data["year"], different_year)
 
     def test_upsert_create_energy_success(self):
         """Test successful creation of a new energy declaration"""

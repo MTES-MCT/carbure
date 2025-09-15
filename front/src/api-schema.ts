@@ -6267,7 +6267,7 @@ export interface operations {
                     "application/json": components["schemas"]["BiomethaneEnergy"];
                 };
             };
-            /** @description Digestate declaration created successfully */
+            /** @description Energy declaration created successfully */
             201: {
                 headers: {
                     [name: string]: unknown;

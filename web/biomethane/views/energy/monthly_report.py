@@ -5,14 +5,13 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.mixins.permissions import BiomethanePermissionsMixin
 from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
 from biomethane.serializers.energy import (
     BiomethaneEnergyMonthlyReportInputSerializer,
     BiomethaneEnergyMonthlyReportSerializer,
 )
 from biomethane.utils import get_declaration_period
-from core.models import Entity, UserRights
-from core.permissions import HasUserRights
 
 
 @extend_schema(
@@ -26,22 +25,17 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin):
+class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin, BiomethanePermissionsMixin):
     queryset = BiomethaneEnergyMonthlyReport.objects.all()
     serializer_class = BiomethaneEnergyMonthlyReportSerializer
-    permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
-    def get_permissions(self):
-        if self.action in [
-            "upsert",
-        ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
-        return super().get_permissions()
+    write_actions = ["upsert"]
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
         setattr(request, "year", get_declaration_period())
+
         return request
 
     def get_serializer_context(self):

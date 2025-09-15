@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.mixins.permissions import BiomethanePermissionsMixin
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.serializers.energy.energy import (
     BiomethaneEnergyInputSerializer,
@@ -12,8 +13,6 @@ from biomethane.serializers.energy.energy import (
 from biomethane.utils import get_declaration_period
 from biomethane.views.energy.mixins.validate import ValidateActionMixin
 from biomethane.views.energy.mixins.years import YearsActionMixin
-from core.models import Entity, UserRights
-from core.permissions import HasUserRights
 
 
 @extend_schema(
@@ -27,19 +26,11 @@ from core.permissions import HasUserRights
         ),
     ]
 )
-class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin):
+class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin, BiomethanePermissionsMixin):
     queryset = BiomethaneEnergy.objects.all()
     serializer_class = BiomethaneEnergySerializer
-    permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
-
-    def get_permissions(self):
-        if self.action in [
-            "upsert",
-            "validate_energy",
-        ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
-        return super().get_permissions()
+    write_actions = ["upsert", "validate_energy"]
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
@@ -59,6 +50,10 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
         if self.action == "upsert":
             return BiomethaneEnergyInputSerializer
         return super().get_serializer_class()
+
+    def get_queryset(self):
+        year = self.request.query_params.get("year") if self.action == "retrieve" else self.request.year
+        return self.queryset.filter(producer=self.request.entity, year=year)
 
     @extend_schema(
         parameters=[
@@ -81,8 +76,7 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            year = request.query_params.get("year")
-            energy = BiomethaneEnergy.objects.get(producer=request.entity, year=year)
+            energy = self.get_queryset().get()
             data = self.get_serializer(energy, many=False).data
             return Response(data)
 
@@ -105,7 +99,7 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
     )
     def upsert(self, request, *args, **kwargs):
         try:
-            energy = BiomethaneEnergy.objects.get(producer=request.entity, year=request.year)
+            energy = self.get_queryset().get()
             serializer = self.get_serializer(energy, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneEnergy.DoesNotExist:

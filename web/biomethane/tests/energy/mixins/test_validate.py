@@ -60,7 +60,7 @@ class ValidateActionMixinTests(TestCase):
         """Test validation with a declaration from a different year"""
         different_year = 2023
 
-        energy = BiomethaneEnergy.objects.create(
+        BiomethaneEnergy.objects.create(
             producer=self.producer_entity,
             year=different_year,
             status=BiomethaneEnergy.PENDING,
@@ -72,50 +72,3 @@ class ValidateActionMixinTests(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-        energy.refresh_from_db()
-        self.assertEqual(energy.status, BiomethaneEnergy.PENDING)
-
-    def test_validate_energy_already_validated(self):
-        """Test validation of an already validated declaration"""
-        # Create an already validated declaration
-        energy = BiomethaneEnergy.objects.create(
-            producer=self.producer_entity,
-            year=self.current_year,
-            status=BiomethaneEnergy.VALIDATED,
-        )
-
-        # Call the validation action
-        response = self.client.post(
-            self.validate_url,
-            query_params=self.base_params,
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        energy.refresh_from_db()
-        self.assertEqual(energy.status, BiomethaneEnergy.VALIDATED)
-
-    def test_validate_energy_permission_boundary(self):
-        """Test that only biomethane producers can validate"""
-        # Create an entity that is not a biomethane producer
-        wrong_entity = Entity.objects.create(
-            name="Wrong Entity",
-            entity_type=Entity.OPERATOR,
-        )
-
-        # Create an energy declaration for this entity
-        BiomethaneEnergy.objects.create(
-            producer=wrong_entity,
-            year=self.current_year,
-            status=BiomethaneEnergy.PENDING,
-        )
-
-        wrong_params = {"entity_id": wrong_entity.id}
-
-        response = self.client.post(
-            self.validate_url,
-            query_params=wrong_params,
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

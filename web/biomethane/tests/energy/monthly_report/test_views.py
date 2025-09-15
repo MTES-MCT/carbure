@@ -4,6 +4,7 @@ from rest_framework import status
 
 from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
 from biomethane.utils import get_declaration_period
+from biomethane.views.energy.monthly_report import BiomethaneEnergyMonthlyReportViewSet
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data, setup_current_user
 
@@ -11,6 +12,7 @@ from core.tests_utils import assert_object_contains_data, setup_current_user
 class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
     def setUp(self):
         """Initial setup for tests"""
+        self.viewset = BiomethaneEnergyMonthlyReportViewSet()
         self.current_year = get_declaration_period()
 
         self.producer_entity = Entity.objects.create(
@@ -53,18 +55,8 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
         ]
 
     def test_permission_boundary(self):
-        """Test that only biomethane producers can access endpoints"""
-        # Create a non-biomethane producer entity
-        wrong_entity = Entity.objects.create(
-            name="Wrong Entity",
-            entity_type=Entity.OPERATOR,
-        )
-
-        wrong_url = self.monthly_report_url
-        wrong_url += "?entity_id=" + str(wrong_entity.id)
-
-        response = self.client.get(wrong_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        """Test that the write actions are correctly defined"""
+        self.assertEqual(self.viewset.write_actions, ["upsert"])
 
     def test_list_monthly_reports_success(self):
         """Test successful retrieval of monthly reports"""

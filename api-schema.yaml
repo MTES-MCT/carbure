@@ -1021,6 +1021,7 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "200":
           content:
@@ -1057,6 +1058,7 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "200":
           content:
@@ -1069,7 +1071,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneEnergy"
-          description: Digestate declaration created successfully
+          description: Energy declaration created successfully
   /api/biomethane/energy/monthly-reports/:
     get:
       operationId: biomethane_energy_monthly_reports_list
@@ -1105,6 +1107,7 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "200":
           content:
@@ -1149,6 +1152,7 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "201":
           description: Monthly reports created or updated successfully
@@ -1167,6 +1171,7 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "200":
           description: No response body
@@ -1185,6 +1190,7 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "200":
           content:
