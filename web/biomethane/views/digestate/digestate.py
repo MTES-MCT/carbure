@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters.digestate import BiomethaneDigestateFilter
+from biomethane.filters.digestate import BiomethaneDigestateFilter, BiomethaneDigestateRetrieveFilter
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.serializers.digestate import (
     BiomethaneDigestateInputSerializer,
@@ -79,7 +79,7 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
+            digestate = BiomethaneDigestateRetrieveFilter(request.GET, queryset=self.get_queryset()).qs.get()
             data = self.get_serializer(digestate, many=False).data
             return Response(data)
 
@@ -102,7 +102,7 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
     )
     def upsert(self, request, *args, **kwargs):
         try:
-            digestate = BiomethaneDigestate.objects.get(producer=request.entity, year=request.year)
+            digestate = BiomethaneDigestateFilter(request.GET, queryset=self.get_queryset()).qs.get()
             serializer = self.get_serializer(digestate, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneDigestate.DoesNotExist:
