@@ -1,35 +1,23 @@
+from django.db import transaction
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from core.models import Biocarburant, MatierePremiere, Pays
+from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
+from certificates.models import ProductionSiteCertificate
+from core.models import Biocarburant, CarbureLot, EntityCertificate, GenericCertificate, MatierePremiere, Pays
 from core.serializers import GenericCertificateSerializer
+from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.models import ProductionSite
-
-
-class EntityFeedStockSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MatierePremiere
-        fields = ["name", "name_en", "code", "category", "is_double_compte"]
-
-
-class EntityBiofuelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Biocarburant
-        fields = ["name", "name_en", "code"]
-
-
-class EntityCountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pays
-        fields = ["name", "name_en", "code_pays", "is_in_europe"]
+from transactions.models.site import Site
 
 
 class EntityProductionSiteSerializer(serializers.ModelSerializer):
-    country = EntityCountrySerializer(read_only=True)
+    country = CountrySerializer(read_only=True)
     inputs = serializers.SerializerMethodField()
     outputs = serializers.SerializerMethodField()
-    certificates = GenericCertificateSerializer(many=True)
+    certificates = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductionSite
@@ -54,14 +42,158 @@ class EntityProductionSiteSerializer(serializers.ModelSerializer):
             "outputs",
         ]
 
-    @extend_schema_field(EntityFeedStockSerializer(many=True))
-    def get_inputs(self, obj):
-        inputs = ProductionSiteInput.objects.filter(production_site=obj)
+    @extend_schema_field(FeedStockSerializer(many=True))
+    def get_inputs(self, production_site):
+        inputs = ProductionSiteInput.objects.filter(production_site=production_site).select_related("matiere_premiere")
         feedstocks = [input.matiere_premiere for input in inputs]
-        return EntityFeedStockSerializer(feedstocks, many=True).data
+        return FeedStockSerializer(feedstocks, many=True).data
 
-    @extend_schema_field(EntityBiofuelSerializer(many=True))
-    def get_outputs(self, obj):
-        inputs = ProductionSiteOutput.objects.filter(production_site=obj)
-        biofuels = [input.biocarburant for input in inputs]
-        return EntityBiofuelSerializer(biofuels, many=True).data
+    @extend_schema_field(BiofuelSerializer(many=True))
+    def get_outputs(self, production_site):
+        outputs = ProductionSiteOutput.objects.filter(production_site=production_site).select_related("biocarburant")
+        biofuels = [output.biocarburant for output in outputs]
+        return BiofuelSerializer(biofuels, many=True).data
+
+    @extend_schema_field(GenericCertificateSerializer(many=True))
+    def get_certificates(self, production_site):
+        certificates = ProductionSiteCertificate.objects.filter(production_site=production_site).select_related(
+            "certificate", "certificate__certificate"
+        )
+        certificates = [certificate.certificate.certificate for certificate in certificates]
+        return GenericCertificateSerializer(certificates, many=True).data
+
+
+class EntityProductionSiteWriteSerializer(serializers.ModelSerializer):
+    inputs = serializers.SlugRelatedField(
+        many=True,
+        slug_field="code",
+        queryset=MatierePremiere.objects.all(),
+    )
+
+    outputs = serializers.SlugRelatedField(
+        many=True,
+        slug_field="code",
+        queryset=Biocarburant.objects.all(),
+    )
+
+    certificates = serializers.SlugRelatedField(
+        many=True,
+        slug_field="certificate_id",
+        queryset=GenericCertificate.objects.all(),
+    )
+
+    country_code = serializers.SlugRelatedField(
+        source="country",
+        slug_field="code_pays",
+        queryset=Pays.objects.all(),
+    )
+
+    class Meta:
+        model = ProductionSite
+        fields = [
+            "address",
+            "certificates",
+            "city",
+            "country_code",
+            "date_mise_en_service",
+            "dc_reference",
+            "eligible_dc",
+            "ges_option",
+            "inputs",
+            "manager_email",
+            "manager_name",
+            "manager_phone",
+            "name",
+            "outputs",
+            "postal_code",
+            "site_siret",
+        ]
+
+    # use the Read serializer when consuming this serializer in a response
+    def to_representation(self, instance):
+        return EntityProductionSiteSerializer(instance, context=self.context).data
+
+    def validate_inputs(self, value):
+        if not value:
+            message = serializers.Field.default_error_messages["required"]
+            raise serializers.ValidationError(message)
+        return value
+
+    def validate_outputs(self, value):
+        if not value:
+            message = serializers.Field.default_error_messages["required"]
+            raise serializers.ValidationError(message)
+        return value
+
+    @transaction.atomic
+    def create(self, validated_data):
+        feedstocks, biofuels, certificates = self.extract_relations(validated_data)
+
+        production_site = Site.objects.create(
+            **validated_data,
+            site_type=Site.PRODUCTION_BIOLIQUID,
+            created_by_id=self.context.get("entity_id"),
+        )
+
+        self.set_relations(production_site, feedstocks, biofuels, certificates)
+
+        return production_site
+
+    @transaction.atomic
+    def update(self, production_site, validated_data):
+        feedstocks, biofuels, certificates = self.extract_relations(validated_data)
+
+        for attr, value in validated_data.items():
+            setattr(production_site, attr, value)
+        production_site.save()
+
+        self.set_relations(production_site, feedstocks, biofuels, certificates)
+
+        return production_site
+
+    def extract_relations(self, validated_data):
+        inputs = validated_data.pop("inputs", None)
+        outputs = validated_data.pop("outputs", None)
+        certificates = validated_data.pop("certificates", None)
+
+        entity_id = self.context.get("entity_id")
+        if certificates:
+            entity_certificates = EntityCertificate.objects.filter(certificate__in=certificates, entity_id=entity_id)
+        else:
+            entity_certificates = None
+
+        return inputs, outputs, entity_certificates
+
+    def set_relations(self, production_site, feedstocks, biofuels, certificates):
+        entity_id = self.context.get("entity_id")
+
+        if feedstocks is not None:
+            ProductionSiteInput.objects.filter(production_site=production_site).delete()
+            inputs = [ProductionSiteInput(production_site=production_site, matiere_premiere=fs) for fs in feedstocks]
+            ProductionSiteInput.objects.bulk_create(inputs)
+
+        if biofuels is not None:
+            ProductionSiteOutput.objects.filter(production_site=production_site).delete()
+            outputs = [ProductionSiteOutput(production_site=production_site, biocarburant=bf) for bf in biofuels]
+            ProductionSiteOutput.objects.bulk_create(outputs)
+
+        if certificates is not None:
+            ProductionSiteCertificate.objects.filter(production_site=production_site).delete()
+            production_certificates = [
+                ProductionSiteCertificate(production_site=production_site, certificate=ct, entity_id=entity_id)
+                for ct in certificates
+            ]
+            ProductionSiteCertificate.objects.bulk_create(production_certificates)
+
+        # Find related biofuel transactions and trigger background checks
+
+        filter = Q()
+        if biofuels is not None:
+            filter |= Q(biofuel__in=biofuels)
+        if feedstocks is not None:
+            filter |= Q(feedstock__in=feedstocks)
+
+        impacted_txs = CarbureLot.objects.filter(carbure_production_site=production_site).filter(filter)
+
+        background_bulk_scoring(impacted_txs)
+        background_bulk_sanity_checks(impacted_txs)
