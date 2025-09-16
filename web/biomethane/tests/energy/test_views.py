@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -39,9 +41,15 @@ class BiomethaneEnergyViewSetTests(TestCase):
             "operating_hours": 8000.0,
         }
 
-    def test_read_write_endpoints(self):
+    @patch("biomethane.views.energy.energy.get_biomethane_permissions")
+    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
         """Test that the write actions are correctly defined"""
-        self.assertEqual(self.viewset.write_actions, ["upsert", "validate_energy"])
+        viewset = BiomethaneEnergyViewSet()
+        viewset.action = "retrieve"
+
+        viewset.get_permissions()
+
+        mock_get_biomethane_permissions.assert_called_once_with(["upsert", "validate_energy"], "retrieve")
 
     def test_retrieve_energy_success(self):
         """Test successful retrieval of an existing energy declaration"""

@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from web.biomethane.permissions import get_biomethane_permissions
 
-from biomethane.mixins.permissions import BiomethanePermissionsMixin
 from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
 from biomethane.serializers.energy import (
     BiomethaneEnergyMonthlyReportInputSerializer,
@@ -25,12 +25,13 @@ from biomethane.utils import get_declaration_period
         ),
     ]
 )
-class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin, BiomethanePermissionsMixin):
+class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin):
     queryset = BiomethaneEnergyMonthlyReport.objects.all()
     serializer_class = BiomethaneEnergyMonthlyReportSerializer
     pagination_class = None
 
-    write_actions = ["upsert"]
+    def get_permissions(self):
+        return get_biomethane_permissions(["upsert"], self.action)
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)

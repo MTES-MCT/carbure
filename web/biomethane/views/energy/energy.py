@@ -3,8 +3,8 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from web.biomethane.permissions import get_biomethane_permissions
 
-from biomethane.mixins.permissions import BiomethanePermissionsMixin
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.serializers.energy.energy import (
     BiomethaneEnergyInputSerializer,
@@ -26,11 +26,13 @@ from biomethane.views.energy.mixins.years import YearsActionMixin
         ),
     ]
 )
-class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin, BiomethanePermissionsMixin):
+class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin):
     queryset = BiomethaneEnergy.objects.all()
     serializer_class = BiomethaneEnergySerializer
     pagination_class = None
-    write_actions = ["upsert", "validate_energy"]
+
+    def get_permissions(self):
+        return get_biomethane_permissions(["upsert", "validate_energy"], self.action)
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
