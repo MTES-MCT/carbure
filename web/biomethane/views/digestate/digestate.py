@@ -53,16 +53,13 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         context["year"] = getattr(self.request, "year", None)
         return context
 
-    def get_serializer_class(self):
-        if self.action == "upsert":
-            return BiomethaneDigestateInputSerializer
-        return super().get_serializer_class()
-
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.action == "retrieve":
             return BiomethaneDigestateRetrieveFilter(self.request.GET, queryset=queryset).qs
         elif self.action == "upsert":
+            # force filtering by current declaration year
+            queryset = queryset.filter(year=self.request.year)
             return BiomethaneDigestateFilter(self.request.GET, queryset=queryset).qs
         return queryset
 
