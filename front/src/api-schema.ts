@@ -1454,84 +1454,20 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/entities/production-sites/{id}/delete/": {
+    "/api/entities/production-sites/{id}/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        post: operations["entities_production_sites_delete_create"];
-        delete?: never;
+        get: operations["entities_production_sites_retrieve"];
+        put: operations["entities_production_sites_update"];
+        post?: never;
+        delete: operations["entities_production_sites_destroy"];
         options?: never;
         head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/entities/production-sites/{id}/set-biofuels/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["entities_production_sites_set_biofuels_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/entities/production-sites/{id}/set-certificates/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["entities_production_sites_set_certificates_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/entities/production-sites/{id}/set-feedstocks/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["entities_production_sites_set_feedstocks_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/entities/production-sites/{id}/update/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["entities_production_sites_update_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
+        patch: operations["entities_production_sites_partial_update"];
         trace?: never;
     };
     "/api/entities/release-for-consumption/": {
@@ -3928,11 +3864,6 @@ export interface components {
             vat_number?: string;
             is_enabled?: boolean;
         };
-        EntityBiofuel: {
-            name: string;
-            name_en: string;
-            code: string;
-        };
         EntityCertificate: {
             readonly id: number;
             entity: components["schemas"]["Entity"];
@@ -3962,12 +3893,6 @@ export interface components {
             website?: string;
             vat_number?: string;
         };
-        EntityCountry: {
-            name: string;
-            name_en: string;
-            code_pays: string;
-            is_in_europe?: boolean;
-        };
         EntityDepot: {
             readonly id: number;
             customs_id?: string;
@@ -3994,13 +3919,6 @@ export interface components {
             useful_temperature?: number | null;
             is_enabled?: boolean;
         };
-        EntityFeedStock: {
-            name: string;
-            name_en: string;
-            code: string;
-            category?: components["schemas"]["MPCategoriesEnum"];
-            is_double_compte?: boolean;
-        };
         EntityMetrics: {
             entity: components["schemas"]["UserEntity"];
             users: number;
@@ -4026,7 +3944,7 @@ export interface components {
             readonly id: number;
             address?: string;
             name: string;
-            readonly country: components["schemas"]["EntityCountry"];
+            readonly country: components["schemas"]["Country"];
             /** Format: date */
             date_mise_en_service?: string | null;
             site_siret?: string;
@@ -4039,9 +3957,47 @@ export interface components {
             dc_reference?: string;
             dc_number?: string;
             city?: string;
-            certificates: components["schemas"]["GenericCertificate"][];
-            readonly inputs: components["schemas"]["EntityFeedStock"][];
-            readonly outputs: components["schemas"]["EntityBiofuel"][];
+            readonly certificates: components["schemas"]["GenericCertificate"][];
+            readonly inputs: components["schemas"]["FeedStock"][];
+            readonly outputs: components["schemas"]["Biofuel"][];
+        };
+        EntityProductionSiteWrite: {
+            address?: string;
+            certificates: string[];
+            city?: string;
+            country_code: string;
+            /** Format: date */
+            date_mise_en_service?: string | null;
+            dc_reference?: string;
+            eligible_dc?: boolean;
+            ges_option?: components["schemas"]["GesOptionEnum"];
+            inputs: string[];
+            manager_email?: string;
+            manager_name?: string;
+            manager_phone?: string;
+            name: string;
+            outputs: string[];
+            postal_code?: string;
+            site_siret?: string;
+        };
+        EntityProductionSiteWriteRequest: {
+            address?: string;
+            certificates: string[];
+            city?: string;
+            country_code: string;
+            /** Format: date */
+            date_mise_en_service?: string | null;
+            dc_reference?: string;
+            eligible_dc?: boolean;
+            ges_option?: components["schemas"]["GesOptionEnum"];
+            inputs: string[];
+            manager_email?: string;
+            manager_name?: string;
+            manager_phone?: string;
+            name: string;
+            outputs: string[];
+            postal_code?: string;
+            site_siret?: string;
         };
         EntitySite: {
             ownership_type: components["schemas"]["OwnershipTypeEnum"];
@@ -4604,6 +4560,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["EntityPreview"][];
         };
+        PaginatedEntityProductionSiteList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["EntityProductionSite"][];
+        };
         PaginatedOperationListList: {
             /** @example 123 */
             count: number;
@@ -4666,6 +4637,25 @@ export interface components {
             /** Format: double */
             quantity?: number;
         };
+        PatchedEntityProductionSiteWriteRequest: {
+            address?: string;
+            certificates?: string[];
+            city?: string;
+            country_code?: string;
+            /** Format: date */
+            date_mise_en_service?: string | null;
+            dc_reference?: string;
+            eligible_dc?: boolean;
+            ges_option?: components["schemas"]["GesOptionEnum"];
+            inputs?: string[];
+            manager_email?: string;
+            manager_name?: string;
+            manager_phone?: string;
+            name?: string;
+            outputs?: string[];
+            postal_code?: string;
+            site_siret?: string;
+        };
         PatchedOperationUpdateRequest: {
             to_depot?: number | null;
             status?: components["schemas"]["OperationStatusEnum"];
@@ -4726,24 +4716,6 @@ export interface components {
         ProductionSiteCertificateSertificate: {
             readonly type: string;
             readonly certificate_id: string;
-        };
-        ProductionSiteModelRequest: {
-            country_code: string;
-            country?: number | null;
-            name: string;
-            /** Format: date */
-            date_mise_en_service: string | null;
-            ges_option: components["schemas"]["GesOptionEnum"];
-            site_siret: string;
-            postal_code: string;
-            manager_name: string;
-            manager_phone: string;
-            manager_email: string;
-            city: string;
-            address: string;
-            eligible_dc: boolean;
-            dc_reference?: string;
-            created_by?: number | null;
         };
         ProvisionCertificateBulkRequest: {
             entity: string;
@@ -5049,18 +5021,8 @@ export interface components {
         SeachCompanyRequest: {
             registration_id: string;
         };
-        SetBioFuelsRequest: {
-            /** @description List of biocarburant codes. */
-            biocarburant_codes: string[];
-        };
-        SetCertificateRequest: {
-            certificate_ids: string[];
-        };
         SetDefaultCertificateRequest: {
             certificate_id: string;
-        };
-        SetFeedstocksRequest: {
-            matiere_premiere_codes: string[];
         };
         /**
          * @description * `PIPELINE` - PIPELINE
@@ -5243,23 +5205,6 @@ export interface components {
             vat_number?: string;
             /** Format: uri */
             website?: string;
-        };
-        UpdateProductionSiteModelRequest: {
-            country_code: string;
-            name: string;
-            /** Format: date */
-            date_mise_en_service?: string | null;
-            ges_option?: components["schemas"]["GesOptionEnum"];
-            site_siret?: string;
-            postal_code?: string;
-            manager_name?: string;
-            manager_phone?: string;
-            manager_email?: string;
-            city?: string;
-            address?: string;
-            eligible_dc?: boolean;
-            dc_reference?: string;
-            created_by?: number | null;
         };
         UpdateRightsRequestsRequest: {
             id: number;
@@ -8622,10 +8567,18 @@ export interface operations {
     entities_production_sites_list: {
         parameters: {
             query: {
-                /** @description Compay ID, Admin only */
+                /** @description Entity ID */
                 company_id?: number;
                 /** @description Entity ID */
                 entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
             };
             header?: never;
             path?: never;
@@ -8638,7 +8591,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EntityProductionSite"][];
+                    "application/json": components["schemas"]["PaginatedEntityProductionSiteList"];
                 };
             };
         };
@@ -8647,6 +8600,8 @@ export interface operations {
         parameters: {
             query: {
                 /** @description Entity ID */
+                company_id?: number;
+                /** @description Entity ID */
                 entity_id: number;
             };
             header?: never;
@@ -8655,9 +8610,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProductionSiteModelRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["ProductionSiteModelRequest"];
-                "multipart/form-data": components["schemas"]["ProductionSiteModelRequest"];
+                "application/json": components["schemas"]["EntityProductionSiteWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EntityProductionSiteWriteRequest"];
+                "multipart/form-data": components["schemas"]["EntityProductionSiteWriteRequest"];
             };
         };
         responses: {
@@ -8666,206 +8621,126 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DepotProductionSite"];
+                    "application/json": components["schemas"]["EntityProductionSiteWrite"];
                 };
             };
         };
     };
-    entities_production_sites_delete_create: {
+    entities_production_sites_retrieve: {
         parameters: {
             query: {
+                /** @description Entity ID */
+                company_id?: number;
                 /** @description Entity ID */
                 entity_id: number;
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de Production. */
+                /** @description A unique integer value identifying this Site de stockage de carburant. */
                 id: number;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Request successful. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EntityProductionSite"];
                 };
             };
         };
     };
-    entities_production_sites_set_biofuels_create: {
+    entities_production_sites_update: {
         parameters: {
             query: {
+                /** @description Entity ID */
+                company_id?: number;
                 /** @description Entity ID */
                 entity_id: number;
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de Production. */
+                /** @description A unique integer value identifying this Site de stockage de carburant. */
                 id: number;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SetBioFuelsRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SetBioFuelsRequest"];
-                "multipart/form-data": components["schemas"]["SetBioFuelsRequest"];
+                "application/json": components["schemas"]["EntityProductionSiteWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EntityProductionSiteWriteRequest"];
+                "multipart/form-data": components["schemas"]["EntityProductionSiteWriteRequest"];
             };
         };
         responses: {
-            /** @description Request successful. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EntityProductionSiteWrite"];
                 };
             };
         };
     };
-    entities_production_sites_set_certificates_create: {
+    entities_production_sites_destroy: {
         parameters: {
             query: {
+                /** @description Entity ID */
+                company_id?: number;
                 /** @description Entity ID */
                 entity_id: number;
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de Production. */
+                /** @description A unique integer value identifying this Site de stockage de carburant. */
                 id: number;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetCertificateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SetCertificateRequest"];
-                "multipart/form-data": components["schemas"]["SetCertificateRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Request successful. */
-            200: {
+            /** @description No response body */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
+                content?: never;
             };
         };
     };
-    entities_production_sites_set_feedstocks_create: {
+    entities_production_sites_partial_update: {
         parameters: {
             query: {
+                /** @description Entity ID */
+                company_id?: number;
                 /** @description Entity ID */
                 entity_id: number;
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de Production. */
+                /** @description A unique integer value identifying this Site de stockage de carburant. */
                 id: number;
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["SetFeedstocksRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["SetFeedstocksRequest"];
-                "multipart/form-data": components["schemas"]["SetFeedstocksRequest"];
+                "application/json": components["schemas"]["PatchedEntityProductionSiteWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedEntityProductionSiteWriteRequest"];
+                "multipart/form-data": components["schemas"]["PatchedEntityProductionSiteWriteRequest"];
             };
         };
         responses: {
-            /** @description Request successful. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    entities_production_sites_update_create: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Site de Production. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateProductionSiteModelRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["UpdateProductionSiteModelRequest"];
-                "multipart/form-data": components["schemas"]["UpdateProductionSiteModelRequest"];
-            };
-        };
-        responses: {
-            /** @description Request successful. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EntityProductionSiteWrite"];
                 };
             };
         };
