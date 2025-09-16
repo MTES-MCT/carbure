@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters import BiomethaneContractFilter
 from biomethane.models import BiomethaneContract
 from biomethane.serializers.contract import (
     BiomethaneContractInputSerializer,
@@ -27,6 +28,7 @@ from core.permissions import HasUserRights
 )
 class BiomethaneContractViewSet(GenericViewSet):
     queryset = BiomethaneContract.objects.all()
+    filterset_class = BiomethaneContractFilter
     serializer_class = BiomethaneContractSerializer
     permission_classes = [HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
@@ -60,7 +62,7 @@ class BiomethaneContractViewSet(GenericViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            contract = BiomethaneContract.objects.get(producer=request.entity)
+            contract = self.filter_queryset(self.get_queryset()).get()
             data = self.get_serializer(contract, many=False).data
             return Response(data)
 
@@ -78,7 +80,7 @@ class BiomethaneContractViewSet(GenericViewSet):
     def upsert(self, request, *args, **kwargs):
         """Create or update contract using upsert logic."""
         try:
-            contract = BiomethaneContract.objects.get(producer=request.entity)
+            contract = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(contract, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneContract.DoesNotExist:
