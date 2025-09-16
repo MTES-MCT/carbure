@@ -3,9 +3,10 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from web.biomethane.permissions import get_biomethane_permissions
 
+from biomethane.filters.energy import BiomethaneEnergyFilter, BiomethaneEnergyRetrieveFilter
 from biomethane.models.biomethane_energy import BiomethaneEnergy
+from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.energy.energy import (
     BiomethaneEnergyInputSerializer,
     BiomethaneEnergySerializer,
@@ -54,8 +55,12 @@ class BiomethaneEnergyViewSet(GenericViewSet, YearsActionMixin, ValidateActionMi
         return super().get_serializer_class()
 
     def get_queryset(self):
-        year = self.request.query_params.get("year") if self.action == "retrieve" else self.request.year
-        return self.queryset.filter(producer=self.request.entity, year=year)
+        queryset = super().get_queryset()
+        if self.action in ["upsert", "validate_energy"]:
+            queryset = queryset.filter(year=self.request.year)
+            return BiomethaneEnergyFilter(self.request.GET, queryset=queryset).qs
+
+        return BiomethaneEnergyRetrieveFilter(self.request.GET, queryset=queryset).qs
 
     @extend_schema(
         parameters=[
