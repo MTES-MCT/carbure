@@ -16,7 +16,7 @@ class BiomethaneContractFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneContract
 
-    entity = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
+    producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     buyer = Entity.objects.filter(entity_type=Entity.OPERATOR).order_by("?").first()
 
     # Tariff reference - choisir aléatoirement parmi les choix valides
@@ -101,7 +101,7 @@ class BiomethaneEntityConfigAmendmentFactory(factory.django.DjangoModelFactory):
 
 
 def create_contract_with_amendments(entity):
-    contract = BiomethaneSignedContractFactory(entity=entity)
+    contract = BiomethaneSignedContractFactory(producer=entity)
     BiomethaneEntityConfigAmendmentFactory.create_batch(
         2,
         contract=contract,

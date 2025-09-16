@@ -1,8 +1,7 @@
 import { api } from "common/services/api-fetch"
 import {
   BiomethaneProductionUnitPatchRequest,
-  BiomethaneDigestateStorageAddRequest,
-  BiomethaneDigestateStoragePatchRequest,
+  BiomethaneDigestateStorageInputRequest,
 } from "./types"
 
 // Production Unit API
@@ -48,7 +47,7 @@ export const getDigestateStorages = async (entity_id: number) => {
 
 export const addDigestateStorage = async (
   entity_id: number,
-  data: BiomethaneDigestateStorageAddRequest
+  data: BiomethaneDigestateStorageInputRequest
 ) => {
   const response = await api.POST("/biomethane/digestate-storage/", {
     params: {
@@ -64,7 +63,7 @@ export const addDigestateStorage = async (
 export const updateDigestateStorage = async (
   entity_id: number,
   id: number,
-  data: BiomethaneDigestateStoragePatchRequest
+  data: BiomethaneDigestateStorageInputRequest
 ) => {
   const response = await api.PATCH("/biomethane/digestate-storage/{id}/", {
     params: {

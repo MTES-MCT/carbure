@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from core.models import Entity
 
@@ -12,7 +14,7 @@ class BiomethaneInjectionSite(models.Model):
         (DISTRIBUTION, "Dristribution"),
     ]
 
-    entity = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_injection_site")
+    producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_injection_site")
 
     # Numéro d'identifiant unique du poste d'injection
     unique_identification_number = models.CharField(max_length=32, unique=True)
@@ -41,3 +43,26 @@ class BiomethaneInjectionSite(models.Model):
     class Meta:
         db_table = "biomethane_injection_site"
         verbose_name = "Biométhane - Site d'injection"
+
+
+@receiver(post_save, sender=BiomethaneInjectionSite)
+def clear_injection_site_fields_on_save(sender, instance, **kwargs):
+    """
+    Clear specific BiomethaneInjectionSite fields based on boolean field values.
+
+    This signal is triggered when a BiomethaneInjectionSite is saved and clears
+    fields that should be reset based on the configuration changes.
+    """
+    fields_to_clear = []
+
+    # Clear meter number if injection site is not shared
+    if not instance.is_shared_injection_site:
+        fields_to_clear.append("meter_number")
+
+    # Clear address fields if injection site is same as production site
+    if not instance.is_different_from_production_site:
+        fields_to_clear.extend(["company_address", "city", "postal_code"])
+
+    if fields_to_clear:
+        update_data = {field: None for field in fields_to_clear}
+        BiomethaneInjectionSite.objects.filter(pk=instance.pk).update(**update_data)

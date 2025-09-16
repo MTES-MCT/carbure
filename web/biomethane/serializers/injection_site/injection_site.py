@@ -13,30 +13,28 @@ class BiomethaneInjectionSiteSerializer(serializers.ModelSerializer):
 class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneInjectionSite
-        exclude = ["entity"]
+        exclude = ["producer"]
 
     def validate(self, data):
+        validated_data = super().validate(data)
+
         errors = {}
 
-        entity = self.context.get("entity")
-        data["entity"] = entity
-
-        if data.get("is_shared_injection_site") and not data.get("meter_number"):
+        if validated_data.get("is_shared_injection_site") and not validated_data.get("meter_number"):
             errors["meter_number"] = [_("Ce champ est obligatoire.")]
-        elif not data.get("is_shared_injection_site"):
-            data["meter_number"] = None
 
-        if data.get("is_different_from_production_site"):
+        if validated_data.get("is_different_from_production_site"):
             required_fields = ["company_address", "city", "postal_code"]
             for field in required_fields:
-                if not data.get(field):
+                if not validated_data.get(field):
                     errors[field] = [_("Ce champ est obligatoire.")]
-        else:
-            data["company_address"] = None
-            data["city"] = None
-            data["postal_code"] = None
 
         if errors:
             raise serializers.ValidationError(errors)
 
-        return super().validate(data)
+        return validated_data
+
+    def create(self, validated_data):
+        entity = self.context.get("entity")
+        validated_data["producer"] = entity
+        return super().create(validated_data)

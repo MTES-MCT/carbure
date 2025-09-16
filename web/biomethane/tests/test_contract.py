@@ -46,9 +46,9 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
 
         response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(BiomethaneContract.objects.filter(entity=self.producer_entity).exists())
+        self.assertTrue(BiomethaneContract.objects.filter(producer=self.producer_entity).exists())
 
-        contract = BiomethaneContract.objects.get(entity=self.producer_entity)
+        contract = BiomethaneContract.objects.get(producer=self.producer_entity)
         self.assertEqual(contract.tariff_reference, "2011")
         self.assertEqual(contract.buyer_id, self.buyer_entity.id)
         self.assertEqual(contract.cmax, 100.0)
@@ -63,7 +63,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
         response = self.client.put(self.contract_url, data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        contract = BiomethaneContract.objects.get(entity=self.producer_entity)
+        contract = BiomethaneContract.objects.get(producer=self.producer_entity)
         self.assertEqual(contract.tariff_reference, "2021")
         self.assertEqual(contract.pap_contracted, 50.0)
 
@@ -96,18 +96,18 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
 
     def test_list_contract_exists(self):
         BiomethaneContract.objects.create(
-            entity=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
+            producer=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
         )
 
         response = self.client.get(self.contract_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["entity"], self.producer_entity.id)
+        self.assertEqual(response.data["producer"], self.producer_entity.id)
         self.assertEqual(response.data["buyer"], self.buyer_entity.id)
 
     def test_patch_contract_basic_fields(self):
         contract = BiomethaneContract.objects.create(
-            entity=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
+            producer=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
         )
 
         data = {"pap_contracted": 75.0}
@@ -119,7 +119,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
 
     def test_patch_contract_signed_cannot_update_contract_fields(self):
         BiomethaneContract.objects.create(
-            entity=self.producer_entity,
+            producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2021",
             pap_contracted=50.0,
@@ -228,7 +228,7 @@ class BiomethaneEntityConfigContractViewSetTests(TestCase):
 
     def test_update_red_ii_status_on_patch(self):
         BiomethaneContract.objects.create(
-            entity=self.producer_entity,
+            producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2011",
             installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,

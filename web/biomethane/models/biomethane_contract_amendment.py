@@ -9,8 +9,8 @@ from core import private_storage
 
 def rename_amendment_file(instance, filename):
     try:
-        contract = BiomethaneContract.objects.select_related("entity").get(id=instance.contract_id)
-        entity_name = slugify(contract.entity.name)
+        contract = BiomethaneContract.objects.select_related("producer").get(id=instance.contract_id)
+        entity_name = slugify(contract.producer.name)
     except BiomethaneContract.DoesNotExist:
         entity_name = "unknown"
 

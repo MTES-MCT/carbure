@@ -127,6 +127,10 @@
   border-radius: 0.25rem;
 }
 
+.checkbox--read-only input[type="checkbox"] + label {
+  font-size: 14px;
+}
+
 .checkbox--small[type="checkbox"] {
   --checkbox-size: 16px;
 }
