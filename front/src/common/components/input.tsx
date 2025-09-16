@@ -321,7 +321,7 @@ export const Input = ({
       ref={inputRef}
       required={props.required}
       step={step}
-      title={`${value}`}
+      title={props.type !== "password" ? `${value}` : undefined}
       type={props.type}
       value={value}
     />
