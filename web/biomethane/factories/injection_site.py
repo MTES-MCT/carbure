@@ -1,10 +1,13 @@
 import random
 
 import factory
+from faker import Faker
 
 from biomethane.models import BiomethaneInjectionSite
 from core.models import Entity
 from entity.factories.entity import EntityFactory
+
+faker = Faker()
 
 
 class BiomethaneInjectionSiteFactory(factory.django.DjangoModelFactory):
@@ -16,17 +19,14 @@ class BiomethaneInjectionSiteFactory(factory.django.DjangoModelFactory):
     unique_identification_number = factory.Faker("lexify", text="?????")
     is_shared_injection_site = factory.Faker("boolean")
     meter_number = factory.LazyAttribute(
-        lambda obj: factory.Faker("lexify", text="????") if obj.is_shared_injection_site else None
+        lambda obj: faker.lexify(text="?????") if obj.is_different_from_production_site else None
     )
     is_different_from_production_site = factory.Faker("boolean")
-    company_address = factory.LazyAttribute(
-        lambda obj: factory.Faker("address") if obj.is_different_from_production_site else None
-    )
-    city = factory.LazyAttribute(lambda obj: factory.Faker("city") if obj.is_different_from_production_site else None)
+    company_address = factory.LazyAttribute(lambda obj: faker.address() if obj.is_different_from_production_site else None)
+    city = factory.LazyAttribute(lambda obj: faker.city() if obj.is_different_from_production_site else None)
 
-    postal_code = factory.LazyAttribute(
-        lambda obj: factory.Faker("postcode", length=5) if obj.is_different_from_production_site else None
-    )
+    postal_code = factory.LazyAttribute(lambda obj: faker.postcode() if obj.is_different_from_production_site else None)
+
     network_type = factory.LazyAttribute(
         lambda obj: random.choice([choice[0] for choice in BiomethaneInjectionSite.NETWORK_TYPE_CHOICES])
     )

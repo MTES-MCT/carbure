@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from web.biomethane.permissions import get_biomethane_permissions
 
 from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
+from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.energy import (
     BiomethaneEnergyMonthlyReportInputSerializer,
     BiomethaneEnergyMonthlyReportSerializer,
