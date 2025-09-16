@@ -308,7 +308,7 @@ export const ProductionSiteForm = ({
           getOptions={common.findFeedstocks}
           normalize={normalizeFeedstock}
           {...bind("matieres_premieres")}
-          // required
+          required
         />
         <TagAutocomplete
           readOnly={readOnly}
@@ -318,7 +318,7 @@ export const ProductionSiteForm = ({
           getOptions={common.findBiofuels}
           normalize={normalizeBiofuel}
           {...bind("biocarburants")}
-          // required
+          required
         />
 
         <Divider noMargin />
