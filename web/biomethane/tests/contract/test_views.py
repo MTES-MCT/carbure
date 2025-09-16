@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
+from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneSignedContractFactory
 from biomethane.models import BiomethaneContract
 from core.models import Entity
 from core.tests_utils import setup_current_user
@@ -35,7 +36,7 @@ class BiomethaneContractViewsTests(TestCase):
         )
 
         self.contract_url = reverse("biomethane-contract")
-        self.contract_url += "?entity_id=" + str(self.producer_entity.id)
+        self.base_params = {"entity_id": self.producer_entity.id}
 
     def test_create_contract_tariff_rule_1(self):
         """Test creating a contract with tariff rule 1."""
@@ -47,9 +48,8 @@ class BiomethaneContractViewsTests(TestCase):
             "cmax_annualized": False,
         }
 
-        response = self.client.put(self.contract_url, data, content_type="application/json")
+        response = self.client.put(self.contract_url, data, content_type="application/json", query_params=self.base_params)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(BiomethaneContract.objects.filter(producer=self.producer_entity).exists())
 
         contract = BiomethaneContract.objects.get(producer=self.producer_entity)
         self.assertEqual(contract.tariff_reference, data["tariff_reference"])
@@ -67,7 +67,7 @@ class BiomethaneContractViewsTests(TestCase):
             "pap_contracted": 50.0,
         }
 
-        response = self.client.put(self.contract_url, data, content_type="application/json")
+        response = self.client.put(self.contract_url, data, content_type="application/json", query_params=self.base_params)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         contract = BiomethaneContract.objects.get(producer=self.producer_entity)
@@ -77,11 +77,11 @@ class BiomethaneContractViewsTests(TestCase):
 
     def test_list_contract_exists(self):
         """Test retrieving an existing contract."""
-        BiomethaneContract.objects.create(
+        BiomethaneContractFactory.create(
             producer=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
         )
 
-        response = self.client.get(self.contract_url)
+        response = self.client.get(self.contract_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["producer"], self.producer_entity.id)
@@ -89,20 +89,20 @@ class BiomethaneContractViewsTests(TestCase):
 
     def test_patch_contract_basic_fields(self):
         """Test updating basic contract fields."""
-        contract = BiomethaneContract.objects.create(
+        contract = BiomethaneContractFactory.create(
             producer=self.producer_entity, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
         )
 
         data = {"pap_contracted": 75.0}
 
-        response = self.client.put(self.contract_url, data, content_type="application/json")
+        response = self.client.put(self.contract_url, data, content_type="application/json", query_params=self.base_params)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         contract.refresh_from_db()
         self.assertEqual(contract.pap_contracted, 75.0)
 
     def test_patch_contract_signed_cannot_update_contract_fields(self):
         """Test that certain fields cannot be modified on a signed contract."""
-        BiomethaneContract.objects.create(
+        BiomethaneSignedContractFactory.create(
             producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2021",
@@ -116,7 +116,7 @@ class BiomethaneContractViewsTests(TestCase):
             "effective_date": date(2025, 1, 1),
         }
 
-        response = self.client.put(self.contract_url, data, content_type="application/json")
+        response = self.client.put(self.contract_url, data, content_type="application/json", query_params=self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("signature_date", response.data)

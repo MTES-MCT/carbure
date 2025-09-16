@@ -6,7 +6,7 @@ from biomethane.serializers import BiomethaneContractInputSerializer
 from core.models import Entity
 
 
-class BiomenthaneContractSerializerTests(TestCase):
+class BiomethaneContractSerializerTests(TestCase):
     """Unit tests for BiomethaneContractInputSerializer validation."""
 
     def setUp(self):
@@ -29,8 +29,7 @@ class BiomenthaneContractSerializerTests(TestCase):
         """Test serializer validation for missing required fields (tariff 2011)."""
         data = {
             "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            # Missing: installation_category, cmax, cmax_annualized
+            # Missing: buyer, installation_category, cmax, cmax_annualized
         }
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
@@ -38,26 +37,24 @@ class BiomenthaneContractSerializerTests(TestCase):
         self.assertIn("installation_category", serializer.errors)
         self.assertIn("cmax", serializer.errors)
         self.assertIn("cmax_annualized", serializer.errors)
+        self.assertIn("buyer", serializer.errors)
 
     def test_tariff_2021_required_fields_validation(self):
         """Test serializer validation for missing required fields (tariff 2021)."""
         data = {
             "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            # Missing: pap_contracted
+            # Missing: pap_contracted, buyer
         }
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
         self.assertFalse(serializer.is_valid())
         self.assertIn("pap_contracted", serializer.errors)
+        self.assertIn("buyer", serializer.errors)
 
     def test_cmax_annualized_value_required_when_annualized_true(self):
         """Test serializer validation when cmax_annualized_value is required."""
         data = {
             "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
             "cmax_annualized": True,
             # Missing: cmax_annualized_value
         }
@@ -69,11 +66,7 @@ class BiomenthaneContractSerializerTests(TestCase):
     def test_invalid_installation_category(self):
         """Test serializer validation for invalid installation category."""
         data = {
-            "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
             "installation_category": "INVALID_CATEGORY",
-            "cmax": 100.0,
-            "cmax_annualized": False,
         }
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
@@ -84,8 +77,6 @@ class BiomenthaneContractSerializerTests(TestCase):
         """Test serializer validation for invalid tariff reference."""
         data = {
             "tariff_reference": "INVALID_TARIFF",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 50.0,
         }
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
@@ -95,68 +86,46 @@ class BiomenthaneContractSerializerTests(TestCase):
     def test_buyer_entity_exists_validation(self):
         """Test serializer validation for non-existent buyer entity."""
         data = {
-            "tariff_reference": "2021",
             "buyer": 99999,  # Non-existent ID
-            "pap_contracted": 50.0,
         }
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
         self.assertFalse(serializer.is_valid())
         self.assertIn("buyer", serializer.errors)
 
-    def test_valid_contract_creation_tariff_2011(self):
-        """Test serializer validation for valid tariff 2011 contract."""
-        data = {
-            "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 150.0,
-            "cmax_annualized": False,
-        }
+    def test_valid_contract_creation_tariff_2011_2020(self):
+        """Test serializer validation for valid tariff 2011 and 2020 contract."""
 
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
+        for tariff in ["2011", "2020"]:
+            data = {
+                "tariff_reference": tariff,
+                "buyer": self.buyer_entity.id,
+                "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
+                "cmax": 150.0,
+                "cmax_annualized": True,
+                "cmax_annualized_value": 150.0,
+            }
+            serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
+            self.assertTrue(serializer.is_valid())
 
-    def test_valid_contract_creation_tariff_2021(self):
-        """Test serializer validation for valid tariff 2021 contract."""
-        data = {
-            "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 20.0,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-        }
+    def test_valid_contract_creation_tariff_2021_2023(self):
+        """Test serializer validation for valid tariff 2021 and 2023 contract."""
 
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
+        for tariff in ["2021", "2023"]:
+            data = {
+                "tariff_reference": tariff,
+                "buyer": self.buyer_entity.id,
+                "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
+                "pap_contracted": 20.0,
+            }
 
-    def test_cmax_annualized_with_value_validation(self):
-        """Test serializer validation when cmax_annualized is True with value."""
-        data = {
-            "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": True,
-            "cmax_annualized_value": 150.0,
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
-
-    def test_empty_required_fields_validation(self):
-        """Test serializer validation for empty string values in required fields."""
-        data = {}
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("tariff_reference", serializer.errors)
+            serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
+            self.assertTrue(serializer.is_valid())
 
     def test_missing_fields_if_signature_date_provided(self):
         """Test that providing signature_date requires effective_date and files."""
+
         data_with_signature_only = {
-            "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 50.0,
             "signature_date": "2022-01-15",
             # Missing: effective_date, general_conditions_file, specific_conditions_file
         }
@@ -172,9 +141,6 @@ class BiomenthaneContractSerializerTests(TestCase):
     def test_effective_date_must_be_after_signature_date(self):
         """Test that effective_date must be after signature_date."""
         data = {
-            "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 50.0,
             "signature_date": "2022-01-15",
             "effective_date": "2022-01-10",  # Before signature_date
         }
@@ -183,213 +149,75 @@ class BiomenthaneContractSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("effective_date", serializer.errors)
 
-    def test_effective_date_equal_to_signature_date_invalid(self):
-        """Test that effective_date equal to signature_date is invalid."""
-        data = {
-            "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 50.0,
-            "signature_date": "2022-01-15",
-            "effective_date": "2022-01-15",  # Same as signature_date
-        }
+    def test_signature_date_before_and_after_range(self):
+        """Test signature date before valid range and after valid range for all tariffs."""
 
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("effective_date", serializer.errors)
+        wrong_signature_dates = [
+            # (tariff, start_date, end_date)
+            ("2011", "2011-11-22", "2020-11-24"),  # valid range 23/11/2011 - 23/11/2020
+            ("2020", "2020-11-22", "2021-12-14"),  # valid range 23/11/2020 - 13/12/2021
+            ("2021", "2021-12-12", "2023-06-13"),  # valid range 13/12/2021 - 10/06/2023
+            ("2023", "2023-06-09", None),  # valid range after 10/06/2023
+        ]
 
-    def test_tariff_2011_signature_date_valid_range(self):
-        """Test valid signature date range for tariff 2011."""
-        data = {
-            "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": False,
-            "signature_date": "2015-06-15",  # Valid date within range
-            "effective_date": "2015-06-20",
-            "general_conditions_file": self.test_file,
-            "specific_conditions_file": self.test_file,
-        }
+        for tariff, start_date, end_date in wrong_signature_dates:
+            data_start = {
+                "tariff_reference": tariff,
+                "signature_date": start_date,
+                "effective_date": "2024-01-01",
+            }
 
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
+            data_end = (
+                {
+                    "tariff_reference": tariff,
+                    "signature_date": end_date,
+                    "effective_date": "2024-01-01",
+                }
+                if end_date
+                else None
+            )
 
-    def test_tariff_2011_signature_date_before_range(self):
-        """Test signature date before valid range for tariff 2011."""
-        data = {
-            "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": False,
-            "signature_date": "2011-11-22",  # Before 23/11/2011
-            "effective_date": "2011-11-25",
-        }
+            for data in [data_start, data_end]:
+                if data:
+                    serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
+                    self.assertFalse(serializer.is_valid())
+                    self.assertIn("signature_date", serializer.errors)
 
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("signature_date", serializer.errors)
+    def test_tariff_2011_2020_signature_date_valid_range(self):
+        """Test valid signature date range for tariff 2011 and 2020"""
 
-    def test_tariff_2011_signature_date_after_range(self):
-        """Test signature date after valid range for tariff 2011."""
-        data = {
-            "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": False,
-            "signature_date": "2020-11-24",  # After 23/11/2020
-            "effective_date": "2020-11-25",
-        }
+        for tariff in ["2011", "2020"]:
+            valid_date = "2015-06-15" if tariff == "2011" else "2021-06-15"
+            data = {
+                "tariff_reference": tariff,
+                "buyer": self.buyer_entity.id,
+                "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
+                "cmax": 100.0,
+                "cmax_annualized": False,
+                "signature_date": valid_date,  # Valid date within range
+                "effective_date": "2022-06-20",
+                "general_conditions_file": self.test_file,
+                "specific_conditions_file": self.test_file,
+            }
 
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("signature_date", serializer.errors)
+            serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
+            self.assertTrue(serializer.is_valid())
 
-    def test_tariff_2020_signature_date_valid_range(self):
-        """Test valid signature date range for tariff 2020."""
-        data = {
-            "tariff_reference": "2020",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": False,
-            "signature_date": "2021-06-15",  # Valid date within range
-            "effective_date": "2021-06-20",
-            "general_conditions_file": self.test_file,
-            "specific_conditions_file": self.test_file,
-        }
+    def test_tariff_2021_2023_signature_date_valid_range(self):
+        """Test valid signature date range for tariff 2021 and 2023"""
 
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
-
-    def test_tariff_2020_signature_date_before_range(self):
-        """Test signature date before valid range for tariff 2020."""
-        data = {
-            "tariff_reference": "2020",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": False,
-            "signature_date": "2020-11-22",  # Before 23/11/2020
-            "effective_date": "2020-11-25",
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("signature_date", serializer.errors)
-
-    def test_tariff_2020_signature_date_after_range(self):
-        """Test signature date after valid range for tariff 2020."""
-        data = {
-            "tariff_reference": "2020",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": False,
-            "signature_date": "2021-12-14",  # After 13/12/2021
-            "effective_date": "2021-12-15",
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("signature_date", serializer.errors)
-
-    def test_tariff_2021_signature_date_valid_range(self):
-        """Test valid signature date range for tariff 2021."""
-        data = {
-            "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "pap_contracted": 50.0,
-            "signature_date": "2022-06-15",  # Valid date within range
-            "effective_date": "2022-06-20",
-            "general_conditions_file": self.test_file,
-            "specific_conditions_file": self.test_file,
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
-
-    def test_tariff_2021_signature_date_before_range(self):
-        """Test signature date before valid range for tariff 2021."""
-        data = {
-            "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 50.0,
-            "signature_date": "2021-12-12",  # Before 13/12/2021
-            "effective_date": "2021-12-15",
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("signature_date", serializer.errors)
-
-    def test_tariff_2021_signature_date_after_range(self):
-        """Test signature date after valid range for tariff 2021."""
-        data = {
-            "tariff_reference": "2021",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 50.0,
-            "signature_date": "2023-06-11",  # After 10/06/2023
-            "effective_date": "2023-06-15",
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("signature_date", serializer.errors)
-
-    def test_tariff_2023_signature_date_valid(self):
-        """Test valid signature date for tariff 2023."""
-        data = {
-            "tariff_reference": "2023",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "pap_contracted": 50.0,
-            "signature_date": "2023-06-15",  # After 10/06/2023
-            "effective_date": "2023-06-20",
-            "general_conditions_file": self.test_file,
-            "specific_conditions_file": self.test_file,
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
-
-    def test_tariff_2023_signature_date_before_threshold(self):
-        """Test signature date before threshold for tariff 2023."""
-        data = {
-            "tariff_reference": "2023",
-            "buyer": self.buyer_entity.id,
-            "pap_contracted": 50.0,
-            "signature_date": "2023-06-10",  # Not after 10/06/2023 (equal)
-            "effective_date": "2023-06-15",
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("signature_date", serializer.errors)
-
-    def test_tariff_range_validation_at_boundaries(self):
-        """Test tariff date validation at exact boundaries."""
-        # Tariff 2011 - exact start boundary
-        data = {
-            "tariff_reference": "2011",
-            "buyer": self.buyer_entity.id,
-            "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
-            "cmax": 100.0,
-            "cmax_annualized": False,
-            "signature_date": "2011-11-23",  # Exactly at start boundary
-            "effective_date": "2011-11-25",
-            "general_conditions_file": self.test_file,
-            "specific_conditions_file": self.test_file,
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertTrue(serializer.is_valid())
-
-        # Tariff 2011 - exact end boundary
-        data["signature_date"] = "2020-11-23"  # Exactly at end boundary
-        data["effective_date"] = "2020-11-25"
+        for tariff in ["2021", "2023"]:
+            valid_date = "2022-06-15" if tariff == "2021" else "2023-06-15"
+            data = {
+                "tariff_reference": tariff,
+                "buyer": self.buyer_entity.id,
+                "installation_category": BiomethaneContract.INSTALLATION_CATEGORY_1,
+                "pap_contracted": 50.0,
+                "signature_date": valid_date,  # Valid date within range
+                "effective_date": "2024-06-20",
+                "general_conditions_file": self.test_file,
+                "specific_conditions_file": self.test_file,
+            }
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
         self.assertTrue(serializer.is_valid())

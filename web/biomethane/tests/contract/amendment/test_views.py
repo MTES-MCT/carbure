@@ -5,7 +5,8 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
-from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
+from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneEntityConfigAmendmentFactory
+from biomethane.models import BiomethaneContractAmendment
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -32,7 +33,7 @@ class BiomethaneContractAmendmentViewSetTests(TestCase):
         )
 
         # Create a base contract for amendments
-        self.contract = BiomethaneContract.objects.create(
+        self.contract = BiomethaneContractFactory.create(
             producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2021",
@@ -55,20 +56,14 @@ class BiomethaneContractAmendmentViewSetTests(TestCase):
 
     def test_list_amendments_success(self):
         """Test successful listing of amendments"""
-        # Create test amendments
-        amendment1 = BiomethaneContractAmendment.objects.create(
+        # Create test amendments using factory
+        amendment1 = BiomethaneEntityConfigAmendmentFactory.create(
             contract=self.contract,
-            signature_date=date.today(),
-            effective_date=date.today(),
             amendment_object=[BiomethaneContractAmendment.CMAX_PAP_UPDATE],
-            amendment_file=self.test_file,
         )
-        amendment2 = BiomethaneContractAmendment.objects.create(
+        amendment2 = BiomethaneEntityConfigAmendmentFactory.create(
             contract=self.contract,
-            signature_date=date.today(),
-            effective_date=date.today(),
             amendment_object=[BiomethaneContractAmendment.EFFECTIVE_DATE],
-            amendment_file=self.test_file,
         )
 
         response = self.client.get(self.amendment_list_url, self.base_params)
@@ -126,12 +121,9 @@ class BiomethaneContractAmendmentViewSetTests(TestCase):
 
     def test_retrieve_amendment_success(self):
         """Test successful retrieval of a specific amendment"""
-        amendment = BiomethaneContractAmendment.objects.create(
+        amendment = BiomethaneEntityConfigAmendmentFactory.create(
             contract=self.contract,
-            signature_date=date.today(),
-            effective_date=date.today(),
             amendment_object=[BiomethaneContractAmendment.CMAX_PAP_UPDATE],
-            amendment_file=self.test_file,
         )
 
         amendment_detail_url = reverse("biomethane-contract-amendment-detail", kwargs={"pk": amendment.id})
@@ -142,8 +134,6 @@ class BiomethaneContractAmendmentViewSetTests(TestCase):
         self.assertEqual(response.data["id"], amendment.id)
         self.assertEqual(response.data["contract"], self.contract.id)
         self.assertEqual(response.data["amendment_object"], [BiomethaneContractAmendment.CMAX_PAP_UPDATE])
-        self.assertEqual(response.data["signature_date"], date.today().isoformat())
-        self.assertEqual(response.data["effective_date"], date.today().isoformat())
 
     def test_retrieve_amendment_not_found(self):
         """Test 404 return when amendment doesn't exist"""

@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.models import BiomethaneContract
 from core.models import Entity
 
@@ -23,13 +24,11 @@ class RedIISignalTests(TestCase):
         """Signal should set is_red_ii=True when cmax > 200."""
         self.assertFalse(self.producer_entity.is_red_ii)
 
-        BiomethaneContract.objects.create(
+        BiomethaneContractFactory.create(
             producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2011",
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
             cmax=250.0,  # > 200
-            cmax_annualized=False,
         )
 
         self.producer_entity.refresh_from_db()
@@ -39,7 +38,7 @@ class RedIISignalTests(TestCase):
         """Signal should set is_red_ii=True when pap_contracted > 19.5."""
         self.assertFalse(self.producer_entity.is_red_ii)
 
-        BiomethaneContract.objects.create(
+        BiomethaneContractFactory.create(
             producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2021",
@@ -53,13 +52,11 @@ class RedIISignalTests(TestCase):
         """Signal should not change is_red_ii when values are below thresholds."""
         self.assertFalse(self.producer_entity.is_red_ii)
 
-        BiomethaneContract.objects.create(
+        BiomethaneContractFactory.create(
             producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2011",
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
             cmax=150.0,  # <= 200
-            cmax_annualized=False,
         )
 
         self.producer_entity.refresh_from_db()
@@ -68,13 +65,11 @@ class RedIISignalTests(TestCase):
     def test_signal_on_contract_update(self):
         """Signal should trigger on contract updates."""
         # Create initial contract below threshold
-        contract = BiomethaneContract.objects.create(
+        contract = BiomethaneContractFactory.create(
             producer=self.producer_entity,
             buyer=self.buyer_entity,
             tariff_reference="2011",
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
             cmax=100.0,  # <= 200
-            cmax_annualized=False,
         )
 
         self.producer_entity.refresh_from_db()
