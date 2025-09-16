@@ -29,6 +29,10 @@ class EntityProductionSiteTest(TestCase):
         "json/biofuels.json",
         "json/feedstock.json",
         "json/countries.json",
+        "json/entities.json",
+        "json/productionsites.json",
+        "json/depots.json",
+        "json/entities_sites.json",
     ]
 
     @classmethod
