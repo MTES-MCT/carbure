@@ -58,6 +58,14 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
             return BiomethaneDigestateInputSerializer
         return super().get_serializer_class()
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == "retrieve":
+            return BiomethaneDigestateRetrieveFilter(self.request.GET, queryset=queryset).qs
+        elif self.action == "upsert":
+            return BiomethaneDigestateFilter(self.request.GET, queryset=queryset).qs
+        return queryset
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -79,7 +87,7 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            digestate = BiomethaneDigestateRetrieveFilter(request.GET, queryset=self.get_queryset()).qs.get()
+            digestate = self.get_queryset().get()
             data = self.get_serializer(digestate, many=False).data
             return Response(data)
 
@@ -102,7 +110,7 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
     )
     def upsert(self, request, *args, **kwargs):
         try:
-            digestate = BiomethaneDigestateFilter(request.GET, queryset=self.get_queryset()).qs.get()
+            digestate = self.get_queryset().get()
             serializer = self.get_serializer(digestate, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneDigestate.DoesNotExist:
