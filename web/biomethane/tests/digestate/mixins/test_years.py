@@ -6,10 +6,10 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 
 
-class BiomethaneDigestateYearsTests(TestCase):
+class YearsDigestateAPITests(TestCase):
     def setUp(self):
-        self.entity = Entity.objects.create(
-            name="Test Entity",
+        self.producer_entity = Entity.objects.create(
+            name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
 
@@ -18,16 +18,15 @@ class BiomethaneDigestateYearsTests(TestCase):
             "tester@carbure.local",
             "Tester",
             "gogogo",
-            [(self.entity, "RW")],
+            [(self.producer_entity, "RW")],
         )
 
         self.years = [2024, 2025, 2015]
         BiomethaneDigestate.objects.bulk_create(
-            [BiomethaneDigestate(producer=self.entity, year=year) for year in self.years]
+            [BiomethaneDigestate(producer=self.producer_entity, year=year) for year in self.years]
         )
 
-    # Checks that the get_years endpoint returns the distinct years of digestate objects sorted in ascending order
     def test_years(self):
-        response = self.client.get(reverse("biomethane-digestate-years"), {"entity_id": self.entity.id})
+        response = self.client.get(reverse("biomethane-digestate-years"), {"entity_id": self.producer_entity.id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, [2015, 2024, 2025])

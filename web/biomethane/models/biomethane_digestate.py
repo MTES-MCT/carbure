@@ -92,10 +92,7 @@ def clear_digestate_fields_on_related_model_save(sender, instance, **kwargs):
     if sender == BiomethaneDigestate:
         digestate_instance = instance
         producer = instance.producer
-    elif sender == BiomethaneProductionUnit:
-        producer = instance.producer
-        digestate_instance = producer.biomethane_digestates.order_by("-id").first()
-    elif sender == BiomethaneContract:
+    elif sender in [BiomethaneProductionUnit, BiomethaneContract]:
         producer = instance.producer
         digestate_instance = producer.biomethane_digestates.order_by("-id").first()
     else:
@@ -104,99 +101,98 @@ def clear_digestate_fields_on_related_model_save(sender, instance, **kwargs):
     if not digestate_instance:
         return
 
-    # Get related objects
-    production_unit = getattr(producer, "biomethane_production_unit", None)
-    contract = getattr(producer, "biomethane_contract", None)
-
     fields_to_clear = []
 
-    # Clear digestate production fields based on phase separation setting
-    if production_unit and production_unit.has_digestate_phase_separation:
-        # If phase separation is enabled, clear raw digestate fields
-        fields_to_clear.extend(
-            [
-                "raw_digestate_tonnage_produced",
-                "raw_digestate_dry_matter_rate",
-            ]
-        )
-    elif production_unit and not production_unit.has_digestate_phase_separation:
-        # If phase separation is disabled, clear separated phase fields
-        fields_to_clear.extend(
-            [
-                "solid_digestate_tonnage",
-                "liquid_digestate_quantity",
-            ]
-        )
-    else:
-        # If no production unit, clear all digestate production fields
-        fields_to_clear.extend(
-            [
-                "raw_digestate_tonnage_produced",
-                "raw_digestate_dry_matter_rate",
-                "solid_digestate_tonnage",
-                "liquid_digestate_quantity",
-            ]
-        )
+    # Handle different senders with specific logic
+    if sender == BiomethaneDigestate:
+        # When digestate is saved, only check composting location-based field clearing
+        production_unit = getattr(producer, "biomethane_production_unit", None)
+        valorization_methods = production_unit.digestate_valorization_methods if production_unit else []
 
-    # Get valorization methods from production unit
-    valorization_methods = production_unit.digestate_valorization_methods if production_unit else []
+        if valorization_methods and BiomethaneProductionUnit.COMPOSTING in valorization_methods:
+            # Clear specific fields based on location settings
+            if BiomethaneDigestate.ON_SITE not in digestate_instance.composting_locations:
+                fields_to_clear.append("on_site_composted_digestate_volume")
 
-    # Clear spreading fields if spreading is not in valorization methods
-    if not valorization_methods or BiomethaneProductionUnit.SPREADING not in valorization_methods:
-        fields_to_clear.append("average_spreading_valorization_distance")
+            if BiomethaneDigestate.EXTERNAL_PLATFORM not in digestate_instance.composting_locations:
+                fields_to_clear.extend(
+                    [
+                        "external_platform_name",
+                        "external_platform_digestate_volume",
+                        "external_platform_department",
+                        "external_platform_municipality",
+                    ]
+                )
 
-    # Clear composting fields if composting is not in valorization methods
-    if not valorization_methods or BiomethaneProductionUnit.COMPOSTING not in valorization_methods:
-        fields_to_clear.extend(
-            [
-                "external_platform_name",
-                "external_platform_digestate_volume",
-                "external_platform_department",
-                "external_platform_municipality",
-                "on_site_composted_digestate_volume",
-                "composting_locations",
-            ]
-        )
-    else:
-        # If composting is enabled, clear specific fields based on location settings
-        if BiomethaneDigestate.ON_SITE not in digestate_instance.composting_locations:
-            fields_to_clear.append("on_site_composted_digestate_volume")
+    elif sender == BiomethaneProductionUnit:
+        # When production unit is saved, check all production unit related fields
+        production_unit = instance
 
-        if BiomethaneDigestate.EXTERNAL_PLATFORM not in digestate_instance.composting_locations:
+        # Clear digestate production fields based on phase separation setting
+        if production_unit.has_digestate_phase_separation:
+            # If phase separation is enabled, clear raw digestate fields
+            fields_to_clear.extend(
+                [
+                    "raw_digestate_tonnage_produced",
+                    "raw_digestate_dry_matter_rate",
+                ]
+            )
+        else:
+            # If phase separation is disabled, clear separated phase fields
+            fields_to_clear.extend(
+                [
+                    "solid_digestate_tonnage",
+                    "liquid_digestate_quantity",
+                ]
+            )
+
+        # Get valorization methods from production unit
+        valorization_methods = production_unit.digestate_valorization_methods
+
+        # Clear spreading fields if spreading is not in valorization methods
+        if BiomethaneProductionUnit.SPREADING not in valorization_methods:
+            fields_to_clear.append("average_spreading_valorization_distance")
+
+        # Clear composting fields if composting is not in valorization methods
+        if BiomethaneProductionUnit.COMPOSTING not in valorization_methods:
             fields_to_clear.extend(
                 [
                     "external_platform_name",
                     "external_platform_digestate_volume",
                     "external_platform_department",
                     "external_platform_municipality",
+                    "on_site_composted_digestate_volume",
+                    "composting_locations",
                 ]
             )
 
-    # Clear incineration/landfilling fields if not in valorization methods
-    if not valorization_methods or BiomethaneProductionUnit.INCINERATION_LANDFILLING not in valorization_methods:
-        fields_to_clear.extend(
-            [
-                "annual_eliminated_volume",
-                "incinerator_landfill_center_name",
-                "wwtp_materials_to_incineration",
-            ]
-        )
+        # Clear incineration/landfilling fields if not in valorization methods
+        if BiomethaneProductionUnit.INCINERATION_LANDFILLING not in valorization_methods:
+            fields_to_clear.extend(
+                [
+                    "annual_eliminated_volume",
+                    "incinerator_landfill_center_name",
+                    "wwtp_materials_to_incineration",
+                ]
+            )
 
-    # Clear WWTP materials field if not installation category 2
-    if contract is None or contract.installation_category != BiomethaneContract.INSTALLATION_CATEGORY_2:
-        # Avoid duplicate if already in list
-        if "wwtp_materials_to_incineration" not in fields_to_clear:
+        # Clear sale fields if sale is not in spreading management methods
+        spreading_management_methods = production_unit.spreading_management_methods
+        if BiomethaneProductionUnit.SALE not in spreading_management_methods:
+            fields_to_clear.extend(
+                [
+                    "sold_volume",
+                    "acquiring_companies",
+                ]
+            )
+
+    elif sender == BiomethaneContract:
+        # When contract is saved, only check contract-related fields
+        contract = instance
+
+        # Clear WWTP materials field if not installation category 2
+        if contract.installation_category != BiomethaneContract.INSTALLATION_CATEGORY_2:
             fields_to_clear.append("wwtp_materials_to_incineration")
-
-    # Clear sale fields if sale is not in spreading management methods
-    spreading_management_methods = production_unit.spreading_management_methods if production_unit else []
-    if not spreading_management_methods or BiomethaneProductionUnit.SALE not in spreading_management_methods:
-        fields_to_clear.extend(
-            [
-                "sold_volume",
-                "acquiring_companies",
-            ]
-        )
 
     if fields_to_clear:
         # Remove duplicates while preserving order

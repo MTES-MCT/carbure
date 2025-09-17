@@ -1,1 +1,5 @@
-from .contract import BiomethaneContractFactory
+from .contract import BiomethaneContractFactory, BiomethaneSignedContractFactory, BiomethaneEntityConfigAmendmentFactory
+from .digestate import BiomethaneDigestateFactory
+from .digestate_spreading import BiomethaneDigestateSpreadingFactory
+from .injection_site import BiomethaneInjectionSiteFactory
+from .production_unit import BiomethaneProductionUnitFactory

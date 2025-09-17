@@ -105,3 +105,9 @@ class BiomethaneInjectionSiteViewsTests(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_injection_site_not_found(self):
+        """Test 404 return when no injection site exists."""
+        response = self.client.get(self.injection_site_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

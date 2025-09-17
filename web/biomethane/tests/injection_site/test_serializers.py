@@ -2,26 +2,9 @@ from django.test import TestCase
 
 from biomethane.models import BiomethaneInjectionSite
 from biomethane.serializers import BiomethaneInjectionSiteInputSerializer
-from core.models import Entity
 
 
 class BiomethaneInjectionSiteSerializerTests(TestCase):
-    """Unit tests for BiomethaneInjectionSite serializers."""
-
-    def setUp(self):
-        """Initial setup for serializer validation tests."""
-        self.producer_entity = Entity.objects.create(
-            name="Test Producer",
-            entity_type=Entity.BIOMETHANE_PRODUCER,
-        )
-
-        self.context = {"entity": self.producer_entity}
-
-        self.producer_entity2 = Entity.objects.create(
-            name="Test Producer 2",
-            entity_type=Entity.BIOMETHANE_PRODUCER,
-        )
-
     def test_injection_site_input_serializer_valid_data(self):
         """Test creating injection site with valid data."""
         data = {
@@ -36,7 +19,7 @@ class BiomethaneInjectionSiteSerializerTests(TestCase):
             "network_manager_name": "New Manager",
         }
 
-        serializer = BiomethaneInjectionSiteInputSerializer(data=data, context=self.context)
+        serializer = BiomethaneInjectionSiteInputSerializer(data=data)
         self.assertTrue(serializer.is_valid())
 
     def test_injection_site_input_serializer_missing_base_fields(self):
@@ -45,7 +28,7 @@ class BiomethaneInjectionSiteSerializerTests(TestCase):
             # Missing: network_type, network_manager_name, unique_identification_number
         }
 
-        serializer = BiomethaneInjectionSiteInputSerializer(data=data, context=self.context)
+        serializer = BiomethaneInjectionSiteInputSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("network_type", serializer.errors)
         self.assertIn("network_manager_name", serializer.errors)
@@ -61,7 +44,7 @@ class BiomethaneInjectionSiteSerializerTests(TestCase):
             # Missing: meter_number
         }
 
-        serializer = BiomethaneInjectionSiteInputSerializer(data=data, context=self.context)
+        serializer = BiomethaneInjectionSiteInputSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("meter_number", serializer.errors)
 
@@ -75,7 +58,7 @@ class BiomethaneInjectionSiteSerializerTests(TestCase):
             # Missing: company_address, city, postal_code
         }
 
-        serializer = BiomethaneInjectionSiteInputSerializer(data=data, context=self.context)
+        serializer = BiomethaneInjectionSiteInputSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("company_address", serializer.errors)
         self.assertIn("city", serializer.errors)
@@ -89,6 +72,6 @@ class BiomethaneInjectionSiteSerializerTests(TestCase):
             "network_type": "INVALID_TYPE",
         }
 
-        serializer = BiomethaneInjectionSiteInputSerializer(data=data, context=self.context)
+        serializer = BiomethaneInjectionSiteInputSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("network_type", serializer.errors)
