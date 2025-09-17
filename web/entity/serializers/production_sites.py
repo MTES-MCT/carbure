@@ -10,6 +10,7 @@ from core.serializers import GenericCertificateSerializer
 from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.models import ProductionSite
+from transactions.models.entity_site import EntitySite
 from transactions.models.site import Site
 
 
@@ -125,13 +126,17 @@ class EntityProductionSiteWriteSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        entity_id = self.context.get("entity_id")
+
         feedstocks, biofuels, certificates = self.extract_relations(validated_data)
 
         production_site = Site.objects.create(
             **validated_data,
             site_type=Site.PRODUCTION_BIOLIQUID,
-            created_by_id=self.context.get("entity_id"),
+            created_by_id=entity_id,
         )
+
+        EntitySite.objects.create(site=production_site, entity_id=entity_id)
 
         self.set_relations(production_site, feedstocks, biofuels, certificates)
 
