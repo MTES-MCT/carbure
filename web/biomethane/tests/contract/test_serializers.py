@@ -2,6 +2,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from biomethane.models import BiomethaneContract
+from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.serializers import BiomethaneContractInputSerializer
 from core.models import Entity
 
@@ -289,3 +290,48 @@ class BiomethaneContractSerializerTests(TestCase):
 
         self.producer_entity.refresh_from_db()
         self.assertTrue(self.producer_entity.is_red_ii)  # Should remain True
+
+    # ========== TESTS FOR TRACKED_AMENDMENT_TYPES HANDLER ==========
+
+    def test_tracked_amendment_types_handler_appends_contract_changed(self):
+        """Test that tracked_amendment_types is updated with existing types and new values."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            buyer=self.buyer_entity,
+            tariff_reference="2011",
+            cmax=100.0,
+            tracked_amendment_types=[BiomethaneContractAmendment.CMAX_ANNUALIZATION],
+        )
+        serializer = BiomethaneContractInputSerializer(context=self.context)
+
+        current_tracked_types = serializer.handle_tracked_amendment_types(contract, {"cmax": 150.0})
+
+        self.assertEqual(
+            current_tracked_types,
+            {BiomethaneContractAmendment.CMAX_ANNUALIZATION, BiomethaneContractAmendment.CMAX_PAP_UPDATE},
+        )
+
+    def test_tracked_amendment_types_handler_add_value_to_none_list(self):
+        """Test that tracked_amendment_types is updated with CMAX_PAP_UPDATE."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            buyer=self.buyer_entity,
+            tariff_reference="2011",
+        )
+        serializer = BiomethaneContractInputSerializer(context=self.context)
+
+        current_tracked_types = serializer.handle_tracked_amendment_types(contract, {"cmax": 150.0})
+
+        self.assertEqual(
+            current_tracked_types,
+            {BiomethaneContractAmendment.CMAX_PAP_UPDATE},
+        )
+
+    def test_tracked_amendment_types_handler_returns_same_list_if_no_change(self):
+        """Test that tracked_amendment_types is returned unchanged if no change."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            buyer=self.buyer_entity,
+            tariff_reference="2011",
+        )
+        serializer = BiomethaneContractInputSerializer(context=self.context)

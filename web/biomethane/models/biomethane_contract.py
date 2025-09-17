@@ -63,6 +63,10 @@ class BiomethaneContract(models.Model):
         storage=private_storage, null=True, blank=True, upload_to=rename_specific_conditions_file
     )
 
+    # List of amendment types that are tracked for the contract when some values are updated
+    # (if cmax or pap is updated, we need to save CMAX_PAP_UPDATE to force the user to add an amendment)
+    tracked_amendment_types = models.JSONField(default=list)
+
     class Meta:
         db_table = "biomethane_contract"
         verbose_name = "Biométhane - Contrat d'achat"

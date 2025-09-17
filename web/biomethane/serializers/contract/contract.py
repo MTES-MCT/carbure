@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneContract
+from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.serializers.contract.contract_amendment import BiomethaneContractAmendmentSerializer
 
 
@@ -141,6 +142,8 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         self.handle_is_red_ii(validated_data, instance.producer)
+
+        self.handle_tracked_amendment_types(validated_data, instance)
         return super().update(instance, validated_data)
 
     def handle_is_red_ii(self, validated_data, producer):
@@ -153,3 +156,12 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
         if is_red_ii is False and ((cmax and cmax <= 200) or (pap_contracted and pap_contracted <= 19.5)):
             producer.is_red_ii = is_red_ii
             producer.save(update_fields=["is_red_ii"])
+
+    def handle_tracked_amendment_types(self, instance, validated_data):
+        current_tracked_types = set(instance.tracked_amendment_types or [])
+        if instance.cmax != validated_data.get("cmax", None) or instance.pap_contracted != validated_data.get(
+            "pap_contracted", None
+        ):
+            current_tracked_types.add(BiomethaneContractAmendment.CMAX_PAP_UPDATE)
+
+        return current_tracked_types
