@@ -174,90 +174,39 @@ def fill_basic_info(lot, data, prefetched_data):
         lot.copy_production_details(parent_lot)
         lot.copy_sustainability_data(parent_lot)
     else:
-        ### BIOFUEL
-        biofuels = prefetched_data["biofuels"]
-        biofuel_code = data.get("biofuel_code", None)
-        lot.biofuel = None
-        if not biofuel_code:
-            errors.append(
-                GenericError(
-                    lot=lot,
-                    field="biofuel_code",
-                    error=MISSING_BIOFUEL,
-                    display_to_creator=True,
-                    is_blocking=True,
-                )
-            )
-        else:
-            if biofuel_code not in biofuels:
-                errors.append(
-                    GenericError(
-                        lot=lot,
-                        field="biofuel_code",
-                        error=UNKNOWN_BIOFUEL,
-                        display_to_creator=True,
-                        is_blocking=True,
-                    )
-                )
+        check_configs = [
+            {
+                "lot_key": "biofuel",
+                "form_key": "biofuel_code",
+                "prefetched_key": "biofuels",
+                "missing_code_error": "MISSING_BIOFUEL",
+                "unknown_code_error": "UNKNOWN_BIOFUEL",
+            },
+            {
+                "lot_key": "feedstock",
+                "form_key": "feedstock_code",
+                "prefetched_key": "feedstocks",
+                "missing_code_error": "MISSING_FEEDSTOCK",
+                "unknown_code_error": "UNKNOWN_FEEDSTOCK",
+            },
+            {
+                "lot_key": "country_of_origin",
+                "form_key": "country_code",
+                "prefetched_key": "countries",
+                "missing_code_error": "MISSING_COUNTRY_OF_ORIGIN",
+                "unknown_code_error": "UNKNOWN_COUNTRY_OF_ORIGIN",
+            },
+        ]
+
+        for config in check_configs:
+            result = check_lot_info(config, data, prefetched_data)
+
+            if isinstance(result, GenericError):
+                setattr(lot, config["lot_key"], None)
+                errors.append(result)
             else:
-                # all good
-                lot.biofuel = biofuels[biofuel_code]
-        ### FEEDSTOCK
-        feedstocks = prefetched_data["feedstocks"]
-        feedstock_code = data.get("feedstock_code", None)
-        lot.feedstock = None
-        if not feedstock_code:
-            errors.append(
-                GenericError(
-                    lot=lot,
-                    field="feedstock_code",
-                    error=MISSING_FEEDSTOCK,
-                    display_to_creator=True,
-                    is_blocking=True,
-                )
-            )
-        else:
-            if feedstock_code not in feedstocks:
-                errors.append(
-                    GenericError(
-                        lot=lot,
-                        field="feedstock_code",
-                        error=UNKNOWN_FEEDSTOCK,
-                        display_to_creator=True,
-                        is_blocking=True,
-                    )
-                )
-            else:
-                # all good
-                lot.feedstock = feedstocks[feedstock_code]
-        ### COUNTRY OF ORIGIN
-        countries = prefetched_data["countries"]
-        country_code = data.get("country_code", None)
-        lot.country_of_origin = None
-        if not country_code:
-            errors.append(
-                GenericError(
-                    lot=lot,
-                    field="country_code",
-                    error=MISSING_COUNTRY_OF_ORIGIN,
-                    display_to_creator=True,
-                    is_blocking=True,
-                )
-            )
-        else:
-            if country_code not in countries:
-                errors.append(
-                    GenericError(
-                        lot=lot,
-                        field="country_code",
-                        error=UNKNOWN_COUNTRY_OF_ORIGIN,
-                        display_to_creator=True,
-                        is_blocking=True,
-                    )
-                )
-            else:
-                # all good
-                lot.country_of_origin = countries[country_code]
+                setattr(lot, config["lot_key"], result)
+
     return errors
 
 
@@ -657,22 +606,21 @@ def bulk_insert_lots(
 
 def check_lot_info(config, form_data, prefetched_data):
     form_key = config["form_key"]
+    prefetched_key = config["prefetched_key"]
 
     code = form_data.get(form_key, None)
-    entries = prefetched_data.get(config["prefetched_key"], None)
+    entries = prefetched_data.get(prefetched_key, None)
+
+    error_config = {
+        "field": form_key,
+        "display_to_creator": True,
+        "is_blocking": True,
+    }
 
     if not code:
-        return GenericError(
-            error=config["missing_code_error"],
-            field=form_key,
-            display_to_creator=True,
-            is_blocking=True,
-        )
+        return GenericError(error=config["missing_code_error"], **error_config)
 
     if code not in entries:
-        return GenericError(
-            error=config["unknown_code_error"],
-            field=form_key,
-            display_to_creator=True,
-            is_blocking=True,
-        )
+        return GenericError(error=config["unknown_code_error"], **error_config)
+
+    return entries[code]

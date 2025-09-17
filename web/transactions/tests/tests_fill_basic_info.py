@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from core.models import CarbureLot, GenericError
+from core.models import Biocarburant, CarbureLot, GenericError
 from transactions.helpers import check_lot_info, fill_basic_info
 
 
@@ -35,14 +35,33 @@ class FillBasicInfoTest(TestCase):
 
         self.assertEqual(result.error, "MISSING_BIOFUEL")
         self.assertEqual(result.field, "biofuel_code")
+        self.assertEqual(result.is_blocking, True)
 
     def test_report_unknown_field(self):
         prefetched_data = {"biofuels": []}
         form_data = {"biofuel_code": "ETH"}
 
-        config = {"form_key": "biofuel_code", "prefetched_key": "biofuels", "unknown_code_error": "UNKNOWN_BIOFUEL"}
+        config = {
+            "form_key": "biofuel_code",
+            "prefetched_key": "biofuels",
+            "unknown_code_error": "UNKNOWN_BIOFUEL",
+        }
 
         result = check_lot_info(config, form_data, prefetched_data)
 
         self.assertEqual(result.error, "UNKNOWN_BIOFUEL")
         self.assertEqual(result.field, "biofuel_code")
+        self.assertEqual(result.is_blocking, True)
+
+    def test_extract_known_field(self):
+        prefetched_data = {"biofuels": {"ETH": Biocarburant(code="ETH")}}
+        form_data = {"biofuel_code": "ETH"}
+
+        config = {
+            "form_key": "biofuel_code",
+            "prefetched_key": "biofuels",
+        }
+
+        result = check_lot_info(config, form_data, prefetched_data)
+
+        self.assertEqual(result, Biocarburant(code="ETH"))
