@@ -11198,6 +11198,10 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        department:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -11296,6 +11300,10 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        department:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -11753,7 +11761,11 @@ components:
           maxLength: 20
         registered_country:
           $ref: "#/components/schemas/RegistrationCountry"
+        department_code:
+          type: string
+          maxLength: 5
       required:
+        - department_code
         - legal_name
         - name
         - registered_address

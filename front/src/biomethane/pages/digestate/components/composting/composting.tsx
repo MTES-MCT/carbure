@@ -16,7 +16,6 @@ import {
 } from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
-import { DepartmentCode } from "common/utils/geography"
 
 type CompostingForm = DeepPartial<
   Pick<
@@ -106,7 +105,6 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
                 readOnly={!isEditing}
                 label={t("Département de la plateforme externe")}
                 {...bind("external_platform_department")}
-                value={value.external_platform_department as DepartmentCode}
                 required
               />
               <TextInput

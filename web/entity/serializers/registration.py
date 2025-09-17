@@ -30,6 +30,7 @@ class CompanyPreviewSerializer(serializers.Serializer):
     registered_city = serializers.CharField(max_length=255)
     registered_zipcode = serializers.CharField(max_length=20)
     registered_country = RegistrationCountrySerializer()
+    department_code = serializers.CharField(max_length=5)
 
 
 class WarningSerializer(serializers.Serializer):

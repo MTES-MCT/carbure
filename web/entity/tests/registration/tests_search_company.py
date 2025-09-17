@@ -18,6 +18,7 @@ MOCK_API_RESPONSE = {
                 "adresse": "2 PL JEAN MILLIER",
                 "code_postal": "92400",
                 "libelle_commune": "COURBEVOIE",
+                "code_departement": "92",
             },
         }
     ]
@@ -57,6 +58,7 @@ class EntityRegistrationSearchCompanyTest(TestCase):
         data = response.json()
         company_preview = data["company_preview"]
         assert company_preview["legal_name"] == "TOTALENERGIES SE"
+        assert company_preview["department_code"] == "92"
         assert company_preview["registered_city"] == "COURBEVOIE"
         assert company_preview["registered_zipcode"] == "92400"
         assert company_preview["registered_address"] == "2 PL JEAN MILLIER"

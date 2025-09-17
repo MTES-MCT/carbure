@@ -19,6 +19,7 @@ class BiomethaneProductionUnit(models.Model):
     company_address = models.CharField(max_length=256, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     city = models.CharField(max_length=128, null=True, blank=True)
+    department = models.CharField(max_length=5, null=True, blank=True)
 
     # légende
     AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS"

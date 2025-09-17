@@ -12,6 +12,7 @@ import {
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
 import { SiretPicker } from "common/molecules/siret-picker"
+import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 
 type GeneralInfoForm = DeepPartial<
   Pick<
@@ -22,6 +23,7 @@ type GeneralInfoForm = DeepPartial<
     | "company_address"
     | "postal_code"
     | "city"
+    | "department"
   >
 >
 
@@ -39,6 +41,7 @@ export function GeneralInfo({
     company_address: productionUnit?.company_address,
     postal_code: productionUnit?.postal_code,
     city: productionUnit?.city,
+    department: productionUnit?.department,
   })
 
   const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
@@ -81,9 +84,12 @@ export function GeneralInfo({
               label={t("SIRET")}
               required
               onSelect={(company) => {
-                setField("company_address", company?.registered_address)
-                setField("postal_code", company?.registered_zipcode)
-                setField("city", company?.registered_city)
+                if (company) {
+                  setField("company_address", company?.registered_address)
+                  setField("postal_code", company?.registered_zipcode)
+                  setField("city", company?.registered_city)
+                  setField("department", company?.department_code)
+                }
               }}
               readOnly={!isEditing}
               {...bind("siret_number")}
@@ -96,6 +102,12 @@ export function GeneralInfo({
             {...bind("company_address")}
           />
           <Grid cols={2} gap="lg">
+            <AutoCompleteDepartments
+              readOnly={!isEditing}
+              label={t("Département")}
+              required
+              {...bind("department")}
+            />
             <TextInput
               readOnly={!isEditing}
               label={t("Code postal")}

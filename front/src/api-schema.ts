@@ -3192,6 +3192,7 @@ export interface components {
             company_address?: string | null;
             postal_code?: string | null;
             city?: string | null;
+            department?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3221,6 +3222,7 @@ export interface components {
             company_address?: string | null;
             postal_code?: string | null;
             city?: string | null;
+            department?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3401,6 +3403,7 @@ export interface components {
             registered_city: string;
             registered_zipcode: string;
             registered_country: components["schemas"]["RegistrationCountry"];
+            department_code: string;
         };
         /**
          * @description * `ON_SITE` - Sur site
