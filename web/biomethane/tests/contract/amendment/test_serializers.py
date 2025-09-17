@@ -146,3 +146,25 @@ class BiomethaneContractAmendmentSerializerTests(TestCase):
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("amendment_details", serializer.errors)
+
+    def test_amendment_add_serializer_removes_tracked_amendment_types(self):
+        """Test that tracked_amendment_types in contract model is removed when
+        amendment_object contains value in tracked_amendment_types"""
+        self.contract.tracked_amendment_types = [
+            BiomethaneContractAmendment.CMAX_PAP_UPDATE,
+            BiomethaneContractAmendment.CMAX_ANNUALIZATION,
+        ]
+        self.contract.save()
+
+        data = {
+            "signature_date": date.today().isoformat(),
+            "effective_date": date.today().isoformat(),
+            "amendment_object": [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
+        }
+
+        context = {"entity": self.producer_entity}
+        serializer = BiomethaneContractAmendmentAddSerializer(context=context)
+
+        serializer.create(data)
+        self.contract.refresh_from_db()
+        self.assertEqual(self.contract.tracked_amendment_types, [BiomethaneContractAmendment.CMAX_ANNUALIZATION])
