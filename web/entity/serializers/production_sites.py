@@ -44,21 +44,19 @@ class EntityProductionSiteSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(FeedStockSerializer(many=True))
     def get_inputs(self, production_site):
-        inputs = ProductionSiteInput.objects.filter(production_site=production_site).select_related("matiere_premiere")
+        inputs = production_site.productionsiteinput_set.all()
         feedstocks = [input.matiere_premiere for input in inputs]
         return FeedStockSerializer(feedstocks, many=True).data
 
     @extend_schema_field(BiofuelSerializer(many=True))
     def get_outputs(self, production_site):
-        outputs = ProductionSiteOutput.objects.filter(production_site=production_site).select_related("biocarburant")
+        outputs = production_site.productionsiteoutput_set.all()
         biofuels = [output.biocarburant for output in outputs]
         return BiofuelSerializer(biofuels, many=True).data
 
     @extend_schema_field(GenericCertificateSerializer(many=True))
     def get_certificates(self, production_site):
-        certificates = ProductionSiteCertificate.objects.filter(production_site=production_site).select_related(
-            "certificate", "certificate__certificate"
-        )
+        certificates = production_site.productionsitecertificate_set.all()
         certificates = [certificate.certificate.certificate for certificate in certificates]
         return GenericCertificateSerializer(certificates, many=True).data
 

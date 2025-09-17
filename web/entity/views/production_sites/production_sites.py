@@ -48,7 +48,15 @@ class ProductionSiteViewSet(ModelViewSet[Site]):
         elif "company_id" in self.request.query_params:
             queryset = queryset.filter(created_by_id=self.request.query_params.get("company_id"))
 
-        return queryset.order_by("id")
+        return (
+            queryset.order_by("id")
+            .select_related("country")
+            .prefetch_related(
+                "productionsiteinput_set__matiere_premiere",
+                "productionsiteoutput_set__biocarburant",
+                "productionsitecertificate_set__certificate__certificate",
+            )
+        )
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
