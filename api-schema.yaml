@@ -495,14 +495,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneContractPatchRequest"
+              $ref: "#/components/schemas/BiomethaneContractInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneContractPatchRequest"
+              $ref: "#/components/schemas/BiomethaneContractInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneContractPatchRequest"
-        required: true
+              $ref: "#/components/schemas/BiomethaneContractInputRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -633,6 +632,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Declaration year.
+          required: true
       tags:
         - biomethane
       security:
@@ -737,13 +742,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateStorageAddRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateStorageInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateStorageAddRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateStorageInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateStorageAddRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateStorageInputRequest"
         required: true
       security:
         - cookieAuth: []
@@ -753,7 +758,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneDigestateStorageAdd"
+                $ref: "#/components/schemas/BiomethaneDigestateStorageInput"
           description: ""
   /api/biomethane/digestate-storage/{id}/:
     get:
@@ -804,13 +809,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateStoragePatchRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateStorageInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateStoragePatchRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateStorageInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BiomethaneDigestateStoragePatchRequest"
+              $ref: "#/components/schemas/BiomethaneDigestateStorageInputRequest"
         required: true
       security:
         - cookieAuth: []
@@ -820,7 +825,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneDigestateStoragePatch"
+                $ref: "#/components/schemas/BiomethaneDigestateStorageInput"
           description: ""
     patch:
       operationId: biomethane_digestate_storage_partial_update
@@ -843,13 +848,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneDigestateStoragePatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneDigestateStorageInputRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneDigestateStoragePatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneDigestateStorageInputRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/PatchedBiomethaneDigestateStoragePatchRequest"
+              $ref: "#/components/schemas/PatchedBiomethaneDigestateStorageInputRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -858,7 +863,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BiomethaneDigestateStoragePatch"
+                $ref: "#/components/schemas/BiomethaneDigestateStorageInput"
           description: ""
     delete:
       operationId: biomethane_digestate_storage_destroy
@@ -975,6 +980,217 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
+  /api/biomethane/energy/:
+    get:
+      operationId: biomethane_energy_retrieve
+      description: Retrieve the energy declaration for the current entity and year.
+        Returns a single energy object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Declaration year.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEnergy"
+          description: Energy declaration details for the entity
+        "404":
+          description: Energy not found for this entity.
+    put:
+      operationId: biomethane_energy_update
+      description: Create or update the energy declaration for the current entity and
+        the current year.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEnergyInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEnergyInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneEnergyInputRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEnergy"
+          description: Energy declaration updated successfully
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneEnergy"
+          description: Energy declaration created successfully
+  /api/biomethane/energy/monthly-reports/:
+    get:
+      operationId: biomethane_energy_monthly_reports_list
+      description: Retrieve the energy declaration monthly reports for the current
+        entity and year
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Declaration year.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BiomethaneEnergyMonthlyReport"
+          description: Energy declaration monthly reports for the year
+        "404":
+          description: Energy monthly reports not found for this entity and year.
+    put:
+      operationId: biomethane_energy_monthly_reports_update
+      description: Create or update monthly reports for the specified energy declaration.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MonthlyReportDataRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MonthlyReportDataRequest"
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MonthlyReportDataRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "201":
+          description: Monthly reports created or updated successfully
+  /api/biomethane/energy/validate/:
+    post:
+      operationId: biomethane_energy_validate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          description: No response body
+  /api/biomethane/energy/years/:
+    get:
+      operationId: biomethane_energy_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
       responses:
         "200":
           content:
@@ -10122,10 +10338,18 @@ components:
     BiomethaneContract:
       type: object
       properties:
-        tariff_reference:
-          $ref: "#/components/schemas/TariffReferenceEnum"
-        buyer:
+        id:
           type: integer
+          readOnly: true
+        amendments:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneContractAmendment"
+          readOnly: true
+        tariff_reference:
+          allOf:
+            - $ref: "#/components/schemas/TariffReferenceEnum"
+          nullable: true
         installation_category:
           allOf:
             - $ref: "#/components/schemas/InstallationCategoryEnum"
@@ -10160,43 +10384,39 @@ components:
           type: string
           format: uri
           nullable: true
-        amendments:
-          type: array
-          items:
-            $ref: "#/components/schemas/BiomethaneContractAmendment"
-          readOnly: true
-        entity:
+        buyer:
+          type: integer
+          nullable: true
+        producer:
           type: integer
       required:
         - amendments
-        - buyer
-        - entity
-        - tariff_reference
+        - id
+        - producer
     BiomethaneContractAmendment:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        contract:
-          type: integer
+        amendment_object:
+          type: array
+          items:
+            $ref: "#/components/schemas/AmendmentObjectEnum"
         signature_date:
           type: string
           format: date
         effective_date:
           type: string
           format: date
-        amendment_object:
-          type: array
-          items:
-            $ref: "#/components/schemas/AmendmentObjectEnum"
-          readOnly: true
         amendment_file:
           type: string
           format: uri
         amendment_details:
           type: string
           nullable: true
+        contract:
+          type: integer
       required:
         - amendment_file
         - amendment_object
@@ -10207,16 +10427,19 @@ components:
     BiomethaneContractAmendmentAdd:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
+        amendment_object:
+          type: array
+          items:
+            $ref: "#/components/schemas/AmendmentObjectEnum"
         signature_date:
           type: string
           format: date
         effective_date:
           type: string
           format: date
-        amendment_object:
-          type: array
-          items:
-            $ref: "#/components/schemas/AmendmentObjectEnum"
         amendment_file:
           type: string
           format: uri
@@ -10227,20 +10450,21 @@ components:
         - amendment_file
         - amendment_object
         - effective_date
+        - id
         - signature_date
     BiomethaneContractAmendmentAddRequest:
       type: object
       properties:
+        amendment_object:
+          type: array
+          items:
+            $ref: "#/components/schemas/AmendmentObjectEnum"
         signature_date:
           type: string
           format: date
         effective_date:
           type: string
           format: date
-        amendment_object:
-          type: array
-          items:
-            $ref: "#/components/schemas/AmendmentObjectEnum"
         amendment_file:
           type: string
           format: binary
@@ -10252,13 +10476,18 @@ components:
         - amendment_object
         - effective_date
         - signature_date
-    BiomethaneContractPatchRequest:
+    BiomethaneContractInputRequest:
       type: object
       properties:
+        cmax_annualized:
+          type: boolean
+          nullable: true
+        is_red_ii:
+          type: boolean
         tariff_reference:
-          $ref: "#/components/schemas/TariffReferenceEnum"
-        buyer:
-          type: integer
+          allOf:
+            - $ref: "#/components/schemas/TariffReferenceEnum"
+          nullable: true
         installation_category:
           allOf:
             - $ref: "#/components/schemas/InstallationCategoryEnum"
@@ -10266,9 +10495,6 @@ components:
         cmax:
           type: number
           format: double
-          nullable: true
-        cmax_annualized:
-          type: boolean
           nullable: true
         cmax_annualized_value:
           type: number
@@ -10294,17 +10520,30 @@ components:
           type: string
           format: binary
           nullable: true
-        is_red_ii:
-          type: boolean
-      required:
-        - buyer
-        - tariff_reference
+        buyer:
+          type: integer
+          nullable: true
     BiomethaneDigestate:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
+        composting_locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompostingLocationsEnum"
+        spreadings:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneDigestateSpreading"
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
         raw_digestate_tonnage_produced:
           type: number
           format: double
@@ -10325,11 +10564,6 @@ components:
           type: number
           format: double
           nullable: true
-        composting_locations:
-          type: array
-          items:
-            $ref: "#/components/schemas/CompostingLocationsEnum"
-          readOnly: true
         external_platform_name:
           type: string
           nullable: true
@@ -10369,26 +10603,21 @@ components:
           type: number
           format: double
           nullable: true
-        year:
+        producer:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
-        spreadings:
-          type: array
-          items:
-            $ref: "#/components/schemas/BiomethaneDigestateSpreading"
-          readOnly: true
       required:
-        - composting_locations
         - id
+        - producer
         - spreadings
         - status
         - year
     BiomethaneDigestateInputRequest:
       type: object
       properties:
+        composting_locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompostingLocationsEnum"
         raw_digestate_tonnage_produced:
           type: number
           format: double
@@ -10409,10 +10638,6 @@ components:
           type: number
           format: double
           nullable: true
-        composting_locations:
-          type: array
-          items:
-            $ref: "#/components/schemas/CompostingLocationsEnum"
         external_platform_name:
           type: string
           nullable: true
@@ -10455,6 +10680,9 @@ components:
     BiomethaneDigestateSpreading:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         spreading_department:
           type: string
           maxLength: 3
@@ -10464,10 +10692,10 @@ components:
         spread_parcels_area:
           type: number
           format: double
-        id:
+        digestate:
           type: integer
-          readOnly: true
       required:
+        - digestate
         - id
         - spread_parcels_area
         - spread_quantity
@@ -10475,6 +10703,9 @@ components:
     BiomethaneDigestateSpreadingAdd:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         spreading_department:
           type: string
           maxLength: 3
@@ -10485,6 +10716,7 @@ components:
           type: number
           format: double
       required:
+        - id
         - spread_parcels_area
         - spread_quantity
         - spreading_department
@@ -10519,8 +10751,29 @@ components:
         id:
           type: integer
           readOnly: true
+        type:
+          type: string
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
         producer:
           type: integer
+      required:
+        - capacity
+        - id
+        - producer
+        - type
+    BiomethaneDigestateStorageInput:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
         type:
           type: string
           maxLength: 32
@@ -10534,74 +10787,274 @@ components:
       required:
         - capacity
         - id
+        - type
+    BiomethaneDigestateStorageInputRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+          maxLength: 32
+        capacity:
+          type: number
+          format: double
+        has_cover:
+          type: boolean
+        has_biogas_recovery:
+          type: boolean
+      required:
+        - capacity
+        - type
+    BiomethaneEnergy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
+        injected_biomethane_gwh_pcs_per_year:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_ch4_rate_percent:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_pcs_kwh_per_nm3:
+          type: number
+          format: double
+          nullable: true
+        operating_hours:
+          type: number
+          format: double
+          nullable: true
+        produced_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flared_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flaring_operating_hours:
+          type: number
+          format: double
+          nullable: true
+        attest_no_fossil_for_digester_heating_and_purification:
+          type: boolean
+        energy_used_for_digester_heating:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_digester_heating:
+          type: string
+          nullable: true
+        attest_no_fossil_for_installation_needs:
+          type: boolean
+        energy_used_for_installation_needs:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_installation_needs:
+          type: string
+          nullable: true
+        purified_biogas_quantity_nm3:
+          type: number
+          format: double
+          nullable: true
+        purification_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        self_consumed_biogas_nm3:
+          type: number
+          format: double
+          nullable: true
+        total_unit_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        butane_or_propane_addition:
+          type: number
+          format: double
+          nullable: true
+        fossil_fuel_consumed_kwh:
+          type: number
+          format: double
+          nullable: true
+        has_opposition_or_complaints_acceptability:
+          type: boolean
+        estimated_work_days_acceptability:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        has_malfunctions:
+          type: boolean
+        malfunction_cumulative_duration_days:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        malfunction_types:
+          allOf:
+            - $ref: "#/components/schemas/MalfunctionTypesEnum"
+          nullable: true
+        malfunction_details:
+          type: string
+          nullable: true
+        has_injection_difficulties_due_to_network_saturation:
+          type: boolean
+        injection_impossibility_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        producer:
+          type: integer
+      required:
+        - id
         - producer
-        - type
-    BiomethaneDigestateStorageAdd:
+        - year
+    BiomethaneEnergyInputRequest:
       type: object
       properties:
-        type:
-          type: string
-          maxLength: 32
-        capacity:
+        injected_biomethane_gwh_pcs_per_year:
           type: number
           format: double
-        has_cover:
+          nullable: true
+        injected_biomethane_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_ch4_rate_percent:
+          type: number
+          format: double
+          nullable: true
+        injected_biomethane_pcs_kwh_per_nm3:
+          type: number
+          format: double
+          nullable: true
+        operating_hours:
+          type: number
+          format: double
+          nullable: true
+        produced_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flared_biogas_nm3_per_year:
+          type: number
+          format: double
+          nullable: true
+        flaring_operating_hours:
+          type: number
+          format: double
+          nullable: true
+        attest_no_fossil_for_digester_heating_and_purification:
           type: boolean
-        has_biogas_recovery:
+        energy_used_for_digester_heating:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_digester_heating:
+          type: string
+          nullable: true
+        attest_no_fossil_for_installation_needs:
           type: boolean
-      required:
-        - capacity
-        - type
-    BiomethaneDigestateStorageAddRequest:
+        energy_used_for_installation_needs:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_installation_needs:
+          type: string
+          nullable: true
+        purified_biogas_quantity_nm3:
+          type: number
+          format: double
+          nullable: true
+        purification_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        self_consumed_biogas_nm3:
+          type: number
+          format: double
+          nullable: true
+        total_unit_electric_consumption_kwe:
+          type: number
+          format: double
+          nullable: true
+        butane_or_propane_addition:
+          type: number
+          format: double
+          nullable: true
+        fossil_fuel_consumed_kwh:
+          type: number
+          format: double
+          nullable: true
+        has_opposition_or_complaints_acceptability:
+          type: boolean
+        estimated_work_days_acceptability:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        has_malfunctions:
+          type: boolean
+        malfunction_cumulative_duration_days:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        malfunction_types:
+          allOf:
+            - $ref: "#/components/schemas/MalfunctionTypesEnum"
+          nullable: true
+        malfunction_details:
+          type: string
+          nullable: true
+        has_injection_difficulties_due_to_network_saturation:
+          type: boolean
+        injection_impossibility_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+    BiomethaneEnergyMonthlyReport:
       type: object
       properties:
-        type:
-          type: string
-          minLength: 1
-          maxLength: 32
-        capacity:
+        id:
+          type: integer
+          readOnly: true
+        month:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        injected_volume_nm3:
           type: number
           format: double
-        has_cover:
-          type: boolean
-        has_biogas_recovery:
-          type: boolean
-      required:
-        - capacity
-        - type
-    BiomethaneDigestateStoragePatch:
-      type: object
-      properties:
-        type:
-          type: string
-          maxLength: 32
-        capacity:
+        average_monthly_flow_nm3_per_hour:
           type: number
           format: double
-        has_cover:
-          type: boolean
-        has_biogas_recovery:
-          type: boolean
-      required:
-        - capacity
-        - type
-    BiomethaneDigestateStoragePatchRequest:
-      type: object
-      properties:
-        type:
-          type: string
-          minLength: 1
-          maxLength: 32
-        capacity:
+        injection_hours:
           type: number
           format: double
-        has_cover:
-          type: boolean
-        has_biogas_recovery:
-          type: boolean
+        energy:
+          type: integer
       required:
-        - capacity
-        - type
+        - energy
+        - id
+        - month
     BiomethaneInjectionSite:
       type: object
       properties:
@@ -10639,11 +11092,11 @@ components:
           type: string
           nullable: true
           maxLength: 100
-        entity:
+        producer:
           type: integer
       required:
-        - entity
         - id
+        - producer
         - unique_identification_number
     BiomethaneInjectionSiteInputRequest:
       type: object
@@ -10688,8 +11141,18 @@ components:
         id:
           type: integer
           readOnly: true
-        producer:
-          type: integer
+        installed_meters:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstalledMetersEnum"
+        digestate_valorization_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
+        spreading_management_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         unit_name:
           type: string
           nullable: true
@@ -10738,11 +11201,6 @@ components:
           type: number
           format: double
           nullable: true
-        installed_meters:
-          type: array
-          items:
-            $ref: "#/components/schemas/InstalledMetersEnum"
-          readOnly: true
         has_hygienization_unit:
           type: boolean
         has_co2_valorization_process:
@@ -10761,29 +11219,30 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_valorization_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
-          readOnly: true
-        spreading_management_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
-          readOnly: true
         digestate_sale_type:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
           nullable: true
+        producer:
+          type: integer
       required:
-        - digestate_valorization_methods
         - id
-        - installed_meters
         - producer
-        - spreading_management_methods
     BiomethaneProductionUnitUpsertRequest:
       type: object
       properties:
+        installed_meters:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstalledMetersEnum"
+        digestate_valorization_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
+        spreading_management_methods:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         unit_name:
           type: string
           nullable: true
@@ -10832,10 +11291,6 @@ components:
           type: number
           format: double
           nullable: true
-        installed_meters:
-          type: array
-          items:
-            $ref: "#/components/schemas/InstalledMetersEnum"
         has_hygienization_unit:
           type: boolean
         has_co2_valorization_process:
@@ -10854,14 +11309,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_valorization_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/DigestateValorizationMethodsEnum"
-        spreading_management_methods:
-          type: array
-          items:
-            $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         digestate_sale_type:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
@@ -13404,6 +13851,34 @@ components:
         - target
         - target_percent
         - unit
+    MalfunctionTypesEnum:
+      enum:
+        - CONCEPTION
+        - MAINTENANCE
+        - BIOLOGICAL
+        - ACCIDENT
+        - PURIFIER
+        - INJECTION_POST
+        - INPUTS
+        - OTHER
+      type: string
+      description: >-
+        * `CONCEPTION` - Conception
+
+        * `MAINTENANCE` - Entretien/Maintenance
+
+        * `BIOLOGICAL` - Biologique
+
+        * `ACCIDENT` - Accident deversement
+
+        * `PURIFIER` - Épurateur
+
+        * `INJECTION_POST` - Poste d'injection (autre que problématiques de
+        saturation des réseaux)
+
+        * `INPUTS` - Intrants
+
+        * `OTHER` - Autres (à préciser)
     MethanizationProcessEnum:
       enum:
         - CONTINUOUS_INFINITELY_MIXED
@@ -13414,6 +13889,27 @@ components:
         * `CONTINUOUS_INFINITELY_MIXED` - Continu (infiniment mélangé)
         * `PLUG_FLOW_SEMI_CONTINUOUS` - En piston (semi-continu)
         * `BATCH_SILOS` - En silos (batch)
+    MonthlyReportDataRequest:
+      type: object
+      properties:
+        month:
+          type: integer
+          maximum: 12
+          minimum: 1
+        injected_volume_nm3:
+          type: number
+          format: double
+        average_monthly_flow_nm3_per_hour:
+          type: number
+          format: double
+        injection_hours:
+          type: number
+          format: double
+      required:
+        - average_monthly_flow_nm3_per_hour
+        - injected_volume_nm3
+        - injection_hours
+        - month
     NavStats:
       type: object
       properties:
@@ -14151,7 +14647,7 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
-    PatchedBiomethaneDigestateStoragePatchRequest:
+    PatchedBiomethaneDigestateStorageInputRequest:
       type: object
       properties:
         type:

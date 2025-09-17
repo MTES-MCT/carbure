@@ -16,7 +16,7 @@ import {
   isContractRedii,
   isTariffReference2011Or2020,
   isTariffReference2021Or2023,
-} from "./contract-infos.utils"
+} from "../../contract.utils"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { Button } from "common/components/button2"
 import {

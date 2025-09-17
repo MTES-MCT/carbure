@@ -2,9 +2,8 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.viewsets import ModelViewSet
 
 from biomethane.models import BiomethaneDigestateStorage
-from biomethane.serializers.digestate_storage import (
-    BiomethaneDigestateStorageAddSerializer,
-    BiomethaneDigestateStoragePatchSerializer,
+from biomethane.serializers import (
+    BiomethaneDigestateStorageInputSerializer,
     BiomethaneDigestateStorageSerializer,
 )
 from core.models import Entity, UserRights
@@ -48,8 +47,6 @@ class BiomethaneDigestateStorageViewSet(ModelViewSet):
         return BiomethaneDigestateStorage.objects.filter(producer=self.request.entity)
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return BiomethaneDigestateStorageAddSerializer
-        elif self.action in ["update", "partial_update"]:
-            return BiomethaneDigestateStoragePatchSerializer
+        if self.action in ["create", "update", "partial_update"]:
+            return BiomethaneDigestateStorageInputSerializer
         return BiomethaneDigestateStorageSerializer

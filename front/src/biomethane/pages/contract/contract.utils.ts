@@ -5,7 +5,7 @@ import {
 } from "biomethane/pages/contract/types"
 
 export const isTariffReference2011Or2020 = (
-  tariff_reference?: TariffReference
+  tariff_reference?: TariffReference | null
 ) => {
   if (!tariff_reference) return false
 
@@ -15,7 +15,7 @@ export const isTariffReference2011Or2020 = (
 }
 
 export const isTariffReference2021Or2023 = (
-  tariff_reference?: TariffReference
+  tariff_reference?: TariffReference | null
 ) => {
   if (!tariff_reference) return false
 
@@ -47,7 +47,9 @@ export const isContractRedii = (
  * @param tariff_reference - The tariff reference to determine the threshold label
  * @returns The threshold label with appropriate units, or empty string if no match
  */
-export const getRediiThresholdLabel = (tariff_reference?: TariffReference) => {
+export const getRediiThresholdLabel = (
+  tariff_reference?: TariffReference | null
+) => {
   if (isTariffReference2011Or2020(tariff_reference))
     return `${REDII_CMAX_THRESHOLD} Nm³/h`
 

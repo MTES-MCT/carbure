@@ -59,6 +59,15 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         return super().get_serializer_class()
 
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="year",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Declaration year.",
+                required=True,
+            ),
+        ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 response=BiomethaneDigestateSerializer,
