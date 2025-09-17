@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from core.models import CarbureLot, GenericError
-from transactions.helpers import fill_basic_info
+from transactions.helpers import check_lot_info, fill_basic_info
 
 
 class FillBasicInfoTest(TestCase):
@@ -22,11 +22,27 @@ class FillBasicInfoTest(TestCase):
         self.assertEqual(errors[0].error, "MISSING_BIOFUEL")
 
     def test_report_missing_field(self):
-        def check_lot_info(config, form_data, prefetched_data):
-            return GenericError(error="SOME ERROR")
-
         form_data = {}
         prefetched_data = {"some_field": None}
-        config = {"field_name": "some_field", "missing_error_label": "SOME ERROR"}
+
+        config = {
+            "form_key": "biofuel_code",
+            "prefetched_key": "biofuels",
+            "missing_code_error": "MISSING_BIOFUEL",
+        }
+
         result = check_lot_info(config, form_data, prefetched_data)
-        self.assertEqual(result.error, "SOME ERROR")
+
+        self.assertEqual(result.error, "MISSING_BIOFUEL")
+        self.assertEqual(result.field, "biofuel_code")
+
+    def test_report_unknown_field(self):
+        prefetched_data = {"biofuels": []}
+        form_data = {"biofuel_code": "ETH"}
+
+        config = {"form_key": "biofuel_code", "prefetched_key": "biofuels", "unknown_code_error": "UNKNOWN_BIOFUEL"}
+
+        result = check_lot_info(config, form_data, prefetched_data)
+
+        self.assertEqual(result.error, "UNKNOWN_BIOFUEL")
+        self.assertEqual(result.field, "biofuel_code")

@@ -653,3 +653,26 @@ def bulk_insert_lots(
     bulk_sanity_checks(inserted_lots, prefetched_data)
     GenericError.objects.bulk_create([error for lot_errors in errors for error in lot_errors], batch_size=100)
     return inserted_lots
+
+
+def check_lot_info(config, form_data, prefetched_data):
+    form_key = config["form_key"]
+
+    code = form_data.get(form_key, None)
+    entries = prefetched_data.get(config["prefetched_key"], None)
+
+    if not code:
+        return GenericError(
+            error=config["missing_code_error"],
+            field=form_key,
+            display_to_creator=True,
+            is_blocking=True,
+        )
+
+    if code not in entries:
+        return GenericError(
+            error=config["unknown_code_error"],
+            field=form_key,
+            display_to_creator=True,
+            is_blocking=True,
+        )
