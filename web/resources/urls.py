@@ -9,6 +9,7 @@ from resources.views import (
     get_entities,
     get_feedstocks,
     get_production_sites,
+    get_systeme_national_certificates,
 )
 
 # from .airlines import get_airlines
@@ -22,4 +23,5 @@ urlpatterns = [
     path("feedstocks", get_feedstocks, name="resources-feedstocks"),
     path("production-sites", get_production_sites, name="resources-production-sites"),
     path("airports", get_airports, name="resources-airports"),
+    path("systeme-national", get_systeme_national_certificates, name="resources-systeme-national"),
 ]
