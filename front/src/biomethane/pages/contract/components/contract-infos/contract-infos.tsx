@@ -91,7 +91,7 @@ export const ContractInfos = ({
       onEdit={setIsEditing}
     >
       <Form onSubmit={onSubmit}>
-        {!entity.is_red_ii && isContractRedii(value) && (
+        {isContractRedii(value) && (
           <Notice variant="info" icon="fr-icon-info-line">
             {t(
               "Votre Capacité maximale de production contractualisée est strictement supérieure à {{value}}, votre production de biométhane est donc soumise aux exigences RED.",
