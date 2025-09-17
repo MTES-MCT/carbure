@@ -17,6 +17,7 @@ import { multipleSelection } from "common/utils/selection"
 import Tag from "@codegouvfr/react-dsfr/Tag"
 import cl from "clsx"
 import { Field } from "../inputs2/field"
+import { HiddenRequiredInput } from "../inputs2/hidden-required-input"
 
 export type TagAutocompleteProps<T, V = T> = Trigger &
   InputProps & {
@@ -103,8 +104,8 @@ export const TagAutocomplete = <T, V = T>({
               onKeyDown={autocomplete.onKeyDown}
               ref={ref}
               disabled={props.readOnly}
-              required={props.required && value.length === 0}
             />
+            {props.required && value.length === 0 && <HiddenRequiredInput />}
           </div>
         </div>
       </Field>
