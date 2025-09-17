@@ -57,8 +57,8 @@ class EntityProductionSiteSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(GenericCertificateSerializer(many=True))
     def get_certificates(self, production_site):
-        certificates = production_site.productionsitecertificate_set.all()
-        certificates = [certificate.certificate.certificate for certificate in certificates]
+        prod_certificates = production_site.productionsitecertificate_set.all()
+        certificates = [certificate.certificate.certificate for certificate in prod_certificates]
         return GenericCertificateSerializer(certificates, many=True).data
 
 
@@ -67,12 +67,14 @@ class EntityProductionSiteWriteSerializer(serializers.ModelSerializer):
         many=True,
         slug_field="code",
         queryset=MatierePremiere.objects.all(),
+        allow_empty=False,
     )
 
     outputs = serializers.SlugRelatedField(
         many=True,
         slug_field="code",
         queryset=Biocarburant.objects.all(),
+        allow_empty=False,
     )
 
     certificates = serializers.SlugRelatedField(
@@ -110,19 +112,7 @@ class EntityProductionSiteWriteSerializer(serializers.ModelSerializer):
 
     # use the Read serializer when consuming this serializer in a response
     def to_representation(self, instance):
-        return EntityProductionSiteSerializer(instance, context=self.context).data
-
-    def validate_inputs(self, value):
-        if not value:
-            message = serializers.Field.default_error_messages["required"]
-            raise serializers.ValidationError(message)
-        return value
-
-    def validate_outputs(self, value):
-        if not value:
-            message = serializers.Field.default_error_messages["required"]
-            raise serializers.ValidationError(message)
-        return value
+        return EntityProductionSiteSerializer(instance).data
 
     @transaction.atomic
     def create(self, validated_data):
