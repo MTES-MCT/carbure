@@ -2,8 +2,14 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.models import CarbureLot
-from core.serializers import CarbureLotPublicSerializer, EntityPreviewSerializer, ProductionSiteSerializer
-from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
+from core.serializers import (
+    BiofuelSerializer,
+    CarbureLotPublicSerializer,
+    CountrySerializer,
+    EntityPreviewSerializer,
+    FeedStockSerializer,
+    ProductionSiteSerializer,
+)
 from saf.models import SafTicket, SafTicketSource
 from saf.serializers.schema import SiteSerializer
 

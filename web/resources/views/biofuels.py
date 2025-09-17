@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Biocarburant
-from doublecount.serializers import BiofuelSerializer
+from core.serializers import BiofuelSerializer
 
 
 @extend_schema(

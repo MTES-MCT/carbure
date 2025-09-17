@@ -6,8 +6,7 @@ from rest_framework import serializers
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from certificates.models import ProductionSiteCertificate
 from core.models import Biocarburant, CarbureLot, EntityCertificate, GenericCertificate, MatierePremiere, Pays
-from core.serializers import GenericCertificateSerializer
-from doublecount.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer
+from core.serializers import BiofuelSerializer, CountrySerializer, FeedStockSerializer, GenericCertificateSerializer
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.models import ProductionSite
 from transactions.models.entity_site import EntitySite

@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.models import (
+    Biocarburant,
     CarbureLot,
     CarbureLotComment,
     CarbureLotEvent,
@@ -15,18 +16,119 @@ from core.models import (
     ExternalAdminRights,
     GenericCertificate,
     GenericError,
+    MatierePremiere,
+    Pays,
     SustainabilityDeclaration,
     UserRights,
     UserRightsRequests,
 )
-from doublecount.serializers import (
-    BiofuelSerializer,
-    CountrySerializer,
-    EntitySerializer,
-    EntitySummarySerializer,
-    FeedStockSerializer,
-)
 from transactions.models import Airport, Depot, ProductionSite
+
+
+class FeedStockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MatierePremiere
+        fields = ["name", "name_en", "code", "category", "is_double_compte"]
+
+
+class BiofuelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Biocarburant
+        fields = ["name", "name_en", "code"]
+
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pays
+        fields = ["name", "name_en", "code_pays", "is_in_europe"]
+
+
+class EntitySummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ["id", "name", "entity_type"]
+        read_only_fields = fields
+
+
+class EntityPreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ["id", "name", "entity_type", "registration_id"]
+        read_only_fields = fields
+
+
+class EntitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = [
+            "id",
+            "name",
+            "entity_type",
+            "has_mac",
+            "has_trading",
+            "has_direct_deliveries",
+            "has_stocks",
+            "preferred_unit",
+            "legal_name",
+            "registration_id",
+            "sustainability_officer_phone_number",
+            "sustainability_officer",
+            "registered_address",
+            "registered_zipcode",
+            "registered_city",
+            "registered_country",
+            "activity_description",
+            "website",
+            "vat_number",
+            "is_enabled",
+        ]
+
+
+class UserEntitySerializer(serializers.ModelSerializer):
+    registered_country = CountrySerializer(required=False)
+    ext_admin_pages = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Entity
+        fields = [
+            "id",
+            "name",
+            "is_enabled",
+            "entity_type",
+            "has_mac",
+            "has_trading",
+            "has_direct_deliveries",
+            "has_stocks",
+            "legal_name",
+            "registration_id",
+            "sustainability_officer",
+            "sustainability_officer_phone_number",
+            "sustainability_officer_email",
+            "registered_address",
+            "registered_zipcode",
+            "registered_city",
+            "registered_country",
+            "default_certificate",
+            "preferred_unit",
+            "has_saf",
+            "has_elec",
+            "activity_description",
+            "website",
+            "vat_number",
+            "ext_admin_pages",
+            "is_tiruert_liable",
+            "accise_number",
+            "is_red_ii",
+        ]
+        read_only_fields = fields
+
+    @extend_schema_field(
+        serializers.ListField(child=serializers.ChoiceField(choices=[r[1] for r in ExternalAdminRights.RIGHTS]))
+    )
+    def get_ext_admin_pages(self, obj):
+        if obj.entity_type == Entity.EXTERNAL_ADMIN:
+            return [e.right for e in obj.externaladminrights_set.all()]
+        return None
 
 
 class AirportSerializer(serializers.ModelSerializer):
@@ -679,60 +781,6 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
             "email_sent",
             "meta",
         ]
-
-
-class EntityPreviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Entity
-        fields = ["id", "name", "entity_type", "registration_id"]
-        read_only_fields = fields
-
-
-class UserEntitySerializer(serializers.ModelSerializer):
-    registered_country = CountrySerializer(required=False)
-    ext_admin_pages = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Entity
-        fields = [
-            "id",
-            "name",
-            "is_enabled",
-            "entity_type",
-            "has_mac",
-            "has_trading",
-            "has_direct_deliveries",
-            "has_stocks",
-            "legal_name",
-            "registration_id",
-            "sustainability_officer",
-            "sustainability_officer_phone_number",
-            "sustainability_officer_email",
-            "registered_address",
-            "registered_zipcode",
-            "registered_city",
-            "registered_country",
-            "default_certificate",
-            "preferred_unit",
-            "has_saf",
-            "has_elec",
-            "activity_description",
-            "website",
-            "vat_number",
-            "ext_admin_pages",
-            "is_tiruert_liable",
-            "accise_number",
-            "is_red_ii",
-        ]
-        read_only_fields = fields
-
-    @extend_schema_field(
-        serializers.ListField(child=serializers.ChoiceField(choices=[r[1] for r in ExternalAdminRights.RIGHTS]))
-    )
-    def get_ext_admin_pages(self, obj):
-        if obj.entity_type == Entity.EXTERNAL_ADMIN:
-            return [e.right for e in obj.externaladminrights_set.all()]
-        return None
 
 
 class UserRightsRequestsSerializer(serializers.ModelSerializer):

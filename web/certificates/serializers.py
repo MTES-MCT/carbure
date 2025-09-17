@@ -1,13 +1,9 @@
 from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
+from core.serializers import BiofuelSerializer, EntitySummarySerializer, FeedStockSerializer
 from doublecount.models import DoubleCountingProduction
-from doublecount.serializers import (
-    BiofuelSerializer,
-    DoubleCountingApplicationSerializer,
-    EntitySummarySerializer,
-    FeedStockSerializer,
-)
+from doublecount.serializers import DoubleCountingApplicationSerializer
 
 from .models import DoubleCountingRegistration
 
