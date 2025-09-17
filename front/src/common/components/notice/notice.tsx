@@ -16,7 +16,7 @@ export type NoticeVariant = "info" | "warning" | "alert"
 export interface NoticeProps {
   variant?: NoticeVariant
   icon?: IconName
-  title?: string
+  title?: React.ReactNode
   children?: React.ReactNode | CustomRenderer
 
   style?: React.CSSProperties

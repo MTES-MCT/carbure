@@ -36,12 +36,12 @@ class ContractUtilsTests(TestCase):
 
         self.assertEqual(
             current_tracked_types,
-            {
+            [
                 BiomethaneContractAmendment.INPUT_BONUS_UPDATE,
                 BiomethaneContractAmendment.CMAX_ANNUALIZATION,
                 BiomethaneContractAmendment.CMAX_PAP_UPDATE,
                 BiomethaneContractAmendment.PRODUCER_BUYER_INFO_CHANGE,
-            },
+            ],
         )
 
     def test_tracked_amendment_types_handler_add_value_to_none_list(self):
@@ -54,7 +54,7 @@ class ContractUtilsTests(TestCase):
 
         self.assertEqual(
             current_tracked_types,
-            {BiomethaneContractAmendment.CMAX_PAP_UPDATE},
+            [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
         )
 
     def test_tracked_amendment_types_handler_returns_same_list_if_no_change(self):
@@ -68,5 +68,5 @@ class ContractUtilsTests(TestCase):
 
         self.assertEqual(
             current_tracked_types,
-            {BiomethaneContractAmendment.CMAX_PAP_UPDATE},
+            [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
         )

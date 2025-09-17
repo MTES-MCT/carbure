@@ -16,4 +16,4 @@ def get_tracked_amendment_types(instance, validated_data):
     if validated_buyer is not None and instance.buyer != validated_buyer:
         current_tracked_types.add(BiomethaneContractAmendment.PRODUCER_BUYER_INFO_CHANGE)
 
-    return current_tracked_types
+    return list(current_tracked_types)

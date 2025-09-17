@@ -4,12 +4,16 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneContract
+from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.serializers.contract.contract_amendment import BiomethaneContractAmendmentSerializer
 from biomethane.utils.contract import get_tracked_amendment_types
 
 
 class BiomethaneContractSerializer(serializers.ModelSerializer):
     amendments = BiomethaneContractAmendmentSerializer(many=True, read_only=True)
+    tracked_amendment_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneContractAmendment.TRACKED_AMENDMENT_TYPES), read_only=True
+    )
 
     class Meta:
         model = BiomethaneContract
