@@ -170,8 +170,8 @@ class EntityProductionSiteTest(TestCase):
 
         self.assertEqual(data["name"], ["Ce champ est obligatoire."])
         self.assertEqual(data["country_code"], ["Ce champ est obligatoire."])
-        self.assertEqual(data["inputs"], ["Ce champ est obligatoire."])
-        self.assertEqual(data["outputs"], ["Ce champ est obligatoire."])
+        self.assertEqual(data["inputs"], ["Cette liste ne peut pas être vide."])
+        self.assertEqual(data["outputs"], ["Cette liste ne peut pas être vide."])
 
     def test_update_production_site(self):
         psite: Site = self.production_site
