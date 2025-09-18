@@ -15,6 +15,7 @@ from certificates.models import DoubleCountingRegistration
 from core.common import CarbureException
 from core.helpers import send_mail
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays, UserRights
+from core.serializers import BiofuelSerializer, FeedStockSerializer
 from core.utils import CarbureEnv
 from doublecount.dc_sanity_checks import (
     check_dc_globally,
@@ -39,12 +40,10 @@ from doublecount.parser.dc_parser import (
     parse_dc_excel,
 )
 from doublecount.serializers import (
-    BiofuelSerializer,
     DoubleCountingProductionHistorySerializer,
     DoubleCountingProductionSerializer,
     DoubleCountingSourcingHistorySerializer,
     DoubleCountingSourcingSerializer,
-    FeedStockSerializer,
 )
 
 today = datetime.date.today()
