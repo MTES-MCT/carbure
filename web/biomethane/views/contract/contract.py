@@ -5,12 +5,11 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import BiomethaneContractFilter
 from biomethane.models import BiomethaneContract
+from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.contract import (
     BiomethaneContractInputSerializer,
     BiomethaneContractSerializer,
 )
-from core.models import Entity, UserRights
-from core.permissions import HasUserRights
 
 # from .mixins import ActionMixin
 
@@ -30,15 +29,10 @@ class BiomethaneContractViewSet(GenericViewSet):
     queryset = BiomethaneContract.objects.all()
     filterset_class = BiomethaneContractFilter
     serializer_class = BiomethaneContractSerializer
-    permission_classes = [HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
     def get_permissions(self):
-        if self.action in [
-            "upsert",
-        ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
-        return super().get_permissions()
+        return get_biomethane_permissions(["upsert"], self.action)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

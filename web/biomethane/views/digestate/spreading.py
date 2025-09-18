@@ -3,12 +3,11 @@ from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
+from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.digestate.spreading import (
     BiomethaneDigestateSpreadingAddSerializer,
 )
 from biomethane.utils import get_declaration_period
-from core.models import Entity, UserRights
-from core.permissions import HasUserRights
 
 
 @extend_schema(
@@ -25,7 +24,9 @@ from core.permissions import HasUserRights
 class BiomethaneDigestateSpreadingViewSet(GenericViewSet, CreateModelMixin, DestroyModelMixin):
     queryset = BiomethaneDigestateSpreading.objects.all()
     serializer_class = BiomethaneDigestateSpreadingAddSerializer
-    permission_classes = [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
+
+    def get_permissions(self):
+        get_biomethane_permissions(["create", "destroy"], self.action)
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)

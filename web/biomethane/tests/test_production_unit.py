@@ -1,8 +1,11 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
 from biomethane.models import BiomethaneProductionUnit
+from biomethane.views.production_unit import BiomethaneProductionUnitViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -24,6 +27,16 @@ class BiomethaneProductionUnitViewSetTests(TestCase):
 
         self.production_unit_url = reverse("biomethane-production-unit")
         self.production_unit_url += "?entity_id=" + str(self.producer_entity.id)
+
+    @patch("biomethane.views.production_unit.production_unit.get_biomethane_permissions")
+    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
+        """Test that the write actions are correctly defined"""
+        viewset = BiomethaneProductionUnitViewSet()
+        viewset.action = "retrieve"
+
+        viewset.get_permissions()
+
+        mock_get_biomethane_permissions.assert_called_once_with(["upsert"], "retrieve")
 
     def test_permission_boundary(self):
         # Create non-biomethane producer entity

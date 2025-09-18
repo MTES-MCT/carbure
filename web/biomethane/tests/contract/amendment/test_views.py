@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -7,6 +8,7 @@ from rest_framework import status
 
 from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneEntityConfigAmendmentFactory
 from biomethane.models import BiomethaneContractAmendment
+from biomethane.views.contract.contract_amendment import BiomethaneContractAmendmentViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -45,6 +47,16 @@ class BiomethaneContractAmendmentViewSetTests(TestCase):
         self.base_params = {"entity_id": self.producer_entity.id}
 
         self.test_file = SimpleUploadedFile("test_amendment.pdf", b"fake pdf content", content_type="application/pdf")
+
+    @patch("biomethane.views.contract.contract_amendment.get_biomethane_permissions")
+    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
+        """Test that the write actions are correctly defined"""
+        viewset = BiomethaneContractAmendmentViewSet()
+        viewset.action = "retrieve"
+
+        viewset.get_permissions()
+
+        mock_get_biomethane_permissions.assert_called_once_with(["create"], "retrieve")
 
     def test_list_amendments_empty(self):
         """Test listing amendments when none exist"""
