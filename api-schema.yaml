@@ -1021,7 +1021,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -1058,7 +1057,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -1107,7 +1105,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -1152,7 +1149,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "201":
           description: Monthly reports created or updated successfully
@@ -1171,7 +1167,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           description: No response body
@@ -1190,7 +1185,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -4609,13 +4603,37 @@ paths:
           name: company_id
           schema:
             type: integer
-          description: Compay ID, Admin only
+          description: Entity ID
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Entity ID
           required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
       tags:
         - entities
       security:
@@ -4626,13 +4644,16 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EntityProductionSite"
+                $ref: "#/components/schemas/PaginatedEntityProductionSiteList"
           description: ""
     post:
       operationId: entities_production_sites_create
       parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Entity ID
         - in: query
           name: entity_id
           schema:
@@ -4645,13 +4666,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProductionSiteModelRequest"
+              $ref: "#/components/schemas/EntityProductionSiteWriteRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/ProductionSiteModelRequest"
+              $ref: "#/components/schemas/EntityProductionSiteWriteRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/ProductionSiteModelRequest"
+              $ref: "#/components/schemas/EntityProductionSiteWriteRequest"
         required: true
       security:
         - cookieAuth: []
@@ -4661,12 +4682,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DepotProductionSite"
+                $ref: "#/components/schemas/EntityProductionSiteWrite"
           description: ""
-  /api/entities/production-sites/{id}/delete/:
-    post:
-      operationId: entities_production_sites_delete_create
+  /api/entities/production-sites/{id}/:
+    get:
+      operationId: entities_production_sites_retrieve
       parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Entity ID
         - in: query
           name: entity_id
           schema:
@@ -4677,7 +4703,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de Production.
+          description: A unique integer value identifying this Site de stockage de
+            carburant.
           required: true
       tags:
         - entities
@@ -4689,28 +4716,16 @@ paths:
           content:
             application/json:
               schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
-  /api/entities/production-sites/{id}/set-biofuels/:
-    post:
-      operationId: entities_production_sites_set_biofuels_create
+                $ref: "#/components/schemas/EntityProductionSite"
+          description: ""
+    put:
+      operationId: entities_production_sites_update
       parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Entity ID
         - in: query
           name: entity_id
           schema:
@@ -4721,7 +4736,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de Production.
+          description: A unique integer value identifying this Site de stockage de
+            carburant.
           required: true
       tags:
         - entities
@@ -4729,13 +4745,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SetBioFuelsRequest"
+              $ref: "#/components/schemas/EntityProductionSiteWriteRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/SetBioFuelsRequest"
+              $ref: "#/components/schemas/EntityProductionSiteWriteRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/SetBioFuelsRequest"
+              $ref: "#/components/schemas/EntityProductionSiteWriteRequest"
         required: true
       security:
         - cookieAuth: []
@@ -4745,28 +4761,16 @@ paths:
           content:
             application/json:
               schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
-  /api/entities/production-sites/{id}/set-certificates/:
-    post:
-      operationId: entities_production_sites_set_certificates_create
+                $ref: "#/components/schemas/EntityProductionSiteWrite"
+          description: ""
+    patch:
+      operationId: entities_production_sites_partial_update
       parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Entity ID
         - in: query
           name: entity_id
           schema:
@@ -4777,7 +4781,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de Production.
+          description: A unique integer value identifying this Site de stockage de
+            carburant.
           required: true
       tags:
         - entities
@@ -4785,14 +4790,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SetCertificateRequest"
+              $ref: "#/components/schemas/PatchedEntityProductionSiteWriteRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/SetCertificateRequest"
+              $ref: "#/components/schemas/PatchedEntityProductionSiteWriteRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/SetCertificateRequest"
-        required: true
+              $ref: "#/components/schemas/PatchedEntityProductionSiteWriteRequest"
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -4801,28 +4805,16 @@ paths:
           content:
             application/json:
               schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
-  /api/entities/production-sites/{id}/set-feedstocks/:
-    post:
-      operationId: entities_production_sites_set_feedstocks_create
+                $ref: "#/components/schemas/EntityProductionSiteWrite"
+          description: ""
+    delete:
+      operationId: entities_production_sites_destroy
       parameters:
+        - in: query
+          name: company_id
+          schema:
+            type: integer
+          description: Entity ID
         - in: query
           name: entity_id
           schema:
@@ -4833,104 +4825,17 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de Production.
+          description: A unique integer value identifying this Site de stockage de
+            carburant.
           required: true
       tags:
         - entities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SetFeedstocksRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/SetFeedstocksRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/SetFeedstocksRequest"
-        required: true
       security:
         - cookieAuth: []
         - basicAuth: []
       responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
-  /api/entities/production-sites/{id}/update/:
-    post:
-      operationId: entities_production_sites_update_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Site de Production.
-          required: true
-      tags:
-        - entities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateProductionSiteModelRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/UpdateProductionSiteModelRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/UpdateProductionSiteModelRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
+        "204":
+          description: No response body
   /api/entities/release-for-consumption/:
     post:
       operationId: entities_release_for_consumption_create
@@ -13081,22 +12986,6 @@ components:
       required:
         - id
         - name
-    EntityBiofuel:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 64
-        name_en:
-          type: string
-          maxLength: 64
-        code:
-          type: string
-          maxLength: 16
-      required:
-        - code
-        - name
-        - name_en
     EntityCertificate:
       type: object
       properties:
@@ -13174,24 +13063,6 @@ components:
           maxLength: 32
       required:
         - name
-    EntityCountry:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 128
-        name_en:
-          type: string
-          maxLength: 128
-        code_pays:
-          type: string
-          maxLength: 64
-        is_in_europe:
-          type: boolean
-      required:
-        - code_pays
-        - name
-        - name_en
     EntityDepot:
       type: object
       properties:
@@ -13242,26 +13113,6 @@ components:
         - country
         - id
         - name
-    EntityFeedStock:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 128
-        name_en:
-          type: string
-          maxLength: 128
-        code:
-          type: string
-          maxLength: 64
-        category:
-          $ref: "#/components/schemas/MPCategoriesEnum"
-        is_double_compte:
-          type: boolean
-      required:
-        - code
-        - name
-        - name_en
     EntityMetrics:
       type: object
       properties:
@@ -13340,7 +13191,7 @@ components:
           maxLength: 128
         country:
           allOf:
-            - $ref: "#/components/schemas/EntityCountry"
+            - $ref: "#/components/schemas/Country"
           readOnly: true
         date_mise_en_service:
           type: string
@@ -13378,20 +13229,142 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GenericCertificate"
+          readOnly: true
         inputs:
           type: array
           items:
-            $ref: "#/components/schemas/EntityFeedStock"
+            $ref: "#/components/schemas/FeedStock"
           readOnly: true
         outputs:
           type: array
           items:
-            $ref: "#/components/schemas/EntityBiofuel"
+            $ref: "#/components/schemas/Biofuel"
           readOnly: true
       required:
         - certificates
         - country
         - id
+        - inputs
+        - name
+        - outputs
+    EntityProductionSiteWrite:
+      type: object
+      properties:
+        address:
+          type: string
+          maxLength: 256
+        certificates:
+          type: array
+          items:
+            type: string
+        city:
+          type: string
+          maxLength: 128
+        country_code:
+          type: string
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        dc_reference:
+          type: string
+          maxLength: 64
+        eligible_dc:
+          type: boolean
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        inputs:
+          type: array
+          items:
+            type: string
+        manager_email:
+          type: string
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 128
+        outputs:
+          type: array
+          items:
+            type: string
+        postal_code:
+          type: string
+          maxLength: 32
+        site_siret:
+          type: string
+          maxLength: 64
+      required:
+        - certificates
+        - country_code
+        - inputs
+        - name
+        - outputs
+    EntityProductionSiteWriteRequest:
+      type: object
+      properties:
+        address:
+          type: string
+          maxLength: 256
+        certificates:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        city:
+          type: string
+          maxLength: 128
+        country_code:
+          type: string
+          minLength: 1
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        dc_reference:
+          type: string
+          maxLength: 64
+        eligible_dc:
+          type: boolean
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        inputs:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        manager_email:
+          type: string
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        outputs:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        postal_code:
+          type: string
+          maxLength: 32
+        site_siret:
+          type: string
+          maxLength: 64
+      required:
+        - certificates
+        - country_code
         - inputs
         - name
         - outputs
@@ -14594,6 +14567,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityPreview"
+    PaginatedEntityProductionSiteList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/EntityProductionSite"
     PaginatedOperationListList:
       type: object
       required:
@@ -14697,6 +14693,63 @@ components:
         quantity:
           type: number
           format: double
+    PatchedEntityProductionSiteWriteRequest:
+      type: object
+      properties:
+        address:
+          type: string
+          maxLength: 256
+        certificates:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        city:
+          type: string
+          maxLength: 128
+        country_code:
+          type: string
+          minLength: 1
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        dc_reference:
+          type: string
+          maxLength: 64
+        eligible_dc:
+          type: boolean
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        inputs:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        manager_email:
+          type: string
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        outputs:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        postal_code:
+          type: string
+          maxLength: 32
+        site_siret:
+          type: string
+          maxLength: 64
     PatchedOperationUpdateRequest:
       type: object
       properties:
@@ -14852,67 +14905,6 @@ components:
       required:
         - certificate_id
         - type
-    ProductionSiteModelRequest:
-      type: object
-      properties:
-        country_code:
-          type: string
-          minLength: 1
-        country:
-          type: integer
-          nullable: true
-        name:
-          type: string
-          minLength: 1
-          maxLength: 128
-        date_mise_en_service:
-          type: string
-          format: date
-          nullable: true
-        ges_option:
-          $ref: "#/components/schemas/GesOptionEnum"
-        site_siret:
-          type: string
-          maxLength: 64
-        postal_code:
-          type: string
-          maxLength: 32
-        manager_name:
-          type: string
-          maxLength: 64
-        manager_phone:
-          type: string
-          maxLength: 64
-        manager_email:
-          type: string
-          maxLength: 64
-        city:
-          type: string
-          maxLength: 128
-        address:
-          type: string
-          maxLength: 256
-        eligible_dc:
-          type: boolean
-        dc_reference:
-          type: string
-          maxLength: 64
-        created_by:
-          type: integer
-          nullable: true
-      required:
-        - address
-        - city
-        - country_code
-        - date_mise_en_service
-        - eligible_dc
-        - ges_option
-        - manager_email
-        - manager_name
-        - manager_phone
-        - name
-        - postal_code
-        - site_siret
     ProvisionCertificateBulkRequest:
       type: object
       properties:
@@ -15740,27 +15732,6 @@ components:
           maxLength: 9
       required:
         - registration_id
-    SetBioFuelsRequest:
-      type: object
-      properties:
-        biocarburant_codes:
-          type: array
-          items:
-            type: string
-            minLength: 1
-          description: List of biocarburant codes.
-      required:
-        - biocarburant_codes
-    SetCertificateRequest:
-      type: object
-      properties:
-        certificate_ids:
-          type: array
-          items:
-            type: string
-            minLength: 1
-      required:
-        - certificate_ids
     SetDefaultCertificateRequest:
       type: object
       properties:
@@ -15769,16 +15740,6 @@ components:
           minLength: 1
       required:
         - certificate_id
-    SetFeedstocksRequest:
-      type: object
-      properties:
-        matiere_premiere_codes:
-          type: array
-          items:
-            type: string
-            minLength: 1
-      required:
-        - matiere_premiere_codes
     ShippingMethodEnum:
       enum:
         - PIPELINE
@@ -16157,54 +16118,6 @@ components:
         website:
           type: string
           format: uri
-    UpdateProductionSiteModelRequest:
-      type: object
-      properties:
-        country_code:
-          type: string
-          minLength: 1
-        name:
-          type: string
-          minLength: 1
-          maxLength: 128
-        date_mise_en_service:
-          type: string
-          format: date
-          nullable: true
-        ges_option:
-          $ref: "#/components/schemas/GesOptionEnum"
-        site_siret:
-          type: string
-          maxLength: 64
-        postal_code:
-          type: string
-          maxLength: 32
-        manager_name:
-          type: string
-          maxLength: 64
-        manager_phone:
-          type: string
-          maxLength: 64
-        manager_email:
-          type: string
-          maxLength: 64
-        city:
-          type: string
-          maxLength: 128
-        address:
-          type: string
-          maxLength: 256
-        eligible_dc:
-          type: boolean
-        dc_reference:
-          type: string
-          maxLength: 64
-        created_by:
-          type: integer
-          nullable: true
-      required:
-        - country_code
-        - name
     UpdateRightsRequestsRequest:
       type: object
       properties:

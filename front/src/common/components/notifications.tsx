@@ -64,6 +64,8 @@ export function useNotifyError() {
         )
         if (isRecordOfStringArrays) {
           errorText = <FormErrors errors={error.data} />
+        } else if (typeof error.data.detail === "string") {
+          errorText = error.data.detail
         }
       }
     }

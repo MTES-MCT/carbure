@@ -4,7 +4,15 @@ from rest_framework import serializers
 
 from certificates.models import ProductionSiteCertificate
 from core import private_storage
-from core.models import Biocarburant, Entity, GenericCertificate, MatierePremiere, Pays
+from core.models import MatierePremiere
+from core.serializers import (
+    BiofuelSerializer,
+    CountrySerializer,
+    EntitySerializer,
+    EntitySummarySerializer,
+    FeedStockSerializer,
+    GenericCertificateSerializer,
+)
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.models import ProductionSite
 
@@ -16,76 +24,6 @@ from .models import (
     DoubleCountingSourcing,
     DoubleCountingSourcingHistory,
 )
-
-
-class EntitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Entity
-        fields = [
-            "id",
-            "name",
-            "entity_type",
-            "has_mac",
-            "has_trading",
-            "has_direct_deliveries",
-            "has_stocks",
-            "preferred_unit",
-            "legal_name",
-            "registration_id",
-            "sustainability_officer_phone_number",
-            "sustainability_officer",
-            "registered_address",
-            "registered_zipcode",
-            "registered_city",
-            "registered_country",
-            "activity_description",
-            "website",
-            "vat_number",
-            "is_enabled",
-        ]
-
-
-class EntitySummarySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Entity
-        fields = ["id", "name", "entity_type"]
-        read_only_fields = fields
-
-
-class FeedStockSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MatierePremiere
-        fields = ["name", "name_en", "code", "category", "is_double_compte"]
-
-
-class BiofuelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Biocarburant
-        fields = ["name", "name_en", "code"]
-
-
-class ProductionSiteCertificateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GenericCertificate
-        fields = [
-            "certificate_id",
-            "certificate_type",
-            "certificate_holder",
-            "certificate_issuer",
-            "address",
-            "valid_from",
-            "valid_until",
-            "download_link",
-            "scope",
-            "input",
-            "output",
-        ]
-
-
-class CountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pays
-        fields = ["name", "name_en", "code_pays", "is_in_europe"]
 
 
 class DoubleCountingProductionSitePreviewSerializer(serializers.ModelSerializer):
@@ -128,11 +66,11 @@ class DoubleCountingProductionSiteSerializer(serializers.ModelSerializer):
             "certificates",
         ]
 
-    @extend_schema_field(ProductionSiteCertificateSerializer(many=True))
+    @extend_schema_field(GenericCertificateSerializer(many=True))
     def get_certificates(self, obj):
         ps_certificates = ProductionSiteCertificate.objects.filter(production_site=obj)
         certificates = [ps_certificate.certificate.certificate for ps_certificate in ps_certificates]
-        return ProductionSiteCertificateSerializer(certificates, many=True).data
+        return GenericCertificateSerializer(certificates, many=True).data
 
     @extend_schema_field(FeedStockSerializer(many=True))
     def get_inputs(self, obj):
