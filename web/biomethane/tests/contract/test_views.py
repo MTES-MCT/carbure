@@ -42,7 +42,7 @@ class BiomethaneContractViewsTests(TestCase):
 
     @patch("biomethane.views.contract.contract.get_biomethane_permissions")
     def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
+        """Test that write actions are correctly defined"""
         viewset = BiomethaneContractViewSet()
         viewset.action = "retrieve"
 
