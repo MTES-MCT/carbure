@@ -60,33 +60,6 @@ export default meta
 
 export const Default: Story = {}
 
-// Check the next step button is disabled
-export const DisallowedNextStep: Story = {
-  decorators: [
-    loadStepsDecorator([
-      {
-        key: "step-1",
-        title: "Step 1",
-        allowNextStep: false,
-      },
-      {
-        key: "step-2",
-        title: "Step 2",
-      },
-    ]),
-  ],
-}
-
-// Check the next step button display the second step
-export const Step2: Story = {
-  play: async ({ canvasElement }) => {
-    const { getByRole } = within(canvasElement)
-    const button = await waitFor(() => getByRole("button", { name: "Suivant" }))
-
-    await userEvent.click(button)
-  },
-}
-
 // Check an error validation message is displayed after submitting the form
 export const StepperWithForm: Story = {
   render: () => {
@@ -109,7 +82,12 @@ export const StepperWithForm: Story = {
       </>
     )
   },
-  play: Step2.play,
+  play: async ({ canvasElement }) => {
+    const { getByRole } = within(canvasElement)
+    const button = await waitFor(() => getByRole("button", { name: "Suivant" }))
+
+    await userEvent.click(button)
+  },
 }
 
 // Check if the form is validated after filling the input

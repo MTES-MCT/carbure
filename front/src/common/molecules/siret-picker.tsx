@@ -2,7 +2,7 @@ import { TextInput, TextInputProps } from "common/components/inputs2"
 import { useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { HttpError } from "common/services/api-fetch"
-import { searchCompanyDataBySiren as searchCompanyDataBySiret } from "common/api"
+import { searchCompanyData } from "common/api"
 import { SearchCompanyPreview } from "companies/types"
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -16,7 +16,7 @@ export const SiretPicker = ({ onSelect, ...props }: SiretPickerProps) => {
   const searchSiretRef = useRef<HTMLInputElement>(null)
   const notifyError = useNotifyError()
   const [error, setError] = useState<string | undefined>(undefined)
-  const companyResponse = useMutation(searchCompanyDataBySiret, {
+  const companyResponse = useMutation(searchCompanyData, {
     onSuccess: (res) => {
       const companyResult = res.data
 
@@ -31,7 +31,7 @@ export const SiretPicker = ({ onSelect, ...props }: SiretPickerProps) => {
 
       if (error === "NO_COMPANY_FOUND") {
         const message = t(
-          "Aucune entreprise n'a été trouvée avec ce numéro SIRET ou SIREN"
+          "Aucune entreprise n'a été trouvée avec ce numéro SIRET"
         )
         notifyError(err, message)
 

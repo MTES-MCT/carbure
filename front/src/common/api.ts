@@ -146,11 +146,10 @@ export async function findMyCertificates(
   )
 }
 
-const searchCompanyData = (registration_id: string, siret: boolean) => {
+export const searchCompanyData = (registration_id: string) => {
   return apiFetch.POST("/entities/search-company/", {
     body: {
       registration_id,
-      siret,
     },
   })
 }
@@ -161,12 +160,4 @@ export async function findSystemNationalCertificates(query: string) {
   })
 
   return res.data ?? []
-}
-
-export function searchCompanyDataBySiren(registration_id: string) {
-  return searchCompanyData(registration_id, false)
-}
-
-export function searchCompanyDataBySiret(registration_id: string) {
-  return searchCompanyData(registration_id, true)
 }

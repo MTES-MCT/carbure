@@ -15768,9 +15768,6 @@ components:
         registration_id:
           type: string
           minLength: 1
-        siret:
-          type: boolean
-          default: false
       required:
         - registration_id
     SetBioFuelsRequest:

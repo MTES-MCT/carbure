@@ -5057,8 +5057,6 @@ export interface components {
         };
         SeachCompanyRequest: {
             registration_id: string;
-            /** @default false */
-            siret: boolean;
         };
         SetBioFuelsRequest: {
             /** @description List of biocarburant codes. */

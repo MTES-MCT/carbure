@@ -14,7 +14,7 @@ class ContractUtilsTests(TestCase):
         )
 
     def test_tracked_amendment_types_handler_appends_contract_changed(self):
-        """Test that tracked_amendment_types is updated with existing types and new values."""
+        """Test that tracked_amendment_types is updated with existing types and new values, sorted alphabetically."""
         buyer_entity = Entity.objects.create(
             name="Buyer",
             entity_type=Entity.OPERATOR,
@@ -37,9 +37,9 @@ class ContractUtilsTests(TestCase):
         self.assertEqual(
             current_tracked_types,
             [
-                BiomethaneContractAmendment.INPUT_BONUS_UPDATE,
                 BiomethaneContractAmendment.CMAX_ANNUALIZATION,
                 BiomethaneContractAmendment.CMAX_PAP_UPDATE,
+                BiomethaneContractAmendment.INPUT_BONUS_UPDATE,
                 BiomethaneContractAmendment.PRODUCER_BUYER_INFO_CHANGE,
             ],
         )
