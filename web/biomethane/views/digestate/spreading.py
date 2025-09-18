@@ -26,7 +26,7 @@ class BiomethaneDigestateSpreadingViewSet(GenericViewSet, CreateModelMixin, Dest
     serializer_class = BiomethaneDigestateSpreadingAddSerializer
 
     def get_permissions(self):
-        get_biomethane_permissions(["create", "destroy"], self.action)
+        return get_biomethane_permissions(["create", "destroy"], self.action)
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
