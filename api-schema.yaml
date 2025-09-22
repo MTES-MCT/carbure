@@ -10273,6 +10273,11 @@ components:
           items:
             $ref: "#/components/schemas/BiomethaneContractAmendment"
           readOnly: true
+        tracked_amendment_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrackedAmendmentTypesEnum"
+          readOnly: true
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
@@ -10320,6 +10325,7 @@ components:
         - amendments
         - id
         - producer
+        - tracked_amendment_types
     BiomethaneContractAmendment:
       type: object
       properties:
@@ -10447,6 +10453,7 @@ components:
           type: string
           format: binary
           nullable: true
+        tracked_amendment_types: {}
         buyer:
           type: integer
           nullable: true
@@ -11061,6 +11068,8 @@ components:
           nullable: true
           maxLength: 100
       required:
+        - network_manager_name
+        - network_type
         - unique_identification_number
     BiomethaneProductionUnit:
       type: object
@@ -11092,6 +11101,18 @@ components:
           type: string
           nullable: true
           maxLength: 256
+        postal_code:
+          type: string
+          nullable: true
+          maxLength: 10
+        city:
+          type: string
+          nullable: true
+          maxLength: 128
+        department:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -11182,6 +11203,18 @@ components:
           type: string
           nullable: true
           maxLength: 256
+        postal_code:
+          type: string
+          nullable: true
+          maxLength: 10
+        city:
+          type: string
+          nullable: true
+          maxLength: 128
+        department:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -11639,7 +11672,11 @@ components:
           maxLength: 20
         registered_country:
           $ref: "#/components/schemas/RegistrationCountry"
+        department_code:
+          type: string
+          maxLength: 5
       required:
+        - department_code
         - legal_name
         - name
         - registered_address
@@ -15729,7 +15766,6 @@ components:
         registration_id:
           type: string
           minLength: 1
-          maxLength: 9
       required:
         - registration_id
     SetDefaultCertificateRequest:
@@ -16025,6 +16061,16 @@ components:
           minLength: 1
       required:
         - refresh
+    TrackedAmendmentTypesEnum:
+      enum:
+        - CMAX_PAP_UPDATE
+        - CMAX_ANNUALIZATION
+        - PRODUCER_BUYER_INFO_CHANGE
+      type: string
+      description: |-
+        * `CMAX_PAP_UPDATE` - CMAX_PAP_UPDATE
+        * `CMAX_ANNUALIZATION` - CMAX_ANNUALIZATION
+        * `PRODUCER_BUYER_INFO_CHANGE` - PRODUCER_BUYER_INFO_CHANGE
     TransportDocumentTypeEnum:
       enum:
         - DAU

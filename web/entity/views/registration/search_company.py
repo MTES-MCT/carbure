@@ -34,11 +34,11 @@ def search_company_view(request):
             {"error": SeachCompanyFormError.NO_COMPANY_FOUND},
             status=status.HTTP_400_BAD_REQUEST,
         )
-
     company_siege = company_found["siege"]
     company_city = company_siege["libelle_commune"]
     company_zipcode = company_siege["code_postal"]
     company_address = company_siege["adresse"]
+    company_department = company_siege["departement"]
     string_to_remove = f"{company_zipcode} {company_city}"
     company_address = company_address.replace(string_to_remove, "")
 
@@ -56,6 +56,7 @@ def search_company_view(request):
         "registered_city": company_siege["libelle_commune"],
         "registered_zipcode": company_siege["code_postal"],
         "registered_country": france,
+        "department_code": company_department,
     }
 
     response_data = {"company_preview": company_preview}

@@ -11,4 +11,5 @@ export const contractData: BiomethaneContract = {
   buyer: 1,
   producer: 1,
   amendments: [],
+  tracked_amendment_types: [],
 }

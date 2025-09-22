@@ -1,13 +1,17 @@
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
-import { Form, FormManager, useForm } from "common/components/form2"
+import { FormManager, useForm } from "common/components/form2"
 import { DateInput, FileInput } from "common/components/inputs2"
 import { Box, Grid } from "common/components/scaffold"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
 import { ReplaceNullWithUndefined } from "common/types"
 import { useTranslation } from "react-i18next"
 import { useAddContract } from "./add-contract.hooks"
-import { BiomethaneContractPatchRequest } from "biomethane/pages/contract/types"
+import {
+  BiomethaneContract,
+  BiomethaneContractPatchRequest,
+} from "biomethane/pages/contract/types"
+import { getSignatureDateConstraints } from "./add-contract.utils"
 
 type AddContractForm = ReplaceNullWithUndefined<
   Pick<
@@ -21,13 +25,18 @@ type AddContractForm = ReplaceNullWithUndefined<
 
 interface AddContractProps {
   onClose: () => void
+  contract?: BiomethaneContract
 }
 
 interface AddContractContentProps extends AddContractProps {
   form: FormManager<AddContractForm>
 }
 
-const AddContractContent = ({ onClose, form }: AddContractContentProps) => {
+const AddContractContent = ({
+  onClose,
+  form,
+  contract,
+}: AddContractContentProps) => {
   const { t } = useTranslation()
   const { currentStep } = useStepper()
   const addContractFiles = useAddContract({
@@ -38,13 +47,17 @@ const AddContractContent = ({ onClose, form }: AddContractContentProps) => {
     addContractFiles.execute(form.value)
   }
 
+  const signatureDateConstraints = getSignatureDateConstraints(
+    contract?.tariff_reference
+  )
+
   return (
     <Dialog
       header={<Dialog.Title>{t("Charger un contrat")}</Dialog.Title>}
       footer={
         <>
           <Stepper.Previous />
-          <Stepper.Next />
+          <Stepper.Next nativeButtonProps={{ form: "add-contract-form" }} />
           {currentStep?.key === "specific" && (
             <Button
               onClick={handleSubmit}
@@ -61,17 +74,19 @@ const AddContractContent = ({ onClose, form }: AddContractContentProps) => {
     >
       <Stepper />
       <Box>
-        <Form form={form}>
+        <Stepper.Form form={form} id="add-contract-form">
           {currentStep?.key === "dates" && (
             <Grid cols={2} gap="lg">
               <DateInput
-                required
                 label={t("Date de signature")}
+                required
                 {...form.bind("signature_date")}
+                {...signatureDateConstraints}
               />
               <DateInput
-                required
                 label={t("Date de prise d'effet")}
+                required
+                min={form.value.signature_date}
                 {...form.bind("effective_date")}
               />
             </Grid>
@@ -90,7 +105,7 @@ const AddContractContent = ({ onClose, form }: AddContractContentProps) => {
               {...form.bind("specific_conditions_file")}
             />
           )}
-        </Form>
+        </Stepper.Form>
       </Box>
     </Dialog>
   )
@@ -103,9 +118,6 @@ export const AddContract = (props: AddContractProps) => {
     {
       key: "dates",
       title: t("Dates"),
-      allowNextStep:
-        Boolean(form.value.effective_date) &&
-        Boolean(form.value.signature_date),
     },
     {
       key: "general",

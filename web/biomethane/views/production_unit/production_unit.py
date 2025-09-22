@@ -4,12 +4,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models import BiomethaneProductionUnit
+from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.production_unit import (
     BiomethaneProductionUnitSerializer,
     BiomethaneProductionUnitUpsertSerializer,
 )
-from core.models import Entity, UserRights
-from core.permissions import HasUserRights
 
 
 @extend_schema(
@@ -26,15 +25,10 @@ from core.permissions import HasUserRights
 class BiomethaneProductionUnitViewSet(GenericViewSet):
     queryset = BiomethaneProductionUnit.objects.all()
     serializer_class = BiomethaneProductionUnitSerializer
-    permission_classes = [HasUserRights(entity_type=[Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
     def get_permissions(self):
-        if self.action in [
-            "upsert",
-        ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
-        return super().get_permissions()
+        return get_biomethane_permissions(["upsert"], self.action)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

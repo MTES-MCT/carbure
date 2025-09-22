@@ -22,6 +22,7 @@ class BiomethaneDigestateSpreadingAddSerializer(BaseBiomethaneDigestateSpreading
         year = self.context.get("year")
 
         digestate = BiomethaneDigestate.objects.filter(producer=entity, year=year).first()
+
         if not digestate:
             raise serializers.ValidationError({"year": [_("Digestat manquant.")]})
 

@@ -2800,6 +2800,7 @@ export interface components {
         BiomethaneContract: {
             readonly id: number;
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
+            readonly tracked_amendment_types: components["schemas"]["TrackedAmendmentTypesEnum"][];
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
@@ -2872,6 +2873,7 @@ export interface components {
             general_conditions_file?: File | null;
             /** Format: binary */
             specific_conditions_file?: File | null;
+            tracked_amendment_types?: unknown;
             buyer?: number | null;
         };
         BiomethaneDigestate: {
@@ -3113,8 +3115,8 @@ export interface components {
             company_address?: string | null;
             city?: string | null;
             postal_code?: string | null;
-            network_type?: components["schemas"]["NetworkTypeEnum"] | null;
-            network_manager_name?: string | null;
+            network_type: components["schemas"]["NetworkTypeEnum"] | null;
+            network_manager_name: string | null;
         };
         BiomethaneProductionUnit: {
             readonly id: number;
@@ -3124,6 +3126,9 @@ export interface components {
             unit_name?: string | null;
             siret_number?: string | null;
             company_address?: string | null;
+            postal_code?: string | null;
+            city?: string | null;
+            department?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3151,6 +3156,9 @@ export interface components {
             unit_name?: string | null;
             siret_number?: string | null;
             company_address?: string | null;
+            postal_code?: string | null;
+            city?: string | null;
+            department?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3331,6 +3339,7 @@ export interface components {
             registered_city: string;
             registered_zipcode: string;
             registered_country: components["schemas"]["RegistrationCountry"];
+            department_code: string;
         };
         /**
          * @description * `ON_SITE` - Sur site
@@ -5161,6 +5170,13 @@ export interface components {
         TokenRefreshRequest: {
             refresh: string;
         };
+        /**
+         * @description * `CMAX_PAP_UPDATE` - CMAX_PAP_UPDATE
+         *     * `CMAX_ANNUALIZATION` - CMAX_ANNUALIZATION
+         *     * `PRODUCER_BUYER_INFO_CHANGE` - PRODUCER_BUYER_INFO_CHANGE
+         * @enum {string}
+         */
+        TrackedAmendmentTypesEnum: TrackedAmendmentTypesEnum;
         /**
          * @description * `DAU` - DAU
          *     * `DAE` - DAE
@@ -12141,6 +12157,11 @@ export enum TariffReferenceEnum {
     Value2020 = "2020",
     Value2021 = "2021",
     Value2023 = "2023"
+}
+export enum TrackedAmendmentTypesEnum {
+    CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",
+    CMAX_ANNUALIZATION = "CMAX_ANNUALIZATION",
+    PRODUCER_BUYER_INFO_CHANGE = "PRODUCER_BUYER_INFO_CHANGE"
 }
 export enum TransportDocumentTypeEnum {
     DAU = "DAU",

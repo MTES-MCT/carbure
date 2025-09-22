@@ -14,6 +14,10 @@ class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneInjectionSite
         exclude = ["producer"]
+        extra_kwargs = {
+            "network_type": {"required": True},
+            "network_manager_name": {"required": True},
+        }
 
     def validate(self, data):
         validated_data = super().validate(data)

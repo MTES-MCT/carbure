@@ -17,7 +17,14 @@ type SaleForm = DeepPartial<
 
 export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<SaleForm>(digestate ?? {})
+  const { bind, value } = useForm<SaleForm>(
+    digestate
+      ? {
+          acquiring_companies: digestate.acquiring_companies,
+          sold_volume: digestate.sold_volume,
+        }
+      : {}
+  )
   const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)

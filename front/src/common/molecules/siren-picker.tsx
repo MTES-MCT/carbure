@@ -2,7 +2,7 @@ import { TextInput } from "common/components/inputs2"
 import { useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { HttpError } from "common/services/api-fetch"
-import * as api from "common/api"
+import { searchCompanyData } from "common/api"
 import { SearchCompanyPreview } from "companies/types"
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -17,7 +17,7 @@ export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
   const [siren, setSiren] = useState<string | undefined>("")
   const notifyError = useNotifyError()
   const [error, setError] = useState<string | undefined>(undefined)
-  const companyResponse = useMutation(api.searchCompanyDataBySiren, {
+  const companyResponse = useMutation(searchCompanyData, {
     onSuccess: (res) => {
       const companyResult = res.data
 

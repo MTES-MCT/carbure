@@ -1,7 +1,9 @@
 import type { Meta, StoryFn, StoryObj } from "@storybook/react"
 import { Stepper } from "./stepper"
-import { Step, StepperProvider } from "./stepper.provider"
+import { Step, StepperProvider, useStepper } from "./stepper.provider"
 import { userEvent, waitFor, within } from "@storybook/test"
+import { TextInput } from "../inputs2"
+import { useForm } from "../form2"
 
 const loadStepsDecorator = (steps: Step<string>[]) => (Story: StoryFn) => {
   return (
@@ -58,27 +60,44 @@ export default meta
 
 export const Default: Story = {}
 
-export const DisallowedNextStep: Story = {
-  decorators: [
-    loadStepsDecorator([
-      {
-        key: "step-1",
-        title: "Step 1",
-        allowNextStep: false,
-      },
-      {
-        key: "step-2",
-        title: "Step 2",
-      },
-    ]),
-  ],
-}
-
-export const Step2: Story = {
+// Check an error validation message is displayed after submitting the form
+export const StepperWithForm: Story = {
+  render: () => {
+    const { bind } = useForm<{
+      field1?: string
+    }>({
+      field1: "",
+    })
+    const { currentStepIndex } = useStepper()
+    return (
+      <>
+        <Stepper marginBottom />
+        <Stepper.Form id="form-id">
+          {currentStepIndex === 1 && <TextInput {...bind("field1")} required />}
+        </Stepper.Form>
+        <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+          <Stepper.Previous />
+          <Stepper.Next nativeButtonProps={{ form: "form-id" }} />
+        </div>
+      </>
+    )
+  },
   play: async ({ canvasElement }) => {
     const { getByRole } = within(canvasElement)
     const button = await waitFor(() => getByRole("button", { name: "Suivant" }))
 
     await userEvent.click(button)
+  },
+}
+
+// Check if the form is validated after filling the input
+export const StepperWithFormValidate: Story = {
+  ...StepperWithForm,
+  play: async (props) => {
+    const { getByRole } = within(props.canvasElement)
+    const input = await waitFor(() => getByRole("textbox"))
+
+    await userEvent.type(input, "test")
+    await StepperWithForm.play?.(props)
   },
 }

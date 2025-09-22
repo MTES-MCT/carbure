@@ -52,6 +52,17 @@ class BiomethaneContractAmendmentAddSerializer(BaseBiomethaneContractAmendmentSe
         try:
             contract = BiomethaneContract.objects.get(producer=entity)
             validated_data["contract_id"] = contract.id
+
+            # Retirer les valeurs de amendment_object du tableau tracked_amendment_types
+            current_tracked_types = set(contract.tracked_amendment_types or [])
+            amendment_objects = set(validated_data.get("amendment_object", []))
+
+            # Utiliser la différence d'ensembles pour retirer les éléments
+            updated_tracked_types = current_tracked_types - amendment_objects
+
+            # Mettre à jour le contrat avec les nouveaux types trackés
+            contract.tracked_amendment_types = list(updated_tracked_types)
+            contract.save(update_fields=["tracked_amendment_types"])
         except BiomethaneContract.DoesNotExist:
             raise serializers.ValidationError({"contract": [_("Cette entité n'a pas de contrat associé.")]})
 

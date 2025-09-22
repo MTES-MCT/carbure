@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.utils.text import slugify
 
-from biomethane.models import BiomethaneContract, rename_file
+from biomethane.models.biomethane_contract import BiomethaneContract, rename_file
 from core import private_storage
 
 
@@ -45,6 +45,12 @@ class BiomethaneContractAmendment(models.Model):
         (ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE, ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE),
         # "Autres"
         (OTHER, OTHER),
+    ]
+
+    TRACKED_AMENDMENT_TYPES = [
+        CMAX_PAP_UPDATE,
+        CMAX_ANNUALIZATION,
+        PRODUCER_BUYER_INFO_CHANGE,
     ]
 
     contract = models.ForeignKey(BiomethaneContract, on_delete=models.CASCADE, related_name="amendments")

@@ -16,7 +16,6 @@ import {
 } from "../../types"
 import { useDigestateContext } from "../../digestate.hooks"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
-import { DepartmentCode } from "common/utils/geography"
 
 type CompostingForm = DeepPartial<
   Pick<
@@ -32,7 +31,21 @@ type CompostingForm = DeepPartial<
 
 export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<CompostingForm>(digestate ?? {})
+  const { bind, value } = useForm<CompostingForm>(
+    digestate
+      ? {
+          external_platform_name: digestate.external_platform_name,
+          external_platform_department: digestate.external_platform_department,
+          external_platform_municipality:
+            digestate.external_platform_municipality,
+          on_site_composted_digestate_volume:
+            digestate.on_site_composted_digestate_volume,
+          external_platform_digestate_volume:
+            digestate.external_platform_digestate_volume,
+          composting_locations: digestate.composting_locations,
+        }
+      : {}
+  )
   const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
 
   const handleSave = async () => saveDigestate.execute(value)
@@ -92,7 +105,6 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
                 readOnly={!isEditing}
                 label={t("Département de la plateforme externe")}
                 {...bind("external_platform_department")}
-                value={value.external_platform_department as DepartmentCode}
                 required
               />
               <TextInput
