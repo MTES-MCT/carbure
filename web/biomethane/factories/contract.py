@@ -17,7 +17,7 @@ class BiomethaneContractFactory(factory.django.DjangoModelFactory):
         model = BiomethaneContract
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
-    buyer = Entity.objects.filter(entity_type=Entity.OPERATOR).order_by("?").first()
+    buyer = factory.LazyFunction(lambda: Entity.objects.filter(entity_type=Entity.OPERATOR).order_by("?").first())
 
     # Tariff reference - choisir aléatoirement parmi les choix valides
     tariff_reference = factory.Faker(
