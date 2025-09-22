@@ -93,12 +93,19 @@ export const ContractInfos = ({
       <Form onSubmit={onSubmit}>
         {isContractRedii(value) && (
           <Notice variant="info" icon="fr-icon-info-line">
-            {t(
-              "Votre Capacité maximale de production contractualisée est strictement supérieure à {{value}}, votre production de biométhane est donc soumise aux exigences RED.",
-              {
-                value: getRediiThresholdLabel(value.tariff_reference),
-              }
-            )}
+            {isTariffReference2011Or2020(value.tariff_reference)
+              ? t(
+                  "Votre Capacité maximale de production contractualisée est strictement supérieure à {{value}}, votre production de biométhane est donc soumise aux exigences RED.",
+                  {
+                    value: getRediiThresholdLabel(value.tariff_reference),
+                  }
+                )
+              : t(
+                  "Votre production annuelle prévisionnelle est strictement supérieure à {{value}}, votre production de biométhane est donc soumise aux exigences RED.",
+                  {
+                    value: getRediiThresholdLabel(value.tariff_reference),
+                  }
+                )}
           </Notice>
         )}
         <Grid cols={2} gap="lg">
