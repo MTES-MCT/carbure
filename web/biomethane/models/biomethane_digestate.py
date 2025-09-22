@@ -71,7 +71,9 @@ class BiomethaneDigestate(models.Model):
 
     class Meta:
         db_table = "biomethane_digestate"
-        verbose_name = "Digestat"
+        unique_together = ["producer", "year"]
+        verbose_name = "Biométhane - Digestat"
+        verbose_name_plural = "Biométhane - Digestats"
 
 
 @receiver(post_save, sender=BiomethaneDigestate)
