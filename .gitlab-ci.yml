@@ -34,6 +34,7 @@ variables:
   MYSQL_ROOT_PASSWORD: carbure_mysql_ci_db_password
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PIPENV_VENV_IN_PROJECT: true
+  AST_ENABLE_MR_PIPELINES: "true"
 
 # job: run linting and tests for backend
 check-backend:
