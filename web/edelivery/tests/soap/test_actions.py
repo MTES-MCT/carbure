@@ -1,10 +1,48 @@
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-from edelivery.soap.envelope import Envelope
+from edelivery.ebms.messages import TestMessage
+from edelivery.soap.actions import ListPendingMessages, SubmitMessage
+from edelivery.soap.responses import ListPendingMessagesResponse
 
 
-class EnvelopeTest(TestCase):
+class ListPendingMessagesTest(TestCase):
+    def setUp(self):
+        self.http_response = MagicMock()
+        self.http_response.text = "<response/>"
+
+        self.send_callback = MagicMock()
+        self.send_callback.return_value = self.http_response
+
+    def test_sends_payload_to_eDelivery_service(self):
+        action = ListPendingMessages(self.send_callback)
+        action.perform()
+
+        expectedPayload = """\
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:_1="http://eu.domibus.wsplugin/">
+  <soap:Header/>
+  <soap:Body>
+    <_1:listPendingMessagesRequest></_1:listPendingMessagesRequest>
+  </soap:Body>
+</soap:Envelope>"""
+        self.send_callback.assert_called_with(action="listPendingMessages", payload=expectedPayload)
+
+    def test_returns_a_ListPendingMessagesResponse_as_result(self):
+        self.http_response.text = "<response>some response</response>"
+        action = ListPendingMessages(self.send_callback)
+        result = action.perform()
+
+        self.assertIsInstance(result, ListPendingMessagesResponse)
+        self.assertEqual(result.text, "<response>some response</response>")
+
+
+class SubmitMessageTest(TestCase):
+    @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
+    def test_knows_its_action_name(self):
+        message = TestMessage()
+        action = SubmitMessage(message)
+        self.assertEqual("submitMessage", action.name)
+
     def test_knows_its_payload(self):
         message = MagicMock()
         message.id = "12345678-1234-1234-1234-1234567890ab"
@@ -14,7 +52,8 @@ class EnvelopeTest(TestCase):
         message.initiator_to_XML.return_value = "<MockValue>initiator</MockValue>"
         message.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
         message.zipped_encoded.return_value = "abcdef"
-        envelope = Envelope(message)
+        action = SubmitMessage(message)
+
         expected_payload = """\
 <soap:Envelope
   xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
@@ -61,4 +100,4 @@ class EnvelopeTest(TestCase):
   </soap:Body>
 </soap:Envelope>"""
 
-        self.assertEqual(expected_payload, envelope.payload())
+        self.assertEqual(action.payload(), expected_payload)
