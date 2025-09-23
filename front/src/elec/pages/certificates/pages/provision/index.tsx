@@ -32,11 +32,13 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 export interface ProvisionCertificatesProps {
   year: number
   snapshot?: ElecCertificateSnapshot
+  formattedBalance: string
 }
 
 export const ProvisionCertificates = ({
   year,
   snapshot,
+  formattedBalance,
 }: ProvisionCertificatesProps) => {
   const { t } = useTranslation()
 
@@ -117,13 +119,14 @@ export const ProvisionCertificates = ({
           <>
             <RecapQuantity
               text={t(
-                "{{count}} certificats et {{total}} d'énergie disponible pour cession",
+                "{{count}} certificats et {{total}} d'énergie disponible pour cession (pour un total disponible de {{total_available_energy}})",
                 {
                   count: data.count,
                   total: formatUnit(
                     data!.available_energy ?? 0,
                     ExtendedUnit.MWh
                   ),
+                  total_available_energy: formattedBalance,
                 }
               )}
             />

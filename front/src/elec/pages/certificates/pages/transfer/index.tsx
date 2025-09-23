@@ -32,11 +32,13 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 export interface TransferCertificatesProps {
   year: number
   snapshot?: ElecCertificateSnapshot
+  formattedBalance: string
 }
 
 export const TransferCertificates = ({
   year,
   snapshot,
+  formattedBalance,
 }: TransferCertificatesProps) => {
   const { t } = useTranslation()
 
@@ -121,13 +123,14 @@ export const TransferCertificates = ({
           <>
             <RecapQuantity
               text={t(
-                "{{count}} certificats, pour un total de {{total}} transférés",
+                "{{count}} certificats, pour un total de {{total}} transférés (solde disponible {{balance}})",
                 {
                   count: data.count,
                   total: formatUnit(
                     data!.transferred_energy ?? 0,
                     ExtendedUnit.MWh
                   ),
+                  balance: formattedBalance,
                 }
               )}
             />
