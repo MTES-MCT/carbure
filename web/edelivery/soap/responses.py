@@ -24,5 +24,9 @@ class ListPendingMessagesResponse(AbstractEdeliveryResponse):
         return len(ids) > 0
 
 
+class RetrieveMessageResponse(AbstractEdeliveryResponse):
+    pass
+
+
 class SubmitMessageResponse(AbstractEdeliveryResponse):
     pass

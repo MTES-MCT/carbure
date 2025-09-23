@@ -1,5 +1,5 @@
 from edelivery.adapters.edelivery_adapter import send_SOAP_request
-from edelivery.soap.responses import ListPendingMessagesResponse, SubmitMessageResponse
+from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
 class AbstractSoapAction:
@@ -26,6 +26,23 @@ class ListPendingMessages(AbstractSoapAction):
   <soap:Header/>
   <soap:Body>
     <_1:listPendingMessagesRequest></_1:listPendingMessagesRequest>
+  </soap:Body>
+</soap:Envelope>"""
+
+
+class RetrieveMessage(AbstractSoapAction):
+    def __init__(self, message_id, send_callback=send_SOAP_request):
+        super().__init__("retrieveMessage", RetrieveMessageResponse, send_callback)
+        self.message_id = message_id
+
+    def payload(self):
+        return f"""\
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:_1="http://eu.domibus.wsplugin/">
+  <soap:Header/>
+  <soap:Body>
+    <_1:retrieveMessageRequest>
+      <messageID>{self.message_id}</messageID>
+    </_1:retrieveMessageRequest>
   </soap:Body>
 </soap:Envelope>"""
 

@@ -2,8 +2,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from edelivery.ebms.messages import TestMessage
-from edelivery.soap.actions import ListPendingMessages, SubmitMessage
-from edelivery.soap.responses import ListPendingMessagesResponse
+from edelivery.soap.actions import ListPendingMessages, RetrieveMessage, SubmitMessage
+from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse
 
 
 class ListPendingMessagesTest(TestCase):
@@ -34,6 +34,30 @@ class ListPendingMessagesTest(TestCase):
 
         self.assertIsInstance(result, ListPendingMessagesResponse)
         self.assertEqual(result.text, "<response>some response</response>")
+
+
+class RetrieveMessageTest(TestCase):
+    def test_knows_its_action_name(self):
+        action = RetrieveMessage("12345")
+        self.assertEqual("retrieveMessage", action.name)
+
+    def test_knows_its_response_class(self):
+        action = RetrieveMessage("12345")
+        self.assertEqual(RetrieveMessageResponse, action.response_class)
+
+    def test_knows_its_payload(self):
+        action = RetrieveMessage("12345")
+
+        expected_payload = """\
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:_1="http://eu.domibus.wsplugin/">
+  <soap:Header/>
+  <soap:Body>
+    <_1:retrieveMessageRequest>
+      <messageID>12345</messageID>
+    </_1:retrieveMessageRequest>
+  </soap:Body>
+</soap:Envelope>"""
+        self.assertEqual(expected_payload, action.payload())
 
 
 class SubmitMessageTest(TestCase):
