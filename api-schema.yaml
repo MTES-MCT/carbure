@@ -12382,7 +12382,7 @@ components:
         certificates:
           type: array
           items:
-            $ref: "#/components/schemas/ProductionSiteCertificate"
+            $ref: "#/components/schemas/GenericCertificate"
           readOnly: true
       required:
         - certificates
@@ -14889,47 +14889,6 @@ components:
         - id
         - name
         - producer
-    ProductionSiteCertificate:
-      type: object
-      properties:
-        certificate_id:
-          type: string
-          maxLength: 64
-        certificate_type:
-          $ref: "#/components/schemas/CertificateTypeEnum"
-        certificate_holder:
-          type: string
-          maxLength: 512
-        certificate_issuer:
-          type: string
-          nullable: true
-          maxLength: 256
-        address:
-          type: string
-          nullable: true
-          maxLength: 512
-        valid_from:
-          type: string
-          format: date
-        valid_until:
-          type: string
-          format: date
-        download_link:
-          type: string
-          nullable: true
-          maxLength: 512
-        scope:
-          nullable: true
-        input:
-          nullable: true
-        output:
-          nullable: true
-      required:
-        - certificate_holder
-        - certificate_id
-        - certificate_type
-        - valid_from
-        - valid_until
     ProductionSiteCertificateSertificate:
       type: object
       properties:

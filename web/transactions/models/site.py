@@ -1,7 +1,5 @@
-from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 
 class SiteManager(models.Manager):
@@ -100,59 +98,6 @@ class Site(models.Model):
         verbose_name = "Site de stockage de carburant"
         verbose_name_plural = "Sites de stockage de carburant"
         ordering = ["name"]
-
-    def clean(self):
-        # Clear fields that are not relevant for the site type (when create depot)
-        fields_to_clear = {
-            "POWER PLANT": ["thermal_efficiency", "useful_temperature"],
-            "HEAT PLANT": ["electrical_efficiency", "useful_temperature"],
-            "COGENERATION PLANT": ["electrical_efficiency", "thermal_efficiency"],
-        }
-
-        fields = fields_to_clear.get(self.depot_type, [])
-        for field in fields:
-            setattr(self, field, None)
-
-        # Check if date_mise_en_service is required for production site
-        if self.site_type in self.PRODUCTION_SITE_TYPES and not self.date_mise_en_service:
-            raise ValidationError({"date_mise_en_service": ["Ce champ est obligatoire pour les sites de production."]})
-
-        # Check if customs_id is required for depot
-        if self.site_type in self.DEPOT_TYPES and not self.customs_id:
-            raise ValidationError({"customs_id": ["Ce champ est obligatoire pour les dépots."]})
-
-        # Check if customs_id is unique for depot, except for the current depot
-        if self.site_type in self.DEPOT_TYPES and (
-            Site.objects.filter(customs_id=self.customs_id).exclude(id=self.id).exists()
-            or Site.objects.filter(name=self.name).exclude(id=self.id).exists()
-        ):
-            site = (
-                Site.objects.filter(models.Q(customs_id=self.customs_id) | models.Q(name=self.name))
-                .exclude(id=self.id)
-                .first()
-            )
-
-            if site:
-                checks = [
-                    {
-                        "field": "customs_id",
-                        "condition": site.customs_id == self.customs_id,
-                        "error": [_("Ce numéro de douane est déjà utilisé.")],
-                    },
-                    {
-                        "field": "site_name",
-                        "condition": site.name == self.name,
-                        "error": [_("Ce nom de dépôt est déjà utilisé.")],
-                    },
-                ]
-                errors = {}
-                for check in checks:
-                    if check["condition"]:
-                        errors[check["field"]] = check["error"]
-
-                raise ValidationError(errors)
-
-        super().clean()
 
     def natural_key(self):
         from transactions.models import Depot, ProductionSite
