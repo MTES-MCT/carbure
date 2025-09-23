@@ -1,1 +1,2 @@
 from .energy import BiomethaneEnergyViewSet
+from .monthly_report import BiomethaneEnergyMonthlyReportViewSet

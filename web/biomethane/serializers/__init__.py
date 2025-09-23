@@ -19,3 +19,14 @@ from .digestate import (
     BiomethaneDigestateInputSerializer,
     BiomethaneDigestateSpreadingSerializer,
 )
+from .energy import (
+    BiomethaneEnergySerializer,
+    BiomethaneEnergyInputSerializer,
+    BiomethaneEnergyMonthlyReportSerializer,
+    BiomethaneEnergyMonthlyReportInputSerializer,
+)
+from .supply_plan import (
+    BiomethaneSupplyInputSerializer,
+    BiomethaneSupplyPlanSerializer,
+    BiomethaneSupplyInputCreateSerializer,
+)

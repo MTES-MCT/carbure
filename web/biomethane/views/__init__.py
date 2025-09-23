@@ -1,4 +1,6 @@
-from .contract import BiomethaneContractViewSet
-from .contract import BiomethaneContractAmendmentViewSet
+from .contract import BiomethaneContractViewSet, BiomethaneContractAmendmentViewSet
 from .injection_site import BiomethaneInjectionSiteViewSet
 from .production_unit import BiomethaneProductionUnitViewSet, BiomethaneDigestateStorageViewSet
+from .digestate import BiomethaneDigestateViewSet, BiomethaneDigestateSpreadingViewSet
+from .energy import BiomethaneEnergyViewSet, BiomethaneEnergyMonthlyReportViewSet
+from .supply_plan import BiomethaneSupplyPlanViewSet, BiomethaneSupplyInputViewSet
