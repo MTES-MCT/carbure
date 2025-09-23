@@ -5,7 +5,7 @@ include:
 
 stages:
   - check
-  - security
+  - test
   - pass
 
 workflow:
@@ -80,7 +80,7 @@ check-frontend:
 
 # Static Application Security Testing
 sast:
-  stage: security
+  stage: test
 
 # job: always succeed so we can merge MR that do not change front/back code
 pass:
