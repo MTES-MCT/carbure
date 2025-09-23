@@ -139,3 +139,23 @@ class DoubleCountAgreementsTest(TestCase):
         )
 
         assert response.status_code == 404
+
+    def test_list_all_public_agreements(self):
+        agreements = DoubleCountingRegistrationFactory.create_batch(
+            3,
+            production_site=self.production_site1,
+            valid_from=date(self.requested_start_year, 1, 1),
+            valid_until=date(self.requested_start_year + 2, 1, 1),
+        )
+
+        # this agreement is outdated and shouldn't be listed
+        _expired_agreement = DoubleCountingRegistrationFactory.create(
+            production_site=self.production_site1,
+            valid_from=date(self.requested_start_year - 4, 1, 1),
+            valid_until=date(self.requested_start_year - 2, 1, 1),
+        )
+
+        data = self.client.get(reverse("double-counting-agreements-agreements-public-list")).json()
+
+        assert len(data) == 3
+        assert {a.certificate_id for a in agreements} == {a["certificate_id"] for a in data}
