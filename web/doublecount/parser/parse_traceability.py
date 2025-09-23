@@ -1,5 +1,4 @@
-import traceback
-
+import sentry_sdk
 from openpyxl import Workbook
 
 
@@ -16,8 +15,8 @@ def parse_traceability(excel_file: Workbook):
             "on_site": on_site,
             "after": after,
         }
-    except Exception:
-        traceback.print_exc()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return {
             "before": None,
             "on_site": None,

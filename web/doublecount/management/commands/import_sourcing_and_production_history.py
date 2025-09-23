@@ -1,8 +1,8 @@
 import os
 import time
-import traceback
 import warnings
 
+import sentry_sdk
 from django.core.management.base import BaseCommand
 
 from core import private_storage
@@ -143,8 +143,8 @@ class Command(BaseCommand):
     def upload_dca_to_s3(self, s3_path, file):
         try:
             private_storage.save(s3_path, file)
-        except Exception:
-            traceback.print_exc()
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
             self.stdout.write(self.style.ERROR(f"Error uploading file to S3: {s3_path}"))
 
     def create_tmp_folder(self):
