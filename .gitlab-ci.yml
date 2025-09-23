@@ -1,5 +1,11 @@
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
 stages:
   - check
+  - security
   - pass
 
 workflow:
@@ -71,6 +77,10 @@ check-frontend:
     - changes:
         - front/**/*
         - .gitlab-ci.yml
+
+# Static Application Security Testing
+sast:
+  stage: security
 
 # job: always succeed so we can merge MR that do not change front/back code
 pass:
