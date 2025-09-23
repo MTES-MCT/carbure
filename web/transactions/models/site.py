@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class SiteManager(models.Manager):
@@ -121,11 +122,35 @@ class Site(models.Model):
             raise ValidationError({"customs_id": ["Ce champ est obligatoire pour les dépots."]})
 
         # Check if customs_id is unique for depot, except for the current depot
-        if (
-            self.site_type in self.DEPOT_TYPES
-            and Site.objects.filter(customs_id=self.customs_id).exclude(id=self.id).exists()
+        if self.site_type in self.DEPOT_TYPES and (
+            Site.objects.filter(customs_id=self.customs_id).exclude(id=self.id).exists()
+            or Site.objects.filter(name=self.name).exclude(id=self.id).exists()
         ):
-            raise ValidationError({"customs_id": ["Ce numéro de douane est déjà utilisé."]})
+            site = (
+                Site.objects.filter(models.Q(customs_id=self.customs_id) | models.Q(name=self.name))
+                .exclude(id=self.id)
+                .first()
+            )
+
+            if site:
+                checks = [
+                    {
+                        "field": "customs_id",
+                        "condition": site.customs_id == self.customs_id,
+                        "error": [_("Ce numéro de douane est déjà utilisé.")],
+                    },
+                    {
+                        "field": "site_name",
+                        "condition": site.name == self.name,
+                        "error": [_("Ce nom de dépôt est déjà utilisé.")],
+                    },
+                ]
+                errors = {}
+                for check in checks:
+                    if check["condition"]:
+                        errors[check["field"]] = check["error"]
+
+                raise ValidationError(errors)
 
         super().clean()
 
