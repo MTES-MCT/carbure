@@ -35,6 +35,7 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PIPENV_VENV_IN_PROJECT: true
   AST_ENABLE_MR_PIPELINES: "true"
+  SECURE_LOG_LEVEL: "info"
 
 # job: run linting and tests for backend
 check-backend:
