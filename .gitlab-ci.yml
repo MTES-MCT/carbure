@@ -78,10 +78,6 @@ check-frontend:
         - front/**/*
         - .gitlab-ci.yml
 
-# Static Application Security Testing
-sast:
-  stage: test
-
 # job: always succeed so we can merge MR that do not change front/back code
 pass:
   stage: pass
