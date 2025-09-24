@@ -1,8 +1,9 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.mixins import CreateModelMixin, UpdateModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.supply_plan.supply_input import (
@@ -10,6 +11,18 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputSerializer,
 )
 from biomethane.utils import get_declaration_period
+from core.pagination import MetadataPageNumberPagination
+
+
+class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
+    aggregate_fields = {"annual_volumes_in_t": 0}
+
+    def get_extra_metadata(self):
+        metadata = {"annual_volumes_in_t": 0}
+
+        for input in self.queryset:
+            metadata["annual_volumes_in_t"] += input.volume
+        return metadata
 
 
 @extend_schema(
@@ -23,13 +36,18 @@ from biomethane.utils import get_declaration_period
         ),
     ]
 )
-class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin):
+class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin, ListModelMixin):
     queryset = BiomethaneSupplyInput.objects.all()
-    serializer_class = BiomethaneSupplyInputSerializer
-    pagination_class = None
+    search_fields = ["input_type", "input_category"]
+    pagination_class = BiomethaneSupplyInputPagination
 
     def get_permissions(self):
         return get_biomethane_permissions(["create", "update", "partial_update"], self.action)
+
+    def get_filterset_class(self):
+        if self.action == "list":
+            return BiomethaneSupplyInputFilter
+        return BiomethaneSupplyInputCreateFilter
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:

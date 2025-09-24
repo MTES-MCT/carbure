@@ -1,5 +1,6 @@
 from typing import Callable
 
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -62,3 +63,11 @@ def FiltersActionFactory(filters: Callable[[Request], dict[str, str]]):
             return Response([v for v in values if v is not None])
 
     return FiltersActionMixin
+
+
+class ViewMethodFilterBackend(DjangoFilterBackend):
+    # Implementation of get_filterset_class
+    def get_filterset_class(self, view, queryset=None):
+        if hasattr(view, "get_filterset_class"):
+            return view.get_filterset_class()
+        return super().get_filterset_class(view, queryset)

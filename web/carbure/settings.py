@@ -385,7 +385,7 @@ SILKY_PYTHON_PROFILER_RESULT_PATH = "/tmp"
 # DRF
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
-        "django_filters.rest_framework.DjangoFilterBackend",
+        "core.filters.ViewMethodFilterBackend",
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],

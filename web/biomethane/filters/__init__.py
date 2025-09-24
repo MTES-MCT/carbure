@@ -3,3 +3,4 @@ from .digestate import BiomethaneDigestateFilter, BiomethaneDigestateRetrieveFil
 from .contract import BiomethaneContractFilter
 from .supply_plan import BiomethaneSupplyPlanFilter, BiomethaneSupplyPlanYearsFilter
 from .energy import BiomethaneEnergyFilter
+from .supply_input import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
