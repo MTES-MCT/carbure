@@ -61,6 +61,7 @@ export const ROUTE_URLS = {
     const baseUrl = urlWithOrgId(entity_id, `/biomethane`)
 
     return {
+      SUPPLY_PLAN: `${baseUrl}/supply-plan/${year}`,
       DIGESTATE: `${baseUrl}/digestate/${year}`,
       ENERGY: `${baseUrl}/energy/${year}`,
     }

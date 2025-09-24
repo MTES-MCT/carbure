@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
+const SupplyPlan = lazy(() => import("biomethane/pages/supply-plan"))
 const currentYear = new Date().getFullYear()
 
 export const BiomethaneRoutes = () => {
@@ -22,6 +23,15 @@ export const BiomethaneRoutes = () => {
       <Route
         path="energy"
         element={<Navigate replace to={`energy/${currentYear}`} />}
+      />
+      <Route path="supply-plan/:year" element={<SupplyPlan />} />
+      <Route
+        path="supply-plan"
+        element={<Navigate replace to={`supply-plan/${currentYear}`} />}
+      />
+      <Route
+        path="digestate"
+        element={<Navigate replace to={`digestate/${currentYear}`} />}
       />
 
       <Route

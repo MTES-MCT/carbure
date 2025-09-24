@@ -13,10 +13,16 @@ export const useBiomethane = () => {
     condition: isBiomethaneProducer,
     children: [
       {
-        path: routes.BIOMETHANE().DIGESTATE,
-        title: t("Digestat"),
+        path: routes.BIOMETHANE().SUPPLY_PLAN,
+        title: t("Approvisionnement"),
         icon: "ri-home-4-line",
         iconActive: "ri-home-4-fill",
+      },
+      {
+        path: routes.BIOMETHANE().DIGESTATE,
+        title: t("Digestat"),
+        icon: "ri-contrast-drop-line",
+        iconActive: "ri-contrast-drop-fill",
       },
       {
         path: routes.BIOMETHANE().ENERGY,
