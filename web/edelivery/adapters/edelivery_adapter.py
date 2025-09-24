@@ -2,7 +2,7 @@ from os import environ
 
 import requests
 
-from edelivery.adapters.base64_encoder import encode
+from edelivery.adapters.base64_utils import encode
 
 
 def request_headers():
