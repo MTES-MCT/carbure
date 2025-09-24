@@ -120,7 +120,7 @@ export const ProvisionCertificates = ({
             <RecapQuantity
               text={
                 <Trans
-                  defaults="{{count}} certificats et {{total}} d'énergie disponible pour cession (<b>pour un total disponible de {{total_available_energy}}</b>)"
+                  defaults="{{count}} certificats et {{total}} d'énergie (<b>total disponible pour cession {{total_available_energy}}</b>)"
                   components={{ b: <b /> }}
                   values={{
                     count: data.count,

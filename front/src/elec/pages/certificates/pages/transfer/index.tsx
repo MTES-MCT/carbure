@@ -124,7 +124,7 @@ export const TransferCertificates = ({
             <RecapQuantity
               text={
                 <Trans
-                  defaults="{{count}} certificats, pour un total de {{total}} transférés (<b>solde disponible {{balance}}</b>)"
+                  defaults="{{count}} certificats, {{total}} transférés (<b>solde disponible pour cession {{balance}}</b>)"
                   values={{
                     count: data.count,
                     total: formatUnit(
