@@ -2,7 +2,7 @@ from io import BytesIO
 from tempfile import SpooledTemporaryFile, TemporaryDirectory
 from zipfile import ZipFile
 
-from edelivery.adapters.base64_encoder import decode, encode_binary
+from edelivery.adapters.base64_utils import decode, encode_binary
 
 UDB_REQUEST_ENCAPSULATING_FILE_NAME = "udb-request.xml"
 UDB_RESPONSE_ENCAPSULATING_FILE_NAME = "udb-response.xml"
