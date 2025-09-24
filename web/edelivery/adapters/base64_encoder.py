@@ -1,4 +1,8 @@
-from base64 import b64encode
+from base64 import b64decode, b64encode
+
+
+def decode(s):
+    return b64decode(s)
 
 
 def encode(b, binary=False):
