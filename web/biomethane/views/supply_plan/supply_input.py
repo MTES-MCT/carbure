@@ -13,6 +13,8 @@ from biomethane.serializers.supply_plan.supply_input import (
 from biomethane.utils import get_declaration_period
 from core.pagination import MetadataPageNumberPagination
 
+from .mixins import FiltersActionMixin
+
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
     aggregate_fields = {"annual_volumes_in_t": 0}
@@ -36,8 +38,9 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
         ),
     ]
 )
-class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin, ListModelMixin):
+class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin, ListModelMixin, FiltersActionMixin):
     queryset = BiomethaneSupplyInput.objects.all()
+    filterset_class = BiomethaneSupplyInputFilter
     search_fields = ["input_type", "input_category"]
     pagination_class = BiomethaneSupplyInputPagination
 
@@ -46,7 +49,7 @@ class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModel
 
     def get_filterset_class(self):
         if self.action == "list":
-            return BiomethaneSupplyInputFilter
+            return self.filterset_class
         return BiomethaneSupplyInputCreateFilter
 
     def get_serializer_class(self):
