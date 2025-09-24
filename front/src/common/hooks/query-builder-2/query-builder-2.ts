@@ -163,7 +163,7 @@ export function useQueryBuilder<Config extends QueryConfig>(
 ) {
   const [state, actions] = useQueryBuilderStore<Config>(params)
   const entity = useEntity()
-  const { year, status, page = 1, limit, filters, order } = state
+  const { year, status, page = 1, limit, filters, order, search } = state
 
   const query = useMemo<QueryParams<Config>>(
     () => ({
@@ -173,9 +173,10 @@ export function useQueryBuilder<Config extends QueryConfig>(
       page: page > 0 ? page : 1,
       page_size: limit ?? undefined,
       order_by: order ? formatOrder<Config["order"]>(order) : undefined,
+      search,
       ...filters,
     }),
-    [entity.id, status, limit, filters, page, year, order]
+    [entity.id, status, limit, filters, page, year, order, search]
   )
 
   return { query, state, actions } as const
