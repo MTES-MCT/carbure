@@ -2,7 +2,6 @@ import { useRoutes } from "common/hooks/routes"
 import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
 import useEntity from "common/hooks/entity"
-import { createIcon } from "common/components/icon"
 
 export const useBiomethane = () => {
   const routes = useRoutes()
@@ -16,14 +15,14 @@ export const useBiomethane = () => {
       {
         path: routes.BIOMETHANE().DIGESTATE,
         title: t("Digestat"),
-        icon: createIcon({ name: "ri-home-4-line" }),
-        iconActive: createIcon({ name: "ri-home-4-fill" }),
+        icon: "ri-home-4-line",
+        iconActive: "ri-home-4-fill",
       },
       {
         path: routes.BIOMETHANE().ENERGY,
         title: t("Énergie"),
-        icon: createIcon({ name: "ri-flashlight-line" }),
-        iconActive: createIcon({ name: "ri-flashlight-fill" }),
+        icon: "ri-flashlight-line",
+        iconActive: "ri-flashlight-fill",
       },
     ],
   }

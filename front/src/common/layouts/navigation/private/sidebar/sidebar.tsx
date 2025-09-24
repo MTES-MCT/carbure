@@ -4,11 +4,6 @@ import styles from "./sidebar.module.css"
 import { ChildItem } from "./child-item"
 import { useTranslation } from "react-i18next"
 import { useRoutes } from "common/hooks/routes"
-import {
-  QuestionLine,
-  SettingsFill,
-  SettingsLine,
-} from "common/components/icon"
 import { EntitySelector } from "./entity-selector"
 import { useUser } from "common/hooks/user"
 import useEntity from "common/hooks/entity"
@@ -53,7 +48,7 @@ export const PrivateSidebar = () => {
             path: routes.USER_GUIDE,
             title: t("Guide d'utilisation"),
             target: "_blank",
-            icon: QuestionLine,
+            icon: "ri-question-line",
           }}
         />
         {/* Display settings only if an entity is selected */}
@@ -62,8 +57,8 @@ export const PrivateSidebar = () => {
             child={{
               path: routes.SETTINGS.ROOT,
               title: t("Paramètres de la société"),
-              icon: SettingsLine,
-              iconActive: SettingsFill,
+              icon: "ri-settings-3-line",
+              iconActive: "ri-settings-3-fill",
             }}
           />
         )}

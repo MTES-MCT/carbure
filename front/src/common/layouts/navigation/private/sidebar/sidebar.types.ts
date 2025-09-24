@@ -1,3 +1,5 @@
+import { IconName } from "common/components/icon"
+
 export type MenuSection = {
   title: string
   condition?: boolean
@@ -5,8 +7,8 @@ export type MenuSection = {
 }
 
 export type MenuItem = Omit<MenuSection, "children"> & {
-  icon?: React.ElementType
-  iconActive?: React.ElementType
+  icon?: IconName
+  iconActive?: IconName
   path: string
   additionalInfo?: string | number
   target?: string

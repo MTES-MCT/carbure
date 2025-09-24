@@ -5,14 +5,13 @@ import cl from "clsx"
 import { Text } from "common/components/text"
 import { useMemo } from "react"
 import { useYearsProvider } from "common/providers/years-provider"
+import { Icon } from "common/components/icon"
 
 type ChildItemProps = {
   child: MenuItem
 }
 
 export const ChildItem = ({ child }: ChildItemProps) => {
-  const Icon = child.icon
-  const IconActive = child.iconActive
   const location = useLocation()
   const { selectedYear, root } = useYearsProvider()
 
@@ -47,11 +46,14 @@ export const ChildItem = ({ child }: ChildItemProps) => {
       <div className={styles["nav-item-child-content"]}>
         {/* Display the icon only if it's not the current page */}
         {/* Or, display the icon only if the iconActive is not defined */}
-        {((Icon && !isActive) || (!IconActive && Icon)) && (
-          <Icon className={styles["nav-item-child-icon"]} />
+        {((child.icon && !isActive) || (!child.iconActive && child.icon)) && (
+          <Icon className={styles["nav-item-child-icon"]} name={child.icon} />
         )}
-        {IconActive && isActive && (
-          <IconActive className={styles["nav-item-child-icon"]} />
+        {child.iconActive && isActive && (
+          <Icon
+            className={styles["nav-item-child-icon"]}
+            name={child.iconActive}
+          />
         )}
         <Text fontWeight="semibold">{child.title}</Text>
       </div>
