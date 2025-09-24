@@ -1,10 +1,10 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import { Text } from "common/components/text"
 import css from "./recap-quantity.module.css"
 
 interface RecapQuantityProps {
-  text: string
+  text: ReactNode
   onRecapClick?: () => void
 }
 

@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom"
 
 import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Content } from "common/components/scaffold"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Tabs } from "common/components/tabs2"
 import { Table } from "common/components/table2"
@@ -122,17 +122,20 @@ export const TransferCertificates = ({
         {!isEmpty && (
           <>
             <RecapQuantity
-              text={t(
-                "{{count}} certificats, pour un total de {{total}} transférés (solde disponible {{balance}})",
-                {
-                  count: data.count,
-                  total: formatUnit(
-                    data!.transferred_energy ?? 0,
-                    ExtendedUnit.MWh
-                  ),
-                  balance: formattedBalance,
-                }
-              )}
+              text={
+                <Trans
+                  defaults="{{count}} certificats, pour un total de {{total}} transférés (<b>solde disponible {{balance}}</b>)"
+                  values={{
+                    count: data.count,
+                    total: formatUnit(
+                      data!.transferred_energy ?? 0,
+                      ExtendedUnit.MWh
+                    ),
+                    balance: formattedBalance,
+                  }}
+                  components={{ b: <b /> }}
+                />
+              }
             />
 
             <Table

@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom"
 
 import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Content } from "common/components/scaffold"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Tabs } from "common/components/tabs2"
 import { Table } from "common/components/table2"
@@ -118,17 +118,20 @@ export const ProvisionCertificates = ({
         {!isEmpty && (
           <>
             <RecapQuantity
-              text={t(
-                "{{count}} certificats et {{total}} d'énergie disponible pour cession (pour un total disponible de {{total_available_energy}})",
-                {
-                  count: data.count,
-                  total: formatUnit(
-                    data!.available_energy ?? 0,
-                    ExtendedUnit.MWh
-                  ),
-                  total_available_energy: formattedBalance,
-                }
-              )}
+              text={
+                <Trans
+                  defaults="{{count}} certificats et {{total}} d'énergie disponible pour cession (<b>pour un total disponible de {{total_available_energy}}</b>)"
+                  components={{ b: <b /> }}
+                  values={{
+                    count: data.count,
+                    total: formatUnit(
+                      data!.available_energy ?? 0,
+                      ExtendedUnit.MWh
+                    ),
+                    total_available_energy: formattedBalance,
+                  }}
+                />
+              }
             />
 
             <Table
