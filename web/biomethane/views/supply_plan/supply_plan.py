@@ -25,18 +25,16 @@ from .mixins import YearsActionMixin
 )
 class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin):
     queryset = BiomethaneSupplyPlan.objects.all()
-    filterset_class = BiomethaneSupplyPlanFilter
     serializer_class = BiomethaneSupplyPlanSerializer
     pagination_class = None
 
     def get_permissions(self):
         return get_biomethane_permissions([], self.action)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    def get_filterset_class(self):
         if self.action == "get_years":
-            return BiomethaneSupplyPlanYearsFilter(self.request.GET, queryset=queryset).qs
-        return self.filter_queryset(queryset)
+            return BiomethaneSupplyPlanYearsFilter
+        return BiomethaneSupplyPlanFilter
 
     @extend_schema(
         parameters=[
@@ -59,7 +57,7 @@ class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            supply_plan = self.get_queryset().get()
+            supply_plan = self.filter_queryset(self.get_queryset()).get()
             data = self.get_serializer(supply_plan, many=False).data
             return Response(data)
         except BiomethaneSupplyPlan.DoesNotExist:

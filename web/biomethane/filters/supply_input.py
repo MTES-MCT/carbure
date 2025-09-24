@@ -1,4 +1,4 @@
-from django_filters import CharFilter, FilterSet
+from django_filters import CharFilter, ChoiceFilter, FilterSet
 
 from biomethane.models import BiomethaneSupplyInput
 
@@ -6,8 +6,10 @@ from biomethane.models import BiomethaneSupplyInput
 class BaseBiomethaneSupplyInputFilter(FilterSet):
     entity_id = CharFilter(field_name="supply_plan__producer__id", lookup_expr="exact", required=True)
     type = CharFilter(field_name="input_type", lookup_expr="exact", required=False)
-    source = CharFilter(field_name="source", lookup_expr="exact", required=False)
-    category = CharFilter(field_name="input_category", lookup_expr="exact", required=False)
+    source = ChoiceFilter(field_name="source", choices=BiomethaneSupplyInput.SOURCE_CHOICES, required=False)
+    category = ChoiceFilter(
+        field_name="input_category", choices=BiomethaneSupplyInput.INPUT_CATEGORY_CHOICES, required=False
+    )
 
 
 class BiomethaneSupplyInputFilter(BaseBiomethaneSupplyInputFilter):
