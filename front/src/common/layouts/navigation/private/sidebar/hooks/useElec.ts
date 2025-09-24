@@ -2,7 +2,6 @@ import useEntity from "common/hooks/entity"
 import { useRoutes } from "common/hooks/routes"
 import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
-import { ArrowGoBackLine, ArrowGoForwardLine } from "common/components/icon"
 import { apiTypes } from "common/services/api-fetch.types"
 
 type ElecParams = Pick<apiTypes["NavStats"], "pending_transfer_certificates">
@@ -24,13 +23,13 @@ export const useElec = (params?: ElecParams) => {
       {
         path: routes.ELEC_V2().CERTIFICATES.PROVISION,
         title: t("Cert. de fourniture"),
-        icon: ArrowGoForwardLine,
+        icon: "ri-arrow-go-forward-line",
         condition: isCPO || isAdmin || isElecAdmin,
       },
       {
         path: routes.ELEC_V2().CERTIFICATES.TRANSFER,
         title: t("Cert. de cession"),
-        icon: ArrowGoBackLine,
+        icon: "ri-arrow-go-back-line",
         additionalInfo: params?.pending_transfer_certificates,
       },
     ],

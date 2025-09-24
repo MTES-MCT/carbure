@@ -2,20 +2,6 @@ import useEntity from "common/hooks/entity"
 import { useRoutes } from "common/hooks/routes"
 import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
-import {
-  BuildingFill,
-  BuildingLine,
-  CalendarCheckFill,
-  CalendarCheckLine,
-  ClipboardFill,
-  ClipboardLine,
-  FileTextFill,
-  FileTextLine,
-  HomeFill,
-  HomeLine,
-  TodoFill,
-  TodoLine,
-} from "common/components/icon/icon"
 import { apiTypes } from "common/services/api-fetch.types"
 import { useUser } from "common/hooks/user"
 
@@ -38,27 +24,27 @@ export const useChargePoints = (params?: ChargePointsParams) => {
         path: routes.ELEC().CHARGE_POINTS.PENDING,
         title: t("Inscription"),
 
-        icon: FileTextLine,
-        iconActive: FileTextFill,
+        icon: "ri-file-text-line",
+        iconActive: "ri-file-text-fill",
       },
       {
         path: routes.ELEC().CHARGE_POINTS.METER_READINGS,
         title: t("Relevés trimestriels"),
-        icon: CalendarCheckLine,
-        iconActive: CalendarCheckFill,
+        icon: "ri-calendar-check-line",
+        iconActive: "ri-calendar-check-fill",
       },
       {
         path: routes.ELEC().CHARGE_POINTS.QUALICHARGE,
         title: t("Données Qualicharge"),
         condition: isMTEDGEC,
-        icon: HomeLine,
-        iconActive: HomeFill,
+        icon: "ri-home-4-line",
+        iconActive: "ri-home-4-fill",
       },
       {
         path: routes.ELEC().CHARGE_POINTS.LIST,
         title: t("Point de recharge"),
-        icon: BuildingLine,
-        iconActive: BuildingFill,
+        icon: "ri-building-4-line",
+        iconActive: "ri-building-4-fill",
       },
     ],
   }
@@ -71,8 +57,8 @@ export const useChargePoints = (params?: ChargePointsParams) => {
         path: routes.ELEC_AUDITOR(),
         title: t("Points de recharge"),
         additionalInfo: params?.audits,
-        icon: BuildingLine,
-        iconActive: BuildingFill,
+        icon: "ri-building-4-line",
+        iconActive: "ri-building-4-fill",
       },
     ],
   }
@@ -85,21 +71,21 @@ export const useChargePoints = (params?: ChargePointsParams) => {
         path: routes.ELEC_ADMIN().CHARGE_POINTS.PENDING,
         title: t("Inscription"),
         additionalInfo: params?.charge_point_registration_pending,
-        icon: ClipboardLine,
-        iconActive: ClipboardFill,
+        icon: "ri-clipboard-line",
+        iconActive: "ri-clipboard-fill",
       },
       {
         path: routes.ELEC_ADMIN().CHARGE_POINTS.METER_READINGS,
         additionalInfo: params?.metering_reading_pending,
         title: t("Relevés"),
-        icon: TodoLine,
-        iconActive: TodoFill,
+        icon: "ri-todo-line",
+        iconActive: "ri-todo-fill",
       },
       {
         path: routes.ELEC().CHARGE_POINTS.QUALICHARGE,
         title: t("Données Qualicharge"),
-        icon: HomeLine,
-        iconActive: HomeFill,
+        icon: "ri-home-4-line",
+        iconActive: "ri-home-4-fill",
       },
     ],
   }
