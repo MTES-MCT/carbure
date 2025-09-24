@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 
-from edelivery.adapters.zip_compressor import unzip_base64_encoded_stream
+from edelivery.adapters.zip_utils import unzip_base64_encoded_stream
 
 
 class AbstractEdeliveryResponse:
