@@ -1,9 +1,42 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 
 class FiltersActionMixin:
+    @extend_schema(
+        filters=True,
+        parameters=[
+            OpenApiParameter(
+                name="filter",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter string to apply",
+            ),
+        ],
+        examples=[
+            OpenApiExample(
+                "Example of filters response.",
+                value=[
+                    "ETBE",
+                    "Ethanol",
+                    "EMHV",
+                    "B100",
+                    "HVOE",
+                ],
+                request_only=False,
+                response_only=True,
+            ),
+        ],
+        responses={
+            200: {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                },
+            },
+        },
+    )
     @action(methods=["get"], detail=False)
     def filters(self, request):
         filter_param = request.query_params.get("filter")
@@ -23,11 +56,3 @@ class FiltersActionMixin:
         # Use pre-filtered queryset for distinct values
         values = filterset.qs.values_list(filter_obj.field_name, flat=True).distinct().order_by(filter_obj.field_name)
         return Response([v for v in values if v is not None])
-
-
-class ViewMethodFilterBackend(DjangoFilterBackend):
-    # Implementation of get_filterset_class
-    def get_filterset_class(self, view, queryset=None):
-        if hasattr(view, "get_filterset_class"):
-            return view.get_filterset_class()
-        return super().get_filterset_class(view, queryset)

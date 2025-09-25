@@ -385,7 +385,7 @@ SILKY_PYTHON_PROFILER_RESULT_PATH = "/tmp"
 # DRF
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
-        "core.filters.ViewMethodFilterBackend",
+        "core.views.ViewMethodFilterBackend",
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
@@ -422,6 +422,7 @@ SPECTACULAR_SETTINGS = {
         "ElecOperationStatusEnum": "tiruert.models.ElecOperation.OPERATION_STATUSES",
         "ElecOperationTypeEnum": "tiruert.models.ElecOperation.OPERATION_TYPES",
         "BiomethaneDigestateStatusEnum": "biomethane.models.BiomethaneDigestate.DIGESTATE_STATUS",
+        "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
