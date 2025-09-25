@@ -14,7 +14,12 @@ from pandas._typing import Scalar
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import Carbure, CarbureUnit
 from core.ign_distance import get_distance
-from core.models import Biocarburant, CarbureLot, GenericCertificate, TransactionDistance
+from core.models import (
+    Biocarburant,
+    CarbureLot,
+    GenericCertificate,
+    TransactionDistance,
+)
 from transactions.models import ProductionSite
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
@@ -130,7 +135,9 @@ def convert_cell(cell, convert_float: bool) -> Scalar:
 def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
     data: List[List[Scalar]] = []
     for row in sheet.rows:
-        data.append([convert_cell(cell, convert_float) if isinstance(cell, openpyxl.cell.cell.Cell) else "" for cell in row])
+        data.append(
+            [(convert_cell(cell, convert_float) if isinstance(cell, openpyxl.cell.cell.Cell) else "") for cell in row]
+        )
     return data
 
 
@@ -177,14 +184,17 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
     df = pd.DataFrame(data, columns=column_names)
     df.fillna("", inplace=True)
     lots_data = []
+
     for row in df.iterrows():
         lot_row = row[1]
         lot = {}
+
         if lot_row.get("volume", "") == "" and (lot_row.get("unit", "") == "" or lot_row.get("quantity", "") == ""):
             # ignore rows with no volume or no unit+quantity
             # this is mostly done to ignore entirely empty rows read in the excel/csv file
             # without this, we can receive dozens of empty rows...
             continue
+
         # TEMPLATE COLUMNS
         # 'champ_libre',
         # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',  # noqa: E501
@@ -202,13 +212,16 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
         lot["carbure_stock_id"] = lot_row.get("carbure_stock_id", "").strip()
         lot["free_field"] = lot_row.get("champ_libre", "")
+
+        # Production
         lot["production_site_certificate"] = lot_row.get("production_site_reference", "").strip()
         lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", None).strip()
         producer = lot_row.get("producer", "").strip()
         production_site = lot_row.get("production_site", "").strip()
-
         carbure_production_site = ProductionSite.objects.filter(name=production_site).first()
+
         if carbure_production_site:
+            # Production
             lot["carbure_production_site"] = carbure_production_site.name
             lot["unknown_production_site"] = ""
             if carbure_production_site.producer:
@@ -216,6 +229,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             else:
                 lot["unknown_producer"] = producer
         else:
+            # Production
             lot["unknown_production_site"] = production_site
             lot["unknown_producer"] = producer
             lot["carbure_production_site"] = ""
@@ -223,13 +237,17 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
             lot["production_country_code"] = lot_row.get("production_site_country", None)
             lot["production_site_commissioning_date"] = lot_row.get("production_site_commissioning_date", "")
+
+            # Livraison
             supplier = lot_row.get("supplier", "").upper()
+
             if supplier in prefetched_data["clientsbyname"]:
                 lot["carbure_supplier_id"] = prefetched_data["clientsbyname"][supplier].id
             else:
                 lot["unknown_supplier"] = supplier
 
         double_counting_cert = lot["production_site_double_counting_certificate"]
+
         if double_counting_cert and double_counting_cert in prefetched_data["double_counting_certificates"]:
             dc_cert_variations = prefetched_data["double_counting_certificates"][double_counting_cert]
             if dc_cert_variations:
@@ -238,37 +256,23 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
                     lot["carbure_producer_id"] = dc_cert.production_site.producer.id
                     lot["carbure_production_site"] = dc_cert.production_site.name
 
+        # Livraison
         lot["vendor_certificate"] = lot_row.get("vendor_certificate", "")
         lot["supplier_certificate"] = lot_row.get("supplier_certificate", "")
+
+        # Lot
+        lot["transport_document_reference"] = lot_row.get("dae", "")
         lot["volume"] = lot_row.get("volume", 0)
         lot["quantity"] = lot_row.get("quantity", 0)
         lot["unit"] = lot_row.get("unit", None)
         lot["feedstock_code"] = lot_row.get("matiere_premiere_code", "").strip()
         lot["biofuel_code"] = lot_row.get("biocarburant_code", "").strip()
         lot["country_code"] = lot_row.get("pays_origine_code", "").strip()
+
         lot["delivery_type"] = lot_row.get("delivery_type", CarbureLot.UNKNOWN)
-        for key in ["el"]:  # negative value allowed
-            try:
-                lot[key] = float(lot_row.get(key, 0))
-            except Exception:
-                lot[key] = 0
-        for key in [
-            "eec",
-            "ep",
-            "etd",
-            "eu",
-            "esca",
-            "eccs",
-            "eccr",
-            "eee",
-        ]:  # positive value only
-            try:
-                lot[key] = abs(float(lot_row.get(key, 0)))
-            except Exception:
-                lot[key] = 0
-        lot["transport_document_reference"] = lot_row.get("dae", "")
         lot["delivery_date"] = lot_row.get("delivery_date", "")
         delivery_site = str(lot_row.get("delivery_site", ""))
+
         if delivery_site.upper() in prefetched_data["depots"]:
             lot["carbure_delivery_site_depot_id"] = prefetched_data["depots"][delivery_site.upper()].depot_id
         elif delivery_site.upper() in prefetched_data["depotsbyname"]:
@@ -277,13 +281,45 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
             lot["unknown_delivery_site"] = delivery_site
             delivery_site_country = lot_row.get("delivery_site_country", "")
             lot["delivery_site_country_code"] = delivery_site_country.strip()
+
         client = lot_row.get("client", "").upper().strip()
+
         if client in prefetched_data["clientsbyname"]:
             lot["carbure_client_id"] = prefetched_data["clientsbyname"][client].id
         else:
             lot["unknown_client"] = client
+
+        copy_ghg_fields(lot_row, lot)
+
         lots_data.append(lot)
+
     return lots_data
+
+
+def copy_ghg_fields(lot_row: dict, lot: dict):
+    # GHG Emissions
+    for key in ["el"]:  # negative value allowed
+        try:
+            lot[key] = float(lot_row.get(key, 0))
+        except Exception:
+            lot[key] = 0
+
+    for key in [
+        # GHG Emissions
+        "eec",
+        "ep",
+        "etd",
+        "eu",
+        # Reductions
+        "esca",
+        "eccs",
+        "eccr",
+        "eee",
+    ]:  # positive value only
+        try:
+            lot[key] = abs(float(lot_row.get(key, 0)))
+        except Exception:
+            lot[key] = 0
 
 
 def ErrorResponse(status_code, error=None, data=None, status=Carbure.ERROR, message=None):
