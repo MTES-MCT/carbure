@@ -19,10 +19,9 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
     permission_classes = [HasProducerRights | HasDoubleCountingAdminRights]
 
     def get_permissions(self):
-        # TODO fix permissions if needed
-        if self.action in ["add", "upload_files", "delete_file"]:
+        if self.action in ["check_file", "add", "upload_files", "delete_file"]:
             return [HasProducerWriteRights()]
-        if self.action in ["list_admin", "export", "approve", "update_approved_quotas"]:
+        if self.action in ["list_admin", "export", "approve", "reject", "generate_decision", "update_approved_quotas"]:
             return [HasDoubleCountingAdminRights()]
 
         return super().get_permissions()
