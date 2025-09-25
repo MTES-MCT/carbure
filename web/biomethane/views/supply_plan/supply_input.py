@@ -19,13 +19,6 @@ from core.pagination import MetadataPageNumberPagination
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
     aggregate_fields = {"annual_volumes_in_t": Sum("volume")}
 
-    def get_extra_metadata(self):
-        metadata = {"annual_volumes_in_t": 0}
-
-        for input in self.queryset:
-            metadata["annual_volumes_in_t"] += input.volume
-        return metadata
-
 
 @extend_schema(
     parameters=[

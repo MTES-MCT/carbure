@@ -17,6 +17,7 @@ import { declarationInterval } from "biomethane/utils"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneSupplyInputQueryBuilder } from "./types"
+import { Pagination } from "common/components/pagination2"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
@@ -32,7 +33,8 @@ export const SupplyPlan = () => {
   >({
     year: years.selected,
   })
-  const { getFilterOptions, filterLabels } = useGetFilterOptions(query)
+  const { getFilterOptions, filterLabels, normalizers } =
+    useGetFilterOptions(query)
 
   const { result: supplyInputs, loading } = useQuery(getSupplyPlanInputs, {
     key: `supply-plan-inputs-${entity.id}-${years.selected}`,
@@ -49,20 +51,26 @@ export const SupplyPlan = () => {
           value={years.selected}
           onChange={years.setYear}
         />
-        <Button onClick={() => {}} iconId="ri-upload-line" asideX>
+        <Button
+          onClick={() => {}}
+          iconId="ri-upload-line"
+          asideX
+          disabled={!selectedYearIsInCurrentInterval}
+        >
           {t("Charger un plan d'approvisionnement")}
         </Button>
       </Row>
       <Content marginTop>
         <ActionBar>
           <ActionBar.Grow>
-            <SearchInput />
+            <SearchInput value={state.search} onChange={actions.setSearch} />
           </ActionBar.Grow>
           <Button
             onClick={() => {}}
             iconId="ri-add-line"
             asideX
             priority="secondary"
+            disabled={!selectedYearIsInCurrentInterval}
           >
             {t("Ajouter un intrant")}
           </Button>
@@ -80,6 +88,7 @@ export const SupplyPlan = () => {
           selected={state.filters}
           onSelect={actions.setFilters}
           getFilterOptions={getFilterOptions}
+          normalizers={normalizers}
         />
         {selectedYearIsInCurrentInterval && (
           <Notice variant="info" icon="ri-time-line" isClosable>
@@ -91,8 +100,10 @@ export const SupplyPlan = () => {
             )}
           </Notice>
         )}
-        {!loading && !supplyInputs && <NoResult />}
-        {supplyInputs && supplyInputs.results?.length > 0 && (
+        {!loading && (!supplyInputs || supplyInputs?.count === 0) && (
+          <NoResult />
+        )}
+        {supplyInputs && supplyInputs.count > 0 && (
           <>
             <RecapQuantity
               text={t("{{total}} tonnes annuelles", {
@@ -100,11 +111,21 @@ export const SupplyPlan = () => {
               })}
             />
             <Table
-              rows={supplyInputs.results}
+              rows={supplyInputs?.results ?? []}
               columns={columns}
               loading={loading}
             />
           </>
+        )}
+
+        {supplyInputs && supplyInputs.count > 0 && (
+          <Pagination
+            defaultPage={query.page}
+            total={supplyInputs.count}
+            limit={state.limit}
+            onLimit={actions.setLimit}
+            disabled={loading}
+          />
         )}
       </Content>
     </Main>

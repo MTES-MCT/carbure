@@ -6683,7 +6683,7 @@ export interface operations {
                  *     * `EXTERNAL` - Externe */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
                 type?: string;
-                year: string;
+                year: number;
             };
             header?: never;
             path?: never;

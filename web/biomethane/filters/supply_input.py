@@ -1,4 +1,4 @@
-from django_filters import CharFilter, ChoiceFilter, FilterSet
+from django_filters import CharFilter, ChoiceFilter, FilterSet, NumberFilter
 
 from biomethane.models import BiomethaneSupplyInput
 
@@ -13,7 +13,7 @@ class BaseBiomethaneSupplyInputFilter(FilterSet):
 
 
 class BiomethaneSupplyInputFilter(BaseBiomethaneSupplyInputFilter):
-    year = CharFilter(field_name="supply_plan__year", lookup_expr="exact", required=True)
+    year = NumberFilter(field_name="supply_plan__year", lookup_expr="exact", required=True)
 
     class Meta:
         model = BiomethaneSupplyInput

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import factory
 from factory import fuzzy
 from faker import Faker
@@ -14,7 +16,7 @@ class BiomethaneSupplyPlanFactory(factory.django.DjangoModelFactory):
         model = BiomethaneSupplyPlan
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
-    year = factory.Faker("random_int", min=2020, max=2030)
+    year = factory.Faker("random_int", min=2020, max=datetime.today().year)
 
 
 class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
@@ -39,7 +41,7 @@ class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
 
     # Section Réception
     origin_country = factory.Iterator(Pays.objects.all())
-    origin_department = factory.Faker("lexify", text="??")
+    origin_department = factory.Faker("random_int", min=10, max=95)
     average_weighted_distance_km = factory.Faker("random_int", min=10, max=500)
     maximum_distance_km = factory.Faker("random_int", min=50, max=1000)
 
@@ -47,3 +49,6 @@ class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
 def create_supply_plan(entity):
     supply_plan = BiomethaneSupplyPlanFactory.create(producer=entity)
     BiomethaneSupplyInputFactory.create_batch(10, supply_plan=supply_plan)
+
+    supply_plan2 = BiomethaneSupplyPlanFactory.create(producer=entity, year=datetime.today().year)
+    BiomethaneSupplyInputFactory.create_batch(10, supply_plan=supply_plan2)

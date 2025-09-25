@@ -9,7 +9,7 @@ type SearchInputProps = {
   className?: string
 }
 export const SearchInput = ({
-  debounce,
+  debounce = 300,
   onChange,
   value,
   placeholder,

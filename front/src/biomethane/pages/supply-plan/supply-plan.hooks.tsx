@@ -2,13 +2,16 @@ import { Cell, Column } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import {
   BiomethaneSupplyInput,
+  BiomethaneSupplyInputCategory,
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputQuery,
+  BiomethaneSupplyInputSource,
 } from "./types"
 import Tag from "@codegouvfr/react-dsfr/Tag"
-import { getSupplyPlanInputSource } from "./utils"
+import { getSupplyPlanInputCategory, getSupplyPlanInputSource } from "./utils"
 import { getDepartmentName } from "common/utils/geography"
 import { getSupplyPlanInputFilters } from "./api"
+import { defaultNormalizer } from "common/utils/normalize"
 
 export const useSupplyPlanColumns = () => {
   const { t } = useTranslation()
@@ -44,20 +47,29 @@ export const useSupplyPlanColumns = () => {
 export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
   const { t } = useTranslation()
 
-  const getFilterOptions = async (filter: string) => {
-    const data = await getSupplyPlanInputFilters(
-      query,
-      filter as BiomethaneSupplyInputFilter
-    )
-
-    return data
-  }
-
   const filterLabels = {
     [BiomethaneSupplyInputFilter.source]: t("Provenance"),
     [BiomethaneSupplyInputFilter.category]: t("Catégorie"),
     [BiomethaneSupplyInputFilter.type]: t("Intrant"),
   }
 
-  return { getFilterOptions, filterLabels }
+  const normalizers = {
+    [BiomethaneSupplyInputFilter.source]: (value: string) => ({
+      value,
+      label: getSupplyPlanInputSource(value as BiomethaneSupplyInputSource),
+    }),
+    [BiomethaneSupplyInputFilter.category]: (value: string) => ({
+      value,
+      label: getSupplyPlanInputCategory(value as BiomethaneSupplyInputCategory),
+    }),
+    [BiomethaneSupplyInputFilter.type]: (value: string) =>
+      defaultNormalizer(value),
+  }
+
+  return {
+    normalizers,
+    filterLabels,
+    getFilterOptions: (filter: BiomethaneSupplyInputFilter) =>
+      getSupplyPlanInputFilters(query, filter),
+  }
 }
