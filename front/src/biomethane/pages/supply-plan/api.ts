@@ -30,3 +30,18 @@ export const getSupplyPlanInputFilters = async (
       },
     })
     .then((res) => res.data ?? [])
+
+export const getSupplyInput = async (
+  entity_id: number,
+  supply_input_id: number
+) =>
+  api
+    .GET("/biomethane/supply-input/{id}/", {
+      params: {
+        path: {
+          id: supply_input_id,
+        },
+        query: { entity_id },
+      },
+    })
+    .then((res) => res.data)

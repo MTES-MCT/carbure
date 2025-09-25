@@ -18,6 +18,8 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneSupplyInputQueryBuilder } from "./types"
 import { Pagination } from "common/components/pagination2"
+import HashRoute from "common/components/hash-route"
+import { SupplyInputDialog } from "./supply-input-dialog"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
@@ -114,6 +116,11 @@ export const SupplyPlan = () => {
               rows={supplyInputs?.results ?? []}
               columns={columns}
               loading={loading}
+              rowLink={(row) => ({
+                pathname: location.pathname,
+                search: location.search,
+                hash: `supply-input/${row.id}`,
+              })}
             />
           </>
         )}
@@ -128,6 +135,7 @@ export const SupplyPlan = () => {
           />
         )}
       </Content>
+      <HashRoute path="/supply-input/:id" element={<SupplyInputDialog />} />
     </Main>
   )
 }

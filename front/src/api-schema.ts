@@ -482,7 +482,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["biomethane_supply_input_retrieve"];
         put: operations["biomethane_supply_input_update"];
         post?: never;
         delete?: never;
@@ -6725,6 +6725,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BiomethaneSupplyInputCreate"];
+                };
+            };
+        };
+    };
+    biomethane_supply_input_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneSupplyInput"];
                 };
             };
         };

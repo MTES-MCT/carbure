@@ -2,6 +2,8 @@ import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiBiomethaneSupplyInputGetParametersQuerySource as BiomethaneSupplyInputSource,
   PathsApiBiomethaneSupplyInputGetParametersQueryCategory as BiomethaneSupplyInputCategory,
+  CropTypeEnum as BiomethaneSupplyInputCropType,
+  MaterialUnitEnum as BiomethaneSupplyInputMaterialUnit,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -19,4 +21,6 @@ export {
   BiomethaneSupplyInputSource,
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputCategory,
+  BiomethaneSupplyInputCropType,
+  BiomethaneSupplyInputMaterialUnit,
 }

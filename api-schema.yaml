@@ -1455,6 +1455,34 @@ paths:
                 $ref: "#/components/schemas/BiomethaneSupplyInputCreate"
           description: ""
   /api/biomethane/supply-input/{id}/:
+    get:
+      operationId: biomethane_supply_input_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Biométhane - Intrant
+            d'approvisionnement.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInput"
+          description: ""
     put:
       operationId: biomethane_supply_input_update
       parameters:

@@ -24,7 +24,7 @@ export interface DialogProps {
   gap?: "lg"
 
   // Define the size of the dialog
-  size?: "medium"
+  size?: "medium" | "large"
   onClose: () => void
 }
 

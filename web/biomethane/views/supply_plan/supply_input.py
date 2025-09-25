@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
@@ -31,7 +31,9 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
         ),
     ]
 )
-class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin, ListModelMixin, FiltersActionMixin):
+class BiomethaneSupplyInputViewSet(
+    GenericViewSet, CreateModelMixin, UpdateModelMixin, ListModelMixin, RetrieveModelMixin, FiltersActionMixin
+):
     queryset = BiomethaneSupplyInput.objects.all()
     filterset_class = BiomethaneSupplyInputFilter
     search_fields = ["input_type", "input_category"]
