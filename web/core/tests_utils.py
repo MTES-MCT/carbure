@@ -149,13 +149,19 @@ class PermissionTestMixin:
         view_extra_actions = [a.__name__ for a in view.get_extra_actions()]
         view_actions = view_core_actions + view_extra_actions
 
+        # collect tested actions to confirm we checked everything later
+        tested_actions = []
+
         for actions, permissions in action_permissions:
             for action in actions:
                 with self.subTest(f"action: {action}"):
                     self.assertIn(action, view_actions)
+                    tested_actions.append(action)
                     view.action = action
                     view_permissions = view.get_permissions()
                     self.assertPermissionsEqual(view_permissions, permissions)
+
+        self.assertCountEqual(view_actions, tested_actions)
 
     def assertPermissionsEqual(self, first, second):
         if isinstance(first, list) and isinstance(second, list):
