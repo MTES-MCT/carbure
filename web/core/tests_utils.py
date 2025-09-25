@@ -142,9 +142,17 @@ class PermissionTestMixin:
 
     def assertViewPermissions(self, View, action_permissions: list[Tuple[list[str], list]]):
         view = View()
+
+        # list all the actual actions listed on the viewset so we can be sure we're testing the right actions
+        core_actions = ["list", "create", "retrieve", "update", "partial_update", "destroy"]
+        view_core_actions = [a for a in core_actions if hasattr(view, a)]
+        view_extra_actions = [a.__name__ for a in view.get_extra_actions()]
+        view_actions = view_core_actions + view_extra_actions
+
         for actions, permissions in action_permissions:
             for action in actions:
                 with self.subTest(f"action: {action}"):
+                    self.assertIn(action, view_actions)
                     view.action = action
                     view_permissions = view.get_permissions()
                     self.assertPermissionsEqual(view_permissions, permissions)
