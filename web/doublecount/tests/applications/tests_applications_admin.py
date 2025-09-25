@@ -14,13 +14,10 @@ from doublecount.factories import (
     DoubleCountingProductionFactory,
     DoubleCountingSourcingFactory,
 )
+from doublecount.helpers import check_has_dechets_industriels
 from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 from doublecount.views.applications.mixins.approve_application import DoubleCountingApplicationApproveError
-from doublecount.views.applications.mixins.export_application import (
-    DoubleCountingApplicationExportError,
-    application_to_json,
-    check_has_dechets_industriels,
-)
+from doublecount.views.applications.mixins.utils import DoubleCountingApplicationExportError, application_to_json
 from transactions.models import ProductionSite
 
 
