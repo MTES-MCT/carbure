@@ -19,10 +19,15 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneSupplyInputQueryBuilder } from "./types"
 import { Pagination } from "common/components/pagination2"
 import HashRoute from "common/components/hash-route"
-import { SupplyInputDialog } from "./supply-input-dialog"
+import {
+  CreateSupplyInputDialog,
+  SupplyInputDialog,
+} from "./supply-input-dialog"
+import { usePortal } from "common/components/portal"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
+  const portal = usePortal()
   usePrivateNavigation(t("Mes plans d'approvisionnement"))
   const entity = useEntity()
   const years = useYears("biomethane/supply-plan", () =>
@@ -44,6 +49,10 @@ export const SupplyPlan = () => {
   })
   const selectedYearIsInCurrentInterval =
     years.selected === declarationInterval.year
+
+  const openCreateSupplyInputDialog = () => {
+    portal((close) => <CreateSupplyInputDialog onClose={close} />)
+  }
 
   return (
     <Main>
@@ -68,7 +77,7 @@ export const SupplyPlan = () => {
             <SearchInput value={state.search} onChange={actions.setSearch} />
           </ActionBar.Grow>
           <Button
-            onClick={() => {}}
+            onClick={openCreateSupplyInputDialog}
             iconId="ri-add-line"
             asideX
             priority="secondary"
