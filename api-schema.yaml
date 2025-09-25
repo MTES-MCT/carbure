@@ -1614,38 +1614,6 @@ paths:
                     - HVOE
                   summary: Example of filters response.
           description: ""
-  /api/biomethane/supply-plan/:
-    get:
-      operationId: biomethane_supply_plan_retrieve
-      description: Retrieve the supply plan for the current entity and year. Returns a
-        single production unit object.
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Declaration year.
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BiomethaneSupplyPlan"
-          description: Supply plan details for the entity
-        "404":
-          description: Supply plan not found for this entity.
   /api/biomethane/supply-plan/years/:
     get:
       operationId: biomethane_supply_plan_years_retrieve
@@ -11623,7 +11591,7 @@ components:
           type: integer
           readOnly: true
         source:
-          $ref: "#/components/schemas/SourceBd7Enum"
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
         input_category:
@@ -11672,7 +11640,7 @@ components:
           type: integer
           readOnly: true
         source:
-          $ref: "#/components/schemas/SourceBd7Enum"
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
         input_category:
@@ -11715,7 +11683,7 @@ components:
       type: object
       properties:
         source:
-          $ref: "#/components/schemas/SourceBd7Enum"
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
         input_category:
@@ -11755,25 +11723,14 @@ components:
         - origin_department
         - source
         - volume
-    BiomethaneSupplyPlan:
-      type: object
-      properties:
-        inputs:
-          type: array
-          items:
-            $ref: "#/components/schemas/BiomethaneSupplyInput"
-          readOnly: true
-        year:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-          title: Année
-        producer:
-          type: integer
-      required:
-        - inputs
-        - producer
-        - year
+    BiomethaneSupplyInputSourceEnum:
+      enum:
+        - INTERNAL
+        - EXTERNAL
+      type: string
+      description: |-
+        * `INTERNAL` - Interne
+        * `EXTERNAL` - Externe
     CarbureLotPublic:
       type: object
       properties:
@@ -15286,7 +15243,7 @@ components:
       type: object
       properties:
         source:
-          $ref: "#/components/schemas/SourceBd7Enum"
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
         input_category:
@@ -16497,14 +16454,6 @@ components:
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
-    SourceBd7Enum:
-      enum:
-        - INTERNAL
-        - EXTERNAL
-      type: string
-      description: |-
-        * `INTERNAL` - Interne
-        * `EXTERNAL` - Externe
     SpreadingManagementMethodsEnum:
       enum:
         - DIRECT_SPREADING

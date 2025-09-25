@@ -507,23 +507,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/biomethane/supply-plan/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Retrieve the supply plan for the current entity and year. Returns a single production unit object. */
-        get: operations["biomethane_supply_plan_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/biomethane/supply-plan/years/": {
         parameters: {
             query?: never;
@@ -3261,7 +3244,7 @@ export interface components {
         };
         BiomethaneSupplyInput: {
             readonly id: number;
-            source: components["schemas"]["SourceBd7Enum"];
+            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
             input_type: string;
@@ -3280,7 +3263,7 @@ export interface components {
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
-            source: components["schemas"]["SourceBd7Enum"];
+            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
             input_type: string;
@@ -3297,7 +3280,7 @@ export interface components {
             origin_country?: number;
         };
         BiomethaneSupplyInputCreateRequest: {
-            source: components["schemas"]["SourceBd7Enum"];
+            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
             input_type: string;
@@ -3313,12 +3296,12 @@ export interface components {
             maximum_distance_km?: number | null;
             origin_country?: number;
         };
-        BiomethaneSupplyPlan: {
-            readonly inputs: components["schemas"]["BiomethaneSupplyInput"][];
-            /** Année */
-            year: number;
-            producer: number;
-        };
+        /**
+         * @description * `INTERNAL` - Interne
+         *     * `EXTERNAL` - Externe
+         * @enum {string}
+         */
+        BiomethaneSupplyInputSourceEnum: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
         CarbureLotPublic: {
             readonly id: number;
             year: number;
@@ -4825,7 +4808,7 @@ export interface components {
             has_biogas_recovery?: boolean;
         };
         PatchedBiomethaneSupplyInputCreateRequest: {
-            source?: components["schemas"]["SourceBd7Enum"];
+            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type?: components["schemas"]["CropTypeEnum"];
             input_category?: components["schemas"]["InputCategoryEnum"];
             input_type?: string;
@@ -5295,12 +5278,6 @@ export interface components {
          * @enum {string}
          */
         SiteTypeEnum: SiteTypeEnum;
-        /**
-         * @description * `INTERNAL` - Interne
-         *     * `EXTERNAL` - Externe
-         * @enum {string}
-         */
-        SourceBd7Enum: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
         /**
          * @description * `DIRECT_SPREADING` - Épandage direct
          *     * `SPREADING_VIA_PROVIDER` - Épandage via un prestataire
@@ -6849,38 +6826,6 @@ export interface operations {
                 content: {
                     "application/json": string[];
                 };
-            };
-        };
-    };
-    biomethane_supply_plan_retrieve: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-                /** @description Declaration year. */
-                year: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Supply plan details for the entity */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BiomethaneSupplyPlan"];
-                };
-            };
-            /** @description Supply plan not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };

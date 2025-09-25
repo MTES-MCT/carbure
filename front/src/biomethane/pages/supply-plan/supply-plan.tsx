@@ -7,13 +7,16 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import { getSupplyPlanInputs, getSupplyPlanYears } from "./api"
 import useEntity from "common/hooks/entity"
-import { useSupplyPlanColumns } from "./supply-plan.hooks"
+import { useGetFilterOptions, useSupplyPlanColumns } from "./supply-plan.hooks"
 import { useQuery } from "common/hooks/async"
 import { Table } from "common/components/table2"
 import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { Notice } from "common/components/notice"
 import { declarationInterval } from "biomethane/utils"
+import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { BiomethaneSupplyInputQueryBuilder } from "./types"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
@@ -23,9 +26,17 @@ export const SupplyPlan = () => {
     getSupplyPlanYears(entity.id)
   )
   const columns = useSupplyPlanColumns()
+
+  const { state, actions, query } = useQueryBuilder<
+    BiomethaneSupplyInputQueryBuilder["config"]
+  >({
+    year: years.selected,
+  })
+  const { getFilterOptions, filterLabels } = useGetFilterOptions(query)
+
   const { result: supplyInputs, loading } = useQuery(getSupplyPlanInputs, {
     key: `supply-plan-inputs-${entity.id}-${years.selected}`,
-    params: [entity.id, years.selected],
+    params: [query],
   })
   const selectedYearIsInCurrentInterval =
     years.selected === declarationInterval.year
@@ -39,7 +50,7 @@ export const SupplyPlan = () => {
           onChange={years.setYear}
         />
         <Button onClick={() => {}} iconId="ri-upload-line" asideX>
-          {t("Valider mes informations annuelles")}
+          {t("Charger un plan d'approvisionnement")}
         </Button>
       </Row>
       <Content marginTop>
@@ -55,7 +66,21 @@ export const SupplyPlan = () => {
           >
             {t("Ajouter un intrant")}
           </Button>
+          <Button
+            onClick={() => {}}
+            iconId="ri-download-line"
+            asideX
+            priority="secondary"
+          >
+            {t("Exporter")}
+          </Button>
         </ActionBar>
+        <FilterMultiSelect2
+          filterLabels={filterLabels}
+          selected={state.filters}
+          onSelect={actions.setFilters}
+          getFilterOptions={getFilterOptions}
+        />
         {selectedYearIsInCurrentInterval && (
           <Notice variant="info" icon="ri-time-line" isClosable>
             {t(

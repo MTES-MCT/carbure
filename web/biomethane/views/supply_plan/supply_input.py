@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
@@ -16,7 +17,7 @@ from core.pagination import MetadataPageNumberPagination
 
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
-    aggregate_fields = {"annual_volumes_in_t": 0}
+    aggregate_fields = {"annual_volumes_in_t": Sum("volume")}
 
     def get_extra_metadata(self):
         metadata = {"annual_volumes_in_t": 0}

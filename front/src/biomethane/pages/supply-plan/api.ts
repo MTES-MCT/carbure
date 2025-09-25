@@ -1,13 +1,32 @@
 import { api } from "common/services/api-fetch"
+import {
+  BiomethaneSupplyInputFilter,
+  BiomethaneSupplyInputQuery,
+} from "./types"
 
 export const getSupplyPlanYears = async (entity_id: number) =>
   api.GET("/biomethane/supply-plan/years/", {
     params: { query: { entity_id } },
   })
 
-export const getSupplyPlanInputs = async (entity_id: number, year: number) =>
+export const getSupplyPlanInputs = async (query: BiomethaneSupplyInputQuery) =>
   api
     .GET("/biomethane/supply-input/", {
-      params: { query: { entity_id, year: year.toString() } },
+      params: { query },
     })
     .then((res) => res.data)
+
+export const getSupplyPlanInputFilters = async (
+  query: BiomethaneSupplyInputQuery,
+  filter: BiomethaneSupplyInputFilter
+) =>
+  api
+    .GET("/biomethane/supply-input/filters/", {
+      params: {
+        query: {
+          ...query,
+          filter,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])
