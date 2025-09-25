@@ -12,7 +12,7 @@ class DoubleCountingApplicationPermissionTest(TestCase, PermissionTestMixin):
             ApplicationViewSet,
             [
                 (
-                    ["list", "retrieve", "files", "filter"],
+                    ["retrieve", "filters"],
                     [(HasProducerRights | HasDoubleCountingAdminRights)()],
                 ),
                 (
