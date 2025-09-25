@@ -1,10 +1,8 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
-from rest_framework import status
-from rest_framework.response import Response
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters import BiomethaneSupplyPlanFilter, BiomethaneSupplyPlanYearsFilter
+from biomethane.filters import BiomethaneSupplyPlanYearsFilter
 from biomethane.models import BiomethaneSupplyPlan
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneSupplyPlanSerializer
@@ -26,39 +24,8 @@ from .mixins import YearsActionMixin
 class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin):
     queryset = BiomethaneSupplyPlan.objects.all()
     serializer_class = BiomethaneSupplyPlanSerializer
+    filterset_class = BiomethaneSupplyPlanYearsFilter
     pagination_class = None
 
     def get_permissions(self):
         return get_biomethane_permissions([], self.action)
-
-    def get_filterset_class(self):
-        if self.action == "get_years":
-            return BiomethaneSupplyPlanYearsFilter
-        return BiomethaneSupplyPlanFilter
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="year",
-                type=OpenApiTypes.INT,
-                location=OpenApiParameter.QUERY,
-                description="Declaration year.",
-                required=True,
-            ),
-        ],
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneSupplyPlanSerializer,
-                description="Supply plan details for the entity",
-            ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Supply plan not found for this entity."),
-        },
-        description="Retrieve the supply plan for the current entity and year. Returns a single production unit object.",
-    )
-    def retrieve(self, request, *args, **kwargs):
-        try:
-            supply_plan = self.filter_queryset(self.get_queryset()).get()
-            data = self.get_serializer(supply_plan, many=False).data
-            return Response(data)
-        except BiomethaneSupplyPlan.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)

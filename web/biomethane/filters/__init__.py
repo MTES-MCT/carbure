@@ -1,6 +1,6 @@
 from .contract_amendment import BiomethaneContractAmendmentFilter
 from .digestate import BiomethaneDigestateFilter, BiomethaneDigestateRetrieveFilter
 from .contract import BiomethaneContractFilter
-from .supply_plan import BiomethaneSupplyPlanFilter, BiomethaneSupplyPlanYearsFilter
+from .supply_plan import BiomethaneSupplyPlanYearsFilter
 from .energy import BiomethaneEnergyFilter
 from .supply_input import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter

@@ -103,12 +103,6 @@ energy_monthly_report_viewset = BiomethaneEnergyMonthlyReportViewSet.as_view(
     }
 )
 
-supply_plan_viewset = BiomethaneSupplyPlanViewSet.as_view(
-    {
-        "get": "retrieve",
-    }
-)
-
 supply_plan_years_viewset = BiomethaneSupplyPlanViewSet.as_view(
     {
         "get": "get_years",
@@ -126,7 +120,6 @@ urlpatterns = [
     path("energy/years/", energy_years_viewset, name="biomethane-energy-years"),
     path("energy/validate/", energy_validate_viewset, name="biomethane-energy-validate"),
     path("energy/monthly-reports/", energy_monthly_report_viewset, name="biomethane-energy-monthly-report"),
-    path("supply-plan/", supply_plan_viewset, name="biomethane-supply-plan"),
     path("supply-plan/years/", supply_plan_years_viewset, name="biomethane-supply-plan-years"),
     *router.urls,
 ]
