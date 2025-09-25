@@ -74,7 +74,6 @@ class EntityRegistrationSearchCompanyTest(TestCase):
             reverse("api-entity-registration-search-company"),
             {"registration_id": siren},
         )
-        print(response)
 
         assert response.status_code == 200
         data = response.json()

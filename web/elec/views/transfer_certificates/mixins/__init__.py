@@ -1,7 +1,7 @@
 from .accept import AcceptActionMixin
 from .reject import RejectActionMixin
 from .cancel import CancelActionMixin
-from .filters import FiltersActionMixin
+from core.filters import FiltersActionMixin
 from .excel_export import ExcelExportActionMixin
 
 

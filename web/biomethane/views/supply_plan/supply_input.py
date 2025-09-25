@@ -11,9 +11,8 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputSerializer,
 )
 from biomethane.utils import get_declaration_period
+from core.filters import FiltersActionMixin
 from core.pagination import MetadataPageNumberPagination
-
-from .mixins import FiltersActionMixin
 
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
