@@ -33,7 +33,7 @@ from .utils import (
 )
 
 
-class ExportApplicationActionMixin:
+class GenerateDecisionActionMixin:
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -74,8 +74,8 @@ class ExportApplicationActionMixin:
             ): OpenApiTypes.STR,
         },
     )
-    @action(methods=["get"], detail=False, url_path="export-application")
-    def export_application(self, request, *args, **kwargs):
+    @action(methods=["get"], detail=False, url_path="generate-decision")
+    def generate_decision(self, request, *args, **kwargs):
         application_id = request.query_params.get("dca_id", False)
         dechets_industriels = request.query_params.get("di", "")
 

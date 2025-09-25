@@ -3,7 +3,7 @@ from .add_application import AddActionMixin
 from .approve_application import ApproveActionMixin
 from .check_file import CheckFileActionMixin
 from .export import ExportActionMixin
-from .export_application import ExportApplicationActionMixin
+from .generate_decision import GenerateDecisionActionMixin
 from .lists import ListActionMixin
 from .reject_application import RejectActionMixin
 from .update_quotas import UpdateQuotaActionMixin
@@ -16,7 +16,7 @@ class ActionMixin(
     ApproveActionMixin,
     CheckFileActionMixin,
     ExportActionMixin,
-    ExportApplicationActionMixin,
+    GenerateDecisionActionMixin,
     ListActionMixin,
     RejectActionMixin,
     UpdateQuotaActionMixin,

@@ -25,8 +25,8 @@ const GenerateDecisionDialog = ({
   const entity = useEntity()
   const [industrialWastes, setIndustrialWastes] = useState("")
 
-  const downloadDoubleCountingApplication = () => {
-    api.downloadDoubleCountingApplication(
+  const generateDoubleCountingDecision = () => {
+    api.generateDoubleCountingDecision(
       entity.id,
       application.id,
       industrialWastes
@@ -51,7 +51,7 @@ const GenerateDecisionDialog = ({
         </Button>
       }
     >
-      <Form id="generate-decision" onSubmit={downloadDoubleCountingApplication}>
+      <Form id="generate-decision" onSubmit={generateDoubleCountingDecision}>
         {hasIndustrialWastes(application) && (
           <>
             <Notice variant="info" icon="ri-alert-line">

@@ -683,22 +683,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/double-counting/applications/export-application/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["double_counting_applications_export_application_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/double-counting/applications/filters/": {
         parameters: {
             query?: never;
@@ -707,6 +691,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["double_counting_applications_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/double-counting/applications/generate-decision/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["double_counting_applications_generate_decision_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3629,7 +3629,7 @@ export interface components {
             manager_email?: string;
             readonly inputs: components["schemas"]["FeedStock"][];
             readonly outputs: components["schemas"]["Biofuel"][];
-            readonly certificates: components["schemas"]["ProductionSiteCertificate"][];
+            readonly certificates: components["schemas"]["GenericCertificate"][];
         };
         DoubleCountingProductionSitePreview: {
             readonly id: number;
@@ -4706,21 +4706,6 @@ export interface components {
             manager_name?: string;
             manager_phone?: string;
             manager_email?: string;
-        };
-        ProductionSiteCertificate: {
-            certificate_id: string;
-            certificate_type: components["schemas"]["CertificateTypeEnum"];
-            certificate_holder: string;
-            certificate_issuer?: string | null;
-            address?: string | null;
-            /** Format: date */
-            valid_from: string;
-            /** Format: date */
-            valid_until: string;
-            download_link?: string | null;
-            scope?: unknown;
-            input?: unknown;
-            output?: unknown;
         };
         ProductionSiteCertificateSertificate: {
             readonly type: string;
@@ -6959,36 +6944,12 @@ export interface operations {
             };
         };
     };
-    double_counting_applications_export_application_retrieve: {
-        parameters: {
-            query: {
-                /** @description Doublecount application ID */
-                dca_id: number;
-                /** @description Dechet industriel */
-                di?: string;
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string;
-                };
-            };
-        };
-    };
     double_counting_applications_filters_retrieve: {
         parameters: {
-            query?: {
+            query: {
                 certificate_id?: string;
+                /** @description Entity ID */
+                entity_id: number;
                 /** @description Filter string to apply */
                 filter?: string;
                 /** @description Ordre
@@ -7032,6 +6993,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    double_counting_applications_generate_decision_retrieve: {
+        parameters: {
+            query: {
+                /** @description Doublecount application ID */
+                dca_id: number;
+                /** @description Dechet industriel */
+                di?: string;
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string;
                 };
             };
         };
