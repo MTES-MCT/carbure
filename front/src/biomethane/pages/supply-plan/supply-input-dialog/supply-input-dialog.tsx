@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next"
 import { LoaderOverlay } from "common/components/scaffold"
 import { Notice } from "common/components/notice"
 import { SupplyInputForm } from "./supply-input-form"
+import { Button } from "common/components/button2"
 
 export const SupplyInputDialog = () => {
   const navigate = useNavigate()
@@ -36,6 +37,7 @@ export const SupplyInputDialog = () => {
           {t("Intrant n°{{id}}", { id: match?.params.id })}
         </Dialog.Title>
       }
+      footer={<Button>{t("Valider l'intrant")}</Button>}
       onClose={onClose}
       size="large"
     >
@@ -44,7 +46,7 @@ export const SupplyInputDialog = () => {
           {t("Intrant non trouvé")}
         </Notice>
       ) : (
-        <SupplyInputForm />
+        <SupplyInputForm supplyInput={supplyInput} />
       )}
     </Dialog>
   )
