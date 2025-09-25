@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 import { SafTicketSourceDetails } from "saf/types"
 import DurabilityFields from "saf/components/durability-fields"
-import { DialogSection } from "saf/components/dialog-section"
 import { TextInput, DateInput } from "common/components/inputs2"
+import { Dialog } from "common/components/dialog2"
 
 interface TicketSourceFieldsProps {
   ticketSource: SafTicketSourceDetails | undefined
@@ -20,7 +20,7 @@ export const TicketSourceFields = ({
 
   return (
     <div className={cl(css.form, css.columns)}>
-      <DialogSection label={t("Lot")}>
+      <Dialog.Section label={t("Lot")}>
         <TextInput
           label={t("Volume")}
           value={`${formatNumber(ticketSource.total_volume)} L`}
@@ -52,8 +52,8 @@ export const TicketSourceFields = ({
           }
           readOnly
         />
-      </DialogSection>
-      <DialogSection label={t("Production")}>
+      </Dialog.Section>
+      <Dialog.Section label={t("Production")}>
         <TextInput
           label={t("Producteur")}
           value={
@@ -86,7 +86,7 @@ export const TicketSourceFields = ({
           value={ticketSource.production_site_commissioning_date ?? ""}
           readOnly
         />
-      </DialogSection>
+      </Dialog.Section>
       <DurabilityFields durability={ticketSource} />
     </div>
   )

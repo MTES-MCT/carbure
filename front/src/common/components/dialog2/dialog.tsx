@@ -8,6 +8,7 @@ import { Text, TextProps } from "../text"
 import { useMutation } from "common/hooks/async"
 import { Trans, useTranslation } from "react-i18next"
 import { IconName } from "../icon"
+import { DialogSection } from "./dialog-section/dialog-section"
 
 export interface DialogProps {
   className?: string
@@ -106,7 +107,7 @@ const DialogDescription = <T extends React.ElementType>(
 
 Dialog.Title = DialogTitle
 Dialog.Description = DialogDescription
-
+Dialog.Section = DialogSection
 export default Dialog
 
 export interface ConfirmProps {

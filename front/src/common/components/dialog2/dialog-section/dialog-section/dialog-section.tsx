@@ -6,6 +6,9 @@ interface DialogSectionProps {
   children: React.ReactNode
 }
 
+/**
+ * A box with a label and a content (used in dialogs)
+ */
 export const DialogSection = ({ label, children }: DialogSectionProps) => {
   return (
     <div className={css["dialog-section"]}>
