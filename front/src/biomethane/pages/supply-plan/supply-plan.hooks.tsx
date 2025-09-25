@@ -1,0 +1,37 @@
+import { Cell, Column } from "common/components/table2"
+import { useTranslation } from "react-i18next"
+import { BiomethaneSupplyInput } from "./types"
+import Tag from "@codegouvfr/react-dsfr/Tag"
+import { getSupplyPlanInputSource } from "./utils"
+import { getDepartmentName } from "common/utils/geography"
+
+export const useSupplyPlanColumns = () => {
+  const { t } = useTranslation()
+
+  const columns: Column<BiomethaneSupplyInput>[] = [
+    {
+      header: t("Provenance"),
+      cell: (input) => <Tag>{getSupplyPlanInputSource(input.source)}</Tag>,
+    },
+    {
+      header: t("Catégorie"),
+      cell: (input) => <Cell text={input.input_category} />,
+    },
+    {
+      header: t("Intrant"),
+      cell: (input) => <Cell text={input.input_type} />,
+    },
+    {
+      header: t("Département"),
+      cell: (input) => (
+        <Tag>{`${input.origin_department} - ${getDepartmentName(input.origin_department) ?? ""}`}</Tag>
+      ),
+    },
+    {
+      header: t("Volume (t)"),
+      cell: (input) => <Cell text={input.volume} />,
+    },
+  ]
+
+  return columns
+}

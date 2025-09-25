@@ -27,5 +27,5 @@ class YearsActionMixin:
         url_path="years",
     )
     def get_years(self, request, *args, **kwargs):
-        years = self.get_queryset().values_list("year", flat=True).distinct()
+        years = self.filter_queryset(self.get_queryset()).values_list("year", flat=True).distinct()
         return Response(sorted(years))
