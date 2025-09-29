@@ -84,7 +84,7 @@ class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.Gene
         if query:
             queryset = queryset.filter(certificate__certificate_id__icontains=query)
 
-        if entity.entity_type == Entity.ADMIN:
+        if entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
             company_id = self.request.query_params.get("company_id")
             if company_id:
                 queryset = queryset.filter(entity_id=company_id)
