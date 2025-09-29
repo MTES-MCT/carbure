@@ -5,7 +5,12 @@ from rest_framework.viewsets import GenericViewSet
 from core.models import Entity
 from doublecount.filters import ApplicationFilter
 from doublecount.models import DoubleCountingApplication
-from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights, HasProducerWriteRights
+from doublecount.permissions import (
+    HasDoubleCountingAdminRights,
+    HasDoubleCountingAdminWriteRights,
+    HasProducerRights,
+    HasProducerWriteRights,
+)
 from doublecount.serializers import DoubleCountingApplicationSerializer
 from doublecount.views.applications.mixins import ActionMixin
 
@@ -21,8 +26,10 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
     def get_permissions(self):
         if self.action in ["check_file", "add", "upload_files", "delete_file"]:
             return [HasProducerWriteRights()]
-        if self.action in ["list_admin", "export", "approve", "reject", "generate_decision", "update_approved_quotas"]:
+        if self.action in ["list_admin", "export"]:
             return [HasDoubleCountingAdminRights()]
+        if self.action in ["approve", "reject", "generate_decision", "update_approved_quotas"]:
+            return [HasDoubleCountingAdminWriteRights()]
 
         return super().get_permissions()
 
