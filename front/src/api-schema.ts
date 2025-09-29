@@ -3629,7 +3629,7 @@ export interface components {
             manager_email?: string;
             readonly inputs: components["schemas"]["FeedStock"][];
             readonly outputs: components["schemas"]["Biofuel"][];
-            readonly certificates: components["schemas"]["ProductionSiteCertificate"][];
+            readonly certificates: components["schemas"]["GenericCertificate"][];
         };
         DoubleCountingProductionSitePreview: {
             readonly id: number;
@@ -4706,21 +4706,6 @@ export interface components {
             manager_name?: string;
             manager_phone?: string;
             manager_email?: string;
-        };
-        ProductionSiteCertificate: {
-            certificate_id: string;
-            certificate_type: components["schemas"]["CertificateTypeEnum"];
-            certificate_holder: string;
-            certificate_issuer?: string | null;
-            address?: string | null;
-            /** Format: date */
-            valid_from: string;
-            /** Format: date */
-            valid_until: string;
-            download_link?: string | null;
-            scope?: unknown;
-            input?: unknown;
-            output?: unknown;
         };
         ProductionSiteCertificateSertificate: {
             readonly type: string;

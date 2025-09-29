@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+
 from transactions.models import Site, SiteManager
 
 
@@ -33,3 +35,7 @@ class ProductionSite(Site):
             "city": self.city,
             "certificates": [c.natural_key() for c in self.productionsitecertificate_set.all()],
         }
+
+    def clean(self):
+        if not self.date_mise_en_service:
+            raise ValidationError({"date_mise_en_service": ["Ce champ est obligatoire pour les sites de production."]})

@@ -12,7 +12,7 @@ export const HiddenRequiredInput = () => (
   <input //
     required
     type="text"
-    value=""
+    defaultValue=""
     aria-hidden="true"
     style={hiddenStyle}
   />

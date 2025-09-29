@@ -8,7 +8,7 @@ import {
   DeliverySiteFormType,
 } from "./create-delivery-site-form"
 import * as api from "../../api/delivery-sites"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 
 type CreateDeliverySiteDialogProps = {
@@ -20,6 +20,7 @@ export const CreateDeliverySiteDialog = ({
 }: CreateDeliverySiteDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const notifyError = useNotifyError()
   const entity = useEntity()
   const closeAll = useCloseAllPortals()
   const createNewDeliverySite = useMutation(api.createNewDeliverySite, {
@@ -35,10 +36,8 @@ export const CreateDeliverySiteDialog = ({
         }
       )
     },
-    onError: () => {
-      notify(t("Une erreur est survenue lors de l'ajout de votre dépôt."), {
-        variant: "danger",
-      })
+    onError: (e) => {
+      notifyError(e)
     },
   })
 

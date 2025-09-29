@@ -34,6 +34,8 @@
   "delivery_date": "Delivery date",
   "free_field": "Free field",
 
+  "site_name": "Site name",
+  "customs_id": "Unique identifier",
   "producer": "Producer",
   "sanitary_approval_number": "Sanitary approval no.",
   "hygienization_exemption_type": "Hygienization exemption",
