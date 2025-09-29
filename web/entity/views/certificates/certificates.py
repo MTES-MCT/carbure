@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from certificates.models import ProductionSiteCertificate
 from core.models import Entity, EntityCertificate, ExternalAdminRights, UserRights
-from core.permissions import HasAdminRights, HasUserRights, OrPermission
+from core.permissions import AdminRightsFactory, HasAdminRights, HasUserRights, UserRightsFactory
 from core.serializers import EntityCertificateSerializer
 
 from .mixins import ActionMixin
@@ -14,40 +14,33 @@ from .mixins import ActionMixin
 class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.GenericViewSet, ActionMixin):
     serializer_class = EntityCertificateSerializer
     pagination_class = None
-    permission_classes = []
+
+    permission_classes = [
+        UserRightsFactory(entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR])
+        | AdminRightsFactory(allow_external=[ExternalAdminRights.DOUBLE_COUNTING, ExternalAdminRights.TRANSFERRED_ELEC])
+    ]
 
     def get_queryset(self):
         return EntityCertificate.objects.order_by("-added_dt", "checked_by_admin").select_related("entity", "certificate")
 
     def get_permissions(self):
-        # TODO fix permissions if needed
-        if self.action in ["add", "delete", "update_certificate"]:
-            return (
+        if self.action in ["add", "delete", "update_certificate", "set_default"]:
+            return [
                 HasUserRights(
-                    [UserRights.ADMIN, UserRights.RW],
-                    [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER],
+                    entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR],
+                    role=[UserRights.RW, UserRights.ADMIN],
                 ),
-            )
-
-        if self.action in ["set_default"]:
-            return (
-                HasUserRights(
-                    None,
-                    [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER],
-                ),
-            )
+            ]
 
         if self.action in ["check_entity", "reject_entity"]:
-            return [HasAdminRights(allow_external=[ExternalAdminRights.DOUBLE_COUNTING])]
+            return [
+                HasAdminRights(
+                    allow_external=[ExternalAdminRights.DOUBLE_COUNTING],
+                    allow_role=[UserRights.RW, UserRights.ADMIN],
+                )
+            ]
 
-        return [
-            OrPermission(
-                lambda: HasUserRights(None, [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]),
-                lambda: HasAdminRights(
-                    allow_external=[ExternalAdminRights.DOUBLE_COUNTING, ExternalAdminRights.TRANSFERRED_ELEC]
-                ),
-            )
-        ]
+        return super().get_permissions()
 
     @extend_schema(
         parameters=[
