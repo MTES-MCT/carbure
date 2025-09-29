@@ -165,14 +165,11 @@ class PermissionTestMixin:
 
     def assertPermissionsEqual(self, first, second):
         if isinstance(first, list) and isinstance(second, list):
-            for i in range(max(len(first), len(second))):
+            self.assertEqual(len(first), len(second))
+            for i in range(len(first)):
                 self.assertPermissionsEqual(first[i], second[i])
 
-        elif isinstance(first, AND) and isinstance(second, AND):
-            self.assertPermissionsEqual(first.op1, second.op1)
-            self.assertPermissionsEqual(first.op2, second.op2)
-
-        elif isinstance(first, OR) and isinstance(second, OR):
+        elif isinstance(first, (AND, OR)) and isinstance(second, type(first)):
             self.assertPermissionsEqual(first.op1, second.op1)
             self.assertPermissionsEqual(first.op2, second.op2)
 
