@@ -15,8 +15,9 @@ class FiltersActionMixin:
 
         # Get the names of the filters, excluding those with custom methods
         available_filters = []
+        excluded_filters = ["entity_id"]
         for filter_name, filter_obj in filterset.filters.items():
-            if not filter_obj.method:  # Exclude filters with custom methods
+            if not filter_obj.method and filter_name not in excluded_filters:
                 available_filters.append(filter_name)
 
         return sorted(available_filters)
