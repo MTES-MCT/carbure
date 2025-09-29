@@ -56,9 +56,8 @@ class Depot(Site):
 
     def clear_fields(self):
         fields_to_clear = {
-            "POWER PLANT": ["thermal_efficiency", "useful_temperature"],
-            "HEAT PLANT": ["electrical_efficiency", "useful_temperature"],
-            "COGENERATION PLANT": ["electrical_efficiency", "thermal_efficiency"],
+            Site.POWER_PLANT: ["thermal_efficiency", "useful_temperature"],
+            Site.HEAT_PLANT: ["electrical_efficiency", "useful_temperature"],
         }
 
         fields = fields_to_clear.get(self.depot_type, [])
