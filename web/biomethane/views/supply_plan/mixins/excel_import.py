@@ -75,6 +75,9 @@ class ExcelImportActionMixin:
             # If all validations passed, save all instances using bulk save
             serializer.save()
 
+            # Upload the file to S3 for backup
+            ExcelImporter.backup_file(file, request.entity)
+
         except ExcelValidationError as e:
             return Response(
                 {

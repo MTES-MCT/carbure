@@ -1,5 +1,10 @@
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
+from django.utils.text import slugify
+
+from core import private_storage
 
 
 class ExcelValidationError(Exception):
@@ -66,3 +71,18 @@ class ExcelImporter:
                     )
 
             raise ExcelValidationError(validation_errors, len(serializer.data))
+
+    @staticmethod
+    def backup_file(file, entity):
+        """
+        Upload the given file to S3 under a path based on the entity.
+
+        Args:
+           file: File object to upload
+           entity: Entity instance to base the path on
+
+        """
+        S3_BACKUP_FOLDER = "biomethane/plans-approvisionnement/"
+        s3_path = f"{S3_BACKUP_FOLDER}{entity.id}_{slugify(entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+
+        private_storage.save(s3_path, file)
