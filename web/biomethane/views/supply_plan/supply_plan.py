@@ -7,7 +7,7 @@ from biomethane.models import BiomethaneSupplyPlan
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneSupplyPlanSerializer
 
-from .mixins import YearsActionMixin
+from .mixins import ExcelImportActionMixin, YearsActionMixin
 
 
 @extend_schema(
@@ -21,11 +21,11 @@ from .mixins import YearsActionMixin
         ),
     ]
 )
-class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin):
+class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin, ExcelImportActionMixin):
     queryset = BiomethaneSupplyPlan.objects.all()
     serializer_class = BiomethaneSupplyPlanSerializer
     filterset_class = BiomethaneSupplyPlanYearsFilter
     pagination_class = None
 
     def get_permissions(self):
-        return get_biomethane_permissions([], self.action)
+        return get_biomethane_permissions(["import_supply_plan_from_excel"], self.action)

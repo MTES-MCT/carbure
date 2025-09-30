@@ -29,4 +29,5 @@ from .supply_plan import (
     BiomethaneSupplyInputSerializer,
     BiomethaneSupplyPlanSerializer,
     BiomethaneSupplyInputCreateSerializer,
+    BiomethaneUploadExcelSerializer
 )
