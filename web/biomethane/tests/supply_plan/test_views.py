@@ -14,4 +14,4 @@ class BiomethaneSupplyPlanViewSetTests(TestCase):
 
         viewset.get_permissions()
 
-        mock_get_biomethane_permissions.assert_called_once_with([], "retrieve")
+        mock_get_biomethane_permissions.assert_called_once_with(["import_supply_plan_from_excel"], "retrieve")
