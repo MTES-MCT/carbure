@@ -32,7 +32,7 @@ class ListPendingMessagesResponseTest(TestCase):
 
 
 class RetrieveMessageResponseTest(TestCase):
-    def response_payload(_, attachment_value):
+    def response_payload(_, attachment_value=""):
         return f"""\
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
   <soap:Header>
@@ -47,10 +47,29 @@ class RetrieveMessageResponseTest(TestCase):
   </soap:Body>
 </soap:Envelope>"""
 
-    @patch("edelivery.soap.responses.unzip_base64_encoded_stream")
-    def test_extracts_zipped_response(self, patched_unzip):
-        patched_unzip.return_value = "<response/>"
+    def request_response(_, request_id):
+        return f"""\
+<?xml version="1.0" encoding="UTF-8"?>
+<udb:GetSourcingContactByIDResponse
+  xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <RESPONSE_HEADER REQUEST_ID="{request_id}"/>
+  <!-- … -->
+</udb:GetSourcingContactByIDResponse>"""
+
+    def setUp(self):
+        self.patched_unzip = patch("edelivery.soap.responses.unzip_base64_encoded_stream").start()
+
+    def tearDown(self):
+        patch.stopall()
+
+    def test_extracts_request_id(self):
+        self.patched_unzip.return_value = self.request_response("12345")
+        response = RetrieveMessageResponse(self.response_payload())
+        self.assertEqual("12345", response.request_id())
+
+    def test_extracts_zipped_response(self):
+        self.patched_unzip.return_value = "<response/>"
 
         response = RetrieveMessageResponse(self.response_payload("Base64EncodedZippedArchive"))
-        patched_unzip.assert_called_with("Base64EncodedZippedArchive")
+        self.patched_unzip.assert_called_with("Base64EncodedZippedArchive")
         self.assertEqual("<response/>", response.contents)

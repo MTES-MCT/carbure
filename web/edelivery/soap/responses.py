@@ -27,14 +27,23 @@ class ListPendingMessagesResponse(AbstractEdeliveryResponse):
 
 
 class RetrieveMessageResponse(AbstractEdeliveryResponse):
+    NAMESPACES = {
+        "soap": "http://www.w3.org/2003/05/soap-envelope",
+        "ws": "http://eu.domibus.wsplugin/",
+    }
+
     def __init__(self, text):
         super().__init__(text)
         self.contents = unzip_base64_encoded_stream(self.attachment_value())
+        self.parsed_contents = ET.fromstring(self.contents)
 
     def attachment_value(self):
-        namespaces = {"soap": "http://www.w3.org/2003/05/soap-envelope", "ws": "http://eu.domibus.wsplugin/"}
-        valueElement = self.parsed_XML.find("soap:Body/ws:retrieveMessageResponse/payload/value", namespaces)
+        valueElement = self.parsed_XML.find("soap:Body/ws:retrieveMessageResponse/payload/value", self.NAMESPACES)
         return valueElement.text
+
+    def request_id(self):
+        request_id_element = self.parsed_contents.find("./RESPONSE_HEADER")
+        return request_id_element.attrib["REQUEST_ID"]
 
 
 class SubmitMessageResponse(AbstractEdeliveryResponse):
