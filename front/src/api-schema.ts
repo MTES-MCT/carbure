@@ -7981,6 +7981,8 @@ export interface operations {
             query: {
                 /** @description Compay ID, Admin only */
                 company_id?: number;
+                /** @description Search within certificates valid at this date */
+                date?: string;
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Which field to use when ordering the results. */
@@ -9320,6 +9322,8 @@ export interface operations {
     resources_certificates_list: {
         parameters: {
             query?: {
+                /** @description Only return certificates valid at the given date */
+                date?: string;
                 /** @description Search within the fields `certificate_id` and `certificate_holder` */
                 query?: string;
             };

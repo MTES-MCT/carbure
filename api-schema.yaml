@@ -3853,6 +3853,11 @@ paths:
             type: integer
           description: Compay ID, Admin only
         - in: query
+          name: date
+          schema:
+            type: string
+          description: Search within certificates valid at this date
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -5598,6 +5603,11 @@ paths:
     get:
       operationId: resources_certificates_list
       parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Only return certificates valid at the given date
         - in: query
           name: query
           schema:
