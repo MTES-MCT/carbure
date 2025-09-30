@@ -1585,7 +1585,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -2072,12 +2071,6 @@ paths:
           name: certificate_id
           schema:
             type: string
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
         - in: query
           name: filter
           schema:
@@ -3799,7 +3792,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -5153,53 +5145,6 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
-  /api/entities/users/:
-    get:
-      operationId: entities_users_list
-      parameters:
-        - in: query
-          name: company_id
-          schema:
-            type: integer
-          description: Compay ID, Admin only
-          required: true
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - in: query
-          name: q
-          schema:
-            type: string
-          description: Search in user email or entity name.
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - entities
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EntityUser"
-          description: ""
   /api/entities/users/accept-user/:
     post:
       operationId: entities_users_accept_user_create
@@ -13492,24 +13437,6 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
-    EntityUser:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          title: Adresse électronique
-          maxLength: 255
-      required:
-        - email
-        - id
-        - name
     ErrorResponse:
       type: object
       properties:

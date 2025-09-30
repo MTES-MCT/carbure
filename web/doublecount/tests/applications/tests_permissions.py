@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from core.tests_utils import PermissionTestMixin
-from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights
+from doublecount.permissions import HasDoubleCountingAdminRights, HasDoubleCountingAdminWriteRights, HasProducerRights
 from doublecount.views.applications.application import ApplicationViewSet
 from entity.permissions import HasProducerWriteRights
 
@@ -20,8 +20,12 @@ class DoubleCountingApplicationPermissionTest(TestCase, PermissionTestMixin):
                     [HasProducerWriteRights()],
                 ),
                 (
-                    ["list_admin", "export", "approve", "reject", "generate_decision", "update_approved_quotas"],
+                    ["list_admin", "export"],
                     [HasDoubleCountingAdminRights()],
+                ),
+                (
+                    ["approve", "reject", "generate_decision", "update_approved_quotas"],
+                    [HasDoubleCountingAdminWriteRights()],
                 ),
             ],
         )

@@ -1582,22 +1582,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/entities/users/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["entities_users_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/entities/users/accept-user/": {
         parameters: {
             query?: never;
@@ -4036,15 +4020,6 @@ export interface components {
          * @enum {string}
          */
         EntityTypeEnum: EntityTypeEnum;
-        EntityUser: {
-            readonly id: number;
-            readonly name: string;
-            /**
-             * Adresse électronique
-             * Format: email
-             */
-            email: string;
-        };
         ErrorResponse: {
             message: string;
         };
@@ -6946,10 +6921,8 @@ export interface operations {
     };
     double_counting_applications_filters_retrieve: {
         parameters: {
-            query: {
+            query?: {
                 certificate_id?: string;
-                /** @description Entity ID */
-                entity_id: number;
                 /** @description Filter string to apply */
                 filter?: string;
                 /** @description Ordre
@@ -8990,36 +8963,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-        };
-    };
-    entities_users_list: {
-        parameters: {
-            query: {
-                /** @description Compay ID, Admin only */
-                company_id: number;
-                /** @description Entity ID */
-                entity_id: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description Search in user email or entity name. */
-                q?: string;
-                /** @description A search term. */
-                search?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EntityUser"][];
                 };
             };
         };
