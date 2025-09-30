@@ -16,6 +16,12 @@ from core.serializers import GenericCertificateSerializer
             required=False,
             type=str,
         ),
+        OpenApiParameter(
+            name="date",
+            description="Only return certificates valid at the given date",
+            required=False,
+            type=str,
+        ),
     ],
     responses=GenericCertificateSerializer(many=True),
 )
@@ -23,9 +29,14 @@ from core.serializers import GenericCertificateSerializer
 @permission_classes([IsAuthenticated])
 def get_certificates(request, *args, **kwargs):
     query = request.query_params.get("query")
+    date = request.query_params.get("date")
 
-    objects = GenericCertificate.objects.filter(Q(certificate_id__icontains=query) | Q(certificate_holder__icontains=query))[
-        0:100
-    ]
-    serializer = GenericCertificateSerializer(objects, many=True)
+    certs = GenericCertificate.objects.all()
+
+    if query:
+        certs = certs.filter(Q(certificate_id__icontains=query) | Q(certificate_holder__icontains=query))
+    if date:
+        certs = certs.filter(Q(valid_from__lte=date) & Q(valid_until__gte=date))
+
+    serializer = GenericCertificateSerializer(certs[0:100], many=True)
     return Response(serializer.data)
