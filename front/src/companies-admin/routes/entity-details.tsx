@@ -12,7 +12,6 @@ import Certificates from "companies-admin/components/certificates"
 import { Main, Row } from "common/components/scaffold"
 import Tabs from "common/components/tabs"
 import HashRoute from "common/components/hash-route"
-import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
 
 import { compact } from "common/utils/collection"
 import { useQuery } from "common/hooks/async"
@@ -21,6 +20,8 @@ import CompanyInfo from "settings/pages/company-info"
 import { AuthorizeEntityBanner } from "companies-admin/components/authorize-entity-banner"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExtAdminPagesEnum } from "api-schema"
+import { ApplicationDetailsDialog } from "double-counting-admin/components/applications/application-details-dialog"
+import { AgreementDetailsDialog } from "double-counting-admin/components/agreements/agreement-details-dialog"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -38,6 +39,8 @@ const EntityDetails = () => {
   const getDepots = (company_id: number) => {
     return api.getCompanyDepots(entity.id, company_id)
   }
+
+  const canWrite = entity.canWrite()
 
   const entityData = company.result?.data
   const isEnabled = Boolean(entityData?.is_enabled)
@@ -102,7 +105,7 @@ const EntityDetails = () => {
           <AuthorizeEntityBanner company={entityData} />
         )}
 
-        <UserRights readOnly={!isEnabled || !canApprove} />
+        <UserRights readOnly={!isEnabled || !canApprove || !canWrite} />
         {entityData && (
           <CompanyInfo readOnly company={entityData} key={entityData.id} />
         )}
@@ -124,7 +127,7 @@ const EntityDetails = () => {
         )}
         {entityData && isProducer && (
           <DoubleCountingSettings
-            readOnly
+            readOnly={!canWrite}
             entity={entityData}
             getDoubleCountingAgreements={(companyId) =>
               api.getCompanyDoubleCountingAgreements(entity.id, companyId)
@@ -132,11 +135,19 @@ const EntityDetails = () => {
           />
         )}
         {!isSAFEntity && (
-          <Certificates readOnly={!isEnabled} entity_id={companyId} />
+          <Certificates
+            readOnly={!canWrite || !isEnabled}
+            entity_id={companyId}
+          />
         )}
       </section>
+
       <HashRoute
-        path="double-counting/agreements/:id"
+        path="application/:id"
+        element={<ApplicationDetailsDialog />}
+      />
+      <HashRoute
+        path="agreement/:id" //
         element={<AgreementDetailsDialog />}
       />
     </Main>

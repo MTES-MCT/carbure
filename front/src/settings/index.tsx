@@ -13,9 +13,6 @@ import Certificates from "./pages/certificates"
 import CompanyInfo from "./pages/company-info"
 import CompanyOptions from "./pages/company-options"
 import { EntityUserRights } from "./pages/user-rights"
-import { ApplicationDetailsDialog } from "double-counting/components/application-details-dialog"
-import HashRoute from "common/components/hash-route"
-import { AgreementDetailsDialog } from "double-counting/components/agreement-details-dialog"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useRoutes } from "common/hooks/routes"
 import { Navigate, Route, Routes } from "react-router-dom"
@@ -115,15 +112,6 @@ const Settings = () => {
         ])}
       />
       <Content>
-        <HashRoute
-          path="double-counting/applications/:id"
-          element={<ApplicationDetailsDialog />}
-        />
-        <HashRoute
-          path="double-counting/agreements/:id"
-          element={<AgreementDetailsDialog />}
-        />
-
         <Routes>
           {hasOptions && <Route path="options" element={<CompanyOptions />} />}
           <Route path="info" element={<CompanyInfo />} />

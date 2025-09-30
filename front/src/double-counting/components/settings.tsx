@@ -61,12 +61,12 @@ const DoubleCountingSettings = ({
     ) {
       navigate({
         pathname: location.pathname,
-        hash: `double-counting/applications/${application.id}`,
+        hash: `application/${application.id}`,
       })
     } else {
       navigate({
         pathname: location.pathname,
-        hash: `double-counting/agreements/${application.agreement_id}`,
+        hash: `agreement/${application.agreement_id}`,
       })
     }
   }

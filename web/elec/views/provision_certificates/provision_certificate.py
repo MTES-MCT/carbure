@@ -40,8 +40,6 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
     search_fields = ["cpo__name", "operating_unit"]
 
     def get_permissions(self):
-        if self.action == "balance":
-            return [HasCpoRights()]
         if self.action == "transfer":
             return [HasCpoWriteRights()]
         if self.action == "import_certificates":
