@@ -6,6 +6,7 @@ from django.db.models import QuerySet
 from core.models import CarbureLot, CarbureLotReliabilityScore, GenericError
 
 from .biofuel_feedstock import check_deprecated_mp, check_mp_bc_incoherent, check_provenance_mp
+from .certificates import check_certificate_validity
 from .double_counting import (
     check_expired_double_counting_certificate,
     check_invalid_double_counting_certificate,
@@ -112,6 +113,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         # check_bc_not_configured(lot, prefetched_data),
         check_depot_not_configured(lot, prefetched_data),
         # check_delivery_date_validity(lot),
+        check_certificate_validity(lot, prefetched_data),
     ]
 
     # remove empty values from error list
