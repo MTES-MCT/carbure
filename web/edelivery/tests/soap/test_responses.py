@@ -33,7 +33,7 @@ class ListPendingMessagesResponseTest(TestCase):
 
 
 class RetrieveMessageResponseTest(TestCase):
-    def response_payload(_, attachment_value=""):
+    def response_payload(_self, attachment_value=""):
         return f"""\
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
   <soap:Header>
