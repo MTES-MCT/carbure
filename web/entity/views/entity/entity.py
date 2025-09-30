@@ -1,13 +1,12 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
-from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import HasAdminRights, HasUserRights
-from doublecount.serializers import EntitySerializer
+from core.serializers import EntitySerializer
 from entity.services.enable_entity import enable_entity as enable_entity_service
 from entity.services.get_administrated_entities import get_administrated_entities
 
@@ -24,42 +23,7 @@ class EntityViewSet(ViewSet, EntityActionMixin):
     lookup_field = "id"
 
     def get_permissions(self):
-        # TODO fix permissions if needed
-        if self.action in [
-            "direct_deliveries",
-            "elec",
-            "release_for_consumption",
-            "stocks",
-            "trading",
-            "preferred_unit",
-        ]:
-            return [
-                IsAuthenticated(),
-                HasUserRights(
-                    [UserRights.ADMIN, UserRights.RW],
-                    [Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER],
-                ),
-            ]
-        if self.action in ["update_entity_info"]:
-            return [
-                HasUserRights([UserRights.ADMIN, UserRights.RW], None),
-            ]
-        if self.action == "get_entity_stats":
-            return [
-                IsAuthenticated(),
-                HasUserRights([UserRights.ADMIN, UserRights.RW], None),
-            ]
-        if self.action == "create":
-            return [
-                HasAdminRights(
-                    allow_external=[
-                        ExternalAdminRights.AIRLINE,
-                        ExternalAdminRights.ELEC,
-                        ExternalAdminRights.DOUBLE_COUNTING,
-                    ]
-                )
-            ]
-        elif self.action in ["list", "retrieve"]:
+        if self.action in ["list", "retrieve"]:
             return [
                 HasAdminRights(
                     allow_external=[
@@ -70,6 +34,37 @@ class EntityViewSet(ViewSet, EntityActionMixin):
                     ]
                 )
             ]
+
+        if self.action == "create":
+            return [
+                HasAdminRights(
+                    allow_role=[UserRights.RW, UserRights.ADMIN],
+                    allow_external=[
+                        ExternalAdminRights.AIRLINE,
+                        ExternalAdminRights.ELEC,
+                        ExternalAdminRights.DOUBLE_COUNTING,
+                    ],
+                )
+            ]
+
+        if self.action == "enable_entity":
+            return [
+                HasAdminRights(
+                    allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC],
+                    allow_role=[UserRights.ADMIN, UserRights.RW],
+                )
+            ]
+
+        if self.action in ["direct_deliveries", "elec", "release_for_consumption", "stocks", "trading", "preferred_unit"]:
+            return [
+                HasUserRights(
+                    entity_type=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER],
+                    role=[UserRights.ADMIN, UserRights.RW],
+                ),
+            ]
+
+        if self.action in ["get_entity_stats", "update_entity_info"]:
+            return [HasUserRights(role=[UserRights.ADMIN, UserRights.RW])]
 
         return super().get_permissions()
 
@@ -85,12 +80,6 @@ class EntityViewSet(ViewSet, EntityActionMixin):
         ],
         request=EmptyResponseSerializer,
         responses=EmptyResponseSerializer,
-    )
-    @permission_classes(
-        [
-            IsAuthenticated,
-            HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC]),
-        ]
     )
     @action(
         methods=["post"],

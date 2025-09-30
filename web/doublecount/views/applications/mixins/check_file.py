@@ -1,6 +1,5 @@
 # /api/stats/entity
 import datetime
-import traceback
 
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import status
@@ -44,44 +43,37 @@ class CheckFileActionMixin:
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            (
-                info,
-                errors,
-                sourcing_data,
-                production_data,
-                sourcing_history_data,
-                production_history_data,
-            ) = check_dc_file(file)
+        (
+            info,
+            errors,
+            sourcing_data,
+            production_data,
+            sourcing_history_data,
+            production_history_data,
+        ) = check_dc_file(file)
 
-            error_count = (
-                +len(errors["sourcing_forecast"])
-                + len(errors["production"])
-                + len(errors["global"])
-                + len(errors["production_history"])
-                + len(errors["sourcing_history"])
-            )
+        error_count = (
+            +len(errors["sourcing_forecast"])
+            + len(errors["production"])
+            + len(errors["global"])
+            + len(errors["production_history"])
+            + len(errors["sourcing_history"])
+        )
 
-            has_dechets_industriels = check_has_dechets_industriels(production_data)
+        has_dechets_industriels = check_has_dechets_industriels(production_data)
 
-            file_info = {
-                "has_dechets_industriels": has_dechets_industriels,
-                "file_name": file.name,
-                "errors": errors,
-                "error_count": error_count,
-                "start_year": info["start_year"] or 0,
-                "production_site": info["production_site"],
-                "producer_email": info["producer_email"],
-                "production": production_data,
-                "sourcing": sourcing_data,
-                "sourcing_history": sourcing_history_data,
-                "production_history": production_history_data,
-            }
+        file_info = {
+            "has_dechets_industriels": has_dechets_industriels,
+            "file_name": file.name,
+            "errors": errors,
+            "error_count": error_count,
+            "start_year": info["start_year"] or 0,
+            "production_site": info["production_site"],
+            "producer_email": info["producer_email"],
+            "production": production_data,
+            "sourcing": sourcing_data,
+            "sourcing_history": sourcing_history_data,
+            "production_history": production_history_data,
+        }
 
-            return Response({"file": file_info, "checked_at": datetime.datetime.now().isoformat()})
-        except Exception:
-            traceback.print_exc()
-            return Response(
-                {"message": CheckFilesError.FILE_CHECK_FAILED},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        return Response({"file": file_info, "checked_at": datetime.datetime.now().isoformat()})

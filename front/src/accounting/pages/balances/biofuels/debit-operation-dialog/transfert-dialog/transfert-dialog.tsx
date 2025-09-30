@@ -1,6 +1,6 @@
 import { Balance, CreateOperationType } from "accounting/types"
 import { Dialog } from "common/components/dialog2"
-import { Form, FormManager, useForm } from "common/components/form2"
+import { FormManager, useForm } from "common/components/form2"
 import { useTranslation } from "react-i18next"
 import { TransfertDialogForm } from "./transfert-dialog.types"
 import {
@@ -63,7 +63,7 @@ export const TransfertDialogContent = ({
       footer={
         <>
           <Stepper.Previous />
-          <Stepper.Next />
+          <Stepper.Next nativeButtonProps={{ form: "transfert-dialog" }} />
           {currentStep?.key === "recap" && (
             <>
               <Button
@@ -117,7 +117,7 @@ export const TransfertDialogContent = ({
         </Box>
 
         {currentStep?.key !== "recap" && (
-          <Form form={form}>
+          <Stepper.Form form={form} id="transfert-dialog">
             {currentStep?.key === recipientStepKey && (
               <>
                 <Box>
@@ -141,7 +141,7 @@ export const TransfertDialogContent = ({
                 />
               </Box>
             )}
-          </Form>
+          </Stepper.Form>
         )}
       </Main>
     </Dialog>

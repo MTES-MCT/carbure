@@ -2,7 +2,7 @@ from os import environ
 
 import requests
 
-from edelivery.adapters.base64_encoder import encode
+from edelivery.adapters.base64_utils import encode
 
 
 def request_headers():
@@ -13,9 +13,9 @@ def request_headers():
     }
 
 
-def request_URL():
-    return f"""{environ["DOMIBUS_BASE_URL"]}/services/wsplugin/submitMessage"""
+def request_URL(action):
+    return f"""{environ["DOMIBUS_BASE_URL"]}/services/wsplugin/{action}"""
 
 
-def send_SOAP_request(envelope):
-    requests.post(request_URL(), headers=request_headers(), data=envelope.payload())
+def send_SOAP_request(action, payload):
+    return requests.post(request_URL(action), headers=request_headers(), data=payload)

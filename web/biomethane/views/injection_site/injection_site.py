@@ -4,9 +4,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.models import BiomethaneInjectionSite
+from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneInjectionSiteInputSerializer, BiomethaneInjectionSiteSerializer
-from core.models import Entity, UserRights
-from core.permissions import HasUserRights
 
 
 @extend_schema(
@@ -23,15 +22,10 @@ from core.permissions import HasUserRights
 class BiomethaneInjectionSiteViewSet(GenericViewSet):
     queryset = BiomethaneInjectionSite.objects.all()
     serializer_class = BiomethaneInjectionSiteSerializer
-    permission_classes = [HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
     def get_permissions(self):
-        if self.action in [
-            "upsert",
-        ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
-        return super().get_permissions()
+        return get_biomethane_permissions(["upsert"], self.action)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -55,7 +49,7 @@ class BiomethaneInjectionSiteViewSet(GenericViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            injection_site = BiomethaneInjectionSite.objects.get(entity=request.entity)
+            injection_site = BiomethaneInjectionSite.objects.get(producer=request.entity)
             data = self.get_serializer(injection_site, many=False).data
             return Response(data)
         except BiomethaneInjectionSite.DoesNotExist:
@@ -78,7 +72,7 @@ class BiomethaneInjectionSiteViewSet(GenericViewSet):
     def upsert(self, request, *args, **kwargs):
         """Create or update injection site using upsert logic."""
         try:
-            injection_site = BiomethaneInjectionSite.objects.get(entity=request.entity)
+            injection_site = BiomethaneInjectionSite.objects.get(producer=request.entity)
             serializer = self.get_serializer(injection_site, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneInjectionSite.DoesNotExist:

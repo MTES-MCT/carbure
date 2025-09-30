@@ -5,7 +5,7 @@ import { Entity, ProductionSiteDetails, UserRole } from "common/types"
 import { useRights } from "common/hooks/entity"
 import { Button } from "common/components/button2"
 import { Confirm } from "common/components/dialog2"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import { usePortal } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import { Table, Cell } from "common/components/table2"
@@ -31,6 +31,7 @@ const ProductionSitesSettings = ({
   const rights = useRights()
   const portal = usePortal()
   const notify = useNotify()
+  const notifyError = useNotifyError()
 
   const productionSites = useQuery(getProductionSites, {
     key: "production-sites",
@@ -46,15 +47,13 @@ const ProductionSitesSettings = ({
       })
     },
 
-    onError: () => {
-      notify(t("Impossible de supprimer le site de production"), {
-        variant: "danger",
-      })
+    onError: (e) => {
+      notifyError(e)
     },
   })
 
   const canModify = !readOnly && rights.is(UserRole.Admin, UserRole.ReadWrite)
-  const prodSitesData = productionSites.result?.data ?? []
+  const prodSitesData = productionSites.result?.data?.results ?? []
 
   function showProductionSite(prodSite: ProductionSiteDetails) {
     portal((close) => (

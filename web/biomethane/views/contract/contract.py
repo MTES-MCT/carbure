@@ -3,14 +3,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters import BiomethaneContractFilter
 from biomethane.models import BiomethaneContract
+from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.contract import (
-    BiomethaneContractAddSerializer,
-    BiomethaneContractPatchSerializer,
+    BiomethaneContractInputSerializer,
     BiomethaneContractSerializer,
 )
-from core.models import Entity, UserRights
-from core.permissions import HasUserRights
 
 # from .mixins import ActionMixin
 
@@ -28,16 +27,12 @@ from core.permissions import HasUserRights
 )
 class BiomethaneContractViewSet(GenericViewSet):
     queryset = BiomethaneContract.objects.all()
+    filterset_class = BiomethaneContractFilter
     serializer_class = BiomethaneContractSerializer
-    permission_classes = [HasUserRights(None, [Entity.BIOMETHANE_PRODUCER])]
     pagination_class = None
 
     def get_permissions(self):
-        if self.action in [
-            "upsert",
-        ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.BIOMETHANE_PRODUCER])]
-        return super().get_permissions()
+        return get_biomethane_permissions(["upsert"], self.action)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -46,7 +41,7 @@ class BiomethaneContractViewSet(GenericViewSet):
 
     def get_serializer_class(self):
         if self.action == "upsert":
-            return BiomethaneContractPatchSerializer
+            return BiomethaneContractInputSerializer
         return BiomethaneContractSerializer
 
     @extend_schema(
@@ -61,7 +56,7 @@ class BiomethaneContractViewSet(GenericViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            contract = BiomethaneContract.objects.get(entity=request.entity)
+            contract = self.filter_queryset(self.get_queryset()).get()
             data = self.get_serializer(contract, many=False).data
             return Response(data)
 
@@ -74,20 +69,16 @@ class BiomethaneContractViewSet(GenericViewSet):
                 response=BiomethaneContractSerializer,
             ),
         },
-        request=BiomethaneContractPatchSerializer,
+        request=BiomethaneContractInputSerializer,
     )
     def upsert(self, request, *args, **kwargs):
         """Create or update contract using upsert logic."""
-        serializer_context = self.get_serializer_context()
-
         try:
-            contract = BiomethaneContract.objects.get(entity=request.entity)
-            serializer = BiomethaneContractPatchSerializer(
-                contract, data=request.data, partial=True, context=serializer_context
-            )
+            contract = self.filter_queryset(self.get_queryset()).get()
+            serializer = self.get_serializer(contract, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneContract.DoesNotExist:
-            serializer = BiomethaneContractAddSerializer(data=request.data, context=serializer_context)
+            serializer = self.get_serializer(data=request.data)
             status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid():

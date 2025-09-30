@@ -13,7 +13,8 @@ class Command(BaseCommand):
         try:
             module = __import__(f"{app_name}.factories.sample_data", fromlist=["create_sample_data"])
             module.create_sample_data()
-        except (ImportError, AttributeError):
+        except (ImportError, AttributeError) as e:
+            print(e)
             self.stderr.write(f"L'app '{app_name}' n'a pas de create_sample_data()")
         else:
             self.stdout.write(f"Données créées pour l'app '{app_name}'")

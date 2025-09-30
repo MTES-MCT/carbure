@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import MatierePremiere
-from doublecount.serializers import FeedStockSerializer
+from core.serializers import FeedStockSerializer
 
 
 @extend_schema(

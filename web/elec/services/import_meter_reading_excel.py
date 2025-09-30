@@ -135,7 +135,6 @@ class ExcelMeterReadingValidator(Validator):
         meter_reading["facteur_de_charge"] = facteur_de_charge
         meter_reading["renewable_energy"] = energy_used_since_last_reading * renewable_share
 
-        # charge_point = self.context.get("charge_point")
         reading_date = meter_reading.get("reading_date")
 
         if charge_point is None:
@@ -176,6 +175,12 @@ class ExcelMeterReadingValidator(Validator):
                 _(
                     "Le facteur de charge estimé depuis le dernier relevé enregistré est supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la puissance de votre point de recharge, renseignée sur TDG."  # noqa: E501
                 ),
+            )
+
+        if charge_point is not None and charge_point.is_article_2:
+            self.add_error(
+                "charge_point_id",
+                _("Ce point de recharge n'est pas soumis aux relevés trimestriels, veuillez le supprimer du fichier."),
             )
 
         beginning_of_quarter = self.context.get("beginning_of_quarter")

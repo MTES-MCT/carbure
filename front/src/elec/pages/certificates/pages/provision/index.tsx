@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom"
 
 import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Content } from "common/components/scaffold"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Tabs } from "common/components/tabs2"
 import { Table } from "common/components/table2"
@@ -32,11 +32,13 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 export interface ProvisionCertificatesProps {
   year: number
   snapshot?: ElecCertificateSnapshot
+  formattedBalance: string
 }
 
 export const ProvisionCertificates = ({
   year,
   snapshot,
+  formattedBalance,
 }: ProvisionCertificatesProps) => {
   const { t } = useTranslation()
 
@@ -116,16 +118,20 @@ export const ProvisionCertificates = ({
         {!isEmpty && (
           <>
             <RecapQuantity
-              text={t(
-                "{{count}} certificats et {{total}} d'énergie disponible pour cession",
-                {
-                  count: data.count,
-                  total: formatUnit(
-                    data!.available_energy ?? 0,
-                    ExtendedUnit.MWh
-                  ),
-                }
-              )}
+              text={
+                <Trans
+                  defaults="{{count}} certificats et {{total}} d'énergie (<b>total disponible pour cession {{total_available_energy}}</b>)"
+                  components={{ b: <b /> }}
+                  values={{
+                    count: data.count,
+                    total: formatUnit(
+                      data!.available_energy ?? 0,
+                      ExtendedUnit.MWh
+                    ),
+                    total_available_energy: formattedBalance,
+                  }}
+                />
+              }
             />
 
             <Table

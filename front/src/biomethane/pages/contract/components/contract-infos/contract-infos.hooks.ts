@@ -13,19 +13,19 @@ export const useTariffReferenceOptions = () => {
 
   return [
     {
-      label: t("2011 - Demande Cmax (Nm3/h)"),
+      label: t("2011 - Arrêté du 23/11/2011"),
       value: TariffReference.Value2011,
     },
     {
-      label: t("2020 - Demande Cmax"),
+      label: t("2020 - Arrêté du 23/11/2020"),
       value: TariffReference.Value2020,
     },
     {
-      label: t("2021 - Demande PAP (GWhPCS/an)"),
+      label: t("2021 - Arrêté du 13/12/2021"),
       value: TariffReference.Value2021,
     },
     {
-      label: t("2023 - Demande PAP"),
+      label: t("2023 - Arrêté du 10/06/2023"),
       value: TariffReference.Value2023,
     },
   ]

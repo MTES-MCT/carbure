@@ -13,6 +13,7 @@ import useEntity from "common/hooks/entity"
 import { ImportProvisionCertificates } from "./components/import-provision-certificates"
 import { SendTransferCertificates } from "./components/send-transfer-certificates"
 import { useQuery } from "common/hooks/async"
+import { useProvisionCertificatesBalance } from "./hooks/provision-certificates.hooks"
 
 export const ElecCertificates = () => {
   const { t } = useTranslation()
@@ -24,6 +25,8 @@ export const ElecCertificates = () => {
     key: "elec-certificates-snapshot",
     params: [entity.id, years.selected],
   })
+
+  const { balance, formattedBalance } = useProvisionCertificatesBalance()
 
   const canWriteCPO = entity.isCPO && entity.canWrite()
   const canWriteAdmin =
@@ -42,7 +45,12 @@ export const ElecCertificates = () => {
             sort={(year) => -year.value}
           />
 
-          {canWriteCPO && <SendTransferCertificates />}
+          {canWriteCPO && (
+            <SendTransferCertificates
+              balance={balance}
+              formattedBalance={formattedBalance}
+            />
+          )}
           {canWriteAdmin && <ImportProvisionCertificates />}
         </section>
       </header>
@@ -54,6 +62,7 @@ export const ElecCertificates = () => {
             <ProvisionCertificates
               year={years.selected}
               snapshot={snapshot.result?.data}
+              formattedBalance={formattedBalance}
             />
           }
         />
@@ -63,6 +72,7 @@ export const ElecCertificates = () => {
             <TransferCertificates
               year={years.selected}
               snapshot={snapshot.result?.data}
+              formattedBalance={formattedBalance}
             />
           }
         />

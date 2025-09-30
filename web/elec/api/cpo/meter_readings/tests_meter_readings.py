@@ -60,7 +60,7 @@ ERROR_METER_READINGS = [
         "reading_date": datetime.date(2025, 9, 29),
     },
     {
-        # PDC is listed twice
+        # PDC is listed twice and is not eligible for meter readings
         "charge_point_id": "FR00IJKL",
         "previous_reading": 500,
         "current_reading": 800,
@@ -448,12 +448,22 @@ class ElecMeterReadingsTest(TestCase):
                     {
                         "error": "INVALID_DATA",
                         "line": 4,
-                        "meta": {"charge_point_id": ["Ce point de recharge a été défini 2 fois (lignes 4, 5)"]},
+                        "meta": {
+                            "charge_point_id": [
+                                "Ce point de recharge a été défini 2 fois (lignes 4, 5)",
+                                "Ce point de recharge n'est pas soumis aux relevés trimestriels, veuillez le supprimer du fichier.",  # noqa: E501
+                            ]
+                        },
                     },
                     {
                         "error": "INVALID_DATA",
                         "line": 5,
-                        "meta": {"charge_point_id": ["Ce point de recharge a été défini 2 fois (lignes 4, 5)"]},
+                        "meta": {
+                            "charge_point_id": [
+                                "Ce point de recharge a été défini 2 fois (lignes 4, 5)",
+                                "Ce point de recharge n'est pas soumis aux relevés trimestriels, veuillez le supprimer du fichier.",  # noqa: E501
+                            ]
+                        },
                     },
                     {
                         "error": "INVALID_DATA",

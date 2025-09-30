@@ -16,7 +16,7 @@ import {
   isContractRedii,
   isTariffReference2011Or2020,
   isTariffReference2021Or2023,
-} from "./contract-infos.utils"
+} from "../../contract.utils"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { Button } from "common/components/button2"
 import {
@@ -91,14 +91,21 @@ export const ContractInfos = ({
       onEdit={setIsEditing}
     >
       <Form onSubmit={onSubmit}>
-        {!entity.is_red_ii && isContractRedii(value) && (
+        {isContractRedii(value) && (
           <Notice variant="info" icon="fr-icon-info-line">
-            {t(
-              "Votre Capacité maximale de production contractualisée est strictement supérieure à {{value}}, votre production de biométhane est donc soumise aux exigences RED.",
-              {
-                value: getRediiThresholdLabel(value.tariff_reference),
-              }
-            )}
+            {isTariffReference2011Or2020(value.tariff_reference)
+              ? t(
+                  "Votre Capacité maximale de production contractualisée est strictement supérieure à {{value}}, votre production de biométhane est donc soumise aux exigences RED.",
+                  {
+                    value: getRediiThresholdLabel(value.tariff_reference),
+                  }
+                )
+              : t(
+                  "Votre production annuelle prévisionnelle est strictement supérieure à {{value}}, votre production de biométhane est donc soumise aux exigences RED.",
+                  {
+                    value: getRediiThresholdLabel(value.tariff_reference),
+                  }
+                )}
           </Notice>
         )}
         <Grid cols={2} gap="lg">

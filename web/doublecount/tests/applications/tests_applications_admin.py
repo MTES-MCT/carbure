@@ -7,7 +7,7 @@ from django.urls import reverse
 from docx import Document
 
 from certificates.models import DoubleCountingRegistration
-from core.models import Entity, MatierePremiere, Pays, UserRights
+from core.models import Entity, ExternalAdminRights, MatierePremiere, Pays, UserRights
 from core.tests_utils import setup_current_user
 from doublecount.factories import (
     DoubleCountingApplicationFactory,
@@ -16,7 +16,7 @@ from doublecount.factories import (
 )
 from doublecount.models import DoubleCountingApplication, DoubleCountingProduction
 from doublecount.views.applications.mixins.approve_application import DoubleCountingApplicationApproveError
-from doublecount.views.applications.mixins.export_application import (
+from doublecount.views.applications.mixins.utils import (
     DoubleCountingApplicationExportError,
     application_to_json,
     check_has_dechets_industriels,
@@ -44,8 +44,12 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
+        self.ext_admin = Entity.objects.create(name="ExternalAdminTest", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=self.ext_admin, right=ExternalAdminRights.DOUBLE_COUNTING)
 
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.user = setup_current_user(
+            self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW"), (self.ext_admin, "RW")], True
+        )
 
         self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
         UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
@@ -93,6 +97,17 @@ class AdminDoubleCountApplicationsTest(TestCase):
         pending = data["pending"]
         application = pending[0]
 
+        assert application["producer"]["id"] == self.production_site.producer.id
+
+    def test_list_applications_for_external_admin(self):
+        self.create_application()
+
+        response = self.client.get(
+            reverse("double-counting-applications-list-admin"),
+            {"entity_id": self.ext_admin.id, "year": self.requested_start_year},
+        )
+
+        application = response.json()["pending"][0]
         assert application["producer"]["id"] == self.production_site.producer.id
 
     def test_application_details(self):
@@ -166,13 +181,13 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert application.status != DoubleCountingApplication.ACCEPTED
 
         # Malformed params
-        response = self.client.get(reverse("double-counting-applications-export-application"), {"entity_id": self.admin.id})
+        response = self.client.get(reverse("double-counting-applications-generate-decision"), {"entity_id": self.admin.id})
         assert response.status_code == 400
         assert response.json()["message"] == DoubleCountingApplicationExportError.MALFORMED_PARAMS
 
         # Application not found
         response = self.client.get(
-            reverse("double-counting-applications-export-application"),
+            reverse("double-counting-applications-generate-decision"),
             {"dca_id": application.id + 200, "entity_id": self.admin.id},
         )
         assert response.status_code == 400
@@ -185,7 +200,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         # Di without di in application
         response = self.client.get(
-            reverse("double-counting-applications-export-application"),
+            reverse("double-counting-applications-generate-decision"),
             {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
         )
         assert response.status_code == 400
@@ -194,7 +209,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         # Export without di
         assert not check_has_dechets_industriels(application)
         response = self.client.get(
-            reverse("double-counting-applications-export-application"),
+            reverse("double-counting-applications-generate-decision"),
             {"dca_id": application.id, "entity_id": self.admin.id},
         )
         assert response.status_code == 200
@@ -244,7 +259,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert check_has_dechets_industriels(application)
 
         response = self.client.get(
-            reverse("double-counting-applications-export-application"),
+            reverse("double-counting-applications-generate-decision"),
             {"dca_id": application.id, "entity_id": self.admin.id, "di": "Graisses brunes, huiles acides"},
         )
         assert response.status_code == 200

@@ -1,4 +1,4 @@
-import { DepartmentCode, getDepartmentOptions } from "common/utils/geography"
+import { getDepartmentOptions } from "common/utils/geography"
 import {
   Autocomplete,
   AutocompleteProps,
@@ -8,10 +8,7 @@ import { useTranslation } from "react-i18next"
 const departmentsOptions = getDepartmentOptions()
 
 export const AutoCompleteDepartments = (
-  props: AutocompleteProps<
-    { label: string; value: DepartmentCode },
-    DepartmentCode | null
-  >
+  props: AutocompleteProps<{ label: string; value: string }, string | null>
 ) => {
   const { t } = useTranslation()
 

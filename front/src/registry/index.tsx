@@ -10,6 +10,7 @@ import DoubleCounting from "./components/double-counting"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { compact } from "common/utils/collection"
 import { Airports } from "./components/airports"
+import { SystemeNational } from "./components/systeme-national"
 import useEntity from "common/hooks/entity"
 
 const Registry = () => {
@@ -49,6 +50,11 @@ const Registry = () => {
             key: "double-counting",
             label: t("Double comptage"),
           },
+          {
+            path: "#systeme-national",
+            key: "systeme-national",
+            label: t("Système national"),
+          },
         ]
       : []),
     (isAirline || isOperator || hasAirline || isAdmin) && {
@@ -69,6 +75,7 @@ const Registry = () => {
             {focus === "depots" && <Depots />}
             {focus === "airports" && <Airports />}
             {focus === "double-counting" && <DoubleCounting />}
+            {focus === "systeme-national" && <SystemeNational />}
           </section>
         )}
       </Tabs>

@@ -18,3 +18,7 @@
 .label--read-only {
   color: var(--text-mention-grey);
 }
+
+:global(.fr-label:empty + .fr-input) {
+  margin-top: 0;
+}

@@ -7,6 +7,7 @@ import {
   DigestateValorizationMethodsEnum as DigestateValorizationMethods,
   SpreadingManagementMethodsEnum as SpreadingManagementMethods,
   DigestateSaleTypeEnum as DigestateSaleType,
+  InstalledMetersEnum as InstalledMeters,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
@@ -19,6 +20,7 @@ export {
   DigestateValorizationMethods,
   SpreadingManagementMethods,
   DigestateSaleType,
+  InstalledMeters,
 }
 
 // Production Unit
@@ -30,7 +32,5 @@ export type BiomethaneProductionUnitPatchRequest =
 // Digestate Storage
 
 export type BiomethaneDigestateStorage = apiTypes["BiomethaneDigestateStorage"]
-export type BiomethaneDigestateStorageAddRequest =
-  apiTypes["BiomethaneDigestateStorageAddRequest"]
-export type BiomethaneDigestateStoragePatchRequest =
-  apiTypes["PatchedBiomethaneDigestateStoragePatchRequest"]
+export type BiomethaneDigestateStorageInputRequest =
+  apiTypes["BiomethaneDigestateStorageInputRequest"]

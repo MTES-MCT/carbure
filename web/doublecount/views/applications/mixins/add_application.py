@@ -1,5 +1,4 @@
-import traceback
-
+import sentry_sdk
 from django.db import transaction
 from django.db.models import Q
 from drf_spectacular.utils import (
@@ -239,13 +238,13 @@ class AddActionMixin:
                 dc_files.append(dc_file)
                 private_storage.save(extra_s3_path, extra_file)
             DoubleCountingDocFile.objects.bulk_create(dc_files)
-        except Exception:
-            traceback.print_exc()
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
 
         # 4 - send emails
         try:
             send_dca_confirmation_email(dca, request)
-        except Exception:
-            print("email send error")
-            traceback.print_exc()
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+
         return Response({"status": "success"})
