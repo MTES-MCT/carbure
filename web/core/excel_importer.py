@@ -44,28 +44,24 @@ class ExcelImporter:
         Raises:
             ExcelValidationError: If validation errors are found
         """
-        # Collect all validation errors by row
-        validation_errors = []
-        valid_instances = []
+        # Bulk validation
+        serializer = serializer_class(data=data, many=True)
 
-        for row_index, row in enumerate(data, start=1):
-            input_serializer = serializer_class(data=row)
+        if serializer.is_valid():
+            return serializer
+        else:
+            validation_errors = []
 
-            if input_serializer.is_valid():
-                valid_instances.append(input_serializer)
-            else:
-                # Add row number to errors
-                excel_row_number = row_index + config["header_row"] + 1
-                validation_errors.append(
-                    {
-                        "row": excel_row_number,
-                        "errors": input_serializer.errors,
-                    }
-                )
+            # serializer.errors is a list where each index corresponds to a data row
+            starting_excel_row = 2 + config["header_row"]
+            for row_index, row_errors in enumerate(serializer.errors, start=starting_excel_row):
+                if row_errors:  # Only include rows with errors
+                    excel_row_number = row_index
+                    validation_errors.append(
+                        {
+                            "row": excel_row_number,
+                            "errors": row_errors,
+                        }
+                    )
 
-        # If there are validation errors, raise exception
-        if validation_errors:
             raise ExcelValidationError(validation_errors, len(data))
-
-        # If all validations passed
-        return valid_instances

@@ -28,15 +28,14 @@ class ExcelImportActionMixin:
         try:
             data = ExcelImporter.parse(file, **config)
 
-            valid_instances = ExcelImporter.validate_retrieved_data(
+            serializer = ExcelImporter.validate_retrieved_data(
                 data,
                 serializer_class=BiomethaneSupplyInputCreateSerializer,
                 config=config,
             )
 
-            # If all validations passed, save all instances
-            for serializer in valid_instances:
-                serializer.save()
+            # If all validations passed, save all instances using bulk save
+            serializer.save()
 
         except ExcelValidationError as e:
             return Response(
