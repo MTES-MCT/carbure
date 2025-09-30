@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 
 from edelivery.adapters.zip_utils import unzip_base64_encoded_stream
+from edelivery.ebms.request_responses import BaseRequestResponse
 
 
 class AbstractEdeliveryResponse:
@@ -35,15 +36,11 @@ class RetrieveMessageResponse(AbstractEdeliveryResponse):
     def __init__(self, text):
         super().__init__(text)
         self.contents = unzip_base64_encoded_stream(self.attachment_value())
-        self.parsed_contents = ET.fromstring(self.contents)
+        self.request_response = BaseRequestResponse(self.contents)
 
     def attachment_value(self):
         valueElement = self.parsed_XML.find("soap:Body/ws:retrieveMessageResponse/payload/value", self.NAMESPACES)
         return valueElement.text
-
-    def request_id(self):
-        request_id_element = self.parsed_contents.find("./RESPONSE_HEADER")
-        return request_id_element.attrib["REQUEST_ID"]
 
 
 class SubmitMessageResponse(AbstractEdeliveryResponse):

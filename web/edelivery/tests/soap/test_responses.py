@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from edelivery.ebms.request_responses import BaseRequestResponse
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse
 
 
@@ -47,25 +48,17 @@ class RetrieveMessageResponseTest(TestCase):
   </soap:Body>
 </soap:Envelope>"""
 
-    def request_response(_, request_id):
-        return f"""\
-<?xml version="1.0" encoding="UTF-8"?>
-<udb:GetSourcingContactByIDResponse
-  xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <RESPONSE_HEADER REQUEST_ID="{request_id}"/>
-  <!-- … -->
-</udb:GetSourcingContactByIDResponse>"""
-
     def setUp(self):
         self.patched_unzip = patch("edelivery.soap.responses.unzip_base64_encoded_stream").start()
 
     def tearDown(self):
         patch.stopall()
 
-    def test_extracts_request_id(self):
-        self.patched_unzip.return_value = self.request_response("12345")
+    def test_initializes_request_response(self):
+        self.patched_unzip.return_value = "<response/>"
         response = RetrieveMessageResponse(self.response_payload())
-        self.assertEqual("12345", response.request_id())
+        self.assertIsInstance(response.request_response, BaseRequestResponse)
+        self.assertEqual("<response/>", response.request_response.payload)
 
     def test_extracts_zipped_response(self):
         self.patched_unzip.return_value = "<response/>"
