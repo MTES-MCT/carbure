@@ -1,5 +1,5 @@
 from django.urls import path
-from rest_framework_nested.routers import SimpleRouter
+from rest_framework.routers import SimpleRouter
 
 from .views import (
     BiomethaneContractAmendmentViewSet,
