@@ -683,22 +683,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/double-counting/applications/export-application/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["double_counting_applications_export_application_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/double-counting/applications/filters/": {
         parameters: {
             query?: never;
@@ -707,6 +691,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["double_counting_applications_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/double-counting/applications/generate-decision/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["double_counting_applications_generate_decision_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1576,22 +1576,6 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["entities_update_entity_info_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/entities/users/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["entities_users_list"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4036,15 +4020,6 @@ export interface components {
          * @enum {string}
          */
         EntityTypeEnum: EntityTypeEnum;
-        EntityUser: {
-            readonly id: number;
-            readonly name: string;
-            /**
-             * Adresse électronique
-             * Format: email
-             */
-            email: string;
-        };
         ErrorResponse: {
             message: string;
         };
@@ -6944,32 +6919,6 @@ export interface operations {
             };
         };
     };
-    double_counting_applications_export_application_retrieve: {
-        parameters: {
-            query: {
-                /** @description Doublecount application ID */
-                dca_id: number;
-                /** @description Dechet industriel */
-                di?: string;
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string;
-                };
-            };
-        };
-    };
     double_counting_applications_filters_retrieve: {
         parameters: {
             query?: {
@@ -7017,6 +6966,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    double_counting_applications_generate_decision_retrieve: {
+        parameters: {
+            query: {
+                /** @description Doublecount application ID */
+                dca_id: number;
+                /** @description Dechet industriel */
+                di?: string;
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": string;
                 };
             };
         };
@@ -8988,36 +8963,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-        };
-    };
-    entities_users_list: {
-        parameters: {
-            query: {
-                /** @description Compay ID, Admin only */
-                company_id: number;
-                /** @description Entity ID */
-                entity_id: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description Search in user email or entity name. */
-                q?: string;
-                /** @description A search term. */
-                search?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EntityUser"][];
                 };
             };
         };

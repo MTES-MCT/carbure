@@ -1585,7 +1585,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -2064,43 +2063,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/CheckFileResponse"
           description: ""
-  /api/double-counting/applications/export-application/:
-    get:
-      operationId: double_counting_applications_export_application_retrieve
-      parameters:
-        - in: query
-          name: dca_id
-          schema:
-            type: integer
-          description: Doublecount application ID
-          required: true
-        - in: query
-          name: di
-          schema:
-            type: string
-          description: Dechet industriel
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - double-counting
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
-              schema:
-                type: string
-              examples:
-                ExampleOfExportResponse.:
-                  value: file.docx
-                  summary: Example of export response.
-          description: ""
   /api/double-counting/applications/filters/:
     get:
       operationId: double_counting_applications_filters_retrieve
@@ -2204,6 +2166,43 @@ paths:
                     message: NOT_FOUND
                   summary: Not found
           description: Bad request - invalid filter or not found.
+  /api/double-counting/applications/generate-decision/:
+    get:
+      operationId: double_counting_applications_generate_decision_retrieve
+      parameters:
+        - in: query
+          name: dca_id
+          schema:
+            type: integer
+          description: Doublecount application ID
+          required: true
+        - in: query
+          name: di
+          schema:
+            type: string
+          description: Dechet industriel
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                type: string
+              examples:
+                ExampleOfExportResponse.:
+                  value: file.docx
+                  summary: Example of export response.
+          description: ""
   /api/double-counting/applications/list-admin/:
     get:
       operationId: double_counting_applications_list_admin_retrieve
@@ -3793,7 +3792,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -5147,53 +5145,6 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
-  /api/entities/users/:
-    get:
-      operationId: entities_users_list
-      parameters:
-        - in: query
-          name: company_id
-          schema:
-            type: integer
-          description: Compay ID, Admin only
-          required: true
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - in: query
-          name: q
-          schema:
-            type: string
-          description: Search in user email or entity name.
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - entities
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EntityUser"
-          description: ""
   /api/entities/users/accept-user/:
     post:
       operationId: entities_users_accept_user_create
@@ -13486,24 +13437,6 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
-    EntityUser:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          title: Adresse électronique
-          maxLength: 255
-      required:
-        - email
-        - id
-        - name
     ErrorResponse:
       type: object
       properties:

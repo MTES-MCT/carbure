@@ -28,6 +28,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
+        self.ext_admin = Entity.objects.create(name="ExternalAdminTest", entity_type=Entity.EXTERNAL_ADMIN)
 
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
 

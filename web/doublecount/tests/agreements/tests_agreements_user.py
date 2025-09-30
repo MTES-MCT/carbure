@@ -4,11 +4,12 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Entity, UserRights
+from core.models import Entity
 from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
+from entity.factories.entity import EntityFactory
 from transactions.models import ProductionSite
 
 User = get_user_model()
@@ -27,40 +28,50 @@ class DoubleCountAgreementsTest(TestCase):
 
     def setUp(self):
         self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
+        self.producer = EntityFactory.create(name="Le Super Producteur 1", entity_type="Producteur")
+        self.producer2 = EntityFactory.create(name="Autre producteur", entity_type="Producteur")
 
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
+        self.user = setup_current_user(
+            self,
+            "tester@carbure.local",
+            "Tester",
+            "gogogo",
+            [(self.admin, "ADMIN"), (self.producer, "ADMIN"), (self.producer2, "ADMIN")],
+            True,
+        )
 
-        self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type="Producteur")
-        UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
         self.production_site1 = ProductionSite.objects.first()
+        self.production_site1.created_by = self.producer
         self.production_site1.entitysite_set.update(entity=self.producer)
         self.production_site1.save()
 
         self.production_site2 = ProductionSite.objects.first()
+        self.production_site1.created_by = self.producer
         self.production_site2.entitysite_set.update(entity=self.producer)
         self.production_site2.save()
 
         self.requested_start_year = 2023
 
+    def create_application(self, id, start_year, production_site, status=DoubleCountingApplication.ACCEPTED):
+        return DoubleCountingApplicationFactory.create(
+            certificate_id=id,
+            producer=self.producer,
+            production_site=production_site,
+            period_start__year=start_year,
+            period_end__year=start_year + 1,
+            status=status,
+        )
+
     def test_get_agreements(self):
         ### Setup
-        def create_application(id, start_year, production_site, status=DoubleCountingApplication.ACCEPTED):
-            return DoubleCountingApplicationFactory.create(
-                certificate_id=id,
-                producer=self.producer,
-                production_site=production_site,
-                period_start__year=start_year,
-                period_end__year=start_year + 1,
-                status=status,
-            )
 
         # an application  with status pending  => En attente
-        create_application(
+        self.create_application(
             "FR_001_2024", self.requested_start_year + 1, self.production_site1, DoubleCountingApplication.PENDING
         )
 
         # an agreement with status valid => Validé
-        application = create_application(
+        application = self.create_application(
             "FR_002_2024", self.requested_start_year - 1, self.production_site1, DoubleCountingApplication.ACCEPTED
         )
         DoubleCountingRegistrationFactory.create(
@@ -72,7 +83,7 @@ class DoubleCountAgreementsTest(TestCase):
         # an agreement to renew but already renewed => "Validé"
 
         # an application with status rejected => Rejeté
-        create_application(
+        self.create_application(
             "FR_003_2024", self.requested_start_year + 1, self.production_site2, DoubleCountingApplication.REJECTED
         )
 
@@ -97,3 +108,54 @@ class DoubleCountAgreementsTest(TestCase):
         assert application1["quotas_progression"] is None
         assert application2["quotas_progression"] == 0
         assert application3["quotas_progression"] is None
+
+    def test_only_owner_can_access_application_details(self):
+        application = DoubleCountingApplicationFactory.create(
+            certificate_id="FR_123_2025",
+            producer=self.producer,
+            production_site=self.production_site1,
+            period_start__year=self.requested_start_year,
+            period_end__year=self.requested_start_year + 2,
+            status="ACCEPTED",
+        )
+
+        agreement = DoubleCountingRegistrationFactory.create(
+            production_site=self.production_site1,
+            valid_from=date(self.requested_start_year, 1, 1),
+            application=application,
+            certificate_id=application.certificate_id,
+        )
+
+        response = self.client.get(
+            reverse("double-counting-agreements-list"),
+            query_params={"entity_id": self.producer2.id},
+        )
+
+        assert response.json() == []
+
+        response = self.client.get(
+            reverse("double-counting-agreements-detail", kwargs={"id": agreement.id}),
+            query_params={"entity_id": self.producer2.id},
+        )
+
+        assert response.status_code == 404
+
+    def test_list_all_public_agreements(self):
+        agreements = DoubleCountingRegistrationFactory.create_batch(
+            3,
+            production_site=self.production_site1,
+            valid_from=date(self.requested_start_year, 1, 1),
+            valid_until=date(self.requested_start_year + 2, 1, 1),
+        )
+
+        # this agreement is outdated and shouldn't be listed
+        _expired_agreement = DoubleCountingRegistrationFactory.create(
+            production_site=self.production_site1,
+            valid_from=date(self.requested_start_year - 4, 1, 1),
+            valid_until=date(self.requested_start_year - 2, 1, 1),
+        )
+
+        data = self.client.get(reverse("double-counting-agreements-agreements-public-list")).json()
+
+        assert len(data) == 3
+        assert {a.certificate_id for a in agreements} == {a["certificate_id"] for a in data}

@@ -4,13 +4,11 @@ from django.db.models.query_utils import Q
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
-from core.models import Entity
-from core.permissions import HasUserRights
 from doublecount.models import DoubleCountingApplication
+from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights
 
 
 class ApplicationSnapshotSerializer(serializers.Serializer):
@@ -39,7 +37,7 @@ class SafSnapshotError:
     responses=ApplicationSnapshotSerializer,
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN])])
+@permission_classes([HasProducerRights | HasDoubleCountingAdminRights])
 def get_snapshot(request, *args, **kwargs):
     current_year = datetime.now().year
 

@@ -102,7 +102,6 @@ class NotificationViewSet(ListModelMixin, viewsets.GenericViewSet):
         serializer = NotificationSerializer(data=request.data, entity_id=entity_id)
         if serializer.is_valid():
             notifications = serializer.validated_data["notification_ids"]
-            print(notifications, "Notification")
             notification_ids = [notification.id for notification in notifications]
             CarbureNotification.objects.filter(id__in=notification_ids).update(acked=True)
 

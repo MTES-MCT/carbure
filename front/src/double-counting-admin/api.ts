@@ -1,4 +1,3 @@
-import { download } from "common/services/api"
 import { QUERY_RESET } from "common/hooks/query-builder-2"
 import {
   api as apiFetch,
@@ -88,13 +87,13 @@ export function approveDoubleCountingQuotas(
   )
 }
 
-export function downloadDoubleCountingApplication(
-  entity_id: number | undefined,
+export function generateDoubleCountingDecision(
+  entity_id: number,
   dca_id: number,
   industrial_wastes?: string
 ) {
   // TODO: rework downloadFetch() to typecheck for endpoints with variable paths
-  return download(`/double-counting/applications/export-application`, {
+  return downloadFetch("/double-counting/applications/generate-decision/", {
     entity_id,
     dca_id,
     ...(industrial_wastes ? { di: industrial_wastes } : {}),
