@@ -5,13 +5,12 @@ from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelM
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
-from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
+from biomethane.models import BiomethaneSupplyInput
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputCreateSerializer,
     BiomethaneSupplyInputSerializer,
 )
-from biomethane.utils import get_declaration_period
 from core.filters import FiltersActionMixin
 from core.pagination import MetadataPageNumberPagination
 
@@ -40,6 +39,11 @@ class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModel
     def get_permissions(self):
         return get_biomethane_permissions(["create", "update", "partial_update"], self.action)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["entity"] = getattr(self.request, "entity", None)
+        return context
+
     def get_filterset_class(self):
         if self.action == "list":
             return self.filterset_class
@@ -49,16 +53,3 @@ class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModel
         if self.action in ["create", "update", "partial_update"]:
             return BiomethaneSupplyInputCreateSerializer
         return BiomethaneSupplyInputSerializer
-
-    def perform_create(self, serializer):
-        entity = self.request.entity
-        year = get_declaration_period()
-
-        # Get or create the supply plan for the entity and year
-        supply_plan, created = BiomethaneSupplyPlan.objects.get_or_create(
-            producer=entity,
-            year=year,
-            defaults={},
-        )
-
-        serializer.save(supply_plan=supply_plan)

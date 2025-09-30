@@ -29,3 +29,8 @@ class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin, ExcelImportA
 
     def get_permissions(self):
         return get_biomethane_permissions(["import_supply_plan_from_excel"], self.action)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["entity"] = getattr(self.request, "entity", None)
+        return context

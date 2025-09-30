@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -26,27 +27,27 @@ class ExcelImporter:
         """
         df = pd.read_excel(file, header=header_row, sheet_name=sheet_name)
 
+        # Replace NaN values with None for better handling in serializers
+        df = df.replace({np.nan: None})
+
         return df.to_dict(orient="records")
 
     @staticmethod
-    def validate_retrieved_data(data, serializer_class, config):
+    def validate_retrieved_data(serializer, config):
         """
-        Validate data using the provided serializer class.
+        Validate retrieved data using the provided serializer.
 
         Args:
-            data: List of dictionaries to validate
-            serializer_class: DRF serializer class to use for validation
-            config: Configuration dict containing header_row info
+            serializer: DRF serializer instance with data to validate
+            config: Configuration dictionary (e.g., header_row)
 
         Returns:
-            List of valid serializer instances
+            Validated serializer instance
 
-        Raises:
-            ExcelValidationError: If validation errors are found
+        Raises: ExcelValidationError: If validation errors are found
+
         """
         # Bulk validation
-        serializer = serializer_class(data=data, many=True)
-
         if serializer.is_valid():
             return serializer
         else:
@@ -64,4 +65,4 @@ class ExcelImporter:
                         }
                     )
 
-            raise ExcelValidationError(validation_errors, len(data))
+            raise ExcelValidationError(validation_errors, len(serializer.data))

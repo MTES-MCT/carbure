@@ -1,2 +1,2 @@
-from .supply_input import BiomethaneSupplyInputSerializer, BiomethaneSupplyInputCreateSerializer
+from .supply_input import BiomethaneSupplyInputSerializer, BiomethaneSupplyInputCreateSerializer, BiomethaneSupplyInputCreateFromExcelSerializer
 from .supply_plan import BiomethaneSupplyPlanSerializer, BiomethaneUploadExcelSerializer
