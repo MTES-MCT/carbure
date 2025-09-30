@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
@@ -6,6 +8,7 @@ from django_otp.plugins.otp_email.models import EmailDevice
 
 from core.models import CarbureLot, Entity, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.factories.certificate import GenericCertificateFactory
 
 
 class LotsCertifMayhemTest(TestCase):
@@ -30,6 +33,13 @@ class LotsCertifMayhemTest(TestCase):
         )
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         assert loggedin
+
+        validity = {"valid_from": date(2000, 1, 1), "valid_until": date(3000, 1, 1)}
+        GenericCertificateFactory.create(certificate_id="TOTO", **validity)
+        GenericCertificateFactory.create(certificate_id="MY_CERTIFICATE", **validity)
+        GenericCertificateFactory.create(certificate_id="MY_SUPPLIER", **validity)
+        GenericCertificateFactory.create(certificate_id="PRODUCER_CERTIFICATE", **validity)
+        GenericCertificateFactory.create(certificate_id="TRADER_CERTIFICATE", **validity)
 
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
