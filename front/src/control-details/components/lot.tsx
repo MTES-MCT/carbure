@@ -55,11 +55,12 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
   const lotData = lot.result?.data.data
   const creator = lotData?.lot.added_by
   const comments = lotData?.comments ?? []
+  const certificates = lotData?.certificates
   const controlComments = lotData?.control_comments ?? []
   const changes = getLotChanges(lotData?.updates)
   const [errors = [], warnings = []] = separateAnomalies(lotData?.errors ?? [])
 
-  const form = useLotForm(lotData?.lot, errors)
+  const form = useLotForm(lotData?.lot, errors, certificates)
 
   const expiring = isExpiring(lotData?.lot)
 

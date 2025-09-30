@@ -44,6 +44,8 @@ export const AgreementDetailsDialog = () => {
 
   const application = agreement?.application
 
+  const canWrite = entity.canWrite()
+
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
@@ -95,7 +97,8 @@ export const AgreementDetailsDialog = () => {
           </>
         }
         footer={
-          application && (
+          application &&
+          canWrite && (
             <Button
               onClick={() => openGenerateDecisionDialog()}
               iconId="ri-download-line"

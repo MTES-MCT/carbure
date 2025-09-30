@@ -25,6 +25,8 @@ export const ProductionTable = ({
 }: ProductionTableProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const canWrite = entity.canWrite()
+
   const productionColumns: Column<DoubleCountingProduction>[] = compact([
     {
       header: t("Matière première"),
@@ -42,7 +44,7 @@ export const ProductionTable = ({
       header: t("Prod. effective"),
       cell: (p) => <Cell text={formatNumber(p.estimated_production ?? 0)} />,
     },
-    entity.isAdmin && {
+    (entity.isAdmin || entity.isExternal) && {
       header: t("Ratio prod."),
       cell: (p) => {
         // Find sources related to the production
@@ -76,14 +78,14 @@ export const ProductionTable = ({
     },
   ])
 
-  if (hasAgreement) {
+  if (!canWrite || hasAgreement) {
     productionColumns?.push({
       header: t("Quota approuvé"),
       cell: (p) => <Cell text={formatNumber(p.approved_quota)} />,
     })
   }
 
-  if (quotas && setQuotas) {
+  if (canWrite && quotas && setQuotas) {
     productionColumns?.push({
       header: t("Quota approuvé"),
       cell: (p) => (
