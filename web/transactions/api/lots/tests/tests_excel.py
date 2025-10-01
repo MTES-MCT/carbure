@@ -1,3 +1,4 @@
+import json
 import os
 
 import pandas as pd
@@ -5,10 +6,12 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
+from core.common import convert_template_row_to_formdata
 from core.models import CarbureLot, Entity, Pays
 from core.tests_utils import setup_current_user
 from transactions.models.entity_site import EntitySite
 from transactions.models.site import Site
+from transactions.sanity_checks.helpers import get_prefetched_data
 
 
 class LotsExcelImportTest(TestCase):
@@ -89,6 +92,23 @@ class LotsExcelImportTest(TestCase):
         print(title)
         print(pd.DataFrame(values).fillna(""))
 
+    def dump_excel_as_json(self, owner: Entity, excel_file_path: str):
+        """
+        generate a JSON dump of the tested excel file with the entity's context
+        """
+
+        prefetched_data = get_prefetched_data(owner)
+        data = convert_template_row_to_formdata(owner, prefetched_data, excel_file_path)
+
+        dump_file_name = owner.entity_type.lower()
+        if owner.has_trading:
+            dump_file_name += "__has_trading"
+        if owner.has_stocks:
+            dump_file_name += "__has_stock"
+
+        with open(f"{os.environ['CARBURE_HOME']}/web/transactions/fixtures/{dump_file_name}.json", "w") as file:
+            json.dump(data, file, indent=4, default=str)
+
     def send_excel(self, entity: Entity, excel_fixture: str):
         CarbureLot.objects.filter(added_by=entity).delete()
 
@@ -96,10 +116,13 @@ class LotsExcelImportTest(TestCase):
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile(excel_fixture, reader.read())
 
+        self.dump_excel_as_json(entity, filepath)
+
         response = self.client.post(
             reverse("transactions-lots-add-excel"),
             {"entity_id": entity.id, "file": file},
         )
+
         if response.status_code != 200:
             print(response.json(), response.status_code)
 
