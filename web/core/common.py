@@ -177,9 +177,11 @@ def get_transaction_distance(tx):
 
 
 class BiofuelExcelSerializer(serializers.Serializer):
-    carbure_stock_id = serializers.CharField(required=False, default="")
-    champ_libre = serializers.CharField(source="free_field", required=False, default="")
-    production_site_reference = serializers.CharField(source="production_site_certificate", required=False, default="")
+    OPTIONAL = {"required": False, "allow_blank": True, "default": ""}
+
+    carbure_stock_id = serializers.CharField(**OPTIONAL)
+    champ_libre = serializers.CharField(source="free_field", **OPTIONAL)
+    production_site_reference = serializers.CharField(source="production_site_certificate", **OPTIONAL)
 
 
 def convert_data_with_serializer(row: dict, Serializer) -> dict:
@@ -200,7 +202,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
     for row in df.iterrows():
         lot_row = row[1]
-        lot = convert_data_with_serializer(lot_row, BiofuelExcelSerializer)
+        lot = convert_data_with_serializer(lot_row.to_dict(), BiofuelExcelSerializer)
 
         if lot_row.get("volume", "") == "" and (lot_row.get("unit", "") == "" or lot_row.get("quantity", "") == ""):
             # ignore rows with no volume or no unit+quantity
