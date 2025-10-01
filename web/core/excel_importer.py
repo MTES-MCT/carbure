@@ -38,7 +38,7 @@ class ExcelImporter:
         return df.to_dict(orient="records")
 
     @staticmethod
-    def validate_retrieved_data(serializer, config):
+    def validate_retrieved_data(serializer, config, nb_rows):
         """
         Validate retrieved data using the provided serializer.
 
@@ -70,7 +70,7 @@ class ExcelImporter:
                         }
                     )
 
-            raise ExcelValidationError(validation_errors, len(serializer.data))
+            raise ExcelValidationError(validation_errors, nb_rows)
 
     @staticmethod
     def backup_file(file, entity):

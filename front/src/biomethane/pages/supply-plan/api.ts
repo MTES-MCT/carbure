@@ -36,3 +36,16 @@ export function downloadSupplyPlan(query: BiomethaneSupplyInputQuery) {
     ...query,
   })
 }
+
+export const importSupplyPlan = async (entity_id: number, file: File) => {
+  await api.POST("/biomethane/supply-plan/import/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      file,
+    },
+  })
+}

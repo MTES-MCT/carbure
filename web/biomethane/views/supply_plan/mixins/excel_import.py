@@ -70,6 +70,7 @@ class ExcelImportActionMixin:
             serializer = ExcelImporter.validate_retrieved_data(
                 serializer=serializer,
                 config=config,
+                nb_rows=len(data),
             )
 
             # If all validations passed, save all instances using bulk save

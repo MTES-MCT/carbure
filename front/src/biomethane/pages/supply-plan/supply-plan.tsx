@@ -23,9 +23,12 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneSupplyInputQueryBuilder } from "./types"
 import { Pagination } from "common/components/pagination2"
 import { ExportButton } from "common/components/export"
+import { ExcelImportDialog } from "./supply-input-dialog"
+import { usePortal } from "common/components/portal"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
+  const portal = usePortal()
   usePrivateNavigation(t("Mes plans d'approvisionnement"))
   const entity = useEntity()
   const years = useYears("biomethane/supply-plan", () =>
@@ -48,6 +51,10 @@ export const SupplyPlan = () => {
   const selectedYearIsInCurrentInterval =
     years.selected === declarationInterval.year
 
+  const openExcelImportDialog = () => {
+    portal((close) => <ExcelImportDialog onClose={close} />)
+  }
+
   return (
     <Main>
       <Row>
@@ -57,7 +64,7 @@ export const SupplyPlan = () => {
           onChange={years.setYear}
         />
         <Button
-          onClick={() => {}}
+          onClick={openExcelImportDialog}
           iconId="ri-upload-line"
           asideX
           disabled={!selectedYearIsInCurrentInterval}
