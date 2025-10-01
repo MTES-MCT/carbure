@@ -1,19 +1,18 @@
 from django.urls import path
 from rest_framework_nested.routers import SimpleRouter
 
-from biomethane.views.energy.energy import BiomethaneEnergyViewSet
-
 from .views import (
     BiomethaneContractAmendmentViewSet,
     BiomethaneContractViewSet,
-    BiomethaneInjectionSiteViewSet,
-)
-from .views.digestate.digestate import BiomethaneDigestateViewSet
-from .views.digestate.spreading import BiomethaneDigestateSpreadingViewSet
-from .views.energy.monthly_report import BiomethaneEnergyMonthlyReportViewSet
-from .views.production_unit import (
+    BiomethaneDigestateSpreadingViewSet,
     BiomethaneDigestateStorageViewSet,
+    BiomethaneDigestateViewSet,
+    BiomethaneEnergyMonthlyReportViewSet,
+    BiomethaneEnergyViewSet,
+    BiomethaneInjectionSiteViewSet,
     BiomethaneProductionUnitViewSet,
+    BiomethaneSupplyInputViewSet,
+    BiomethaneSupplyPlanViewSet,
 )
 
 router = SimpleRouter()
@@ -31,6 +30,11 @@ router.register(
     "digestate/spreading",
     BiomethaneDigestateSpreadingViewSet,
     basename="biomethane-digestate-spreading",
+)
+router.register(
+    "supply-input",
+    BiomethaneSupplyInputViewSet,
+    basename="biomethane-supply-input",
 )
 
 contract_viewset = BiomethaneContractViewSet.as_view(
@@ -99,6 +103,12 @@ energy_monthly_report_viewset = BiomethaneEnergyMonthlyReportViewSet.as_view(
     }
 )
 
+supply_plan_years_viewset = BiomethaneSupplyPlanViewSet.as_view(
+    {
+        "get": "get_years",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
@@ -110,5 +120,6 @@ urlpatterns = [
     path("energy/years/", energy_years_viewset, name="biomethane-energy-years"),
     path("energy/validate/", energy_validate_viewset, name="biomethane-energy-validate"),
     path("energy/monthly-reports/", energy_monthly_report_viewset, name="biomethane-energy-monthly-report"),
+    path("supply-plan/years/", supply_plan_years_viewset, name="biomethane-supply-plan-years"),
     *router.urls,
 ]

@@ -43,6 +43,7 @@ class BiomethaneInjectionSite(models.Model):
     class Meta:
         db_table = "biomethane_injection_site"
         verbose_name = "Biométhane - Site d'injection"
+        verbose_name_plural = "Biométhane - Sites d'injection"
 
 
 @receiver(post_save, sender=BiomethaneInjectionSite)
