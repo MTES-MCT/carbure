@@ -28,8 +28,6 @@ class ImportActionMixin:
 
         certificate_df = pd.read_csv(file, sep=";", decimal=",")
 
-        print(certificate_df)
-
         cpos = Entity.objects.filter(entity_type=Entity.CPO)
         cpos_by_name = {normalize_string(cpo.name): cpo for cpo in cpos}
 

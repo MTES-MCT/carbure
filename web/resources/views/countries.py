@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Pays
-from doublecount.serializers import CountrySerializer
+from core.serializers import CountrySerializer
 
 
 @extend_schema(

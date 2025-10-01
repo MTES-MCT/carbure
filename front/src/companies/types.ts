@@ -1,20 +1,8 @@
 import { Certificate, Country, EntityType } from "common/types"
+import { apiTypes } from "common/services/api-fetch.types"
 
-export interface SearchCompanyResult {
-  company_preview: SearchCompanyPreview
-  warning?: {
-    code: string
-    meta: null | any
-  }
-}
-export interface SearchCompanyPreview {
-  legal_name: string
-  registration_id: string
-  registered_address: string
-  registered_city: string
-  registered_zipcode: string
-  registered_country: Country
-}
+export type SearchCompanyPreview = apiTypes["CompanyPreview"]
+export type SearchCompanyResult = apiTypes["ResponseData"]
 
 export interface CompanyFormValue {
   activity_description: string | undefined

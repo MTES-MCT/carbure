@@ -40,6 +40,7 @@ const EntityList = () => {
   const entity = useEntity()
 
   const isAdminDC = entity.isExternal && entity.hasAdminRight("DCA")
+  const canWrite = entity.canWrite()
   const canAdd =
     entity.isAdmin ||
     entity.hasAdminRight(ExtAdminPagesEnum.AIRLINE) ||
@@ -77,7 +78,7 @@ const EntityList = () => {
               },
             ])}
           />
-          {canAdd && (
+          {canWrite && canAdd && (
             <Button
               asideX
               variant="primary"

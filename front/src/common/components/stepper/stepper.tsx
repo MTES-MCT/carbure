@@ -4,10 +4,11 @@ import {
 } from "@codegouvfr/react-dsfr/Stepper"
 import styles from "./stepper.module.css"
 import cl from "clsx"
-import { Button } from "../button2"
+import { Button, ButtonProps } from "../button2"
 import { useStepper } from "./stepper.provider"
 import { useTranslation } from "react-i18next"
-import { useMutation } from "common/hooks/async"
+import { PropsWithChildren } from "react"
+import { Form, FormProps } from "../form2"
 
 type AdditionalStepperProps = {
   marginBottom?: boolean
@@ -30,29 +31,25 @@ export const BaseStepper = ({
   )
 }
 
-const StepperNextButton = () => {
-  const { goToNextStep, currentStep, nextStep } = useStepper()
+type StepperNextButtonProps = Pick<
+  ButtonProps,
+  "disabled" | "loading" | "nativeButtonProps" | "onClick" | "type"
+>
+
+const StepperNextButton = ({ loading, ...props }: StepperNextButtonProps) => {
+  const { nextStep, mutation } = useStepper()
   const { t } = useTranslation()
-  const mutation = useMutation(async () => {
-    if (currentStep?.onClick) {
-      await currentStep.onClick()
-    }
-    goToNextStep()
-  })
+
   if (!nextStep) return null
 
   return (
     <Button
       priority="secondary"
-      onClick={mutation.execute}
-      disabled={
-        currentStep.allowNextStep !== undefined
-          ? !currentStep.allowNextStep
-          : false
-      }
       iconId="ri-arrow-right-s-line"
       iconPosition="right"
-      loading={mutation.loading}
+      type="submit"
+      loading={loading ?? mutation.loading}
+      {...props}
     >
       {t("Suivant")}
     </Button>
@@ -76,6 +73,27 @@ const StepperPreviousButton = () => {
   )
 }
 
+type StepperFormProps<T> = Exclude<FormProps<T>, "id"> & {
+  id: string
+} & PropsWithChildren
+
+const StepperForm = <T,>({ children, ...props }: StepperFormProps<T>) => {
+  const { currentStep, goToNextStep, mutation: onSubmitMutation } = useStepper()
+
+  const onSubmit = async () => {
+    if (currentStep.onSubmit) {
+      await onSubmitMutation.execute()
+    }
+    goToNextStep()
+  }
+
+  return (
+    <Form onSubmit={onSubmit} {...props}>
+      {children}
+    </Form>
+  )
+}
+
 /**
  * Stepper with provider (used to simplify the usage of the stepper)
  */
@@ -95,3 +113,4 @@ export const Stepper = (props: AdditionalStepperProps) => {
 
 Stepper.Next = StepperNextButton
 Stepper.Previous = StepperPreviousButton
+Stepper.Form = StepperForm

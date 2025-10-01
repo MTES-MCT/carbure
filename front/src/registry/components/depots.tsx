@@ -6,6 +6,7 @@ import Table from "common/components/table"
 import { useQuery } from "common/hooks/async"
 import { Fragment, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
+import { useDepotTypeLabels } from "settings/pages/delivery-site/delivery-site.hooks"
 
 const Depots = () => {
   const { t } = useTranslation()
@@ -14,6 +15,8 @@ const Depots = () => {
     key: "depots",
     params: [query, true],
   })
+
+  const depotTypeLabels = useDepotTypeLabels()
 
   const depotsData = depots.result ?? []
   const isEmpty = depotsData.length === 0
@@ -44,6 +47,12 @@ const Depots = () => {
               header: t("Dépôt"),
               cell: (e) => e.name,
               orderBy: (e) => e.name,
+            },
+            {
+              key: "type",
+              header: t("Type"),
+              cell: (e) => depotTypeLabels[e.site_type!] ?? "-",
+              orderBy: (e) => depotTypeLabels[e.site_type!] ?? "",
             },
             {
               key: "city",

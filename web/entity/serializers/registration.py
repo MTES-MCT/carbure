@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 
 class SeachCompanySerializer(serializers.Serializer):
-    registration_id = serializers.CharField(max_length=9, required=True)  # SIREN
+    registration_id = serializers.CharField(required=True)  # SIREN or SIRET
 
 
 class RegistrationCountrySerializer(serializers.Serializer):
@@ -20,6 +20,7 @@ class CompanyPreviewSerializer(serializers.Serializer):
     registered_city = serializers.CharField(max_length=255)
     registered_zipcode = serializers.CharField(max_length=20)
     registered_country = RegistrationCountrySerializer()
+    department_code = serializers.CharField(max_length=5)
 
 
 class WarningSerializer(serializers.Serializer):

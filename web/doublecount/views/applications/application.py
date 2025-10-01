@@ -1,48 +1,46 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import RetrieveModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import Entity, UserRights
-from core.permissions import HasAdminRights, HasUserRights
+from core.models import Entity
 from doublecount.filters import ApplicationFilter
 from doublecount.models import DoubleCountingApplication
+from doublecount.permissions import (
+    HasDoubleCountingAdminRights,
+    HasDoubleCountingAdminWriteRights,
+    HasProducerRights,
+    HasProducerWriteRights,
+)
 from doublecount.serializers import DoubleCountingApplicationSerializer
 from doublecount.views.applications.mixins import ActionMixin
 
 
 class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
-    queryset = DoubleCountingApplication.objects.none()
+    queryset = DoubleCountingApplication.objects.all()
     serializer_class = DoubleCountingApplicationSerializer
     pagination_class = None
     lookup_field = "id"
     filterset_class = ApplicationFilter
-    permission_classes = (
-        IsAuthenticated,
-        HasUserRights(None, [Entity.PRODUCER, Entity.ADMIN]),
-    )
+    permission_classes = [HasProducerRights | HasDoubleCountingAdminRights]
 
     def get_permissions(self):
-        # TODO fix permissions if needed
-        if self.action in ["add", "upload_files", "delete_file"]:
-            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.PRODUCER])]
-        if self.action in ["list_admin", "export", "approve", "update_approved_quotas"]:
-            return [HasAdminRights()]
+        if self.action in ["check_file", "add", "upload_files", "delete_file"]:
+            return [HasProducerWriteRights()]
+        if self.action in ["list_admin", "export"]:
+            return [HasDoubleCountingAdminRights()]
+        if self.action in ["approve", "reject", "generate_decision", "update_approved_quotas"]:
+            return [HasDoubleCountingAdminWriteRights()]
 
         return super().get_permissions()
 
     def get_queryset(self):
-        queryset = DoubleCountingApplication.objects.none()
-        entity_id = self.request.query_params.get("entity_id", self.request.data.get("entity_id"))
-        entity = Entity.objects.get(pk=int(entity_id))
+        queryset = super().get_queryset()
+        entity = self.request.entity
 
-        if entity.entity_type == Entity.ADMIN:
-            queryset = DoubleCountingApplication.objects.all()
-        elif entity.entity_type == Entity.PRODUCER:
+        if entity.entity_type == Entity.PRODUCER:
             queryset = DoubleCountingApplication.objects.filter(producer=entity)
 
         queryset = queryset.select_related("production_site").prefetch_related("production")
-        self.applications = queryset
         return queryset
 
     @extend_schema(

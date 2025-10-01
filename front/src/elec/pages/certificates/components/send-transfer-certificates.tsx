@@ -5,26 +5,35 @@ import { Form, useForm } from "common/components/form2"
 import { NumberInput } from "common/components/inputs2"
 import { Notice } from "common/components/notice"
 import { usePortal } from "common/components/portal"
-import { EntityPreview, ExtendedUnit } from "common/types"
-import { formatUnit } from "common/utils/formatters"
+import { EntityPreview } from "common/types"
 import { useTranslation } from "react-i18next"
-import {
-  createTransferCertificate,
-  getClients,
-  getProvisionCertificateBalance,
-} from "../api"
+import { createTransferCertificate, getClients } from "../api"
 import useEntity from "common/hooks/entity"
 import { normalizeEntityPreview } from "common/utils/normalizers"
-import { useMutation, useQuery } from "common/hooks/async"
+import { useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { getTransferErrorLabel } from "../utils"
 
-export const SendTransferCertificates = () => {
+export interface SendTransferCertificatesProps {
+  balance: number
+  formattedBalance: string
+}
+
+export const SendTransferCertificates = ({
+  balance,
+  formattedBalance,
+}: SendTransferCertificatesProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
   function showDialog() {
-    portal((close) => <SendTransferCertificatesDialog onClose={close} />)
+    portal((close) => (
+      <SendTransferCertificatesDialog
+        onClose={close}
+        balance={balance}
+        formattedBalance={formattedBalance}
+      />
+    ))
   }
 
   return (
@@ -36,10 +45,14 @@ export const SendTransferCertificates = () => {
 
 type SendTransferCertificatesDialogProps = {
   onClose: () => void
+  balance: number
+  formattedBalance: string
 }
 
 const SendTransferCertificatesDialog = ({
   onClose,
+  balance,
+  formattedBalance,
 }: SendTransferCertificatesDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -48,11 +61,6 @@ const SendTransferCertificatesDialog = ({
   const form = useForm({
     energy_amount: 0 as number | undefined,
     client: undefined as EntityPreview | undefined,
-  })
-
-  const balanceResponse = useQuery(getProvisionCertificateBalance, {
-    key: "elec-provision-certificate-balance",
-    params: [entity.id],
   })
 
   const transferResponse = useMutation(createTransferCertificate, {
@@ -89,8 +97,6 @@ const SendTransferCertificatesDialog = ({
       )
     }
   }
-
-  const balance = balanceResponse.result?.data?.balance ?? 0
 
   return (
     <Dialog
@@ -138,7 +144,7 @@ const SendTransferCertificatesDialog = ({
 
         <Notice>
           {t("{{balance}} d'énergie disponible au total", {
-            balance: formatUnit(balance, ExtendedUnit.MWh),
+            balance: formattedBalance,
           })}
         </Notice>
 

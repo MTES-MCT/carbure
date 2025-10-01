@@ -79,24 +79,7 @@ class HasAdminRights(BasePermission):
 # User rights
 
 
-class BaseEntityPermission(BasePermission):
-    def get_user_rights(self, request, entity):
-        try:
-            rights = UserRights.objects.get(entity=entity, user=request.user)
-        except Exception:
-            return None
-        return rights
-
-
-class IsVerifiedUser(BasePermission):
-    def has_permission(self, request, view):
-        user = request.user
-        if not user or user.is_anonymous:
-            return False
-        return user.is_authenticated and user.is_verified()
-
-
-class HasUserRights(BaseEntityPermission):
+class HasUserRights(BasePermission):
     role = None
     entity_type = None
 
@@ -144,24 +127,6 @@ class HasUserRights(BaseEntityPermission):
         if isinstance(self.role, list) and user_role not in self.role:
             return False
         return True
-
-
-class OrPermission(BasePermission):
-    """
-    Combines multiple permission classes using OR logic.
-    The request is allowed if any of the provided permissions are satisfied.
-    """
-
-    def __init__(self, *permission_classes):
-        self.permission_classes = permission_classes
-
-    def has_permission(self, request, view):
-        # Instantiate each permission class and check if any are satisfied
-        return any(permission().has_permission(request, view) for permission in self.permission_classes)
-
-    def has_object_permission(self, request, view, obj):
-        # Instantiate each permission class and check if any object-level permission is satisfied
-        return any(permission().has_object_permission(request, view, obj) for permission in self.permission_classes)
 
 
 # static types

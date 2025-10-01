@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from core.models import Entity, ExternalAdminRights
-from core.permissions.user_rights import HasAdminRights
-from doublecount.serializers import EntitySerializer
+from core.permissions import HasAdminRights
+from core.serializers import EntitySerializer
 from entity.services.enable_entity import enable_entity as enable_entity_service
 from entity.services.get_administrated_entities import get_administrated_entities
 

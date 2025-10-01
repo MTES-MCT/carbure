@@ -33,6 +33,8 @@
   "delivery_site_country": "Pays de livraison",
   "delivery_date": "Date de livraison",
   "free_field": "Champ libre",
+  "site_name": "Nom du site",
+  "customs_id": "Identifiant officiel",
 
   "producer": "Producteur",
   "sanitary_approval_number": "N° Agrément sanitaire",

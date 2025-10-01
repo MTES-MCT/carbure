@@ -4,7 +4,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
 from core.models import Entity, UserRights
-from core.permissions import HasAdminRights, HasUserRights, OrPermission
+from core.permissions import HasAdminRights, HasUserRights
 from entity.serializers import EntitySiteSerializer
 from transactions.models import Depot, EntitySite
 
@@ -14,18 +14,13 @@ from .mixins import DepotActionMixin
 class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
     serializer_class = EntitySiteSerializer
     pagination_class = None
-    permission_classes = []
+    permission_classes = [HasUserRights | HasAdminRights]
 
     def get_permissions(self):
-        # TODO fix permissions if needed
-        if self.action in [
-            "add",
-            "create_depot",
-            "delete_depot",
-        ]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW], None)]
+        if self.action in ["add", "create_depot", "delete_depot"]:
+            return [HasUserRights(role=[UserRights.ADMIN, UserRights.RW])]
 
-        return [OrPermission(lambda: HasUserRights(), lambda: HasAdminRights(allow_external=[]))]
+        return super().get_permissions()
 
     def get_queryset(self):
         return EntitySite.objects.all()
@@ -52,7 +47,7 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
     def list(self, request):
         entity_id = self.request.query_params.get("entity_id")
         entity = Entity.objects.get(id=entity_id)
-        if entity.entity_type == Entity.ADMIN:
+        if entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
             entity_id = self.request.query_params.get("company_id")
 
         entity = Entity.objects.get(id=entity_id)
@@ -62,8 +57,6 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
             return Response(serializer.data)
         except Exception:
             return Response(
-                {
-                    "message": "Could not find entity's delivery sites",
-                },
+                {"message": "Could not find entity's delivery sites"},
                 status=status.HTTP_400_BAD_REQUEST,
             )

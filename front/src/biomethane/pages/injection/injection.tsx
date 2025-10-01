@@ -75,7 +75,7 @@ export const BiomethaneInjectionPage = () => {
             {value.is_different_from_production_site && (
               <>
                 <TextInput
-                  label={t("Adresse de la société (Numéro et rue)")}
+                  label={t("Adresse du site d'injection (Numéro et rue)")}
                   {...bind("company_address")}
                   readOnly={!isEditing}
                   required
@@ -87,7 +87,7 @@ export const BiomethaneInjectionPage = () => {
                   readOnly={!isEditing}
                 />
                 <TextInput
-                  label={t("Ville")}
+                  label={t("Commune")}
                   {...bind("city")}
                   required
                   readOnly={!isEditing}

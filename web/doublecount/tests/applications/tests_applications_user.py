@@ -5,12 +5,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Entity, Pays, UserRights
+from core.models import Entity, Pays
 from core.tests_utils import setup_current_user
 from doublecount.errors import DoubleCountingError
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.models import DoubleCountingApplication
 from doublecount.views.applications.mixins.add_application import DoubleCountingAddError
+from entity.factories.entity import EntityFactory
 from transactions.models import ProductionSite
 
 
@@ -33,11 +34,17 @@ class DoubleCountApplicationsTest(TestCase):
     ]
 
     def setUp(self):
-        # self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
+        self.producer = EntityFactory.create(name="Le Super Producteur 1", entity_type=Entity.PRODUCER)
+        self.producer2 = EntityFactory.create(name="Le Super Producteur 2", entity_type=Entity.PRODUCER)
 
-        self.producer, _ = Entity.objects.update_or_create(name="Le Super Producteur 1", entity_type=Entity.PRODUCER)
-        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.producer, "RW")], True)
-        UserRights.objects.update_or_create(user=self.user, entity=self.producer, defaults={"role": UserRights.ADMIN})
+        self.user = setup_current_user(
+            self,
+            "tester@carbure.local",
+            "Tester",
+            "gogogo",
+            [(self.producer, "ADMIN"), (self.producer2, "ADMIN")],
+            True,
+        )
 
         self.production_site = ProductionSite.objects.first()
         self.production_site.address = "1 rue de la Paix"
@@ -328,6 +335,14 @@ class DoubleCountApplicationsTest(TestCase):
         assert production_site["id"] == self.production_site.id
         assert production_site["inputs"] == []
         assert production_site["certificates"] == []
+
+    def test_only_owner_can_access_application_details(self):
+        app = self.create_application()
+        response = self.client.get(
+            reverse("double-counting-applications-detail", kwargs={"id": app.id}),
+            {"entity_id": self.producer2.id, "dca_id": app.id},
+        )
+        assert response.status_code == 404
 
     ######################@
 

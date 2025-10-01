@@ -1,11 +1,11 @@
 import datetime
 import os
 import re
-import traceback
 import unicodedata
 from typing import List
 
 import pandas as pd
+import sentry_sdk
 from django.conf import settings
 from django.db import transaction
 from django.db.models.aggregates import Count, Sum
@@ -15,6 +15,7 @@ from certificates.models import DoubleCountingRegistration
 from core.common import CarbureException
 from core.helpers import send_mail
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays, UserRights
+from core.serializers import BiofuelSerializer, FeedStockSerializer
 from core.utils import CarbureEnv
 from doublecount.dc_sanity_checks import (
     check_dc_globally,
@@ -39,12 +40,10 @@ from doublecount.parser.dc_parser import (
     parse_dc_excel,
 )
 from doublecount.serializers import (
-    BiofuelSerializer,
     DoubleCountingProductionHistorySerializer,
     DoubleCountingProductionSerializer,
     DoubleCountingSourcingHistorySerializer,
     DoubleCountingSourcingSerializer,
-    FeedStockSerializer,
 )
 
 today = datetime.date.today()
@@ -393,12 +392,6 @@ def load_dc_filepath(file):
 
 def load_dc_period(start_year):
     errors = []
-    # if start_year == 0:
-    #     errors.append(
-    #         error(
-    #             DoubleCountingError.MISSING_PERIOD,
-    #         )
-    #     )
 
     end_year = start_year + 1
     start = datetime.date(end_year - 1, 1, 1)
@@ -462,7 +455,7 @@ def check_dc_file(file):
             excel_error = error(DoubleCountingError.BAD_WORKSHEET_NAME, is_blocking=True, meta=e.meta)
 
     except Exception as e:
-        traceback.print_exc()
+        sentry_sdk.capture_exception(e)
 
         # bad tab name
         sheetNameRegexp = r"'Worksheet (.*) does not exist.'"

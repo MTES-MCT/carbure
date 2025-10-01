@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-02 09:57+0200\n"
+"POT-Creation-Date: 2025-09-16 18:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: FRENCH <LL@li.org>\n"
@@ -16,17 +16,17 @@ msgstr ""
 msgid "Email"
 msgstr "Email"
 
-#: web/auth/serializers/reset_password.py:9
+#: web/auth/serializers/reset_password.py:10
 #: web/auth/serializers/user_creation.py:16
 msgid "Password"
 msgstr ""
 
-#: web/auth/serializers/reset_password.py:10
+#: web/auth/serializers/reset_password.py:11
 #: web/auth/serializers/user_creation.py:17
 msgid "Password confirmation"
 msgstr ""
 
-#: web/auth/serializers/reset_password.py:14
+#: web/auth/serializers/reset_password.py:15
 #: web/auth/serializers/user_creation.py:38
 msgid "The two password fields didn't match."
 msgstr ""
@@ -63,64 +63,60 @@ msgstr "The security code has expired. Please request a new code."
 msgid "Le code de sécurité est incorrect."
 msgstr "The security code is incorrect."
 
-#: web/biomethane/serializers/contract.py:53
+#: web/biomethane/serializers/contract/contract.py:67
 msgid ""
 "Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai."
 msgstr ""
 "The cmax_annualized_value field is mandatory if cmax_annualized is true."
 
-#: web/biomethane/serializers/contract.py:72
-#, python-brace-format
-msgid "Le champ {field} est obligatoire."
-msgstr "The {field} field is mandatory."
+#: web/biomethane/serializers/contract/contract.py:83
+#: web/biomethane/serializers/contract/contract_amendment.py:44
+msgid "La date d'effet doit être postérieure à la date de signature."
+msgstr ""
 
-#: web/biomethane/serializers/contract.py:103
-msgid "Un site contract existe déjà pour cette entité."
-msgstr "A contract site already exists for this entity."
+#: web/biomethane/serializers/contract/contract.py:124
+msgid ""
+"Pour la référence tarifaire 2023, la date de signature doit être postérieure "
+"au 10/06/2023."
+msgstr ""
 
-#: web/biomethane/serializers/contract.py:150
-#, python-brace-format
-msgid "Le champ {field} ne peut pas être modifié une fois le contrat signé."
-msgstr "The {field} field cannot be modified once the contract is signed."
-
-#: web/biomethane/serializers/contract_amendment.py:50
-msgid "Ce champ est obligatoire si amendment_object contient 'OTHER'."
-msgstr "This field is mandatory if amendment_object contains 'OTHER'."
-
-#: web/biomethane/serializers/contract_amendment.py:61
-msgid "Cette entité n'a pas de contrat associé."
-msgstr "This entity has no associated contract."
-
-#: web/biomethane/serializers/digestate/digestate.py:69
-msgid "Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné."
-msgstr "This field is mandatory when 'External platform' is selected."
-
-#: web/biomethane/serializers/digestate/digestate.py:75
-msgid "Ce champ est obligatoire lorsque 'Sur site' est sélectionné."
-msgstr "This field is mandatory when 'On site' is selected."
-
-#: web/biomethane/serializers/digestate/digestate.py:88
-msgid "Un digestat existe déjà pour cette entité."
-msgstr "A digestate already exists for this entity."
-
-#: web/biomethane/serializers/digestate/spreading.py:29
-msgid "Année manquante."
-msgstr "Missing year."
-
-#: web/biomethane/serializers/digestate/spreading.py:33
-msgid "Digestat manquant."
-msgstr "Missing digestate."
-
-#: web/biomethane/serializers/injection_site.py:22
-#: web/biomethane/serializers/injection_site.py:30
+#: web/biomethane/serializers/contract/contract.py:129
+#: web/biomethane/serializers/injection_site/injection_site.py:24
+#: web/biomethane/serializers/injection_site/injection_site.py:30
 msgid "Ce champ est obligatoire."
 msgstr "This field is mandatory."
 
-#: web/biomethane/serializers/production_unit.py:75
+#: web/biomethane/serializers/contract/contract_amendment.py:37
+msgid "Ce champ est obligatoire si amendment_object contient 'OTHER'."
+msgstr "This field is mandatory if amendment_object contains 'OTHER'."
+
+#: web/biomethane/serializers/contract/contract_amendment.py:56
+msgid "Cette entité n'a pas de contrat associé."
+msgstr "This entity has no associated contract."
+
+#: web/biomethane/serializers/digestate/digestate.py:45
+msgid "Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné."
+msgstr "This field is mandatory when 'External platform' is selected."
+
+#: web/biomethane/serializers/digestate/digestate.py:51
+msgid "Ce champ est obligatoire lorsque 'Sur site' est sélectionné."
+msgstr "This field is mandatory when 'On site' is selected."
+
+#: web/biomethane/serializers/digestate/spreading.py:26
+msgid "Digestat manquant."
+msgstr "Missing digestate."
+
+#: web/biomethane/serializers/energy/monthly_report.py:31
+#, fuzzy
+#| msgid "Cette entité n'a pas de contrat associé."
+msgid "Cette entité n'a pas de déclaration énergétique pour cette année."
+msgstr "This entity has no associated contract."
+
+#: web/biomethane/serializers/production_unit/production_unit.py:38
 msgid "Ce champ est obligatoire lorsque l'agrément sanitaire est activé."
 msgstr "This field is mandatory when sanitary approval is enabled."
 
-#: web/biomethane/serializers/production_unit.py:81
+#: web/biomethane/serializers/production_unit/production_unit.py:43
 msgid ""
 "Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
 msgstr "This field is mandatory when the hygienization exemption is enabled."
@@ -128,6 +124,11 @@ msgstr "This field is mandatory when the hygienization exemption is enabled."
 #: web/core/admin.py:338
 msgid "Tous"
 msgstr "All"
+
+#: web/core/exceptions.py:7
+#, fuzzy
+msgid "Impossible de supprimer cette ressource car elle est liée à d'autres."
+msgstr "Unable to delete this resource, it is already bound to others."
 
 #: web/elec/api/cpo/charge_points/check_application.py:53
 #, fuzzy, python-format
@@ -231,6 +232,13 @@ msgstr ""
 msgid "La date du relevé ne correspond pas au trimestre traité actuellement."
 msgstr "The reading date does not correspond to the current quarter."
 
+#: web/entity/views/production_sites/production_sites.py:71
+msgid ""
+"Impossible de supprimer ce site de production, des lots de biocarburant y "
+"sont associés."
+msgstr ""
+"Unable to delete this production site, biofuel batches are linked to it."
+
 #: web/saf/views/ticket/mixins/export.py:48
 msgid "tickets"
 msgstr "tickets"
@@ -292,6 +300,23 @@ msgstr ""
 #: web/transactions/api/lots/add.py:14
 msgid "Le lot n'a pas pu être créé."
 msgstr "The lot could not be created."
+
+#~ msgid "Un site contract existe déjà pour cette entité."
+#~ msgstr "A contract site already exists for this entity."
+
+#~ msgid "Un digestat existe déjà pour cette entité."
+#~ msgstr "A digestate already exists for this entity."
+
+#~ msgid "Année manquante."
+#~ msgstr "Missing year."
+
+#, python-brace-format
+#~ msgid "Le champ {field} est obligatoire."
+#~ msgstr "The {field} field is mandatory."
+
+#, python-brace-format
+#~ msgid "Le champ {field} ne peut pas être modifié une fois le contrat signé."
+#~ msgstr "The {field} field cannot be modified once the contract is signed."
 
 #~ msgid "Utilisateur inconnu."
 #~ msgstr "Unknown user."

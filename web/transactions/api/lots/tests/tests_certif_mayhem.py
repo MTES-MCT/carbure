@@ -70,8 +70,6 @@ class LotsCertifMayhemTest(TestCase):
             reverse("transactions-lots-send"),
             {"entity_id": self.producer.id, "selection": [lot.id]},
         )
-        if response.status_code != 200:
-            print(response.json(), response.status_code)
         assert response.status_code == expected_status
         lot = CarbureLot.objects.get(id=lot.id)
         return lot

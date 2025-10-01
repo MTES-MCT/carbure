@@ -72,10 +72,11 @@ export const ApplicationDetailsDialog = () => {
   const application = applicationResponse.result?.data
   const dcaStatus = application?.status ?? DCStatus.PENDING
 
-  const isAdmin = entity?.entity_type === EntityType.Administration
   const hasQuotas = !application?.production.some(
     (p) => p.approved_quota === -1
   )
+
+  const canWrite = entity.canWrite()
 
   const isPendingFiles =
     application?.has_dechets_industriels && application.documents.length <= 1
@@ -189,47 +190,44 @@ export const ApplicationDetailsDialog = () => {
           </>
         }
         footer={
-          <>
-            {!applicationResponse.loading && (
-              <>
-                <Button
-                  loading={rejectApplication.loading}
-                  disabled={applicationResponse.loading}
-                  customPriority="danger"
-                  iconId="ri-close-line"
-                  onClick={submitReject}
-                >
-                  <Trans>Refuser</Trans>
-                </Button>
-                <Button
-                  disabled={applicationResponse.loading || !hasQuotas}
-                  customPriority="success"
-                  iconId="ri-check-line"
-                  onClick={displayAcceptApplicationDetailsDialog}
-                >
-                  <Trans>Valider les quotas</Trans>
-                </Button>
+          canWrite &&
+          !applicationResponse.loading && (
+            <>
+              <Button
+                loading={rejectApplication.loading}
+                disabled={applicationResponse.loading}
+                customPriority="danger"
+                iconId="ri-close-line"
+                onClick={submitReject}
+              >
+                <Trans>Refuser</Trans>
+              </Button>
+              <Button
+                disabled={applicationResponse.loading || !hasQuotas}
+                customPriority="success"
+                iconId="ri-check-line"
+                onClick={displayAcceptApplicationDetailsDialog}
+              >
+                <Trans>Valider les quotas</Trans>
+              </Button>
 
-                <Button
-                  iconId="ri-download-line"
-                  priority="secondary"
-                  onClick={displayGenerateDecisionDialog}
-                  disabled={applicationResponse.loading || !hasQuotas}
-                >
-                  <Trans>Générer la décision</Trans>
-                </Button>
-                {isAdmin && (
-                  <Button
-                    loading={approveQuotas.loading}
-                    disabled={!quotasIsUpdated}
-                    onClick={submitQuotas}
-                  >
-                    <Trans>Enregistrer</Trans>
-                  </Button>
-                )}
-              </>
-            )}
-          </>
+              <Button
+                iconId="ri-download-line"
+                priority="secondary"
+                onClick={displayGenerateDecisionDialog}
+                disabled={applicationResponse.loading || !hasQuotas}
+              >
+                <Trans>Générer la décision</Trans>
+              </Button>
+              <Button
+                loading={approveQuotas.loading}
+                disabled={!quotasIsUpdated}
+                onClick={submitQuotas}
+              >
+                <Trans>Enregistrer</Trans>
+              </Button>
+            </>
+          )
         }
       >
         {application && (

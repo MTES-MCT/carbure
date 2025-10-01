@@ -96,10 +96,14 @@ export const DeliverySiteForm = ({
       site_type: values.site_type!,
       address: values.address!,
       postal_code: values.postal_code!,
-      electrical_efficiency: isPowerPlant
-        ? values.electrical_efficiency
-        : undefined,
-      thermal_efficiency: isHeatPlant ? values.thermal_efficiency : undefined,
+      electrical_efficiency:
+        isPowerPlant || isCogenerationPlant
+          ? values.electrical_efficiency
+          : undefined,
+      thermal_efficiency:
+        isHeatPlant || isCogenerationPlant
+          ? values.thermal_efficiency
+          : undefined,
       useful_temperature: isCogenerationPlant
         ? values.useful_temperature
         : undefined!,

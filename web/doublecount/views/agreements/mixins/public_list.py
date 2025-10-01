@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationPublicSerializer
 
 
@@ -14,8 +15,9 @@ class AgreementPublicListActionMixin:
     )
     @action(methods=["get"], detail=False, url_path="agreement-public")
     def agreements_public_list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = DoubleCountingRegistration.objects.all()
         year = datetime.now().year
+
         agreements_active = (
             queryset.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year))
             .select_related("production_site")

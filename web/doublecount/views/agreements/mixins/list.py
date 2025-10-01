@@ -35,7 +35,7 @@ class ListActionMixin(ListModelMixin):
         entity_id = self.request.query_params.get("entity_id")
         company_id = self.request.query_params.get("company_id")
         entity = Entity.objects.get(id=entity_id)
-        if entity.entity_type == Entity.ADMIN:
+        if entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
             entity_id = company_id
 
         producer_applications = DoubleCountingApplication.objects.filter(producer_id=entity_id)

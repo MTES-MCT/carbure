@@ -21,7 +21,7 @@ import { Autocomplete } from "common/components/autocomplete2"
 
 import { Dialog } from "common/components/dialog2"
 import { TextInput, Checkbox, RadioGroup } from "common/components/inputs2"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import { Divider, Grid } from "common/components/scaffold"
 import { TagAutocomplete } from "common/components/tag-autocomplete2"
 import { useMutation } from "common/hooks/async"
@@ -100,6 +100,8 @@ export const ProductionSiteForm = ({
   const { t } = useTranslation()
   const notify = useNotify()
   const entity = useEntity()
+  const notifyError = useNotifyError()
+
   const addProdSite = useMutation(addProductionSite, {
     invalidates: ["production-sites"],
 
@@ -110,10 +112,8 @@ export const ProductionSiteForm = ({
       onClose?.()
     },
 
-    onError: () => {
-      notify(t("Impossible de créer le site de production."), {
-        variant: "danger",
-      })
+    onError: (e) => {
+      notifyError(e)
     },
   })
 
@@ -126,10 +126,8 @@ export const ProductionSiteForm = ({
       })
     },
 
-    onError: () => {
-      notify(t("Impossible de modifier le site de production."), {
-        variant: "danger",
-      })
+    onError: (e) => {
+      notifyError(e)
     },
   })
 
@@ -332,7 +330,6 @@ export const ProductionSiteForm = ({
           defaultOptions={value.certificates}
           getOptions={(search) => common.findMyCertificates(search, { entity_id: entity.id })} // prettier-ignore
           {...bind("certificates")}
-          required
         />
       </Form>
       {!readOnly && (
@@ -357,7 +354,11 @@ async function addProductionSite(
   entity: Entity,
   form: ProductionSiteFormValue
 ) {
-  const res = await api.addProductionSite(
+  const inputs = form.matieres_premieres?.map((mp) => mp.code) ?? []
+  const outputs = form.biocarburants?.map((bc) => bc.code) ?? []
+  const certificates = form.certificates ?? []
+
+  return api.addProductionSite(
     entity.id,
     form.name!,
     form.date_mise_en_service!,
@@ -371,19 +372,11 @@ async function addProductionSite(
     form.dc_reference!,
     form.manager_name!,
     form.manager_phone!,
-    form.manager_email!
+    form.manager_email!,
+    inputs,
+    outputs,
+    certificates
   )
-
-  const psite = res.data!
-
-  const mps = form.matieres_premieres?.map((mp) => mp.code)
-  await api.setProductionSiteFeedstock(entity.id, psite!.id, mps ?? [])
-
-  const bcs = form.biocarburants?.map((bc) => bc.code)
-  await api.setProductionSiteBiofuel(entity.id, psite!.id, bcs ?? [])
-
-  const cs = form.certificates ?? []
-  await api.setProductionSiteCertificates(entity.id, psite!.id, cs)
 }
 
 async function updateProductionSite(
@@ -391,7 +384,11 @@ async function updateProductionSite(
   psite: ProductionSiteDetails,
   form: ProductionSiteFormValue
 ) {
-  await api.updateProductionSite(
+  const inputs = form.matieres_premieres?.map((mp) => mp.code) ?? []
+  const outputs = form.biocarburants?.map((bc) => bc.code) ?? []
+  const certificates = form.certificates ?? []
+
+  return api.updateProductionSite(
     entity.id,
     psite.id,
     form.name!,
@@ -406,15 +403,9 @@ async function updateProductionSite(
     form.dc_reference!,
     form.manager_name!,
     form.manager_phone!,
-    form.manager_email!
+    form.manager_email!,
+    inputs,
+    outputs,
+    certificates
   )
-
-  const mps = form.matieres_premieres?.map((mp) => mp.code)
-  await api.setProductionSiteFeedstock(entity.id, psite!.id, mps ?? [])
-
-  const bcs = form.biocarburants?.map((bc) => bc.code)
-  await api.setProductionSiteBiofuel(entity.id, psite!.id, bcs ?? [])
-
-  const cs = form.certificates ?? []
-  await api.setProductionSiteCertificates(entity.id, psite!.id, cs)
 }

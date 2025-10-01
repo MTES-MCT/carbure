@@ -2,14 +2,6 @@ import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
 import { useRoutes } from "common/hooks/routes"
 import useEntity from "common/hooks/entity"
-import {
-  FileDownloadFill,
-  FileDownloadLine,
-  FileTextFill,
-  FileTextLine,
-  HomeFill,
-  HomeLine,
-} from "common/components/icon"
 import { apiTypes } from "common/services/api-fetch.types"
 
 type DoubleCountParams = Pick<
@@ -29,8 +21,8 @@ export const useDoubleCount = (params?: DoubleCountParams) => {
       {
         path: routes.DOUBLE_COUNTING().AGREEMENTS,
         title: t("Agréments"),
-        icon: HomeLine,
-        iconActive: HomeFill,
+        icon: "ri-home-4-line",
+        iconActive: "ri-home-4-fill",
       },
     ],
   }
@@ -43,14 +35,14 @@ export const useDoubleCount = (params?: DoubleCountParams) => {
         path: routes.ADMIN().DOUBLE_COUNT.APPLICATIONS,
         title: t("En attente"),
         additionalInfo: params?.doublecount_agreement_pending,
-        icon: FileTextLine,
-        iconActive: FileTextFill,
+        icon: "ri-file-text-line",
+        iconActive: "ri-file-text-fill",
       },
       {
         path: routes.ADMIN().DOUBLE_COUNT.AGREEMENTS,
         title: t("Agréments actifs"),
-        icon: FileDownloadLine,
-        iconActive: FileDownloadFill,
+        icon: "ri-file-download-line",
+        iconActive: "ri-file-download-fill",
       },
     ],
   }
