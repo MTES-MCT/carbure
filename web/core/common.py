@@ -10,6 +10,7 @@ import openpyxl
 import pandas as pd
 from django.http import JsonResponse
 from pandas._typing import Scalar
+from rest_framework import serializers
 
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import Carbure, CarbureUnit
@@ -175,6 +176,18 @@ def get_transaction_distance(tx):
         return res
 
 
+class BiofuelExcelSerializer(serializers.Serializer):
+    carbure_stock_id = serializers.CharField(required=False, default="")
+    champ_libre = serializers.CharField(source="free_field", required=False, default="")
+    production_site_reference = serializers.CharField(source="production_site_certificate", required=False, default="")
+
+
+def convert_data_with_serializer(row: dict, Serializer) -> dict:
+    serializer = Serializer(data=row)
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data
+
+
 def convert_template_row_to_formdata(entity, prefetched_data, filepath):
     wb = openpyxl.load_workbook(filepath, data_only=True)
     sheet = wb.worksheets[0]
@@ -187,7 +200,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
 
     for row in df.iterrows():
         lot_row = row[1]
-        lot = {}
+        lot = convert_data_with_serializer(lot_row, BiofuelExcelSerializer)
 
         if lot_row.get("volume", "") == "" and (lot_row.get("unit", "") == "" or lot_row.get("quantity", "") == ""):
             # ignore rows with no volume or no unit+quantity
@@ -210,11 +223,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country  # noqa: E501
         # biofuel, feedstock, country_of_origin
 
-        lot["carbure_stock_id"] = lot_row.get("carbure_stock_id", "").strip()
-        lot["free_field"] = lot_row.get("champ_libre", "")
-
         # Production
-        lot["production_site_certificate"] = lot_row.get("production_site_reference", "").strip()
         lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", None).strip()
         producer = lot_row.get("producer", "").strip()
         production_site = lot_row.get("production_site", "").strip()
