@@ -1,4 +1,4 @@
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import {
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputQuery,
@@ -30,3 +30,9 @@ export const getSupplyPlanInputFilters = async (
       },
     })
     .then((res) => res.data ?? [])
+
+export function downloadSupplyPlan(query: BiomethaneSupplyInputQuery) {
+  return download(`/biomethane/supply-input/export/`, {
+    ...query,
+  })
+}

@@ -5,7 +5,11 @@ import { Select } from "common/components/selects2"
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { getSupplyPlanInputs, getSupplyPlanYears } from "./api"
+import {
+  getSupplyPlanInputs,
+  getSupplyPlanYears,
+  downloadSupplyPlan,
+} from "./api"
 import useEntity from "common/hooks/entity"
 import { useGetFilterOptions, useSupplyPlanColumns } from "./supply-plan.hooks"
 import { useQuery } from "common/hooks/async"
@@ -18,6 +22,7 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneSupplyInputQueryBuilder } from "./types"
 import { Pagination } from "common/components/pagination2"
+import { ExportButton } from "common/components/export"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
@@ -74,14 +79,7 @@ export const SupplyPlan = () => {
           >
             {t("Ajouter un intrant")}
           </Button>
-          <Button
-            onClick={() => {}}
-            iconId="ri-download-line"
-            asideX
-            priority="secondary"
-          >
-            {t("Exporter")}
-          </Button>
+          <ExportButton query={query} download={downloadSupplyPlan} />
         </ActionBar>
         <FilterMultiSelect2
           filterLabels={filterLabels}

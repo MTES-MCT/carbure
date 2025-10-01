@@ -1534,6 +1534,28 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneSupplyInputCreate"
           description: ""
+  /api/biomethane/supply-input/export/:
+    get:
+      operationId: biomethane_supply_input_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInputExport"
+          description: ""
   /api/biomethane/supply-input/filters/:
     get:
       operationId: biomethane_supply_input_filters_retrieve
@@ -1558,13 +1580,19 @@ paths:
           name: entity_id
           schema:
             type: integer
-          description: Authorised entity ID.
+          description: Entity ID
           required: true
         - in: query
           name: filter
           schema:
             type: string
+            enum:
+              - category
+              - source
+              - type
+              - year
           description: Filter string to apply
+          required: true
         - name: ordering
           required: false
           in: query
@@ -1607,12 +1635,98 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - ETBE
-                    - Ethanol
-                    - EMHV
-                    - B100
-                    - HVOE
+                    - category
+                    - source
+                    - type
+                    - year
                   summary: Example of filters response.
+          description: ""
+  /api/biomethane/supply-plan/export/:
+    get:
+      operationId: biomethane_supply_plan_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInputExport"
+          description: ""
+  /api/biomethane/supply-plan/import/:
+    post:
+      operationId: import_supply_plan_from_excel
+      description: "Upload and process an Excel file to create supply plan entries. "
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneUploadExcelRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneUploadExcelRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneUploadExcelRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                ExampleOfSuccessfulImportResponse.:
+                  value:
+                    rows_imported: 25
+                  summary: Example of successful import response.
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                ExampleOfValidationErrorResponse.:
+                  value:
+                    validation_errors:
+                      - row: 3
+                        errors:
+                          volume:
+                            - This field is required.
+                      - row: 5
+                        errors:
+                          input_type:
+                            - Invalid input type.
+                    total_errors: 2
+                    total_rows_processed: 10
+                  summary: Example of validation error response.
+                ExampleOfFileErrorResponse.:
+                  value:
+                    file: The file is too large (maximum 10MB)
+                  summary: Example of file error response.
           description: ""
   /api/biomethane/supply-plan/years/:
     get:
@@ -3332,7 +3446,13 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - category
+              - source
+              - type
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: operating_unit
           schema:
@@ -3439,11 +3559,10 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - ETBE
-                    - Ethanol
-                    - EMHV
-                    - B100
-                    - HVOE
+                    - category
+                    - source
+                    - type
+                    - year
                   summary: Example of filters response.
           description: ""
   /api/elec/provision-certificates/import/:
@@ -3851,7 +3970,13 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - category
+              - source
+              - type
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: month
           schema:
@@ -3954,11 +4079,10 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - ETBE
-                    - Ethanol
-                    - EMHV
-                    - B100
-                    - HVOE
+                    - category
+                    - source
+                    - type
+                    - year
                   summary: Example of filters response.
           description: ""
   /api/entities/:
@@ -11645,9 +11769,6 @@ components:
           $ref: "#/components/schemas/CropTypeEnum"
         input_category:
           $ref: "#/components/schemas/InputCategoryEnum"
-        input_type:
-          type: string
-          maxLength: 100
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -11657,9 +11778,6 @@ components:
         volume:
           type: number
           format: double
-        origin_department:
-          type: string
-          maxLength: 3
         average_weighted_distance_km:
           type: number
           format: double
@@ -11668,6 +11786,12 @@ components:
           type: number
           format: double
           nullable: true
+        input_type:
+          type: string
+          maxLength: 100
+        origin_department:
+          type: string
+          maxLength: 3
         origin_country:
           type: integer
       required:
@@ -11688,9 +11812,58 @@ components:
           $ref: "#/components/schemas/CropTypeEnum"
         input_category:
           $ref: "#/components/schemas/InputCategoryEnum"
+        material_unit:
+          $ref: "#/components/schemas/MaterialUnitEnum"
+        dry_matter_ratio_percent:
+          type: number
+          format: double
+          nullable: true
+        volume:
+          type: number
+          format: double
+        average_weighted_distance_km:
+          type: number
+          format: double
+          nullable: true
+        maximum_distance_km:
+          type: number
+          format: double
+          nullable: true
         input_type:
           type: string
           minLength: 1
+          maxLength: 100
+        origin_department:
+          type: string
+          minLength: 1
+          maxLength: 3
+        origin_country:
+          type: integer
+      required:
+        - crop_type
+        - input_category
+        - input_type
+        - material_unit
+        - origin_department
+        - source
+        - volume
+    BiomethaneSupplyInputExport:
+      type: object
+      properties:
+        year:
+          type: integer
+          readOnly: true
+        origin_country:
+          type: string
+          readOnly: true
+        source:
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+        crop_type:
+          $ref: "#/components/schemas/CropTypeEnum"
+        input_category:
+          $ref: "#/components/schemas/InputCategoryEnum"
+        input_type:
+          type: string
           maxLength: 100
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
@@ -11703,7 +11876,6 @@ components:
           format: double
         origin_department:
           type: string
-          minLength: 1
           maxLength: 3
         average_weighted_distance_km:
           type: number
@@ -11713,16 +11885,16 @@ components:
           type: number
           format: double
           nullable: true
-        origin_country:
-          type: integer
       required:
         - crop_type
         - input_category
         - input_type
         - material_unit
+        - origin_country
         - origin_department
         - source
         - volume
+        - year
     BiomethaneSupplyInputSourceEnum:
       enum:
         - INTERNAL
@@ -11731,6 +11903,14 @@ components:
       description: |-
         * `INTERNAL` - Interne
         * `EXTERNAL` - Externe
+    BiomethaneUploadExcelRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
     CarbureLotPublic:
       type: object
       properties:
@@ -15248,10 +15428,6 @@ components:
           $ref: "#/components/schemas/CropTypeEnum"
         input_category:
           $ref: "#/components/schemas/InputCategoryEnum"
-        input_type:
-          type: string
-          minLength: 1
-          maxLength: 100
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -15261,10 +15437,6 @@ components:
         volume:
           type: number
           format: double
-        origin_department:
-          type: string
-          minLength: 1
-          maxLength: 3
         average_weighted_distance_km:
           type: number
           format: double
@@ -15273,6 +15445,14 @@ components:
           type: number
           format: double
           nullable: true
+        input_type:
+          type: string
+          minLength: 1
+          maxLength: 100
+        origin_department:
+          type: string
+          minLength: 1
+          maxLength: 3
         origin_country:
           type: integer
     PatchedElecOperationUpdateRequest:
