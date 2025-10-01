@@ -31,6 +31,7 @@ from .supply_plan import (
     BiomethaneSupplyInputCreateSerializer,
     BiomethaneUploadExcelSerializer,
     BiomethaneSupplyInputCreateFromExcelSerializer,
+    BiomethaneSupplyInputExportSerializer
 )
 
 from .fields import LabelChoiceField, EuropeanFloatField, DepartmentField

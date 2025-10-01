@@ -81,3 +81,12 @@ class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreate
     # Override some fields to handle Excel-specific formats
     origin_country = serializers.SlugRelatedField(slug_field="name", queryset=Pays.objects.all())
     origin_department = DepartmentField(max_length=3)
+
+
+class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
+    year = serializers.IntegerField(source="supply_plan.year", read_only=True)
+    origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
+
+    class Meta:
+        model = BiomethaneSupplyInput
+        exclude = ["id", "supply_plan"]

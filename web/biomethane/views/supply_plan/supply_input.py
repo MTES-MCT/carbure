@@ -9,10 +9,13 @@ from biomethane.models import BiomethaneSupplyInput
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputCreateSerializer,
+    BiomethaneSupplyInputExportSerializer,
     BiomethaneSupplyInputSerializer,
 )
 from core.filters import FiltersActionMixin
 from core.pagination import MetadataPageNumberPagination
+
+from .mixins import ExcelExportActionMixin
 
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
@@ -30,7 +33,14 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
         ),
     ]
 )
-class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin, ListModelMixin, FiltersActionMixin):
+class BiomethaneSupplyInputViewSet(
+    GenericViewSet,
+    CreateModelMixin,
+    UpdateModelMixin,
+    ListModelMixin,
+    FiltersActionMixin,
+    ExcelExportActionMixin,
+):
     queryset = BiomethaneSupplyInput.objects.all()
     filterset_class = BiomethaneSupplyInputFilter
     search_fields = ["input_type", "input_category"]
@@ -45,11 +55,13 @@ class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModel
         return context
 
     def get_filterset_class(self):
-        if self.action == "list":
+        if self.action in ["list", "export_supply_plan_to_excel"]:
             return self.filterset_class
         return BiomethaneSupplyInputCreateFilter
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
             return BiomethaneSupplyInputCreateSerializer
+        elif self.action == "export_supply_plan_to_excel":
+            return BiomethaneSupplyInputExportSerializer
         return BiomethaneSupplyInputSerializer
