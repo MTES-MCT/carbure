@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 
 from edelivery.adapters.zip_utils import unzip_base64_encoded_stream
+from edelivery.ebms.request_responses import BaseRequestResponse
 
 
 class AbstractEdeliveryResponse:
@@ -27,14 +28,19 @@ class ListPendingMessagesResponse(AbstractEdeliveryResponse):
 
 
 class RetrieveMessageResponse(AbstractEdeliveryResponse):
+    NAMESPACES = {
+        "soap": "http://www.w3.org/2003/05/soap-envelope",
+        "ws": "http://eu.domibus.wsplugin/",
+    }
+
     def __init__(self, text):
         super().__init__(text)
         self.contents = unzip_base64_encoded_stream(self.attachment_value())
+        self.request_response = BaseRequestResponse(self.contents)
 
     def attachment_value(self):
-        namespaces = {"soap": "http://www.w3.org/2003/05/soap-envelope", "ws": "http://eu.domibus.wsplugin/"}
-        valueElement = self.parsed_XML.find("soap:Body/ws:retrieveMessageResponse/payload/value", namespaces)
-        return valueElement.text
+        value_element = self.parsed_XML.find("soap:Body/ws:retrieveMessageResponse/payload/value", self.NAMESPACES)
+        return value_element.text
 
 
 class SubmitMessageResponse(AbstractEdeliveryResponse):
