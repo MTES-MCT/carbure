@@ -18,14 +18,14 @@ class ExcelValidationError(Exception):
 
 class ExcelImporter:
     @staticmethod
-    def parse(file, header_row=0, sheet_name=None):
+    def parse(file, header_row=0, sheet_name=0):
         """
         Parse an Excel file and return data as a list of dictionaries.
 
         Args:
             file: Excel file to parse
-            header_row: Row to use as headers (int or string)
-            sheet_name: Sheet name (None for first sheet)
+            header_row: Row to use as headers
+            sheet_name: Sheet name (int or string)
 
         Returns:
             List of dictionaries representing rows
