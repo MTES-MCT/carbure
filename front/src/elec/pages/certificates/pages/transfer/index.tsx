@@ -16,6 +16,7 @@ import { useQuery } from "common/hooks/async"
 import {
   ElecCertificateSnapshot,
   TransferCertificate,
+  TransferCertificateFilter,
   TransferCertificatesQueryBuilder,
 } from "../../types"
 import {
@@ -76,7 +77,7 @@ export const TransferCertificates = ({
   }
 
   const getTransferCertificateFilter = (filter: string) =>
-    getTransferCertificateFilters(filter, query)
+    getTransferCertificateFilters(filter as TransferCertificateFilter, query)
 
   return (
     <>
