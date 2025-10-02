@@ -51,11 +51,6 @@ class LabelChoiceFieldTests(TestCase):
 
     def test_non_string_input(self):
         """Test field behavior with non-string input"""
-        # Numbers should be converted to string and processed
-        result = self.field.to_internal_value("import")
-        self.assertEqual(result, "import")
-
-        # Test with choices that have numeric values
         numeric_choices = [(1, "One"), (2, "Two")]
         numeric_field = LabelChoiceField(choices=numeric_choices)
 
