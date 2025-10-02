@@ -28,7 +28,7 @@ import {
   SupplyInputDialog,
 } from "./supply-input-dialog"
 import { ExportButton } from "common/components/export"
-import { ExcelImportDialog } from "./supply-input-dialog"
+import { ExcelImportDialog } from "./supply-excel-import-dialog"
 import { usePortal } from "common/components/portal"
 
 export const SupplyPlan = () => {
@@ -50,7 +50,7 @@ export const SupplyPlan = () => {
     useGetFilterOptions(query)
 
   const { result: supplyInputs, loading } = useQuery(getSupplyPlanInputs, {
-    key: `supply-plan-inputs-${entity.id}-${years.selected}`,
+    key: `supply-plan-inputs`,
     params: [query],
   })
   const selectedYearIsInCurrentInterval =

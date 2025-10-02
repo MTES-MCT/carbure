@@ -16,6 +16,7 @@ export const AutoCompleteDepartments = (
     <Autocomplete
       placeholder={t("Rechercher un département...")}
       options={departmentsOptions}
+      sort={(item) => item.value ?? ""}
       {...props}
     />
   )

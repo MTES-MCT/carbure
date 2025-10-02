@@ -31,9 +31,10 @@ export const useSupplyPlanColumns = () => {
     },
     {
       header: t("Département"),
-      cell: (input) => (
-        <Tag>{`${input.origin_department} - ${getDepartmentName(input.origin_department) ?? ""}`}</Tag>
-      ),
+      cell: (input) =>
+        input.origin_department && (
+          <Tag>{`${input.origin_department} - ${getDepartmentName(input.origin_department) ?? ""}`}</Tag>
+        ),
     },
     {
       header: t("Volume (t)"),
@@ -51,6 +52,7 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
     [BiomethaneSupplyInputFilter.source]: t("Provenance"),
     [BiomethaneSupplyInputFilter.category]: t("Catégorie"),
     [BiomethaneSupplyInputFilter.type]: t("Intrant"),
+    [BiomethaneSupplyInputFilter.year]: t("Année"),
   }
 
   const normalizers = {
@@ -63,6 +65,8 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
       label: getSupplyPlanInputCategory(value as BiomethaneSupplyInputCategory),
     }),
     [BiomethaneSupplyInputFilter.type]: (value: string) =>
+      defaultNormalizer(value),
+    [BiomethaneSupplyInputFilter.year]: (value: string) =>
       defaultNormalizer(value),
   }
 
