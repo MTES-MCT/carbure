@@ -85,7 +85,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
 class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreateSerializer):
     # Override some fields to handle Excel-specific formats
     origin_country = serializers.SlugRelatedField(slug_field="name", queryset=Pays.objects.all())
-    origin_department = DepartmentField(max_length=3)
+    origin_department = DepartmentField(max_length=3, required=False, allow_null=True)
 
 
 class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
