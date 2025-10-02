@@ -7,9 +7,11 @@ import { FileInput } from "common/components/inputs2"
 import { useMutation } from "common/hooks/async"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
-import { Alert } from "common/components/alert"
 import { useState } from "react"
 import { importSupplyPlan } from "../api"
+import { Notice } from "common/components/notice"
+import { Box } from "common/components/scaffold"
+import { ExcelImportErrors } from "./excel-import-errors"
 
 interface ImportFormData {
   supplyPlanFile: File | null
@@ -20,7 +22,7 @@ interface ValidationError {
   errors: Record<string, string[]>
 }
 
-interface ImportErrorResponse {
+export interface ImportErrorResponse {
   validation_errors: ValidationError[]
   total_errors: number
   total_rows_processed: number
@@ -90,20 +92,21 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
       onClose={onClose}
       size="medium"
     >
-      <section>
-        <Form id="supply-plan-import-form" onSubmit={handleSubmit}>
-          <p>
-            {t(
-              "Vous déposez ici un plan d'approvisionnement afin de le visualiser dans notre outil."
-            )}
-          </p>
-          <p>
-            <Trans>
-              Le template du fichier attendu est disponible{" "}
-              <ExternalLink href={filePath}>sur ce lien</ExternalLink>.
-            </Trans>
-          </p>
+      <Notice variant="info" icon="fr-icon-info-line">
+        {t(
+          "Vous pouvez déposer ici un plan d'approvisionnement afin de le visualiser dans notre outil."
+        )}
+      </Notice>
 
+      <Box>
+        <p>
+          <Trans>
+            Le template du fichier attendu est disponible{" "}
+            <ExternalLink href={filePath}>sur ce lien</ExternalLink>.
+          </Trans>
+        </p>
+
+        <Form id="supply-plan-import-form" onSubmit={handleSubmit}>
           <FileInput
             loading={loading}
             label={t("Importer le fichier excel")}
@@ -117,43 +120,10 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
           />
 
           {importErrors && importErrors.validation_errors.length > 0 && (
-            <Alert variant="danger" multiline>
-              <p>
-                {t(
-                  "({{count}}) erreurs ont été détectées dans le fichier Excel source. Veuillez vous assurer que les intitulés des colonnes sont bien les mêmes que dans notre modèle prédéfini. Merci de corriger le fichier et de l'envoyer à nouveau.",
-                  {
-                    count: importErrors.total_errors,
-                  }
-                )}
-              </p>
-              <br></br>
-              <ul>
-                {importErrors.validation_errors.map(
-                  (validationError, index) => (
-                    <li key={index}>
-                      {t("Ligne {{line}} :", { line: validationError.row })}
-                      <ul>
-                        {Object.entries(validationError.errors).map(
-                          ([field, messages]) => (
-                            <li key={field}>
-                              {t("Champ {{field}} :", { field })}
-                              <ul>
-                                {messages.map((message, msgIndex) => (
-                                  <li key={msgIndex}>{message}</li>
-                                ))}
-                              </ul>
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    </li>
-                  )
-                )}
-              </ul>
-            </Alert>
+            <ExcelImportErrors importErrors={importErrors} />
           )}
         </Form>
-      </section>
+      </Box>
     </Dialog>
   )
 }
