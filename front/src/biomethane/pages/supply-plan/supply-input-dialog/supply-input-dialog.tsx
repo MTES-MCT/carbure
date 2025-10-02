@@ -10,6 +10,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { Notice } from "common/components/notice"
 import { SupplyInputForm } from "./supply-input-form"
 import { Button } from "common/components/button2"
+import { useNotify, useNotifyError } from "common/components/notifications"
 
 export const SupplyInputDialog = () => {
   const navigate = useNavigate()
@@ -17,6 +18,8 @@ export const SupplyInputDialog = () => {
   const match = useHashMatch("supply-input/:id")
   const entity = useEntity()
   const { t } = useTranslation()
+  const notify = useNotify()
+  const notifyError = useNotifyError()
 
   const supplyInputId = Number(match?.params.id)
 
@@ -27,6 +30,14 @@ export const SupplyInputDialog = () => {
 
   const saveSupplyInputMutation = useMutation(saveSupplyInput, {
     invalidates: ["supply-input", "supply-plan-inputs"],
+    onSuccess: () => {
+      notify(t("Les détails de l'intrant ont bien été mis à jour."), {
+        variant: "success",
+      })
+    },
+    onError: (e) => {
+      notifyError(e)
+    },
   })
 
   const onClose = () => {
@@ -65,7 +76,9 @@ export const SupplyInputDialog = () => {
           supplyInput={supplyInput}
           onSubmit={(form) =>
             form &&
-            saveSupplyInputMutation.execute(entity.id, supplyInputId, form)
+            saveSupplyInputMutation
+              .execute(entity.id, supplyInputId, form)
+              .then(onClose)
           }
         />
       )}

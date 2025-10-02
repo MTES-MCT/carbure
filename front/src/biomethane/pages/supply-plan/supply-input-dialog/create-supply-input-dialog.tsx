@@ -5,6 +5,7 @@ import { SupplyInputForm } from "./supply-input-form"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { createSupplyInput } from "../api"
+import { useNotify, useNotifyError } from "common/components/notifications"
 
 export const CreateSupplyInputDialog = ({
   onClose,
@@ -13,9 +14,19 @@ export const CreateSupplyInputDialog = ({
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const notify = useNotify()
+  const notifyError = useNotifyError()
 
   const createSupplyInputMutation = useMutation(createSupplyInput, {
     invalidates: ["supply-plan-inputs"],
+    onSuccess: () => {
+      notify(t("L'intrant a bien été créé."), {
+        variant: "success",
+      })
+    },
+    onError: (e) => {
+      notifyError(e)
+    },
   })
 
   return (
