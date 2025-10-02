@@ -4,9 +4,12 @@ from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
 from biomethane.utils import get_declaration_period
 from core.models import Pays
+from core.serializers import CountrySerializer
 
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
+    origin_country = CountrySerializer()
+
     class Meta:
         model = BiomethaneSupplyInput
         fields = "__all__"
@@ -18,6 +21,8 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     crop_type = LabelChoiceField(choices=BiomethaneSupplyInput.CROP_TYPE_CHOICES)
     input_category = LabelChoiceField(choices=BiomethaneSupplyInput.INPUT_CATEGORY_CHOICES)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
+
+    origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
 
     # Use European float fields for numeric values
     dry_matter_ratio_percent = EuropeanFloatField(required=False, allow_null=True)

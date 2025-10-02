@@ -3293,6 +3293,7 @@ export interface components {
         };
         BiomethaneSupplyInput: {
             readonly id: number;
+            origin_country: components["schemas"]["Country"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
@@ -3302,13 +3303,12 @@ export interface components {
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
             volume: number;
-            origin_department: string;
+            origin_department?: string | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
             supply_plan: number;
-            origin_country?: number;
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
@@ -3316,6 +3316,7 @@ export interface components {
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
@@ -3325,14 +3326,14 @@ export interface components {
             /** Format: double */
             maximum_distance_km?: number | null;
             input_type: string;
-            origin_department: string;
-            origin_country?: number;
+            origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
@@ -3342,8 +3343,7 @@ export interface components {
             /** Format: double */
             maximum_distance_km?: number | null;
             input_type: string;
-            origin_department: string;
-            origin_country?: number;
+            origin_department?: string | null;
         };
         BiomethaneSupplyInputExport: {
             readonly year: number;
@@ -3357,7 +3357,7 @@ export interface components {
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
             volume: number;
-            origin_department: string;
+            origin_department?: string | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
@@ -4883,6 +4883,7 @@ export interface components {
             crop_type?: components["schemas"]["CropTypeEnum"];
             input_category?: components["schemas"]["InputCategoryEnum"];
             material_unit?: components["schemas"]["MaterialUnitEnum"];
+            origin_country?: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
@@ -4892,8 +4893,7 @@ export interface components {
             /** Format: double */
             maximum_distance_km?: number | null;
             input_type?: string;
-            origin_department?: string;
-            origin_country?: number;
+            origin_department?: string | null;
         };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
@@ -6918,7 +6918,7 @@ export interface operations {
                  *     * `CIVE` - CIVE
                  *     * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA */
                 category?: PathsApiBiomethaneSupplyInputGetParametersQueryCategory;
-                /** @description Entity ID */
+                /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
@@ -8037,7 +8037,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
-                filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
+                filter: PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter;
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Ordre
@@ -8344,7 +8344,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
-                filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
+                filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
                 month?: number;
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operator?: string[];
@@ -12285,6 +12285,15 @@ export enum PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQuer
     validated_by = "validated_by",
     year = "year"
 }
+export enum PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter {
+    cpo = "cpo",
+    energy_amount = "energy_amount",
+    operating_unit = "operating_unit",
+    order_by = "order_by",
+    quarter = "quarter",
+    source = "source",
+    year = "year"
+}
 export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
     ValueMinusconsumption_date = "-consumption_date",
@@ -12300,6 +12309,21 @@ export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     operator = "operator",
     status = "status",
     transfer_date = "transfer_date"
+}
+export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
+    certificate_id = "certificate_id",
+    client = "client",
+    consumption_date = "consumption_date",
+    cpo = "cpo",
+    energy_amount = "energy_amount",
+    month = "month",
+    operator = "operator",
+    order_by = "order_by",
+    status = "status",
+    supplier = "supplier",
+    transfer_date = "transfer_date",
+    used_in_tiruert = "used_in_tiruert",
+    year = "year"
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
     ValueMinusadded_by = "-added_by",

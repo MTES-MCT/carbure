@@ -1608,7 +1608,7 @@ paths:
           name: entity_id
           schema:
             type: integer
-          description: Entity ID
+          description: Authorised entity ID.
           required: true
         - in: query
           name: filter
@@ -3475,9 +3475,12 @@ paths:
           schema:
             type: string
             enum:
-              - category
+              - cpo
+              - energy_amount
+              - operating_unit
+              - order_by
+              - quarter
               - source
-              - type
               - year
           description: Filter string to apply
           required: true
@@ -3587,10 +3590,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - category
-                    - source
-                    - type
-                    - year
+                    - cpo
+                    - energy_amount
+                    - operating_unit
+                    - order_by
+                    - quarter
                   summary: Example of filters response.
           description: ""
   /api/elec/provision-certificates/import/:
@@ -3999,9 +4003,18 @@ paths:
           schema:
             type: string
             enum:
-              - category
-              - source
-              - type
+              - certificate_id
+              - client
+              - consumption_date
+              - cpo
+              - energy_amount
+              - month
+              - operator
+              - order_by
+              - status
+              - supplier
+              - transfer_date
+              - used_in_tiruert
               - year
           description: Filter string to apply
           required: true
@@ -4107,10 +4120,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - category
-                    - source
-                    - type
-                    - year
+                    - certificate_id
+                    - client
+                    - consumption_date
+                    - cpo
+                    - energy_amount
                   summary: Example of filters response.
           description: ""
   /api/entities/:
@@ -11742,6 +11756,8 @@ components:
         id:
           type: integer
           readOnly: true
+        origin_country:
+          $ref: "#/components/schemas/Country"
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
@@ -11762,6 +11778,7 @@ components:
           format: double
         origin_department:
           type: string
+          nullable: true
           maxLength: 3
         average_weighted_distance_km:
           type: number
@@ -11773,15 +11790,13 @@ components:
           nullable: true
         supply_plan:
           type: integer
-        origin_country:
-          type: integer
       required:
         - crop_type
         - id
         - input_category
         - input_type
         - material_unit
-        - origin_department
+        - origin_country
         - source
         - supply_plan
         - volume
@@ -11799,6 +11814,8 @@ components:
           $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        origin_country:
+          type: string
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -11819,16 +11836,15 @@ components:
           maxLength: 100
         origin_department:
           type: string
+          nullable: true
           maxLength: 3
-        origin_country:
-          type: integer
       required:
         - crop_type
         - id
         - input_category
         - input_type
         - material_unit
-        - origin_department
+        - origin_country
         - source
         - volume
     BiomethaneSupplyInputCreateRequest:
@@ -11842,6 +11858,9 @@ components:
           $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        origin_country:
+          type: string
+          minLength: 1
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -11863,16 +11882,14 @@ components:
           maxLength: 100
         origin_department:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 3
-        origin_country:
-          type: integer
       required:
         - crop_type
         - input_category
         - input_type
         - material_unit
-        - origin_department
+        - origin_country
         - source
         - volume
     BiomethaneSupplyInputExport:
@@ -11904,6 +11921,7 @@ components:
           format: double
         origin_department:
           type: string
+          nullable: true
           maxLength: 3
         average_weighted_distance_km:
           type: number
@@ -11919,7 +11937,6 @@ components:
         - input_type
         - material_unit
         - origin_country
-        - origin_department
         - source
         - volume
         - year
@@ -15458,6 +15475,9 @@ components:
           $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        origin_country:
+          type: string
+          minLength: 1
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -15479,10 +15499,8 @@ components:
           maxLength: 100
         origin_department:
           type: string
-          minLength: 1
+          nullable: true
           maxLength: 3
-        origin_country:
-          type: integer
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
