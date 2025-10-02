@@ -4,7 +4,7 @@ from core.models import Biocarburant, MatierePremiere
 from doublecount.errors import DcError, DoubleCountingError, error
 from doublecount.models import DoubleCountingApplication, DoubleCountingProduction, DoubleCountingSourcing
 from doublecount.parser.types import ProductionBaseRow, ProductionRow, SourcingRow
-from transactions.sanity_checks.double_counting import get_dc_biofuel_feedstock_incompatibilities
+from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_incompatibilities
 
 
 # check a line in the sourcing section of an imported dc excel file
@@ -175,3 +175,18 @@ def check_pome_excess(production: list[DoubleCountingProduction]) -> List[DcErro
             errors.append(error(DoubleCountingError.POME_GT_2000, meta=meta))
 
     return errors
+
+
+def get_dc_biofuel_feedstock_incompatibilities(
+    biofuel: Biocarburant,
+    feedstock: MatierePremiere,
+):
+    # Dans le cas du double comptage UNIQUEMENT, on ne differencie pas les HVO, les HO et les HC
+    if (
+        biofuel.is_graisse
+        and feedstock.compatible_graisse
+        and biofuel.code not in ["EMHA", "EMHU", "EMHV", "EEHA", "EEHU", "EEHV", "EEAG"]
+    ):
+        return None
+
+    yield from get_biofuel_feedstock_incompatibilities(biofuel=biofuel, feedstock=feedstock)
