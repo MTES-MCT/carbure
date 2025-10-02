@@ -1,4 +1,4 @@
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import {
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputQuery,
@@ -45,3 +45,22 @@ export const getSupplyInput = async (
       },
     })
     .then((res) => res.data)
+
+export function downloadSupplyPlan(query: BiomethaneSupplyInputQuery) {
+  return download(`/biomethane/supply-input/export/`, {
+    ...query,
+  })
+}
+
+export const importSupplyPlan = async (entity_id: number, file: File) => {
+  await api.POST("/biomethane/supply-plan/import/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      file,
+    },
+  })
+}

@@ -5,7 +5,11 @@ import { Select } from "common/components/selects2"
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { getSupplyPlanInputs, getSupplyPlanYears } from "./api"
+import {
+  getSupplyPlanInputs,
+  getSupplyPlanYears,
+  downloadSupplyPlan,
+} from "./api"
 import useEntity from "common/hooks/entity"
 import { useGetFilterOptions, useSupplyPlanColumns } from "./supply-plan.hooks"
 import { useQuery } from "common/hooks/async"
@@ -23,6 +27,8 @@ import {
   CreateSupplyInputDialog,
   SupplyInputDialog,
 } from "./supply-input-dialog"
+import { ExportButton } from "common/components/export"
+import { ExcelImportDialog } from "./supply-input-dialog"
 import { usePortal } from "common/components/portal"
 
 export const SupplyPlan = () => {
@@ -54,6 +60,10 @@ export const SupplyPlan = () => {
     portal((close) => <CreateSupplyInputDialog onClose={close} />)
   }
 
+  const openExcelImportDialog = () => {
+    portal((close) => <ExcelImportDialog onClose={close} />)
+  }
+
   return (
     <Main>
       <Row>
@@ -63,7 +73,7 @@ export const SupplyPlan = () => {
           onChange={years.setYear}
         />
         <Button
-          onClick={() => {}}
+          onClick={openExcelImportDialog}
           iconId="ri-upload-line"
           asideX
           disabled={!selectedYearIsInCurrentInterval}
@@ -85,14 +95,7 @@ export const SupplyPlan = () => {
           >
             {t("Ajouter un intrant")}
           </Button>
-          <Button
-            onClick={() => {}}
-            iconId="ri-download-line"
-            asideX
-            priority="secondary"
-          >
-            {t("Exporter")}
-          </Button>
+          <ExportButton query={query} download={downloadSupplyPlan} />
         </ActionBar>
         <FilterMultiSelect2
           filterLabels={filterLabels}
