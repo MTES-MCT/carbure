@@ -1,5 +1,6 @@
 import { api, download } from "common/services/api-fetch"
 import {
+  BiomethaneSupplyInput,
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputQuery,
 } from "./types"
@@ -43,6 +44,32 @@ export const getSupplyInput = async (
         },
         query: { entity_id },
       },
+    })
+    .then((res) => res.data)
+
+export const createSupplyInput = async (
+  entity_id: number,
+  data: BiomethaneSupplyInput
+) =>
+  api
+    .POST("/biomethane/supply-input/", {
+      params: { query: { entity_id } },
+      body: { ...data, origin_country: data.origin_country?.code_pays },
+    })
+    .then((res) => res.data)
+
+export const saveSupplyInput = async (
+  entity_id: number,
+  supply_input_id: number,
+  data: BiomethaneSupplyInput
+) =>
+  api
+    .PATCH("/biomethane/supply-input/{id}/", {
+      params: {
+        path: { id: supply_input_id },
+        query: { entity_id },
+      },
+      body: { ...data, origin_country: data.origin_country?.code_pays },
     })
     .then((res) => res.data)
 

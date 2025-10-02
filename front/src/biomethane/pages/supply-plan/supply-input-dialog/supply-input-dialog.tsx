@@ -3,8 +3,8 @@ import { useHashMatch } from "common/components/hash-route"
 import { useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
 import useEntity from "common/hooks/entity"
-import { useQuery } from "common/hooks/async"
-import { getSupplyInput } from "../api"
+import { useMutation, useQuery } from "common/hooks/async"
+import { getSupplyInput, saveSupplyInput } from "../api"
 import { useTranslation } from "react-i18next"
 import { LoaderOverlay } from "common/components/scaffold"
 import { Notice } from "common/components/notice"
@@ -17,9 +17,16 @@ export const SupplyInputDialog = () => {
   const match = useHashMatch("supply-input/:id")
   const entity = useEntity()
   const { t } = useTranslation()
+
+  const supplyInputId = Number(match?.params.id)
+
   const { result: supplyInput, loading } = useQuery(getSupplyInput, {
-    key: `supply-input-${match?.params.id}`,
-    params: [entity.id, Number(match?.params.id)],
+    key: "supply-input",
+    params: [entity.id, supplyInputId],
+  })
+
+  const saveSupplyInputMutation = useMutation(saveSupplyInput, {
+    invalidates: ["supply-input", "supply-plan-inputs"],
   })
 
   const onClose = () => {
@@ -37,7 +44,15 @@ export const SupplyInputDialog = () => {
           {t("Intrant n°{{id}}", { id: match?.params.id })}
         </Dialog.Title>
       }
-      footer={<Button>{t("Valider l'intrant")}</Button>}
+      footer={
+        <Button
+          type="submit"
+          loading={saveSupplyInputMutation.loading}
+          nativeButtonProps={{ form: "supply-input-form" }}
+        >
+          {t("Valider l'intrant")}
+        </Button>
+      }
       onClose={onClose}
       size="large"
     >
@@ -46,7 +61,13 @@ export const SupplyInputDialog = () => {
           {t("Intrant non trouvé")}
         </Notice>
       ) : (
-        <SupplyInputForm supplyInput={supplyInput} />
+        <SupplyInputForm
+          supplyInput={supplyInput}
+          onSubmit={(form) =>
+            form &&
+            saveSupplyInputMutation.execute(entity.id, supplyInputId, form)
+          }
+        />
       )}
     </Dialog>
   )
