@@ -12,7 +12,7 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputExportSerializer,
     BiomethaneSupplyInputSerializer,
 )
-from core.filters import FiltersActionMixin
+from core.filters import FiltersActionFactory
 from core.pagination import MetadataPageNumberPagination
 
 from .mixins import ExcelExportActionMixin
@@ -39,8 +39,8 @@ class BiomethaneSupplyInputViewSet(
     UpdateModelMixin,
     ListModelMixin,
     RetrieveModelMixin,
-    FiltersActionMixin,
     ExcelExportActionMixin,
+    FiltersActionFactory(),
 ):
     queryset = BiomethaneSupplyInput.objects.all()
     filterset_class = BiomethaneSupplyInputFilter
