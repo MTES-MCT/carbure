@@ -6,7 +6,7 @@ from edelivery.adapters.zip_utils import zip_and_stream_udb_request
 from edelivery.ebms.access_points import Initiator, Responder
 
 
-class Message:
+class BaseRequest:
     def __init__(self, responder_id, body):
         self.id = new_uuid()
         self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
@@ -31,6 +31,6 @@ class Message:
         return zip_and_stream_udb_request(self.body)
 
 
-class TestMessage(Message):
+class TestRequest(BaseRequest):
     def __init__(self):
         super().__init__(environ["INITIATOR_ACCESS_POINT_ID"], "<test>Hello World!</test>")

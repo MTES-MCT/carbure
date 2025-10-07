@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from edelivery.ebms.messages import TestMessage
+from edelivery.ebms.requests import TestRequest
 from edelivery.soap.actions import ListPendingMessages, RetrieveMessage, SubmitMessage
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
@@ -63,25 +63,25 @@ class RetrieveMessageTest(TestCase):
 @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
 class SubmitMessageTest(TestCase):
     def test_knows_its_action_name(self):
-        message = TestMessage()
-        action = SubmitMessage(message)
+        request = TestRequest()
+        action = SubmitMessage(request)
         self.assertEqual("submitMessage", action.name)
 
     def test_knows_its_response_class(self):
-        message = TestMessage()
-        action = SubmitMessage(message)
+        request = TestRequest()
+        action = SubmitMessage(request)
         self.assertEqual(SubmitMessageResponse, action.response_class)
 
     def test_knows_its_payload(self):
-        message = MagicMock()
-        message.id = "12345678-1234-1234-1234-1234567890ab"
-        message.original_sender = "CarbuRe_NTR"
-        message.timestamp = "2025-07-15T13:00:00+00:00"
-        message.initiator_id.return_value = "initiator"
-        message.initiator_to_XML.return_value = "<MockValue>initiator</MockValue>"
-        message.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
-        message.zipped_encoded.return_value = "abcdef"
-        action = SubmitMessage(message)
+        request = MagicMock()
+        request.id = "12345678-1234-1234-1234-1234567890ab"
+        request.original_sender = "CarbuRe_NTR"
+        request.timestamp = "2025-07-15T13:00:00+00:00"
+        request.initiator_id.return_value = "initiator"
+        request.initiator_to_XML.return_value = "<MockValue>initiator</MockValue>"
+        request.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
+        request.zipped_encoded.return_value = "abcdef"
+        action = SubmitMessage(request)
 
         expected_payload = """\
 <soap:Envelope
