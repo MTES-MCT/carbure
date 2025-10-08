@@ -104,6 +104,17 @@ export async function findProductionSites(
   return res.data ?? []
 }
 
+/**
+ * Get the delivery sites of an entity
+ * @param entity_id - The ID of the entity
+ * @returns The delivery sites of the entity
+ */
+export function getDeliverySites(entity_id: number) {
+  return apiFetch.GET("/entities/depots/", {
+    params: { query: { entity_id } },
+  })
+}
+
 export async function findDepots(query?: string, public_only?: boolean) {
   const res = await apiFetch.GET("/resources/depots", {
     params: { query: { query, public_only } },
