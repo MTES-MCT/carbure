@@ -18,7 +18,7 @@ export const balance: Balance = {
   unit: "l",
   customs_category: CategoryEnum.CONV,
   biofuel: balanceBiofuel,
-  ghg_reduction_min: 0,
-  ghg_reduction_max: 0,
+  ghg_reduction_min: 10,
+  ghg_reduction_max: 80,
   saved_emissions: 0,
 }
