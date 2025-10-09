@@ -4,7 +4,7 @@ import {
   ElecOperationsFilter,
   ElecOperationsQuery,
   ElecOperationOrder,
-} from "../types"
+} from "../../types"
 
 export const getOperationsFilters = (
   filter: string,

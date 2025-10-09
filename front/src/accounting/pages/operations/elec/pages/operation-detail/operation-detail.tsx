@@ -2,7 +2,7 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
-import * as api from "accounting/api/elec-operations"
+import * as api from "accounting/api/elec/operations"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import {

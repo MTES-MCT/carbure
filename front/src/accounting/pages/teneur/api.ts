@@ -1,5 +1,5 @@
 import { getBalances } from "accounting/api/biofuels/balances"
-import { getElecBalances } from "accounting/api/elec-balances"
+import { getElecBalances } from "accounting/api/elec/balances"
 import { CategoryEnum, Unit } from "common/types"
 import {
   CategoryObjective,
