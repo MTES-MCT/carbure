@@ -1,4 +1,4 @@
-import { createOperation } from "accounting/api/operations"
+import { createOperation } from "accounting/api/biofuels/operations"
 import useEntity from "common/hooks/entity"
 import { SessionDialogForm } from "./cession-dialog.types"
 import { Balance, CreateOperationType } from "accounting/types"

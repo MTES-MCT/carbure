@@ -4,7 +4,7 @@ import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
 import { isOperationDebit } from "./operations.utils"
-import * as api from "accounting/api/operations"
+import * as api from "accounting/api/biofuels/operations"
 import {
   Operation,
   OperationDebitOrCredit,

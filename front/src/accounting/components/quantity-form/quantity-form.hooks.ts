@@ -1,4 +1,4 @@
-import { simulate, simulateMinMax } from "accounting/api/operations"
+import { simulate, simulateMinMax } from "accounting/api/biofuels/operations"
 import { Balance } from "accounting/types"
 import { MutationOptions, useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
