@@ -5,7 +5,7 @@ import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 import { okFindClients, assignSafTicket } from "saf/__test__/api"
 
 const meta = {
-  title: "SAF/Components/TicketAssignment",
+  title: "modules/saf/components/TicketAssignment",
   component: TicketAssignment,
   parameters: {
     layout: "centered",
