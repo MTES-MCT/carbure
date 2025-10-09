@@ -1,2 +1,3 @@
 from .supply_plan import BiomethaneSupplyPlanViewSet
 from .supply_input import BiomethaneSupplyInputViewSet
+from .excel_template_download import download_template
