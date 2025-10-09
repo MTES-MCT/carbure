@@ -16,6 +16,7 @@ import {
   DeepPartial,
   EntityDepot,
   OwnershipType,
+  Biofuel,
 } from "common/types"
 import { mergeDeepRight } from "ramda"
 
@@ -197,7 +198,7 @@ export const matierePremiere: Feedstock = {
 
 // BIOCARBURANT
 
-export const biocarburant = {
+export const biocarburant: Biofuel = {
   code: "EMHV",
   name: "EMHV",
   name_en: "EMHV",
