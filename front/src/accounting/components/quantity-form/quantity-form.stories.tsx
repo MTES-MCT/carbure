@@ -4,8 +4,15 @@ import { QuantityForm } from "./quantity-form"
 import { Form, useForm } from "common/components/form2"
 import { okGetDeliverySites } from "common/__test__/api"
 import { CreateOperationType } from "accounting/types"
-import { balance } from "accounting/__test__/data"
+import { balance } from "accounting/__test__/data/balances"
 import { userEvent, waitFor, within } from "@storybook/test"
+import {
+  okSimulateMinMax,
+  okSimulateMinMaxWithEqualValues,
+  okSimulateMinMaxWithZeroValues,
+} from "accounting/__test__/api/biofuels/operations"
+
+const baseHandlers = [okGetDeliverySites, okSimulateMinMax]
 
 const meta: Meta<typeof QuantityForm> = {
   component: QuantityForm,
@@ -13,10 +20,11 @@ const meta: Meta<typeof QuantityForm> = {
   args: {
     balance,
     type: CreateOperationType.TRANSFERT,
+    depot_quantity_max: 10000,
   },
   parameters: {
     msw: {
-      handlers: [okGetDeliverySites],
+      handlers: baseHandlers,
     },
   },
   render: (args) => {
@@ -56,6 +64,47 @@ export const ShowErrorWhenQuantityIsGreaterThanQuantityMax: Story = {
     const { getByRole } = within(props.canvasElement)
     const button = await waitFor(() =>
       getByRole("button", { name: "Valider la quantité" })
+    )
+
+    await userEvent.click(button)
+  },
+}
+
+// Show an error when the simulate min max returns zero values
+export const ShowErrorWhenSimulateMinMaxReturnsZeroValues: Story = {
+  parameters: {
+    msw: {
+      handlers: [okSimulateMinMaxWithZeroValues, ...baseHandlers],
+    },
+  },
+  play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
+}
+
+// Display the avoided emissions component with the range returned by the backend when the quantity is declared
+export const DisplayAvoidedEmissionsWhenQuantityIsDeclared: Story = {
+  play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
+}
+
+// Display the avoided emissions component with the range returned by the backend when the quantity is declared with equal values
+export const DisplayAvoidedEmissionsWhenQuantityIsDeclaredWithEqualValues: Story =
+  {
+    parameters: {
+      msw: {
+        // Overrides the simulate min max mock api by setting the needed mock as first
+        handlers: [okSimulateMinMaxWithEqualValues, ...baseHandlers],
+      },
+    },
+    play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
+  }
+
+// When the quantity is declared, the button should be replaced by a reset button that hides the avoided emissions component
+export const ResetQuantityDeclared: Story = {
+  play: async (props) => {
+    const { getByRole } = within(props.canvasElement)
+    await ShowErrorWhenQuantityIsGreaterThanQuantityMax.play?.(props)
+
+    const button = await waitFor(() =>
+      getByRole("button", { name: "Modifier" })
     )
 
     await userEvent.click(button)
