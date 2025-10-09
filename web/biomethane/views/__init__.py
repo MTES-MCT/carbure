@@ -3,4 +3,4 @@ from .injection_site import BiomethaneInjectionSiteViewSet
 from .production_unit import BiomethaneProductionUnitViewSet, BiomethaneDigestateStorageViewSet
 from .digestate import BiomethaneDigestateViewSet, BiomethaneDigestateSpreadingViewSet
 from .energy import BiomethaneEnergyViewSet, BiomethaneEnergyMonthlyReportViewSet
-from .supply_plan import BiomethaneSupplyPlanViewSet, BiomethaneSupplyInputViewSet
+from .supply_plan import BiomethaneSupplyPlanViewSet, BiomethaneSupplyInputViewSet, download_template
