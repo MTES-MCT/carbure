@@ -1,9 +1,9 @@
 from core.common import SuccessResponse
 from core.decorators import check_admin_rights
-from core.models import CarbureLot, CarbureStockTransformation
+from core.models import CarbureLot, CarbureStockTransformation, ExternalAdminRights
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_years(request):
     lots_years = (
         CarbureLot.objects.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])

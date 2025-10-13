@@ -562,6 +562,7 @@ class ExternalAdminRights(models.Model):
     AIRLINE = "AIRLINE"
     ELEC = "ELEC"
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
+    BIOFUEL = "BIOFUEL"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -570,6 +571,7 @@ class ExternalAdminRights(models.Model):
         (AIRLINE, AIRLINE),
         (ELEC, ELEC),
         (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
+        (BIOFUEL, BIOFUEL),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)
