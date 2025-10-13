@@ -784,7 +784,7 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
 
 
 class UserRightsRequestsSerializer(serializers.ModelSerializer):
-    entity = UserEntitySerializer()
+    entity = EntitySummarySerializer()
     user = serializers.SerializerMethodField()
 
     class Meta:
