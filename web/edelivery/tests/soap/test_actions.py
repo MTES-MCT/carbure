@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from edelivery.ebms.requests import TestRequest
+from edelivery.ebms.requests import BaseRequest
 from edelivery.soap.actions import ListPendingMessages, RetrieveMessage, SubmitMessage
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
@@ -63,12 +63,12 @@ class RetrieveMessageTest(TestCase):
 @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
 class SubmitMessageTest(TestCase):
     def test_knows_its_action_name(self):
-        request = TestRequest()
+        request = BaseRequest("")
         action = SubmitMessage("responder_id", request)
         self.assertEqual("submitMessage", action.name)
 
     def test_knows_its_response_class(self):
-        request = TestRequest()
+        request = BaseRequest("")
         action = SubmitMessage("responder_id", request)
         self.assertEqual(SubmitMessageResponse, action.response_class)
 

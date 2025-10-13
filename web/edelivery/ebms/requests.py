@@ -23,8 +23,3 @@ class GetSourcingContactByIdRequest(BaseRequest):
   </SC_ID_HEADER>
 </udb:GetSourcingContactByIDRequest>"""
         super().__init__(body)
-
-
-class TestRequest(BaseRequest):
-    def __init__(self):
-        super().__init__("<test>Hello World!</test>")
