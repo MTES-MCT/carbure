@@ -8,7 +8,7 @@ class BaseRequestTest(TestCase):
     @patch("edelivery.ebms.requests.zip_and_stream_udb_request")
     def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
         patched_zip_and_stream_udb_request.return_value = "abcdef"
-        request = BaseRequest("responder_id", "A request")
+        request = BaseRequest("A request")
 
         encoded_request = request.zipped_encoded()
         patched_zip_and_stream_udb_request.assert_called_with("A request")
@@ -22,13 +22,13 @@ class GetSourcingContactByIdRequestTest(TestCase):
     def test_knows_its_identifier(self):
         self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
 
-        request = GetSourcingContactByIdRequest("responder_id", "")
+        request = GetSourcingContactByIdRequest("")
         self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.id)
 
     def test_injects_request_id_and_sourcing_contact_id_in_body(self):
         self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
 
-        request = GetSourcingContactByIdRequest("responder_id", "99999")
+        request = GetSourcingContactByIdRequest("99999")
         expected_body = """\
 <udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
   <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab"/>

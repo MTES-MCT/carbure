@@ -3,7 +3,7 @@ from os import environ
 from edelivery.adapters.clock import timestamp
 from edelivery.adapters.edelivery_adapter import send_SOAP_request
 from edelivery.adapters.uuid_generator import new_uuid
-from edelivery.ebms.access_points import Initiator
+from edelivery.ebms.access_points import Initiator, Responder
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
@@ -53,10 +53,11 @@ class RetrieveMessage(AbstractSoapAction):
 
 
 class SubmitMessage(AbstractSoapAction):
-    def __init__(self, message, send_callback=send_SOAP_request):
+    def __init__(self, responder_id, message, send_callback=send_SOAP_request):
         super().__init__("submitMessage", SubmitMessageResponse, send_callback)
-        self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
         self.original_sender = environ["CARBURE_NTR"]
+        self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
+        self.responder = Responder(responder_id)
         self.message_id = new_uuid()
         self.timestamp = timestamp()
         self.message = message
@@ -78,7 +79,7 @@ class SubmitMessage(AbstractSoapAction):
         </eb:MessageInfo>
         <eb:PartyInfo>
           <eb:From>{self.initiator.to_XML()}</eb:From>
-          <eb:To>{self.message.responder_to_XML()}</eb:To>
+          <eb:To>{self.responder.to_XML()}</eb:To>
         </eb:PartyInfo>
         <eb:CollaborationInfo>
           <eb:Service>https://union-database.ec.europa.eu/e-delivery/services/send</eb:Service>

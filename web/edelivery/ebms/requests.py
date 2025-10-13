@@ -1,24 +1,17 @@
-from os import environ
-
 from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.adapters.zip_utils import zip_and_stream_udb_request
-from edelivery.ebms.access_points import Responder
 
 
 class BaseRequest:
-    def __init__(self, responder_id, body):
-        self.responder = Responder(responder_id)
+    def __init__(self, body):
         self.body = body
-
-    def responder_to_XML(self):
-        return self.responder.to_XML()
 
     def zipped_encoded(self):
         return zip_and_stream_udb_request(self.body)
 
 
 class GetSourcingContactByIdRequest(BaseRequest):
-    def __init__(self, responder_id, sourcing_contact_id):
+    def __init__(self, sourcing_contact_id):
         self.id = new_uuid()
         body = f"""\
 <udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
@@ -29,9 +22,9 @@ class GetSourcingContactByIdRequest(BaseRequest):
     </SC_ID>
   </SC_ID_HEADER>
 </udb:GetSourcingContactByIDRequest>"""
-        super().__init__(responder_id, body)
+        super().__init__(body)
 
 
 class TestRequest(BaseRequest):
     def __init__(self):
-        super().__init__(environ["INITIATOR_ACCESS_POINT_ID"], "<test>Hello World!</test>")
+        super().__init__("<test>Hello World!</test>")
