@@ -130,13 +130,13 @@ const MyComponent = () => {
   return (
     <StepperProvider steps={steps}>
       <Stepper />
-      <Stepper.Form>
+      <Stepper.Form id="my-form-id">
         <input type="text" name="field1" />
         <input type="text" name="field2" />
       </Stepper.Form>
       <div>
         <Stepper.Previous />
-        <Stepper.Next />
+        <Stepper.Next nativeButtonProps={{ form: "my-form-id" }}/>
       </div>
     </StepperProvider>
   )
