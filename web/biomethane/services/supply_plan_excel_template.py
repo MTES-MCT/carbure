@@ -122,10 +122,6 @@ def create_supply_plan_template() -> BufferedReader:
     The template contains:
     - A main sheet "Plan d'approvisionnement" with columns to fill and dropdown lists
     - Reference sheets for dropdown lists:
-        - Provenance (2 values)
-        - Type de culture (2 values)
-        - Categories (from model)
-        - Unites (2 values)
         - Departements (complete list)
         - Pays (from model)
 
@@ -142,12 +138,12 @@ def create_supply_plan_template() -> BufferedReader:
     # Get countries from database
     eu_countries = list(Pays.objects.filter(is_in_europe=True).order_by("name"))
 
-    # Create reference sheets first
+    # Create main sheet
+    _create_main_sheet(workbook, header_format, eu_countries)
+
+    # Create reference sheets
     _create_departments_sheet(workbook, bold)
     _create_countries_sheet(workbook, bold, eu_countries)
-
-    # Create main sheet with data validation
-    _create_main_sheet(workbook, header_format, eu_countries)
 
     workbook.close()
     return open(location, "rb")
@@ -159,67 +155,167 @@ def _create_main_sheet(workbook, header_format, countries):
 
     # Column headers
     headers = [
-        "Provenance",
-        "Type de culture",
-        "Catégorie",
-        "Intrant",
-        "Unité",
-        "Ratio de matière sèche (%)",
-        "Volume (tMB ou tMS)",
-        "Pays d'origine",
-        "Département",
-        "Distance moyenne pondérée (km)",
-        "Distance maximale (km)",
+        ("Provenance", "source"),
+        ("Catégorie", "input_category"),
+        ("Intrant", "input_type"),
+        ("Type de culture", "crop_type"),
+        ("Unité", "material_unit"),
+        ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
+        ("Volume (tMB ou tMS)", "volume"),
+        ("Département", "origin_department"),
+        ("Distance moyenne pondérée (km)", "average_weighted_distance_km"),
+        ("Distance maximale (km)", "maximum_distance_km"),
+        ("Pays d'origine", "origin_country"),
     ]
 
     # Write headers
     sheet.set_row(0, 30)
-    for col, header in enumerate(headers):
-        sheet.write(0, col, header, header_format)
+    for col, (header, key) in enumerate(headers):
+        sheet.write(0, col, header, header_format)  # Visible header
+        sheet.write(1, col, key)  # Hidden key row for reference
         sheet.set_column(col, col, 25)
 
-    # Add data validation (dropdowns) starting from row 2 to 1000
+    # Add all data validations
+    _add_dropdown_validations(sheet, countries)
+    _add_numeric_validations(sheet)
+
+    # Protect sheet and format columns
+    _protect_and_format_sheet(workbook, sheet)
+
+
+def _add_dropdown_validations(sheet, countries):
+    """Add dropdown list validations to the main sheet."""
     # Provenance (column A)
     provenance_labels = [label for _, label in BiomethaneSupplyInput.SOURCE_CHOICES]
     sheet.data_validation(
-        "A2:A1000",
+        "A3:A1000",
         {"validate": "list", "source": provenance_labels},
     )
 
-    # Type de culture (column B)
-    crop_type_labels = [label for _, label in BiomethaneSupplyInput.CROP_TYPE_CHOICES]
-    sheet.data_validation(
-        "B2:B1000",
-        {"validate": "list", "source": crop_type_labels},
-    )
-
-    # Catégorie (column C)
+    # Catégorie (column B)
     category_labels = [label for _, label in BiomethaneSupplyInput.INPUT_CATEGORY_CHOICES]
     sheet.data_validation(
-        "C2:C1000",
+        "B3:B1000",
         {"validate": "list", "source": category_labels},
+    )
+
+    # Type de culture (column D)
+    crop_type_labels = [label for _, label in BiomethaneSupplyInput.CROP_TYPE_CHOICES]
+    sheet.data_validation(
+        "D3:D1000",
+        {"validate": "list", "source": crop_type_labels},
     )
 
     # Unité (column E)
     unit_labels = [label for _, label in BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES]
     sheet.data_validation(
-        "E2:E1000",
+        "E3:E1000",
         {"validate": "list", "source": unit_labels},
     )
 
-    # Pays d'origine (column H) - using reference sheet
+    # Département (column H) - using reference sheet
+    dept_count = len(FRENCH_DEPARTMENTS)
+    sheet.data_validation(
+        "H3:H1000",
+        {"validate": "list", "source": f"=Departements!$B$2:$B${dept_count + 1}"},
+    )
+
+    # Pays d'origine (column K) - using reference sheet
     country_labels = [country.name for country in countries]
     sheet.data_validation(
-        "H2:H1000",
+        "K2:K1000",
         {"validate": "list", "source": country_labels},
     )
 
-    # Département (column I) - using reference sheet
-    dept_count = len(FRENCH_DEPARTMENTS)
+
+def _add_numeric_validations(sheet):
+    """Add numeric validations with error messages to the main sheet."""
+    # Ratio de matière sèche (column F) - must be a number between 0 and 100
     sheet.data_validation(
-        "I2:I1000",
-        {"validate": "list", "source": f"=Departements!$B$2:$B${dept_count + 1}"},
+        "F3:F1000",
+        {
+            "validate": "decimal",
+            "criteria": "between",
+            "minimum": 0,
+            "maximum": 100,
+            "error_title": "Valeur invalide",
+            "error_message": "Le ratio de matière sèche doit être un nombre entre 0 et 100.",
+        },
     )
+
+    # Volume (column G) - must be a positive number
+    sheet.data_validation(
+        "G3:G1000",
+        {
+            "validate": "decimal",
+            "criteria": ">=",
+            "value": 0,
+            "error_title": "Valeur invalide",
+            "error_message": "Le volume doit être un nombre positif.",
+        },
+    )
+
+    # Distance moyenne pondérée (column I) - must be a positive number
+    sheet.data_validation(
+        "I3:I1000",
+        {
+            "validate": "decimal",
+            "criteria": ">=",
+            "value": 0,
+            "error_title": "Valeur invalide",
+            "error_message": "La distance moyenne doit être un nombre positif.",
+        },
+    )
+
+    # Distance maximale (column J) - must be a positive number
+    sheet.data_validation(
+        "J3:J1000",
+        {
+            "validate": "decimal",
+            "criteria": ">=",
+            "value": 0,
+            "error_title": "Valeur invalide",
+            "error_message": "La distance maximale doit être un nombre positif.",
+        },
+    )
+
+
+def _protect_and_format_sheet(workbook, sheet):
+    """Protect the sheet and apply formatting to columns."""
+    # Protect the sheet to prevent unhiding rows/columns
+    sheet.protect(
+        "",  # No password (or add one if needed)
+        {
+            "format_rows": False,  # Prevent unhiding rows
+            "format_columns": False,  # Prevent unhiding columns
+            "insert_rows": False,
+            "delete_rows": False,
+            "insert_columns": False,
+            "delete_columns": False,
+        },
+    )
+
+    # Hide the key row
+    sheet.set_row(1, None, None, {"hidden": True})
+
+    # Unlock data cells (rows 3 to 1000) so users can edit them
+    unlocked = workbook.add_format({"locked": False})
+
+    unlocked_decimal_number = workbook.add_format({"locked": False, "num_format": "0.0"})
+    unlocked_number = workbook.add_format({"locked": False, "num_format": "0"})
+
+    # Apply formats to columns
+    for col in range(11):  # 11 columns (A to K)
+        if col == 5:  # Column F: Ratio de matière sèche (%)
+            sheet.set_column(col, col, 25, unlocked_decimal_number)
+        elif col == 6:  # Column G: Volume (tMB ou tMS)
+            sheet.set_column(col, col, 25, unlocked_decimal_number)
+        elif col == 8:  # Column I: Distance moyenne pondérée (km)
+            sheet.set_column(col, col, 25, unlocked_number)
+        elif col == 9:  # Column J: Distance maximale (km)
+            sheet.set_column(col, col, 25, unlocked_number)
+        else:
+            sheet.set_column(col, col, 25, unlocked)
 
 
 def _create_departments_sheet(workbook, bold):
@@ -232,7 +328,6 @@ def _create_departments_sheet(workbook, bold):
         sheet.write(row, 0, dept[0])
         sheet.write(row, 1, f"{dept[0]} - {dept[1]}")
 
-    # Hide the sheet (can be unhidden without password)
     sheet.hide()
     sheet.protect()
 
@@ -247,6 +342,5 @@ def _create_countries_sheet(workbook, bold, countries):
         sheet.write(row, 0, country.code_pays)
         sheet.write(row, 1, country.name)
 
-    # Hide the sheet (can be unhidden without password)
     sheet.hide()
     sheet.protect()
