@@ -1,7 +1,7 @@
 import Dialog from "common/components/dialog2/dialog"
 import { useTranslation } from "react-i18next"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
-import { FormManager, useForm, Form } from "common/components/form2"
+import { FormManager, useForm } from "common/components/form2"
 import { DeclareTeneurDialogForm } from "./declare-teneur-dialog.types"
 import {
   QuantityForm,
@@ -112,7 +112,7 @@ const DeclareTeneurDialogContent = ({
       footer={
         <>
           <Stepper.Previous />
-          <Stepper.Next />
+          <Stepper.Next nativeButtonProps={{ form: "declare-teneur-dialog" }} />
           {currentStep?.key === "recap" && (
             <Button
               priority="primary"
@@ -196,7 +196,7 @@ const DeclareTeneurDialogContent = ({
           </>
         )}
         {currentStep?.key !== "recap" && (
-          <Form form={form}>
+          <Stepper.Form form={form} id="declare-teneur-dialog">
             {currentStep?.key === biofuelFormStepKey && (
               <Box spacing="md">
                 <BiofuelForm category={objective.code} />
@@ -243,7 +243,7 @@ const DeclareTeneurDialogContent = ({
                 ) : null}
               </>
             )}
-          </Form>
+          </Stepper.Form>
         )}
       </Main>
     </Dialog>

@@ -16320,7 +16320,7 @@ components:
             type: string
           readOnly: true
         entity:
-          $ref: "#/components/schemas/UserEntity"
+          $ref: "#/components/schemas/EntitySummary"
         date_requested:
           type: string
           format: date-time
