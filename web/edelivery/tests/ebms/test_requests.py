@@ -1,11 +1,9 @@
-from os import environ
 from unittest import TestCase
 from unittest.mock import patch
 
 from edelivery.ebms.requests import BaseRequest, GetSourcingContactByIdRequest
 
 
-@patch.dict("os.environ", {"CARBURE_NTR": "CarbuRe_NTR"})
 class BaseRequestTest(TestCase):
     def setUp(self):
         self.patched_timestamp = patch("edelivery.ebms.requests.timestamp").start()
@@ -18,12 +16,6 @@ class BaseRequestTest(TestCase):
 
         request = BaseRequest("responder_id", "A request")
         self.assertEqual("2025-07-15T13:00:00+00:00", request.timestamp)
-
-    def test_knows_original_sender(self):
-        self.assertEqual("CarbuRe_NTR", environ["CARBURE_NTR"])
-
-        request = BaseRequest("responder_id", "A request")
-        self.assertEqual("CarbuRe_NTR", request.original_sender)
 
     @patch("edelivery.ebms.requests.zip_and_stream_udb_request")
     def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):

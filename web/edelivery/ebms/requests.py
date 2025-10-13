@@ -8,7 +8,6 @@ from edelivery.ebms.access_points import Responder
 
 class BaseRequest:
     def __init__(self, responder_id, body):
-        self.original_sender = environ["CARBURE_NTR"]
         self.responder = Responder(responder_id)
         self.timestamp = timestamp()
         self.body = body

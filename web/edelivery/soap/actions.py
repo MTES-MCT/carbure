@@ -55,6 +55,7 @@ class SubmitMessage(AbstractSoapAction):
     def __init__(self, message, send_callback=send_SOAP_request):
         super().__init__("submitMessage", SubmitMessageResponse, send_callback)
         self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
+        self.original_sender = environ["CARBURE_NTR"]
         self.message_id = new_uuid()
         self.message = message
 
@@ -82,7 +83,7 @@ class SubmitMessage(AbstractSoapAction):
           <eb:Action>https://union-database.ec.europa.eu/e-delivery/actions/sendRequest</eb:Action>
         </eb:CollaborationInfo>
         <eb:MessageProperties>
-          <eb:Property name="originalSender">{self.message.original_sender}</eb:Property>
+          <eb:Property name="originalSender">{self.original_sender}</eb:Property>
           <eb:Property name="finalRecipient">EC</eb:Property>
         </eb:MessageProperties>
         <eb:PayloadInfo>
