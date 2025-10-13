@@ -64,3 +64,18 @@ export const FitContent: Story = {
     fitContent: true,
   },
 }
+
+export const DialogSection: Story = {
+  args: {
+    children: (
+      <div style={{ display: "flex", gap: "10px" }}>
+        <Dialog.Section label="Section 1">
+          <div>Section content</div>
+        </Dialog.Section>
+        <Dialog.Section label="Section 2">
+          <div>Section content</div>
+        </Dialog.Section>
+      </div>
+    ),
+  },
+}

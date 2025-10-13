@@ -1,19 +1,21 @@
 from django.db.models import Sum
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
-from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
+from biomethane.models import BiomethaneSupplyInput
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputCreateSerializer,
+    BiomethaneSupplyInputExportSerializer,
     BiomethaneSupplyInputSerializer,
 )
-from biomethane.utils import get_declaration_period
-from core.filters import FiltersActionMixin
+from core.filters import FiltersActionFactory
 from core.pagination import MetadataPageNumberPagination
+
+from .mixins import ExcelExportActionMixin
 
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
@@ -31,7 +33,15 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
         ),
     ]
 )
-class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin, ListModelMixin, FiltersActionMixin):
+class BiomethaneSupplyInputViewSet(
+    GenericViewSet,
+    CreateModelMixin,
+    UpdateModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    ExcelExportActionMixin,
+    FiltersActionFactory(),
+):
     queryset = BiomethaneSupplyInput.objects.all()
     filterset_class = BiomethaneSupplyInputFilter
     search_fields = ["input_type", "input_category"]
@@ -40,25 +50,19 @@ class BiomethaneSupplyInputViewSet(GenericViewSet, CreateModelMixin, UpdateModel
     def get_permissions(self):
         return get_biomethane_permissions(["create", "update", "partial_update"], self.action)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["entity"] = getattr(self.request, "entity", None)
+        return context
+
     def get_filterset_class(self):
-        if self.action == "list":
+        if self.action in ["list", "export_supply_plan_to_excel"]:
             return self.filterset_class
         return BiomethaneSupplyInputCreateFilter
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
             return BiomethaneSupplyInputCreateSerializer
+        elif self.action == "export_supply_plan_to_excel":
+            return BiomethaneSupplyInputExportSerializer
         return BiomethaneSupplyInputSerializer
-
-    def perform_create(self, serializer):
-        entity = self.request.entity
-        year = get_declaration_period()
-
-        # Get or create the supply plan for the entity and year
-        supply_plan, created = BiomethaneSupplyPlan.objects.get_or_create(
-            producer=entity,
-            year=year,
-            defaults={},
-        )
-
-        serializer.save(supply_plan=supply_plan)

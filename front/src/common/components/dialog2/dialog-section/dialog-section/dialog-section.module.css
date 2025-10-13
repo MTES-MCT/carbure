@@ -20,5 +20,12 @@
 .dialog-section__content {
   display: flex;
   flex-direction: column;
+}
+
+.dialog-section__content--gap-md {
   gap: var(--spacing-2w);
+}
+
+.dialog-section__content--gap-lg {
+  gap: var(--spacing-3w);
 }

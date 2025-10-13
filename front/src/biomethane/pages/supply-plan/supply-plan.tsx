@@ -5,7 +5,11 @@ import { Select } from "common/components/selects2"
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { getSupplyPlanInputs, getSupplyPlanYears } from "./api"
+import {
+  getSupplyPlanInputs,
+  getSupplyPlanYears,
+  downloadSupplyPlan,
+} from "./api"
 import useEntity from "common/hooks/entity"
 import { useGetFilterOptions, useSupplyPlanColumns } from "./supply-plan.hooks"
 import { useQuery } from "common/hooks/async"
@@ -18,9 +22,18 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneSupplyInputQueryBuilder } from "./types"
 import { Pagination } from "common/components/pagination2"
+import HashRoute from "common/components/hash-route"
+import {
+  CreateSupplyInputDialog,
+  SupplyInputDialog,
+} from "./supply-input-dialog"
+import { ExportButton } from "common/components/export"
+import { ExcelImportDialog } from "./supply-excel-import-dialog"
+import { usePortal } from "common/components/portal"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
+  const portal = usePortal()
   usePrivateNavigation(t("Mes plans d'approvisionnement"))
   const entity = useEntity()
   const years = useYears("biomethane/supply-plan", () =>
@@ -37,11 +50,19 @@ export const SupplyPlan = () => {
     useGetFilterOptions(query)
 
   const { result: supplyInputs, loading } = useQuery(getSupplyPlanInputs, {
-    key: `supply-plan-inputs-${entity.id}-${years.selected}`,
+    key: `supply-plan-inputs`,
     params: [query],
   })
   const selectedYearIsInCurrentInterval =
     years.selected === declarationInterval.year
+
+  const openCreateSupplyInputDialog = () => {
+    portal((close) => <CreateSupplyInputDialog onClose={close} />)
+  }
+
+  const openExcelImportDialog = () => {
+    portal((close) => <ExcelImportDialog onClose={close} />)
+  }
 
   return (
     <Main>
@@ -52,7 +73,7 @@ export const SupplyPlan = () => {
           onChange={years.setYear}
         />
         <Button
-          onClick={() => {}}
+          onClick={openExcelImportDialog}
           iconId="ri-upload-line"
           asideX
           disabled={!selectedYearIsInCurrentInterval}
@@ -66,7 +87,7 @@ export const SupplyPlan = () => {
             <SearchInput value={state.search} onChange={actions.setSearch} />
           </ActionBar.Grow>
           <Button
-            onClick={() => {}}
+            onClick={openCreateSupplyInputDialog}
             iconId="ri-add-line"
             asideX
             priority="secondary"
@@ -74,14 +95,7 @@ export const SupplyPlan = () => {
           >
             {t("Ajouter un intrant")}
           </Button>
-          <Button
-            onClick={() => {}}
-            iconId="ri-download-line"
-            asideX
-            priority="secondary"
-          >
-            {t("Exporter")}
-          </Button>
+          <ExportButton query={query} download={downloadSupplyPlan} />
         </ActionBar>
         <FilterMultiSelect2
           filterLabels={filterLabels}
@@ -114,6 +128,11 @@ export const SupplyPlan = () => {
               rows={supplyInputs?.results ?? []}
               columns={columns}
               loading={loading}
+              rowLink={(row) => ({
+                pathname: location.pathname,
+                search: location.search,
+                hash: `supply-input/${row.id}`,
+              })}
             />
           </>
         )}
@@ -128,6 +147,7 @@ export const SupplyPlan = () => {
           />
         )}
       </Content>
+      <HashRoute path="/supply-input/:id" element={<SupplyInputDialog />} />
     </Main>
   )
 }

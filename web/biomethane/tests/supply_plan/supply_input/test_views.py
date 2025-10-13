@@ -67,7 +67,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         new_supply_data = {
             "supply_plan": self.supply_plan.id,
             "source": "INTERNAL",
-            "origin_country": 77,
+            "origin_country": "FR",
             "origin_department": "75",
             "crop_type": "MAIN",
             "volume": 500.0,
@@ -80,8 +80,13 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             self.url_base, new_supply_data, content_type="application/json", query_params=self.base_params
         )
 
+        expected_data = {
+            **new_supply_data,
+            "origin_country": {"name": "France", "name_en": "France", "code_pays": "FR", "is_in_europe": True},
+        }
+
         self.assertEqual(response.status_code, 201)
-        assert_object_contains_data(self, response.data, new_supply_data, object_name="supply input")
+        assert_object_contains_data(self, response.data, expected_data, object_name="supply input")
 
     def test_update_supply_input_success(self):
         """Test successful update of a supply input."""

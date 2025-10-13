@@ -31,9 +31,10 @@ export const useSupplyPlanColumns = () => {
     },
     {
       header: t("Département"),
-      cell: (input) => (
-        <Tag>{`${input.origin_department} - ${getDepartmentName(input.origin_department) ?? ""}`}</Tag>
-      ),
+      cell: (input) =>
+        input.origin_department && (
+          <Tag>{`${input.origin_department} - ${getDepartmentName(input.origin_department) ?? ""}`}</Tag>
+        ),
     },
     {
       header: t("Volume (t)"),

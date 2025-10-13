@@ -25,6 +25,9 @@ type TextOwnProps<T extends React.ElementType> = {
   fontWeight?: "light" | "regular" | "semibold" | "bold" | "heavy"
 
   domRef?: React.RefObject<HTMLElement | undefined>
+
+  // Enable/disable the default margin designed by the DSFR
+  margin?: boolean
 }
 
 // Make mandatory the componentProps property if there are mandatory props for the generic component
@@ -45,6 +48,7 @@ export const Text: <T extends React.ElementType>(
   fontWeight = "regular",
   componentProps,
   domRef,
+  margin = false,
   ...props
 }) => {
   return (
@@ -57,6 +61,7 @@ export const Text: <T extends React.ElementType>(
         fontWeight === "semibold"
           ? styles.semibold
           : fr.cx(`fr-text--${fontWeight}`),
+        !margin && styles.noMargin,
         componentProps?.className,
         className
       )}

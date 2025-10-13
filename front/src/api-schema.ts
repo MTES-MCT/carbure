@@ -482,13 +482,29 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["biomethane_supply_input_retrieve"];
         put: operations["biomethane_supply_input_update"];
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch: operations["biomethane_supply_input_partial_update"];
+        trace?: never;
+    };
+    "/api/biomethane/supply-input/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_supply_input_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/biomethane/supply-input/filters/": {
@@ -501,6 +517,39 @@ export interface paths {
         get: operations["biomethane_supply_input_filters_retrieve"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/supply-plan/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_supply_plan_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/supply-plan/import/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Upload and process an Excel file to create supply plan entries.  */
+        post: operations["import_supply_plan_from_excel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3228,6 +3277,7 @@ export interface components {
         };
         BiomethaneSupplyInput: {
             readonly id: number;
+            origin_country: components["schemas"]["Country"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
@@ -3237,33 +3287,51 @@ export interface components {
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
             volume: number;
-            origin_department: string;
+            origin_department?: string | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
             supply_plan: number;
-            origin_country?: number;
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
-            input_type: string;
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
             volume: number;
-            origin_department: string;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            origin_country?: number;
+            input_type: string;
+            origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
+            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
+            crop_type: components["schemas"]["CropTypeEnum"];
+            input_category: components["schemas"]["InputCategoryEnum"];
+            material_unit: components["schemas"]["MaterialUnitEnum"];
+            origin_country: string;
+            /** Format: double */
+            dry_matter_ratio_percent?: number | null;
+            /** Format: double */
+            volume: number;
+            /** Format: double */
+            average_weighted_distance_km?: number | null;
+            /** Format: double */
+            maximum_distance_km?: number | null;
+            input_type: string;
+            origin_department?: string | null;
+        };
+        BiomethaneSupplyInputExport: {
+            readonly year: number;
+            readonly origin_country: string;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             input_category: components["schemas"]["InputCategoryEnum"];
@@ -3273,12 +3341,11 @@ export interface components {
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
             volume: number;
-            origin_department: string;
+            origin_department?: string | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            origin_country?: number;
         };
         /**
          * @description * `INTERNAL` - Interne
@@ -3286,6 +3353,10 @@ export interface components {
          * @enum {string}
          */
         BiomethaneSupplyInputSourceEnum: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
+        BiomethaneUploadExcelRequest: {
+            /** Format: binary */
+            file: File;
+        };
         CarbureLotPublic: {
             readonly id: number;
             year: number;
@@ -4787,18 +4858,18 @@ export interface components {
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type?: components["schemas"]["CropTypeEnum"];
             input_category?: components["schemas"]["InputCategoryEnum"];
-            input_type?: string;
             material_unit?: components["schemas"]["MaterialUnitEnum"];
+            origin_country?: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
             volume?: number;
-            origin_department?: string;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            origin_country?: number;
+            input_type?: string;
+            origin_department?: string | null;
         };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
@@ -6705,6 +6776,31 @@ export interface operations {
             };
         };
     };
+    biomethane_supply_input_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneSupplyInput"];
+                };
+            };
+        };
+    };
     biomethane_supply_input_update: {
         parameters: {
             query: {
@@ -6767,6 +6863,28 @@ export interface operations {
             };
         };
     };
+    biomethane_supply_input_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneSupplyInputExport"];
+                };
+            };
+        };
+    };
     biomethane_supply_input_filters_retrieve: {
         parameters: {
             query: {
@@ -6779,7 +6897,7 @@ export interface operations {
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
-                filter?: string;
+                filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A search term. */
@@ -6801,6 +6919,64 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    biomethane_supply_plan_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneSupplyInputExport"];
+                };
+            };
+        };
+    };
+    import_supply_plan_from_excel: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiomethaneUploadExcelRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BiomethaneUploadExcelRequest"];
+                "multipart/form-data": components["schemas"]["BiomethaneUploadExcelRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -7837,7 +8013,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
-                filter?: string;
+                filter: PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter;
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Ordre
@@ -8144,7 +8320,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
-                filter?: string;
+                filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
                 month?: number;
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operator?: string[];
@@ -11990,6 +12166,12 @@ export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
     EXTERNAL = "EXTERNAL",
     INTERNAL = "INTERNAL"
 }
+export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
+    category = "category",
+    source = "source",
+    type = "type",
+    year = "year"
+}
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
     ValueMinusproducer = "-producer",
@@ -12049,6 +12231,15 @@ export enum PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQuer
     validated_by = "validated_by",
     year = "year"
 }
+export enum PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter {
+    cpo = "cpo",
+    energy_amount = "energy_amount",
+    operating_unit = "operating_unit",
+    order_by = "order_by",
+    quarter = "quarter",
+    source = "source",
+    year = "year"
+}
 export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
     ValueMinusconsumption_date = "-consumption_date",
@@ -12064,6 +12255,21 @@ export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     operator = "operator",
     status = "status",
     transfer_date = "transfer_date"
+}
+export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
+    certificate_id = "certificate_id",
+    client = "client",
+    consumption_date = "consumption_date",
+    cpo = "cpo",
+    energy_amount = "energy_amount",
+    month = "month",
+    operator = "operator",
+    order_by = "order_by",
+    status = "status",
+    supplier = "supplier",
+    transfer_date = "transfer_date",
+    used_in_tiruert = "used_in_tiruert",
+    year = "year"
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
     ValueMinusadded_by = "-added_by",

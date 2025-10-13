@@ -74,7 +74,7 @@ class BiomethaneSupplyInput(models.Model):
     origin_country = models.ForeignKey(Pays, on_delete=models.PROTECT, default=1)
 
     # Département d'origine
-    origin_department = models.CharField(max_length=3)
+    origin_department = models.CharField(max_length=3, null=True, blank=True)
 
     # Distance moyenne pondérée d'approvisionnement (Km)
     average_weighted_distance_km = models.FloatField(null=True, blank=True)

@@ -16,7 +16,7 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             "input_category": BiomethaneSupplyInput.CIVE,
             "input_type": "Maïs",
             "volume": 1000.0,
-            "origin_country": 77,
+            "origin_country": "FR",
             "origin_department": "75",
         }
 
