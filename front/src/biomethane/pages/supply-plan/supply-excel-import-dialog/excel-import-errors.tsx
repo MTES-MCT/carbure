@@ -12,7 +12,7 @@ export const ExcelImportErrors = ({
 
   return (
     <Notice variant="alert">
-      <Text style={{ marginBottom: "var(--spacing-l)" }}>
+      <Text margin>
         {t(
           "({{count}}) erreurs ont été détectées dans le fichier Excel source. Veuillez vous assurer que les intitulés des colonnes sont bien les mêmes que dans notre modèle prédéfini. Merci de corriger le fichier et de l'envoyer à nouveau.",
           { count: importErrors.total_errors }

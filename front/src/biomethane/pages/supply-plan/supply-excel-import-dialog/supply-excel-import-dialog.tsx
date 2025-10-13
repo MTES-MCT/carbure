@@ -2,7 +2,6 @@ import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { Trans, useTranslation } from "react-i18next"
 import { Form, useForm } from "common/components/form"
-import { ExternalLink } from "common/components/button"
 import { FileInput } from "common/components/inputs2"
 import { useMutation } from "common/hooks/async"
 import { useNotify, useNotifyError } from "common/components/notifications"
@@ -27,6 +26,8 @@ export interface ImportErrorResponse {
   total_errors: number
   total_rows_processed: number
 }
+
+const FILE_PATH = "/templates/plan_approvisionnement_non_red.xlsx"
 
 export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation()
@@ -72,8 +73,6 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
     bind("supplyPlanFile").onChange(file || null)
   }
 
-  const filePath = "/templates/plan_approvisionnement_non_red.xlsx"
-
   return (
     <Dialog
       header={
@@ -102,7 +101,13 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
         <p>
           <Trans>
             Le template du fichier attendu est disponible{" "}
-            <ExternalLink href={filePath}>sur ce lien</ExternalLink>.
+            <Button
+              linkProps={{ to: FILE_PATH, target: "_blank" }}
+              customPriority="link"
+            >
+              sur ce lien
+            </Button>
+            .
           </Trans>
         </p>
 
