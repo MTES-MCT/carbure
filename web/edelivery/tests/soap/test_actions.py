@@ -72,9 +72,10 @@ class SubmitMessageTest(TestCase):
         action = SubmitMessage(request)
         self.assertEqual(SubmitMessageResponse, action.response_class)
 
-    def test_knows_its_payload(self):
+    @patch("edelivery.soap.actions.new_uuid")
+    def test_knows_its_payload(self, patched_new_uuid):
+        patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
         request = MagicMock()
-        request.id = "12345678-1234-1234-1234-1234567890ab"
         request.original_sender = "CarbuRe_NTR"
         request.timestamp = "2025-07-15T13:00:00+00:00"
         request.initiator_id.return_value = "initiator"

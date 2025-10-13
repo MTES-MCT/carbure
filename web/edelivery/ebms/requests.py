@@ -8,15 +8,11 @@ from edelivery.ebms.access_points import Initiator, Responder
 
 class BaseRequest:
     def __init__(self, responder_id, body):
-        self.id = new_uuid()
         self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
         self.original_sender = environ["CARBURE_NTR"]
         self.responder = Responder(responder_id)
         self.timestamp = timestamp()
         self.body = body
-
-    def identifier(self):
-        return str(self.id)
 
     def initiator_id(self):
         return self.initiator.id
@@ -33,10 +29,10 @@ class BaseRequest:
 
 class GetSourcingContactByIdRequest(BaseRequest):
     def __init__(self, responder_id, sourcing_contact_id):
-        self.request_id = new_uuid()
+        self.id = new_uuid()
         body = f"""\
 <udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <REQUEST_HEADER REQUEST_ID="{self.request_id}"/>
+  <REQUEST_HEADER REQUEST_ID="{self.id}"/>
   <SC_ID_HEADER>
     <SC_ID>
       <SOURCING_CONTACT_NUMBER>{sourcing_contact_id}</SOURCING_CONTACT_NUMBER>

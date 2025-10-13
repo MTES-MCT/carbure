@@ -1,4 +1,5 @@
 from edelivery.adapters.edelivery_adapter import send_SOAP_request
+from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
@@ -51,6 +52,7 @@ class SubmitMessage(AbstractSoapAction):
     def __init__(self, message, send_callback=send_SOAP_request):
         super().__init__("submitMessage", SubmitMessageResponse, send_callback)
         self.message = message
+        self.message_id = new_uuid()
 
     def payload(self):
         return f"""\
@@ -65,7 +67,7 @@ class SubmitMessage(AbstractSoapAction):
       <eb:UserMessage>
         <eb:MessageInfo>
           <eb:Timestamp>{self.message.timestamp}</eb:Timestamp>
-          <eb:MessageId>{self.message.id}</eb:MessageId>
+          <eb:MessageId>{self.message_id}</eb:MessageId>
         </eb:MessageInfo>
         <eb:PartyInfo>
           <eb:From>{self.message.initiator_to_XML()}</eb:From>

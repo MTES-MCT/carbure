@@ -8,17 +8,10 @@ from edelivery.ebms.requests import BaseRequest, GetSourcingContactByIdRequest
 @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
 class BaseRequestTest(TestCase):
     def setUp(self):
-        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
         self.patched_timestamp = patch("edelivery.ebms.requests.timestamp").start()
 
     def tearDown(self):
         patch.stopall()
-
-    def test_has_a_UUID(self):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
-
-        request = BaseRequest("responder_id", "A request")
-        self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.identifier())
 
     def test_has_a_timestamp(self):
         self.patched_timestamp.return_value = "2025-07-15T13:00:00+00:00"
@@ -53,6 +46,12 @@ class GetSourcingContactByIdRequestTest(TestCase):
         self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
         self.patched_timestamp = patch("edelivery.ebms.requests.timestamp").start()
 
+    def test_knows_its_identifier(self):
+        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+
+        request = GetSourcingContactByIdRequest("responder_id", "")
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.id)
+
     def test_injects_request_id_and_sourcing_contact_id_in_body(self):
         self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
 
@@ -68,9 +67,3 @@ class GetSourcingContactByIdRequestTest(TestCase):
 </udb:GetSourcingContactByIDRequest>"""
 
         self.assertEqual(expected_body, request.body)
-
-    def test_knows_its_identifier(self):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
-
-        request = GetSourcingContactByIdRequest("responder_id", "")
-        self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.request_id)
