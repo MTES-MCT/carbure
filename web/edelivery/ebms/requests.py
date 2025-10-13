@@ -1,6 +1,5 @@
 from os import environ
 
-from edelivery.adapters.clock import timestamp
 from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.adapters.zip_utils import zip_and_stream_udb_request
 from edelivery.ebms.access_points import Responder
@@ -9,7 +8,6 @@ from edelivery.ebms.access_points import Responder
 class BaseRequest:
     def __init__(self, responder_id, body):
         self.responder = Responder(responder_id)
-        self.timestamp = timestamp()
         self.body = body
 
     def responder_to_XML(self):

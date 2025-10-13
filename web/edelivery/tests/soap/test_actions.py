@@ -73,11 +73,12 @@ class SubmitMessageTest(TestCase):
         self.assertEqual(SubmitMessageResponse, action.response_class)
 
     @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
+    @patch("edelivery.soap.actions.timestamp")
     @patch("edelivery.soap.actions.new_uuid")
-    def test_knows_its_payload(self, patched_new_uuid):
+    def test_knows_its_payload(self, patched_new_uuid, patched_timestamp):
         patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+        patched_timestamp.return_value = "2025-07-15T13:00:00+00:00"
         request = MagicMock()
-        request.timestamp = "2025-07-15T13:00:00+00:00"
         request.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
         request.zipped_encoded.return_value = "abcdef"
         action = SubmitMessage(request)
