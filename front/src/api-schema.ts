@@ -5274,7 +5274,7 @@ export interface components {
         UserRightsRequests: {
             readonly id: number;
             readonly user: string[];
-            entity: components["schemas"]["UserEntity"];
+            entity: components["schemas"]["EntitySummary"];
             /** Format: date-time */
             readonly date_requested: string;
             readonly status: components["schemas"]["UserRightsRequestsStatusEnum"];
