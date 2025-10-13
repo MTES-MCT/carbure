@@ -11,6 +11,7 @@ import {
   biocarburant,
   productionSite,
   generateUser,
+  entitySite,
 } from "./data"
 import { mockGetWithResponseData } from "./helpers"
 
@@ -68,6 +69,10 @@ export const okProductionSitesSearch = http.get(
     })
   }
 )
+
+export const okGetDeliverySites = http.get("/api/entities/depots", () => {
+  return HttpResponse.json([entitySite])
+})
 
 export const okDeliverySitesSearch = http.get("/api/resources/depots", () => {
   return HttpResponse.json({

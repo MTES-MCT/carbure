@@ -6,7 +6,7 @@ import { getViewport } from "@storybook/mocks/utils"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const meta = {
-  title: "SAF/Operator/TicketSourceDetails",
+  title: "modules/saf/pages/TicketSourceDetails",
   component: TicketSourceDetails,
   parameters: {
     layout: "centered",

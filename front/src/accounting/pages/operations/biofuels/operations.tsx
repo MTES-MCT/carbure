@@ -2,7 +2,7 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { OperationsFilter, OperationsQueryBuilder } from "accounting/types"
 import { useTranslation } from "react-i18next"
 
-import * as api from "accounting/api/operations"
+import * as api from "accounting/api/biofuels/operations"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import {

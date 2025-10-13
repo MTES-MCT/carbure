@@ -7,12 +7,6 @@ import {
   EntityDepot,
 } from "common/types"
 
-export function getDeliverySites(entity_id: number) {
-  return apiFetch.GET("/entities/depots/", {
-    params: { query: { entity_id } },
-  })
-}
-
 /**
  * Link an existing delivery site to an entity
  */

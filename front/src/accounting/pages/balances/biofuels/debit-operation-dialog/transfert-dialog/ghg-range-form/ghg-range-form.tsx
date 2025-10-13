@@ -1,4 +1,4 @@
-import { getBalances } from "accounting/api/balances"
+import { getBalances } from "accounting/api/biofuels/balances"
 import { GHGRangeForm } from "accounting/components/ghg-range-form"
 import { Balance } from "accounting/types"
 import { useFormContext } from "common/components/form2"

@@ -1,7 +1,7 @@
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { ElecOperationsQueryBuilder, OperationsFilter } from "accounting/types"
 import { useTranslation } from "react-i18next"
-import * as api from "accounting/api/elec-operations"
+import * as api from "accounting/api/elec/operations"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import {

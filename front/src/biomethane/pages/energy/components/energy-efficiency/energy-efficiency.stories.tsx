@@ -7,7 +7,7 @@ import { EnergyProvider } from "../../energy.hooks"
 import { userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<typeof EnergyEfficiency> = {
-  title: "Biomethane/Energy/EnergyEfficiency",
+  title: "modules/biomethane/pages/energy/components/EnergyEfficiency",
   component: EnergyEfficiency,
   render: (args) => (
     <EnergyProvider year={2025}>

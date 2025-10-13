@@ -1,4 +1,4 @@
-import { createOperation } from "accounting/api/operations"
+import { createOperation } from "accounting/api/biofuels/operations"
 import { useMutation } from "common/hooks/async"
 import { DeclareTeneurDialogForm } from "./declare-teneur-dialog.types"
 import { useTranslation } from "react-i18next"
