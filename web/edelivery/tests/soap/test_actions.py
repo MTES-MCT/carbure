@@ -73,13 +73,12 @@ class SubmitMessageTest(TestCase):
         self.assertEqual(SubmitMessageResponse, action.response_class)
 
     @patch("edelivery.soap.actions.new_uuid")
+    @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id"})
     def test_knows_its_payload(self, patched_new_uuid):
         patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
         request = MagicMock()
         request.original_sender = "CarbuRe_NTR"
         request.timestamp = "2025-07-15T13:00:00+00:00"
-        request.initiator_id.return_value = "initiator"
-        request.initiator_to_XML.return_value = "<MockValue>initiator</MockValue>"
         request.responder_to_XML.return_value = "<MockValue>responder</MockValue>"
         request.zipped_encoded.return_value = "abcdef"
         action = SubmitMessage(request)
@@ -99,7 +98,8 @@ class SubmitMessageTest(TestCase):
           <eb:MessageId>12345678-1234-1234-1234-1234567890ab</eb:MessageId>
         </eb:MessageInfo>
         <eb:PartyInfo>
-          <eb:From><MockValue>initiator</MockValue></eb:From>
+          <eb:From><eb:PartyId type="urn:oasis:names:tc:ebcore:partyid-type:unregistered:UDB">initiator_id</eb:PartyId>
+<eb:Role>http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/initiator</eb:Role></eb:From>
           <eb:To><MockValue>responder</MockValue></eb:To>
         </eb:PartyInfo>
         <eb:CollaborationInfo>
