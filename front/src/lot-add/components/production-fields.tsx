@@ -15,6 +15,7 @@ import { UserCheck } from "common/components/icons"
 import { Country, ProductionSite, EntityPreview } from "common/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 import { compact, uniqueBy } from "common/utils/collection"
+import { isSAF } from "saf/utils/guards"
 
 interface ProductionFieldsProps {
   readOnly?: boolean
@@ -206,6 +207,7 @@ export const ProductionSiteDoubleCountingCertificateField = (
       icon={<CertificateIcon certificate={certificate} />}
       label={t("Certificat double-comptage")}
       {...dcProps}
+      required={!isSAF(value.biofuel)}
     />
   )
 }
