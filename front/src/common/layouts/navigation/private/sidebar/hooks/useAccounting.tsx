@@ -2,6 +2,7 @@ import { useRoutes } from "common/hooks/routes"
 import { MenuSection } from "../sidebar.types"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
+import { Badge } from "@codegouvfr/react-dsfr/Badge"
 
 export const useAccounting = () => {
   const routes = useRoutes()
@@ -12,6 +13,7 @@ export const useAccounting = () => {
 
   const section: MenuSection = {
     title: t("Comptabilité"),
+    badge: <Badge severity="info">BETA</Badge>,
     condition: accise_number !== "" || isAdmin || hasAdminRight("TIRIB"),
     children: [
       {

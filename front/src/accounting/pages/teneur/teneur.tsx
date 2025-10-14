@@ -24,6 +24,7 @@ import { ElecOperationSector } from "accounting/types"
 import { DeclareElecTeneurDialog } from "./components/declare-elec-teneur-dialog"
 import { useOutletContext } from "react-router-dom"
 import { TeneurOutletContext } from "accounting/layouts/teneur-layout"
+import { BetaPage } from "common/molecules/beta-page"
 
 function getObjectivesForEntityOrAdmin(
   entityId: number,
@@ -43,7 +44,7 @@ const Teneur = () => {
   const readOnly = isAdminOrExternal
   const { t } = useTranslation()
   const portal = usePortal()
-  usePrivateNavigation(t("Objectifs annuels"))
+  usePrivateNavigation(<BetaPage title={t("Objectifs annuels")} />)
 
   const { selectedEntityId } = useOutletContext<TeneurOutletContext>()
 

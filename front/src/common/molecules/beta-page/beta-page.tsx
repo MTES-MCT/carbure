@@ -24,7 +24,7 @@ export const BetaPage: React.FC<BetaPageProps> = ({ title, text }) => {
   const { t } = useTranslation()
 
   const defaultText = t(
-    "Version d'essai (bêta) – Les actions effectuées dans cette version n'ont aucun impact réel."
+    "Les actions effectuées dans cette version n'ont aucun impact réel."
   )
   const displayText = text ?? defaultText
 
