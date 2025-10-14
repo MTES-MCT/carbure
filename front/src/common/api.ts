@@ -131,9 +131,12 @@ export async function findAirports(query?: string, public_only?: boolean) {
   return res.data ?? []
 }
 
-export async function findCertificates(query: string) {
+export async function findCertificates(
+  query: string,
+  options?: { date?: string }
+) {
   const res = await apiFetch.GET("/resources/certificates", {
-    params: { query: { query } },
+    params: { query: { query, ...options } },
   })
 
   return res.data?.map((c) => c.certificate_id) ?? []
@@ -144,6 +147,7 @@ export async function findMyCertificates(
   options: {
     entity_id: number
     production_site_id?: number
+    date?: string
   }
 ) {
   const res = await apiFetch.GET("/entities/certificates/", {

@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
@@ -7,6 +9,7 @@ from django_otp.plugins.otp_email.models import EmailDevice
 from core.carburetypes import CarbureError
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import YearConfig
 
 
@@ -45,6 +48,12 @@ class LotsFlowTest(TestCase):
         UserRights.objects.update_or_create(entity=self.trader, user=self.user1, role=UserRights.RW)
         UserRights.objects.update_or_create(entity=self.operator, user=self.user1, role=UserRights.RW)
 
+        GenericCertificateFactory.create(
+            certificate_id="VALID",
+            valid_from=date(2000, 1, 1),
+            valid_until=date(3000, 1, 1),
+        )
+
         # pass otp verification
         response = self.client.get(reverse("auth-request-otp"))
         assert response.status_code == 200
@@ -60,6 +69,7 @@ class LotsFlowTest(TestCase):
     def create_draft(self, lot=None, **kwargs):
         if lot is None:
             lot = get_lot(self.producer)
+        lot["supplier_certificate"] = "VALID"
         lot.update(kwargs)
         response = self.client.post(reverse("transactions-lots-add"), lot)
         assert response.status_code == 200

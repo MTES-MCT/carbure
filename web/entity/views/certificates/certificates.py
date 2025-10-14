@@ -1,3 +1,4 @@
+from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import viewsets
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
@@ -72,17 +73,27 @@ class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.Gene
                 description="Search within the field `certificate_id`",
                 required=False,
             ),
+            OpenApiParameter(
+                "date",
+                OpenApiTypes.STR,
+                OpenApiParameter.QUERY,
+                description="Search within certificates valid at this date",
+                required=False,
+            ),
         ],
         responses=EntityCertificateSerializer(many=True),
     )
     def list(self, request):
         entity_id = self.request.query_params.get("entity_id")
         query = self.request.query_params.get("query", None)
+        date = self.request.query_params.get("date", None)
         production_site_id = self.request.query_params.get("production_site_id")
         entity = Entity.objects.get(id=entity_id)
         queryset = self.get_queryset()
         if query:
             queryset = queryset.filter(certificate__certificate_id__icontains=query)
+        if date:
+            queryset = queryset.filter(Q(certificate__valid_from__lte=date) & Q(certificate__valid_until__gte=date))
 
         if entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
             company_id = self.request.query_params.get("company_id")
