@@ -1,0 +1,1 @@
+from .annual_declaration import BiomethaneAnnualDeclarationViewSet
