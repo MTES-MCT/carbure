@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 
 from .views import (
+    BiomethaneAnnualDeclarationViewSet,
     BiomethaneContractAmendmentViewSet,
     BiomethaneContractViewSet,
     BiomethaneDigestateSpreadingViewSet,
@@ -122,6 +123,12 @@ supply_plan_export_to_excel_viewset = BiomethaneSupplyInputViewSet.as_view(
     }
 )
 
+annual_declaration_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
+    {
+        "get": "retrieve",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
@@ -137,5 +144,6 @@ urlpatterns = [
     path("supply-plan/import/", supply_plan_import_excel_viewset, name="biomethane-supply-plan-import-excel"),
     path("supply-plan/export/", supply_plan_export_to_excel_viewset, name="biomethane-supply-plan-export-excel"),
     path("supply-plan/download-template/", download_template, name="biomethane-supply-plan-dl-template"),
+    path("annual-declaration/", annual_declaration_viewset, name="biomethane-annual-declaration"),
     *router.urls,
 ]
