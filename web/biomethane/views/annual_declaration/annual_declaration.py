@@ -1,0 +1,60 @@
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
+from biomethane.models import BiomethaneAnnualDeclaration
+from biomethane.permissions import get_biomethane_permissions
+from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ]
+)
+class BiomethaneAnnualDeclarationViewSet(GenericViewSet):
+    queryset = BiomethaneAnnualDeclaration.objects.all()
+    serializer_class = BiomethaneAnnualDeclarationSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        return get_biomethane_permissions([], self.action)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["entity"] = getattr(self.request, "entity", None)
+        return context
+
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=BiomethaneAnnualDeclarationSerializer,
+                description="Declaration details for the entity",
+            ),
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response=BiomethaneAnnualDeclarationSerializer,
+                description="Declaration created for the entity",
+            ),
+        },
+        description="Retrieve the declaration. Returns a single declaration object.",
+    )
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve the declaration for the current entity and current period or create it if it does not exist."""
+        try:
+            declaration = self.filter_queryset(self.get_queryset()).get()
+            status_code = status.HTTP_200_OK
+        except BiomethaneAnnualDeclaration.DoesNotExist:
+            serializer = self.get_serializer(data={})
+            serializer.is_valid(raise_exception=True)
+            declaration = serializer.save()
+            status_code = status.HTTP_201_CREATED
+
+        data = self.get_serializer(declaration, many=False).data
+        return Response(data, status=status_code)
