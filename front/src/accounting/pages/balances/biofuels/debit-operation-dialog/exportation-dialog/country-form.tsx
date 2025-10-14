@@ -3,7 +3,6 @@ import {
   RecipientForm,
   RecipientFormProps,
   RecipientSummary,
-  showNextStepRecipientForm,
 } from "accounting/components/recipient-form"
 import { findCountries } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
@@ -18,9 +17,6 @@ export type CountryFormProps = RecipientFormProps & {
   country?: Country
 }
 
-/**
- * This component overrides the recipient-to-depot form to add a country field
- */
 export const CountryForm = () => {
   const { bind } = useFormContext<CountryFormProps>()
   const { t } = useTranslation()
@@ -33,8 +29,9 @@ export const CountryForm = () => {
         placeholder={t("Rechercher un pays...")}
         getOptions={findCountries}
         normalize={normalizeCountry}
+        required
       />
-      <RecipientForm />
+      <RecipientForm required={false} />
     </>
   )
 }
@@ -58,17 +55,12 @@ export const CountryFormSummary = ({
   )
 }
 
-const showNextStepCountryForm = (values: CountryFormProps) => {
-  return showNextStepRecipientForm(values) && Boolean(values.country)
-}
-
 export const countryFormStepKey = "country-form"
 type CountryFormStepKey = typeof countryFormStepKey
 
 export const countryFormStep: (
   values: CountryFormProps
-) => Step<CountryFormStepKey> = (values) => ({
+) => Step<CountryFormStepKey> = () => ({
   key: countryFormStepKey,
-  title: i18next.t("Pays, client et dépôt destinataire"),
-  allowNextStep: showNextStepCountryForm(values),
+  title: i18next.t("Pays et client"),
 })
