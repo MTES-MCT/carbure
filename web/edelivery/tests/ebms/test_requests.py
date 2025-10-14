@@ -8,10 +8,10 @@ class BaseRequestTest(TestCase):
     @patch("edelivery.ebms.requests.zip_and_stream_udb_request")
     def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
         patched_zip_and_stream_udb_request.return_value = "abcdef"
-        request = BaseRequest("A request")
+        request = BaseRequest("12345", "<request/>")
 
         encoded_request = request.zipped_encoded()
-        patched_zip_and_stream_udb_request.assert_called_with("A request")
+        patched_zip_and_stream_udb_request.assert_called_with("<request/>")
         self.assertEqual("abcdef", encoded_request)
 
 

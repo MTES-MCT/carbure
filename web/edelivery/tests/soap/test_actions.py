@@ -63,12 +63,12 @@ class RetrieveMessageTest(TestCase):
 @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
 class SubmitMessageTest(TestCase):
     def test_knows_its_action_name(self):
-        request = BaseRequest("")
+        request = BaseRequest("12345", "<request/>")
         action = SubmitMessage("responder_id", request)
         self.assertEqual("submitMessage", action.name)
 
     def test_knows_its_response_class(self):
-        request = BaseRequest("")
+        request = BaseRequest("12345", "<request/>")
         action = SubmitMessage("responder_id", request)
         self.assertEqual(SubmitMessageResponse, action.response_class)
 
