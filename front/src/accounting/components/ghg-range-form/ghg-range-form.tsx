@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next"
 import { GHGRangeFormProps } from "./ghg-range-form.types"
 import { ceilNumber, floorNumber } from "common/utils/formatters"
 import { DoubleRange } from "common/components/inputs2"
+import { useEffect } from "react"
 
 type GHGRangeFormComponentProps = {
   balance: Balance
@@ -44,7 +45,8 @@ export const GHGRangeForm = ({ balance }: GHGRangeFormComponentProps) => {
   const { t } = useTranslation()
   const { formatUnit, unit } = useUnit()
   const entity = useEntity()
-  const { value, setField, bind } = useFormContext<GHGRangeFormProps>()
+  const { value, setField, bind, setValue } =
+    useFormContext<GHGRangeFormProps>()
 
   const ghgReductionMin = floorNumber(balance?.ghg_reduction_min ?? 50, 1)
   const ghgReductionMax = ceilNumber(balance?.ghg_reduction_max ?? 100, 1)
@@ -70,6 +72,18 @@ export const GHGRangeForm = ({ balance }: GHGRangeFormComponentProps) => {
       }
     },
   })
+
+  // When the component is mounted, init form values with the balance values only if they are not already set
+  useEffect(() => {
+    const formValue = {
+      ...value,
+      availableBalance: value.availableBalance ?? balance.available_balance,
+      gesBoundMin: value.gesBoundMin ?? Math.floor(balance.ghg_reduction_min),
+      gesBoundMax: value.gesBoundMax ?? Math.ceil(balance.ghg_reduction_max),
+    }
+
+    setValue(formValue)
+  }, [])
 
   return (
     <>

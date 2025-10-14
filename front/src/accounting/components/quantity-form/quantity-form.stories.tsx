@@ -20,7 +20,7 @@ const meta: Meta<typeof QuantityForm> = {
   args: {
     balance,
     type: CreateOperationType.TRANSFERT,
-    depot_quantity_max: 10000,
+    quantityMax: 10000,
   },
   parameters: {
     msw: {
@@ -56,7 +56,7 @@ export const ValidateQuantityButtonEnabled: Story = {
 // Display an error when the quantity is greater than the quantity max available
 export const ShowErrorWhenQuantityIsGreaterThanQuantityMax: Story = {
   args: {
-    depot_quantity_max: 100,
+    quantityMax: 100,
   },
   play: async (props) => {
     await ValidateQuantityButtonEnabled.play?.(props)
