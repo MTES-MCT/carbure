@@ -22,8 +22,14 @@ def get_settings(request, *args, **kwargs):
     # user-rights
     rights = UserRights.objects.filter(user=request.user).select_related("user", "entity")
     request.session["rights"] = {ur.entity.id: ur.role for ur in rights}
-    rights_sez = [r.natural_key() for r in rights]
     # requests
     requests = UserRightsRequests.objects.filter(user=request.user).select_related("user", "entity")
-    requests_sez = [r.natural_key() for r in requests]
-    return Response({"rights": rights_sez, "email": request.user.email, "requests": requests_sez})
+    serializer = UserSettingsResponseSerializer(
+        {
+            "email": request.user.email,
+            "rights": rights,
+            "requests": requests,
+        }
+    ).data
+
+    return Response(serializer)
