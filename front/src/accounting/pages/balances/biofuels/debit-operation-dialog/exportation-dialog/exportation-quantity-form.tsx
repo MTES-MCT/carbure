@@ -3,7 +3,6 @@ import { useFormContext } from "common/components/form2"
 import {
   QuantityFormProps,
   QuantitySummary as ExportationQuantitySummary,
-  quantityFormStep,
   quantityFormStepKey as exportationQuantityFormStepKey,
   QuantityFormComponentProps,
   QuantityForm,
@@ -46,17 +45,4 @@ export const ExportationQuantityForm = ({
   )
 }
 
-export const exportationQuantityFormStep = (
-  values: ExportationQuantityFormProps
-) => {
-  return {
-    ...quantityFormStep(values),
-    allowNextStep: Boolean(
-      values.quantity &&
-        values.quantity > 0 &&
-        values.avoided_emissions &&
-        values.avoided_emissions > 0
-    ),
-  }
-}
 export { ExportationQuantitySummary, exportationQuantityFormStepKey }

@@ -12,19 +12,25 @@ import i18next from "i18next"
 export type RecipientFormProps = {
   credited_entity?: EntityPreview
 }
-export const RecipientForm = () => {
+
+export type RecipientFormComponentProps = {
+  required?: boolean
+}
+
+export const RecipientForm = (overrides: RecipientFormComponentProps) => {
   const { t } = useTranslation()
   const { bind } = useFormContext<RecipientFormProps>()
   const entity = useEntity()
 
   return (
     <Autocomplete
-      label={t("Sélectionnez un destinataire")}
+      label={t("Destinataire")}
       placeholder={t("Rechercher un destinataire")}
       getOptions={(query) => findEligibleTiruertEntities(entity.id, query)}
       normalize={normalizeEntityPreview}
       {...bind("credited_entity")}
       required
+      {...overrides}
     />
   )
 }

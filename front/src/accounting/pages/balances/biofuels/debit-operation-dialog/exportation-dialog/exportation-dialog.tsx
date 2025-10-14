@@ -26,12 +26,12 @@ import { ExportationDialogForm } from "./exportation-dialog.types"
 import { useExportationDialog } from "./exportation-dialog.hooks"
 import {
   ExportationQuantityForm,
-  exportationQuantityFormStep,
   exportationQuantityFormStepKey,
   ExportationQuantitySummary,
 } from "./exportation-quantity-form"
 import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 import { GHGRangeForm } from "accounting/components/ghg-range-form"
+import { useQuantityFormStep } from "accounting/components/quantity-form"
 
 interface ExportationDialogProps {
   onClose: () => void
@@ -152,13 +152,23 @@ export const ExportationDialogContent = ({
 export const ExportationDialog = (props: ExportationDialogProps) => {
   const { t } = useTranslation()
   const form = useForm<ExportationDialogForm>({})
+  const exportationQuantityFormStep = useQuantityFormStep({
+    balance: props.balance,
+    form,
+    overrides: {
+      title: t(
+        "Quantité d'énergie exportée et tonnes de CO2 évitées équivalentes"
+      ),
+    },
+  })
 
   const steps = [
     fromDepotStep(form.value),
-    exportationQuantityFormStep(form.value),
+    exportationQuantityFormStep,
     countryFormStep(form.value),
     { key: "recap", title: t("Récapitulatif") },
   ]
+
   return (
     <StepperProvider steps={steps}>
       <ExportationDialogContent {...props} form={form} />
