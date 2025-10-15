@@ -128,6 +128,12 @@ annual_declaration_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
     }
 )
 
+annual_declaration_validate_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
+    {
+        "post": "validate_annual_declaration",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
@@ -143,5 +149,6 @@ urlpatterns = [
     path("supply-plan/import/", supply_plan_import_excel_viewset, name="biomethane-supply-plan-import-excel"),
     path("supply-plan/export/", supply_plan_export_to_excel_viewset, name="biomethane-supply-plan-export-excel"),
     path("annual-declaration/", annual_declaration_viewset, name="biomethane-annual-declaration"),
+    path("annual-declaration/validate/", annual_declaration_validate_viewset, name="biomethane-annual-declaration-validate"),
     *router.urls,
 ]

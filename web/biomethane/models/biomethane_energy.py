@@ -147,6 +147,12 @@ class BiomethaneEnergy(models.Model):
         unique_together = ["producer", "year"]
         verbose_name = "Biométhane - Énergie"
 
+    @property
+    def optional_fields(self):
+        from biomethane.services import BiomethaneEnergyService
+
+        return BiomethaneEnergyService.get_optional_fields(self)
+
 
 @receiver(post_save, sender=BiomethaneEnergy)
 @receiver(post_save, sender=BiomethaneProductionUnit)
@@ -156,17 +162,15 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
     Clear specific BiomethaneEnergy fields based on related model changes.
 
     This signal is triggered when BiomethaneEnergy, BiomethaneProductionUnit,
-    or BiomethaneContract models are saved, and clears energy fields that
-    should be reset based on the configuration changes.
+    or BiomethaneContract models are saved, and clears energy fields based on
+    the business rules centralized in BiomethaneEnergyService.
     """
+    from biomethane.services import BiomethaneEnergyService
+
     # Get the producer and related objects based on the sender
     if sender == BiomethaneEnergy:
         energy_instance = instance
-        producer = instance.producer
-    elif sender == BiomethaneProductionUnit:
-        producer = instance.producer
-        energy_instance = producer.biomethane_energies.order_by("-id").first()
-    elif sender == BiomethaneContract:
+    elif sender in [BiomethaneProductionUnit, BiomethaneContract]:
         producer = instance.producer
         energy_instance = producer.biomethane_energies.order_by("-id").first()
     else:
@@ -175,61 +179,9 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
     if not energy_instance:
         return
 
-    # Get related objects
-    production_unit = getattr(producer, "biomethane_production_unit", None)
-    contract = getattr(producer, "biomethane_contract", None)
-
-    fields_to_clear = []
-
-    if sender == BiomethaneProductionUnit:
-        # Clear flaring_operating_hours if FLARING_FLOWMETER is NOT in installed_meters
-        if (
-            production_unit
-            and production_unit.installed_meters
-            and BiomethaneProductionUnit.FLARING_FLOWMETER not in production_unit.installed_meters
-        ):
-            fields_to_clear.append("flaring_operating_hours")
-    elif sender == BiomethaneContract:
-        # Clear fields based on tariff reference (older tariffs)
-        if contract and contract.tariff_reference not in ["2011", "2020", "2021"]:
-            fields_to_clear.extend(
-                [
-                    "energy_used_for_digester_heating",
-                    "purified_biogas_quantity_nm3",
-                    "purification_electric_consumption_kwe",
-                ]
-            )
-
-        # Clear fields based on tariff reference (newer tariffs)
-        if contract and contract.tariff_reference not in ["2023"]:
-            fields_to_clear.extend(
-                [
-                    "energy_used_for_installation_needs",
-                    "self_consumed_biogas_nm3",
-                    "total_unit_electric_consumption_kwe",
-                ]
-            )
-    elif sender == BiomethaneEnergy:
-        # Clear malfunction_details if malfunction_types is not OTHER
-        if (
-            energy_instance.malfunction_types
-            and energy_instance.malfunction_types != BiomethaneEnergy.MALFUNCTION_TYPE_OTHER
-        ):
-            fields_to_clear.append("malfunction_details")
-
-        # Clear malfunction fields if has_malfunctions is False
-        if not energy_instance.has_malfunctions:
-            fields_to_clear.extend(
-                [
-                    "malfunction_cumulative_duration_days",
-                    "malfunction_types",
-                    "malfunction_details",
-                ]
-            )
-
-        # Clear injection_impossibility_hours if has_injection_difficulties_due_to_network_saturation is False
-        if not energy_instance.has_injection_difficulties_due_to_network_saturation:
-            fields_to_clear.append("injection_impossibility_hours")
+    # Use the service to determine which fields should be cleared
+    rules = BiomethaneEnergyService.get_conditional_fields_rules(energy_instance)
+    fields_to_clear = rules["fields_to_clear"]
 
     if fields_to_clear:
         update_data = {field: None for field in fields_to_clear}
