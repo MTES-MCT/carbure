@@ -66,10 +66,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
                 fractionDigits: 0,
                 mode: "ceil",
               }),
-              target_percent: formatNumber(objective.target_percent, {
-                fractionDigits: 2,
-                appendZeros: false,
-              }),
+              target_percent: formatNumber(objective.target_percent),
             }
           )}
           mainValue={formatNumber(

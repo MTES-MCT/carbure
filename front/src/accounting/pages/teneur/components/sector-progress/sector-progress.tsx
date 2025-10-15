@@ -32,10 +32,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 objective: formatUnit(sector.target, ExtendedUnit.GJ, {
                   fractionDigits: 0,
                 }),
-                target_percent: formatNumber(sector.target_percent, {
-                  fractionDigits: 2,
-                  appendZeros: false,
-                }),
+                target_percent: formatNumber(sector.target_percent),
               }
             )}
             mainValue={floorNumber(

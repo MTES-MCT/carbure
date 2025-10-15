@@ -199,7 +199,6 @@ const QuantitySection = ({
               values={{
                 quantity: formatUnit(value.quantity!, {
                   fractionDigits: 10,
-                  appendZeros: false,
                 }),
                 value: value.avoided_emissions_min,
               }}
@@ -212,7 +211,6 @@ const QuantitySection = ({
               values={{
                 quantity: formatUnit(value.quantity!, {
                   fractionDigits: 10,
-                  appendZeros: false,
                 }),
                 min: value.avoided_emissions_min,
                 max: value.avoided_emissions_max,
