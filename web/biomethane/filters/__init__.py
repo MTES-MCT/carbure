@@ -4,3 +4,4 @@ from .contract import BiomethaneContractFilter
 from .supply_plan import BiomethaneSupplyPlanYearsFilter
 from .energy import BiomethaneEnergyFilter
 from .supply_input import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
+from .annual_declaration import BiomethaneAnnualDeclarationFilter

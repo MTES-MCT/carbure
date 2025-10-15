@@ -3,9 +3,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters import BiomethaneAnnualDeclarationFilter
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
+from biomethane.utils import get_declaration_period
+
+from .mixins import ValidateActionMixin
 
 
 @extend_schema(
@@ -19,9 +23,10 @@ from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
         ),
     ]
 )
-class BiomethaneAnnualDeclarationViewSet(GenericViewSet):
+class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin):
     queryset = BiomethaneAnnualDeclaration.objects.all()
     serializer_class = BiomethaneAnnualDeclarationSerializer
+    filterset_class = BiomethaneAnnualDeclarationFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -31,6 +36,10 @@ class BiomethaneAnnualDeclarationViewSet(GenericViewSet):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
         return context
+
+    def get_queryset(self):
+        year = get_declaration_period()
+        return self.queryset.filter(year=year)
 
     @extend_schema(
         responses={
