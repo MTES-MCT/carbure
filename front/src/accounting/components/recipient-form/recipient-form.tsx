@@ -59,6 +59,6 @@ export const recipientStep: (
   values: RecipientFormProps
 ) => Step<RecipientStepKey> = (values) => ({
   key: recipientStepKey,
-  title: i18next.t("Redevable et dépôt destinataire"),
+  title: i18next.t("Destinataire"),
   allowNextStep: showNextStepRecipientForm(values),
 })

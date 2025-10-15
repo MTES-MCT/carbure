@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react"
-import { TransfertGHGRangeForm } from "./ghg-range-form"
+import { GHGRangeForm } from "./ghg-range-form"
 import { Form, useForm } from "common/components/form2"
 import { balance } from "accounting/__test__/data/balances"
 import { fireEvent, waitFor, within } from "@storybook/test"
@@ -21,10 +21,9 @@ const getBalancesWithUpdatedAvailableBalance = http.get(
   }
 )
 
-const meta: Meta<typeof TransfertGHGRangeForm> = {
-  component: TransfertGHGRangeForm,
-  title:
-    "modules/accounting/pages/balances/biofuels/debit-operation-dialog/transfert-dialog/GHGRangeForm",
+const meta: Meta<typeof GHGRangeForm> = {
+  component: GHGRangeForm,
+  title: "modules/accounting/components/GHGRangeForm",
   parameters: {
     msw: {
       handlers: [getBalancesWithUpdatedAvailableBalance],
@@ -38,12 +37,12 @@ const meta: Meta<typeof TransfertGHGRangeForm> = {
 
     return (
       <Form form={form}>
-        <TransfertGHGRangeForm {...args} />
+        <GHGRangeForm {...args} />
       </Form>
     )
   },
 }
-type Story = StoryObj<typeof TransfertGHGRangeForm>
+type Story = StoryObj<typeof GHGRangeForm>
 
 export default meta
 

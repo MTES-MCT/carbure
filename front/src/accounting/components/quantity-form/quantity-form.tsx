@@ -25,9 +25,6 @@ type QuantityFormComponentProps = {
   // Custom conversion function for the backend (default is the value passed as parameter)
   converter?: (value: number) => number
 
-  // Depot id can be used to known in which depot the quantity will be picked up
-  depotId?: number
-
   // Lot GHG min and max bounds
   gesBoundMin?: number
   gesBoundMax?: number
@@ -61,7 +58,6 @@ const QuantitySection = ({
   type,
   unit: customUnit,
   backendUnit: customBackendUnit,
-  depotId,
   gesBoundMin,
   gesBoundMax,
   converter,
@@ -76,7 +72,6 @@ const QuantitySection = ({
     values: value,
     unit: customBackendUnit,
     converter,
-    depotId,
     gesBoundMin,
     gesBoundMax,
   })
@@ -225,7 +220,6 @@ export const QuantityForm = ({
   type,
   unit: customUnit,
   backendUnit: customBackendUnit,
-  depotId,
   converter,
   gesBoundMin,
   gesBoundMax,
@@ -238,7 +232,6 @@ export const QuantityForm = ({
         type={type}
         unit={customUnit}
         backendUnit={customBackendUnit}
-        depotId={depotId}
         converter={converter}
         gesBoundMin={gesBoundMin}
         gesBoundMax={gesBoundMax}

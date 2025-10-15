@@ -18,13 +18,13 @@ import {
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
 import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
-import { TransfertGHGRangeForm } from "./ghg-range-form"
 import {
   RecipientForm,
   recipientStep,
   recipientStepKey,
   RecipientSummary,
 } from "accounting/components/recipient-form"
+import { GHGRangeForm } from "accounting/components/ghg-range-form"
 
 interface TransfertDialogProps {
   onClose: () => void
@@ -124,7 +124,7 @@ export const TransfertDialogContent = ({
                   <RecipientForm />
                 </Box>
                 <Box>
-                  <TransfertGHGRangeForm balance={balance} />
+                  <GHGRangeForm balance={balance} />
                 </Box>
               </>
             )}
