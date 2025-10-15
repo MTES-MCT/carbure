@@ -99,11 +99,15 @@ export const simulate = (
   })
 }
 
+export type CreateOperationProps = Omit<
+  apiTypes["OperationInputRequest"],
+  "lots"
+> & {
+  lots: apiTypes["SimulationLotOutput"][]
+}
 export const createOperation = (
   entityId: number,
-  data: Omit<apiTypes["OperationInputRequest"], "lots"> & {
-    lots: apiTypes["SimulationLotOutput"][]
-  }
+  data: CreateOperationProps
 ) => {
   return api.POST("/tiruert/operations/", {
     params: { query: { entity_id: entityId } },

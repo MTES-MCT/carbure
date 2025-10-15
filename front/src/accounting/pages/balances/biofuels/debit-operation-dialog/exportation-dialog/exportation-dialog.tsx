@@ -11,7 +11,6 @@ import {
 import { Balance } from "accounting/types"
 import Dialog from "common/components/dialog2/dialog"
 import { FormManager, useForm } from "common/components/form2"
-import Portal from "common/components/portal"
 import { Box, Main } from "common/components/scaffold"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
 import { Trans, useTranslation } from "react-i18next"
@@ -67,85 +66,91 @@ export const ExportationDialogContent = ({
         }
       : balance
   return (
-    <Portal>
-      <Dialog
-        fullWidth
-        onClose={onClose}
-        header={
-          <Dialog.Title>
-            <Trans>Réaliser une exportation</Trans>
-          </Dialog.Title>
-        }
-        footer={
-          <>
-            <Stepper.Previous />
-            <Stepper.Next nativeButtonProps={{ form: "exportation-dialog" }} />
-            {currentStep?.key === "recap" && (
+    <Dialog
+      fullWidth
+      onClose={onClose}
+      header={
+        <Dialog.Title>
+          <Trans>Réaliser une exportation</Trans>
+        </Dialog.Title>
+      }
+      footer={
+        <>
+          <Stepper.Previous />
+          <Stepper.Next nativeButtonProps={{ form: "exportation-dialog" }} />
+          {currentStep?.key === "recap" && (
+            <>
               <Button
-                priority="primary"
-                onClick={() => mutation.execute()}
+                priority="secondary"
+                onClick={() => mutation.execute({ draft: true })}
                 loading={mutation.loading}
               >
-                {t("Déclarer une exportation")}
+                {t("Sauvegarder")}
               </Button>
-            )}
-          </>
-        }
-      >
-        <Main>
-          <Stepper />
-          <Box>
-            <RecapOperationGrid>
-              <RecapOperation balance={currentBalance} />
-              {currentStepIndex > 1 && (
-                <>
-                  <FromDepotSummary values={form.value} />
-                  <RecapGHGRange
-                    min={form.value.gesBoundMin}
-                    max={form.value.gesBoundMax}
-                  />
-                </>
-              )}
-              {currentStepIndex > 2 && (
-                <ExportationQuantitySummary values={form.value} />
-              )}
-              {currentStepIndex > 3 && (
-                <CountryFormSummary values={form.value} />
-              )}
-            </RecapOperationGrid>
-          </Box>
-          {currentStep?.key !== "recap" && (
-            <Stepper.Form form={form} id="exportation-dialog">
-              {currentStep?.key === fromDepotStepKey && (
-                <>
-                  <Box>
-                    <FromDepotForm />
-                  </Box>
-                  <Box>
-                    <GHGRangeForm balance={balance} />
-                  </Box>
-                </>
-              )}
-              {currentStep?.key === exportationQuantityFormStepKey && (
-                <Box>
-                  <ExportationQuantityForm
-                    balance={balance}
-                    quantityMax={form.value.availableBalance}
-                    gesBoundMin={form.value.gesBoundMin}
-                    gesBoundMax={form.value.gesBoundMax}
-                  />
-                </Box>
-              )}
-              {currentStep?.key === countryFormStepKey && (
-                <Box>
-                  <CountryForm />
-                </Box>
-              )}
-            </Stepper.Form>
+
+              <Button
+                priority="primary"
+                onClick={() => mutation.execute({ draft: false })}
+                loading={mutation.loading}
+              >
+                {t("Exporter")}
+              </Button>
+            </>
           )}
-        </Main>
-      </Dialog>
-    </Portal>
+        </>
+      }
+    >
+      <Main>
+        <Stepper />
+        <Box>
+          <RecapOperationGrid>
+            <RecapOperation balance={currentBalance} />
+            {currentStepIndex > 1 && (
+              <>
+                <FromDepotSummary values={form.value} />
+                <RecapGHGRange
+                  min={form.value.gesBoundMin}
+                  max={form.value.gesBoundMax}
+                />
+              </>
+            )}
+            {currentStepIndex > 2 && (
+              <ExportationQuantitySummary values={form.value} />
+            )}
+            {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
+          </RecapOperationGrid>
+        </Box>
+        {currentStep?.key !== "recap" && (
+          <Stepper.Form form={form} id="exportation-dialog">
+            {currentStep?.key === fromDepotStepKey && (
+              <>
+                <Box>
+                  <FromDepotForm />
+                </Box>
+                <Box>
+                  <GHGRangeForm balance={balance} />
+                </Box>
+              </>
+            )}
+            {currentStep?.key === exportationQuantityFormStepKey && (
+              <Box>
+                <ExportationQuantityForm
+                  balance={balance}
+                  quantityMax={form.value.availableBalance}
+                  gesBoundMin={form.value.gesBoundMin}
+                  gesBoundMax={form.value.gesBoundMax}
+                />
+              </Box>
+            )}
+            {currentStep?.key === countryFormStepKey && (
+              <Box>
+                <CountryForm />
+              </Box>
+            )}
+          </Stepper.Form>
+        )}
+      </Main>
+    </Dialog>
   )
 }
 

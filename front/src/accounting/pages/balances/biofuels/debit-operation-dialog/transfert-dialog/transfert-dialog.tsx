@@ -77,7 +77,7 @@ export const TransfertDialogContent = ({
             <>
               <Button
                 priority="secondary"
-                onClick={() => mutation.execute(true)}
+                onClick={() => mutation.execute({ draft: true })}
                 loading={mutation.loading}
               >
                 {t("Sauvegarder")}
@@ -85,7 +85,7 @@ export const TransfertDialogContent = ({
 
               <Button
                 priority="primary"
-                onClick={() => mutation.execute(false)}
+                onClick={() => mutation.execute({ draft: false })}
                 loading={mutation.loading}
               >
                 {t("Transférer")}
