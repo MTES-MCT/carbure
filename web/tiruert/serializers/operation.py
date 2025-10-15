@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import transaction
 from rest_framework import serializers
 
+from core.models import Pays
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
@@ -147,6 +148,9 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "debited_entity": {"required": True},
         }
 
+    export_country = serializers.SlugRelatedField(
+        slug_field="code_pays", queryset=Pays.objects.all(), required=False, allow_null=True
+    )
     lots = OperationLotSerializer(many=True, required=True)
 
     def create(self, validated_data):
