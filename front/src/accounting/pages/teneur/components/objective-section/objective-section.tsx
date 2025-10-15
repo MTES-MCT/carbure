@@ -24,7 +24,9 @@ export const ObjectiveSection = ({
         {title}
       </Title>
       {description && (
-        <Text className={css["objective-section__text"]}>{description}</Text>
+        <Text className={css["objective-section__text"]} is="div">
+          {description}
+        </Text>
       )}
       <div className={css["objective-section__content"]}>{children}</div>
     </div>

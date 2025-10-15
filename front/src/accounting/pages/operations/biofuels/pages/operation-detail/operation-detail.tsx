@@ -154,16 +154,11 @@ export const OperationDetail = () => {
           label: t("Quantité"),
           value: `${getOperationQuantity(
             operation,
-            formatUnit(operation.quantity, {
-              fractionDigits: 2,
-              appendZeros: false,
-            })
+            formatUnit(operation.quantity)
           )} / ${getOperationQuantity(
             operation,
             formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
-              fractionDigits: 2,
               unit: ExtendedUnit.GJ,
-              appendZeros: false,
             })
           )}`,
         },
@@ -172,10 +167,7 @@ export const OperationDetail = () => {
             label: t("Quantité renouvelable"),
             value: `${getOperationQuantity(
               operation,
-              formatUnit(roundNumber(formatValue(operation.quantity), 2), {
-                fractionDigits: 2,
-                appendZeros: false,
-              })
+              formatUnit(roundNumber(formatValue(operation.quantity), 2))
             )} / ${getOperationQuantity(
               operation,
               formatUnit(
@@ -183,9 +175,7 @@ export const OperationDetail = () => {
                   roundNumber(formatValue(operation.quantity_mj), 2)
                 ),
                 {
-                  fractionDigits: 2,
                   unit: ExtendedUnit.GJ,
-                  appendZeros: false,
                 }
               )
             )}`,
