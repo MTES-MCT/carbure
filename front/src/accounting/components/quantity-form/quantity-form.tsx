@@ -4,7 +4,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
@@ -74,6 +74,7 @@ const QuantitySection = ({
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
   const { formatUnit, unit } = useUnit(customUnit)
+  const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } =
     useFormContext<QuantityFormProps>()
@@ -113,6 +114,19 @@ const QuantitySection = ({
         ? Math.trunc(emissions?.max_avoided_emissions)
         : 0
 
+      if (emissionsMin === 0) {
+        quantityInputRef.current?.setCustomValidity(
+          t(
+            "La quantité entrée n'est pas suffisante pour enregistrer des tCO2 évitées. Merci de modifier la quantité."
+          )
+        )
+        requestAnimationFrame(() => {
+          quantityInputRef.current?.reportValidity()
+        })
+        return
+      }
+      setQuantityDeclared(true)
+
       if (onQuantityDeclared) {
         onQuantityDeclared({
           emissionsMin,
@@ -126,8 +140,6 @@ const QuantitySection = ({
           setField("avoided_emissions", emissionsMin)
         }
       }
-
-      setQuantityDeclared(true)
     })
   }
 
@@ -137,7 +149,14 @@ const QuantitySection = ({
     setQuantityDeclared(false)
   }
 
-  const quantityBind = bind("quantity", { showError: true })
+  const quantityBind = bind("quantity", {
+    showError: true,
+    onChange: () => {
+      // Reset the custom validity of the quantity input when the quantity is changed
+      quantityInputRef.current?.setCustomValidity("")
+      quantityInputRef.current?.reportValidity()
+    },
+  })
 
   return (
     <>
@@ -185,6 +204,7 @@ const QuantitySection = ({
         }
         disabled={quantityDeclared || mutation.loading}
         required
+        inputRef={quantityInputRef}
       />
       {quantityDeclared &&
       value.avoided_emissions_min &&
@@ -220,13 +240,6 @@ const QuantitySection = ({
           )}
         </Notice>
       ) : null}
-      {quantityDeclared && value.avoided_emissions_min === 0 && (
-        <Notice noColor variant="warning">
-          {t(
-            "La quantité entrée n'est pas suffisante pour enregistrer des tCO2 évitées. Merci de modifier la quantité."
-          )}
-        </Notice>
-      )}
     </>
   )
 }

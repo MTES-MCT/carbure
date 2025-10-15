@@ -2,17 +2,14 @@ import type { Meta, StoryObj } from "@storybook/react"
 
 import { QuantityForm } from "./quantity-form"
 import { Form, useForm } from "common/components/form2"
-import { okGetDeliverySites } from "common/__test__/api"
 import { CreateOperationType } from "accounting/types"
 import { balance } from "accounting/__test__/data/balances"
 import { userEvent, waitFor, within } from "@storybook/test"
 import {
-  okSimulateMinMax,
   okSimulateMinMaxWithEqualValues,
   okSimulateMinMaxWithZeroValues,
 } from "accounting/__test__/api/biofuels/operations"
-
-const baseHandlers = [okGetDeliverySites, okSimulateMinMax]
+import { baseHandlers } from "./quantity-form.stories.utils"
 
 const meta: Meta<typeof QuantityForm> = {
   component: QuantityForm,
