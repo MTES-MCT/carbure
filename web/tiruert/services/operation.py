@@ -37,7 +37,8 @@ class OperationService:
         """
         np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
 
-        available_volumes = dict(zip(map(int, np_lot_ids), map(float, np_volumes)))
+        # Round available volumes to 8 decimals to match optimization algorithm precision
+        available_volumes = {int(lot_id): round(float(volume), 8) for lot_id, volume in zip(np_lot_ids, np_volumes)}
         requested_volumes = {lot["id"]: lot["volume"] for lot in selected_lots}
 
         for lot_id, volume in requested_volumes.items():
