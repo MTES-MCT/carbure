@@ -143,26 +143,19 @@ class TeneurService:
         nonzero_indices = np.nonzero(result_array[0 : len(batches_volumes)])[0]
 
         # Create a dictionary of selected batches with their respective index and volume
-        # Apply truncation logic to guarantee we never exceed available volumes
+        # Round all volumes to 2 decimals to match database precision
         selected_batches_volumes = {}
         for idx in nonzero_indices:
             optimized_volume = result_array[idx]  # Volume suggested by optimization algorithm
             available_volume = batches_volumes[idx]  # Available volume at the beginning of optimization
 
-            # STEP 1: Clean available_volume from microscopic precision errors
-            # (but keep real decimals like 87257.52772722)
-            available_volume_clean = round(available_volume, 8)  # Keep 8 significant decimal places
+            # Clean available_volume to 2 decimals (database precision)
+            # Any extra decimals are float conversion artifacts
+            available_volume_clean = round(available_volume, 2)
 
-            # STEP 2: Guarantee we NEVER exceed available volume
+            # Ensure we never exceed available volume, then round to 2 decimals
             safe_volume = min(optimized_volume, available_volume_clean)
-
-            # STEP 3: Apply truncation logic
-            if abs(safe_volume - available_volume_clean) <= 1.0:
-                # Nearly complete lot (≤ 1L difference): take the exact available volume
-                selected_volume = available_volume_clean
-            else:
-                # Partial lot: truncate to lower integer to guarantee safety
-                selected_volume = int(safe_volume)
+            selected_volume = round(safe_volume, 2)
 
             selected_batches_volumes[idx] = selected_volume
 
@@ -320,7 +313,6 @@ class TeneurService:
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
-
             volumes = np.append(volumes, value["available_balance"])
             emissions = np.append(emissions, value["emission_rate_per_mj"])
             lot_ids = np.append(lot_ids, lot_id)

@@ -80,9 +80,13 @@ class BalanceService:
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
             balance[key][teneur_type] += quantity
+            # Round to 2 decimals after each operation to prevent float precision errors accumulation
+            balance[key][teneur_type] = round(balance[key][teneur_type], 2)
 
         quantity_type = "credit" if credit_operation else "debit"
         balance[key]["quantity"][quantity_type] += quantity
+        # Round to 2 decimals after each operation to prevent float precision errors accumulation
+        balance[key]["quantity"][quantity_type] = round(balance[key]["quantity"][quantity_type], 2)
 
         return balance
 
@@ -96,12 +100,17 @@ class BalanceService:
         volume_sign = 1 if credit_operation else -1
         quantity = detail.volume * conversion_factor * operation.renewable_energy_share
         balance[key]["available_balance"] += quantity * volume_sign
+        # Round to 2 decimals after each operation to prevent float precision errors accumulation
+        balance[key]["available_balance"] = round(balance[key]["available_balance"], 2)
+
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj  # used when displaying balance by lot
 
         avoided_emissions = TeneurService.convert_producted_emissions_to_avoided_emissions(
             detail.volume, operation.biofuel, detail.emission_rate_per_mj
         )
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
+        # Round to 2 decimals after each operation to prevent float precision errors accumulation
+        balance[key]["saved_emissions"] = round(balance[key]["saved_emissions"], 2)
         return
 
     @staticmethod
@@ -259,6 +268,10 @@ class BalanceService:
                         if volume_to_debit > 0:
                             # Update the debit amount
                             balance[key]["quantity"]["debit"] += volume_to_debit
+                            # Round to 2 decimals after each operation to prevent float precision errors accumulation
+                            balance[key]["quantity"]["debit"] = round(balance[key]["quantity"]["debit"], 2)
                             remaining_volume -= volume_to_debit
+                            # Round to 2 decimals after each operation to prevent float precision errors accumulation
+                            remaining_volume = round(remaining_volume, 2)
 
         return balance
