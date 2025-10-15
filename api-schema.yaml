@@ -14896,7 +14896,8 @@ components:
           type: integer
           nullable: true
         export_country:
-          type: integer
+          type: string
+          minLength: 1
           nullable: true
         lots:
           type: array

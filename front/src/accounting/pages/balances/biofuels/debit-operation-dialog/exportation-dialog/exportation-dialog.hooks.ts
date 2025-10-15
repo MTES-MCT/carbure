@@ -27,7 +27,7 @@ export const useExportationDialog = ({
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,
       lots: values.selected_lots!,
-      // export_country: values.country?.code_pays ?? "",
+      export_country: values.country?.code_pays ?? "",
     },
     quantity: values.quantity!,
     onClose,

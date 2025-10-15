@@ -4563,7 +4563,7 @@ export interface components {
             debited_entity: number | null;
             from_depot?: number | null;
             to_depot?: number | null;
-            export_country?: number | null;
+            export_country?: string | null;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
         };
