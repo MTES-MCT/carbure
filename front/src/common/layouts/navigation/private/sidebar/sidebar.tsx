@@ -29,6 +29,8 @@ export const PrivateSidebar = () => {
                 size="sm"
                 fontWeight="bold"
                 className={styles["nav-item-title"]}
+                // DSFR Badge is a p, and we can't use a <p> inside a <p>
+                is={Badge ? "span" : "p"}
               >
                 {item.title}
                 {Badge ?? null}
