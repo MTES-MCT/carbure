@@ -303,7 +303,12 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.type in [Operation.CESSION, Operation.TENEUR, Operation.TRANSFERT] and instance.status in [
+        if instance.type in [
+            Operation.CESSION,
+            Operation.TENEUR,
+            Operation.TRANSFERT,
+            Operation.EXPORTATION,
+        ] and instance.status in [
             Operation.PENDING,
             Operation.REJECTED,
             Operation.DRAFT,
