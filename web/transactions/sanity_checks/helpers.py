@@ -1,5 +1,6 @@
 import datetime
 from collections import defaultdict
+from typing import TypedDict
 
 from certificates.models import DoubleCountingRegistration
 from core.models import (
@@ -97,8 +98,29 @@ def enrich_lot(lot):
     return queryset.get()
 
 
+class PrefetchedData(TypedDict):
+    countries: dict[str, Pays]
+    biofuels: dict[str, Biocarburant]
+    depots: dict[str, Depot]
+    depotsbyname: dict[str, Depot]
+    locked_years: list[int]
+    my_production_sites: dict[str, ProductionSite]
+    my_vendor_certificates: list[str]
+    depotsbyentity: dict[int, list[str]]
+    entity_certificates: dict[int, dict[str, EntityCertificate]]
+    production_sites: dict[int, dict[str, list[int]]]
+    clients: dict[int, Entity]
+    clientsbyname: dict[str, Entity]
+    certificates: dict[str, GenericCertificate]
+    double_counting_certificates: dict[str, list[DoubleCountingRegistration]]
+    etd: dict[str, float]
+    eec: dict[str, float]
+    ep: dict[str, float]
+    checked_certificates: dict
+
+
 def get_prefetched_data(entity=None):
-    data = {
+    data: PrefetchedData = {
         "countries": {},
         "biofuels": {},
         "depots": {},
@@ -199,7 +221,9 @@ def get_prefetched_data(entity=None):
 
     # CERTIFICATES
     lastyear = datetime.date.today() - datetime.timedelta(days=365)
-    certs = GenericCertificate.objects.filter(valid_until__gte=lastyear).values("certificate_id", "valid_until")
+    certs = GenericCertificate.objects.filter(valid_until__gte=lastyear).values(
+        "certificate_id", "valid_from", "valid_until"
+    )
     data["certificates"] = {c["certificate_id"].upper(): c for c in certs}
 
     # for each different DC agreement id, we store a list of agreements

@@ -3,12 +3,18 @@ import {
   PathsApiElecTransferCertificatesGetParametersQueryOrder_by,
   PathsApiSafTicketsGetParametersQueryStatus as TransferCertificateStatus,
   PathsApiElecProvisionCertificatesGetParametersQuerySource,
+  PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter as ProvisionCertificateFilter,
+  PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter as TransferCertificateFilter,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export { PathsApiElecProvisionCertificatesGetParametersQuerySource as ProvisionCertificateSource }
-export { TransferCertificateStatus }
+export {
+  TransferCertificateStatus,
+  TransferCertificateFilter,
+  ProvisionCertificateFilter,
+}
 
 export type ElecCertificateSnapshot = {
   provision_certificates_available: number
@@ -19,13 +25,6 @@ export type ElecCertificateSnapshot = {
 }
 
 export type ProvisionCertificateStatus = "available" | "history"
-
-export enum ProvisionCertificateFilter {
-  Quarter = "quarter",
-  OperatingUnit = "operating_unit",
-  Source = "source",
-  Cpo = "cpo",
-}
 
 export type ProvisionCertificateOrder =
   PathsApiElecProvisionCertificatesGetParametersQueryOrder_by
@@ -38,13 +37,6 @@ export type ProvisionCertificatesQuery =
   ProvisionCertificatesQueryBuilder["query"]
 
 export type ProvisionCertificate = apiTypes["ElecProvisionCertificate"]
-
-export enum TransferCertificateFilter {
-  Month = "month",
-  Operator = "operator",
-  Cpo = "cpo",
-  UsedInTiruert = "used_in_tiruert",
-}
 
 export type TransferCertificateOrder =
   PathsApiElecTransferCertificatesGetParametersQueryOrder_by

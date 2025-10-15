@@ -35,6 +35,9 @@
   text-transform: uppercase;
   margin-bottom: var(--spacing-1w);
   padding: 0 var(--spacing-1w);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .nav-item-children {

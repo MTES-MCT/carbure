@@ -24,7 +24,7 @@ class BiomethaneContractAmendmentViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
 ):
-    queryset = BiomethaneContractAmendment.objects.all()
+    queryset = BiomethaneContractAmendment.objects.all().order_by("pk")
     serializer_class = BiomethaneContractAmendmentSerializer
     filterset_class = BiomethaneContractAmendmentFilter
 

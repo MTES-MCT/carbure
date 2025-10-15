@@ -1,12 +1,15 @@
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
-from core.models import Biocarburant, CarbureLot, MatierePremiere
-from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_incompatibilities
+from core.models import CarbureLot
+from saf.models.constants import SAF_BIOFUEL_TYPES
 
 from .helpers import generic_error
 
 
 def check_missing_ref_dbl_counting(lot: CarbureLot):
-    if lot.feedstock and lot.feedstock.is_double_compte:
+    is_dc = lot.feedstock and lot.feedstock.is_double_compte
+    is_saf = lot.biofuel and lot.biofuel.code in SAF_BIOFUEL_TYPES
+
+    if is_dc and not is_saf:
         if not lot.production_site_double_counting_certificate:
             return generic_error(
                 error=CarbureSanityCheckErrors.MISSING_REF_DBL_COUNTING,
@@ -18,6 +21,9 @@ def check_missing_ref_dbl_counting(lot: CarbureLot):
 
 
 def check_unknown_double_counting_certificate(lot: CarbureLot, prefetched_data):
+    if not lot.production_site_double_counting_certificate:
+        return
+
     is_dc, certificate = get_dc(lot, prefetched_data)
 
     if is_dc and certificate is None:
@@ -78,7 +84,6 @@ def get_dc(lot: CarbureLot, prefetched_data):
 
     is_dc = lot.feedstock and lot.feedstock.is_double_compte
     dc_cert_id = lot.production_site_double_counting_certificate
-
     dc_cert_variations = prefetched_data["double_counting_certificates"].get(dc_cert_id, [])
 
     if len(dc_cert_variations) == 0:
@@ -94,18 +99,3 @@ def get_dc(lot: CarbureLot, prefetched_data):
             return is_dc, dc_cert
 
     return is_dc, None
-
-
-def get_dc_biofuel_feedstock_incompatibilities(
-    biofuel: Biocarburant,
-    feedstock: MatierePremiere,
-):
-    # Dans le cas du double comptage UNIQUEMENT, on ne differencie pas les HVO, les HO et les HC
-    if (
-        biofuel.is_graisse
-        and feedstock.compatible_graisse
-        and biofuel.code not in ["EMHA", "EMHU", "EMHV", "EEHA", "EEHU", "EEHV", "EEAG"]
-    ):
-        return None
-
-    yield from get_biofuel_feedstock_incompatibilities(biofuel=biofuel, feedstock=feedstock)

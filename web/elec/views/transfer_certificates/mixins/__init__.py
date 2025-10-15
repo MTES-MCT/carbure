@@ -1,15 +1,16 @@
 from .accept import AcceptActionMixin
 from .reject import RejectActionMixin
 from .cancel import CancelActionMixin
-from .filters import FiltersActionMixin
+from core.filters import FiltersActionFactory
 from .excel_export import ExcelExportActionMixin
 
 
 class ActionMixin(
-    FiltersActionMixin,
     AcceptActionMixin,
     RejectActionMixin,
     CancelActionMixin,
-    ExcelExportActionMixin
+    ExcelExportActionMixin,
+    FiltersActionFactory()
+
 ):
     pass

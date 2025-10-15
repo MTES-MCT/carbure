@@ -2,15 +2,11 @@ from rest_framework import serializers
 
 from core.models import Entity, MatierePremiere
 from tiruert.models.operation import Operation
-
-
-class QuantitySerializer(serializers.Serializer):
-    credit = serializers.FloatField()
-    debit = serializers.FloatField()
+from tiruert.serializers.fields import RoundedFloatField
 
 
 class ObjectiveSerializer(serializers.Serializer):
-    target_mj = serializers.FloatField()
+    target_mj = RoundedFloatField()
     target_type = serializers.CharField()
     penalty = serializers.IntegerField()
     target_percent = serializers.FloatField()
@@ -18,27 +14,27 @@ class ObjectiveSerializer(serializers.Serializer):
 
 class ObjectiveSectorSerializer(serializers.Serializer):
     code = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
-    pending_teneur = serializers.FloatField()
-    declared_teneur = serializers.FloatField()
-    available_balance = serializers.FloatField()
+    pending_teneur = RoundedFloatField()
+    declared_teneur = RoundedFloatField()
+    available_balance = RoundedFloatField()
     unit = serializers.CharField()
     objective = ObjectiveSerializer()
 
 
 class ObjectiveCategorySerializer(serializers.Serializer):
     code = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
-    pending_teneur = serializers.FloatField()
-    declared_teneur = serializers.FloatField()
-    available_balance = serializers.FloatField()
+    pending_teneur = RoundedFloatField()
+    declared_teneur = RoundedFloatField()
+    available_balance = RoundedFloatField()
     unit = serializers.CharField()
     objective = ObjectiveSerializer()
 
 
 class MainObjectiveSerializer(serializers.Serializer):
-    available_balance = serializers.FloatField()
+    available_balance = RoundedFloatField()
     target = serializers.FloatField()
-    pending_teneur = serializers.FloatField()
-    declared_teneur = serializers.FloatField()
+    pending_teneur = RoundedFloatField()
+    declared_teneur = RoundedFloatField()
     unit = serializers.CharField()
     penalty = serializers.IntegerField()
     target_percent = serializers.FloatField()

@@ -1,7 +1,7 @@
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { ElecOperationsQueryBuilder, OperationsFilter } from "accounting/types"
 import { useTranslation } from "react-i18next"
-import * as api from "accounting/api/elec-operations"
+import * as api from "accounting/api/elec/operations"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
 import {
@@ -11,7 +11,6 @@ import {
 import { Pagination } from "common/components/pagination2/pagination"
 import HashRoute from "common/components/hash-route"
 import { OperationDetail } from "./pages/operation-detail"
-import { usePrivateNavigation } from "common/layouts/navigation"
 import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
@@ -20,7 +19,6 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const OperationsElec = () => {
   const { t } = useTranslation()
-  usePrivateNavigation(t("Comptabilité"))
   const { formatUnit } = useUnit()
   const filterLabels = {
     [OperationsFilter.status]: t("Statut"),

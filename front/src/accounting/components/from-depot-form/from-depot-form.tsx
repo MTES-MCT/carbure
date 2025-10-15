@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import { OperationText } from "accounting/components/operation-text"
 import { useQuery } from "common/hooks/async"
-import { getDeliverySites } from "settings/api/delivery-sites"
 import { FromDepotFormProps } from "./from-depot-form.types"
+import { getDeliverySites } from "common/api"
 
 export const FromDepotForm = () => {
   const { t } = useTranslation()

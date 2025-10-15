@@ -10,10 +10,12 @@ type BiofuelsParams = Pick<
 >
 
 export const useBiofuels = (params?: BiofuelsParams) => {
+  const entity = useEntity()
   const { isAuditor, isIndustry, isPowerOrHeatProducer, has_stocks, isAdmin } =
-    useEntity()
+    entity
   const { t } = useTranslation()
   const routes = useRoutes()
+  const isBiofuelAdmin = entity.isExternal && entity.hasAdminRight("BIOFUEL")
 
   const biofuels: MenuSection = {
     title: t("Lots de biocarburants"),
@@ -51,7 +53,7 @@ export const useBiofuels = (params?: BiofuelsParams) => {
 
   const biofuelsControls: MenuSection = {
     ...biofuels,
-    condition: isAuditor || isAdmin,
+    condition: isAuditor || isAdmin || isBiofuelAdmin,
     children: [
       {
         path: routes.BIOFUELS_CONTROLS().ALERTS,

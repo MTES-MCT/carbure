@@ -52,19 +52,19 @@ export function useFilters() {
   const entity = useEntity()
 
   const filters: Record<string, string> = {
-    [TransferCertificateFilter.Month]: t("Mois"),
-    [TransferCertificateFilter.Cpo]: t("Aménageur"),
-    [TransferCertificateFilter.Operator]: t("Redevable"),
-    [TransferCertificateFilter.UsedInTiruert]: t("Décl. TIRUERT"),
+    [TransferCertificateFilter.month]: t("Mois"),
+    [TransferCertificateFilter.cpo]: t("Aménageur"),
+    [TransferCertificateFilter.operator]: t("Redevable"),
+    [TransferCertificateFilter.used_in_tiruert]: t("Décl. TIRUERT"),
   }
 
   if (entity.isCPO) {
-    delete filters[TransferCertificateFilter.Cpo]
-    delete filters[TransferCertificateFilter.UsedInTiruert]
+    delete filters[TransferCertificateFilter.cpo]
+    delete filters[TransferCertificateFilter.used_in_tiruert]
   }
 
   if (entity.isOperator) {
-    delete filters[TransferCertificateFilter.Operator]
+    delete filters[TransferCertificateFilter.operator]
   }
 
   return filters

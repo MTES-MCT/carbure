@@ -774,7 +774,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Stockage de Digestat.
+          description: A unique integer value identifying this Biométhane - Stockage de
+            Digestat.
           required: true
       tags:
         - biomethane
@@ -801,7 +802,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Stockage de Digestat.
+          description: A unique integer value identifying this Biométhane - Stockage de
+            Digestat.
           required: true
       tags:
         - biomethane
@@ -840,7 +842,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Stockage de Digestat.
+          description: A unique integer value identifying this Biométhane - Stockage de
+            Digestat.
           required: true
       tags:
         - biomethane
@@ -878,7 +881,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Stockage de Digestat.
+          description: A unique integer value identifying this Biométhane - Stockage de
+            Digestat.
           required: true
       tags:
         - biomethane
@@ -936,8 +940,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Données d'épandage du
-            digestat.
+          description: A unique integer value identifying this Biométhane - Données
+            d'épandage du digestat.
           required: true
       tags:
         - biomethane
@@ -1336,6 +1340,455 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneProductionUnit"
           description: Production unit created successfully
+  /api/biomethane/supply-input/:
+    get:
+      operationId: biomethane_supply_input_list
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+            enum:
+              - CIVE
+              - IAA_WASTE_RESIDUES
+              - INTERMEDIATE_CROPS
+              - LIVESTOCK_EFFLUENTS
+              - PRIMARY_CROPS
+          description: |-
+            * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
+            * `PRIMARY_CROPS` - Culture principale
+            * `INTERMEDIATE_CROPS` - Culture intermédiaire
+            * `CIVE` - CIVE
+            * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: string
+            enum:
+              - EXTERNAL
+              - INTERNAL
+          description: |-
+            * `INTERNAL` - Interne
+            * `EXTERNAL` - Externe
+        - in: query
+          name: type
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedBiomethaneSupplyInputList"
+          description: ""
+    post:
+      operationId: biomethane_supply_input_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneSupplyInputCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneSupplyInputCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneSupplyInputCreateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInputCreate"
+          description: ""
+  /api/biomethane/supply-input/{id}/:
+    get:
+      operationId: biomethane_supply_input_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Biométhane - Intrant
+            d'approvisionnement.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInput"
+          description: ""
+    put:
+      operationId: biomethane_supply_input_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Biométhane - Intrant
+            d'approvisionnement.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneSupplyInputCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneSupplyInputCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneSupplyInputCreateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInputCreate"
+          description: ""
+    patch:
+      operationId: biomethane_supply_input_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Biométhane - Intrant
+            d'approvisionnement.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneSupplyInputCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneSupplyInputCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneSupplyInputCreateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInputCreate"
+          description: ""
+  /api/biomethane/supply-input/export/:
+    get:
+      operationId: biomethane_supply_input_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInputExport"
+          description: ""
+  /api/biomethane/supply-input/filters/:
+    get:
+      operationId: biomethane_supply_input_filters_retrieve
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+            enum:
+              - CIVE
+              - IAA_WASTE_RESIDUES
+              - INTERMEDIATE_CROPS
+              - LIVESTOCK_EFFLUENTS
+              - PRIMARY_CROPS
+          description: |-
+            * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
+            * `PRIMARY_CROPS` - Culture principale
+            * `INTERMEDIATE_CROPS` - Culture intermédiaire
+            * `CIVE` - CIVE
+            * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - category
+              - source
+              - type
+              - year
+          description: Filter string to apply
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: string
+            enum:
+              - EXTERNAL
+              - INTERNAL
+          description: |-
+            * `INTERNAL` - Interne
+            * `EXTERNAL` - Externe
+        - in: query
+          name: type
+          schema:
+            type: string
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - category
+                    - source
+                    - type
+                    - year
+                  summary: Example of filters response.
+          description: ""
+  /api/biomethane/supply-plan/export/:
+    get:
+      operationId: biomethane_supply_plan_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneSupplyInputExport"
+          description: ""
+  /api/biomethane/supply-plan/import/:
+    post:
+      operationId: import_supply_plan_from_excel
+      description: "Upload and process an Excel file to create supply plan entries. "
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneUploadExcelRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneUploadExcelRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneUploadExcelRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                ExampleOfSuccessfulImportResponse.:
+                  value:
+                    rows_imported: 25
+                  summary: Example of successful import response.
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                ExampleOfValidationErrorResponse.:
+                  value:
+                    validation_errors:
+                      - row: 3
+                        errors:
+                          volume:
+                            - This field is required.
+                      - row: 5
+                        errors:
+                          input_type:
+                            - Invalid input type.
+                    total_errors: 2
+                    total_rows_processed: 10
+                  summary: Example of validation error response.
+                ExampleOfFileErrorResponse.:
+                  value:
+                    file: The file is too large (maximum 10MB)
+                  summary: Example of file error response.
+          description: ""
+  /api/biomethane/supply-plan/years/:
+    get:
+      operationId: biomethane_supply_plan_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
   /api/double-counting/agreements/:
     get:
       operationId: double_counting_agreements_list
@@ -3020,7 +3473,16 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - cpo
+              - energy_amount
+              - operating_unit
+              - order_by
+              - quarter
+              - source
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: operating_unit
           schema:
@@ -3127,11 +3589,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - ETBE
-                    - Ethanol
-                    - EMHV
-                    - B100
-                    - HVOE
+                    - cpo
+                    - energy_amount
+                    - operating_unit
+                    - order_by
+                    - quarter
                   summary: Example of filters response.
           description: ""
   /api/elec/provision-certificates/import/:
@@ -3539,7 +4001,22 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - certificate_id
+              - client
+              - consumption_date
+              - cpo
+              - energy_amount
+              - month
+              - operator
+              - order_by
+              - status
+              - supplier
+              - transfer_date
+              - used_in_tiruert
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: month
           schema:
@@ -3642,11 +4119,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - ETBE
-                    - Ethanol
-                    - EMHV
-                    - B100
-                    - HVOE
+                    - certificate_id
+                    - client
+                    - consumption_date
+                    - cpo
+                    - energy_amount
                   summary: Example of filters response.
           description: ""
   /api/entities/:
@@ -3852,6 +4329,11 @@ paths:
           schema:
             type: integer
           description: Compay ID, Admin only
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Search within certificates valid at this date
         - in: query
           name: entity_id
           schema:
@@ -5598,6 +6080,11 @@ paths:
     get:
       operationId: resources_certificates_list
       parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Only return certificates valid at the given date
         - in: query
           name: query
           schema:
@@ -11224,6 +11711,212 @@ components:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
           nullable: true
+    BiomethaneSupplyInput:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        origin_country:
+          $ref: "#/components/schemas/Country"
+        source:
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+        crop_type:
+          $ref: "#/components/schemas/CropTypeEnum"
+        input_category:
+          $ref: "#/components/schemas/InputCategoryEnum"
+        input_type:
+          type: string
+          maxLength: 100
+        material_unit:
+          $ref: "#/components/schemas/MaterialUnitEnum"
+        dry_matter_ratio_percent:
+          type: number
+          format: double
+          nullable: true
+        volume:
+          type: number
+          format: double
+        origin_department:
+          type: string
+          nullable: true
+          maxLength: 3
+        average_weighted_distance_km:
+          type: number
+          format: double
+          nullable: true
+        maximum_distance_km:
+          type: number
+          format: double
+          nullable: true
+        supply_plan:
+          type: integer
+      required:
+        - crop_type
+        - id
+        - input_category
+        - input_type
+        - material_unit
+        - origin_country
+        - source
+        - supply_plan
+        - volume
+    BiomethaneSupplyInputCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        source:
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+        crop_type:
+          $ref: "#/components/schemas/CropTypeEnum"
+        input_category:
+          $ref: "#/components/schemas/InputCategoryEnum"
+        material_unit:
+          $ref: "#/components/schemas/MaterialUnitEnum"
+        origin_country:
+          type: string
+        dry_matter_ratio_percent:
+          type: number
+          format: double
+          nullable: true
+        volume:
+          type: number
+          format: double
+        average_weighted_distance_km:
+          type: number
+          format: double
+          nullable: true
+        maximum_distance_km:
+          type: number
+          format: double
+          nullable: true
+        input_type:
+          type: string
+          maxLength: 100
+        origin_department:
+          type: string
+          nullable: true
+          maxLength: 3
+      required:
+        - crop_type
+        - id
+        - input_category
+        - input_type
+        - material_unit
+        - origin_country
+        - source
+        - volume
+    BiomethaneSupplyInputCreateRequest:
+      type: object
+      properties:
+        source:
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+        crop_type:
+          $ref: "#/components/schemas/CropTypeEnum"
+        input_category:
+          $ref: "#/components/schemas/InputCategoryEnum"
+        material_unit:
+          $ref: "#/components/schemas/MaterialUnitEnum"
+        origin_country:
+          type: string
+          minLength: 1
+        dry_matter_ratio_percent:
+          type: number
+          format: double
+          nullable: true
+        volume:
+          type: number
+          format: double
+        average_weighted_distance_km:
+          type: number
+          format: double
+          nullable: true
+        maximum_distance_km:
+          type: number
+          format: double
+          nullable: true
+        input_type:
+          type: string
+          minLength: 1
+          maxLength: 100
+        origin_department:
+          type: string
+          nullable: true
+          maxLength: 3
+      required:
+        - crop_type
+        - input_category
+        - input_type
+        - material_unit
+        - origin_country
+        - source
+        - volume
+    BiomethaneSupplyInputExport:
+      type: object
+      properties:
+        year:
+          type: integer
+          readOnly: true
+        origin_country:
+          type: string
+          readOnly: true
+        source:
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+        crop_type:
+          $ref: "#/components/schemas/CropTypeEnum"
+        input_category:
+          $ref: "#/components/schemas/InputCategoryEnum"
+        input_type:
+          type: string
+          maxLength: 100
+        material_unit:
+          $ref: "#/components/schemas/MaterialUnitEnum"
+        dry_matter_ratio_percent:
+          type: number
+          format: double
+          nullable: true
+        volume:
+          type: number
+          format: double
+        origin_department:
+          type: string
+          nullable: true
+          maxLength: 3
+        average_weighted_distance_km:
+          type: number
+          format: double
+          nullable: true
+        maximum_distance_km:
+          type: number
+          format: double
+          nullable: true
+      required:
+        - crop_type
+        - input_category
+        - input_type
+        - material_unit
+        - origin_country
+        - source
+        - volume
+        - year
+    BiomethaneSupplyInputSourceEnum:
+      enum:
+        - INTERNAL
+        - EXTERNAL
+      type: string
+      description: |-
+        * `INTERNAL` - Interne
+        * `EXTERNAL` - Externe
+    BiomethaneUploadExcelRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
     CarbureLotPublic:
       type: object
       properties:
@@ -11841,6 +12534,14 @@ components:
           type: boolean
       required:
         - name
+    CropTypeEnum:
+      enum:
+        - MAIN
+        - INTERMEDIATE
+      type: string
+      description: |-
+        * `MAIN` - Principale
+        * `INTERMEDIATE` - Intermédiaire
     DeleteCertificateRequest:
       type: object
       properties:
@@ -12744,7 +13445,7 @@ components:
           readOnly: true
         source:
           allOf:
-            - $ref: "#/components/schemas/SourceEnum"
+            - $ref: "#/components/schemas/ElecProvisionCertificateSourceEnum"
           nullable: true
         quarter:
           allOf:
@@ -12826,6 +13527,16 @@ components:
         - operating_unit
         - station_id
         - year
+    ElecProvisionCertificateSourceEnum:
+      enum:
+        - MANUAL
+        - METER_READINGS
+        - QUALICHARGE
+      type: string
+      description: |-
+        * `MANUAL` - MANUAL
+        * `METER_READINGS` - METER_READINGS
+        * `QUALICHARGE` - QUALICHARGE
     ElecTransferAcceptRequest:
       type: object
       properties:
@@ -13462,6 +14173,7 @@ components:
         - AIRLINE
         - ELEC
         - TRANSFERRED_ELEC
+        - BIOFUEL
       type: string
       description: |-
         * `DCA` - DCA
@@ -13470,6 +14182,7 @@ components:
         * `AIRLINE` - AIRLINE
         * `ELEC` - ELEC
         * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
+        * `BIOFUEL` - BIOFUEL
     FeedStock:
       type: object
       properties:
@@ -13701,6 +14414,20 @@ components:
 
         * `DECLARATION_PERIODIC_CONTROLS` - Déclaration (avec contrôles
         périodiques)
+    InputCategoryEnum:
+      enum:
+        - LIVESTOCK_EFFLUENTS
+        - PRIMARY_CROPS
+        - INTERMEDIATE_CROPS
+        - CIVE
+        - IAA_WASTE_RESIDUES
+      type: string
+      description: |-
+        * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
+        * `PRIMARY_CROPS` - Culture principale
+        * `INTERMEDIATE_CROPS` - Culture intermédiaire
+        * `CIVE` - CIVE
+        * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
     InstallationCategoryEnum:
       enum:
         - INSTALLATION_CATEGORY_1
@@ -13844,6 +14571,14 @@ components:
         * `INPUTS` - Intrants
 
         * `OTHER` - Autres (à préciser)
+    MaterialUnitEnum:
+      enum:
+        - DRY
+        - WET
+      type: string
+      description: |-
+        * `DRY` - Sèche
+        * `WET` - Brute
     MethanizationProcessEnum:
       enum:
         - CONTINUOUS_INFINITELY_MIXED
@@ -14389,6 +15124,31 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BiomethaneContractAmendment"
+    PaginatedBiomethaneSupplyInputList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneSupplyInput"
+        annual_volumes_in_t:
+          type: number
     PaginatedElecBalanceList:
       type: object
       required:
@@ -14649,6 +15409,43 @@ components:
           type: boolean
         has_biogas_recovery:
           type: boolean
+    PatchedBiomethaneSupplyInputCreateRequest:
+      type: object
+      properties:
+        source:
+          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+        crop_type:
+          $ref: "#/components/schemas/CropTypeEnum"
+        input_category:
+          $ref: "#/components/schemas/InputCategoryEnum"
+        material_unit:
+          $ref: "#/components/schemas/MaterialUnitEnum"
+        origin_country:
+          type: string
+          minLength: 1
+        dry_matter_ratio_percent:
+          type: number
+          format: double
+          nullable: true
+        volume:
+          type: number
+          format: double
+        average_weighted_distance_km:
+          type: number
+          format: double
+          nullable: true
+        maximum_distance_km:
+          type: number
+          format: double
+          nullable: true
+        input_type:
+          type: string
+          minLength: 1
+          maxLength: 100
+        origin_department:
+          type: string
+          nullable: true
+          maxLength: 3
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
@@ -15828,16 +16625,6 @@ components:
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
-    SourceEnum:
-      enum:
-        - MANUAL
-        - METER_READINGS
-        - QUALICHARGE
-      type: string
-      description: |-
-        * `MANUAL` - MANUAL
-        * `METER_READINGS` - METER_READINGS
-        * `QUALICHARGE` - QUALICHARGE
     SpreadingManagementMethodsEnum:
       enum:
         - DIRECT_SPREADING

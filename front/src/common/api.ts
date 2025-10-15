@@ -104,6 +104,17 @@ export async function findProductionSites(
   return res.data ?? []
 }
 
+/**
+ * Get the delivery sites of an entity
+ * @param entity_id - The ID of the entity
+ * @returns The delivery sites of the entity
+ */
+export function getDeliverySites(entity_id: number) {
+  return apiFetch.GET("/entities/depots/", {
+    params: { query: { entity_id } },
+  })
+}
+
 export async function findDepots(query?: string, public_only?: boolean) {
   const res = await apiFetch.GET("/resources/depots", {
     params: { query: { query, public_only } },
@@ -120,9 +131,12 @@ export async function findAirports(query?: string, public_only?: boolean) {
   return res.data ?? []
 }
 
-export async function findCertificates(query: string) {
+export async function findCertificates(
+  query: string,
+  options?: { date?: string }
+) {
   const res = await apiFetch.GET("/resources/certificates", {
-    params: { query: { query } },
+    params: { query: { query, ...options } },
   })
 
   return res.data?.map((c) => c.certificate_id) ?? []
@@ -133,6 +147,7 @@ export async function findMyCertificates(
   options: {
     entity_id: number
     production_site_id?: number
+    date?: string
   }
 ) {
   const res = await apiFetch.GET("/entities/certificates/", {

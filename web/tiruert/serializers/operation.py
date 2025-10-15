@@ -41,10 +41,10 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
     def get_quantity(self, instance) -> float:
         if getattr(instance, "_quantity", None) is not None:
-            return instance._quantity
+            return round(instance._quantity, 2)
 
         volume = self.get_volume_l(instance)
-        return instance.volume_to_quantity(volume, self.context.get("unit"))
+        return round(instance.volume_to_quantity(volume, self.context.get("unit")), 2)
 
     def get_unit(self, instance) -> str:
         return self.context.get("unit")
@@ -113,11 +113,11 @@ class OperationSerializer(BaseOperationSerializer):
     quantity_mj = serializers.SerializerMethodField()
 
     def get_avoided_emissions(self, instance) -> float:
-        return sum(detail.avoided_emissions for detail in instance.details.all())
+        return round(sum(detail.avoided_emissions for detail in instance.details.all()), 2)
 
     def get_quantity_mj(self, instance) -> float:
         volume = self.get_volume_l(instance)
-        return instance.volume_to_quantity(volume, "mj")
+        return round(instance.volume_to_quantity(volume, "mj"), 2)
 
 
 class OperationLotSerializer(serializers.Serializer):

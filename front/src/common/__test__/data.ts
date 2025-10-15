@@ -14,6 +14,9 @@ import {
   CategoryEnum,
   Unit,
   DeepPartial,
+  EntityDepot,
+  OwnershipType,
+  Biofuel,
 } from "common/types"
 import { mergeDeepRight } from "ramda"
 
@@ -149,7 +152,6 @@ export const deliverySite: Depot = {
   thermal_efficiency: null,
   useful_temperature: null,
 }
-
 // PRODUCTION SITES
 
 export const productionSite: ProductionSite = {
@@ -173,6 +175,18 @@ export const productionSite: ProductionSite = {
   city: "Baigorri",
 }
 
+export const productionSiteCertificate: EntityDepot["site"] = {
+  certificates: [],
+  ...productionSite,
+}
+
+export const entitySite: EntityDepot = {
+  ownership_type: OwnershipType.OWN,
+  blending_is_outsourced: false,
+  blender: producer,
+  depot: deliverySite,
+  site: productionSiteCertificate,
+}
 // MATIERE PREMIERE
 
 export const matierePremiere: Feedstock = {
@@ -184,7 +198,7 @@ export const matierePremiere: Feedstock = {
 
 // BIOCARBURANT
 
-export const biocarburant = {
+export const biocarburant: Biofuel = {
   code: "EMHV",
   name: "EMHV",
   name_en: "EMHV",

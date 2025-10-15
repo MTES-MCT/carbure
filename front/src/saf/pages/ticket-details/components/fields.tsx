@@ -8,7 +8,7 @@ import css from "common/components/form.module.css"
 import DurabilityFields from "../../../components/durability-fields"
 import { SafTicketDetails } from "../../../types"
 import { EtsStatusEnum } from "api-schema"
-import { DialogSection } from "../../../components/dialog-section"
+import { Dialog } from "common/components/dialog2"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
@@ -26,7 +26,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
 
   return (
     <div className={cl(css.form, css.columns)}>
-      <DialogSection label={t("Lot")}>
+      <Dialog.Section label={t("Lot")}>
         <TextInput
           label={t("Volume")}
           value={`${formatNumber(ticket.volume)} L`}
@@ -47,8 +47,8 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={norm.normalizeCountry(ticket.country_of_origin).label}
           readOnly
         />
-      </DialogSection>
-      <DialogSection label={t("Producteur")}>
+      </Dialog.Section>
+      <Dialog.Section label={t("Producteur")}>
         <TextInput
           label={t("Production")}
           value={
@@ -81,8 +81,8 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={ticket.production_site_commissioning_date ?? ""}
           readOnly
         />
-      </DialogSection>
-      <DialogSection label={t("Affectation")}>
+      </Dialog.Section>
+      <Dialog.Section label={t("Affectation")}>
         <TextInput label={t("Fournisseur")} value={ticket.supplier} readOnly />
         <TextInput label={t("Client")} value={ticket.client} readOnly />
         <TextInput
@@ -125,7 +125,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
             readOnly
           />
         )}
-      </DialogSection>
+      </Dialog.Section>
       <DurabilityFields durability={ticket} />
     </div>
   )

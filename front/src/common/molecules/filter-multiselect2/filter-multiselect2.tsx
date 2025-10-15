@@ -8,7 +8,7 @@ export interface FilterMultiSelectProps2<
   Key extends string,
   Value extends string = Key,
 > {
-  filterLabels: Record<Key, string>
+  filterLabels: Partial<Record<Key, string>>
   selected: QueryFilters
   onSelect: (filters: QueryFilters) => void
   getFilterOptions: (filter: Key) => Promise<any[]>
@@ -40,6 +40,7 @@ export const FilterMultiSelect2 = <
           getOptions={() => getFilterOptions(filter)}
           className={styles["filter-multiselect__filter"]}
           normalize={normalizers?.[filter]}
+          clear
         />
       ))}
     </ShowMore>

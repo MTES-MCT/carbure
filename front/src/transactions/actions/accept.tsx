@@ -17,8 +17,11 @@ import { usePortal } from "common/components/portal"
 import useEntity from "common/hooks/entity"
 import Autocomplete from "common/components/autocomplete"
 import * as norm from "common/utils/normalizers"
-import { getDeliverySites } from "settings/api/delivery-sites"
-import { findBiofuelEntities, findMyCertificates } from "common/api"
+import {
+  findBiofuelEntities,
+  findMyCertificates,
+  getDeliverySites,
+} from "common/api"
 import Select from "common/components/select"
 import { compact } from "common/utils/collection"
 import Form from "common/components/form"

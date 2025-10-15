@@ -42,9 +42,13 @@ export const PrivateNavigation = ({ children }: PropsWithChildren) => {
           </NavLink>
         </div>
         <div className={styles["header-right"]}>
-          <Text is="h1" fontWeight="bold">
-            {title}
-          </Text>
+          {typeof title === "string" ? (
+            <Text is="h1" fontWeight="bold">
+              {title}
+            </Text>
+          ) : (
+            title
+          )}
           <div className={styles["header-right-actions"]}>
             <Button
               priority="tertiary"
