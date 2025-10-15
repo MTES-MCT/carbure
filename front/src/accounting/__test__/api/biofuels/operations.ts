@@ -30,3 +30,24 @@ export const okSimulateMinMaxWithZeroValues = http.post(
     })
   }
 )
+
+export const okSimulateOperation = http.post(
+  "/api/tiruert/operations/simulate/",
+  () => {
+    return HttpResponse.json<apiTypes["SimulationOutput"]>({
+      selected_lots: [
+        {
+          lot_id: 1,
+          emission_rate_per_mj: 25,
+          volume: "100",
+        },
+        {
+          lot_id: 2,
+          emission_rate_per_mj: 20.1,
+          volume: "78.5",
+        },
+      ],
+      fun: 1,
+    })
+  }
+)
