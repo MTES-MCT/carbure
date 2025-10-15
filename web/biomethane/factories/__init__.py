@@ -3,3 +3,4 @@ from .digestate import BiomethaneDigestateFactory
 from .digestate_spreading import BiomethaneDigestateSpreadingFactory
 from .injection_site import BiomethaneInjectionSiteFactory
 from .production_unit import BiomethaneProductionUnitFactory
+from .supply_plan import BiomethaneSupplyPlanFactory, BiomethaneSupplyInputFactory

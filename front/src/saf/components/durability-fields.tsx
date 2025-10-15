@@ -7,7 +7,7 @@ import {
   formatPercentage,
 } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { DialogSection } from "saf/components/dialog-section"
+import { Dialog } from "common/components/dialog2"
 import { SafDurability } from "saf/types"
 
 const formatNumberToText = (value: number | undefined) =>
@@ -16,7 +16,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
   const { t } = useTranslation()
 
   return (
-    <DialogSection label={t("Émissions/Réductions")}>
+    <Dialog.Section label={t("Émissions/Réductions")}>
       <Row style={{ gap: "16px" }}>
         <Col grow gap="md">
           <TextInput
@@ -97,7 +97,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             : "-"
         }
       />
-    </DialogSection>
+    </Dialog.Section>
   )
 }
 

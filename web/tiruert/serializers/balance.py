@@ -2,39 +2,41 @@ from rest_framework import serializers
 
 from core.models import MatierePremiere
 from tiruert.models.operation import Operation
+from tiruert.serializers.fields import RoundedFloatField
 
 
 class BalanceBiofuelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     code = serializers.CharField()
-    renewable_energy_share = serializers.FloatField()
+    renewable_energy_share = RoundedFloatField()
 
 
 class BalanceQuantitySerializer(serializers.Serializer):
-    credit = serializers.FloatField(default=0.0)
-    debit = serializers.FloatField(default=0.0)
+    credit = RoundedFloatField(default=0.0)
+    debit = RoundedFloatField(default=0.0)
 
 
 class BaseBalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
     initial_balance = serializers.SerializerMethodField()
-    available_balance = serializers.FloatField()
+    available_balance = RoundedFloatField()
     quantity = BalanceQuantitySerializer()
-    pending_teneur = serializers.FloatField()
-    declared_teneur = serializers.FloatField()
+    pending_teneur = RoundedFloatField()
+    declared_teneur = RoundedFloatField()
     pending_operations = serializers.IntegerField()
     unit = serializers.CharField()
 
     def get_initial_balance(self, instance) -> float:
-        return instance["available_balance"] - instance["quantity"]["credit"] + instance["quantity"]["debit"]
+        result = instance["available_balance"] - instance["quantity"]["credit"] + instance["quantity"]["debit"]
+        return round(result, 2)
 
 
 class BalanceSerializer(BaseBalanceSerializer):
     customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
     biofuel = BalanceBiofuelSerializer()
-    ghg_reduction_min = serializers.FloatField()
-    ghg_reduction_max = serializers.FloatField()
-    saved_emissions = serializers.FloatField()
+    ghg_reduction_min = RoundedFloatField()
+    ghg_reduction_max = RoundedFloatField()
+    saved_emissions = RoundedFloatField()
 
 
 class BalanceBySectorSerializer(BaseBalanceSerializer):
@@ -43,9 +45,9 @@ class BalanceBySectorSerializer(BaseBalanceSerializer):
 
 class BalanceLotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
-    available_balance = serializers.FloatField()
+    available_balance = RoundedFloatField()
     volume = BalanceQuantitySerializer()
-    emission_rate_per_mj = serializers.FloatField()
+    emission_rate_per_mj = RoundedFloatField()
 
 
 class BalanceByLotSerializer(serializers.Serializer):

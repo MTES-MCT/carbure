@@ -23,7 +23,7 @@ export const PrivateSidebar = () => {
           <EntitySelector className={styles["entity-selector"]} />
         )}
         <nav className={styles["nav"]}>
-          {menuItems.map((item) => (
+          {menuItems.map(({ badge: Badge, ...item }) => (
             <div key={item.title}>
               <Text
                 size="sm"
@@ -31,6 +31,7 @@ export const PrivateSidebar = () => {
                 className={styles["nav-item-title"]}
               >
                 {item.title}
+                {Badge ?? null}
               </Text>
               <div className={styles["nav-item-children"]}>
                 {item.children.map((child) => (

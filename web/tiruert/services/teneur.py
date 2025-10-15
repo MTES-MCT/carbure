@@ -1,4 +1,3 @@
-from decimal import getcontext
 from typing import Optional
 
 import numpy as np
@@ -9,9 +8,6 @@ from django.db.models import Q
 
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
-
-# Configure decimal precision for exact calculations
-getcontext().prec = 28
 
 
 class TeneurServiceErrors:
@@ -147,21 +143,21 @@ class TeneurService:
         nonzero_indices = np.nonzero(result_array[0 : len(batches_volumes)])[0]
 
         # Create a dictionary of selected batches with their respective index and volume
-        # Apply intelligent rounding to handle scipy's floating point precision errors
+        # Round all volumes to 2 decimals to match database precision
         selected_batches_volumes = {}
         for idx in nonzero_indices:
-            val_float = result_array[idx]
-            cap_float = batches_volumes[idx]
+            optimized_volume = result_array[idx]  # Volume suggested by optimization algorithm
+            available_volume = batches_volumes[idx]  # Available volume at the beginning of optimization
 
-            # Round to reasonable precision (10 decimal places) to eliminate tiny floating point errors
-            val_rounded = round(val_float, 10)
-            cap_rounded = round(cap_float, 10)
+            # Clean available_volume to 2 decimals (database precision)
+            # Any extra decimals are float conversion artifacts
+            available_volume_clean = round(available_volume, 2)
 
-            # Clamp any tiny overshoot: selected volume can't exceed available start volume
-            if val_rounded > cap_rounded:
-                val_rounded = cap_rounded
+            # Ensure we never exceed available volume, then round to 2 decimals
+            safe_volume = min(optimized_volume, available_volume_clean)
+            selected_volume = round(safe_volume, 2)
 
-            selected_batches_volumes[idx] = val_rounded
+            selected_batches_volumes[idx] = selected_volume
 
         return selected_batches_volumes, res.fun
 
@@ -317,7 +313,6 @@ class TeneurService:
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
-
             volumes = np.append(volumes, value["available_balance"])
             emissions = np.append(emissions, value["emission_rate_per_mj"])
             lot_ids = np.append(lot_ids, lot_id)

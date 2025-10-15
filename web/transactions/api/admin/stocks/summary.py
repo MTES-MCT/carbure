@@ -8,9 +8,10 @@ from core.helpers import (
     get_all_stock,
     get_stocks_summary_data,
 )
+from core.models import ExternalAdminRights
 
 
-@check_admin_rights()
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
 def get_stocks_summary(request, *args, **kwargs):
     short = request.GET.get("short", False)
     try:

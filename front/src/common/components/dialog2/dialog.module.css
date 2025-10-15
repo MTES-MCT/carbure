@@ -50,6 +50,10 @@
   min-width: 792px;
 }
 
+.dialog--size-large {
+  min-width: 1100px;
+}
+
 .dialog__header {
   padding: 0 var(--spacing-2w);
 }

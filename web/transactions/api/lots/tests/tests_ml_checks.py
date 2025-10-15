@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.test import TestCase
@@ -6,6 +8,7 @@ from django_otp.plugins.otp_email.models import EmailDevice
 
 from core.models import CarbureLot, Entity, GenericError, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.factories.certificate import GenericCertificateFactory
 
 
 class LotGHGTest(TestCase):
@@ -32,6 +35,12 @@ class LotGHGTest(TestCase):
         loggedin = self.client.login(username=self.user1.email, password=self.password)
         assert loggedin
 
+        self.cert = GenericCertificateFactory.create(
+            certificate_id="VALID_CERT",
+            valid_from=date(2000, 1, 1),
+            valid_until=date(3000, 1, 1),
+        )
+
         self.producer = (
             Entity.objects.filter(entity_type=Entity.PRODUCER)
             .annotate(psites=Count("entitysite__site"))
@@ -49,6 +58,7 @@ class LotGHGTest(TestCase):
     def create_draft(self, lot=None, **kwargs):
         if lot is None:
             lot = get_lot(self.producer)
+        lot["supplier_certificate"] = self.cert.certificate_id
         lot.update(kwargs)
         response = self.client.post(reverse("transactions-lots-add"), lot)
         assert response.status_code == 200

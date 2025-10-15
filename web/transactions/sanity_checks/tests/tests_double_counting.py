@@ -4,7 +4,8 @@ from django.test import TestCase
 
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
-from core.models import MatierePremiere
+from core.models import Biocarburant, MatierePremiere
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from transactions.factories import CarbureLotFactory
 from transactions.models import ProductionSite
 
@@ -27,6 +28,9 @@ class DoubleCountingSanityChecksTest(TestCase):
     def setUp(self):
         self.dc_feedstock = MatierePremiere.objects.filter(is_double_compte=True).first()
         self.other_feedstock = MatierePremiere.objects.exclude(is_double_compte=True).first()
+
+        self.dc_biofuel = Biocarburant.objects.get(code="ETH")
+        self.saf_biofuel = Biocarburant.objects.filter(code__in=SAF_BIOFUEL_TYPES).first()
 
         self.production_site = ProductionSite.objects.first()
         self.producer = self.production_site.created_by
@@ -82,6 +86,7 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         lot = self.create_lot(
             feedstock=self.other_feedstock,
+            biofuel=self.dc_biofuel,
             production_site_double_counting_certificate="",
         )
 
@@ -103,6 +108,7 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         lot = self.create_lot(
             feedstock=self.dc_feedstock,
+            biofuel=self.dc_biofuel,
             carbure_producer=None,
             carbure_production_site=None,
         )
@@ -122,6 +128,7 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         lot = self.create_lot(
             feedstock=self.dc_feedstock,
+            biofuel=self.dc_biofuel,
             carbure_producer=self.producer,
             carbure_production_site=self.production_site,
         )
@@ -151,6 +158,7 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         lot = self.create_lot(
             feedstock=self.dc_feedstock,
+            biofuel=self.dc_biofuel,
             carbure_producer=self.producer,
             carbure_production_site=self.production_site,
             delivery_date=datetime.date(2023, 7, 1),
@@ -171,6 +179,7 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         lot = self.create_lot(
             feedstock=self.dc_feedstock,
+            biofuel=self.dc_biofuel,
             carbure_producer=self.producer,
             carbure_production_site=self.production_site,
             delivery_date=datetime.date(2023, 7, 1),
@@ -185,3 +194,14 @@ class DoubleCountingSanityChecksTest(TestCase):
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
+
+    def test_no_double_counting_requirement_on_saf(self):
+        lot = self.create_lot(
+            feedstock=self.dc_feedstock,
+            biofuel=self.saf_biofuel,
+            production_site_double_counting_certificate="",
+        )
+
+        error_list = self.run_checks(lot)
+
+        assert not has_error(CarbureCertificatesErrors.MISSING_REF_DBL_COUNTING, error_list)

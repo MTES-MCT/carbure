@@ -1,4 +1,9 @@
+from os import environ
+
+from edelivery.adapters.clock import timestamp
 from edelivery.adapters.edelivery_adapter import send_SOAP_request
+from edelivery.adapters.uuid_generator import new_uuid
+from edelivery.ebms.access_points import Initiator, Responder
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
@@ -48,8 +53,13 @@ class RetrieveMessage(AbstractSoapAction):
 
 
 class SubmitMessage(AbstractSoapAction):
-    def __init__(self, message, send_callback=send_SOAP_request):
+    def __init__(self, responder_id, message, send_callback=send_SOAP_request):
         super().__init__("submitMessage", SubmitMessageResponse, send_callback)
+        self.original_sender = environ["CARBURE_NTR"]
+        self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
+        self.responder = Responder(responder_id)
+        self.message_id = new_uuid()
+        self.timestamp = timestamp()
         self.message = message
 
     def payload(self):
@@ -64,19 +74,19 @@ class SubmitMessage(AbstractSoapAction):
     <eb:Messaging xmlns:eb="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/">
       <eb:UserMessage>
         <eb:MessageInfo>
-          <eb:Timestamp>{self.message.timestamp}</eb:Timestamp>
-          <eb:MessageId>{self.message.id}</eb:MessageId>
+          <eb:Timestamp>{self.timestamp}</eb:Timestamp>
+          <eb:MessageId>{self.message_id}</eb:MessageId>
         </eb:MessageInfo>
         <eb:PartyInfo>
-          <eb:From>{self.message.initiator_to_XML()}</eb:From>
-          <eb:To>{self.message.responder_to_XML()}</eb:To>
+          <eb:From>{self.initiator.to_XML()}</eb:From>
+          <eb:To>{self.responder.to_XML()}</eb:To>
         </eb:PartyInfo>
         <eb:CollaborationInfo>
           <eb:Service>https://union-database.ec.europa.eu/e-delivery/services/send</eb:Service>
           <eb:Action>https://union-database.ec.europa.eu/e-delivery/actions/sendRequest</eb:Action>
         </eb:CollaborationInfo>
         <eb:MessageProperties>
-          <eb:Property name="originalSender">{self.message.original_sender}</eb:Property>
+          <eb:Property name="originalSender">{self.original_sender}</eb:Property>
           <eb:Property name="finalRecipient">EC</eb:Property>
         </eb:MessageProperties>
         <eb:PayloadInfo>

@@ -206,7 +206,7 @@ def create_tiruert_operations_from_lots(lots):
                 {
                     "operation": operation,
                     "lot": lot,
-                    "volume": lot.volume,  # litres
+                    "volume": round(lot.volume, 2),  # litres
                     "emission_rate_per_mj": lot.ghg_total,  # gCO2/MJ (input algo d'optimisation)
                 }
             )
@@ -237,12 +237,12 @@ def ep2_processing(lots):
             new_lot_conv.feedstock = copy(lot.feedstock)
             new_lot_conv.feedstock.category = MatierePremiere.CONV
             volume_decimal = Decimal(str(lot.volume))
-            new_lot_conv.volume = float(volume_decimal * Decimal("0.4"))
+            new_lot_conv.volume = round(float(volume_decimal * Decimal("0.4")), 2)
 
             new_lot_ep2 = copy(lot)
             new_lot_ep2.feedstock = copy(lot.feedstock)
             new_lot_ep2.feedstock.category = MatierePremiere.EP2AM
-            new_lot_ep2.volume = float(volume_decimal * Decimal("0.6"))
+            new_lot_ep2.volume = round(float(volume_decimal * Decimal("0.6")), 2)
 
             result_lots.append(new_lot_conv)
             result_lots.append(new_lot_ep2)

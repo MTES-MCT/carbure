@@ -1,15 +1,17 @@
 import {
   createContext,
   PropsWithChildren,
+  ReactElement,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
 
 interface PrivateNavigationContext {
-  title: string
-  setTitle: (title: string) => void
+  title?: ReactElement | string
+  setTitle: (title: ReactElement | string) => void
 }
 export const PrivateNavigationContext = createContext<PrivateNavigationContext>(
   {
@@ -18,16 +20,18 @@ export const PrivateNavigationContext = createContext<PrivateNavigationContext>(
   }
 )
 
-export const usePrivateNavigation = (newTitle: string) => {
+export const usePrivateNavigation = (newTitle: ReactElement | string) => {
   const { setTitle } = useContext(PrivateNavigationContext)
+  const ref = useRef(newTitle)
 
+  // Title need to be updated only when the ref changes (to prevent infinite re-renders with a react element)
   useEffect(() => {
-    setTitle(newTitle)
-  }, [newTitle, setTitle])
+    setTitle(ref.current)
+  }, [ref])
 }
 
 export const PrivateNavigationProvider = ({ children }: PropsWithChildren) => {
-  const [title, setTitle] = useState("")
+  const [title, setTitle] = useState<ReactElement | string | undefined>("")
 
   const value = useMemo(
     () => ({

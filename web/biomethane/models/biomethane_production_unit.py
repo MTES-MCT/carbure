@@ -202,7 +202,8 @@ class BiomethaneProductionUnit(models.Model):
 
     class Meta:
         db_table = "biomethane_production_unit"
-        verbose_name = "Unité de Production de Biométhane"
+        verbose_name = "Biométhane - Unité de Production"
+        verbose_name_plural = "Biométhane - Unités de Production"
 
 
 @receiver(post_save, sender=BiomethaneProductionUnit)

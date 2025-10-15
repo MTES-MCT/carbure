@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from edelivery.ebms.request_responses import BaseRequestResponse
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse
 
 
@@ -32,7 +33,7 @@ class ListPendingMessagesResponseTest(TestCase):
 
 
 class RetrieveMessageResponseTest(TestCase):
-    def response_payload(_, attachment_value):
+    def response_payload(_self, attachment_value=""):
         return f"""\
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
   <soap:Header>
@@ -47,10 +48,21 @@ class RetrieveMessageResponseTest(TestCase):
   </soap:Body>
 </soap:Envelope>"""
 
-    @patch("edelivery.soap.responses.unzip_base64_encoded_stream")
-    def test_extracts_zipped_response(self, patched_unzip):
-        patched_unzip.return_value = "<response/>"
+    def setUp(self):
+        self.patched_unzip = patch("edelivery.soap.responses.unzip_base64_encoded_stream").start()
+
+    def tearDown(self):
+        patch.stopall()
+
+    def test_initializes_request_response(self):
+        self.patched_unzip.return_value = "<response/>"
+        response = RetrieveMessageResponse(self.response_payload())
+        self.assertIsInstance(response.request_response, BaseRequestResponse)
+        self.assertEqual("<response/>", response.request_response.payload)
+
+    def test_extracts_zipped_response(self):
+        self.patched_unzip.return_value = "<response/>"
 
         response = RetrieveMessageResponse(self.response_payload("Base64EncodedZippedArchive"))
-        patched_unzip.assert_called_with("Base64EncodedZippedArchive")
+        self.patched_unzip.assert_called_with("Base64EncodedZippedArchive")
         self.assertEqual("<response/>", response.contents)

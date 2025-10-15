@@ -2,7 +2,7 @@ import useEntity from "common/hooks/entity"
 import { TransfertDialogForm } from "./transfert-dialog.types"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
-import { createOperation } from "accounting/api/operations"
+import { createOperation } from "accounting/api/biofuels/operations"
 import {
   Balance,
   CreateOperationType,

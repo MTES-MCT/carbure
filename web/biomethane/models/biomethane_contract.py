@@ -70,6 +70,7 @@ class BiomethaneContract(models.Model):
     class Meta:
         db_table = "biomethane_contract"
         verbose_name = "Biométhane - Contrat d'achat"
+        verbose_name_plural = "Biométhane - Contrats d'achat"
 
     def does_contract_exist(self):
         return bool(self.signature_date)

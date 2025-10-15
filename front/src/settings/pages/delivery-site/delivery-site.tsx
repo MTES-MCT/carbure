@@ -36,13 +36,13 @@ import Badge from "@codegouvfr/react-dsfr/Badge"
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
   entity: Entity
-  getDepots?: typeof api.getDeliverySites
+  getDepots?: typeof common.getDeliverySites
 }
 
 const DeliverySitesSettings = ({
   readOnly,
   entity,
-  getDepots = api.getDeliverySites,
+  getDepots = common.getDeliverySites,
 }: DeliverySiteSettingsProps) => {
   const { t } = useTranslation()
   const rights = useRights()

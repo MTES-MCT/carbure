@@ -144,6 +144,7 @@ class BiomethaneEnergy(models.Model):
 
     class Meta:
         db_table = "biomethane_energy"
+        unique_together = ["producer", "year"]
         verbose_name = "Biométhane - Énergie"
 
 

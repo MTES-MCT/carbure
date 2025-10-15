@@ -95,6 +95,7 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
   const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
 
+  const date = value.delivery_date
   const certificate = value.certificates?.supplier_certificate ?? undefined
   const bound = bind("supplier_certificate")
 
@@ -106,8 +107,8 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) =>
         isLotSupplier(entity, value)
-          ? api.findMyCertificates(query, { entity_id: entity.id })
-          : api.findCertificates(query)
+          ? api.findMyCertificates(query, { entity_id: entity.id, date })
+          : api.findCertificates(query, { date })
       }
       {...bound}
       {...props}

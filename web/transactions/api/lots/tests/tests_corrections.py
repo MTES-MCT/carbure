@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db.models import Count
 from django.test import TestCase
 from django.urls import reverse
@@ -6,6 +8,7 @@ from core.carburetypes import CarbureError
 from core.models import CarbureLot, Entity
 from core.tests_utils import setup_current_user
 from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import YearConfig
 
 
@@ -31,6 +34,12 @@ class LotCorrectionTest(TestCase):
         self.trader.save()
         self.operator = Entity.objects.filter(entity_type=Entity.OPERATOR)[0]
 
+        GenericCertificateFactory.create(
+            certificate_id="VALID",
+            valid_from=date(2000, 1, 1),
+            valid_until=date(3000, 1, 1),
+        )
+
         self.user = setup_current_user(
             self,
             "tester@carbure.local",
@@ -45,6 +54,7 @@ class LotCorrectionTest(TestCase):
 
     def prepare_lot(self, supplier, client=None, **kwargs):
         lot_data = get_lot(supplier, **kwargs)
+        lot_data["supplier_certificate"] = "VALID"
         lot_data["carbure_supplier_id"] = supplier.id
         lot_data["carbure_client_id"] = client.id if client else self.trader.id
 

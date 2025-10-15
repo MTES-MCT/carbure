@@ -47,14 +47,14 @@ export function useFilters() {
   const entity = useEntity()
 
   const filters: Record<string, string> = {
-    [ProvisionCertificateFilter.Cpo]: t("Aménageur"),
-    [ProvisionCertificateFilter.Quarter]: t("Trimestre"),
-    [ProvisionCertificateFilter.OperatingUnit]: t("Unité d'exploitation"),
-    [ProvisionCertificateFilter.Source]: t("Source"),
+    [ProvisionCertificateFilter.cpo]: t("Aménageur"),
+    [ProvisionCertificateFilter.quarter]: t("Trimestre"),
+    [ProvisionCertificateFilter.operating_unit]: t("Unité d'exploitation"),
+    [ProvisionCertificateFilter.source]: t("Source"),
   }
 
   if (entity.isCPO) {
-    delete filters[ProvisionCertificateFilter.Cpo]
+    delete filters[ProvisionCertificateFilter.cpo]
   }
 
   return filters

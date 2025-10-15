@@ -13,7 +13,7 @@ import {
   OperationsStatus,
   OperationOrder,
 } from "accounting/types"
-import * as api from "accounting/api/balances"
+import * as api from "accounting/api/biofuels/balances"
 import { formatSector } from "accounting/utils/formatters"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import useEntity from "common/hooks/entity"

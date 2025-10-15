@@ -1,0 +1,31 @@
+.dialog-section {
+  border: 1px solid var(--border-default-grey);
+  padding: var(--spacing-4w) var(--spacing-2w);
+  min-width: 250px;
+}
+
+.dialog-section__title {
+  color: var(--blue-france-sun-113-625);
+}
+
+.dialog-section__title::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-default-grey);
+  margin: var(--spacing-2w) 0;
+}
+
+.dialog-section__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-section__content--gap-md {
+  gap: var(--spacing-2w);
+}
+
+.dialog-section__content--gap-lg {
+  gap: var(--spacing-3w);
+}

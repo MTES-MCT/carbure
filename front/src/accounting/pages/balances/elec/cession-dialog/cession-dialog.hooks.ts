@@ -1,4 +1,4 @@
-import { createOperation } from "accounting/api/elec-operations"
+import { createOperation } from "accounting/api/elec/operations"
 import useEntity from "common/hooks/entity"
 import { CreateElecOperationType } from "accounting/types"
 import { useMutation } from "common/hooks/async"
