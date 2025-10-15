@@ -1,15 +1,14 @@
 import { Meta, StoryObj } from "@storybook/react"
 import { RecipientForm } from "./recipient-form"
 import { Form, useForm } from "common/components/form2"
-import { okFindEligibleTiruertEntities } from "./__test__/api"
-import { fillRecipientForm } from "./recipient-form.stories.utils"
+import { baseHandlers, fillRecipientForm } from "./recipient-form.stories.utils"
 
 const meta: Meta<typeof RecipientForm> = {
   component: RecipientForm,
   title: "modules/accounting/components/RecipientForm",
   parameters: {
     msw: {
-      handlers: [okFindEligibleTiruertEntities],
+      handlers: baseHandlers,
     },
   },
   render: (args) => {
