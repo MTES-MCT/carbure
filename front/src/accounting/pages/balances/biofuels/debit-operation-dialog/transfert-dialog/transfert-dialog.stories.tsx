@@ -75,7 +75,7 @@ export const SecondStep: Story = {
   },
 }
 
-// Second step - Could not switch to the next step when the quantity is insufficient
+// Second step - Could not switch to the next step when the quantity is not submitted
 export const SecondStepNextStepButtonDisabled: Story = {
   ...SecondStep,
   parameters: {
