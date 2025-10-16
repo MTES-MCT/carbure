@@ -4521,7 +4521,7 @@ export interface components {
             to_depot: components["schemas"]["OperationDepot"];
             /**  depot */
             readonly _depot: string;
-            export_country?: number | null;
+            readonly export_country: components["schemas"]["Country"];
             /** Format: date-time */
             readonly created_at: string;
             /** Format: date */

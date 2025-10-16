@@ -29,22 +29,25 @@ export const useCreateOperation = ({
 
   const getSuccessMessage = useCallback(
     (operationType: CreateOperationType, quantity: number) => {
+      const quantityFormatted = formatUnit(quantity, {
+        fractionDigits: 0,
+      })
       const messages: Partial<Record<CreateOperationType, string>> = {
-        [CreateOperationType.TRANSFERT]:
+        [CreateOperationType.TRANSFERT]: t(
           "Le transfert de droits d'une quantité de {{quantity}} a été réalisé avec succès",
-        [CreateOperationType.EXPORTATION]:
+          { quantity: quantityFormatted }
+        ),
+        [CreateOperationType.EXPORTATION]: t(
           "L'exportation d'une quantité de {{quantity}} a été réalisée avec succès",
+          { quantity: quantityFormatted }
+        ),
       }
 
       if (!messages[operationType]) {
         return t("L'opération a été réalisée avec succès")
       }
 
-      return t(messages[operationType], {
-        quantity: formatUnit(quantity, {
-          fractionDigits: 0,
-        }),
-      })
+      return messages[operationType]
     },
     [formatUnit, t]
   )

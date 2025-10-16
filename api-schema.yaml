@@ -14782,8 +14782,9 @@ components:
           readOnly: true
           title: " depot"
         export_country:
-          type: integer
-          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -14823,6 +14824,7 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - export_country
         - from_depot
         - id
         - quantity

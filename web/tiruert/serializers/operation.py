@@ -4,6 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from core.models import Pays
+from core.serializers import CountrySerializer
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
@@ -112,6 +113,7 @@ class OperationSerializer(BaseOperationSerializer):
 
     avoided_emissions = serializers.SerializerMethodField()
     quantity_mj = serializers.SerializerMethodField()
+    export_country = CountrySerializer(read_only=True)
 
     def get_avoided_emissions(self, instance) -> float:
         return round(sum(detail.avoided_emissions for detail in instance.details.all()), 2)

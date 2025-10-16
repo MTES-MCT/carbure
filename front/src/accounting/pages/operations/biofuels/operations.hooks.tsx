@@ -6,8 +6,8 @@ import { Text } from "common/components/text"
 import { isOperationDebit } from "./operations.utils"
 import * as api from "accounting/api/biofuels/operations"
 import {
-  Operation,
   OperationDebitOrCredit,
+  OperationList,
   OperationOrder,
   OperationsFilter,
   OperationsQuery,
@@ -33,7 +33,7 @@ export const useOperationsBiofuelsColumns = ({
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
   const { unit } = useUnit()
-  const columns: Column<Operation>[] = [
+  const columns: Column<OperationList>[] = [
     {
       header: t("Statut"),
       cell: (item) => <OperationBadge status={item.status} />,
