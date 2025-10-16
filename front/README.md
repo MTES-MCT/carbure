@@ -52,7 +52,7 @@ The project is structured to facilitate modular development, ensuring that each 
 #### Page Structure
 
 - Each page is represented by an `index.tsx` file within its respective folder.
-- Supporting files such as `types.ts`, `api.ts`, and test files (`*.spec.tsx`) can reside either in the page's folder or at the domain level.
+- Supporting files such as `types.ts`, `api.ts` can reside either in the page's folder or at the domain level.
 
 ### Shared Components
 
@@ -111,14 +111,17 @@ common/
 
 ## Testing components
 
-We decided to stop testing with react testing library because it didn't check the final rendering the user had. This is why these tests will gradually be migrated to Storybook and Chromatic, which offer a tool dedicated to the visual testing of components, corresponding to the user's final rendering.
+We decided to stop testing with react testing library because it didn't check the final rendering the user had. This is why these tests will gradually be migrated to Storybook and Chromatic, which offer a tool dedicated to the visual testing of components, corresponding to the user's final rendering. In addition, we use vitest for unit testing.
 
 ### Workflow
 
-During development, if certain components need to be tested, create a .stories.tsx file next to the component, and follow Storybook's documentation on how to create stories. Storybook's interface offers the option of launching visual tests for a component, which will launch the storybook build step, and then send the files to Chromatic.
+Chromatic offers a free version with 5000 snapshots per month. For the moment, this offer is sufficient, and the significant cost of the paid version (£180/month) forces us to organise ourselves to avoid spending too much on captures.That is why, when developing features, the workflow is as follows :
 
-You'll then need to go to Chromatic if the visual differences between the previous state and the current state of the component are no longer the same (see Chromatic documentation).
-
+- During development, if certain components need to be tested, create a .stories.tsx file next to the component, and follow Storybook's documentation on how to create stories (or check existing stories).
+- Add tests for use cases that are worth testing.
+- Once the tests match expectations and the branch work is complete, open a merge request, which will launch the storybook build and publish the screenshots on Chromatic. (This allows screenshots to be generated only at the time of the merge request and not during the development phase.)
+- Check Chromatic to see if there are any differences in the screenshots. If so, accept/reject the screenshots depending on whether the result matches what was expected.
+  
 ## Type safety between frontend and backend
 
 ### Schema generation
