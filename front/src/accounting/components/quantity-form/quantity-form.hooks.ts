@@ -74,6 +74,9 @@ export const useQuantityFormStep = ({
 
   return quantityFormStep(form.value, {
     ...overrides,
+    allowNextStep:
+      form.value.avoided_emissions_min !== undefined &&
+      form.value.avoided_emissions_max !== undefined,
     onSubmit: () => {
       if (!balance) return Promise.resolve()
 

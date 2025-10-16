@@ -157,7 +157,7 @@ export const TransfertDialog = (props: TransfertDialogProps) => {
   })
 
   const steps = [
-    recipientStep(form.value),
+    recipientStep,
     quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]

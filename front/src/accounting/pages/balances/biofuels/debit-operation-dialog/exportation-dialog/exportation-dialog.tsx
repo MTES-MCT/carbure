@@ -8,7 +8,7 @@ import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
-import { Balance } from "accounting/types"
+import { Balance, CreateOperationType } from "accounting/types"
 import Dialog from "common/components/dialog2/dialog"
 import { FormManager, useForm } from "common/components/form2"
 import { Box, Main } from "common/components/scaffold"
@@ -23,14 +23,14 @@ import {
 import { Button } from "common/components/button2"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import { useExportationDialog } from "./exportation-dialog.hooks"
-import {
-  ExportationQuantityForm,
-  exportationQuantityFormStepKey,
-  ExportationQuantitySummary,
-} from "./exportation-quantity-form"
 import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 import { GHGRangeForm } from "accounting/components/ghg-range-form"
-import { useQuantityFormStep } from "accounting/components/quantity-form"
+import {
+  QuantityForm,
+  quantityFormStepKey,
+  QuantitySummary,
+  useQuantityFormStep,
+} from "accounting/components/quantity-form"
 
 interface ExportationDialogProps {
   onClose: () => void
@@ -114,9 +114,7 @@ export const ExportationDialogContent = ({
                 />
               </>
             )}
-            {currentStepIndex > 2 && (
-              <ExportationQuantitySummary values={form.value} />
-            )}
+            {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
             {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
           </RecapOperationGrid>
         </Box>
@@ -132,11 +130,12 @@ export const ExportationDialogContent = ({
                 </Box>
               </>
             )}
-            {currentStep?.key === exportationQuantityFormStepKey && (
+            {currentStep?.key === quantityFormStepKey && (
               <Box>
-                <ExportationQuantityForm
+                <QuantityForm
                   balance={balance}
                   quantityMax={form.value.availableBalance}
+                  type={CreateOperationType.EXPORTATION}
                   gesBoundMin={form.value.gesBoundMin}
                   gesBoundMax={form.value.gesBoundMax}
                 />
@@ -168,9 +167,9 @@ export const ExportationDialog = (props: ExportationDialogProps) => {
   })
 
   const steps = [
-    fromDepotStep(form.value),
+    fromDepotStep,
     exportationQuantityFormStep,
-    countryFormStep(form.value),
+    countryFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]
 

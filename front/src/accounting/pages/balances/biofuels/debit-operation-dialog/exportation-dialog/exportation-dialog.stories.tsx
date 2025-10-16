@@ -70,12 +70,12 @@ export const SecondStep: Story = {
     await clickNextStepButton(canvasElement)
 
     // Fill the second step
-    await fillQuantityForm(canvasElement, { tC02: null })
+    await fillQuantityForm(canvasElement)
   },
 }
 
 // Second step - Could not switch to the next step when the tCO2 is outside the range
-export const SecondStepNextStepButtonDisabledWithTCO2OutsideRange: Story = {
+export const SecondStepNextDisabledWithTCO2OutsideRange: Story = {
   play: async (canvas) => {
     const { canvasElement } = canvas
 
@@ -85,7 +85,7 @@ export const SecondStepNextStepButtonDisabledWithTCO2OutsideRange: Story = {
     await clickNextStepButton(canvasElement)
 
     // Fill the second step and append a 00 to the tCO2 value to simulate a value outside the range
-    await fillQuantityForm(canvasElement, { tC02: "00" })
+    await fillQuantityForm(canvasElement, { tC02: "10000" })
     // Click on the next step button
     await clickNextStepButton(canvasElement)
   },

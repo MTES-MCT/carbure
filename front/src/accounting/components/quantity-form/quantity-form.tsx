@@ -31,12 +31,6 @@ export type QuantityFormComponentProps = {
   // Lot GHG min and max bounds
   gesBoundMin?: number
   gesBoundMax?: number
-
-  // Callback function to be called when the quantity is valid and overrides the default behavior
-  onQuantityDeclared?: (emissions: {
-    emissionsMin: number
-    emissionsMax: number
-  }) => void
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
@@ -70,7 +64,6 @@ const QuantitySection = ({
   gesBoundMin,
   gesBoundMax,
   converter,
-  onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
   const { formatUnit, unit } = useUnit(customUnit)
@@ -127,18 +120,11 @@ const QuantitySection = ({
       }
       setQuantityDeclared(true)
 
-      if (onQuantityDeclared) {
-        onQuantityDeclared({
-          emissionsMin,
-          emissionsMax,
-        })
-      } else {
-        setField("avoided_emissions_min", emissionsMin)
-        setField("avoided_emissions_max", emissionsMax)
+      setField("avoided_emissions_min", emissionsMin)
+      setField("avoided_emissions_max", emissionsMax)
 
-        if (emissionsMin === emissionsMax) {
-          setField("avoided_emissions", emissionsMin)
-        }
+      if (emissionsMin === emissionsMax) {
+        setField("avoided_emissions", emissionsMin)
       }
     })
   }

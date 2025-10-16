@@ -61,10 +61,7 @@ export const showNextStepRecipientForm = (values: RecipientFormProps) => {
 export const recipientStepKey = "recipient_to_depot"
 type RecipientStepKey = typeof recipientStepKey
 
-export const recipientStep: (
-  values: RecipientFormProps
-) => Step<RecipientStepKey> = (values) => ({
+export const recipientStep: Step<RecipientStepKey> = {
   key: recipientStepKey,
   title: i18next.t("Destinataire"),
-  allowNextStep: showNextStepRecipientForm(values),
-})
+}

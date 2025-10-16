@@ -58,9 +58,7 @@ export const CountryFormSummary = ({
 export const countryFormStepKey = "country-form"
 type CountryFormStepKey = typeof countryFormStepKey
 
-export const countryFormStep: (
-  values: CountryFormProps
-) => Step<CountryFormStepKey> = () => ({
+export const countryFormStep: Step<CountryFormStepKey> = {
   key: countryFormStepKey,
   title: i18next.t("Pays et client"),
-})
+}
