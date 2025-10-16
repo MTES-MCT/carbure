@@ -192,17 +192,24 @@ export const OperationDetail = () => {
           label: t("Expéditeur"),
           value: operation._entity ?? "-",
         },
-        [OperationType.CESSION, OperationType.TRANSFERT].includes(
+        [OperationType.EXPORTATION, OperationType.TRANSFERT].includes(
           operation.type as OperationType
         ) &&
           operation.quantity < 0 && {
             label: t("Destinataire"),
             value: operation._entity ?? "-",
           },
-        operation.type !== OperationType.TENEUR &&
-          operation.type !== OperationType.TRANSFERT && {
-            label: t("Dépôt expéditeur"),
-            value: operation._depot ?? "-",
+        operation.type === OperationType.EXPORTATION && {
+          label: t("Dépôt expéditeur"),
+          value: operation.from_depot ? operation.from_depot.name : "-",
+        },
+        operation.type === OperationType.EXPORTATION &&
+          operation.export_country &&
+          operation.quantity < 0 && {
+            label: t("Pays d'exportation"),
+            value: operation.export_country
+              ? operation.export_country.name
+              : "-",
           },
         operation.type !== OperationType.DEVALUATION &&
           operation.type === OperationType.ACQUISITION &&
