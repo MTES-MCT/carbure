@@ -2,6 +2,12 @@
 
 Traçabilité et durabilité des biocarburants, de la production à la distribution
 
+## Documentation
+
+### Frontend
+- [Documentation complète du frontend](./front/README.md) - Structure, commandes, tests et architecture du frontend
+
+
 ## Prérequis
 
 Il est nécessaire d'avoir installé sur le poste local
