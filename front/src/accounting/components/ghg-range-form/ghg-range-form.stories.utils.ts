@@ -4,12 +4,14 @@ import { apiTypes } from "common/services/api-fetch.types"
 import { http, HttpResponse } from "msw"
 
 export const fillGHGRangeForm = async (canvasElement: HTMLElement) => {
-  const { getAllByRole } = within(canvasElement)
+  const { getAllByRole, getByText } = within(canvasElement)
   const range = await waitFor(() => getAllByRole("slider"))
   const firstCursor = range[0]
   if (!firstCursor) throw new Error("First cursor not found")
 
-  fireEvent.change(firstCursor, { target: { value: "50" } })
+  await fireEvent.change(firstCursor, { target: { value: "50" } })
+
+  await waitFor(() => getByText("2 500 litres"))
 }
 
 export const getBalancesWithUpdatedAvailableBalance = http.get(
