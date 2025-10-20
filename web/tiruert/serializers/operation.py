@@ -101,6 +101,7 @@ class OperationSerializer(BaseOperationSerializer):
             "to_depot",
             "_depot",
             "export_country",
+            "export_recipient",
             "created_at",
             "validation_date",
             "durability_period",
@@ -141,6 +142,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "from_depot",
             "to_depot",
             "export_country",
+            "export_recipient",
             "lots",
             "status",
         ]

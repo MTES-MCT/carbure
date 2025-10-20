@@ -308,6 +308,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             Operation.TENEUR,
             Operation.TRANSFERT,
             Operation.EXPORTATION,
+            Operation.EXPEDITION,
         ] and instance.status in [
             Operation.PENDING,
             Operation.REJECTED,
