@@ -1,20 +1,11 @@
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiExample, extend_schema
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 
 class YearsActionMixin:
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         examples=[
             OpenApiExample(
                 "Example of filters response.",
@@ -29,7 +20,7 @@ class YearsActionMixin:
                 response_only=True,
             ),
         ],
-        responses={200: {"type": "array", "items": {"type": "integer"}}},
+        responses={status.HTTP_200_OK: {"type": "array", "items": {"type": "integer"}}},
     )
     @action(
         detail=False,

@@ -4,4 +4,4 @@ from .production_unit import BiomethaneProductionUnitViewSet, BiomethaneDigestat
 from .digestate import BiomethaneDigestateViewSet, BiomethaneDigestateSpreadingViewSet, OptionalFieldsActionMixin
 from .energy import BiomethaneEnergyViewSet, BiomethaneEnergyMonthlyReportViewSet
 from .supply_plan import BiomethaneSupplyPlanViewSet, BiomethaneSupplyInputViewSet
-from .annual_declaration import BiomethaneAnnualDeclarationViewSet
+from .annual_declaration import BiomethaneAnnualDeclarationViewSet, YearsActionMixin, ValidateActionMixin
