@@ -44,19 +44,15 @@ class BiomethaneDigestateService:
         return composting_locations, production_unit, contract
 
     @staticmethod
-    def _apply_phase_separation_rules(production_unit, optional_fields, fields_to_clear):
+    def _apply_phase_separation_rules(production_unit, fields_to_clear):
         """Apply digestate phase separation rules."""
         if production_unit.has_digestate_phase_separation:
-            optional_fields.extend(BiomethaneDigestateService.RAW_DIGESTATE_FIELDS)
             fields_to_clear.extend(BiomethaneDigestateService.RAW_DIGESTATE_FIELDS)
         else:
-            optional_fields.extend(BiomethaneDigestateService.SEPARATED_DIGESTATE_FIELDS)
             fields_to_clear.extend(BiomethaneDigestateService.SEPARATED_DIGESTATE_FIELDS)
 
     @staticmethod
-    def _apply_composting_rules(
-        valorization_methods, composting_locations, required_fields, optional_fields, fields_to_clear
-    ):
+    def _apply_composting_rules(valorization_methods, composting_locations, required_fields, fields_to_clear):
         """Apply composting rules based on valorization methods and locations."""
         from biomethane.models import BiomethaneProductionUnit
 
@@ -68,44 +64,38 @@ class BiomethaneDigestateService:
 
         if BiomethaneProductionUnit.COMPOSTING not in valorization_methods:
             # Composting not enabled → all fields are optional
-            optional_fields.extend(all_composting_fields)
             fields_to_clear.extend(all_composting_fields)
             # Remove from required fields if already added
             required_fields[:] = [f for f in required_fields if f not in all_composting_fields]
         else:
             # Composting enabled → apply location rules
             BiomethaneDigestateService._apply_composting_location_rules(
-                composting_locations, required_fields, optional_fields, fields_to_clear
+                composting_locations, required_fields, fields_to_clear
             )
 
     @staticmethod
-    def _apply_composting_location_rules(composting_locations, required_fields, optional_fields, fields_to_clear):
+    def _apply_composting_location_rules(composting_locations, required_fields, fields_to_clear):
         """Apply rules based on selected composting locations."""
         if composting_locations:
             # EXTERNAL_PLATFORM selected?
             if BiomethaneDigestate.EXTERNAL_PLATFORM in composting_locations:
                 required_fields.extend(BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS)
             else:
-                optional_fields.extend(BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS)
                 fields_to_clear.extend(BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS)
 
             # ON_SITE selected?
             if BiomethaneDigestate.ON_SITE in composting_locations:
                 required_fields.extend(BiomethaneDigestateService.ON_SITE_FIELDS)
             else:
-                optional_fields.extend(BiomethaneDigestateService.ON_SITE_FIELDS)
                 fields_to_clear.extend(BiomethaneDigestateService.ON_SITE_FIELDS)
         else:
             # No location selected → all location fields are optional
-            optional_fields.extend(
-                BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS + BiomethaneDigestateService.ON_SITE_FIELDS
-            )
             fields_to_clear.extend(
                 BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS + BiomethaneDigestateService.ON_SITE_FIELDS
             )
 
     @staticmethod
-    def _apply_valorization_rules(production_unit, optional_fields, fields_to_clear):
+    def _apply_valorization_rules(production_unit, fields_to_clear):
         """Apply rules based on valorization methods."""
         from biomethane.models import BiomethaneProductionUnit
 
@@ -113,31 +103,27 @@ class BiomethaneDigestateService:
 
         # Spreading
         if BiomethaneProductionUnit.SPREADING not in valorization_methods:
-            optional_fields.extend(BiomethaneDigestateService.SPREADING_FIELDS)
             fields_to_clear.extend(BiomethaneDigestateService.SPREADING_FIELDS)
 
         # Incineration / Landfilling
         if BiomethaneProductionUnit.INCINERATION_LANDFILLING not in valorization_methods:
-            optional_fields.extend(BiomethaneDigestateService.INCINERATION_FIELDS + BiomethaneDigestateService.WWTP_FIELDS)
             fields_to_clear.extend(BiomethaneDigestateService.INCINERATION_FIELDS + BiomethaneDigestateService.WWTP_FIELDS)
 
     @staticmethod
-    def _apply_spreading_management_rules(production_unit, optional_fields, fields_to_clear):
+    def _apply_spreading_management_rules(production_unit, fields_to_clear):
         """Apply rules based on spreading management methods."""
         from biomethane.models import BiomethaneProductionUnit
 
         spreading_management_methods = production_unit.spreading_management_methods or []
         if BiomethaneProductionUnit.SALE not in spreading_management_methods:
-            optional_fields.extend(BiomethaneDigestateService.SALE_FIELDS)
             fields_to_clear.extend(BiomethaneDigestateService.SALE_FIELDS)
 
     @staticmethod
-    def _apply_contract_rules(contract, optional_fields, fields_to_clear):
+    def _apply_contract_rules(contract, fields_to_clear):
         """Apply rules based on contract."""
         from biomethane.models import BiomethaneContract
 
         if contract.installation_category != BiomethaneContract.INSTALLATION_CATEGORY_2:
-            optional_fields.extend(BiomethaneDigestateService.WWTP_FIELDS)
             fields_to_clear.extend(BiomethaneDigestateService.WWTP_FIELDS)
 
     @staticmethod
@@ -148,12 +134,10 @@ class BiomethaneDigestateService:
         Returns:
             dict: {
                 'required_fields': list,  # Required fields based on business rules
-                'optional_fields': list,  # Optional fields
-                'fields_to_clear': list,  # Fields to clear/empty
+                'fields_to_clear': list,  # Fields to clear/empty (also represents optional fields)
             }
         """
         required_fields = []
-        optional_fields = []
         fields_to_clear = []
 
         # Extract data
@@ -161,30 +145,29 @@ class BiomethaneDigestateService:
 
         # Apply rules based on production unit
         if production_unit:
-            BiomethaneDigestateService._apply_phase_separation_rules(production_unit, optional_fields, fields_to_clear)
+            BiomethaneDigestateService._apply_phase_separation_rules(production_unit, fields_to_clear)
 
-            BiomethaneDigestateService._apply_valorization_rules(production_unit, optional_fields, fields_to_clear)
+            BiomethaneDigestateService._apply_valorization_rules(production_unit, fields_to_clear)
 
             valorization_methods = production_unit.digestate_valorization_methods or []
 
             BiomethaneDigestateService._apply_composting_rules(
-                valorization_methods, composting_locations, required_fields, optional_fields, fields_to_clear
+                valorization_methods, composting_locations, required_fields, fields_to_clear
             )
 
-            BiomethaneDigestateService._apply_spreading_management_rules(production_unit, optional_fields, fields_to_clear)
+            BiomethaneDigestateService._apply_spreading_management_rules(production_unit, fields_to_clear)
         else:
             # No production unit → apply basic composting rules only
             BiomethaneDigestateService._apply_composting_location_rules(
-                composting_locations, required_fields, optional_fields, fields_to_clear
+                composting_locations, required_fields, fields_to_clear
             )
 
         # Apply rules based on contract
         if contract:
-            BiomethaneDigestateService._apply_contract_rules(contract, optional_fields, fields_to_clear)
+            BiomethaneDigestateService._apply_contract_rules(contract, fields_to_clear)
 
         return {
             "required_fields": list(set(required_fields)),
-            "optional_fields": list(set(optional_fields)),
             "fields_to_clear": list(set(fields_to_clear)),
         }
 
@@ -195,7 +178,7 @@ class BiomethaneDigestateService:
         Used by the optional_fields property of the model.
         """
         rules = BiomethaneDigestateService.get_conditional_fields_rules(instance)
-        return rules["optional_fields"]
+        return rules["fields_to_clear"]
 
     @staticmethod
     def get_required_fields(instance_or_data):
