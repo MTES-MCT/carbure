@@ -1,6 +1,7 @@
 import useEntity from "common/hooks/entity"
 import { lazy } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
+import { BiomethanePageHeader } from "./layouts/page-header"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -14,29 +15,20 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      <Route path="digestate/:year" element={<Digestate />} />
-      <Route
-        path="digestate"
-        element={<Navigate replace to={`digestate/${currentYear}`} />}
-      />
-      <Route path="energy/:year" element={<Energy />} />
-      <Route
-        path="energy"
-        element={<Navigate replace to={`energy/${currentYear}`} />}
-      />
+      <Route path=":year" element={<BiomethanePageHeader />}>
+        <Route index element={<Navigate replace to="digestate" />} />
+        <Route path="digestate" element={<Digestate />} />
+        <Route path="energy" element={<Energy />} />
+      </Route>
       <Route path="supply-plan/:year" element={<SupplyPlan />} />
       <Route
         path="supply-plan"
         element={<Navigate replace to={`supply-plan/${currentYear}`} />}
       />
-      <Route
-        path="digestate"
-        element={<Navigate replace to={`digestate/${currentYear}`} />}
-      />
 
       <Route
         path=""
-        element={<Navigate replace to={`digestate/${currentYear}`} />}
+        element={<Navigate replace to={`${currentYear}/digestate`} />}
       />
     </Routes>
   )

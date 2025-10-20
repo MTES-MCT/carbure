@@ -6,8 +6,9 @@ import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
-import { useEnergyContext } from "../energy.hooks"
+import { useSaveEnergy } from "../energy.hooks"
 import { getYesNoOptions } from "common/utils/normalizers"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type AcceptabilityForm = DeepPartial<
   Pick<
@@ -20,7 +21,8 @@ type AcceptabilityForm = DeepPartial<
 export function Acceptability({ energy }: { energy?: BiomethaneEnergy }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<AcceptabilityForm>(energy ?? {})
-  const { saveEnergy, isInDeclarationPeriod } = useEnergyContext()
+  const saveEnergy = useSaveEnergy()
+  const { isInDeclarationPeriod } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 

@@ -14,8 +14,9 @@ import {
   BiomethaneDigestateInputRequest,
   BiomethaneDigestateCompostingLocation,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type CompostingForm = DeepPartial<
   Pick<
@@ -46,7 +47,8 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
         }
       : {}
   )
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const isInDeclarationPeriod = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 

@@ -453,6 +453,86 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/biomethane/annual-declaration/:
+    get:
+      operationId: biomethane_annual_declaration_retrieve
+      description: Retrieve the declaration. Returns a single declaration object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: Declaration details for the entity
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: Declaration created for the entity
+  /api/biomethane/annual-declaration/validate/:
+    post:
+      operationId: biomethane_annual_declaration_validate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+  /api/biomethane/annual-declaration/years/:
+    get:
+      operationId: biomethane_annual_declaration_years_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of filters response.
+          description: ""
   /api/biomethane/contract/:
     get:
       operationId: biomethane_contract_retrieve
@@ -969,39 +1049,6 @@ paths:
       responses:
         "200":
           description: No response body
-  /api/biomethane/digestate/years/:
-    get:
-      operationId: biomethane_digestate_years_retrieve
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: integer
-              examples:
-                ExampleOfFiltersResponse.:
-                  value:
-                    - 2020
-                    - 2021
-                    - 2022
-                    - 2023
-                    - 2024
-                  summary: Example of filters response.
-          description: ""
   /api/biomethane/energy/:
     get:
       operationId: biomethane_energy_retrieve
@@ -1174,39 +1221,6 @@ paths:
       responses:
         "200":
           description: No response body
-  /api/biomethane/energy/years/:
-    get:
-      operationId: biomethane_energy_years_retrieve
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: integer
-              examples:
-                ExampleOfFiltersResponse.:
-                  value:
-                    - 2020
-                    - 2021
-                    - 2022
-                    - 2023
-                    - 2024
-                  summary: Example of filters response.
-          description: ""
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
@@ -10726,6 +10740,32 @@ components:
         - code
         - name
         - name_en
+    BiomethaneAnnualDeclaration:
+      type: object
+      properties:
+        year:
+          type: integer
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        missing_fields:
+          type: string
+          readOnly: true
+        is_ready:
+          type: string
+          readOnly: true
+      required:
+        - is_ready
+        - missing_fields
+        - year
+    BiomethaneAnnualDeclarationStatusEnum:
+      enum:
+        - PENDING
+        - DECLARED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `DECLARED` - DECLARED
     BiomethaneContract:
       type: object
       properties:
