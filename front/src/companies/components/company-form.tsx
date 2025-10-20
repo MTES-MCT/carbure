@@ -156,6 +156,7 @@ export const CompanyForm = ({
               getCertificates(query).then((res) => res.data ?? [])
             }
             {...companyForm.bind("certificate")}
+            required={companyForm.value?.entity_type === EntityType.Trader}
           />
         )}
       <TextArea
