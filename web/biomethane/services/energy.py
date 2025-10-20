@@ -62,18 +62,17 @@ class BiomethaneEnergyService:
         return production_unit, contract, has_malfunctions, malfunction_types, has_injection_difficulties
 
     @staticmethod
-    def _apply_flaring_rules(production_unit, optional_fields, fields_to_clear):
+    def _apply_flaring_rules(production_unit, fields_to_clear):
         """Apply flaring rules based on installed meters."""
         from biomethane.models import BiomethaneProductionUnit
 
         installed_meters = production_unit.installed_meters if production_unit else []
 
         if BiomethaneProductionUnit.FLARING_FLOWMETER not in installed_meters:
-            optional_fields.extend(BiomethaneEnergyService.FLARING_FIELDS)
             fields_to_clear.extend(BiomethaneEnergyService.FLARING_FIELDS)
 
     @staticmethod
-    def _apply_tariff_rules(contract, optional_fields, fields_to_clear):
+    def _apply_tariff_rules(contract, fields_to_clear):
         """Apply rules based on contract tariff reference."""
         if not contract:
             return
@@ -82,33 +81,28 @@ class BiomethaneEnergyService:
 
         # Old tariff fields (2011, 2020, 2021)
         if tariff_reference not in ["2011", "2020", "2021"]:
-            optional_fields.extend(BiomethaneEnergyService.OLD_TARIFF_FIELDS)
             fields_to_clear.extend(BiomethaneEnergyService.OLD_TARIFF_FIELDS)
 
         # New tariff fields (2023)
         if tariff_reference not in ["2023"]:
-            optional_fields.extend(BiomethaneEnergyService.NEW_TARIFF_FIELDS)
             fields_to_clear.extend(BiomethaneEnergyService.NEW_TARIFF_FIELDS)
 
     @staticmethod
-    def _apply_malfunction_rules(has_malfunctions, malfunction_types, optional_fields, fields_to_clear):
+    def _apply_malfunction_rules(has_malfunctions, malfunction_types, fields_to_clear):
         """Apply rules based on malfunction status."""
         if not has_malfunctions:
             # No malfunctions → all malfunction fields are optional
-            optional_fields.extend(BiomethaneEnergyService.MALFUNCTION_FIELDS)
             fields_to_clear.extend(BiomethaneEnergyService.MALFUNCTION_FIELDS)
         else:
             # Has malfunctions → check malfunction type
             if malfunction_types and malfunction_types != BiomethaneEnergy.MALFUNCTION_TYPE_OTHER:
                 # Not "OTHER" type → details field is optional
-                optional_fields.extend(BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD)
                 fields_to_clear.extend(BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD)
 
     @staticmethod
-    def _apply_injection_difficulty_rules(has_injection_difficulties, optional_fields, fields_to_clear):
+    def _apply_injection_difficulty_rules(has_injection_difficulties, fields_to_clear):
         """Apply rules based on injection difficulties status."""
         if not has_injection_difficulties:
-            optional_fields.extend(BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS)
             fields_to_clear.extend(BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS)
 
     @staticmethod
@@ -119,12 +113,10 @@ class BiomethaneEnergyService:
         Returns:
             dict: {
                 'required_fields': list,  # Required fields based on business rules
-                'optional_fields': list,  # Optional fields
-                'fields_to_clear': list,  # Fields to clear/empty
+                'fields_to_clear': list,  # Fields to clear/empty (also represents optional fields)
             }
         """
         required_fields = []
-        optional_fields = []
         fields_to_clear = []
 
         # Extract data
@@ -138,25 +130,20 @@ class BiomethaneEnergyService:
 
         # Apply rules based on production unit
         if production_unit:
-            BiomethaneEnergyService._apply_flaring_rules(production_unit, optional_fields, fields_to_clear)
+            BiomethaneEnergyService._apply_flaring_rules(production_unit, fields_to_clear)
 
         # Apply rules based on contract
         if contract:
-            BiomethaneEnergyService._apply_tariff_rules(contract, optional_fields, fields_to_clear)
+            BiomethaneEnergyService._apply_tariff_rules(contract, fields_to_clear)
 
         # Apply rules based on malfunction status
-        BiomethaneEnergyService._apply_malfunction_rules(
-            has_malfunctions, malfunction_types, optional_fields, fields_to_clear
-        )
+        BiomethaneEnergyService._apply_malfunction_rules(has_malfunctions, malfunction_types, fields_to_clear)
 
         # Apply rules based on injection difficulties
-        BiomethaneEnergyService._apply_injection_difficulty_rules(
-            has_injection_difficulties, optional_fields, fields_to_clear
-        )
+        BiomethaneEnergyService._apply_injection_difficulty_rules(has_injection_difficulties, fields_to_clear)
 
         return {
             "required_fields": list(set(required_fields)),
-            "optional_fields": list(set(optional_fields)),
             "fields_to_clear": list(set(fields_to_clear)),
         }
 
@@ -167,7 +154,7 @@ class BiomethaneEnergyService:
         Used by the optional_fields property of the model.
         """
         rules = BiomethaneEnergyService.get_conditional_fields_rules(instance)
-        return rules["optional_fields"]
+        return rules["fields_to_clear"]
 
     @staticmethod
     def get_required_fields(instance_or_data):
