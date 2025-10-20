@@ -4522,6 +4522,7 @@ export interface components {
             /**  depot */
             readonly _depot: string;
             readonly export_country: components["schemas"]["Country"];
+            export_recipient?: string;
             /** Format: date-time */
             readonly created_at: string;
             /** Format: date */
@@ -4564,6 +4565,7 @@ export interface components {
             from_depot?: number | null;
             to_depot?: number | null;
             export_country?: string | null;
+            export_recipient?: string;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
         };
@@ -4618,6 +4620,7 @@ export interface components {
          *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
          *     * `MAC_BIO` - MAC_BIO
          *     * `EXPORTATION` - EXPORTATION
+         *     * `EXPEDITION` - EXPEDITION
          *     * `DEVALUATION` - DEVALUATION
          *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
          *     * `TRANSFERT` - TRANSFERT
@@ -11296,6 +11299,7 @@ export interface operations {
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
                  *     * `MAC_BIO` - MAC_BIO
                  *     * `EXPORTATION` - EXPORTATION
+                 *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
@@ -11663,6 +11667,7 @@ export interface operations {
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
                  *     * `MAC_BIO` - MAC_BIO
                  *     * `EXPORTATION` - EXPORTATION
+                 *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
@@ -11760,6 +11765,7 @@ export interface operations {
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
                  *     * `MAC_BIO` - MAC_BIO
                  *     * `EXPORTATION` - EXPORTATION
+                 *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
@@ -11877,6 +11883,7 @@ export interface operations {
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
                  *     * `MAC_BIO` - MAC_BIO
                  *     * `EXPORTATION` - EXPORTATION
+                 *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
@@ -12371,6 +12378,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     CESSION = "CESSION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     DEVALUATION = "DEVALUATION",
+    EXPEDITION = "EXPEDITION",
     EXPORTATION = "EXPORTATION",
     INCORPORATION = "INCORPORATION",
     LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
@@ -12638,6 +12646,7 @@ export enum OperationTypeEnum {
     LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
     MAC_BIO = "MAC_BIO",
     EXPORTATION = "EXPORTATION",
+    EXPEDITION = "EXPEDITION",
     DEVALUATION = "DEVALUATION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     TRANSFERT = "TRANSFERT"

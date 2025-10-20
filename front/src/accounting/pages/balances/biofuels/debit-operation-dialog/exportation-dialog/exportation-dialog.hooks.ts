@@ -20,9 +20,11 @@ export const useExportationDialog = ({
   const createOperation = useCreateOperation({
     onOperationCreated,
     data: {
-      type: CreateOperationType.EXPORTATION,
+      type: values.country?.is_in_europe
+        ? CreateOperationType.EXPEDITION
+        : CreateOperationType.EXPORTATION,
       from_depot: values.from_depot?.id,
-      credited_entity: values.credited_entity?.id,
+      export_recipient: values.export_recipient,
       customs_category: balance.customs_category,
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,

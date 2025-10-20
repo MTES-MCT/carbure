@@ -8730,6 +8730,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -8743,6 +8744,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -9361,6 +9363,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9374,6 +9377,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -9619,6 +9623,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9632,6 +9637,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -9913,6 +9919,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9926,6 +9933,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -14785,6 +14793,9 @@ components:
           allOf:
             - $ref: "#/components/schemas/Country"
           readOnly: true
+        export_recipient:
+          type: string
+          maxLength: 255
         created_at:
           type: string
           format: date-time
@@ -14901,6 +14912,9 @@ components:
           type: string
           minLength: 1
           nullable: true
+        export_recipient:
+          type: string
+          maxLength: 255
         lots:
           type: array
           items:
@@ -15027,6 +15041,7 @@ components:
         - LIVRAISON_DIRECTE
         - MAC_BIO
         - EXPORTATION
+        - EXPEDITION
         - DEVALUATION
         - CUSTOMS_CORRECTION
         - TRANSFERT
@@ -15038,6 +15053,7 @@ components:
         * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
         * `MAC_BIO` - MAC_BIO
         * `EXPORTATION` - EXPORTATION
+        * `EXPEDITION` - EXPEDITION
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT

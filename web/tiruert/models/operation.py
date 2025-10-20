@@ -24,6 +24,7 @@ class OperationManager(models.Manager):
                 "validation_date",
                 "created_at",
                 "renewable_energy_share",
+                "export_recipient",
                 # Relations nécessaires
                 "biofuel_id",
                 "credited_entity_id",
@@ -76,6 +77,7 @@ class Operation(models.Model):
     DEVALUATION = "DEVALUATION"
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION"
     TRANSFERT = "TRANSFERT"
+    EXPEDITION = "EXPEDITION"
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -83,6 +85,7 @@ class Operation(models.Model):
         (LIVRAISON_DIRECTE, LIVRAISON_DIRECTE),
         (MAC_BIO, MAC_BIO),
         (EXPORTATION, EXPORTATION),
+        (EXPEDITION, EXPEDITION),
         (DEVALUATION, DEVALUATION),
         (CUSTOMS_CORRECTION, CUSTOMS_CORRECTION),
         (TRANSFERT, TRANSFERT),
@@ -113,9 +116,12 @@ class Operation(models.Model):
     to_depot = models.ForeignKey(
         "transactions.Depot", null=True, on_delete=models.SET_NULL, related_name="operations_to_depot"
     )
+    # Specific field for exportation/expedition
     export_country = models.ForeignKey(
         Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="operations_country"
     )
+    # Specific field for exportation/expedition
+    export_recipient = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     validation_date = models.DateField(null=True, blank=True)
     renewable_energy_share = models.FloatField(default=1)

@@ -1,8 +1,5 @@
 import { userEvent, waitFor, within } from "@storybook/test"
-import {
-  fillRecipientForm,
-  baseHandlers as recipientBaseHandlers,
-} from "accounting/components/recipient-form/recipient-form.stories.utils"
+import { baseHandlers as recipientBaseHandlers } from "accounting/components/recipient-form/recipient-form.stories.utils"
 import { okCountrySearch } from "common/__test__/api"
 
 export const fillCountryForm = async (canvasElement: HTMLElement) => {
@@ -21,7 +18,10 @@ export const fillCountryForm = async (canvasElement: HTMLElement) => {
   await userEvent.click(option)
 
   // Fill the recipient input
-  await fillRecipientForm(canvasElement)
+  const recipientInput = await waitFor(() =>
+    getByPlaceholderText("Ex: Nom de la société")
+  )
+  await userEvent.type(recipientInput, "Test")
 }
 
 export const baseHandlers = [okCountrySearch, ...recipientBaseHandlers]

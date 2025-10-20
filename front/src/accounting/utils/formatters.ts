@@ -47,6 +47,8 @@ export const formatOperationType = (type: string) => {
       return i18next.t("Teneur")
     case OperationType.EXPORTATION:
       return i18next.t("Exportation")
+    case OperationType.EXPEDITION:
+      return i18next.t("Expédition")
     case OperationType.DEVALUATION:
       return i18next.t("Dévaluation")
     case OperationType.LIVRAISON_DIRECTE:

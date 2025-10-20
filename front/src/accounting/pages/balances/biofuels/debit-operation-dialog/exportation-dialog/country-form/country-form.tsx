@@ -1,20 +1,17 @@
 import { OperationText } from "accounting/components/operation-text"
-import {
-  RecipientForm,
-  RecipientFormProps,
-  RecipientSummary,
-} from "accounting/components/recipient-form"
 import { findCountries } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useFormContext } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
 import { Step } from "common/components/stepper"
 import { Country } from "common/types"
 import { normalizeCountry } from "common/utils/normalizers"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 
-export type CountryFormProps = RecipientFormProps & {
+export type CountryFormProps = {
   country?: Country
+  export_recipient?: string
 }
 
 export const CountryForm = () => {
@@ -31,7 +28,11 @@ export const CountryForm = () => {
         normalize={normalizeCountry}
         required
       />
-      <RecipientForm required={false} />
+      <TextInput
+        label={t("Destinataire")}
+        {...bind("export_recipient")}
+        placeholder={t("Ex: Nom de la société")}
+      />
     </>
   )
 }
@@ -45,7 +46,12 @@ export const CountryFormSummary = ({
 
   return (
     <>
-      <RecipientSummary values={values} />
+      {values?.export_recipient && (
+        <OperationText
+          title={t("Destinataire")}
+          description={values?.export_recipient}
+        />
+      )}
       <OperationText title={t("Pays")} description={values.country?.name} />
       <OperationText
         title={t("Etat membre")}
