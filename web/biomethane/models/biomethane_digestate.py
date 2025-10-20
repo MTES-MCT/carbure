@@ -75,6 +75,12 @@ class BiomethaneDigestate(models.Model):
         verbose_name = "Biométhane - Digestat"
         verbose_name_plural = "Biométhane - Digestats"
 
+    @property
+    def optional_fields(self):
+        from biomethane.services import BiomethaneDigestateService
+
+        return BiomethaneDigestateService.get_optional_fields(self)
+
 
 @receiver(post_save, sender=BiomethaneDigestate)
 @receiver(post_save, sender=BiomethaneProductionUnit)
