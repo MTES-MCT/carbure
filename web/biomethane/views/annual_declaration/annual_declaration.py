@@ -9,7 +9,7 @@ from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
 from biomethane.utils import get_declaration_period
 
-from .mixins import ValidateActionMixin
+from .mixins import ValidateActionMixin, YearsActionMixin
 
 
 @extend_schema(
@@ -23,7 +23,7 @@ from .mixins import ValidateActionMixin
         ),
     ]
 )
-class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin):
+class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin, YearsActionMixin):
     queryset = BiomethaneAnnualDeclaration.objects.all()
     serializer_class = BiomethaneAnnualDeclarationSerializer
     filterset_class = BiomethaneAnnualDeclarationFilter
@@ -38,6 +38,9 @@ class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin):
         return context
 
     def get_queryset(self):
+        if self.action == "get_years":
+            return super().get_queryset()
+
         year = get_declaration_period()
         return self.queryset.filter(year=year)
 

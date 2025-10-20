@@ -67,12 +67,6 @@ digestate_viewset = BiomethaneDigestateViewSet.as_view(
     }
 )
 
-digestate_years_viewset = BiomethaneDigestateViewSet.as_view(
-    {
-        "get": "get_years",
-    }
-)
-
 digestate_validate_viewset = BiomethaneDigestateViewSet.as_view(
     {
         "post": "validate_digestate",
@@ -83,12 +77,6 @@ energy_viewset = BiomethaneEnergyViewSet.as_view(
     {
         "get": "retrieve",
         "put": "upsert",
-    }
-)
-
-energy_years_viewset = BiomethaneEnergyViewSet.as_view(
-    {
-        "get": "get_years",
     }
 )
 
@@ -135,15 +123,19 @@ annual_declaration_validate_viewset = BiomethaneAnnualDeclarationViewSet.as_view
     }
 )
 
+annual_declaration_years_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
+    {
+        "get": "get_years",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
     path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
     path("digestate/", digestate_viewset, name="biomethane-digestate"),
-    path("digestate/years/", digestate_years_viewset, name="biomethane-digestate-years"),
     path("digestate/validate/", digestate_validate_viewset, name="biomethane-digestate-validate"),
     path("energy/", energy_viewset, name="biomethane-energy"),
-    path("energy/years/", energy_years_viewset, name="biomethane-energy-years"),
     path("energy/validate/", energy_validate_viewset, name="biomethane-energy-validate"),
     path("energy/monthly-reports/", energy_monthly_report_viewset, name="biomethane-energy-monthly-report"),
     path("supply-plan/years/", supply_plan_years_viewset, name="biomethane-supply-plan-years"),
@@ -152,5 +144,6 @@ urlpatterns = [
     path("supply-plan/download-template/", download_template, name="biomethane-supply-plan-dl-template"),
     path("annual-declaration/", annual_declaration_viewset, name="biomethane-annual-declaration"),
     path("annual-declaration/validate/", annual_declaration_validate_viewset, name="biomethane-annual-declaration-validate"),
+    path("annual-declaration/years/", annual_declaration_years_viewset, name="biomethane-annual-declaration-years"),
     *router.urls,
 ]
