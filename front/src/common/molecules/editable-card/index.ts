@@ -1,1 +1,1 @@
-export { EditableCard } from "./editable-card"
+export { EditableCard, type EditableCardProps } from "./editable-card"
