@@ -75,12 +75,6 @@ class BiomethaneDigestate(models.Model):
         verbose_name = "Biométhane - Digestat"
         verbose_name_plural = "Biométhane - Digestats"
 
-    @property
-    def optional_fields(self):
-        from biomethane.services import BiomethaneDigestateService
-
-        return BiomethaneDigestateService.get_optional_fields(self)
-
 
 @receiver(post_save, sender=BiomethaneDigestate)
 @receiver(post_save, sender=BiomethaneProductionUnit)
@@ -108,8 +102,7 @@ def clear_digestate_fields_on_related_model_save(sender, instance, **kwargs):
         return
 
     # Use the service to determine which fields should be cleared
-    rules = BiomethaneDigestateService.get_conditional_fields_rules(digestate_instance)
-    fields_to_clear = rules["fields_to_clear"]
+    fields_to_clear = BiomethaneDigestateService.get_fields_to_clear(digestate_instance)
 
     if fields_to_clear:
         # Remove duplicates while preserving order

@@ -180,8 +180,7 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
         return
 
     # Use the service to determine which fields should be cleared
-    rules = BiomethaneEnergyService.get_conditional_fields_rules(energy_instance)
-    fields_to_clear = rules["fields_to_clear"]
+    fields_to_clear = BiomethaneEnergyService.get_fields_to_clear(energy_instance)
 
     if fields_to_clear:
         update_data = {field: None for field in fields_to_clear}
