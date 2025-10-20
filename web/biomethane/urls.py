@@ -67,6 +67,13 @@ digestate_viewset = BiomethaneDigestateViewSet.as_view(
     }
 )
 
+digestate_optional_fields_viewset = BiomethaneDigestateViewSet.as_view(
+    {
+        "get": "get_optional_fields",
+    }
+)
+
+
 energy_viewset = BiomethaneEnergyViewSet.as_view(
     {
         "get": "retrieve",
@@ -78,6 +85,12 @@ energy_monthly_report_viewset = BiomethaneEnergyMonthlyReportViewSet.as_view(
     {
         "put": "upsert",
         "get": "list",
+    }
+)
+
+energy_optional_fields_viewset = BiomethaneEnergyViewSet.as_view(
+    {
+        "get": "get_optional_fields",
     }
 )
 
@@ -122,8 +135,10 @@ urlpatterns = [
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
     path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
     path("digestate/", digestate_viewset, name="biomethane-digestate"),
+    path("digestate/optional-fields/", digestate_optional_fields_viewset, name="biomethane-digestate-optional-fields"),
     path("energy/", energy_viewset, name="biomethane-energy"),
     path("energy/monthly-reports/", energy_monthly_report_viewset, name="biomethane-energy-monthly-report"),
+    path("energy/optional-fields/", energy_optional_fields_viewset, name="biomethane-energy-optional-fields"),
     path("supply-plan/years/", supply_plan_years_viewset, name="biomethane-supply-plan-years"),
     path("supply-plan/import/", supply_plan_import_excel_viewset, name="biomethane-supply-plan-import-excel"),
     path("supply-plan/export/", supply_plan_export_to_excel_viewset, name="biomethane-supply-plan-export-excel"),
