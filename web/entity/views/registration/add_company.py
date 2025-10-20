@@ -48,9 +48,18 @@ class EntityCompanySerializer(serializers.ModelSerializer):
             "vat_number",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        initial = getattr(self, "initial_data", None) or {}
+        entity_type = initial.get("entity_type") or getattr(self.instance, "entity_type", None)
+
+        if entity_type in [Entity.TRADER]:
+            self.fields["certificate_type"].required = True
+            self.fields["certificate_id"].required = True
+
     def validate(self, attrs):
-        attrs.pop("certificate_type", None)
         attrs.pop("certificate_id", None)
+        attrs.pop("certificate_type", None)
         return attrs
 
 
@@ -110,7 +119,11 @@ def add_company_view(request):
     certificate_id = request.data.get("certificate_id")
     certificate_type = request.data.get("certificate_type")
 
-    if validated_data["entity_type"] not in [Entity.AIRLINE, Entity.CPO] and certificate_id and certificate_type:
+    if (
+        validated_data["entity_type"] not in [Entity.AIRLINE, Entity.CPO, Entity.SAF_TRADER]
+        and certificate_id
+        and certificate_type
+    ):
         try:
             original_certificate = GenericCertificate.objects.get(
                 certificate_type=certificate_type, certificate_id=certificate_id
