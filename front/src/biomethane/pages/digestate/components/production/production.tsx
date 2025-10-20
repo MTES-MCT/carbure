@@ -9,8 +9,9 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type ProductionForm = DeepPartial<
   Pick<
@@ -42,7 +43,8 @@ export function Production({
         }
       : {}
   )
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const isInDeclarationPeriod = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
