@@ -5,7 +5,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
-from biomethane.models.biomethane_digestate import BiomethaneDigestate
 
 
 class ValidateActionMixin:
@@ -32,7 +31,7 @@ class ValidateActionMixin:
     def validate_annual_declaration(self, request, *args, **kwargs):
         try:
             declaration = self.get_queryset().get()
-            declaration.status = BiomethaneDigestate.VALIDATED
+            declaration.status = BiomethaneAnnualDeclaration.DECLARED
             declaration.save(update_fields=["status"])
 
             return Response(status=status.HTTP_200_OK)

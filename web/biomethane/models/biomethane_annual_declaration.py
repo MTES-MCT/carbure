@@ -5,8 +5,8 @@ from core.models import Entity
 
 class BiomethaneAnnualDeclaration(models.Model):
     PENDING = "PENDING"
-    VALIDATED = "DECLARED"
-    DECLARATION_STATUS = [(PENDING, "PENDING"), (VALIDATED, "DECLARED")]
+    DECLARED = "DECLARED"
+    DECLARATION_STATUS = [(PENDING, "PENDING"), (DECLARED, "DECLARED")]
 
     # Propriétaire de la déclaration annuelle
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_declarations")
