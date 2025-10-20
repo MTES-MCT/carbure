@@ -11,8 +11,8 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneAnnualDeclaration
-        fields = ["year", "status", "missing_fields", "is_ready"]
-        read_only_fields = ["year", "missing_fields", "is_ready"]
+        fields = ["year", "status", "missing_fields", "is_complete"]
+        read_only_fields = ["year", "missing_fields", "is_complete"]
 
     def get_missing_fields(self, instance):
         if not hasattr(self, "_missing_fields_cache"):
