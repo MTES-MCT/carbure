@@ -12,6 +12,7 @@ import {
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
 type ProductionForm = DeepPartial<
   Pick<
@@ -49,7 +50,8 @@ export function Production({
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="production"
       title={t("Production de digestat")}
       readOnly={!canEditDeclaration}
     >
@@ -107,6 +109,6 @@ export function Production({
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

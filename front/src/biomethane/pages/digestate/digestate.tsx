@@ -18,11 +18,13 @@ import { useGetContractInfos } from "../contract/contract.hooks"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
 
 export const Digestate = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { selectedYear } = useAnnualDeclaration()
+
   const { result: digestate, loading } = useQuery(getDigestate, {
     key: "digestate",
     params: [entity.id, selectedYear],
@@ -30,6 +32,7 @@ export const Digestate = () => {
 
   const { result: productionUnit } = useProductionUnit()
   const { result: contract } = useGetContractInfos()
+
   usePrivateNavigation(t("Digestat"))
 
   if (loading && !digestate) return <LoaderOverlay />
@@ -39,7 +42,7 @@ export const Digestate = () => {
   }
 
   return (
-    <>
+    <SectionsManagerProvider>
       {productionUnit && (
         <Production
           digestate={digestate?.data}
@@ -69,6 +72,6 @@ export const Digestate = () => {
       {productionUnit?.spreading_management_methods?.includes(
         SpreadingManagementMethods.SALE
       ) && <Sale digestate={digestate?.data} />}
-    </>
+    </SectionsManagerProvider>
   )
 }
