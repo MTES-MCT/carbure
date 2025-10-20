@@ -2,7 +2,7 @@ import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { BiomethaneEnergy, MalfunctionTypes } from "../types"
 import { useForm } from "common/components/form2"
-import { useEnergyContext } from "../energy.hooks"
+import { useSaveEnergy } from "../energy.hooks"
 import { Button } from "common/components/button2"
 import { Grid } from "common/components/scaffold"
 import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
@@ -10,6 +10,7 @@ import { getYesNoOptions } from "common/utils/normalizers"
 import { useMemo } from "react"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergyInputRequest } from "../types"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type MalfunctionForm = DeepPartial<
   Pick<
@@ -26,7 +27,8 @@ type MalfunctionForm = DeepPartial<
 export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
   const { t } = useTranslation()
   const { bind, value } = useForm<MalfunctionForm>(energy ?? {})
-  const { saveEnergy, isInDeclarationPeriod } = useEnergyContext()
+  const saveEnergy = useSaveEnergy()
+  const { isInDeclarationPeriod } = useAnnualDeclaration()
 
   const dysfunctionOptions = useMemo(
     () => [

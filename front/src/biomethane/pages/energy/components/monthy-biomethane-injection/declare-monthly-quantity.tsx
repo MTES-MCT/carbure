@@ -12,7 +12,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { useDeclareMonthlyQuantityColumns } from "./declare-monthly-quantity.hooks"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useNavigate } from "react-router-dom"
-import { useEnergyContext } from "../../energy.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type BiomethaneEnergyMonthlyReportForm = Partial<
   Exclude<BiomethaneEnergyMonthlyReportDataRequest, "month">
@@ -42,7 +42,7 @@ export const DeclareMonthlyQuantity = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
-  const { year } = useEnergyContext()
+  const { year } = useAnnualDeclaration()
 
   const { loading } = useQuery(getMonthlyReports, {
     key: "monthly-reports",

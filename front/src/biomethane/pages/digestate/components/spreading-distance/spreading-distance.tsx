@@ -8,7 +8,8 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type SpreadingDistanceForm = DeepPartial<
   Pick<
@@ -32,7 +33,8 @@ export function SpreadingDistance({
       : {}
   )
 
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const isInDeclarationPeriod = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 

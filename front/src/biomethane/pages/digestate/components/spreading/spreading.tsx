@@ -7,7 +7,7 @@ import { BiomethaneDigestate } from "../../types"
 import { Notice } from "common/components/notice"
 import { usePortal } from "common/components/portal"
 import { AddSpreadingDepartment } from "./add-spreading-department"
-import { useDigestateContext } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 export const Spreading = ({
   digestate,
@@ -17,7 +17,7 @@ export const Spreading = ({
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
   const portal = usePortal()
-  const { isInDeclarationPeriod } = useDigestateContext()
+  const isInDeclarationPeriod = useAnnualDeclaration()
 
   const openAddSpreadingDepartmentDialog = () => {
     portal((close) => (

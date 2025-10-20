@@ -1,37 +1,15 @@
-import { createContext, useContext, ReactNode } from "react"
 import { useMutation } from "common/hooks/async"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import { saveEnergy } from "./api"
 import { BiomethaneEnergyInputRequest } from "./types"
-import { declarationInterval } from "biomethane/utils"
 
-interface EnergyContextValue {
-  year: number
-  saveEnergy: ReturnType<
-    typeof useMutation<
-      Awaited<ReturnType<typeof saveEnergy>>,
-      [BiomethaneEnergyInputRequest]
-    >
-  >
-  isInDeclarationPeriod: boolean
-}
-
-const EnergyContext = createContext<EnergyContextValue | null>(null)
-
-interface EnergyProviderProps {
-  children: ReactNode
-  year: number
-}
-
-export function EnergyProvider({ children, year }: EnergyProviderProps) {
+export const useSaveEnergy = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-
-  const isInDeclarationPeriod = year === declarationInterval.year
 
   const saveEnergyMutation = useMutation(
     (data: BiomethaneEnergyInputRequest) => saveEnergy(entity.id, data),
@@ -46,23 +24,5 @@ export function EnergyProvider({ children, year }: EnergyProviderProps) {
     }
   )
 
-  const contextValue: EnergyContextValue = {
-    year,
-    saveEnergy: saveEnergyMutation,
-    isInDeclarationPeriod,
-  }
-
-  return (
-    <EnergyContext.Provider value={contextValue}>
-      {children}
-    </EnergyContext.Provider>
-  )
-}
-
-export function useEnergyContext(): EnergyContextValue {
-  const context = useContext(EnergyContext)
-  if (!context) {
-    throw new Error("useEnergyContext doit être utilisé dans un EnergyProvider")
-  }
-  return context
+  return saveEnergyMutation
 }

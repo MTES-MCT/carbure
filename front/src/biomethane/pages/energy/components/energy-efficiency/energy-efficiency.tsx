@@ -6,12 +6,13 @@ import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../../types"
-import { useEnergyContext } from "../../energy.hooks"
+import { useSaveEnergy } from "../../energy.hooks"
 import {
   BiomethaneContract,
   TariffReference,
 } from "biomethane/pages/contract/types"
 import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -35,7 +36,8 @@ export function EnergyEfficiency({
   const { t } = useTranslation()
 
   const { bind, value } = useForm<EnergyEfficiencyForm>(energy ?? {})
-  const { saveEnergy, isInDeclarationPeriod } = useEnergyContext()
+  const saveEnergy = useSaveEnergy()
+  const { isInDeclarationPeriod } = useAnnualDeclaration()
 
   const handleSubmit = async () => saveEnergy.execute(value)
 

@@ -9,7 +9,8 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type SaleForm = DeepPartial<
   Pick<BiomethaneDigestateInputRequest, "acquiring_companies" | "sold_volume">
@@ -25,7 +26,8 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
         }
       : {}
   )
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const isInDeclarationPeriod = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 

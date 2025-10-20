@@ -4,40 +4,46 @@ import { Notice } from "common/components/notice"
 import { Content, Main, Row } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { Title } from "common/components/title"
-import { PropsWithChildren } from "react"
 import { useTranslation } from "react-i18next"
 import { declarationInterval } from "biomethane/utils"
 import { usePortal } from "common/components/portal"
 import { Confirm } from "common/components/dialog2"
+import useYears from "common/hooks/years-2"
+import { getAnnualDeclarationYears } from "biomethane/api"
+import { useNotify } from "common/components/notifications"
+import { useMutation } from "common/hooks/async"
+import { Outlet } from "react-router-dom"
+import { AnnualDeclarationProvider } from "biomethane/providers/annual-declaration.provider"
 
-export interface BiomethanePageHeaderProps extends PropsWithChildren {
-  selectedYear?: number
-  yearsOptions: { label: string; value: number }[]
+export interface BiomethanePageHeaderProps {
   status?: "PENDING" | "VALIDATED"
-  onChangeYear: (year?: number) => void
-  onConfirm: () => Promise<any>
 }
 
-export const BiomethanePageHeader = ({
-  selectedYear,
-  yearsOptions,
-  children,
-  status,
-  onChangeYear,
-  onConfirm,
-}: BiomethanePageHeaderProps) => {
+// Digestate and Energy pages share the same page header and the same declaration validation logic
+export const BiomethanePageHeader = ({ status }: BiomethanePageHeaderProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const notify = useNotify()
+  const years = useYears("biomethane", getAnnualDeclarationYears)
 
+  const validateAnnualDeclarationMutation = useMutation(() => {}, {
+    invalidates: ["annual-declaration"],
+    onSuccess: () => {
+      notify(t("Les informations ont bien été validées."), {
+        variant: "success",
+      })
+    },
+  })
   const selectedYearIsInCurrentInterval =
-    selectedYear === declarationInterval.year
+    years.selected === declarationInterval.year
+  const selectedYear = years.selected
 
   const openValidateDeclarationDialog = () => {
     portal((close) => (
       <Confirm
         onClose={close}
         confirm={t("Valider")}
-        onConfirm={onConfirm}
+        onConfirm={validateAnnualDeclarationMutation.execute}
         title={t("Valider mes informations annuelles")}
         description={
           <>
@@ -59,9 +65,9 @@ export const BiomethanePageHeader = ({
     <Main>
       <Row>
         <Select
-          options={yearsOptions}
+          options={years.options}
           value={selectedYear}
-          onChange={onChangeYear}
+          onChange={years.setYear}
         />
         <Button
           onClick={openValidateDeclarationDialog}
@@ -100,7 +106,11 @@ export const BiomethanePageHeader = ({
           })}
         </Notice>
       )}
-      <Content marginTop>{children}</Content>
+      <Content marginTop>
+        <AnnualDeclarationProvider year={selectedYear}>
+          <Outlet />
+        </AnnualDeclarationProvider>
+      </Content>
     </Main>
   )
 }

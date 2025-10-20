@@ -3,8 +3,8 @@ import { EditableCard } from "common/molecules/editable-card"
 import { Button } from "common/components/button2"
 import { DeclareMonthlyQuantity } from "./declare-monthly-quantity"
 import HashRoute from "common/components/hash-route"
-import { useEnergyContext } from "../../energy.hooks"
 import { BiomethaneEnergy } from "../../types"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 export const MonthlyBiomethaneInjection = ({
   energy,
@@ -12,7 +12,7 @@ export const MonthlyBiomethaneInjection = ({
   energy?: BiomethaneEnergy
 }) => {
   const { t } = useTranslation()
-  const { isInDeclarationPeriod } = useEnergyContext()
+  const { isInDeclarationPeriod } = useAnnualDeclaration()
   return (
     <>
       <EditableCard

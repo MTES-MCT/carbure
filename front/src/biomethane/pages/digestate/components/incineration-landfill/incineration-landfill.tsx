@@ -9,11 +9,12 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
 import {
   BiomethaneContract,
   InstallationCategory,
 } from "biomethane/pages/contract/types"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 
 type IncinerationLandfillForm = DeepPartial<
   Pick<
@@ -43,7 +44,8 @@ export function IncinerationLandfill({
         }
       : {}
   )
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const isInDeclarationPeriod = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 

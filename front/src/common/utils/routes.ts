@@ -62,8 +62,8 @@ export const ROUTE_URLS = {
 
     return {
       SUPPLY_PLAN: `${baseUrl}/supply-plan/${year}`,
-      DIGESTATE: `${baseUrl}/digestate/${year}`,
-      ENERGY: `${baseUrl}/energy/${year}`,
+      DIGESTATE: `${baseUrl}/${year}/digestate`,
+      ENERGY: `${baseUrl}/${year}/energy`,
     }
   },
 
