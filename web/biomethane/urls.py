@@ -67,22 +67,10 @@ digestate_viewset = BiomethaneDigestateViewSet.as_view(
     }
 )
 
-digestate_validate_viewset = BiomethaneDigestateViewSet.as_view(
-    {
-        "post": "validate_digestate",
-    }
-)
-
 energy_viewset = BiomethaneEnergyViewSet.as_view(
     {
         "get": "retrieve",
         "put": "upsert",
-    }
-)
-
-energy_validate_viewset = BiomethaneEnergyViewSet.as_view(
-    {
-        "post": "validate_energy",
     }
 )
 
@@ -134,9 +122,7 @@ urlpatterns = [
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
     path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
     path("digestate/", digestate_viewset, name="biomethane-digestate"),
-    path("digestate/validate/", digestate_validate_viewset, name="biomethane-digestate-validate"),
     path("energy/", energy_viewset, name="biomethane-energy"),
-    path("energy/validate/", energy_validate_viewset, name="biomethane-energy-validate"),
     path("energy/monthly-reports/", energy_monthly_report_viewset, name="biomethane-energy-monthly-report"),
     path("supply-plan/years/", supply_plan_years_viewset, name="biomethane-supply-plan-years"),
     path("supply-plan/import/", supply_plan_import_excel_viewset, name="biomethane-supply-plan-import-excel"),

@@ -7,7 +7,7 @@ from biomethane.utils import get_declaration_period
 
 class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
     missing_fields = serializers.SerializerMethodField()
-    is_ready = serializers.SerializerMethodField()
+    is_complete = serializers.SerializerMethodField()
 
     class Meta:
         model = BiomethaneAnnualDeclaration
@@ -19,7 +19,7 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
             self._missing_fields_cache = BiomethaneAnnualDeclarationService.get_missing_fields(instance)
         return self._missing_fields_cache
 
-    def get_is_ready(self, instance):
+    def get_is_complete(self, instance):
         missing_fields = self.get_missing_fields(instance)
         return (
             len(missing_fields.get("digestate_missing_fields", [])) == 0
