@@ -1,12 +1,12 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from biomethane.models import BiomethaneEnergy
+from biomethane.models import BiomethaneAnnualDeclaration
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
 
-class BiomethaneEnergyYearsTests(TestCase):
+class BiomethaneAnnualDeclarationYearsTests(TestCase):
     def setUp(self):
         self.entity = Entity.objects.create(
             name="Test Entity",
@@ -22,10 +22,12 @@ class BiomethaneEnergyYearsTests(TestCase):
         )
 
         self.years = [2024, 2025, 2015]
-        BiomethaneEnergy.objects.bulk_create([BiomethaneEnergy(producer=self.entity, year=year) for year in self.years])
+        BiomethaneAnnualDeclaration.objects.bulk_create(
+            [BiomethaneAnnualDeclaration(producer=self.entity, year=year) for year in self.years]
+        )
 
-    # Checks that the get_years endpoint returns the distinct years of energy objects sorted in ascending order
+    # Checks that the get_years endpoint returns the distinct years of annual declaration objects sorted in ascending order
     def test_years(self):
-        response = self.client.get(reverse("biomethane-energy-years"), {"entity_id": self.entity.id})
+        response = self.client.get(reverse("biomethane-annual-declaration-years"), {"entity_id": self.entity.id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, [2015, 2024, 2025])

@@ -3,8 +3,6 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schem
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from biomethane.models.biomethane_energy import BiomethaneEnergy
-
 
 class YearsActionMixin:
     @extend_schema(
@@ -39,6 +37,5 @@ class YearsActionMixin:
         url_path="years",
     )
     def get_years(self, request, *args, **kwargs):
-        entity = request.entity
-        years = BiomethaneEnergy.objects.filter(producer=entity).values_list("year", flat=True).distinct()
+        years = self.get_queryset().values_list("year", flat=True).distinct()
         return Response(sorted(years))

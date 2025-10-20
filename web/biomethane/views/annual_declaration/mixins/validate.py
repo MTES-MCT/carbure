@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
+from biomethane.models import BiomethaneAnnualDeclaration
 
 
 class ValidateActionMixin:
