@@ -56,3 +56,8 @@ class BiomethaneAnnualDeclarationService:
         for field in model._meta.get_fields():
             fields.append(field.name)
         return fields
+
+    @staticmethod
+    def is_declaration_complete(declaration):
+        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+        return len(missing_fields["digestate_missing_fields"]) == 0 and len(missing_fields["energy_missing_fields"]) == 0

@@ -13,8 +13,6 @@ from biomethane.serializers.digestate import (
 )
 from biomethane.utils import get_declaration_period
 
-from .mixins import ValidateActionMixin
-
 
 @extend_schema(
     parameters=[
@@ -27,7 +25,7 @@ from .mixins import ValidateActionMixin
         ),
     ]
 )
-class BiomethaneDigestateViewSet(GenericViewSet, ValidateActionMixin):
+class BiomethaneDigestateViewSet(GenericViewSet):
     queryset = BiomethaneDigestate.objects.all()
     serializer_class = BiomethaneDigestateSerializer
     filterset_class = BiomethaneDigestateFilter

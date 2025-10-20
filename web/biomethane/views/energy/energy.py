@@ -13,8 +13,6 @@ from biomethane.serializers.energy.energy import (
 )
 from biomethane.utils import get_declaration_period
 
-from .mixins import ValidateActionMixin
-
 
 @extend_schema(
     parameters=[
@@ -27,7 +25,7 @@ from .mixins import ValidateActionMixin
         ),
     ]
 )
-class BiomethaneEnergyViewSet(GenericViewSet, ValidateActionMixin):
+class BiomethaneEnergyViewSet(GenericViewSet):
     queryset = BiomethaneEnergy.objects.all()
     serializer_class = BiomethaneEnergySerializer
     pagination_class = None
