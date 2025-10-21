@@ -31,15 +31,15 @@ export function AnnualDeclarationProvider({
     params: [entity.id],
   })
   const { year: _year } = useParams<{ year: string }>()
-  const year = _year ? parseInt(_year) : undefined
 
-  const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
-
-  if (loadingCurrentAnnualDeclaration) return <LoaderOverlay />
+  if (loadingCurrentAnnualDeclaration && !currentAnnualDeclaration)
+    return <LoaderOverlay />
 
   if (!currentAnnualDeclaration) return null
 
-  if (!year) return null
+  // Use year from url if provided, otherwise use the year of the current annual declaration
+  const year = _year ? parseInt(_year) : currentAnnualDeclaration?.year
+  const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
 
   const value: AnnualDeclarationContextValue = {
     selectedYear: year,

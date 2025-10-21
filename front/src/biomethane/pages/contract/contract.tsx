@@ -4,6 +4,7 @@ import { ContractInfos } from "./components/contract-infos"
 import { useGetContractInfos } from "./contract.hooks"
 import { ErrorTrackedAmendmentTypes } from "./components/tracked-amendment-types"
 import { LoaderOverlay } from "common/components/scaffold"
+import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
 
 export const BiomethaneContractPage = () => {
   const { result: contractInfos, loading } = useGetContractInfos()
@@ -12,6 +13,7 @@ export const BiomethaneContractPage = () => {
 
   return (
     <>
+      <AnnualDeclarationAlert />
       {contractInfos && contractInfos.tracked_amendment_types.length > 0 && (
         <ErrorTrackedAmendmentTypes
           trackedAmendmentTypes={contractInfos.tracked_amendment_types}

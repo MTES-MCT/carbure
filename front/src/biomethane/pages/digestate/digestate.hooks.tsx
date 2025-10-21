@@ -14,7 +14,7 @@ export const useSaveDigestate = () => {
   const saveDigestateMutation = useMutation(
     (data: BiomethaneDigestateInputRequest) => saveDigestate(entity.id, data),
     {
-      invalidates: ["digestate"],
+      invalidates: ["digestate", "current-annual-declaration"],
       onSuccess: () => {
         notify(t("Le digestat a bien été mis à jour."), { variant: "success" })
       },
