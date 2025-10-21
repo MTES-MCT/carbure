@@ -166,7 +166,7 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
         energy_instance = instance
     elif sender in [BiomethaneProductionUnit, BiomethaneContract]:
         producer = instance.producer
-        energy_instance = producer.biomethane_energies.order_by("-id").first()
+        energy_instance = producer.biomethane_energies.order_by("-year").first()
     else:
         return
 
@@ -178,4 +178,5 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
 
     if fields_to_clear:
         update_data = {field: None for field in fields_to_clear}
+
         BiomethaneEnergy.objects.filter(pk=energy_instance.pk).update(**update_data)

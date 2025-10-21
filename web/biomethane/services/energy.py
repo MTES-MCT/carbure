@@ -13,6 +13,7 @@ class BiomethaneEnergyService:
     # Fields for tariff reference 2011, 2020, 2021
     OLD_TARIFF_FIELDS = [
         "energy_used_for_digester_heating",
+        "fossil_details_for_digester_heating",
         "purified_biogas_quantity_nm3",
         "purification_electric_consumption_kwe",
     ]
@@ -20,6 +21,7 @@ class BiomethaneEnergyService:
     # Fields for tariff reference 2023
     NEW_TARIFF_FIELDS = [
         "energy_used_for_installation_needs",
+        "fossil_details_for_installation_needs",
         "self_consumed_biogas_nm3",
         "total_unit_electric_consumption_kwe",
     ]
@@ -42,12 +44,22 @@ class BiomethaneEnergyService:
             has_malfunctions = instance_or_data.get("has_malfunctions", False)
             malfunction_types = instance_or_data.get("malfunction_types")
             has_injection_difficulties = instance_or_data.get("has_injection_difficulties_due_to_network_saturation", False)
+            attest_no_fossil_for_digester_heating_and_purification = instance_or_data.get(
+                "attest_no_fossil_for_digester_heating_and_purification", False
+            )
+            attest_no_fossil_for_installation_needs = instance_or_data.get("attest_no_fossil_for_installation_needs", False)
         else:
             producer = getattr(instance_or_data, "producer", None)
             has_malfunctions = getattr(instance_or_data, "has_malfunctions", False)
             malfunction_types = getattr(instance_or_data, "malfunction_types", None)
             has_injection_difficulties = getattr(
                 instance_or_data, "has_injection_difficulties_due_to_network_saturation", False
+            )
+            attest_no_fossil_for_digester_heating_and_purification = getattr(
+                instance_or_data, "attest_no_fossil_for_digester_heating_and_purification", False
+            )
+            attest_no_fossil_for_installation_needs = getattr(
+                instance_or_data, "attest_no_fossil_for_installation_needs", False
             )
 
         production_unit = None
@@ -59,7 +71,15 @@ class BiomethaneEnergyService:
             except Exception:
                 contract = None
 
-        return production_unit, contract, has_malfunctions, malfunction_types, has_injection_difficulties
+        return (
+            production_unit,
+            contract,
+            has_malfunctions,
+            malfunction_types,
+            has_injection_difficulties,
+            attest_no_fossil_for_digester_heating_and_purification,
+            attest_no_fossil_for_installation_needs,
+        )
 
     @staticmethod
     def _apply_flaring_rules(production_unit, fields_to_clear):
@@ -106,6 +126,17 @@ class BiomethaneEnergyService:
             fields_to_clear.extend(BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS)
 
     @staticmethod
+    def _apply_installation_energy_needs_rules(
+        attest_no_fossil_for_digester_heating_and_purification, attest_no_fossil_for_installation_needs, fields_to_clear
+    ):
+        """Apply rules based on installation energy needs status."""
+        if attest_no_fossil_for_digester_heating_and_purification:
+            fields_to_clear.extend(["fossil_details_for_digester_heating"])
+
+        if attest_no_fossil_for_installation_needs:
+            fields_to_clear.extend(["fossil_details_for_installation_needs"])
+
+    @staticmethod
     def get_conditional_fields_rules(instance_or_data):
         """
         Return conditional field rules for an instance or data dictionary.
@@ -126,6 +157,8 @@ class BiomethaneEnergyService:
             has_malfunctions,
             malfunction_types,
             has_injection_difficulties,
+            attest_no_fossil_for_digester_heating_and_purification,
+            attest_no_fossil_for_installation_needs,
         ) = BiomethaneEnergyService._extract_data(instance_or_data)
 
         # Apply rules based on production unit
@@ -142,6 +175,10 @@ class BiomethaneEnergyService:
         # Apply rules based on injection difficulties
         BiomethaneEnergyService._apply_injection_difficulty_rules(has_injection_difficulties, fields_to_clear)
 
+        # Apply rules based on installation energy needs
+        BiomethaneEnergyService._apply_installation_energy_needs_rules(
+            attest_no_fossil_for_digester_heating_and_purification, attest_no_fossil_for_installation_needs, fields_to_clear
+        )
         return {
             "required_fields": list(set(required_fields)),
             "fields_to_clear": list(set(fields_to_clear)),
