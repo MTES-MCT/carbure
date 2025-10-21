@@ -1,4 +1,27 @@
+from dataclasses import dataclass
+from typing import Optional
+
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
+
+
+@dataclass
+class DigestateContext:
+    """Context data extracted from a digestate instance or data dictionary."""
+
+    instance: object  # The original instance or data dict
+    production_unit: Optional[object] = None
+    contract: Optional[object] = None
+
+    def get_value(self, key, default=None):
+        """Get value from instance (dict or object)."""
+        if isinstance(self.instance, dict):
+            return self.instance.get(key, default)
+        return getattr(self.instance, key, default)
+
+    @property
+    def composting_locations(self) -> list:
+        locations = self.get_value("composting_locations", [])
+        return locations if locations else []
 
 
 class BiomethaneDigestateService:
@@ -23,15 +46,17 @@ class BiomethaneDigestateService:
     SALE_FIELDS = ["sold_volume", "acquiring_companies"]
 
     @staticmethod
-    def _extract_data(instance_or_data):
-        """Extract data from an instance or a dictionary."""
-        if isinstance(instance_or_data, dict):
-            composting_locations = instance_or_data.get("composting_locations", [])
-            producer = instance_or_data.get("producer")
-        else:
-            composting_locations = getattr(instance_or_data, "composting_locations", []) or []
-            producer = getattr(instance_or_data, "producer", None)
+    def _extract_data(instance_or_data) -> DigestateContext:
+        """Extract data from an instance or a dictionary and return structured context."""
 
+        # Helper to get value from dict or instance
+        def get_value(key, default=None):
+            if isinstance(instance_or_data, dict):
+                return instance_or_data.get(key, default)
+            return getattr(instance_or_data, key, default)
+
+        # Extract producer and related objects
+        producer = get_value("producer")
         production_unit = None
         contract = None
         if producer:
@@ -41,7 +66,12 @@ class BiomethaneDigestateService:
             except Exception:
                 contract = None
 
-        return composting_locations, production_unit, contract
+        # Return structured context
+        return DigestateContext(
+            instance=instance_or_data,
+            production_unit=production_unit,
+            contract=contract,
+        )
 
     @staticmethod
     def _apply_phase_separation_rules(production_unit, fields_to_clear):
@@ -52,7 +82,7 @@ class BiomethaneDigestateService:
             fields_to_clear.extend(BiomethaneDigestateService.SEPARATED_DIGESTATE_FIELDS)
 
     @staticmethod
-    def _apply_composting_rules(valorization_methods, composting_locations, required_fields, fields_to_clear):
+    def _apply_composting_rules(context: DigestateContext, required_fields, fields_to_clear):
         """Apply composting rules based on valorization methods and locations."""
         from biomethane.models import BiomethaneProductionUnit
 
@@ -60,6 +90,10 @@ class BiomethaneDigestateService:
             BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS
             + BiomethaneDigestateService.ON_SITE_FIELDS
             + ["composting_locations"]
+        )
+
+        valorization_methods = (
+            context.production_unit.digestate_valorization_methods or [] if context.production_unit else []
         )
 
         if BiomethaneProductionUnit.COMPOSTING not in valorization_methods:
@@ -70,7 +104,7 @@ class BiomethaneDigestateService:
         else:
             # Composting enabled → apply location rules
             BiomethaneDigestateService._apply_composting_location_rules(
-                composting_locations, required_fields, fields_to_clear
+                context.composting_locations, required_fields, fields_to_clear
             )
 
     @staticmethod
@@ -140,31 +174,27 @@ class BiomethaneDigestateService:
         required_fields = []
         fields_to_clear = []
 
-        # Extract data
-        composting_locations, production_unit, contract = BiomethaneDigestateService._extract_data(instance_or_data)
+        # Extract context
+        context = BiomethaneDigestateService._extract_data(instance_or_data)
 
         # Apply rules based on production unit
-        if production_unit:
-            BiomethaneDigestateService._apply_phase_separation_rules(production_unit, fields_to_clear)
+        if context.production_unit:
+            BiomethaneDigestateService._apply_phase_separation_rules(context.production_unit, fields_to_clear)
 
-            BiomethaneDigestateService._apply_valorization_rules(production_unit, fields_to_clear)
+            BiomethaneDigestateService._apply_valorization_rules(context.production_unit, fields_to_clear)
 
-            valorization_methods = production_unit.digestate_valorization_methods or []
+            BiomethaneDigestateService._apply_composting_rules(context, required_fields, fields_to_clear)
 
-            BiomethaneDigestateService._apply_composting_rules(
-                valorization_methods, composting_locations, required_fields, fields_to_clear
-            )
-
-            BiomethaneDigestateService._apply_spreading_management_rules(production_unit, fields_to_clear)
+            BiomethaneDigestateService._apply_spreading_management_rules(context.production_unit, fields_to_clear)
         else:
             # No production unit → apply basic composting rules only
             BiomethaneDigestateService._apply_composting_location_rules(
-                composting_locations, required_fields, fields_to_clear
+                context.composting_locations, required_fields, fields_to_clear
             )
 
         # Apply rules based on contract
-        if contract:
-            BiomethaneDigestateService._apply_contract_rules(contract, fields_to_clear)
+        if context.contract:
+            BiomethaneDigestateService._apply_contract_rules(context.contract, fields_to_clear)
 
         return {
             "required_fields": list(set(required_fields)),
