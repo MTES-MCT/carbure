@@ -86,7 +86,6 @@ class BiomethaneEnergyViewSetTests(TestCase):
 
         # Verify that the object was created in the database
         energy = BiomethaneEnergy.objects.get(producer=self.producer_entity, year=self.current_year)
-        self.assertEqual(energy.status, BiomethaneEnergy.PENDING)
         self.assertEqual(energy.year, self.current_year)
         assert_object_contains_data(self, energy, self.valid_energy_data)
 
@@ -96,7 +95,6 @@ class BiomethaneEnergyViewSetTests(TestCase):
         energy = BiomethaneEnergy.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
-            status=BiomethaneEnergy.VALIDATED,
             injected_biomethane_gwh_pcs_per_year=50.0,
         )
         # Update data
@@ -119,5 +117,20 @@ class BiomethaneEnergyViewSetTests(TestCase):
         self.assertEqual(energy.operating_hours, 8500.0)
         self.assertEqual(energy.year, self.current_year)
 
-        # Status must be reset to PENDING during update
-        self.assertEqual(energy.status, BiomethaneEnergy.PENDING)
+    @patch(
+        "biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.is_declaration_editable",
+        return_value=False,
+    )
+    def test_upsert_energy_forbidden_when_declaration_not_editable(self, mock_is_editable):
+        """Test that upsert is forbidden when the annual declaration is not editable"""
+        response = self.client.put(
+            self.energy_url,
+            self.valid_energy_data,
+            content_type="application/json",
+            query_params=self.base_params,
+        )
+
+        mock_is_editable.assert_called_once_with(self.producer_entity, self.current_year)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("error", response.data)
