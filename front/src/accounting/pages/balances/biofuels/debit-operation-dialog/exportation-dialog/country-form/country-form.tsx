@@ -1,26 +1,19 @@
 import { OperationText } from "accounting/components/operation-text"
-import {
-  RecipientForm,
-  RecipientFormProps,
-  RecipientSummary,
-  showNextStepRecipientForm,
-} from "accounting/components/recipient-form"
 import { findCountries } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useFormContext } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
 import { Step } from "common/components/stepper"
 import { Country } from "common/types"
 import { normalizeCountry } from "common/utils/normalizers"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 
-export type CountryFormProps = RecipientFormProps & {
+export type CountryFormProps = {
   country?: Country
+  export_recipient?: string
 }
 
-/**
- * This component overrides the recipient-to-depot form to add a country field
- */
 export const CountryForm = () => {
   const { bind } = useFormContext<CountryFormProps>()
   const { t } = useTranslation()
@@ -33,8 +26,13 @@ export const CountryForm = () => {
         placeholder={t("Rechercher un pays...")}
         getOptions={findCountries}
         normalize={normalizeCountry}
+        required
       />
-      <RecipientForm />
+      <TextInput
+        label={t("Destinataire")}
+        {...bind("export_recipient")}
+        placeholder={t("Ex: Nom de la société")}
+      />
     </>
   )
 }
@@ -48,7 +46,12 @@ export const CountryFormSummary = ({
 
   return (
     <>
-      <RecipientSummary values={values} />
+      {values?.export_recipient && (
+        <OperationText
+          title={t("Destinataire")}
+          description={values?.export_recipient}
+        />
+      )}
       <OperationText title={t("Pays")} description={values.country?.name} />
       <OperationText
         title={t("Etat membre")}
@@ -58,17 +61,10 @@ export const CountryFormSummary = ({
   )
 }
 
-const showNextStepCountryForm = (values: CountryFormProps) => {
-  return showNextStepRecipientForm(values) && Boolean(values.country)
-}
-
 export const countryFormStepKey = "country-form"
 type CountryFormStepKey = typeof countryFormStepKey
 
-export const countryFormStep: (
-  values: CountryFormProps
-) => Step<CountryFormStepKey> = (values) => ({
+export const countryFormStep: Step<CountryFormStepKey> = {
   key: countryFormStepKey,
-  title: i18next.t("Pays, client et dépôt destinataire"),
-  allowNextStep: showNextStepCountryForm(values),
-})
+  title: i18next.t("Pays et client"),
+}

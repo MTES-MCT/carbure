@@ -4,16 +4,19 @@ import { Trans, useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
 import { useQuantityForm } from "./quantity-form.hooks"
 import { ExtendedUnit, Unit } from "common/types"
 
-type QuantityFormComponentProps = {
+export type QuantityFormComponentProps = {
   balance: Balance
-  depot_quantity_max?: number
+
+  // Maximum quantity allowed
+  quantityMax?: number
+
   type: CreateOperationType
 
   // Unit of the quantity displayed to the user (default is the entity preferred unit)
@@ -54,7 +57,7 @@ const AvoidedEmissionsSection = () => {
 
 const QuantitySection = ({
   balance,
-  depot_quantity_max,
+  quantityMax,
   type,
   unit: customUnit,
   backendUnit: customBackendUnit,
@@ -64,6 +67,7 @@ const QuantitySection = ({
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
   const { formatUnit, unit } = useUnit(customUnit)
+  const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } =
     useFormContext<QuantityFormProps>()
@@ -83,12 +87,12 @@ const QuantitySection = ({
   const declareQuantity = () => {
     if (!value.quantity) return
 
-    if (depot_quantity_max && value.quantity > depot_quantity_max) {
+    if (quantityMax && value.quantity > quantityMax) {
       setFieldError(
         "quantity",
         t(
           "La quantité déclarée est supérieure à la quantité maximale autorisée ({{max}}). Merci de modifier la quantité.",
-          { max: formatUnit(depot_quantity_max, { fractionDigits: 0 }) }
+          { max: formatUnit(quantityMax, { fractionDigits: 0 }) }
         )
       )
       return
@@ -102,13 +106,26 @@ const QuantitySection = ({
       const emissionsMax = emissions?.max_avoided_emissions
         ? Math.trunc(emissions?.max_avoided_emissions)
         : 0
+
+      if (emissionsMin === 0) {
+        quantityInputRef.current?.setCustomValidity(
+          t(
+            "La quantité entrée n'est pas suffisante pour enregistrer des tCO2 évitées. Merci de modifier la quantité."
+          )
+        )
+        requestAnimationFrame(() => {
+          quantityInputRef.current?.reportValidity()
+        })
+        return
+      }
+      setQuantityDeclared(true)
+
       setField("avoided_emissions_min", emissionsMin)
       setField("avoided_emissions_max", emissionsMax)
 
       if (emissionsMin === emissionsMax) {
         setField("avoided_emissions", emissionsMin)
       }
-      setQuantityDeclared(true)
     })
   }
 
@@ -118,14 +135,21 @@ const QuantitySection = ({
     setQuantityDeclared(false)
   }
 
-  const quantityBind = bind("quantity", { showError: true })
+  const quantityBind = bind("quantity", {
+    showError: true,
+    onChange: () => {
+      // Reset the custom validity of the quantity input when the quantity is changed
+      quantityInputRef.current?.setCustomValidity("")
+      quantityInputRef.current?.reportValidity()
+    },
+  })
 
   return (
     <>
       <NumberInput
         label={`${getQuantityInputLabel(type)} (${unit.toLocaleUpperCase()})`}
         step={1}
-        max={depot_quantity_max}
+        max={quantityMax}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             declareQuantity()
@@ -166,6 +190,7 @@ const QuantitySection = ({
         }
         disabled={quantityDeclared || mutation.loading}
         required
+        inputRef={quantityInputRef}
       />
       {quantityDeclared &&
       value.avoided_emissions_min &&
@@ -180,7 +205,6 @@ const QuantitySection = ({
               values={{
                 quantity: formatUnit(value.quantity!, {
                   fractionDigits: 10,
-                  appendZeros: false,
                 }),
                 value: value.avoided_emissions_min,
               }}
@@ -193,7 +217,6 @@ const QuantitySection = ({
               values={{
                 quantity: formatUnit(value.quantity!, {
                   fractionDigits: 10,
-                  appendZeros: false,
                 }),
                 min: value.avoided_emissions_min,
                 max: value.avoided_emissions_max,
@@ -203,39 +226,14 @@ const QuantitySection = ({
           )}
         </Notice>
       ) : null}
-      {quantityDeclared && value.avoided_emissions_min === 0 && (
-        <Notice noColor variant="warning">
-          {t(
-            "La quantité entrée n'est pas suffisante pour enregistrer des tCO2 évitées. Merci de modifier la quantité."
-          )}
-        </Notice>
-      )}
     </>
   )
 }
 
-export const QuantityForm = ({
-  balance,
-  depot_quantity_max,
-  type,
-  unit: customUnit,
-  backendUnit: customBackendUnit,
-  converter,
-  gesBoundMin,
-  gesBoundMax,
-}: QuantityFormComponentProps) => {
+export const QuantityForm = (props: QuantityFormComponentProps) => {
   return (
     <>
-      <QuantitySection
-        balance={balance}
-        depot_quantity_max={depot_quantity_max}
-        type={type}
-        unit={customUnit}
-        backendUnit={customBackendUnit}
-        converter={converter}
-        gesBoundMin={gesBoundMin}
-        gesBoundMax={gesBoundMax}
-      />
+      <QuantitySection {...props} />
       <AvoidedEmissionsSection />
     </>
   )

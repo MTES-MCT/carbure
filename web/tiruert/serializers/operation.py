@@ -3,6 +3,8 @@ from datetime import datetime
 from django.db import transaction
 from rest_framework import serializers
 
+from core.models import Pays
+from core.serializers import CountrySerializer
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
@@ -99,6 +101,7 @@ class OperationSerializer(BaseOperationSerializer):
             "to_depot",
             "_depot",
             "export_country",
+            "export_recipient",
             "created_at",
             "validation_date",
             "durability_period",
@@ -111,6 +114,7 @@ class OperationSerializer(BaseOperationSerializer):
 
     avoided_emissions = serializers.SerializerMethodField()
     quantity_mj = serializers.SerializerMethodField()
+    export_country = CountrySerializer(read_only=True)
 
     def get_avoided_emissions(self, instance) -> float:
         return round(sum(detail.avoided_emissions for detail in instance.details.all()), 2)
@@ -138,6 +142,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "from_depot",
             "to_depot",
             "export_country",
+            "export_recipient",
             "lots",
             "status",
         ]
@@ -147,6 +152,9 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "debited_entity": {"required": True},
         }
 
+    export_country = serializers.SlugRelatedField(
+        slug_field="code_pays", queryset=Pays.objects.all(), required=False, allow_null=True
+    )
     lots = OperationLotSerializer(many=True, required=True)
 
     def create(self, validated_data):

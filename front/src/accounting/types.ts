@@ -22,9 +22,11 @@ import {
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
 // Type definitions
-export type Operation = apiTypes["OperationList"] & {
+type ExtraOperationData = {
   quantity_renewable: number
 }
+export type Operation = apiTypes["Operation"] & ExtraOperationData
+export type OperationList = apiTypes["OperationList"] & ExtraOperationData
 
 export type Balance = apiTypes["Balance"]
 

@@ -208,7 +208,7 @@ const DeclareTeneurDialogContent = ({
                   <QuantityForm.Quantity
                     balance={form.value.balance!}
                     type={CreateOperationType.TENEUR}
-                    depot_quantity_max={depotQuantityMax}
+                    quantityMax={depotQuantityMax}
                     unit={ExtendedUnit.GJ}
                     backendUnit={Unit.MJ}
                     // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)

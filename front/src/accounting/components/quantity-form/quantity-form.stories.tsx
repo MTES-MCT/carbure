@@ -2,17 +2,14 @@ import type { Meta, StoryObj } from "@storybook/react"
 
 import { QuantityForm } from "./quantity-form"
 import { Form, useForm } from "common/components/form2"
-import { okGetDeliverySites } from "common/__test__/api"
 import { CreateOperationType } from "accounting/types"
 import { balance } from "accounting/__test__/data/balances"
 import { userEvent, waitFor, within } from "@storybook/test"
 import {
-  okSimulateMinMax,
   okSimulateMinMaxWithEqualValues,
   okSimulateMinMaxWithZeroValues,
 } from "accounting/__test__/api/biofuels/operations"
-
-const baseHandlers = [okGetDeliverySites, okSimulateMinMax]
+import { baseHandlers } from "./quantity-form.stories.utils"
 
 const meta: Meta<typeof QuantityForm> = {
   component: QuantityForm,
@@ -20,7 +17,7 @@ const meta: Meta<typeof QuantityForm> = {
   args: {
     balance,
     type: CreateOperationType.TRANSFERT,
-    depot_quantity_max: 10000,
+    quantityMax: 10000,
   },
   parameters: {
     msw: {
@@ -56,7 +53,7 @@ export const ValidateQuantityButtonEnabled: Story = {
 // Display an error when the quantity is greater than the quantity max available
 export const ShowErrorWhenQuantityIsGreaterThanQuantityMax: Story = {
   args: {
-    depot_quantity_max: 100,
+    quantityMax: 100,
   },
   play: async (props) => {
     await ValidateQuantityButtonEnabled.play?.(props)

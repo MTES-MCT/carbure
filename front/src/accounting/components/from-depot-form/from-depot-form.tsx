@@ -22,9 +22,9 @@ export const FromDepotForm = () => {
       label={t("Sélectionnez un dépôt d'expédition")}
       placeholder={t("Rechercher un dépôt")}
       options={entityDepots.result?.data ?? []}
-      normalize={(entityDepot: any) => ({
-        value: entityDepot.depot,
-        label: entityDepot.depot?.name,
+      normalize={(entityDepot) => ({
+        value: entityDepot.depot!,
+        label: entityDepot.depot!.name,
       })}
       {...bind("from_depot")}
       required

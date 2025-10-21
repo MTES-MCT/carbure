@@ -154,16 +154,11 @@ export const OperationDetail = () => {
           label: t("Quantité"),
           value: `${getOperationQuantity(
             operation,
-            formatUnit(operation.quantity, {
-              fractionDigits: 2,
-              appendZeros: false,
-            })
+            formatUnit(operation.quantity)
           )} / ${getOperationQuantity(
             operation,
             formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
-              fractionDigits: 2,
               unit: ExtendedUnit.GJ,
-              appendZeros: false,
             })
           )}`,
         },
@@ -172,10 +167,7 @@ export const OperationDetail = () => {
             label: t("Quantité renouvelable"),
             value: `${getOperationQuantity(
               operation,
-              formatUnit(roundNumber(formatValue(operation.quantity), 2), {
-                fractionDigits: 2,
-                appendZeros: false,
-              })
+              formatUnit(roundNumber(formatValue(operation.quantity), 2))
             )} / ${getOperationQuantity(
               operation,
               formatUnit(
@@ -183,9 +175,7 @@ export const OperationDetail = () => {
                   roundNumber(formatValue(operation.quantity_mj), 2)
                 ),
                 {
-                  fractionDigits: 2,
                   unit: ExtendedUnit.GJ,
-                  appendZeros: false,
                 }
               )
             )}`,
@@ -202,17 +192,24 @@ export const OperationDetail = () => {
           label: t("Expéditeur"),
           value: operation._entity ?? "-",
         },
-        [OperationType.CESSION, OperationType.TRANSFERT].includes(
+        [OperationType.EXPORTATION, OperationType.TRANSFERT].includes(
           operation.type as OperationType
         ) &&
           operation.quantity < 0 && {
             label: t("Destinataire"),
             value: operation._entity ?? "-",
           },
-        operation.type !== OperationType.TENEUR &&
-          operation.type !== OperationType.TRANSFERT && {
-            label: t("Dépôt expéditeur"),
-            value: operation._depot ?? "-",
+        operation.type === OperationType.EXPORTATION && {
+          label: t("Dépôt expéditeur"),
+          value: operation.from_depot ? operation.from_depot.name : "-",
+        },
+        operation.type === OperationType.EXPORTATION &&
+          operation.export_country &&
+          operation.quantity < 0 && {
+            label: t("Pays d'exportation"),
+            value: operation.export_country
+              ? operation.export_country.name
+              : "-",
           },
         operation.type !== OperationType.DEVALUATION &&
           operation.type === OperationType.ACQUISITION &&
