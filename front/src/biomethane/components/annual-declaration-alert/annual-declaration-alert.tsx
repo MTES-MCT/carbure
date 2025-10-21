@@ -7,7 +7,7 @@ export const AnnualDeclarationAlert = () => {
   const { t } = useTranslation()
   const { currentAnnualDeclaration, isInDeclarationPeriod } =
     useAnnualDeclaration()
-  console.log(currentAnnualDeclaration)
+
   if (
     !isInDeclarationPeriod ||
     currentAnnualDeclaration?.status === AnnualDeclarationStatus.IN_PROGRESS
@@ -19,6 +19,7 @@ export const AnnualDeclarationAlert = () => {
       variant="warning"
       icon="ri-alert-line"
       title={t("Déclaration annuelle déjà transmise")}
+      data-testid="annual-declaration-alert"
     >
       {t(
         "En cas de modification de champs sur cette page, votre déclaration annuelle (digestat et énergie) devra être soumise à nouveau."

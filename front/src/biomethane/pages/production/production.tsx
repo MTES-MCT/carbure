@@ -6,12 +6,14 @@ import { ICPE } from "./components/icpe"
 import { ProductionSite } from "./components/production-site"
 import { SanitaryAgreement } from "./components/sanitary-agreement"
 import { useProductionUnit } from "./production.hooks"
+import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
 
 export const BiomethaneProductionPage = () => {
   const { result: productionUnit } = useProductionUnit()
 
   return (
     <Fragment key={productionUnit?.id}>
+      <AnnualDeclarationAlert />
       <GeneralInfo productionUnit={productionUnit} />
       <SanitaryAgreement productionUnit={productionUnit} />
       <ICPE productionUnit={productionUnit} />

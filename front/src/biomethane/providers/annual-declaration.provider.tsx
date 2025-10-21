@@ -19,6 +19,8 @@ interface AnnualDeclarationProviderProps {
   children: ReactNode
 }
 
+const currentYear = new Date().getFullYear()
+
 export function AnnualDeclarationProvider({
   children,
 }: AnnualDeclarationProviderProps) {
@@ -37,8 +39,8 @@ export function AnnualDeclarationProvider({
 
   if (!currentAnnualDeclaration) return null
 
-  // Use year from url if provided, otherwise use the year of the current annual declaration
-  const year = _year ? parseInt(_year) : currentAnnualDeclaration?.year
+  // Use year from url if provided, otherwise selected year is current year
+  const year = _year ? parseInt(_year) : currentYear
   const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
 
   const value: AnnualDeclarationContextValue = {
