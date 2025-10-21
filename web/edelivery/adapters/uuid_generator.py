@@ -2,4 +2,4 @@ import uuid
 
 
 def new_uuid():
-    return uuid.uuid4()
+    return str(uuid.uuid4())
