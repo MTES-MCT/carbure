@@ -6,7 +6,7 @@ import { getDeclarationInterval } from "biomethane/utils"
 
 // Get the current declaration year for Digestate/Energy
 const declarationYear = getDeclarationInterval().year
-console.log("declarationYear", declarationYear)
+
 export const useBiomethane = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
