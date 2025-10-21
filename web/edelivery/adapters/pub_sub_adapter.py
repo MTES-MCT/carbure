@@ -11,7 +11,8 @@ class PubSubAdapter:
         self.pubsub = self.redis_client.pubsub(ignore_subscribe_messages=True)
 
     def next_message(self):
-        return self.pubsub.get_message()
+        message = self.pubsub.get_message()
+        return message and message["data"].decode("utf-8")
 
     def publish(self, message):
         return self.redis_client.publish(self.REDIS_CHANNEL, message)

@@ -21,7 +21,7 @@ class Requester:
                 tried += 1
                 message = self.pub_sub_adapter.next_message()
                 if message is not None:
-                    candidate = BaseRequestResponse(message["data"])
+                    candidate = BaseRequestResponse(message)
                     if candidate.request_id() == self.request.id:
                         return candidate
                 sleep(self.delay_between_retries)

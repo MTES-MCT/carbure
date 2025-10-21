@@ -17,7 +17,7 @@ class RequesterTest(TestCase):
         patch("edelivery.soap.requester.sleep").start()
         self.patched_PubSubAdapter = patch("edelivery.soap.requester.PubSubAdapter").start()
         self.patched_SubmitMessage = patch("edelivery.soap.requester.SubmitMessage").start()
-        self.patched_PubSubAdapter.return_value.next_message.return_value = {"data": self.DEFAULT_RESPONSE_PAYLOAD}
+        self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
 
     def tearDown(self):
         patch.stopall()
@@ -39,7 +39,7 @@ class RequesterTest(TestCase):
 
         def log_next_message_call():
             commands_called.append("fetch message")
-            return {"data": self.DEFAULT_RESPONSE_PAYLOAD}
+            return self.DEFAULT_RESPONSE_PAYLOAD
 
         self.patched_PubSubAdapter.return_value.next_message = log_next_message_call
         self.patched_PubSubAdapter.return_value.unsubscribe = lambda: commands_called.append("unsubscribe")
@@ -52,7 +52,7 @@ class RequesterTest(TestCase):
         self.assertEqual(["fetch message", "unsubscribe"], commands_called)
 
     def test_returns_request_response_received_from_udb(self):
-        self.patched_PubSubAdapter.return_value.next_message.return_value = {"data": self.DEFAULT_RESPONSE_PAYLOAD}
+        self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
         request = BaseRequest("111", "<request/>")
         requester = Requester(request)
 
@@ -67,7 +67,7 @@ class RequesterTest(TestCase):
         self.assertRaises(TimeoutError, requester.response)
 
     def test_retries_few_times_before_throwing_timeout_error(self):
-        self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, {"data": self.DEFAULT_RESPONSE_PAYLOAD}]
+        self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, self.DEFAULT_RESPONSE_PAYLOAD]
         request = BaseRequest("111", "<request/>")
         requester = Requester(request)
 
@@ -76,7 +76,7 @@ class RequesterTest(TestCase):
 
     @patch("edelivery.ebms.requests.new_uuid")
     def test_checks_whether_request_ids_correspond(self, patched_new_uuid):
-        self.patched_PubSubAdapter.return_value.next_message.return_value = {"data": self.DEFAULT_RESPONSE_PAYLOAD}
+        self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
         request = BaseRequest("different_request_id", "<request/>")
         requester = Requester(request, delay_between_retries=0.001, timeout=0.002)
 
