@@ -37,6 +37,7 @@ class RetrieveMessageResponse(AbstractEdeliveryResponse):
         super().__init__(text)
         self.contents = unzip_base64_encoded_stream(self.attachment_value())
         self.request_response = BaseRequestResponse(self.contents)
+        self.request_response_payload = self.request_response.payload
 
     def attachment_value(self):
         value_element = self.parsed_XML.find("soap:Body/ws:retrieveMessageResponse/payload/value", self.NAMESPACES)
