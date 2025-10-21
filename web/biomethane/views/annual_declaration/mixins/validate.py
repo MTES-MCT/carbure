@@ -23,7 +23,7 @@ class ValidateActionMixin:
     )
     def validate_annual_declaration(self, request, *args, **kwargs):
         try:
-            declaration = self.get_queryset().get()
+            declaration = self.filter_queryset(self.get_queryset()).get()
 
             if BiomethaneAnnualDeclarationService.is_declaration_complete(declaration):
                 declaration.status = BiomethaneAnnualDeclaration.DECLARED
