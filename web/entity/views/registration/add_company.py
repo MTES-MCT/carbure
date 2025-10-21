@@ -9,6 +9,7 @@ from drf_spectacular.utils import (
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from web.core.serializers import check_fields_required
 
 from core.decorators import otp_or_403
 from core.helpers import send_mail
@@ -48,16 +49,11 @@ class EntityCompanySerializer(serializers.ModelSerializer):
             "vat_number",
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        initial = getattr(self, "initial_data", None) or {}
-        entity_type = initial.get("entity_type") or getattr(self.instance, "entity_type", None)
-
-        if entity_type in [Entity.TRADER]:
-            self.fields["certificate_type"].required = True
-            self.fields["certificate_id"].required = True
-
     def validate(self, attrs):
+        entity_type = attrs.get("entity_type")
+        if entity_type == Entity.TRADER:
+            check_fields_required(attrs, ["certificate_type", "certificate_id"])
+
         attrs.pop("certificate_id", None)
         attrs.pop("certificate_type", None)
         return attrs
