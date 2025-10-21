@@ -24,7 +24,6 @@ class Requester:
                     candidate = BaseRequestResponse(message["data"])
                     if candidate.request_id() == self.request.id:
                         return candidate
-                    break
                 sleep(self.delay_between_retries)
 
             raise TimeoutError()
