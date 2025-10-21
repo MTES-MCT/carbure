@@ -1,8 +1,14 @@
 import { createContext, ReactNode, useContext } from "react"
-import { declarationInterval } from "biomethane/utils"
+import { getCurrentAnnualDeclaration } from "biomethane/api"
+import { useQuery } from "common/hooks/async"
+import useEntity from "common/hooks/entity"
+import { LoaderOverlay } from "common/components/scaffold"
+import { AnnualDeclaration } from "biomethane/types"
+import { useParams } from "react-router-dom"
 
 export interface AnnualDeclarationContextValue {
-  year: number
+  selectedYear: number
+  currentAnnualDeclaration: AnnualDeclaration
   isInDeclarationPeriod: boolean
 }
 
@@ -11,17 +17,33 @@ export const AnnualDeclarationContext =
 
 interface AnnualDeclarationProviderProps {
   children: ReactNode
-  year: number
 }
 
 export function AnnualDeclarationProvider({
   children,
-  year,
 }: AnnualDeclarationProviderProps) {
-  const isInDeclarationPeriod = year === declarationInterval.year
+  const entity = useEntity()
+  const {
+    result: currentAnnualDeclaration,
+    loading: loadingCurrentAnnualDeclaration,
+  } = useQuery(getCurrentAnnualDeclaration, {
+    key: "current-annual-declaration",
+    params: [entity.id],
+  })
+  const { year: _year } = useParams<{ year: string }>()
+  const year = _year ? parseInt(_year) : undefined
+
+  const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
+
+  if (loadingCurrentAnnualDeclaration) return <LoaderOverlay />
+
+  if (!currentAnnualDeclaration) return null
+
+  if (!year) return null
 
   const value: AnnualDeclarationContextValue = {
-    year,
+    selectedYear: year,
+    currentAnnualDeclaration,
     isInDeclarationPeriod,
   }
 

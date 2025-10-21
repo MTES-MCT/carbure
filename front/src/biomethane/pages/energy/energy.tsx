@@ -20,12 +20,12 @@ import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.pr
 export const Energy = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { year } = useAnnualDeclaration()
+  const { selectedYear } = useAnnualDeclaration()
   const { result: contract } = useGetContractInfos()
   const { result: productionUnit } = useProductionUnit()
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "energy",
-    params: [entity.id, year],
+    params: [entity.id, selectedYear],
   })
 
   usePrivateNavigation(t("Énergie"))
