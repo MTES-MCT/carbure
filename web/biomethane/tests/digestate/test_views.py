@@ -111,3 +111,19 @@ class BiomethaneDigestateViewsTests(TestCase):
 
         response = self.client.put(self.digestate_url, data, content_type="application/json", query_params=self.base_params)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch(
+        "biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.is_declaration_editable",
+        return_value=False,
+    )
+    def test_upsert_digestate_forbidden_when_declaration_not_editable(self, mock_is_editable):
+        """Test that upsert is forbidden when the annual declaration is not editable."""
+        data = {
+            "raw_digestate_tonnage_produced": 1500.0,
+            "raw_digestate_dry_matter_rate": 8.5,
+            "average_spreading_valorization_distance": 25.5,
+        }
+
+        response = self.client.put(self.digestate_url, data, content_type="application/json", query_params=self.base_params)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn("error", response.data)

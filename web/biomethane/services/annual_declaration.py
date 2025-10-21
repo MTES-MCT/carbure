@@ -1,4 +1,4 @@
-from biomethane.models import BiomethaneDigestate, BiomethaneEnergy
+from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate, BiomethaneEnergy
 
 
 class BiomethaneAnnualDeclarationService:
@@ -61,3 +61,11 @@ class BiomethaneAnnualDeclarationService:
     def is_declaration_complete(declaration):
         missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
         return len(missing_fields["digestate_missing_fields"]) == 0 and len(missing_fields["energy_missing_fields"]) == 0
+
+    @staticmethod
+    def is_declaration_editable(producer, year):
+        try:
+            declaration = BiomethaneAnnualDeclaration.objects.get(producer=producer, year=year)
+            return declaration.status != BiomethaneAnnualDeclaration.DECLARED
+        except BiomethaneAnnualDeclaration.DoesNotExist:
+            return True
