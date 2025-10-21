@@ -115,6 +115,7 @@ supply_plan_export_to_excel_viewset = BiomethaneSupplyInputViewSet.as_view(
 annual_declaration_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
     {
         "get": "retrieve",
+        "patch": "partial_update",
     }
 )
 
