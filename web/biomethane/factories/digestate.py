@@ -17,7 +17,6 @@ class BiomethaneDigestateFactory(factory.django.DjangoModelFactory):
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     year = factory.LazyFunction(get_declaration_period)
-    status = BiomethaneDigestate.PENDING
 
     # Production de digestat
     raw_digestate_tonnage_produced = factory.Faker("random_number", digits=4)

@@ -38,7 +38,7 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=get_declaration_period(),
-            status=BiomethaneAnnualDeclaration.PENDING,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
         response = self.client.post(self.validate_url, query_params=self.base_params)
@@ -60,7 +60,7 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=get_declaration_period(),
-            status=BiomethaneAnnualDeclaration.PENDING,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
         response = self.client.post(self.validate_url, query_params=self.base_params)
@@ -71,7 +71,7 @@ class ValidateAnnualDeclarationAPITests(TestCase):
 
         # Verify declaration status was not updated
         declaration.refresh_from_db()
-        self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.PENDING)
+        self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
 
     def test_validate_digestate_endpoint_not_found(self):
         """Test validation when declaration doesn't exist."""
