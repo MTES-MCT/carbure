@@ -14,7 +14,7 @@ export const useSaveEnergy = () => {
   const saveEnergyMutation = useMutation(
     (data: BiomethaneEnergyInputRequest) => saveEnergy(entity.id, data),
     {
-      invalidates: ["energy"],
+      invalidates: ["energy", "current-annual-declaration"],
       onSuccess: () => {
         notify(t("Les données ont bien été mises à jour."), {
           variant: "success",
