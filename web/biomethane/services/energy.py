@@ -45,7 +45,7 @@ class BiomethaneEnergyService:
     All validation rules and conditional field logic are defined here.
     """
 
-    # Field groups definition (class constants)
+    # Field groups definition
     FLARING_FIELDS = ["flaring_operating_hours"]
 
     # Fields for tariff reference 2011, 2020, 2021
@@ -63,6 +63,8 @@ class BiomethaneEnergyService:
         "self_consumed_biogas_nm3",
         "total_unit_electric_consumption_kwe",
     ]
+
+    TARRIF_2011_2020_FIELDS = ["injected_biomethane_nm3_per_year"]
 
     MALFUNCTION_FIELDS = [
         "malfunction_cumulative_duration_days",
@@ -127,6 +129,10 @@ class BiomethaneEnergyService:
         # New tariff fields (2023)
         if tariff_reference not in ["2023"]:
             fields_to_clear.extend(BiomethaneEnergyService.NEW_TARIFF_FIELDS)
+
+        # Tariff fields for 2011 and 2020
+        if tariff_reference not in ["2011", "2020"]:
+            fields_to_clear.extend(BiomethaneEnergyService.TARRIF_2011_2020_FIELDS)
 
     @staticmethod
     def _apply_malfunction_rules(context: EnergyContext, fields_to_clear):

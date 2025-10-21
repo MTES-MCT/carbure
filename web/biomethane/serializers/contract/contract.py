@@ -6,6 +6,7 @@ from rest_framework import serializers
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.serializers.contract.contract_amendment import BiomethaneContractAmendmentSerializer
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.utils.contract import get_tracked_amendment_types
 
 
@@ -149,6 +150,10 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
 
         tracked_types = get_tracked_amendment_types(instance, validated_data)
         validated_data["tracked_amendment_types"] = tracked_types
+
+        # Check if annual declaration needs to be reset
+        if BiomethaneAnnualDeclarationService.has_watched_field_changed(instance, validated_data.keys()):
+            BiomethaneAnnualDeclarationService.reset_annual_declaration_status(instance.producer)
 
         return super().update(instance, validated_data)
 
