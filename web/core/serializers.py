@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
@@ -823,3 +824,16 @@ class UserRightsSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.EmailField)
     def get_email(self, obj):
         return obj.user.email
+
+
+# Check if the fields are defined in the attrs and raise a validation error if they are not
+def check_fields_required(attrs, fields, _error_message=None):
+    default_error_message = _("Ce champ est obligatoire")
+    error_message = _error_message or default_error_message
+    errors = {}
+
+    for field in fields:
+        if not attrs.get(field):
+            errors[field] = error_message
+    if errors:
+        raise serializers.ValidationError(errors)
