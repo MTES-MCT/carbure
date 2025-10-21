@@ -45,7 +45,7 @@ export function IncinerationLandfill({
       : {}
   )
   const saveDigestate = useSaveDigestate()
-  const isInDeclarationPeriod = useAnnualDeclaration()
+  const { isInDeclarationPeriod } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 

@@ -3,7 +3,6 @@ import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
 import { Content, Main, Row } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
-import { Title } from "common/components/title"
 import { useTranslation } from "react-i18next"
 import { declarationInterval } from "biomethane/utils"
 import { usePortal } from "common/components/portal"
@@ -13,18 +12,16 @@ import { getAnnualDeclarationYears } from "biomethane/api"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { Outlet } from "react-router-dom"
-import { AnnualDeclarationProvider } from "biomethane/providers/annual-declaration.provider"
-
-export interface BiomethanePageHeaderProps {
-  status?: "PENDING" | "VALIDATED"
-}
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { AnnualDeclarationStatus } from "biomethane/types"
 
 // Digestate and Energy pages share the same page header and the same declaration validation logic
-export const BiomethanePageHeader = ({ status }: BiomethanePageHeaderProps) => {
+export const BiomethanePageHeader = () => {
   const { t } = useTranslation()
   const portal = usePortal()
   const notify = useNotify()
   const years = useYears("biomethane", getAnnualDeclarationYears)
+  const { selectedYear, currentAnnualDeclaration } = useAnnualDeclaration()
 
   const validateAnnualDeclarationMutation = useMutation(() => {}, {
     invalidates: ["annual-declaration"],
@@ -36,7 +33,8 @@ export const BiomethanePageHeader = ({ status }: BiomethanePageHeaderProps) => {
   })
   const selectedYearIsInCurrentInterval =
     years.selected === declarationInterval.year
-  const selectedYear = years.selected
+  const status =
+    currentAnnualDeclaration?.status ?? AnnualDeclarationStatus.PENDING
 
   const openValidateDeclarationDialog = () => {
     portal((close) => (
@@ -63,53 +61,43 @@ export const BiomethanePageHeader = ({ status }: BiomethanePageHeaderProps) => {
   }
   return (
     <Main>
-      <Row>
+      <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
         <Select
           options={years.options}
           value={selectedYear}
           onChange={years.setYear}
         />
-        <Button
-          onClick={openValidateDeclarationDialog}
-          iconId="ri-file-text-line"
-          asideX
-          disabled={
-            !selectedYearIsInCurrentInterval ||
-            status === "VALIDATED" ||
-            !status
+        <Badge
+          severity={
+            status === AnnualDeclarationStatus.DECLARED ? "success" : "info"
           }
         >
-          {t("Valider mes informations annuelles")}
-        </Button>
-      </Row>
-      <Row
-        style={{
-          justifyContent: "space-between",
-          marginTop: "var(--spacing-2w)",
-        }}
-      >
-        <Title
-          is="h1"
-          as="h5"
-          style={{ color: "var(--artwork-major-blue-france" }}
-        >
-          {t("Récapitulatif de vos informations")}
-        </Title>
-        <Badge severity={status === "VALIDATED" ? "success" : "info"}>
-          {status === "VALIDATED" ? t("Validé") : t("En cours")}
+          {status === AnnualDeclarationStatus.DECLARED
+            ? t("Déclaration transmise")
+            : t("Déclaration en cours")}
         </Badge>
       </Row>
       {selectedYearIsInCurrentInterval && (
-        <Notice variant="info" icon="ri-time-line" isClosable>
+        <Notice variant="info" icon="ri-time-line">
           {t("A déclarer et mettre à jour une fois par an, avant le {{date}}", {
             date: `31/03/${selectedYear + 1}`,
           })}
+          <Button
+            onClick={openValidateDeclarationDialog}
+            iconId="ri-file-text-line"
+            asideX
+            disabled={
+              !selectedYearIsInCurrentInterval ||
+              status === AnnualDeclarationStatus.DECLARED ||
+              !status
+            }
+          >
+            {t("Transmettre mes informations annuelles")}
+          </Button>
         </Notice>
       )}
       <Content marginTop>
-        <AnnualDeclarationProvider year={selectedYear}>
-          <Outlet />
-        </AnnualDeclarationProvider>
+        <Outlet />
       </Content>
     </Main>
   )

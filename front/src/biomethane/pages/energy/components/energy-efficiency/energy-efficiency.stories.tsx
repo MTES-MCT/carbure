@@ -3,16 +3,16 @@ import { EnergyEfficiency } from "./energy-efficiency"
 import { contractData } from "biomethane/pages/contract/tests/contract.data"
 import { energyData } from "../../tests/energy.data"
 import { TariffReference } from "biomethane/pages/contract/types"
-import { EnergyProvider } from "../../energy.hooks"
 import { userEvent, waitFor, within } from "@storybook/test"
+import { AnnualDeclarationProvider } from "biomethane/providers/annual-declaration.provider"
 
 const meta: Meta<typeof EnergyEfficiency> = {
   title: "modules/biomethane/pages/energy/components/EnergyEfficiency",
   component: EnergyEfficiency,
   render: (args) => (
-    <EnergyProvider year={2025}>
+    <AnnualDeclarationProvider>
       <EnergyEfficiency {...args} />
-    </EnergyProvider>
+    </AnnualDeclarationProvider>
   ),
 }
 

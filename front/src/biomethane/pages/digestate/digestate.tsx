@@ -22,10 +22,10 @@ import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.pr
 export const Digestate = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { year } = useAnnualDeclaration()
+  const { selectedYear } = useAnnualDeclaration()
   const { result: digestate, loading } = useQuery(getDigestate, {
     key: "digestate",
-    params: [entity.id, year],
+    params: [entity.id, selectedYear],
   })
 
   const { result: productionUnit } = useProductionUnit()

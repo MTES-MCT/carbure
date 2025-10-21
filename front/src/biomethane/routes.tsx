@@ -2,11 +2,15 @@ import useEntity from "common/hooks/entity"
 import { lazy } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { BiomethanePageHeader } from "./layouts/page-header"
+import { getDeclarationInterval } from "./utils"
+import { AnnualDeclarationProvider } from "./providers/annual-declaration.provider"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
 const SupplyPlan = lazy(() => import("biomethane/pages/supply-plan"))
+
 const currentYear = new Date().getFullYear()
+const declarationYear = getDeclarationInterval().year
 
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer } = useEntity()
@@ -15,7 +19,14 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      <Route path=":year" element={<BiomethanePageHeader />}>
+      <Route
+        path=":year"
+        element={
+          <AnnualDeclarationProvider>
+            <BiomethanePageHeader />
+          </AnnualDeclarationProvider>
+        }
+      >
         <Route index element={<Navigate replace to="digestate" />} />
         <Route path="digestate" element={<Digestate />} />
         <Route path="energy" element={<Energy />} />
@@ -28,7 +39,7 @@ export const BiomethaneRoutes = () => {
 
       <Route
         path=""
-        element={<Navigate replace to={`${currentYear}/digestate`} />}
+        element={<Navigate replace to={`${declarationYear}/digestate`} />}
       />
     </Routes>
   )
