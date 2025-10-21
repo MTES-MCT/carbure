@@ -94,7 +94,7 @@ def clear_digestate_fields_on_related_model_save(sender, instance, **kwargs):
         digestate_instance = instance
     elif sender in [BiomethaneProductionUnit, BiomethaneContract]:
         producer = instance.producer
-        digestate_instance = producer.biomethane_digestates.order_by("-id").first()
+        digestate_instance = producer.biomethane_digestates.order_by("-year").first()
     else:
         return
 
