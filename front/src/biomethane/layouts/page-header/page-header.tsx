@@ -21,7 +21,7 @@ export const BiomethanePageHeader = () => {
     usePageHeaderActions()
 
   const status =
-    currentAnnualDeclaration?.status ?? AnnualDeclarationStatus.PENDING
+    currentAnnualDeclaration?.status ?? AnnualDeclarationStatus.IN_PROGRESS
 
   return (
     <Main>
@@ -46,7 +46,7 @@ export const BiomethanePageHeader = () => {
           {t("A déclarer et mettre à jour une fois par an, avant le {{date}}", {
             date: `31/03/${selectedYear + 1}`,
           })}
-          {status === AnnualDeclarationStatus.PENDING && (
+          {status === AnnualDeclarationStatus.IN_PROGRESS && (
             <Button
               onClick={openValidateDeclarationDialog}
               iconId="ri-file-text-line"

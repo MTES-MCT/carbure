@@ -4,20 +4,35 @@ import { Confirm } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { validateAnnualDeclaration } from "biomethane/api"
+import useEntity from "common/hooks/entity"
+import { HttpError } from "common/services/api-fetch"
 
 export const usePageHeaderActions = () => {
   const { t } = useTranslation()
   const portal = usePortal()
   const notify = useNotify()
+  const entity = useEntity()
   const { currentAnnualDeclaration } = useAnnualDeclaration()
   const validateAnnualDeclarationMutation = useMutation(
-    () => Promise.resolve(),
+    () => validateAnnualDeclaration(entity.id),
     {
-      invalidates: ["annual-declaration"],
+      invalidates: ["current-annual-declaration"],
       onSuccess: () => {
-        notify(t("Les informations ont bien été validées."), {
+        notify(t("Votre déclaration a bien été transmise."), {
           variant: "success",
         })
+      },
+      onError: (err) => {
+        const errorCode = (err as HttpError).status
+        if (errorCode === 400) {
+          notify(
+            t("Votre déclaration n'est pas complète, veuillez la compléter."),
+            {
+              variant: "danger",
+            }
+          )
+        }
       },
     }
   )
