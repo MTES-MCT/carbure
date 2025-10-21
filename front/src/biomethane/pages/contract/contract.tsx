@@ -3,9 +3,12 @@ import { ContractFiles } from "./components/contract-files"
 import { ContractInfos } from "./components/contract-infos"
 import { useGetContractInfos } from "./contract.hooks"
 import { ErrorTrackedAmendmentTypes } from "./components/tracked-amendment-types"
+import { LoaderOverlay } from "common/components/scaffold"
 
 export const BiomethaneContractPage = () => {
   const { result: contractInfos, loading } = useGetContractInfos()
+
+  if (loading) return <LoaderOverlay />
 
   return (
     <>
