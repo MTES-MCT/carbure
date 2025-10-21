@@ -11,6 +11,7 @@ from biomethane.serializers.energy.energy import (
     BiomethaneEnergyInputSerializer,
     BiomethaneEnergySerializer,
 )
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.utils import get_declaration_period
 from biomethane.views import OptionalFieldsActionMixin
 
@@ -36,10 +37,7 @@ class BiomethaneEnergyViewSet(GenericViewSet, OptionalFieldsActionMixin):
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
-
-        # We don't want to set the year for the retrieve action because it's already set in the request
-        if self.action != "retrieve":
-            setattr(request, "year", get_declaration_period())
+        setattr(request, "year", get_declaration_period())
         return request
 
     def get_serializer_context(self):
@@ -55,11 +53,13 @@ class BiomethaneEnergyViewSet(GenericViewSet, OptionalFieldsActionMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.action in ["upsert", "validate_energy"]:
+        if self.action == "retrieve":
+            return BiomethaneEnergyRetrieveFilter(self.request.GET, queryset=queryset).qs
+        elif self.action in ["upsert", "get_optional_fields"]:
+            # force filtering by current declaration year
             queryset = queryset.filter(year=self.request.year)
             return BiomethaneEnergyFilter(self.request.GET, queryset=queryset).qs
-
-        return BiomethaneEnergyRetrieveFilter(self.request.GET, queryset=queryset).qs
+        return queryset
 
     @extend_schema(
         parameters=[
@@ -104,6 +104,12 @@ class BiomethaneEnergyViewSet(GenericViewSet, OptionalFieldsActionMixin):
         description="Create or update the energy declaration for the current entity and the current year.",
     )
     def upsert(self, request, *args, **kwargs):
+        if not BiomethaneAnnualDeclarationService.is_declaration_editable(request.entity, request.year):
+            return Response(
+                {"error": "Cannot modify energy declaration when annual declaration is already declared."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         try:
             energy = self.get_queryset().get()
             serializer = self.get_serializer(energy, data=request.data, partial=True)
