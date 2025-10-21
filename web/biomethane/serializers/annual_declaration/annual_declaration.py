@@ -14,6 +14,7 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         model = BiomethaneAnnualDeclaration
         fields = ["year", "status", "missing_fields", "is_complete"]
         read_only_fields = ["year", "missing_fields", "is_complete"]
+        writeable_fields = ["status"]
 
     @extend_schema_field(
         {
@@ -50,3 +51,14 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         validated_data["producer"] = self.context["entity"]
         validated_data["year"] = get_declaration_period()
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Allow partial update of the declaration, only for status field to IN_PROGRESS
+        status = validated_data.get("status")
+        if status is not None:
+            if status == BiomethaneAnnualDeclaration.IN_PROGRESS:
+                instance.status = status
+                instance.save()
+            else:
+                raise serializers.ValidationError({"status": "Seul le statut IN_PROGRESS est autorisé."})
+        return instance
