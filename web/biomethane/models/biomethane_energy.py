@@ -7,16 +7,10 @@ from core.models import Entity
 
 
 class BiomethaneEnergy(models.Model):
-    PENDING = "PENDING"
-    VALIDATED = "VALIDATED"
-    ENERGY_STATUS = [(PENDING, "PENDING"), (VALIDATED, "VALIDATED")]
-
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_energies")
 
     # Année de déclaration des informations
     year = models.IntegerField()
-
-    status = models.CharField(choices=ENERGY_STATUS, max_length=28, default=PENDING)
 
     ## Biométhane injecté dans le réseau
 

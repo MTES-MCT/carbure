@@ -21,7 +21,6 @@ class BiomethaneEnergySignalsTests(TestCase):
         self.base_energy_data = {
             "producer": self.producer_entity,
             "year": 2024,
-            "status": BiomethaneEnergy.PENDING,
         }
 
         self.contract = BiomethaneContract.objects.create(

@@ -12,7 +12,7 @@ class BiomethaneEnergySerializer(serializers.ModelSerializer):
 class BiomethaneEnergyInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneEnergy
-        exclude = ["year", "status", "producer"]
+        exclude = ["year", "producer"]
 
     def create(self, validated_data):
         entity = self.context.get("entity")
@@ -21,7 +21,3 @@ class BiomethaneEnergyInputSerializer(serializers.ModelSerializer):
         validated_data["producer"] = entity
         validated_data["year"] = year
         return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        validated_data["status"] = BiomethaneEnergy.PENDING
-        return super().update(instance, validated_data)

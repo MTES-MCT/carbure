@@ -7,17 +7,11 @@ from core.models import Entity
 
 
 class BiomethaneDigestate(models.Model):
-    PENDING = "PENDING"
-    VALIDATED = "VALIDATED"
-    DIGESTATE_STATUS = [(PENDING, "PENDING"), (VALIDATED, "VALIDATED")]
-
     # Propriétaire du digestat
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_digestates")
 
     # Année de déclaration des informations
     year = models.IntegerField()
-
-    status = models.CharField(choices=DIGESTATE_STATUS, max_length=28)
 
     ## Production de digestat
 

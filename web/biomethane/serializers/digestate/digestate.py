@@ -13,7 +13,7 @@ class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneDigestate
-        exclude = ["producer", "year", "status"]
+        exclude = ["producer", "year"]
 
 
 class BiomethaneDigestateSerializer(BaseBiomethaneDigestateSerializer):
@@ -64,7 +64,3 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
         validated_data["year"] = year
 
         return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        validated_data["status"] = BiomethaneDigestate.PENDING
-        return super().update(instance, validated_data)
