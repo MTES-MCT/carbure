@@ -70,3 +70,13 @@ class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin, Ye
 
         data = self.get_serializer(declaration, many=False).data
         return Response(data, status=status_code)
+
+    def partial_update(self, request, *args, **kwargs):
+        try:
+            declaration = self.filter_queryset(self.get_queryset()).get()
+            serializer = self.get_serializer(declaration, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except BiomethaneAnnualDeclaration.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
