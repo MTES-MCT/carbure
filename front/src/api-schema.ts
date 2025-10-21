@@ -340,6 +340,22 @@ export interface paths {
         patch: operations["biomethane_digestate_storage_partial_update"];
         trace?: never;
     };
+    "/api/biomethane/digestate/optional-fields/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_digestate_optional_fields_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/digestate/spreading/": {
         parameters: {
             query?: never;
@@ -367,22 +383,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["biomethane_digestate_spreading_destroy"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/biomethane/digestate/validate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["biomethane_digestate_validate_create"];
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -424,16 +424,16 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/biomethane/energy/validate/": {
+    "/api/biomethane/energy/optional-fields/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["biomethane_energy_optional_fields_retrieve"];
         put?: never;
-        post: operations["biomethane_energy_validate_create"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2931,11 +2931,17 @@ export interface components {
         BiomethaneAnnualDeclaration: {
             readonly year: number;
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
-            readonly missing_fields: string;
-            readonly is_ready: string;
+            /** @description Missing fields grouped by type */
+            readonly missing_fields: {
+                /** @description List of missing fields for digestate */
+                digestate_missing_fields?: string[];
+                /** @description List of missing fields for energy */
+                energy_missing_fields?: string[];
+            };
+            readonly is_complete: boolean;
         };
         /**
-         * @description * `PENDING` - PENDING
+         * @description * `IN_PROGRESS` - IN_PROGRESS
          *     * `DECLARED` - DECLARED
          * @enum {string}
          */
@@ -3024,7 +3030,6 @@ export interface components {
             composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
             readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
             year: number;
-            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
             /** Format: double */
             raw_digestate_tonnage_produced?: number | null;
             /** Format: double */
@@ -3104,12 +3109,6 @@ export interface components {
             /** Format: double */
             spread_parcels_area: number;
         };
-        /**
-         * @description * `PENDING` - PENDING
-         *     * `VALIDATED` - VALIDATED
-         * @enum {string}
-         */
-        BiomethaneDigestateStatusEnum: BiomethaneDigestateStatusEnum;
         BiomethaneDigestateStorage: {
             readonly id: number;
             type: string;
@@ -3137,7 +3136,6 @@ export interface components {
         BiomethaneEnergy: {
             readonly id: number;
             year: number;
-            status?: components["schemas"]["BiomethaneDigestateStatusEnum"];
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
             /** Format: double */
@@ -6008,7 +6006,7 @@ export interface operations {
     biomethane_annual_declaration_validate_create: {
         parameters: {
             query: {
-                /** @description Entity ID */
+                /** @description Authorised entity ID. */
                 entity_id: number;
             };
             header?: never;
@@ -6024,12 +6022,26 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     biomethane_annual_declaration_years_retrieve: {
         parameters: {
             query: {
-                /** @description Entity ID */
+                /** @description Authorised entity ID. */
                 entity_id: number;
             };
             header?: never;
@@ -6424,6 +6436,35 @@ export interface operations {
             };
         };
     };
+    biomethane_digestate_optional_fields_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     biomethane_digestate_spreading_create: {
         parameters: {
             query: {
@@ -6469,27 +6510,6 @@ export interface operations {
         responses: {
             /** @description No response body */
             204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    biomethane_digestate_validate_create: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6630,10 +6650,10 @@ export interface operations {
             };
         };
     };
-    biomethane_energy_validate_create: {
+    biomethane_energy_optional_fields_retrieve: {
         parameters: {
             query: {
-                /** @description Entity ID */
+                /** @description Authorised entity ID. */
                 entity_id: number;
             };
             header?: never;
@@ -6642,8 +6662,16 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Not found for this entity. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12561,12 +12589,8 @@ export enum AmendmentObjectEnum {
     OTHER = "OTHER"
 }
 export enum BiomethaneAnnualDeclarationStatusEnum {
-    PENDING = "PENDING",
+    IN_PROGRESS = "IN_PROGRESS",
     DECLARED = "DECLARED"
-}
-export enum BiomethaneDigestateStatusEnum {
-    PENDING = "PENDING",
-    VALIDATED = "VALIDATED"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

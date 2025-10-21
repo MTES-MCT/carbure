@@ -490,7 +490,7 @@ paths:
           name: entity_id
           schema:
             type: integer
-          description: Entity ID
+          description: Authorised entity ID.
           required: true
       tags:
         - biomethane
@@ -500,6 +500,10 @@ paths:
       responses:
         "200":
           description: No response body
+        "400":
+          description: No response body
+        "404":
+          description: No response body
   /api/biomethane/annual-declaration/years/:
     get:
       operationId: biomethane_annual_declaration_years_retrieve
@@ -508,7 +512,7 @@ paths:
           name: entity_id
           schema:
             type: integer
-          description: Entity ID
+          description: Authorised entity ID.
           required: true
       tags:
         - biomethane
@@ -972,6 +976,33 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/biomethane/digestate/optional-fields/:
+    get:
+      operationId: biomethane_digestate_optional_fields_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                description: List of optional field names
+          description: ""
+        "404":
+          description: Not found for this entity.
   /api/biomethane/digestate/spreading/:
     post:
       operationId: biomethane_digestate_spreading_create
@@ -1030,24 +1061,6 @@ paths:
         - basicAuth: []
       responses:
         "204":
-          description: No response body
-  /api/biomethane/digestate/validate/:
-    post:
-      operationId: biomethane_digestate_validate_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
           description: No response body
   /api/biomethane/energy/:
     get:
@@ -1203,15 +1216,15 @@ paths:
       responses:
         "201":
           description: Monthly reports created or updated successfully
-  /api/biomethane/energy/validate/:
-    post:
-      operationId: biomethane_energy_validate_create
+  /api/biomethane/energy/optional-fields/:
+    get:
+      operationId: biomethane_energy_optional_fields_retrieve
       parameters:
         - in: query
           name: entity_id
           schema:
             type: integer
-          description: Entity ID
+          description: Authorised entity ID.
           required: true
       tags:
         - biomethane
@@ -1220,7 +1233,16 @@ paths:
         - basicAuth: []
       responses:
         "200":
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                description: List of optional field names
+          description: ""
+        "404":
+          description: Not found for this entity.
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
@@ -10749,22 +10771,34 @@ components:
         status:
           $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         missing_fields:
-          type: string
+          type: object
+          properties:
+            digestate_missing_fields:
+              type: array
+              items:
+                type: string
+              description: List of missing fields for digestate
+            energy_missing_fields:
+              type: array
+              items:
+                type: string
+              description: List of missing fields for energy
+          description: Missing fields grouped by type
           readOnly: true
-        is_ready:
-          type: string
+        is_complete:
+          type: boolean
           readOnly: true
       required:
-        - is_ready
+        - is_complete
         - missing_fields
         - year
     BiomethaneAnnualDeclarationStatusEnum:
       enum:
-        - PENDING
+        - IN_PROGRESS
         - DECLARED
       type: string
       description: |-
-        * `PENDING` - PENDING
+        * `IN_PROGRESS` - IN_PROGRESS
         * `DECLARED` - DECLARED
     BiomethaneContract:
       type: object
@@ -10980,8 +11014,6 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
         raw_digestate_tonnage_produced:
           type: number
           format: double
@@ -11047,7 +11079,6 @@ components:
         - id
         - producer
         - spreadings
-        - status
         - year
     BiomethaneDigestateInputRequest:
       type: object
@@ -11175,14 +11206,6 @@ components:
         - spread_parcels_area
         - spread_quantity
         - spreading_department
-    BiomethaneDigestateStatusEnum:
-      enum:
-        - PENDING
-        - VALIDATED
-      type: string
-      description: |-
-        * `PENDING` - PENDING
-        * `VALIDATED` - VALIDATED
     BiomethaneDigestateStorage:
       type: object
       properties:
@@ -11253,8 +11276,6 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
         injected_biomethane_gwh_pcs_per_year:
           type: number
           format: double
