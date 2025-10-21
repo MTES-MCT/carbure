@@ -4,9 +4,9 @@ from core.models import Entity
 
 
 class BiomethaneAnnualDeclaration(models.Model):
-    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
     DECLARED = "DECLARED"
-    DECLARATION_STATUS = [(PENDING, "PENDING"), (DECLARED, "DECLARED")]
+    DECLARATION_STATUS = [(IN_PROGRESS, IN_PROGRESS), (DECLARED, DECLARED)]
 
     # Propriétaire de la déclaration annuelle
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_declarations")
@@ -14,7 +14,7 @@ class BiomethaneAnnualDeclaration(models.Model):
     # Année de déclaration
     year = models.IntegerField()
 
-    status = models.CharField(choices=DECLARATION_STATUS, max_length=20, default=PENDING)
+    status = models.CharField(choices=DECLARATION_STATUS, max_length=20, default=IN_PROGRESS)
 
     class Meta:
         db_table = "biomethane_annual_declaration"
