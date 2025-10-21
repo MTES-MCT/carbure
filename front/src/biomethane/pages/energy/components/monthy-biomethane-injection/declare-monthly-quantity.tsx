@@ -42,11 +42,11 @@ export const DeclareMonthlyQuantity = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
-  const { year } = useAnnualDeclaration()
+  const { selectedYear } = useAnnualDeclaration()
 
   const { loading } = useQuery(getMonthlyReports, {
     key: "monthly-reports",
-    params: [entity.id, year],
+    params: [entity.id, selectedYear],
     onSuccess: (data) => {
       setTableData(data && data.length > 0 ? data : DEFAULT_DATA)
     },

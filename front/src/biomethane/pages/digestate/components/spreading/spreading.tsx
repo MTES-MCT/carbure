@@ -17,7 +17,7 @@ export const Spreading = ({
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
   const portal = usePortal()
-  const isInDeclarationPeriod = useAnnualDeclaration()
+  const { isInDeclarationPeriod } = useAnnualDeclaration()
 
   const openAddSpreadingDepartmentDialog = () => {
     portal((close) => (
