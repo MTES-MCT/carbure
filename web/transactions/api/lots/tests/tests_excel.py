@@ -92,7 +92,7 @@ class LotsExcelImportTest(TestCase):
         print(title)
         print(pd.DataFrame(values).fillna(""))
 
-    def dump_excel_as_json(self, owner: Entity, excel_file_path: str):
+    def excel_approval_test(self, owner: Entity, excel_file_path: str):
         """
         generate a JSON dump of the tested excel file with the entity's context
         """
@@ -106,8 +106,16 @@ class LotsExcelImportTest(TestCase):
         if owner.has_stocks:
             dump_file_name += "__has_stock"
 
-        with open(f"{os.environ['CARBURE_HOME']}/web/transactions/fixtures/{dump_file_name}.json", "w") as file:
-            json.dump(data, file, indent=4, default=str)
+        file_path = f"{os.environ['CARBURE_HOME']}/web/transactions/fixtures/{dump_file_name}.json"
+
+        if os.path.exist(file_path):
+            with open(file_path, "r") as file:
+                file_data = file.read()
+                json_data = json.dumps(data)
+                self.assertEqual(file_data, json_data)
+        else:
+            with open(file_path, "w") as file:
+                json.dump(data, file, indent=4, default=str)
 
     def send_excel(self, entity: Entity, excel_fixture: str):
         CarbureLot.objects.filter(added_by=entity).delete()
@@ -116,7 +124,7 @@ class LotsExcelImportTest(TestCase):
         with open(filepath, "rb") as reader:
             file = SimpleUploadedFile(excel_fixture, reader.read())
 
-        self.dump_excel_as_json(entity, filepath)
+        self.excel_approval_test(entity, filepath)
 
         response = self.client.post(
             reverse("transactions-lots-add-excel"),
