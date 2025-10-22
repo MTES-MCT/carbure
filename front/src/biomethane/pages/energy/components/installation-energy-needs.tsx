@@ -35,7 +35,7 @@ export function InstallationEnergyNeeds({
 
   const { bind, value } = useForm<InstallationEnergyNeedsForm>(energy ?? {})
   const saveEnergy = useSaveEnergy()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSubmit = async () => saveEnergy.execute(value)
 
@@ -47,7 +47,7 @@ export function InstallationEnergyNeeds({
       title={t(
         "Nature de l’énergie utilisée pour les besoins de l'installation"
       )}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSubmit}>

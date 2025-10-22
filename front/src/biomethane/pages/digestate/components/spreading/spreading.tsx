@@ -17,7 +17,7 @@ export const Spreading = ({
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
   const portal = usePortal()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const openAddSpreadingDepartmentDialog = () => {
     portal((close) => (
@@ -47,12 +47,12 @@ export const Spreading = ({
         <Button
           iconId="ri-add-line"
           onClick={openAddSpreadingDepartmentDialog}
-          disabled={!digestate || !isInDeclarationPeriod}
+          disabled={!digestate || !canEditDeclaration}
         >
           {t("Ajouter un département")}
         </Button>
       }
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {digestate && digestate?.spreadings.length > 0 ? (
         <>

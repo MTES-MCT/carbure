@@ -48,7 +48,7 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
       : {}
   )
   const saveDigestate = useSaveDigestate()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
@@ -74,7 +74,7 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
   return (
     <EditableCard
       title={t("Lieu du compostage")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

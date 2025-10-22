@@ -32,7 +32,7 @@ export function BiogasProduction({
   const { t } = useTranslation()
   const { bind, value } = useForm<BiogasProductionForm>(energy ?? {})
   const saveEnergy = useSaveEnergy()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 
@@ -42,7 +42,7 @@ export function BiogasProduction({
       description={t(
         "Ces informations concernent la production de biogaz (avant épuration)"
       )}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

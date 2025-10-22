@@ -28,7 +28,7 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
   const { t } = useTranslation()
   const { bind, value } = useForm<MalfunctionForm>(energy ?? {})
   const saveEnergy = useSaveEnergy()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const dysfunctionOptions = useMemo(
     () => [
@@ -55,7 +55,7 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
   return (
     <EditableCard
       title={t("Dysfonctionnements")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveEnergy.execute(value)}>

@@ -4,7 +4,10 @@ import { Confirm } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
-import { validateAnnualDeclaration } from "biomethane/api"
+import {
+  correctAnnualDeclaration,
+  validateAnnualDeclaration,
+} from "biomethane/api"
 import useEntity from "common/hooks/entity"
 import { HttpError } from "common/services/api-fetch"
 
@@ -36,6 +39,32 @@ export const usePageHeaderActions = () => {
       },
     }
   )
+  const correctAnnualDeclarationMutation = useMutation(
+    () => correctAnnualDeclaration(entity.id),
+    {
+      invalidates: ["current-annual-declaration"],
+      onSuccess: () => {
+        notify(
+          t(
+            "Votre déclaration est repassée à en cours, vous pouvez la corriger."
+          ),
+          {
+            variant: "success",
+          }
+        )
+      },
+      onError: () => {
+        notify(
+          t(
+            "Une erreur est survenue lors de la correction de votre déclaration."
+          ),
+          {
+            variant: "danger",
+          }
+        )
+      },
+    }
+  )
 
   const openValidateDeclarationDialog = () => {
     portal((close) => (
@@ -60,12 +89,8 @@ export const usePageHeaderActions = () => {
     ))
   }
 
-  const openCorrectionDeclarationDialog = () => {
-    // TODO: Implémenter la logique de correction
-  }
-
   return {
     openValidateDeclarationDialog,
-    openCorrectionDeclarationDialog,
+    correctAnnualDeclarationMutation,
   }
 }

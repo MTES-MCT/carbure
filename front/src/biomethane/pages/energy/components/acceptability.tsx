@@ -22,12 +22,12 @@ export function Acceptability({ energy }: { energy?: BiomethaneEnergy }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<AcceptabilityForm>(energy ?? {})
   const saveEnergy = useSaveEnergy()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 
   return (
-    <EditableCard title={t("Acceptabilité")} readOnly={!isInDeclarationPeriod}>
+    <EditableCard title={t("Acceptabilité")} readOnly={!canEditDeclaration}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
