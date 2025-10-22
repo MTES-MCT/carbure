@@ -15,6 +15,7 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         fields = ["year", "status", "missing_fields", "is_complete"]
         read_only_fields = ["year", "missing_fields", "is_complete"]
         writeable_fields = ["status"]
+        required_fields = writeable_fields
 
     @extend_schema_field(
         {
@@ -23,11 +24,13 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
                 "digestate_missing_fields": {
                     "type": "array",
                     "items": {"type": "string"},
+                    "nullable": True,
                     "description": "List of missing fields for digestate",
                 },
                 "energy_missing_fields": {
                     "type": "array",
                     "items": {"type": "string"},
+                    "nullable": True,
                     "description": "List of missing fields for energy",
                 },
             },
@@ -42,10 +45,7 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
     @extend_schema_field({"type": "boolean"})
     def get_is_complete(self, instance):
         missing_fields = self.get_missing_fields(instance)
-        return (
-            len(missing_fields.get("digestate_missing_fields", [])) == 0
-            and len(missing_fields.get("energy_missing_fields", [])) == 0
-        )
+        return BiomethaneAnnualDeclarationService.is_declaration_complete(instance, missing_fields)
 
     def create(self, validated_data):
         validated_data["producer"] = self.context["entity"]
@@ -56,9 +56,14 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         # Allow partial update of the declaration, only for status field to IN_PROGRESS
         status = validated_data.get("status")
         if status is not None:
+            if instance.status == BiomethaneAnnualDeclaration.IN_PROGRESS:
+                return instance
+
             if status == BiomethaneAnnualDeclaration.IN_PROGRESS:
                 instance.status = status
                 instance.save()
             else:
-                raise serializers.ValidationError({"status": "Seul le statut IN_PROGRESS est autorisé."})
+                raise serializers.ValidationError(
+                    {"status": f"Seul le statut {BiomethaneAnnualDeclaration.IN_PROGRESS} est autorisé."}
+                )
         return instance

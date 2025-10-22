@@ -52,8 +52,8 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
 
-        self.assertEqual(missing_fields["digestate_missing_fields"], [])
-        self.assertEqual(missing_fields["energy_missing_fields"], [])
+        self.assertIsNone(missing_fields["digestate_missing_fields"])
+        self.assertIsNone(missing_fields["energy_missing_fields"])
 
     def test_get_required_fields_with_valid_model(self):
         """Test get_required_fields returns all field names for a model"""
@@ -71,13 +71,25 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
     def test_is_declaration_complete_with_incomplete_data(self):
         """Test is_declaration_complete returns False when required fields are missing"""
-        # Create incomplete digestate
-        BiomethaneDigestate.objects.create(
-            producer=self.producer_entity,
-            year=self.current_year,
-        )
+        missing_fields = {
+            "digestate_missing_fields": ["xxx"],
+            "energy_missing_fields": ["yyy"],
+        }
 
         # Create declaration
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        is_complete = BiomethaneAnnualDeclarationService.is_declaration_complete(declaration, missing_fields)
+
+        self.assertFalse(is_complete)
+
+    def test_is_declaration_complete_with_no_data(self):
+        """Test is_declaration_complete returns False when no digestate/energy exist"""
+        # Create declaration without digestate and energy
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
@@ -88,19 +100,22 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         self.assertFalse(is_complete)
 
-    def test_is_declaration_complete_with_no_data(self):
-        """Test is_declaration_complete returns True when no digestate/energy exist"""
-        # Create declaration without digestate and energy
+    def test_is_declaration_complete_with_complete_data(self):
+        """Test is_declaration_complete returns True when all required fields are filled"""
+        missing_fields = {
+            "digestate_missing_fields": [],
+            "energy_missing_fields": [],
+        }
+
+        # Create declaration
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        # Test the method
-        is_complete = BiomethaneAnnualDeclarationService.is_declaration_complete(declaration)
+        is_complete = BiomethaneAnnualDeclarationService.is_declaration_complete(declaration, missing_fields)
 
-        # Assert it's complete (no missing fields when nothing exists)
         self.assertTrue(is_complete)
 
     def test_is_declaration_editable_in_progress_status(self):
