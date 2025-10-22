@@ -45,14 +45,14 @@ export function IncinerationLandfill({
       : {}
   )
   const saveDigestate = useSaveDigestate()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
     <EditableCard
       title={t("Incinération / Enfouissement")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

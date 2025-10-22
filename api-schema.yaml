@@ -482,6 +482,38 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
           description: Declaration created for the entity
+    patch:
+      operationId: biomethane_annual_declaration_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneAnnualDeclarationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneAnnualDeclarationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneAnnualDeclarationRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: ""
   /api/biomethane/annual-declaration/validate/:
     post:
       operationId: biomethane_annual_declaration_validate_create
@@ -15493,6 +15525,11 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedBiomethaneAnnualDeclarationRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
     PatchedBiomethaneDigestateStorageInputRequest:
       type: object
       properties:

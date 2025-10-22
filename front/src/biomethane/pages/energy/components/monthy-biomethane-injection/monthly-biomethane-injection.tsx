@@ -12,7 +12,7 @@ export const MonthlyBiomethaneInjection = ({
   energy?: BiomethaneEnergy
 }) => {
   const { t } = useTranslation()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
   return (
     <>
       <EditableCard
@@ -29,14 +29,14 @@ export const MonthlyBiomethaneInjection = ({
                 to: { hash: "monthly-reports" },
               }}
             >
-              {!isInDeclarationPeriod
+              {!canEditDeclaration
                 ? t("Visualiser mes volumes mensuels")
                 : t("Déclarer mes volumes mensuels")}
             </Button>
           )
         }
       >
-        {!isInDeclarationPeriod
+        {!canEditDeclaration
           ? t("Visualisez les volumes mensuels de biométhane injecté")
           : t(
               "Déclarez ou modifiez les volumes mensuels de biométhane injecté"
@@ -44,7 +44,7 @@ export const MonthlyBiomethaneInjection = ({
       </EditableCard>
       <HashRoute
         path="monthly-reports"
-        element={<DeclareMonthlyQuantity isReadOnly={!isInDeclarationPeriod} />}
+        element={<DeclareMonthlyQuantity isReadOnly={!canEditDeclaration} />}
       />
     </>
   )

@@ -32,7 +32,7 @@ export function InjectedBiomethane({
   const { t } = useTranslation()
   const { bind, value } = useForm<InjectedBiomethaneForm>(energy ?? {})
   const saveEnergy = useSaveEnergy()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 
@@ -42,7 +42,7 @@ export function InjectedBiomethane({
       description={t(
         "Ces informations concernent la production finale de biométhane de votre installation"
       )}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

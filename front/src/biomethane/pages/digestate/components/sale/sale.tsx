@@ -27,12 +27,12 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
       : {}
   )
   const saveDigestate = useSaveDigestate()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
-    <EditableCard title={t("Vente")} readOnly={!isInDeclarationPeriod}>
+    <EditableCard title={t("Vente")} readOnly={!canEditDeclaration}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">

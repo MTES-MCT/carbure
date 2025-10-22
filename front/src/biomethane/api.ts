@@ -1,3 +1,4 @@
+import { BiomethaneAnnualDeclarationStatusEnum } from "api-schema"
 import { api } from "common/services/api-fetch"
 
 export const getAnnualDeclarationYears = (entity_id: number) =>
@@ -26,5 +27,17 @@ export const validateAnnualDeclaration = (entity_id: number) =>
       query: {
         entity_id,
       },
+    },
+  })
+
+export const correctAnnualDeclaration = (entity_id: number) =>
+  api.PATCH("/biomethane/annual-declaration/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      status: BiomethaneAnnualDeclarationStatusEnum.IN_PROGRESS,
     },
   })

@@ -34,7 +34,7 @@ export function SpreadingDistance({
   )
 
   const saveDigestate = useSaveDigestate()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
@@ -42,7 +42,7 @@ export function SpreadingDistance({
     <EditableCard
       title={t("Distance d'épandage")}
       description={t("Données par département")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

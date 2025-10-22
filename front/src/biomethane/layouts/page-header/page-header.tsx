@@ -10,14 +10,16 @@ import { Outlet } from "react-router-dom"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
 import { AnnualDeclarationStatus } from "biomethane/types"
 import { usePageHeaderActions } from "./page-header.hooks"
+import useEntity from "common/hooks/entity"
 
 // Digestate and Energy pages share the same page header and the same declaration validation logic
 export const BiomethanePageHeader = () => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const years = useYears("biomethane", getAnnualDeclarationYears)
   const { selectedYear, currentAnnualDeclaration, isInDeclarationPeriod } =
     useAnnualDeclaration()
-  const { openValidateDeclarationDialog, openCorrectionDeclarationDialog } =
+  const { openValidateDeclarationDialog, correctAnnualDeclarationMutation } =
     usePageHeaderActions()
 
   const status =
@@ -41,7 +43,7 @@ export const BiomethanePageHeader = () => {
             : t("Déclaration en cours")}
         </Badge>
       </Row>
-      {isInDeclarationPeriod && (
+      {isInDeclarationPeriod && entity.canWrite() && (
         <Notice variant="info" icon="ri-time-line">
           {t("A déclarer et mettre à jour une fois par an, avant le {{date}}", {
             date: `31/03/${selectedYear + 1}`,
@@ -57,9 +59,10 @@ export const BiomethanePageHeader = () => {
           )}
           {status === AnnualDeclarationStatus.DECLARED && (
             <Button
-              onClick={openCorrectionDeclarationDialog}
+              onClick={() => correctAnnualDeclarationMutation.execute()}
               iconId="ri-edit-line"
               asideX
+              loading={correctAnnualDeclarationMutation.loading}
             >
               {t("Corriger mes informations annuelles")}
             </Button>

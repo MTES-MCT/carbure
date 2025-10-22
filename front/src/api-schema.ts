@@ -205,7 +205,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["biomethane_annual_declaration_partial_update"];
         trace?: never;
     };
     "/api/biomethane/annual-declaration/validate/": {
@@ -4894,6 +4894,9 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
+        PatchedBiomethaneAnnualDeclarationRequest: {
+            status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
+        };
         PatchedBiomethaneDigestateStorageInputRequest: {
             type?: string;
             /** Format: double */
@@ -5994,6 +5997,34 @@ export interface operations {
             };
             /** @description Declaration created for the entity */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneAnnualDeclaration"];
+                };
+            };
+        };
+    };
+    biomethane_annual_declaration_partial_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedBiomethaneAnnualDeclarationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneAnnualDeclarationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneAnnualDeclarationRequest"];
+            };
+        };
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

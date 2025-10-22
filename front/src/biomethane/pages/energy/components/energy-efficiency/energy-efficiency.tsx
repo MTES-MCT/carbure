@@ -37,7 +37,7 @@ export function EnergyEfficiency({
 
   const { bind, value } = useForm<EnergyEfficiencyForm>(energy ?? {})
   const saveEnergy = useSaveEnergy()
-  const { isInDeclarationPeriod } = useAnnualDeclaration()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSubmit = async () => saveEnergy.execute(value)
 
@@ -61,7 +61,7 @@ export function EnergyEfficiency({
       description={t(
         "Ces informations permettent de vérifier le respect des obligations en termes d'efficacité énergétique"
       )}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSubmit}>
