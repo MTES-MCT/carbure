@@ -173,6 +173,7 @@ export async function findSystemNationalCertificates(query: string) {
   const res = await apiFetch.GET("/resources/systeme-national", {
     params: { query: { query } },
   })
+  return res.data ?? []
 }
 
 export async function findDcAgreements(query: string) {

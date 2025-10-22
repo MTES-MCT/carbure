@@ -15672,6 +15672,52 @@ components:
       required:
         - certificate_id
         - type
+    ProductionSiteInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+          readOnly: true
+      required:
+        - address
+        - city
+        - country
+        - name
+        - postal_code
+    ProductionSiteResource:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        postal_code:
+          type: string
+        country:
+          $ref: "#/components/schemas/Country"
+        date_mise_en_service:
+          type: string
+          format: date
+      required:
+        - address
+        - city
+        - country
+        - date_mise_en_service
+        - id
+        - name
+        - postal_code
     ProvisionCertificateBulkRequest:
       type: object
       properties:
