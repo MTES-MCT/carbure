@@ -10809,11 +10809,13 @@ components:
               type: array
               items:
                 type: string
+              nullable: true
               description: List of missing fields for digestate
             energy_missing_fields:
               type: array
               items:
                 type: string
+              nullable: true
               description: List of missing fields for energy
           description: Missing fields grouped by type
           readOnly: true
