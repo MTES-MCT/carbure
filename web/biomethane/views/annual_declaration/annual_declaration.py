@@ -30,7 +30,7 @@ class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin, Ye
     pagination_class = None
 
     def get_permissions(self):
-        return get_biomethane_permissions([], self.action)
+        return get_biomethane_permissions(["partial_update", "validate_annual_declaration"], self.action)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
