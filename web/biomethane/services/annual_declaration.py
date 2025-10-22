@@ -11,6 +11,16 @@ from biomethane.utils import get_declaration_period
 class BiomethaneAnnualDeclarationService:
     @staticmethod
     def get_missing_fields(declaration):
+        """
+        Get the missing required fields for digestate and energy declarations.
+
+        Args:
+            declaration: A BiomethaneAnnualDeclaration instance
+
+        Returns:
+            dict: Dictionary with 'digestate_missing_fields' and 'energy_missing_fields' keys.
+                  Values are lists of missing field names or None if the model doesn't exist.
+        """
         digestate_missing_fields = None
         energy_missing_fields = None
 
@@ -59,6 +69,9 @@ class BiomethaneAnnualDeclarationService:
 
     @staticmethod
     def get_required_fields(model):
+        """
+        Return all field names for a given model.
+        """
         if model is None:
             return []
         fields = []
@@ -68,6 +81,16 @@ class BiomethaneAnnualDeclarationService:
 
     @staticmethod
     def is_declaration_complete(declaration, missing_fields=None):
+        """
+        Check if the annual declaration is complete (all required fields are filled).
+
+        Args:
+            declaration: A BiomethaneAnnualDeclaration instance
+            missing_fields: Optional dict of missing fields (will be computed if not provided)
+
+        Returns:
+            bool: True if both digestate and energy declarations exist and have no missing fields
+        """
         if missing_fields is None:
             missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
 
@@ -78,6 +101,16 @@ class BiomethaneAnnualDeclarationService:
 
     @staticmethod
     def is_declaration_editable(producer, year):
+        """
+        Check if the annual declaration can be edited for a given producer and year.
+
+        Args:
+            producer: The Entity instance representing the producer
+            year: The year of the declaration to check
+
+        Returns:
+            bool: True if declaration doesn't exist or status is not DECLARED, False otherwise
+        """
         try:
             declaration = BiomethaneAnnualDeclaration.objects.get(producer=producer, year=year)
             return declaration.status != BiomethaneAnnualDeclaration.DECLARED
