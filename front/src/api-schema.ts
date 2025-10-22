@@ -2934,9 +2934,9 @@ export interface components {
             /** @description Missing fields grouped by type */
             readonly missing_fields: {
                 /** @description List of missing fields for digestate */
-                digestate_missing_fields?: string[];
+                digestate_missing_fields?: string[] | null;
                 /** @description List of missing fields for energy */
-                energy_missing_fields?: string[];
+                energy_missing_fields?: string[] | null;
             };
             readonly is_complete: boolean;
         };
