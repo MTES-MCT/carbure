@@ -24,11 +24,13 @@ class LotsExcelImportTest(TestCase):
     # create the entity that will import the excel file
     def setupOwnerEntity(self):
         self.owner = Entity.objects.create(
+            id=999,
             is_enabled=True,
             name="Owner",
             default_certificate="OWNER_CERTIFICATE",
         )
         self.owner_production_site = Site.objects.create(
+            id=999,
             site_type=Site.PRODUCTION_BIOLIQUID,
             is_enabled=True,
             name="Owner Production Site",
@@ -36,6 +38,7 @@ class LotsExcelImportTest(TestCase):
             created_by=self.owner,
         )
         self.owner_depot = Site.objects.create(
+            id=1000,
             site_type=Site.EFPE,
             is_enabled=True,
             name="Owner Depot",
@@ -46,6 +49,7 @@ class LotsExcelImportTest(TestCase):
     # create another entity that will be involved in transactions
     def setupOtherEntity(self):
         self.other = Entity.objects.create(
+            id=1000,
             is_enabled=True,
             name="Other",
             entity_type=Entity.OPERATOR,
@@ -53,6 +57,7 @@ class LotsExcelImportTest(TestCase):
             has_trading=True,
         )
         self.other_depot = Site.objects.create(
+            id=1001,
             site_type=Site.EFPE,
             is_enabled=True,
             name="Other Depot",
@@ -62,6 +67,7 @@ class LotsExcelImportTest(TestCase):
         EntitySite.objects.create(entity=self.other, site=self.other_depot)
 
     def setUp(self):
+        self.maxDiff = None
         self.FR = Pays.objects.get(code_pays="FR")
 
         self.setupOwnerEntity()
@@ -108,10 +114,11 @@ class LotsExcelImportTest(TestCase):
 
         file_path = f"{os.environ['CARBURE_HOME']}/web/transactions/fixtures/{dump_file_name}.json"
 
-        if os.path.exist(file_path):
+        if os.path.exists(file_path):
             with open(file_path, "r") as file:
                 file_data = file.read()
-                json_data = json.dumps(data)
+                json_data = json.dumps(data, indent=4, default=str)
+
                 self.assertEqual(file_data, json_data)
         else:
             with open(file_path, "w") as file:
