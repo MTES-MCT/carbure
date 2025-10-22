@@ -11,27 +11,29 @@ from biomethane.utils import get_declaration_period
 class BiomethaneAnnualDeclarationService:
     @staticmethod
     def get_missing_fields(declaration):
-        digestat_missing_fields = []
-        energy_missing_fields = []
+        digestate_missing_fields = None
+        energy_missing_fields = None
 
         try:
-            digestat = BiomethaneDigestate.objects.get(producer=declaration.producer, year=declaration.year)
+            digestate = BiomethaneDigestate.objects.get(producer=declaration.producer, year=declaration.year)
         except BiomethaneDigestate.DoesNotExist:
-            digestat = None
+            digestate = None
 
         try:
             energy = BiomethaneEnergy.objects.get(producer=declaration.producer, year=declaration.year)
         except BiomethaneEnergy.DoesNotExist:
             energy = None
 
-        if digestat is not None:
-            digestat_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(digestat)
+        if digestate is not None:
+            digestate_missing_fields = []
+            digestate_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(digestate)
 
         if energy is not None:
+            energy_missing_fields = []
             energy_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(energy)
 
         return {
-            "digestate_missing_fields": digestat_missing_fields,
+            "digestate_missing_fields": digestate_missing_fields,
             "energy_missing_fields": energy_missing_fields,
         }
 
@@ -65,8 +67,13 @@ class BiomethaneAnnualDeclarationService:
         return fields
 
     @staticmethod
-    def is_declaration_complete(declaration):
-        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+    def is_declaration_complete(declaration, missing_fields=None):
+        if missing_fields is None:
+            missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+
+        if missing_fields["digestate_missing_fields"] is None or missing_fields["energy_missing_fields"] is None:
+            return False
+
         return len(missing_fields["digestate_missing_fields"]) == 0 and len(missing_fields["energy_missing_fields"]) == 0
 
     @staticmethod
