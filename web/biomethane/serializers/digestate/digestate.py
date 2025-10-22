@@ -31,25 +31,13 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
 
         errors = {}
 
-        # Use the service to get the conditional fields rules
-        rules = BiomethaneDigestateService.get_conditional_fields_rules(validated_data)
-        required_fields = rules["required_fields"]
+        # Use the service to get the required fields
+        required_fields = BiomethaneDigestateService.get_required_fields(validated_data)
 
         # Check that all required fields are present and non-empty
         for field_name in required_fields:
             if not validated_data.get(field_name):
-                # Messages personnalisés selon le contexte
-                if field_name in [
-                    "external_platform_name",
-                    "external_platform_digestate_volume",
-                    "external_platform_department",
-                    "external_platform_municipality",
-                ]:
-                    errors[field_name] = [_("Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné.")]
-                elif field_name == "on_site_composted_digestate_volume":
-                    errors[field_name] = [_("Ce champ est obligatoire lorsque 'Sur site' est sélectionné.")]
-                else:
-                    errors[field_name] = [_("Ce champ est obligatoire.")]
+                errors[field_name] = [_("Ce champ est obligatoire.")]
 
         if errors:
             raise serializers.ValidationError(errors)
