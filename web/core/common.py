@@ -182,6 +182,7 @@ class BiofuelExcelSerializer(serializers.Serializer):
     carbure_stock_id = serializers.CharField(**OPTIONAL)
     champ_libre = serializers.CharField(source="free_field", **OPTIONAL)
     production_site_reference = serializers.CharField(source="production_site_certificate", **OPTIONAL)
+    matiere_premiere_code = serializers.CharField(source="feedstock_code", **OPTIONAL)
 
 
 def convert_data_with_serializer(row: dict, Serializer) -> dict:
@@ -276,7 +277,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot["volume"] = lot_row.get("volume", 0)
         lot["quantity"] = lot_row.get("quantity", 0)
         lot["unit"] = lot_row.get("unit", None)
-        lot["feedstock_code"] = lot_row.get("matiere_premiere_code", "").strip()
+        # lot["feedstock_code"] = lot_row.get("matiere_premiere_code", "").strip()
         lot["biofuel_code"] = lot_row.get("biocarburant_code", "").strip()
         lot["country_code"] = lot_row.get("pays_origine_code", "").strip()
 

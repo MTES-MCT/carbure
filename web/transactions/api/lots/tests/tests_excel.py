@@ -117,12 +117,12 @@ class LotsExcelImportTest(TestCase):
         if os.path.exists(file_path):
             with open(file_path, "r") as file:
                 file_data = file.read()
-                json_data = json.dumps(data, indent=4, default=str)
+                json_data = json.dumps(data, indent=4, default=str, sort_keys=True)
 
                 self.assertEqual(file_data, json_data)
         else:
             with open(file_path, "w") as file:
-                json.dump(data, file, indent=4, default=str)
+                json.dump(data, file, indent=4, default=str, sort_keys=True)
 
     def send_excel(self, entity: Entity, excel_fixture: str):
         CarbureLot.objects.filter(added_by=entity).delete()
