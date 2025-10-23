@@ -7,13 +7,13 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import serializers
-from web.entity.factories.entity import EntityFactory
-from web.transactions.factories.certificate import GenericCertificateFactory
 
 from core.models import Entity, EntityCertificate, GenericCertificate, Pays, UserRights, UserRightsRequests
 from core.tests_utils import assert_object_contains_data, setup_current_user
+from entity.factories.entity import EntityFactory
 from entity.services.enable_entity import enable_entity
 from entity.views.registration.add_company import EntityCompanySerializer
+from transactions.factories.certificate import GenericCertificateFactory
 
 
 class EntityRegistrationAddCompanyTest(TestCase):

@@ -9,7 +9,6 @@ from drf_spectacular.utils import (
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from web.core.serializers import check_fields_required
 
 from core.decorators import otp_or_403
 from core.helpers import send_mail
@@ -20,6 +19,7 @@ from core.models import (
     Pays,
     UserRightsRequests,
 )
+from core.serializers import check_fields_required
 from core.utils import CarbureEnv
 
 
