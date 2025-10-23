@@ -8,6 +8,7 @@ class ListenerTest(TestCase):
     def setUp(self):
         self.patched_ListPendingMessages = patch("edelivery.soap.listener.ListPendingMessages").start()
         self.patched_PubSubAdapter = patch("edelivery.soap.listener.PubSubAdapter").start()
+        self.patched_PubSubAdapter.return_value.next_message.return_value = None
         self.patched_RetrieveMessage = patch("edelivery.soap.listener.RetrieveMessage").start()
         self.patched_sleep = patch("edelivery.soap.listener.sleep").start()
 
@@ -68,3 +69,68 @@ class ListenerTest(TestCase):
         except Warning:
             self.patched_sleep.assert_called_with(1)
             self.assertEqual(["list", "list", "list"], commands_called)
+
+    def test_registers_to_service_pub_sub_channel_at_initialization(self):
+        subscribe = self.patched_PubSubAdapter.return_value.subscribeToServiceChannel
+
+        subscribe.assert_not_called()
+        Listener()
+        subscribe.assert_called()
+
+    def test_stops_polling_when_receiving_stop_message_from_service_pub_sub_channel(self):
+        commands_called = []
+
+        def log_list_pending_messages_call():
+            commands_called.append("list")
+            return Mock()
+
+        self.patched_ListPendingMessages.return_value.perform = log_list_pending_messages_call
+        self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, Listener.STOP_SERVICE_COMMAND, None]
+        self.patched_sleep.side_effect = [None, None, Warning()]
+
+        try:
+            listener = Listener()
+            self.assertEqual([], commands_called)
+            listener.start()
+
+            self.fail("sleep() should have been called")
+        except Warning:
+            self.assertEqual(["list"], commands_called)
+
+    def test_restarts_polling_when_receiving_start_message_from_service_pub_sub_channel(self):
+        commands_called = []
+
+        def log_list_pending_messages_call():
+            commands_called.append("list")
+            return Mock()
+
+        self.patched_ListPendingMessages.return_value.perform = log_list_pending_messages_call
+        self.patched_PubSubAdapter.return_value.next_message.side_effect = [
+            Listener.STOP_SERVICE_COMMAND,
+            None,
+            Listener.START_SERVICE_COMMAND,
+        ]
+        self.patched_sleep.side_effect = [None, None, Warning()]
+
+        try:
+            listener = Listener()
+            self.assertEqual([], commands_called)
+            listener.start()
+
+            self.fail("sleep() should have been called")
+        except Warning:
+            self.assertEqual(["list"], commands_called)
+
+    def test_sends_stop_signal_to_pub_sub_channel(self):
+        service = self.patched_PubSubAdapter.return_value.service
+
+        service.assert_not_called()
+        Listener.send_stop_signal()
+        service.assert_called_with(Listener.STOP_SERVICE_COMMAND)
+
+    def test_sends_start_signal_to_pub_sub_channel(self):
+        service = self.patched_PubSubAdapter.return_value.service
+
+        service.assert_not_called()
+        Listener.send_start_signal()
+        service.assert_called_with(Listener.START_SERVICE_COMMAND)
