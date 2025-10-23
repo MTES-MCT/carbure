@@ -75,6 +75,13 @@ class BiomethaneContract(models.Model):
     def does_contract_exist(self):
         return bool(self.signature_date)
 
+    @property
+    def watched_fields(self):
+        from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+
+        watched_fields = BiomethaneAnnualDeclarationService.get_watched_fields()
+        return watched_fields["contract"]
+
 
 @receiver(post_save, sender=BiomethaneContract)
 def update_red_ii_status(sender, instance, **kwargs):

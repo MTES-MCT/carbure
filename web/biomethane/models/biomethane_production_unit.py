@@ -205,6 +205,13 @@ class BiomethaneProductionUnit(models.Model):
         verbose_name = "Biométhane - Unité de Production"
         verbose_name_plural = "Biométhane - Unités de Production"
 
+    @property
+    def watched_fields(self):
+        from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+
+        watched_fields = BiomethaneAnnualDeclarationService.get_watched_fields()
+        return watched_fields["production_unit"]
+
 
 @receiver(post_save, sender=BiomethaneProductionUnit)
 def clear_production_unit_fields_on_save(sender, instance, **kwargs):
