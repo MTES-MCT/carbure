@@ -38,6 +38,16 @@ router.register(
     BiomethaneSupplyInputViewSet,
     basename="biomethane-supply-input",
 )
+router.register(
+    "contract",
+    BiomethaneContractViewSet,
+    basename="biomethane-contract",
+)
+router.register(
+    "production-unit",
+    BiomethaneProductionUnitViewSet,
+    basename="biomethane-production-unit",
+)
 
 contract_viewset = BiomethaneContractViewSet.as_view(
     {
