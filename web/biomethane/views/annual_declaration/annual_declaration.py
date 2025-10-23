@@ -8,8 +8,9 @@ from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
 from biomethane.utils import get_declaration_period
+from biomethane.views.mixins import YearsActionMixin
 
-from .mixins import ValidateActionMixin, YearsActionMixin
+from .mixins import ValidateActionMixin
 
 
 @extend_schema(

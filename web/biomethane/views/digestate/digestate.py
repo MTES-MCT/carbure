@@ -13,8 +13,7 @@ from biomethane.serializers.digestate import (
 )
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.utils import get_declaration_period
-
-from .mixins import OptionalFieldsActionMixin
+from biomethane.views.mixins import OptionalFieldsActionMixin
 
 
 @extend_schema(
