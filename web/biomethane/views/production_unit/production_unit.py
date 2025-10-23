@@ -9,6 +9,7 @@ from biomethane.serializers.production_unit import (
     BiomethaneProductionUnitSerializer,
     BiomethaneProductionUnitUpsertSerializer,
 )
+from biomethane.views.mixins import WatchedFieldsActionMixin
 
 
 @extend_schema(
@@ -22,7 +23,7 @@ from biomethane.serializers.production_unit import (
         ),
     ]
 )
-class BiomethaneProductionUnitViewSet(GenericViewSet):
+class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
     queryset = BiomethaneProductionUnit.objects.all()
     serializer_class = BiomethaneProductionUnitSerializer
     pagination_class = None
