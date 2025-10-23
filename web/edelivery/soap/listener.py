@@ -1,3 +1,4 @@
+from os import environ
 from time import sleep
 
 from edelivery.adapters.pub_sub_adapter import PubSubAdapter
@@ -24,6 +25,9 @@ class Listener:
         self.started = False
 
     def poll_once(self):
+        if "WITH_EDELIVERY" not in environ.keys() or environ["WITH_EDELIVERY"] != "True":
+            return
+
         list = ListPendingMessages().perform()
         if list.pending_message_present():
             id = list.next_pending_message_id()
