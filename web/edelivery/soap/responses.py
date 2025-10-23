@@ -4,13 +4,13 @@ from edelivery.adapters.zip_utils import unzip_base64_encoded_stream
 from edelivery.ebms.request_responses import BaseRequestResponse
 
 
-class AbstractEdeliveryResponse:
+class BaseEdeliveryResponse:
     def __init__(self, text):
         self.text = text
         self.parsed_XML = ET.fromstring(text)
 
 
-class ListPendingMessagesResponse(AbstractEdeliveryResponse):
+class ListPendingMessagesResponse(BaseEdeliveryResponse):
     def __init__(self, text):
         super().__init__(text)
         self.message_id_elements = self.parsed_XML.findall(".//messageID")
@@ -27,7 +27,7 @@ class ListPendingMessagesResponse(AbstractEdeliveryResponse):
         return len(ids) > 0
 
 
-class RetrieveMessageResponse(AbstractEdeliveryResponse):
+class RetrieveMessageResponse(BaseEdeliveryResponse):
     NAMESPACES = {
         "soap": "http://www.w3.org/2003/05/soap-envelope",
         "ws": "http://eu.domibus.wsplugin/",
@@ -44,6 +44,6 @@ class RetrieveMessageResponse(AbstractEdeliveryResponse):
         return value_element.text
 
 
-class SubmitMessageResponse(AbstractEdeliveryResponse):
+class SubmitMessageResponse(BaseEdeliveryResponse):
     def __init__(self, text):
         super().__init__(text)
