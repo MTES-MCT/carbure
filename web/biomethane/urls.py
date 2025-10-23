@@ -13,6 +13,7 @@ from .views import (
     BiomethaneProductionUnitViewSet,
     BiomethaneSupplyInputViewSet,
     BiomethaneSupplyPlanViewSet,
+    download_template,
 )
 
 router = SimpleRouter()
@@ -135,5 +136,6 @@ urlpatterns = [
     path("supply-plan/years/", supply_plan_years_viewset, name="biomethane-supply-plan-years"),
     path("supply-plan/import/", supply_plan_import_excel_viewset, name="biomethane-supply-plan-import-excel"),
     path("supply-plan/export/", supply_plan_export_to_excel_viewset, name="biomethane-supply-plan-export-excel"),
+    path("supply-plan/download-template/", download_template, name="biomethane-supply-plan-dl-template"),
     *router.urls,
 ]
