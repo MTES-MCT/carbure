@@ -1669,6 +1669,24 @@ paths:
                     - year
                   summary: Example of filters response.
           description: ""
+  /api/biomethane/supply-plan/download-template/:
+    get:
+      operationId: biomethane_supply_plan_download_template_retrieve
+      description: Download Supply Plan Excel Template
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Fichier Excel généré
   /api/biomethane/supply-plan/export/:
     get:
       operationId: biomethane_supply_plan_export_retrieve
