@@ -8,7 +8,7 @@ from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessag
 
 
 class AbstractSoapAction:
-    def __init__(self, name, response_class, send_callback):
+    def __init__(self, name, response_class, send_callback=send_SOAP_request):
         self.name = name
         self.response_class = response_class
         self.send_callback = send_callback
@@ -22,8 +22,8 @@ class AbstractSoapAction:
 
 
 class ListPendingMessages(AbstractSoapAction):
-    def __init__(self, send_callback=send_SOAP_request):
-        super().__init__("listPendingMessages", ListPendingMessagesResponse, send_callback)
+    def __init__(self, **kwargs):
+        super().__init__("listPendingMessages", ListPendingMessagesResponse, **kwargs)
 
     def payload(self):
         return """\
@@ -36,8 +36,8 @@ class ListPendingMessages(AbstractSoapAction):
 
 
 class RetrieveMessage(AbstractSoapAction):
-    def __init__(self, message_id, send_callback=send_SOAP_request):
-        super().__init__("retrieveMessage", RetrieveMessageResponse, send_callback)
+    def __init__(self, message_id, **kwargs):
+        super().__init__("retrieveMessage", RetrieveMessageResponse, **kwargs)
         self.message_id = message_id
 
     def payload(self):
@@ -53,8 +53,8 @@ class RetrieveMessage(AbstractSoapAction):
 
 
 class SubmitMessage(AbstractSoapAction):
-    def __init__(self, responder_id, message, send_callback=send_SOAP_request):
-        super().__init__("submitMessage", SubmitMessageResponse, send_callback)
+    def __init__(self, responder_id, message, **kwargs):
+        super().__init__("submitMessage", SubmitMessageResponse, **kwargs)
         self.original_sender = environ["CARBURE_NTR"]
         self.initiator = Initiator(environ["INITIATOR_ACCESS_POINT_ID"])
         self.responder = Responder(responder_id)
