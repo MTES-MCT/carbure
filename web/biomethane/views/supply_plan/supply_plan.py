@@ -7,7 +7,7 @@ from biomethane.models import BiomethaneSupplyPlan
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneSupplyPlanSerializer
 from biomethane.utils import get_declaration_period
-from biomethane.views.annual_declaration.mixins import YearsActionMixin
+from biomethane.views.mixins import YearsActionMixin
 
 from .mixins import ExcelImportActionMixin
 

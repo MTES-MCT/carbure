@@ -5,6 +5,13 @@ from rest_framework.response import Response
 
 
 class OptionalFieldsActionMixin:
+    """
+    Mixin to add an optional_fields action to a ViewSet.
+
+    The ViewSet's model must have an optional_fields property.
+    Returns the optional fields for the first object in the queryset.
+    """
+
     @extend_schema(
         responses={
             status.HTTP_200_OK: {
@@ -21,8 +28,9 @@ class OptionalFieldsActionMixin:
         url_path="optional-fields",
     )
     def get_optional_fields(self, request, *args, **kwargs):
-        instance = self.get_queryset().first()
-        if not instance:
+        """Return the optional fields for the first object in the queryset."""
+        try:
+            instance = self.get_queryset().get()
+            return Response(instance.optional_fields, status=status.HTTP_200_OK)
+        except self.get_queryset().model.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        return Response(instance.optional_fields, status=status.HTTP_200_OK)
