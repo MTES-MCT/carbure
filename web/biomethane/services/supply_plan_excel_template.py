@@ -18,7 +18,7 @@ def create_supply_plan_template() -> BufferedReader:
     The template contains:
     - A main sheet "Plan d'approvisionnement" with columns to fill and dropdown lists
     - Reference sheets for dropdown lists:
-        - Departements (complete list)
+        - Departements (from model)
         - Pays (from model)
 
     Returns:
@@ -73,12 +73,31 @@ def _create_main_sheet(workbook, header_format, countries, departments):
         sheet.write(1, col, key)  # Hidden key row for reference
         sheet.set_column(col, col, 25)
 
+    # Add formulas for automatic France country when department is selected
+    _add_country_formulas(sheet, countries)
+
     # Add all data validations
     _add_dropdown_validations(sheet, countries, departments)
     _add_numeric_validations(sheet)
 
     # Protect sheet and format columns
     _protect_and_format_sheet(workbook, sheet)
+
+
+def _add_country_formulas(sheet, countries):
+    """
+    Add formulas to automatically set France when a department is selected.
+    The formula will overwrite empty value in the country column if a department is selected.
+    """
+    # Find France in the countries list
+    france = next((c for c in countries if c.code_pays == "FR"), None)
+    france_name = france.name if france else "France"
+
+    # Add formula in column K (Pays d'origine) for rows 3 to 1000
+    # If department (column H) is filled, force France, otherwise leave empty
+    for row in range(2, 1000):
+        formula = f'=IF(H{row+1}<>"","{france_name}","")'
+        sheet.write_formula(row, 10, formula)  # column K (0-indexed = 10)
 
 
 def _add_dropdown_validations(sheet, countries, departments):

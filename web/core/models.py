@@ -45,7 +45,7 @@ class Department(models.Model):
     name = models.CharField(max_length=128)
 
     def __str__(self):
-        return self.code_dept - self.name
+        return f"{self.code_dept} - {self.name}"
 
     def natural_key(self):
         return {
