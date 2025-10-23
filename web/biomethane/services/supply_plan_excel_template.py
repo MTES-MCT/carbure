@@ -8,111 +8,7 @@ from io import BufferedReader
 import xlsxwriter
 
 from biomethane.models import BiomethaneSupplyInput
-from core.models import Pays
-
-FRENCH_DEPARTMENTS = [
-    ("01", "Ain"),
-    ("02", "Aisne"),
-    ("03", "Allier"),
-    ("04", "Alpes-de-Haute-Provence"),
-    ("05", "Hautes-Alpes"),
-    ("06", "Alpes-Maritimes"),
-    ("07", "Ardèche"),
-    ("08", "Ardennes"),
-    ("09", "Ariège"),
-    ("10", "Aube"),
-    ("11", "Aude"),
-    ("12", "Aveyron"),
-    ("13", "Bouches-du-Rhône"),
-    ("14", "Calvados"),
-    ("15", "Cantal"),
-    ("16", "Charente"),
-    ("17", "Charente-Maritime"),
-    ("18", "Cher"),
-    ("19", "Corrèze"),
-    ("2A", "Corse-du-Sud"),
-    ("2B", "Haute-Corse"),
-    ("21", "Côte-d'Or"),
-    ("22", "Côtes-d'Armor"),
-    ("23", "Creuse"),
-    ("24", "Dordogne"),
-    ("25", "Doubs"),
-    ("26", "Drôme"),
-    ("27", "Eure"),
-    ("28", "Eure-et-Loir"),
-    ("29", "Finistère"),
-    ("30", "Gard"),
-    ("31", "Haute-Garonne"),
-    ("32", "Gers"),
-    ("33", "Gironde"),
-    ("34", "Hérault"),
-    ("35", "Ille-et-Vilaine"),
-    ("36", "Indre"),
-    ("37", "Indre-et-Loire"),
-    ("38", "Isère"),
-    ("39", "Jura"),
-    ("40", "Landes"),
-    ("41", "Loir-et-Cher"),
-    ("42", "Loire"),
-    ("43", "Haute-Loire"),
-    ("44", "Loire-Atlantique"),
-    ("45", "Loiret"),
-    ("46", "Lot"),
-    ("47", "Lot-et-Garonne"),
-    ("48", "Lozère"),
-    ("49", "Maine-et-Loire"),
-    ("50", "Manche"),
-    ("51", "Marne"),
-    ("52", "Haute-Marne"),
-    ("53", "Mayenne"),
-    ("54", "Meurthe-et-Moselle"),
-    ("55", "Meuse"),
-    ("56", "Morbihan"),
-    ("57", "Moselle"),
-    ("58", "Nièvre"),
-    ("59", "Nord"),
-    ("60", "Oise"),
-    ("61", "Orne"),
-    ("62", "Pas-de-Calais"),
-    ("63", "Puy-de-Dôme"),
-    ("64", "Pyrénées-Atlantiques"),
-    ("65", "Hautes-Pyrénées"),
-    ("66", "Pyrénées-Orientales"),
-    ("67", "Bas-Rhin"),
-    ("68", "Haut-Rhin"),
-    ("69", "Rhône"),
-    ("70", "Haute-Saône"),
-    ("71", "Saône-et-Loire"),
-    ("72", "Sarthe"),
-    ("73", "Savoie"),
-    ("74", "Haute-Savoie"),
-    ("75", "Paris"),
-    ("76", "Seine-Maritime"),
-    ("77", "Seine-et-Marne"),
-    ("78", "Yvelines"),
-    ("79", "Deux-Sèvres"),
-    ("80", "Somme"),
-    ("81", "Tarn"),
-    ("82", "Tarn-et-Garonne"),
-    ("83", "Var"),
-    ("84", "Vaucluse"),
-    ("85", "Vendée"),
-    ("86", "Vienne"),
-    ("87", "Haute-Vienne"),
-    ("88", "Vosges"),
-    ("89", "Yonne"),
-    ("90", "Territoire de Belfort"),
-    ("91", "Essonne"),
-    ("92", "Hauts-de-Seine"),
-    ("93", "Seine-Saint-Denis"),
-    ("94", "Val-de-Marne"),
-    ("95", "Val-d'Oise"),
-    ("971", "Guadeloupe"),
-    ("972", "Martinique"),
-    ("973", "Guyane"),
-    ("974", "La Réunion"),
-    ("976", "Mayotte"),
-]
+from core.models import Department, Pays
 
 
 def create_supply_plan_template() -> BufferedReader:
@@ -137,19 +33,21 @@ def create_supply_plan_template() -> BufferedReader:
 
     # Get countries from database
     eu_countries = list(Pays.objects.filter(is_in_europe=True).order_by("name"))
+    # Get departments from database
+    departments = list(Department.objects.all().order_by("code_dept"))
 
     # Create main sheet
-    _create_main_sheet(workbook, header_format, eu_countries)
+    _create_main_sheet(workbook, header_format, eu_countries, departments)
 
     # Create reference sheets
-    _create_departments_sheet(workbook, bold)
+    _create_departments_sheet(workbook, bold, departments)
     _create_countries_sheet(workbook, bold, eu_countries)
 
     workbook.close()
     return open(location, "rb")
 
 
-def _create_main_sheet(workbook, header_format, countries):
+def _create_main_sheet(workbook, header_format, countries, departments):
     """Create the main sheet with data validation."""
     sheet = workbook.add_worksheet("Plan d'approvisionnement")
 
@@ -176,14 +74,14 @@ def _create_main_sheet(workbook, header_format, countries):
         sheet.set_column(col, col, 25)
 
     # Add all data validations
-    _add_dropdown_validations(sheet, countries)
+    _add_dropdown_validations(sheet, countries, departments)
     _add_numeric_validations(sheet)
 
     # Protect sheet and format columns
     _protect_and_format_sheet(workbook, sheet)
 
 
-def _add_dropdown_validations(sheet, countries):
+def _add_dropdown_validations(sheet, countries, departments):
     """Add dropdown list validations to the main sheet."""
     # Provenance (column A)
     provenance_labels = [label for _, label in BiomethaneSupplyInput.SOURCE_CHOICES]
@@ -214,17 +112,17 @@ def _add_dropdown_validations(sheet, countries):
     )
 
     # Département (column H) - using reference sheet
-    dept_count = len(FRENCH_DEPARTMENTS)
+    dept_count = len(departments)
     sheet.data_validation(
         "H3:H1000",
         {"validate": "list", "source": f"=Departements!$B$2:$B${dept_count + 1}"},
     )
 
     # Pays d'origine (column K) - using reference sheet
-    country_labels = [country.name for country in countries]
+    countries_count = len(countries)
     sheet.data_validation(
         "K2:K1000",
-        {"validate": "list", "source": country_labels},
+        {"validate": "list", "source": f"=Pays!$B$2:$B${countries_count + 1}"},
     )
 
 
@@ -318,15 +216,15 @@ def _protect_and_format_sheet(workbook, sheet):
             sheet.set_column(col, col, 25, unlocked)
 
 
-def _create_departments_sheet(workbook, bold):
+def _create_departments_sheet(workbook, bold, departments):
     """Create the Departments reference sheet."""
     sheet = workbook.add_worksheet("Departements")
     sheet.write(0, 0, "Code", bold)
     sheet.write(0, 1, "Nom", bold)
 
-    for row, dept in enumerate(FRENCH_DEPARTMENTS, start=1):
-        sheet.write(row, 0, dept[0])
-        sheet.write(row, 1, f"{dept[0]} - {dept[1]}")
+    for row, dept in enumerate(departments, start=1):
+        sheet.write(row, 0, dept.code_dept)
+        sheet.write(row, 1, f"{dept.code_dept} - {dept.name}")
 
     sheet.hide()
     sheet.protect()
