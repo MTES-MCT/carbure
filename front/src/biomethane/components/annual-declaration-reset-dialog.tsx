@@ -2,15 +2,15 @@ import React from "react"
 import { useTranslation } from "react-i18next"
 import { Confirm, ConfirmProps } from "common/components/dialog2"
 
-export type AnnualDeclarationConfirmDialogProps = Pick<
+export type AnnualDeclarationResetDialogProps = Pick<
   ConfirmProps,
   "onClose" | "onConfirm"
 >
 
-export const AnnualDeclarationConfirmDialog = ({
+export const AnnualDeclarationResetDialog = ({
   onClose,
   onConfirm,
-}: AnnualDeclarationConfirmDialogProps) => {
+}: AnnualDeclarationResetDialogProps) => {
   const { t } = useTranslation()
 
   return (
@@ -18,21 +18,22 @@ export const AnnualDeclarationConfirmDialog = ({
       onClose={onClose}
       onConfirm={onConfirm}
       title={t("Votre déclaration annuelle doit être soumise à nouveau")}
-      confirm={t("Confirmer")}
+      confirm={t("J'ai compris")}
       description={
         <>
           <p>
             {t(
-              "Vous allez modifier des champs de la section contrat ou production."
+              "Vous avez modifié des champs de la section contrat ou production."
             )}
           </p>
           <p>
             {t(
-              "Après la sauvegarde de ces changements, rendez-vous dans les sections digestat et énergie pour compléter les nouveaux champs et soumettre votre déclaration à nous."
+              "Rendez-vous dans les sections digestat et énergie pour compléter les nouveaux champs et soumettre votre déclaration à nouveau."
             )}
           </p>
         </>
       }
+      hideCancel
     />
   )
 }
