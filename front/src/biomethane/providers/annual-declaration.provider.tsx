@@ -28,6 +28,17 @@ interface AnnualDeclarationProviderProps {
 
 const currentYear = new Date().getFullYear()
 
+/**
+ * Provider for managing biomethane annual declaration context.
+ *
+ * This provider centralizes the business logic related to annual declarations:
+ * - Fetches the current annual declaration for the entity
+ * - Determines the selected year (from URL or current year)
+ * - Calculates edit permissions based on status and entity rights
+ * - Provides a global context with all necessary data for child components
+ *
+ * Child components can access this data via the useAnnualDeclaration() hook.
+ */
 export function AnnualDeclarationProvider({
   children,
 }: AnnualDeclarationProviderProps) {
