@@ -17,7 +17,6 @@ import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
-import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 import {
   RecipientForm,
   recipientStep,
@@ -100,15 +99,7 @@ export const TransfertDialogContent = ({
         <Box>
           <RecapOperationGrid>
             <RecapOperation balance={currentBalance} />
-            {currentStepIndex > 1 && (
-              <>
-                <RecipientSummary values={form.value} />
-                <RecapGHGRange
-                  min={form.value.gesBoundMin}
-                  max={form.value.gesBoundMax}
-                />
-              </>
-            )}
+            {currentStepIndex > 1 && <RecipientSummary values={form.value} />}
             {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
           </RecapOperationGrid>
         </Box>

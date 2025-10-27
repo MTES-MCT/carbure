@@ -42,8 +42,6 @@ import {
   DeclareTeneurProgressBar,
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
-import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
-
 interface DeclareTeneurDialogProps {
   onClose: () => void
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective
@@ -135,10 +133,6 @@ const DeclareTeneurDialogContent = ({
                 <RecapOperation
                   balance={form.value.balance!}
                   unit={ExtendedUnit.GJ}
-                />
-                <RecapGHGRange
-                  min={form.value.gesBoundMin}
-                  max={form.value.gesBoundMax}
                 />
                 {currentStepIndex > 2 && (
                   <QuantitySummary values={form.value} unit={ExtendedUnit.GJ} />
