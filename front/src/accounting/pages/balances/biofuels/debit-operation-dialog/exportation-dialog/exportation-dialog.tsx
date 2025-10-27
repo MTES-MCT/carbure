@@ -23,7 +23,6 @@ import {
 import { Button } from "common/components/button2"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import { useExportationDialog } from "./exportation-dialog.hooks"
-import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
 import { GHGRangeForm } from "accounting/components/ghg-range-form"
 import {
   QuantityForm,
@@ -105,15 +104,7 @@ export const ExportationDialogContent = ({
         <Box>
           <RecapOperationGrid>
             <RecapOperation balance={currentBalance} />
-            {currentStepIndex > 1 && (
-              <>
-                <FromDepotSummary values={form.value} />
-                <RecapGHGRange
-                  min={form.value.gesBoundMin}
-                  max={form.value.gesBoundMax}
-                />
-              </>
-            )}
+            {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
             {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
             {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
           </RecapOperationGrid>
