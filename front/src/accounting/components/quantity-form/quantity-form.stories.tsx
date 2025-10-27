@@ -10,6 +10,7 @@ import {
   okSimulateMinMaxWithZeroValues,
 } from "accounting/__test__/api/biofuels/operations"
 import { baseHandlers } from "./quantity-form.stories.utils"
+import { getViewport } from "@storybook/mocks/utils"
 
 const meta: Meta<typeof QuantityForm> = {
   component: QuantityForm,
@@ -80,6 +81,14 @@ export const ShowErrorWhenSimulateMinMaxReturnsZeroValues: Story = {
 // Display the avoided emissions component with the range returned by the backend when the quantity is declared
 export const DisplayAvoidedEmissionsWhenQuantityIsDeclared: Story = {
   play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
+}
+
+// Focus on the avoided emissions input when the quantity is declared (visible when the viewport height is small)
+export const FocusOnAvoidedEmissionsWhenQuantityIsDeclared: Story = {
+  play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
+  parameters: {
+    viewport: getViewport("fullModal", { width: "1200px", height: "200px" }),
+  },
 }
 
 // Display the avoided emissions component with the range returned by the backend when the quantity is declared with equal values
