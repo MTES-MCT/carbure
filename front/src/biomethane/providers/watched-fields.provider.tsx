@@ -46,8 +46,6 @@ export function WatchedFieldsProvider<T extends object>({
     params: [entity.id],
   })
 
-  // const WatchedFieldsContext = createWatchedFieldsContext<T>()
-
   const hasWatchedFieldsChanged = useCallback(
     (contract: Partial<T>, form: Partial<T>) => {
       const fields = Object.entries(form).filter(
@@ -76,8 +74,6 @@ export function WatchedFieldsProvider<T extends object>({
 export function useWatchedFields<
   T extends object,
 >(): WatchedFieldsContextValue<T> {
-  // const WatchedFieldsContext = createWatchedFieldsContext<T>()
-
   const ctx = useContext<WatchedFieldsContextValue<T> | null>(
     WatchedFieldsContext
   )

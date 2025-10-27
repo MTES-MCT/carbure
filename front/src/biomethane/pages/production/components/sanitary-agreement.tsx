@@ -29,7 +29,8 @@ export function SanitaryAgreement({
     hygienization_exemption_type: productionUnit?.hygienization_exemption_type,
   })
 
-  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
+  const { execute: saveProductionUnit, loading } =
+    useSaveProductionUnit(productionUnit)
 
   const hygienizationExemptionOptions = [
     {
