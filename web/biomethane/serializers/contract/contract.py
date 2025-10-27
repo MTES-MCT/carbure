@@ -6,6 +6,7 @@ from biomethane.serializers.contract.contract_amendment import BiomethaneContrac
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.services.contract import BiomethaneContractService
 from biomethane.utils.contract import get_tracked_amendment_types
+from core.serializers import check_fields_required
 
 
 class BiomethaneContractSerializer(serializers.ModelSerializer):
@@ -38,9 +39,8 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
         # Use the service to validate the contract data and get required fields
         errors, required_fields = BiomethaneContractService.validate_contract(contract, validated_data)
 
-        for field in required_fields:
-            if validated_data.get(field) in [None, "", []]:
-                errors[field] = ["Ce champ est obligatoire."]
+        # Check for validation errors
+        check_fields_required(validated_data, required_fields)
 
         if errors:
             raise serializers.ValidationError(errors)

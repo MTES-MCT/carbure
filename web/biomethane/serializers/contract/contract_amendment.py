@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
+from core.serializers import check_fields_required
 
 
 class BaseBiomethaneContractAmendmentSerializer(serializers.ModelSerializer):
@@ -30,12 +31,8 @@ class BiomethaneContractAmendmentAddSerializer(BaseBiomethaneContractAmendmentSe
     def validate(self, data):
         validated_data = super().validate(data)
 
-        if BiomethaneContractAmendment.OTHER in validated_data.get("amendment_object") and not validated_data.get(
-            "amendment_details"
-        ):
-            raise serializers.ValidationError(
-                {"amendment_details": [_("Ce champ est obligatoire si amendment_object contient 'OTHER'.")]}
-            )
+        if BiomethaneContractAmendment.OTHER in validated_data.get("amendment_object"):
+            check_fields_required(validated_data, ["amendment_details"])
 
         signature_date = validated_data.get("signature_date")
         effective_date = validated_data.get("effective_date")

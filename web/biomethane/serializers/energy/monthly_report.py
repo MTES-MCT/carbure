@@ -23,7 +23,7 @@ class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
     def validate(self, attrs):
         months = [item["month"] for item in attrs]
         if len(months) != len(set(months)):
-            raise serializers.ValidationError("Chaque mois ne peut apparaître qu'une seule fois")
+            raise serializers.ValidationError(_("Chaque mois ne peut apparaître qu'une seule fois"))
 
         energy_instance = self.context.get("energy")
         if not energy_instance:
