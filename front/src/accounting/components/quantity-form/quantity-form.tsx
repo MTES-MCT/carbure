@@ -18,7 +18,7 @@ export type QuantityFormComponentProps = {
   balance: Balance
 
   // Maximum quantity allowed
-  quantityMax?: number
+  quantityMax: number
 
   type: CreateOperationType
 
@@ -78,7 +78,7 @@ const QuantitySection = ({
   onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit, unit } = useUnit(customUnit)
+  const { formatUnit } = useUnit(customUnit)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } =
@@ -158,10 +158,14 @@ const QuantitySection = ({
     },
   })
 
+  const quantityMaxLabel = quantityMax
+    ? `(${t("solde disponible")}: ${formatUnit(quantityMax, { fractionDigits: 0 })})`
+    : undefined
+
   return (
     <>
       <NumberInput
-        label={`${getQuantityInputLabel(type)} (${unit.toLocaleUpperCase()})`}
+        label={`${getQuantityInputLabel(type)} ${quantityMaxLabel ?? ""}`}
         step={1}
         max={quantityMax}
         onKeyDown={(e) => {
