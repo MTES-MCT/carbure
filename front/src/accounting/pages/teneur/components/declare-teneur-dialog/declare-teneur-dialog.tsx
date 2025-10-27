@@ -42,6 +42,7 @@ import {
   DeclareTeneurProgressBar,
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
+import { useFocusOnAvoidedEmissions } from "accounting/components/quantity-form/quantity-form.hooks"
 interface DeclareTeneurDialogProps {
   onClose: () => void
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective
@@ -70,6 +71,8 @@ const DeclareTeneurDialogContent = ({
     onOperationCreated: () => {},
     values: form.value,
   })
+  const { avoidedEmissionsInputRef, handleQuantityDeclared } =
+    useFocusOnAvoidedEmissions()
 
   const remainingEnergyBeforeLimitOrObjective =
     useRemainingEnergyBeforeLimitOrObjective(objective, form.value)
@@ -209,11 +212,14 @@ const DeclareTeneurDialogContent = ({
                     converter={CONVERSIONS.energy.GJ_TO_MJ}
                     gesBoundMin={form.value.gesBoundMin}
                     gesBoundMax={form.value.gesBoundMax}
+                    onQuantityDeclared={handleQuantityDeclared}
                   />
                 </Box>
                 {form.value.avoided_emissions_min ? (
                   <Box spacing="md">
-                    <QuantityForm.AvoidedEmissions />
+                    <QuantityForm.AvoidedEmissions
+                      inputRef={avoidedEmissionsInputRef}
+                    />
                     {mainObjective && (
                       <DeclareTeneurProgressBar
                         teneurDeclared={mainObjective.teneur_declared}

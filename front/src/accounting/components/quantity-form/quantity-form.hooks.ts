@@ -8,6 +8,7 @@ import { useUnit } from "common/hooks/unit"
 import { FormManager } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
 import { GHGRangeFormProps } from "../ghg-range-form"
+import { useRef } from "react"
 // import { GHGRangeFormProps } from "../ghg-range-form"
 
 type UseQuantityFormProps = {
@@ -94,4 +95,20 @@ export const useQuantityFormStep = ({
       })
     },
   })
+}
+
+export const useFocusOnAvoidedEmissions = () => {
+  const avoidedEmissionsInputRef = useRef<HTMLInputElement>(null)
+
+  const handleQuantityDeclared = () => {
+    // Wait for the avoided emissions input to be mounted
+    requestAnimationFrame(() => {
+      avoidedEmissionsInputRef.current?.focus()
+    })
+  }
+
+  return {
+    avoidedEmissionsInputRef,
+    handleQuantityDeclared,
+  }
 }
