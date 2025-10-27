@@ -125,7 +125,7 @@ export const ExportationDialogContent = ({
               <Box>
                 <QuantityForm
                   balance={balance}
-                  quantityMax={form.value.availableBalance}
+                  quantityMax={form.value.availableBalance ?? 0}
                   type={CreateOperationType.EXPORTATION}
                   gesBoundMin={form.value.gesBoundMin}
                   gesBoundMax={form.value.gesBoundMax}
