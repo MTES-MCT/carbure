@@ -54,7 +54,7 @@ export const CountryFormSummary = ({
       )}
       <OperationText title={t("Pays")} description={values.country?.name} />
       <OperationText
-        title={t("Etat membre")}
+        title={t("Etat membre (UE)")}
         description={values?.country?.is_in_europe ? t("Oui") : t("Non")}
       />
     </>

@@ -33,6 +33,7 @@ import { Depot, ExtendedUnit, UserRole } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { formatOperationType, formatSector } from "accounting/utils/formatters"
 import { OperationsStatus, OperationType } from "accounting/types"
+import { getOperationValidationButtonText } from "./operation-detail.utils"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
@@ -101,13 +102,18 @@ export const OperationDetail = () => {
   } = useMutation(api.patchOperation, {
     invalidates: ["operations"],
     onSuccess: () => {
-      notify(t("Le transfert a été réalisé avec succès."), {
-        variant: "success",
-      })
+      notify(
+        t(
+          "L'opération a bien été envoyée et est en attente de validation par l'administration."
+        ),
+        {
+          variant: "success",
+        }
+      )
       closeDialog()
     },
     onError: () => {
-      notify(t("Une erreur est survenue lors du transfert."), {
+      notify(t("Une erreur est survenue lors de l'opération."), {
         variant: "danger",
       })
     },
@@ -285,30 +291,31 @@ export const OperationDetail = () => {
               )}
 
             {/* Display cancel/transfer button only if operation is a DRAFT transfer */}
-            {operation?.status === OperationsStatus.DRAFT &&
-              operation?.type === OperationType.TRANSFERT && (
-                <>
-                  <Button
-                    customPriority="danger"
-                    iconId="fr-icon-close-line"
-                    onClick={() => deleteOperation(entity.id, operation.id)}
-                    loading={deleteOperationLoading}
-                  >
-                    {t("Annuler la transaction")}
-                  </Button>
-                  <Button
-                    priority="primary"
-                    onClick={() =>
-                      validateDraftTransfer(entity.id, operation.id, {
-                        status: OperationsStatus.PENDING,
-                      })
-                    }
-                    loading={validateDraftTransferLoading}
-                  >
-                    {t("Transférer")}
-                  </Button>
-                </>
-              )}
+            {operation?.status === OperationsStatus.DRAFT && (
+              <>
+                <Button
+                  customPriority="danger"
+                  iconId="fr-icon-close-line"
+                  onClick={() => deleteOperation(entity.id, operation.id)}
+                  loading={deleteOperationLoading}
+                >
+                  {t("Annuler")}
+                </Button>
+                <Button
+                  priority="primary"
+                  onClick={() =>
+                    validateDraftTransfer(entity.id, operation.id, {
+                      status: OperationsStatus.PENDING,
+                    })
+                  }
+                  loading={validateDraftTransferLoading}
+                >
+                  {getOperationValidationButtonText(
+                    operation?.type as OperationType
+                  )}
+                </Button>
+              </>
+            )}
           </>
         }
       >
