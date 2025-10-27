@@ -8,14 +8,17 @@ import { useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
-import { useQuantityForm } from "./quantity-form.hooks"
+import {
+  useFocusOnAvoidedEmissions,
+  useQuantityForm,
+} from "./quantity-form.hooks"
 import { ExtendedUnit, Unit } from "common/types"
 
 export type QuantityFormComponentProps = {
   balance: Balance
 
   // Maximum quantity allowed
-  quantityMax?: number
+  quantityMax: number
 
   type: CreateOperationType
 
@@ -31,12 +34,19 @@ export type QuantityFormComponentProps = {
   // Lot GHG min and max bounds
   gesBoundMin?: number
   gesBoundMax?: number
+
+  // Callback function to be called when the quantity is declared
+  onQuantityDeclared?: () => void
 }
 
 const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
 export const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 
-const AvoidedEmissionsSection = () => {
+const AvoidedEmissionsSection = ({
+  inputRef,
+}: {
+  inputRef?: React.RefObject<HTMLInputElement>
+}) => {
   const { value, bind } = useFormContext<QuantityFormProps>()
   const { t } = useTranslation()
 
@@ -51,6 +61,7 @@ const AvoidedEmissionsSection = () => {
       max={formatEmissionMax(value.avoided_emissions_max)}
       {...bind("avoided_emissions")}
       required
+      inputRef={inputRef}
     />
   )
 }
@@ -64,9 +75,10 @@ const QuantitySection = ({
   gesBoundMin,
   gesBoundMax,
   converter,
+  onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit, unit } = useUnit(customUnit)
+  const { formatUnit } = useUnit(customUnit)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } =
@@ -123,6 +135,8 @@ const QuantitySection = ({
       setField("avoided_emissions_min", emissionsMin)
       setField("avoided_emissions_max", emissionsMax)
 
+      onQuantityDeclared?.()
+
       if (emissionsMin === emissionsMax) {
         setField("avoided_emissions", emissionsMin)
       }
@@ -144,10 +158,14 @@ const QuantitySection = ({
     },
   })
 
+  const quantityMaxLabel = quantityMax
+    ? `(${t("solde")}: ${formatUnit(balance.available_balance, { fractionDigits: 0 })})`
+    : undefined
+
   return (
     <>
       <NumberInput
-        label={`${getQuantityInputLabel(type)} (${unit.toLocaleUpperCase()})`}
+        label={`${getQuantityInputLabel(type)} ${quantityMaxLabel ?? ""}`}
         step={1}
         max={quantityMax}
         onKeyDown={(e) => {
@@ -231,10 +249,13 @@ const QuantitySection = ({
 }
 
 export const QuantityForm = (props: QuantityFormComponentProps) => {
+  const { avoidedEmissionsInputRef, handleQuantityDeclared } =
+    useFocusOnAvoidedEmissions()
+
   return (
     <>
-      <QuantitySection {...props} />
-      <AvoidedEmissionsSection />
+      <QuantitySection {...props} onQuantityDeclared={handleQuantityDeclared} />
+      <AvoidedEmissionsSection inputRef={avoidedEmissionsInputRef} />
     </>
   )
 }
