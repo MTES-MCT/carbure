@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
@@ -138,7 +140,8 @@ class BiomethaneContractSerializerTests(TestCase):
 
     # ========== TESTS FOR DATE VALIDATION ==========
 
-    def test_effective_date_must_be_after_signature_date(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_effective_date_must_be_after_signature_date(self, _):
         """Test that effective_date must be after signature_date."""
         data = {
             "tariff_reference": "2023",
@@ -150,7 +153,8 @@ class BiomethaneContractSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("effective_date", serializer.errors)
 
-    def test_signature_date_before_and_after_range(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_signature_date_before_and_after_range(self, _):
         """Test signature date before valid range and after valid range for all tariffs."""
 
         wrong_signature_dates = [
@@ -184,7 +188,8 @@ class BiomethaneContractSerializerTests(TestCase):
                     self.assertFalse(serializer.is_valid())
                     self.assertIn("signature_date", serializer.errors)
 
-    def test_tariff_2011_2020_signature_date_valid_range(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_tariff_2011_2020_signature_date_valid_range(self, _):
         """Test valid signature date range for tariff 2011 and 2020"""
 
         for tariff in ["2011", "2020"]:
@@ -204,7 +209,8 @@ class BiomethaneContractSerializerTests(TestCase):
             serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
             self.assertTrue(serializer.is_valid())
 
-    def test_tariff_2021_2023_signature_date_valid_range(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_tariff_2021_2023_signature_date_valid_range(self, _):
         """Test valid signature date range for tariff 2021 and 2023"""
 
         for tariff in ["2021", "2023"]:

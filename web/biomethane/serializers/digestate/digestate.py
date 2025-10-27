@@ -1,8 +1,8 @@
-from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneDigestate
 from biomethane.serializers.digestate.spreading import BiomethaneDigestateSpreadingSerializer
+from core.serializers import check_fields_required
 
 
 class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
@@ -29,18 +29,11 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
 
         validated_data = super().validate(data)
 
-        errors = {}
-
         # Use the service to get the required fields
         required_fields = BiomethaneDigestateService.get_required_fields(validated_data)
 
         # Check that all required fields are present and non-empty
-        for field_name in required_fields:
-            if not validated_data.get(field_name):
-                errors[field_name] = [_("Ce champ est obligatoire.")]
-
-        if errors:
-            raise serializers.ValidationError(errors)
+        check_fields_required(validated_data, required_fields)
 
         return validated_data
 

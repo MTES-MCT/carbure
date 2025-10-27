@@ -38,15 +38,13 @@ class BiomethaneContractService:
                 errors[field] = [_(f"Le champ {field} ne peut pas être modifié une fois le contrat signé.")]
 
     @staticmethod
-    def get_required_fields_for_tariff(tariff_reference, validated_data):
+    def get_required_fields_for_tariff(tariff_reference, required_fields):
         """
         Return required fields based on tariff reference.
 
         Returns:
             list: Required fields for the given tariff reference
         """
-        required_fields = []
-
         # Tariff rule 1
         if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
             required_fields.extend(BiomethaneContractService.TARIFF_RULE_1_FIELDS)
@@ -55,18 +53,13 @@ class BiomethaneContractService:
         elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
             required_fields.extend(BiomethaneContractService.TARIFF_RULE_2_FIELDS)
 
-        return required_fields
-
     @staticmethod
-    def validate_tariff_rule_1_specific(validated_data, errors):
+    def validate_tariff_rule_1_specific(validated_data, required_fields):
         """Validate specific rules for tariff rule 1."""
         cmax_annualized = validated_data.get("cmax_annualized")
-        cmax_annualized_value = validated_data.get("cmax_annualized_value")
 
-        if cmax_annualized and not cmax_annualized_value:
-            errors["cmax_annualized_value"] = [
-                _("Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai.")
-            ]
+        if cmax_annualized:
+            required_fields.append("cmax_annualized_value")
 
     @staticmethod
     def validate_contract_dates(signature_date, effective_date, tariff_reference, errors):
@@ -128,7 +121,7 @@ class BiomethaneContractService:
             ]
 
     @staticmethod
-    def get_required_fields_for_contract_document(validated_data):
+    def get_required_fields_for_contract_document(validated_data, required_fields):
         """
         Return all contract document fields as required if any of them is provided.
 
@@ -137,8 +130,8 @@ class BiomethaneContractService:
         """
         for field in BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS:
             if field in validated_data:
-                return BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS
-        return []
+                required_fields.extend(BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS)
+                break
 
     @staticmethod
     def validate_contract(contract, validated_data):
@@ -165,17 +158,15 @@ class BiomethaneContractService:
         BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
 
         # Get required fields for contract document
-        required_fields.extend(BiomethaneContractService.get_required_fields_for_contract_document(validated_data))
+        BiomethaneContractService.get_required_fields_for_contract_document(validated_data, required_fields)
 
         # Get required fields based on tariff reference
         if tariff_reference:
-            required_fields.extend(
-                BiomethaneContractService.get_required_fields_for_tariff(tariff_reference, validated_data)
-            )
+            BiomethaneContractService.get_required_fields_for_tariff(tariff_reference, required_fields)
 
             # Validate tariff rule 1 specific rules
             if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-                BiomethaneContractService.validate_tariff_rule_1_specific(validated_data, errors)
+                BiomethaneContractService.validate_tariff_rule_1_specific(validated_data, required_fields)
 
         # Validate contract dates
         signature_date = validated_data.get("signature_date")
