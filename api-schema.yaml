@@ -539,6 +539,7 @@ paths:
   /api/biomethane/annual-declaration/years/:
     get:
       operationId: biomethane_annual_declaration_years_retrieve
+      description: Return a sorted list of distinct years from the queryset.
       parameters:
         - in: query
           name: entity_id
@@ -560,14 +561,14 @@ paths:
                 items:
                   type: integer
               examples:
-                ExampleOfFiltersResponse.:
+                ExampleOfYearsResponse.:
                   value:
                     - 2020
                     - 2021
                     - 2022
                     - 2023
                     - 2024
-                  summary: Example of filters response.
+                  summary: Example of years response.
           description: ""
   /api/biomethane/contract/:
     get:
@@ -628,6 +629,38 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneContract"
           description: ""
+  /api/biomethane/contract/{id}/:
+    get:
+      operationId: biomethane_contract_retrieve_2
+      description: Retrieve the contract for the current entity. Returns a single
+        contract object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Biométhane - Contrat d'achat.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneContract"
+          description: Contract details for the entity
+        "404":
+          description: Contract not found for this entity.
   /api/biomethane/contract/amendments/:
     get:
       operationId: biomethane_contract_amendments_list
@@ -736,6 +769,30 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneContractAmendment"
           description: ""
+  /api/biomethane/contract/watched-fields/:
+    get:
+      operationId: biomethane_contract_watched_fields_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+          description: List of watched fields
   /api/biomethane/digestate/:
     get:
       operationId: biomethane_digestate_retrieve
@@ -1011,6 +1068,7 @@ paths:
   /api/biomethane/digestate/optional-fields/:
     get:
       operationId: biomethane_digestate_optional_fields_retrieve
+      description: Return the optional fields for the first object in the queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1251,6 +1309,7 @@ paths:
   /api/biomethane/energy/optional-fields/:
     get:
       operationId: biomethane_energy_optional_fields_retrieve
+      description: Return the optional fields for the first object in the queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1408,6 +1467,63 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneProductionUnit"
           description: Production unit created successfully
+  /api/biomethane/production-unit/{id}/:
+    get:
+      operationId: biomethane_production_unit_retrieve_2
+      description: Retrieve the production unit for the current entity. Returns a
+        single production unit object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Biométhane - Unité de
+            Production.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneProductionUnit"
+          description: Production unit details for the entity
+        "404":
+          description: Production unit not found for this entity.
+  /api/biomethane/production-unit/watched-fields/:
+    get:
+      operationId: biomethane_production_unit_watched_fields_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+          description: List of watched fields
   /api/biomethane/supply-input/:
     get:
       operationId: biomethane_supply_input_list
@@ -1845,6 +1961,7 @@ paths:
   /api/biomethane/supply-plan/years/:
     get:
       operationId: biomethane_supply_plan_years_retrieve
+      description: Return a sorted list of distinct years from the queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1866,14 +1983,14 @@ paths:
                 items:
                   type: integer
               examples:
-                ExampleOfFiltersResponse.:
+                ExampleOfYearsResponse.:
                   value:
                     - 2020
                     - 2021
                     - 2022
                     - 2023
                     - 2024
-                  summary: Example of filters response.
+                  summary: Example of years response.
           description: ""
   /api/double-counting/agreements/:
     get:

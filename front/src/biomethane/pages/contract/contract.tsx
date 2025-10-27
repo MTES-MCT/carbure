@@ -5,6 +5,8 @@ import { useGetContractInfos } from "./contract.hooks"
 import { ErrorTrackedAmendmentTypes } from "./components/tracked-amendment-types"
 import { LoaderOverlay } from "common/components/scaffold"
 import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
+import { WatchedFieldsProvider } from "biomethane/providers/watched-fields.provider"
+import { getContractWatchedFields } from "./api"
 
 export const BiomethaneContractPage = () => {
   const { result: contractInfos, loading } = useGetContractInfos()
@@ -12,7 +14,10 @@ export const BiomethaneContractPage = () => {
   if (loading) return <LoaderOverlay />
 
   return (
-    <>
+    <WatchedFieldsProvider
+      apiFunction={getContractWatchedFields}
+      queryKey="contract-watched-fields"
+    >
       <AnnualDeclarationAlert />
       {contractInfos && contractInfos.tracked_amendment_types.length > 0 && (
         <ErrorTrackedAmendmentTypes
@@ -29,6 +34,6 @@ export const BiomethaneContractPage = () => {
       )}
       <ContractFiles contract={contractInfos} />
       <ContractAmendments contract={contractInfos} />
-    </>
+    </WatchedFieldsProvider>
   )
 }
