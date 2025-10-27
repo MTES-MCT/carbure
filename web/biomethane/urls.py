@@ -38,21 +38,17 @@ router.register(
     BiomethaneSupplyInputViewSet,
     basename="biomethane-supply-input",
 )
-router.register(
-    "contract",
-    BiomethaneContractViewSet,
-    basename="biomethane-contract",
-)
-router.register(
-    "production-unit",
-    BiomethaneProductionUnitViewSet,
-    basename="biomethane-production-unit",
-)
 
 contract_viewset = BiomethaneContractViewSet.as_view(
     {
         "get": "retrieve",
         "put": "upsert",
+    }
+)
+
+contract_watched_fields_viewset = BiomethaneContractViewSet.as_view(
+    {
+        "get": "watched_fields",
     }
 )
 
@@ -67,6 +63,12 @@ production_unit_viewset = BiomethaneProductionUnitViewSet.as_view(
     {
         "get": "retrieve",
         "put": "upsert",
+    }
+)
+
+production_unit_watched_fields_viewset = BiomethaneProductionUnitViewSet.as_view(
+    {
+        "get": "watched_fields",
     }
 )
 
@@ -143,8 +145,14 @@ annual_declaration_years_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
 
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
+    path("contract/watched-fields/", contract_watched_fields_viewset, name="biomethane-contract-watched-fields"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
     path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
+    path(
+        "production-unit/watched-fields/",
+        production_unit_watched_fields_viewset,
+        name="biomethane-production-unit-watched-fields",
+    ),
     path("digestate/", digestate_viewset, name="biomethane-digestate"),
     path("digestate/optional-fields/", digestate_optional_fields_viewset, name="biomethane-digestate-optional-fields"),
     path("energy/", energy_viewset, name="biomethane-energy"),
