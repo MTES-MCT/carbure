@@ -92,3 +92,17 @@ export const deleteDigestateStorage = async (entity_id: number, id: number) => {
   })
   return response.data
 }
+
+export const getProductionUnitWatchedFields = async (entity_id: number) => {
+  const response = await api.GET(
+    "/biomethane/production-unit/watched-fields/",
+    {
+      params: {
+        query: {
+          entity_id,
+        },
+      },
+    }
+  )
+  return response.data ?? []
+}

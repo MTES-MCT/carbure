@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters.production_unit import BiomethaneProductionUnitFilter
 from biomethane.models import BiomethaneProductionUnit
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.production_unit import (
@@ -26,6 +27,7 @@ from biomethane.views.mixins import WatchedFieldsActionMixin
 class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
     queryset = BiomethaneProductionUnit.objects.all()
     serializer_class = BiomethaneProductionUnitSerializer
+    filterset_class = BiomethaneProductionUnitFilter
     pagination_class = None
 
     def get_permissions(self):

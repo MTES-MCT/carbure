@@ -39,7 +39,8 @@ export function ProductionSite({
     has_co2_valorization_process: productionUnit?.has_co2_valorization_process,
   })
 
-  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
+  const { execute: saveProductionUnit, loading } =
+    useSaveProductionUnit(productionUnit)
 
   const processTypeOptions = [
     {
