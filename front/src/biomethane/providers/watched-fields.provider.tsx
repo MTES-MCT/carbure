@@ -1,35 +1,39 @@
-import { createContext, ReactNode, useContext } from "react"
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+} from "react"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 
 export interface WatchedFieldsContextValue<T extends object> {
-  /** Liste des champs surveillés */
+  /** List of watched fields */
   watchedFields: string[]
-  /** Fonction pour vérifier si un champ est surveillé */
+  /** Function to check if a field is watched */
   hasWatchedFieldsChanged: (obj: Partial<T>, form: Partial<T>) => boolean
 }
 
-const createWatchedFieldsContext = <T extends object>() => {
-  return createContext<WatchedFieldsContextValue<T> | null>(null)
-}
+const WatchedFieldsContext =
+  createContext<WatchedFieldsContextValue<object> | null>(null)
 
 interface WatchedFieldsProviderProps {
   children: ReactNode
-  /** Fonction API qui retourne un tableau de champs */
+  /** API function that returns an array of fields */
   apiFunction: (entity_id: number) => Promise<string[]>
-  /** Clé unique pour le cache de la requête */
+  /** Unique key for query cache */
   queryKey: string
 }
 
 /**
- * Provider pour gérer les champs surveillés.
+ * Provider for managing watched fields.
  *
- * Ce provider centralise la logique de récupération et de vérification des champs surveillés :
- * - Récupère la liste des champs via une fonction API
- * - Fournit une fonction has() pour vérifier si un champ est surveillé
- * - Met en cache les résultats pour éviter les requêtes répétées
+ * This provider centralizes the logic for retrieving and checking watched fields:
+ * - Retrieves the list of fields via an API function
+ * - Provides a hasWatchedFieldsChanged() function to check if the watched fields have changed
  *
- * Les composants enfants peuvent accéder à ces données via le hook useWatchedFields().
+ * Child components can access this data via the useWatchedFields() hook.
  */
 export function WatchedFieldsProvider<T extends object>({
   children,
@@ -42,19 +46,25 @@ export function WatchedFieldsProvider<T extends object>({
     params: [entity.id],
   })
 
-  const WatchedFieldsContext = createWatchedFieldsContext<T>()
+  // const WatchedFieldsContext = createWatchedFieldsContext<T>()
 
-  const hasWatchedFieldsChanged = (contract: Partial<T>, form: Partial<T>) => {
-    const fields = Object.entries(form).filter(
-      ([key, value]) => contract[key as keyof T] !== value
-    )
-    return fields.some(([key]) => watchedFields.includes(key))
-  }
+  const hasWatchedFieldsChanged = useCallback(
+    (contract: Partial<T>, form: Partial<T>) => {
+      const fields = Object.entries(form).filter(
+        ([key, value]) => contract[key as keyof T] !== value
+      )
+      return fields.some(([key]) => watchedFields.includes(key))
+    },
+    [watchedFields]
+  )
 
-  const value: WatchedFieldsContextValue<T> = {
-    watchedFields,
-    hasWatchedFieldsChanged,
-  }
+  const value: WatchedFieldsContextValue<T> = useMemo(
+    () => ({
+      watchedFields,
+      hasWatchedFieldsChanged,
+    }),
+    [watchedFields, hasWatchedFieldsChanged]
+  )
 
   return (
     <WatchedFieldsContext.Provider value={value}>
@@ -66,12 +76,14 @@ export function WatchedFieldsProvider<T extends object>({
 export function useWatchedFields<
   T extends object,
 >(): WatchedFieldsContextValue<T> {
-  const WatchedFieldsContext = createWatchedFieldsContext<T>()
+  // const WatchedFieldsContext = createWatchedFieldsContext<T>()
 
-  const ctx = useContext(WatchedFieldsContext)
+  const ctx = useContext<WatchedFieldsContextValue<T> | null>(
+    WatchedFieldsContext
+  )
   if (!ctx) {
     throw new Error(
-      "useWatchedFields doit être utilisé dans un WatchedFieldsProvider"
+      "useWatchedFields must be used within a WatchedFieldsProvider"
     )
   }
   return ctx

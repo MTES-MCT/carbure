@@ -18,6 +18,8 @@ const meta: Meta<typeof AnnualDeclarationAlert> = {
           AnnualDeclarationStatus.IN_PROGRESS
         )}
         isInDeclarationPeriod={false}
+        isDeclarationValidated={false}
+        canEditDeclaration={false}
       >
         <Story />
       </AnnualDeclarationContextProvider>
@@ -51,6 +53,8 @@ export const DeclarationInProgress: Story = {
         )}
         selectedYear={2024}
         isInDeclarationPeriod
+        isDeclarationValidated={false}
+        canEditDeclaration={false}
       >
         <Story />
       </AnnualDeclarationContextProvider>
@@ -68,6 +72,8 @@ export const DeclarationAlreadySubmitted: Story = {
         )}
         selectedYear={2024}
         isInDeclarationPeriod
+        isDeclarationValidated={true}
+        canEditDeclaration={false}
       >
         <Story />
       </AnnualDeclarationContextProvider>
