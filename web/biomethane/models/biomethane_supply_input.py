@@ -90,13 +90,3 @@ class BiomethaneSupplyInput(models.Model):
 
     def __str__(self):
         return f"Intrant n°{self.id} - {self.input_type} ({self.supply_plan.year})"
-
-    def clean(self):
-        from django.core.exceptions import ValidationError
-
-        # Check that the dry matter ratio is provided only if the unit is "dry"
-        if self.material_unit == self.DRY and self.dry_matter_ratio_percent is None:
-            raise ValidationError({"dry_matter_ratio_percent": 'Le ratio de matière sèche est requis pour l\'unité "Sèche"'})
-
-        if self.material_unit == self.WET and self.dry_matter_ratio_percent is not None:
-            self.dry_matter_ratio_percent = None

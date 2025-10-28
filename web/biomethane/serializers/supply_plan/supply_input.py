@@ -49,10 +49,8 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
                 {"dry_matter_ratio_percent": "Le ratio de matière sèche est requis pour l'unité 'Sèche'"}
             )
 
-        if material_unit == BiomethaneSupplyInput.WET and dry_matter_ratio_percent is not None:
-            raise serializers.ValidationError(
-                {"dry_matter_ratio_percent": "Le ratio de matière sèche ne doit pas être renseigné pour l'unité 'Brute'"}
-            )
+        if material_unit == BiomethaneSupplyInput.WET:
+            validated_data["dry_matter_ratio_percent"] = None
 
         return validated_data
 
