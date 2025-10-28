@@ -194,3 +194,41 @@ class BiomethaneContractService:
         if is_red_ii is False and ((cmax and cmax <= 200) or (pap_contracted and pap_contracted <= 19.5)):
             producer.is_red_ii = is_red_ii
             producer.save(update_fields=["is_red_ii"])
+
+    @staticmethod
+    def clear_fields_based_on_tariff(contract):
+        """
+        Clear specific contract fields based on tariff reference and boolean values.
+
+        This method determines which fields should be cleared based on the tariff rules:
+        - TARIFF_RULE_1 (2011, 2020): clears pap_contracted
+        - TARIFF_RULE_2 (2021, 2023): clears cmax, cmax_annualized, cmax_annualized_value
+        - When cmax_annualized is False: clears cmax_annualized_value
+
+        Args:
+            contract: The BiomethaneContract instance to update
+
+        Returns:
+            dict: Dictionary of fields to update with their new values
+        """
+        fields_to_clear = []
+
+        # Clear fields based on tariff reference rules
+        if contract.tariff_reference in BiomethaneContract.TARIFF_RULE_1:
+            fields_to_clear.append("pap_contracted")
+        elif contract.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
+            fields_to_clear.extend(["cmax_annualized", "cmax_annualized_value", "cmax"])
+
+        # Clear cmax_annualized_value if cmax_annualized is explicitly set to False
+        # and it's not already in the list to be cleared
+        if contract.cmax_annualized is False and "cmax_annualized_value" not in fields_to_clear:
+            fields_to_clear.append("cmax_annualized_value")
+
+        update_data = {}
+        if fields_to_clear:
+            for field in fields_to_clear:
+                # Special case: cmax_annualized should be set to False, not None
+                new_value = False if field == "cmax_annualized" else None
+                update_data[field] = new_value
+
+        return update_data
