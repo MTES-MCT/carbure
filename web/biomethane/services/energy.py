@@ -6,37 +6,31 @@ from biomethane.models.biomethane_energy import BiomethaneEnergy
 
 @dataclass
 class EnergyContext:
-    """Context data extracted from an energy instance or data dictionary."""
+    """Context data extracted from an energy instance."""
 
-    instance: object  # The original instance or data dict
+    instance: object  # The energy instance
     production_unit: Optional[object] = None
     contract: Optional[object] = None
 
-    def get_value(self, key, default=None):
-        """Get value from instance (dict or object)."""
-        if isinstance(self.instance, dict):
-            return self.instance.get(key, default)
-        return getattr(self.instance, key, default)
-
     @property
     def has_malfunctions(self) -> bool:
-        return self.get_value("has_malfunctions", False)
+        return getattr(self.instance, "has_malfunctions", False)
 
     @property
     def malfunction_types(self) -> Optional[str]:
-        return self.get_value("malfunction_types")
+        return getattr(self.instance, "malfunction_types", None)
 
     @property
     def has_injection_difficulties(self) -> bool:
-        return self.get_value("has_injection_difficulties_due_to_network_saturation", False)
+        return getattr(self.instance, "has_injection_difficulties_due_to_network_saturation", False)
 
     @property
     def attest_no_fossil_for_digester_heating_and_purification(self) -> bool:
-        return self.get_value("attest_no_fossil_for_digester_heating_and_purification", False)
+        return getattr(self.instance, "attest_no_fossil_for_digester_heating_and_purification", False)
 
     @property
     def attest_no_fossil_for_installation_needs(self) -> bool:
-        return self.get_value("attest_no_fossil_for_installation_needs", False)
+        return getattr(self.instance, "attest_no_fossil_for_installation_needs", False)
 
 
 class BiomethaneEnergyService:
@@ -77,19 +71,13 @@ class BiomethaneEnergyService:
     INJECTION_DIFFICULTY_FIELDS = ["injection_impossibility_hours"]
 
     @staticmethod
-    def _extract_data(instance_or_data) -> EnergyContext:
-        """Extract data from an instance or a dictionary and return structured context."""
-
-        # Helper to get value from dict or instance
-        def get_value(key, default=None):
-            if isinstance(instance_or_data, dict):
-                return instance_or_data.get(key, default)
-            return getattr(instance_or_data, key, default)
-
+    def _extract_data(instance) -> EnergyContext:
+        """Extract data from an energy instance and return structured context."""
         # Extract producer and related objects
-        producer = get_value("producer")
+        producer = getattr(instance, "producer", None)
         production_unit = None
         contract = None
+
         if producer:
             production_unit = getattr(producer, "biomethane_production_unit", None)
             try:
@@ -99,7 +87,7 @@ class BiomethaneEnergyService:
 
         # Return structured context
         return EnergyContext(
-            instance=instance_or_data,
+            instance=instance,
             production_unit=production_unit,
             contract=contract,
         )
@@ -162,21 +150,17 @@ class BiomethaneEnergyService:
             fields_to_clear.extend(["fossil_details_for_installation_needs"])
 
     @staticmethod
-    def get_conditional_fields_rules(instance_or_data):
+    def _get_fields_to_clear(instance):
         """
-        Return conditional field rules for an instance or data dictionary.
+        Return the list of fields to clear for an energy instance.
 
         Returns:
-            dict: {
-                'required_fields': list,  # Required fields based on business rules
-                'fields_to_clear': list,  # Fields to clear/empty (also represents optional fields)
-            }
+            list: Fields to clear/empty (also represents optional fields)
         """
-        required_fields = []
         fields_to_clear = []
 
         # Extract context
-        context = BiomethaneEnergyService._extract_data(instance_or_data)
+        context = BiomethaneEnergyService._extract_data(instance)
 
         # Apply rules based on production unit
         if context.production_unit:
@@ -191,10 +175,7 @@ class BiomethaneEnergyService:
         BiomethaneEnergyService._apply_injection_difficulty_rules(context, fields_to_clear)
         BiomethaneEnergyService._apply_installation_energy_needs_rules(context, fields_to_clear)
 
-        return {
-            "required_fields": list(set(required_fields)),
-            "fields_to_clear": list(set(fields_to_clear)),
-        }
+        return list(set(fields_to_clear))
 
     @staticmethod
     def get_optional_fields(instance):
@@ -202,17 +183,7 @@ class BiomethaneEnergyService:
         Return the list of optional fields for a given instance.
         Used by the optional_fields property of the model.
         """
-        rules = BiomethaneEnergyService.get_conditional_fields_rules(instance)
-        return rules["fields_to_clear"]
-
-    @staticmethod
-    def get_required_fields(instance_or_data):
-        """
-        Return the list of required fields for an instance or data dictionary.
-        Used for validation.
-        """
-        rules = BiomethaneEnergyService.get_conditional_fields_rules(instance_or_data)
-        return rules["required_fields"]
+        return BiomethaneEnergyService._get_fields_to_clear(instance)
 
     @staticmethod
     def get_fields_to_clear(instance):
@@ -220,5 +191,4 @@ class BiomethaneEnergyService:
         Return the list of fields to clear for a given instance.
         Used by signals.
         """
-        rules = BiomethaneEnergyService.get_conditional_fields_rules(instance)
-        return rules["fields_to_clear"]
+        return BiomethaneEnergyService._get_fields_to_clear(instance)
