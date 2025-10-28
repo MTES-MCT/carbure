@@ -3,12 +3,9 @@ import { NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestateInputRequest,
-} from "../../types"
+import { BiomethaneDigestateInputRequest } from "../../types"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
@@ -24,30 +21,25 @@ type ProductionForm = DeepPartial<
   >
 >
 
+const extractValues = (digestate?: ProductionForm) => {
+  return {
+    raw_digestate_tonnage_produced: digestate?.raw_digestate_tonnage_produced,
+    raw_digestate_dry_matter_rate: digestate?.raw_digestate_dry_matter_rate,
+    solid_digestate_tonnage: digestate?.solid_digestate_tonnage,
+    liquid_digestate_quantity: digestate?.liquid_digestate_quantity,
+  }
+}
 export function Production({
-  digestate,
   productionUnit,
 }: {
-  digestate?: BiomethaneDigestate
   productionUnit: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<ProductionForm>(
-    digestate
-      ? {
-          raw_digestate_tonnage_produced:
-            digestate.raw_digestate_tonnage_produced,
-          raw_digestate_dry_matter_rate:
-            digestate.raw_digestate_dry_matter_rate,
-          solid_digestate_tonnage: digestate.solid_digestate_tonnage,
-          liquid_digestate_quantity: digestate.liquid_digestate_quantity,
-        }
-      : {}
-  )
+  const { bind, value } = useFormContext<ProductionForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveDigestate.execute(value)
+  const handleSave = async () => saveDigestate.execute(extractValues(value))
 
   return (
     <ManagedEditableCard

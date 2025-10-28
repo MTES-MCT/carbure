@@ -1,6 +1,6 @@
 import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
@@ -10,6 +10,7 @@ import {
 } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type SpreadingDistanceForm = DeepPartial<
   Pick<
@@ -39,7 +40,8 @@ export function SpreadingDistance({
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="spreading-distance"
       title={t("Distance d'épandage")}
       description={t("Données par département")}
       readOnly={!canEditDeclaration}
@@ -59,6 +61,6 @@ export function SpreadingDistance({
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

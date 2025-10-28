@@ -5,18 +5,18 @@ import {
   CheckboxGroup,
 } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import {
-  BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
   BiomethaneDigestateCompostingLocation,
 } from "../../types"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type CompostingForm = DeepPartial<
   Pick<
@@ -30,27 +30,25 @@ type CompostingForm = DeepPartial<
 > &
   Pick<BiomethaneDigestateInputRequest, "composting_locations">
 
-export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
+const extractValues = (digestate?: CompostingForm) => {
+  return {
+    external_platform_name: digestate?.external_platform_name,
+    external_platform_department: digestate?.external_platform_department,
+    external_platform_municipality: digestate?.external_platform_municipality,
+    on_site_composted_digestate_volume:
+      digestate?.on_site_composted_digestate_volume,
+    external_platform_digestate_volume:
+      digestate?.external_platform_digestate_volume,
+  }
+}
+
+export function Composting() {
   const { t } = useTranslation()
-  const { bind, value } = useForm<CompostingForm>(
-    digestate
-      ? {
-          external_platform_name: digestate.external_platform_name,
-          external_platform_department: digestate.external_platform_department,
-          external_platform_municipality:
-            digestate.external_platform_municipality,
-          on_site_composted_digestate_volume:
-            digestate.on_site_composted_digestate_volume,
-          external_platform_digestate_volume:
-            digestate.external_platform_digestate_volume,
-          composting_locations: digestate.composting_locations,
-        }
-      : {}
-  )
+  const { bind, value } = useFormContext<CompostingForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveDigestate.execute(value)
+  const handleSave = async () => saveDigestate.execute(extractValues(value))
 
   const compostingOptions = [
     {
@@ -72,7 +70,8 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
   )
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="composting"
       title={t("Lieu du compostage")}
       readOnly={!canEditDeclaration}
     >
@@ -137,6 +136,6 @@ export function Composting({ digestate }: { digestate?: BiomethaneDigestate }) {
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }
