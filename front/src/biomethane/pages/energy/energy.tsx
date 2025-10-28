@@ -49,13 +49,13 @@ export const Energy = () => {
         {energy && <MissingFields form={form} />}
         <InjectedBiomethane contract={contract} />
         <BiogasProduction productionUnit={productionUnit} />
-        <InstallationEnergyNeeds energy={energy} contract={contract} />
+        <InstallationEnergyNeeds contract={contract} />
         <EnergyEfficiency energy={energy} contract={contract} />
         {isTariffReference2011Or2020(contract?.tariff_reference) && (
           <MonthlyBiomethaneInjection energy={energy} />
         )}
-        <Acceptability energy={energy} />
-        <Malfunction energy={energy} />
+        <Acceptability />
+        <Malfunction />
       </SectionsManagerProvider>
     </FormContext.Provider>
   )

@@ -23,6 +23,13 @@ type BiogasProductionForm = DeepPartial<
   >
 >
 
+const extractValues = (energy?: BiogasProductionForm) => {
+  return {
+    produced_biogas_nm3_per_year: energy?.produced_biogas_nm3_per_year,
+    flared_biogas_nm3_per_year: energy?.flared_biogas_nm3_per_year,
+    flaring_operating_hours: energy?.flaring_operating_hours,
+  }
+}
 export function BiogasProduction({
   productionUnit,
 }: {
@@ -33,7 +40,7 @@ export function BiogasProduction({
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveEnergy.execute(value)
+  const handleSave = async () => saveEnergy.execute(extractValues(value))
 
   return (
     <ManagedEditableCard

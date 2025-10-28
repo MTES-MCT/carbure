@@ -2,12 +2,9 @@ import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestateInputRequest,
-} from "../../types"
+import { BiomethaneDigestateInputRequest } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { EditableCard } from "common/molecules/editable-card"
@@ -19,25 +16,20 @@ type SpreadingDistanceForm = DeepPartial<
   >
 >
 
-export function SpreadingDistance({
-  digestate,
-}: {
-  digestate?: BiomethaneDigestate
-}) {
+const extractValues = (digestate?: SpreadingDistanceForm) => {
+  return {
+    average_spreading_valorization_distance:
+      digestate?.average_spreading_valorization_distance,
+  }
+}
+export function SpreadingDistance() {
   const { t } = useTranslation()
-  const { bind, value } = useForm<SpreadingDistanceForm>(
-    digestate
-      ? {
-          average_spreading_valorization_distance:
-            digestate.average_spreading_valorization_distance,
-        }
-      : {}
-  )
+  const { bind, value } = useFormContext<SpreadingDistanceForm>()
 
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveDigestate.execute(value)
+  const handleSave = async () => saveDigestate.execute(extractValues(value))
 
   return (
     <ManagedEditableCard

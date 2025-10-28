@@ -22,7 +22,18 @@ type InjectedBiomethaneForm = DeepPartial<
     | "operating_hours"
   >
 >
-
+const extractValues = (energy?: InjectedBiomethaneForm) => {
+  return {
+    injected_biomethane_gwh_pcs_per_year:
+      energy?.injected_biomethane_gwh_pcs_per_year,
+    injected_biomethane_nm3_per_year: energy?.injected_biomethane_nm3_per_year,
+    injected_biomethane_ch4_rate_percent:
+      energy?.injected_biomethane_ch4_rate_percent,
+    injected_biomethane_pcs_kwh_per_nm3:
+      energy?.injected_biomethane_pcs_kwh_per_nm3,
+    operating_hours: energy?.operating_hours,
+  }
+}
 export function InjectedBiomethane({
   contract,
 }: {
@@ -33,7 +44,7 @@ export function InjectedBiomethane({
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveEnergy.execute(value)
+  const handleSave = async () => saveEnergy.execute(extractValues(value))
 
   return (
     <ManagedEditableCard
