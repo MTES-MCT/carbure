@@ -48,7 +48,7 @@ export const useSaveProductionUnit = (
         }
       }),
     {
-      invalidates: ["production-unit"],
+      invalidates: ["production-unit", "current-annual-declaration"],
       onSuccess: () => {
         notify(t("L'unité de production a bien été sauvegardée."), {
           variant: "success",

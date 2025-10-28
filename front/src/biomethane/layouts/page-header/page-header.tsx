@@ -17,8 +17,12 @@ export const BiomethanePageHeader = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const years = useYears("biomethane", getAnnualDeclarationYears)
-  const { selectedYear, currentAnnualDeclaration, isInDeclarationPeriod } =
-    useAnnualDeclaration()
+  const {
+    selectedYear,
+    currentAnnualDeclaration,
+    isInDeclarationPeriod,
+    hasAnnualDeclarationMissingObjects,
+  } = useAnnualDeclaration()
   const { openValidateDeclarationDialog, correctAnnualDeclarationMutation } =
     usePageHeaderActions()
 
@@ -53,6 +57,7 @@ export const BiomethanePageHeader = () => {
               onClick={openValidateDeclarationDialog}
               iconId="ri-file-text-line"
               asideX
+              disabled={hasAnnualDeclarationMissingObjects}
             >
               {t("Transmettre mes informations annuelles")}
             </Button>
@@ -63,6 +68,7 @@ export const BiomethanePageHeader = () => {
               iconId="ri-edit-line"
               asideX
               loading={correctAnnualDeclarationMutation.loading}
+              disabled={hasAnnualDeclarationMissingObjects}
             >
               {t("Corriger mes informations annuelles")}
             </Button>
