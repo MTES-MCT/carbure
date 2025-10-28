@@ -20,6 +20,7 @@ const meta: Meta<typeof AnnualDeclarationAlert> = {
         isInDeclarationPeriod={false}
         isDeclarationValidated={false}
         canEditDeclaration={false}
+        hasAnnualDeclarationMissingObjects={false}
       >
         <Story />
       </AnnualDeclarationContextProvider>
@@ -55,6 +56,7 @@ export const DeclarationInProgress: Story = {
         isInDeclarationPeriod
         isDeclarationValidated={false}
         canEditDeclaration={false}
+        hasAnnualDeclarationMissingObjects={false}
       >
         <Story />
       </AnnualDeclarationContextProvider>
@@ -74,6 +76,7 @@ export const DeclarationAlreadySubmitted: Story = {
         isInDeclarationPeriod
         isDeclarationValidated={true}
         canEditDeclaration={false}
+        hasAnnualDeclarationMissingObjects={false}
       >
         <Story />
       </AnnualDeclarationContextProvider>
