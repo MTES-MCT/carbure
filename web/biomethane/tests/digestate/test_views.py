@@ -7,7 +7,7 @@ from rest_framework import status
 
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.digestate.digestate import BiomethaneDigestateViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
@@ -35,7 +35,7 @@ class BiomethaneDigestateViewsTests(TestCase):
             has_digestate_phase_separation=False,
         )
 
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
         self.digestate_url = reverse("biomethane-digestate")
         self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
 

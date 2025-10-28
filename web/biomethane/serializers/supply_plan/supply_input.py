@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Pays
 from core.serializers import CountrySerializer
 
@@ -56,7 +56,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         entity = self.context.get("entity")
-        year = get_declaration_period()
+        year = BiomethaneAnnualDeclarationService.get_declaration_period()
 
         # Get or create the supply plan for the entity and year
         supply_plan, created = BiomethaneSupplyPlan.objects.get_or_create(

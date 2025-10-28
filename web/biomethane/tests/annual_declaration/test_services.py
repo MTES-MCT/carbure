@@ -4,7 +4,6 @@ from biomethane.factories import BiomethaneDigestateFactory
 from biomethane.factories.energy import BiomethaneEnergyFactory
 from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
-from biomethane.utils import get_declaration_period
 from core.models import Entity
 
 
@@ -14,7 +13,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
 
     def test_get_missing_fields_both_models_exist(self):
         """Test get_missing_fields structure when both digestate and energy exist"""
