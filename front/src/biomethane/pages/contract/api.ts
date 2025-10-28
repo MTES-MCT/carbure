@@ -68,3 +68,14 @@ export const getAmendment = async (entity_id: number, amendment_id: number) => {
 
   return response.data
 }
+
+export const getContractWatchedFields = async (entity_id: number) => {
+  const response = await api.GET("/biomethane/contract/watched-fields/", {
+    params: {
+      query: {
+        entity_id,
+      },
+    },
+  })
+  return response.data ?? []
+}

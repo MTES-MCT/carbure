@@ -6,9 +6,10 @@ import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
-import { useEnergyContext } from "../energy.hooks"
+import { useSaveEnergy } from "../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { isTariffReference2011Or2020 } from "biomethane/pages/contract"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type InjectedBiomethaneForm = DeepPartial<
   Pick<
@@ -30,7 +31,8 @@ export function InjectedBiomethane({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<InjectedBiomethaneForm>(energy ?? {})
-  const { saveEnergy, isInDeclarationPeriod } = useEnergyContext()
+  const saveEnergy = useSaveEnergy()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 
@@ -40,7 +42,7 @@ export function InjectedBiomethane({
       description={t(
         "Ces informations concernent la production finale de biométhane de votre installation"
       )}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

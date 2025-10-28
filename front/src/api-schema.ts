@@ -191,6 +191,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/annual-declaration/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieve the declaration. Returns a single declaration object. */
+        get: operations["biomethane_annual_declaration_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["biomethane_annual_declaration_partial_update"];
+        trace?: never;
+    };
+    "/api/biomethane/annual-declaration/validate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["biomethane_annual_declaration_validate_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/annual-declaration/years/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Return a sorted list of distinct years from the queryset. */
+        get: operations["biomethane_annual_declaration_years_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/contract/": {
         parameters: {
             query?: never;
@@ -202,6 +252,23 @@ export interface paths {
         get: operations["biomethane_contract_retrieve"];
         /** @description Create or update contract using upsert logic. */
         put: operations["biomethane_contract_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/contract/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieve the contract for the current entity. Returns a single contract object. */
+        get: operations["biomethane_contract_retrieve_2"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -233,6 +300,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["biomethane_contract_amendments_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/contract/watched-fields/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_contract_watched_fields_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -291,6 +374,23 @@ export interface paths {
         patch: operations["biomethane_digestate_storage_partial_update"];
         trace?: never;
     };
+    "/api/biomethane/digestate/optional-fields/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Return the optional fields for the first object in the queryset. */
+        get: operations["biomethane_digestate_optional_fields_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/digestate/spreading/": {
         parameters: {
             query?: never;
@@ -318,38 +418,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["biomethane_digestate_spreading_destroy"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/biomethane/digestate/validate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["biomethane_digestate_validate_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/biomethane/digestate/years/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["biomethane_digestate_years_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -391,30 +459,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/biomethane/energy/validate/": {
+    "/api/biomethane/energy/optional-fields/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        post: operations["biomethane_energy_validate_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/biomethane/energy/years/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["biomethane_energy_years_retrieve"];
+        /** @description Return the optional fields for the first object in the queryset. */
+        get: operations["biomethane_energy_optional_fields_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -452,6 +505,39 @@ export interface paths {
         get: operations["biomethane_production_unit_retrieve"];
         /** @description Create or update the production unit for the current entity (upsert operation). */
         put: operations["biomethane_production_unit_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/production-unit/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Retrieve the production unit for the current entity. Returns a single production unit object. */
+        get: operations["biomethane_production_unit_retrieve_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/biomethane/production-unit/watched-fields/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["biomethane_production_unit_watched_fields_retrieve"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -580,6 +666,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Return a sorted list of distinct years from the queryset. */
         get: operations["biomethane_supply_plan_years_retrieve"];
         put?: never;
         post?: never;
@@ -2911,6 +2998,24 @@ export interface components {
             name_en: string;
             code: string;
         };
+        BiomethaneAnnualDeclaration: {
+            readonly year: number;
+            status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
+            /** @description Missing fields grouped by type */
+            readonly missing_fields: {
+                /** @description List of missing fields for digestate */
+                digestate_missing_fields?: string[] | null;
+                /** @description List of missing fields for energy */
+                energy_missing_fields?: string[] | null;
+            };
+            readonly is_complete: boolean;
+        };
+        /**
+         * @description * `IN_PROGRESS` - IN_PROGRESS
+         *     * `DECLARED` - DECLARED
+         * @enum {string}
+         */
+        BiomethaneAnnualDeclarationStatusEnum: BiomethaneAnnualDeclarationStatusEnum;
         BiomethaneContract: {
             readonly id: number;
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
@@ -2995,7 +3100,6 @@ export interface components {
             composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
             readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
             year: number;
-            status: components["schemas"]["BiomethaneDigestateStatusEnum"];
             /** Format: double */
             raw_digestate_tonnage_produced?: number | null;
             /** Format: double */
@@ -3075,12 +3179,6 @@ export interface components {
             /** Format: double */
             spread_parcels_area: number;
         };
-        /**
-         * @description * `PENDING` - PENDING
-         *     * `VALIDATED` - VALIDATED
-         * @enum {string}
-         */
-        BiomethaneDigestateStatusEnum: BiomethaneDigestateStatusEnum;
         BiomethaneDigestateStorage: {
             readonly id: number;
             type: string;
@@ -3108,7 +3206,6 @@ export interface components {
         BiomethaneEnergy: {
             readonly id: number;
             year: number;
-            status?: components["schemas"]["BiomethaneDigestateStatusEnum"];
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
             /** Format: double */
@@ -4867,6 +4964,9 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
+        PatchedBiomethaneAnnualDeclarationRequest: {
+            status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
+        };
         PatchedBiomethaneDigestateStorageInputRequest: {
             type?: string;
             /** Format: double */
@@ -5944,6 +6044,123 @@ export interface operations {
             };
         };
     };
+    biomethane_annual_declaration_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Declaration details for the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneAnnualDeclaration"];
+                };
+            };
+            /** @description Declaration created for the entity */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneAnnualDeclaration"];
+                };
+            };
+        };
+    };
+    biomethane_annual_declaration_partial_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedBiomethaneAnnualDeclarationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBiomethaneAnnualDeclarationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedBiomethaneAnnualDeclarationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneAnnualDeclaration"];
+                };
+            };
+        };
+    };
+    biomethane_annual_declaration_validate_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_annual_declaration_years_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": number[];
+                };
+            };
+        };
+    };
     biomethane_contract_retrieve: {
         parameters: {
             query: {
@@ -5999,6 +6216,39 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneContract"];
                 };
+            };
+        };
+    };
+    biomethane_contract_retrieve_2: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Biométhane - Contrat d'achat. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Contract details for the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneContract"];
+                };
+            };
+            /** @description Contract not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -6081,6 +6331,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BiomethaneContractAmendment"];
+                };
+            };
+        };
+    };
+    biomethane_contract_watched_fields_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of watched fields */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
                 };
             };
         };
@@ -6320,6 +6593,35 @@ export interface operations {
             };
         };
     };
+    biomethane_digestate_optional_fields_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     biomethane_digestate_spreading_create: {
         parameters: {
             query: {
@@ -6369,49 +6671,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    biomethane_digestate_validate_create: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    biomethane_digestate_years_retrieve: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": number[];
-                };
             };
         };
     };
@@ -6548,31 +6807,10 @@ export interface operations {
             };
         };
     };
-    biomethane_energy_validate_create: {
+    biomethane_energy_optional_fields_retrieve: {
         parameters: {
             query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No response body */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    biomethane_energy_years_retrieve: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
+                /** @description Authorised entity ID. */
                 entity_id: number;
             };
             header?: never;
@@ -6586,8 +6824,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": number[];
+                    "application/json": string[];
                 };
+            };
+            /** @description Not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -6723,6 +6968,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BiomethaneProductionUnit"];
+                };
+            };
+        };
+    };
+    biomethane_production_unit_retrieve_2: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Biométhane - Unité de Production. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Production unit details for the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneProductionUnit"];
+                };
+            };
+            /** @description Production unit not found for this entity. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    biomethane_production_unit_watched_fields_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of watched fields */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
                 };
             };
         };
@@ -12500,9 +12801,9 @@ export enum AmendmentObjectEnum {
     ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE = "ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE",
     OTHER = "OTHER"
 }
-export enum BiomethaneDigestateStatusEnum {
-    PENDING = "PENDING",
-    VALIDATED = "VALIDATED"
+export enum BiomethaneAnnualDeclarationStatusEnum {
+    IN_PROGRESS = "IN_PROGRESS",
+    DECLARED = "DECLARED"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

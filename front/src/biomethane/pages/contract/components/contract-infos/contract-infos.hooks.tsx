@@ -1,12 +1,16 @@
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import {
+  BiomethaneContract,
   InstallationCategory,
   TariffReference,
 } from "biomethane/pages/contract/types"
 import { saveContract } from "biomethane/pages/contract/api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
+import { usePortal } from "common/components/portal"
+import { AnnualDeclarationResetDialog } from "biomethane/components/annual-declaration-reset-dialog"
+import { useWatchedFields } from "biomethane/providers/watched-fields.provider"
 
 export const useTariffReferenceOptions = () => {
   const { t } = useTranslation()
@@ -55,24 +59,40 @@ export const useInstallationCategoryOptions = () => {
   ]
 }
 
-/**
- * @param hasContract if true, the mutation will create a new contract, otherwise it will update the existing one
- */
-export const useMutateContractInfos = () => {
+export const useMutateContractInfos = (contract?: BiomethaneContract) => {
   const notify = useNotify()
   const notifyError = useNotifyError()
   const { t } = useTranslation()
   const entity = useEntity()
+  const portal = usePortal()
+  const { hasWatchedFieldsChanged } = useWatchedFields<BiomethaneContract>()
 
-  const mutation = useMutation((data) => saveContract(entity.id, data), {
-    invalidates: ["contract-infos", "user-settings"],
-    onSuccess: () => {
-      notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
-    },
-    onError: (e) => {
-      notifyError(e)
-    },
-  })
+  const mutation = useMutation(
+    (data) =>
+      saveContract(entity.id, data).then(() => {
+        if (contract && hasWatchedFieldsChanged(contract, data)) {
+          portal((close) => (
+            <AnnualDeclarationResetDialog
+              onClose={close}
+              onConfirm={() => Promise.resolve()}
+            />
+          ))
+        }
+      }),
+    {
+      invalidates: [
+        "contract-infos",
+        "user-settings",
+        "current-annual-declaration",
+      ],
+      onSuccess: () => {
+        notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
+      },
+      onError: (e) => {
+        notifyError(e)
+      },
+    }
+  )
 
   return mutation
 }

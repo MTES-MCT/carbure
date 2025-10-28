@@ -43,7 +43,8 @@ export function DigestateProcessing({
     digestate_sale_type: productionUnit?.digestate_sale_type,
   })
 
-  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
+  const { execute: saveProductionUnit, loading } =
+    useSaveProductionUnit(productionUnit)
 
   const digestateValorizationOptions = [
     {

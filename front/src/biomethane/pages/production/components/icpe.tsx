@@ -25,7 +25,8 @@ export function ICPE({
     icpe_regime: productionUnit?.icpe_regime,
   })
 
-  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
+  const { execute: saveProductionUnit, loading } =
+    useSaveProductionUnit(productionUnit)
 
   const icpeRegimeOptions = [
     {

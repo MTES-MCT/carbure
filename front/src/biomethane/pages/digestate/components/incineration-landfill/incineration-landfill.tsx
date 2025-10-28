@@ -9,11 +9,12 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
 import {
   BiomethaneContract,
   InstallationCategory,
 } from "biomethane/pages/contract/types"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type IncinerationLandfillForm = DeepPartial<
   Pick<
@@ -43,14 +44,15 @@ export function IncinerationLandfill({
         }
       : {}
   )
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
     <EditableCard
       title={t("Incinération / Enfouissement")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

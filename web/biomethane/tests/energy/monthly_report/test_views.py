@@ -26,7 +26,6 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
         self.energy = BiomethaneEnergy.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
-            status=BiomethaneEnergy.PENDING,
         )
 
         self.user = setup_current_user(

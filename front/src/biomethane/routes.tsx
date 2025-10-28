@@ -1,11 +1,16 @@
 import useEntity from "common/hooks/entity"
 import { lazy } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
+import { BiomethanePageHeader } from "./layouts/page-header"
+import { getDeclarationInterval } from "./utils"
+import { AnnualDeclarationProvider } from "./providers/annual-declaration"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
 const SupplyPlan = lazy(() => import("biomethane/pages/supply-plan"))
+
 const currentYear = new Date().getFullYear()
+const declarationYear = getDeclarationInterval().year
 
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer } = useEntity()
@@ -14,29 +19,27 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      <Route path="digestate/:year" element={<Digestate />} />
       <Route
-        path="digestate"
-        element={<Navigate replace to={`digestate/${currentYear}`} />}
-      />
-      <Route path="energy/:year" element={<Energy />} />
-      <Route
-        path="energy"
-        element={<Navigate replace to={`energy/${currentYear}`} />}
-      />
+        path=":year"
+        element={
+          <AnnualDeclarationProvider>
+            <BiomethanePageHeader />
+          </AnnualDeclarationProvider>
+        }
+      >
+        <Route index element={<Navigate replace to="digestate" />} />
+        <Route path="digestate" element={<Digestate />} />
+        <Route path="energy" element={<Energy />} />
+      </Route>
       <Route path="supply-plan/:year" element={<SupplyPlan />} />
       <Route
         path="supply-plan"
         element={<Navigate replace to={`supply-plan/${currentYear}`} />}
       />
-      <Route
-        path="digestate"
-        element={<Navigate replace to={`digestate/${currentYear}`} />}
-      />
 
       <Route
         path=""
-        element={<Navigate replace to={`digestate/${currentYear}`} />}
+        element={<Navigate replace to={`${declarationYear}/digestate`} />}
       />
     </Routes>
   )

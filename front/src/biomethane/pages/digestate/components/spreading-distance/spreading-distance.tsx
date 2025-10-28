@@ -8,7 +8,8 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type SpreadingDistanceForm = DeepPartial<
   Pick<
@@ -32,7 +33,8 @@ export function SpreadingDistance({
       : {}
   )
 
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
@@ -40,7 +42,7 @@ export function SpreadingDistance({
     <EditableCard
       title={t("Distance d'épandage")}
       description={t("Données par département")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>

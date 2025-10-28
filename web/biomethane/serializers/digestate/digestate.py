@@ -1,8 +1,8 @@
-from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneDigestate
 from biomethane.serializers.digestate.spreading import BiomethaneDigestateSpreadingSerializer
+from core.serializers import check_fields_required
 
 
 class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneDigestate
-        exclude = ["producer", "year", "status"]
+        exclude = ["producer", "year"]
 
 
 class BiomethaneDigestateSerializer(BaseBiomethaneDigestateSerializer):
@@ -25,34 +25,15 @@ class BiomethaneDigestateSerializer(BaseBiomethaneDigestateSerializer):
 
 class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
     def validate(self, data):
+        from biomethane.services import BiomethaneDigestateService
+
         validated_data = super().validate(data)
 
-        errors = {}
+        # Use the service to get the required fields
+        required_fields = BiomethaneDigestateService.get_required_fields(validated_data)
 
-        ## Compostage
-        if validated_data.get("composting_locations"):
-            # If composting_locations contains EXTERNAL_PLATFORM, the related fields are required
-            if BiomethaneDigestate.EXTERNAL_PLATFORM in validated_data["composting_locations"]:
-                external_platform_fields = [
-                    ("external_platform_name", "external_platform_name"),
-                    ("external_platform_digestate_volume", "external_platform_digestate_volume"),
-                    ("external_platform_department", "external_platform_department"),
-                    ("external_platform_municipality", "external_platform_municipality"),
-                ]
-
-                for field_name, error_field in external_platform_fields:
-                    if not validated_data.get(field_name):
-                        errors[error_field] = [_("Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné.")]
-
-            # If composting_locations contains ON_SITE, the related field is required
-            if BiomethaneDigestate.ON_SITE in validated_data["composting_locations"]:
-                if not validated_data.get("on_site_composted_digestate_volume"):
-                    errors["on_site_composted_digestate_volume"] = [
-                        _("Ce champ est obligatoire lorsque 'Sur site' est sélectionné.")
-                    ]
-
-        if errors:
-            raise serializers.ValidationError(errors)
+        # Check that all required fields are present and non-empty
+        check_fields_required(validated_data, required_fields)
 
         return validated_data
 
@@ -64,7 +45,3 @@ class BiomethaneDigestateInputSerializer(BaseBiomethaneDigestateSerializer):
         validated_data["year"] = year
 
         return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        validated_data["status"] = BiomethaneDigestate.PENDING
-        return super().update(instance, validated_data)

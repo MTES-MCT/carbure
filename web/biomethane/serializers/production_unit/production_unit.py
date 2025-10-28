@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneProductionUnit
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 
 
 class BaseBiomethaneProductionUnitSerializer(serializers.ModelSerializer):
@@ -52,3 +53,9 @@ class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSeria
         entity = self.context.get("entity")
         validated_data["producer"] = entity
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Check if annual declaration needs to be reset
+        if BiomethaneAnnualDeclarationService.has_watched_field_changed(instance, validated_data.keys()):
+            BiomethaneAnnualDeclarationService.reset_annual_declaration_status(instance.producer)
+        return super().update(instance, validated_data)

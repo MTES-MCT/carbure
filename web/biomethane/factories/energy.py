@@ -18,7 +18,6 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     year = faker.random_int(2000, 2024)
-    status = factory.LazyAttribute(lambda obj: random.choice([choice[0] for choice in BiomethaneEnergy.ENERGY_STATUS]))
 
     # Biométhane injecté dans le réseau
     injected_biomethane_gwh_pcs_per_year = factory.Faker("pyfloat", min_value=0, max_value=1000, right_digits=2)

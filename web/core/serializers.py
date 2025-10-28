@@ -833,7 +833,7 @@ def check_fields_required(attrs, fields, _error_message=None):
     errors = {}
 
     for field in fields:
-        if not attrs.get(field):
+        if field not in attrs or attrs[field] in [None, "", []]:
             errors[field] = error_message
     if errors:
         raise serializers.ValidationError(errors)

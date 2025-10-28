@@ -9,7 +9,8 @@ import {
   BiomethaneDigestate,
   BiomethaneDigestateInputRequest,
 } from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type SaleForm = DeepPartial<
   Pick<BiomethaneDigestateInputRequest, "acquiring_companies" | "sold_volume">
@@ -25,12 +26,13 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
         }
       : {}
   )
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
-    <EditableCard title={t("Vente")} readOnly={!isInDeclarationPeriod}>
+    <EditableCard title={t("Vente")} readOnly={!canEditDeclaration}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">

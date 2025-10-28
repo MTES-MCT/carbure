@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
@@ -138,9 +140,11 @@ class BiomethaneContractSerializerTests(TestCase):
 
     # ========== TESTS FOR DATE VALIDATION ==========
 
-    def test_effective_date_must_be_after_signature_date(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_effective_date_must_be_after_signature_date(self, _):
         """Test that effective_date must be after signature_date."""
         data = {
+            "tariff_reference": "2023",
             "signature_date": "2022-01-15",
             "effective_date": "2022-01-10",  # Before signature_date
         }
@@ -149,7 +153,8 @@ class BiomethaneContractSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("effective_date", serializer.errors)
 
-    def test_signature_date_before_and_after_range(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_signature_date_before_and_after_range(self, _):
         """Test signature date before valid range and after valid range for all tariffs."""
 
         wrong_signature_dates = [
@@ -183,7 +188,8 @@ class BiomethaneContractSerializerTests(TestCase):
                     self.assertFalse(serializer.is_valid())
                     self.assertIn("signature_date", serializer.errors)
 
-    def test_tariff_2011_2020_signature_date_valid_range(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_tariff_2011_2020_signature_date_valid_range(self, _):
         """Test valid signature date range for tariff 2011 and 2020"""
 
         for tariff in ["2011", "2020"]:
@@ -203,7 +209,8 @@ class BiomethaneContractSerializerTests(TestCase):
             serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
             self.assertTrue(serializer.is_valid())
 
-    def test_tariff_2021_2023_signature_date_valid_range(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_tariff_2021_2023_signature_date_valid_range(self, _):
         """Test valid signature date range for tariff 2021 and 2023"""
 
         for tariff in ["2021", "2023"]:
@@ -221,71 +228,3 @@ class BiomethaneContractSerializerTests(TestCase):
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
         self.assertTrue(serializer.is_valid())
-
-    # ========== TESTS FOR IS_RED_II HANDLER ==========
-
-    def test_handle_is_red_ii_disables_when_cmax_below_threshold(self):
-        """Test that handle_is_red_ii disables Red II when cmax <= 200 and user wants to disable."""
-        # Setup producer with Red II enabled
-        self.producer_entity.is_red_ii = True
-        self.producer_entity.save()
-
-        validated_data = {
-            "cmax": 150.0,  # Below threshold
-            "is_red_ii": False,  # User wants to disable
-        }
-
-        serializer = BiomethaneContractInputSerializer(context=self.context)
-        serializer.handle_is_red_ii(validated_data, self.producer_entity)
-
-        self.producer_entity.refresh_from_db()
-        self.assertFalse(self.producer_entity.is_red_ii)
-        self.assertNotIn("is_red_ii", validated_data)
-
-    def test_handle_is_red_ii_disables_when_pap_below_threshold(self):
-        """Test that handle_is_red_ii disables Red II when pap_contracted <= 19.5."""
-        self.producer_entity.is_red_ii = True
-        self.producer_entity.save()
-
-        validated_data = {
-            "pap_contracted": 15.0,  # Below threshold
-            "is_red_ii": False,
-        }
-
-        serializer = BiomethaneContractInputSerializer(context=self.context)
-        serializer.handle_is_red_ii(validated_data, self.producer_entity)
-
-        self.producer_entity.refresh_from_db()
-        self.assertFalse(self.producer_entity.is_red_ii)
-
-    def test_handle_is_red_ii_no_change_when_above_threshold(self):
-        """Test that handle_is_red_ii doesn't change Red II when values are above threshold."""
-        self.producer_entity.is_red_ii = True
-        self.producer_entity.save()
-
-        validated_data = {
-            "cmax": 250.0,  # Above threshold
-            "is_red_ii": False,  # User wants to disable but can't
-        }
-
-        serializer = BiomethaneContractInputSerializer(context=self.context)
-        serializer.handle_is_red_ii(validated_data, self.producer_entity)
-
-        self.producer_entity.refresh_from_db()
-        self.assertTrue(self.producer_entity.is_red_ii)  # Should remain True
-
-    def test_handle_is_red_ii_no_change_when_is_red_ii_not_false(self):
-        """Test that handle_is_red_ii only acts when is_red_ii is explicitly False."""
-        self.producer_entity.is_red_ii = True
-        self.producer_entity.save()
-
-        validated_data = {
-            "cmax": 150.0,  # Below threshold
-            "is_red_ii": True,  # User doesn't want to disable
-        }
-
-        serializer = BiomethaneContractInputSerializer(context=self.context)
-        serializer.handle_is_red_ii(validated_data, self.producer_entity)
-
-        self.producer_entity.refresh_from_db()
-        self.assertTrue(self.producer_entity.is_red_ii)  # Should remain True

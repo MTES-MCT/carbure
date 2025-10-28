@@ -11,8 +11,9 @@ from biomethane.serializers.digestate import (
     BiomethaneDigestateInputSerializer,
     BiomethaneDigestateSerializer,
 )
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.utils import get_declaration_period
-from biomethane.views.digestate.mixins import ValidateActionMixin, YearsActionMixin
+from biomethane.views.mixins import OptionalFieldsActionMixin
 
 
 @extend_schema(
@@ -26,7 +27,7 @@ from biomethane.views.digestate.mixins import ValidateActionMixin, YearsActionMi
         ),
     ]
 )
-class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActionMixin):
+class BiomethaneDigestateViewSet(GenericViewSet, OptionalFieldsActionMixin):
     queryset = BiomethaneDigestate.objects.all()
     serializer_class = BiomethaneDigestateSerializer
     filterset_class = BiomethaneDigestateFilter
@@ -55,7 +56,7 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         queryset = super().get_queryset()
         if self.action == "retrieve":
             return BiomethaneDigestateRetrieveFilter(self.request.GET, queryset=queryset).qs
-        elif self.action == "upsert":
+        elif self.action in ["upsert", "get_optional_fields"]:
             # force filtering by current declaration year
             queryset = queryset.filter(year=self.request.year)
             return BiomethaneDigestateFilter(self.request.GET, queryset=queryset).qs
@@ -104,6 +105,12 @@ class BiomethaneDigestateViewSet(GenericViewSet, YearsActionMixin, ValidateActio
         description="Create or update the digestate for the current entity (upsert operation).",
     )
     def upsert(self, request, *args, **kwargs):
+        if not BiomethaneAnnualDeclarationService.is_declaration_editable(request.entity, request.year):
+            return Response(
+                {"error": "Cannot modify digestate declaration when annual declaration is already declared."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         try:
             digestate = self.get_queryset().get()
             serializer = self.get_serializer(digestate, data=request.data, partial=True)

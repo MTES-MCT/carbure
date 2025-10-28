@@ -10,6 +10,10 @@ import {
 } from "./api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
+import { usePortal } from "common/components/portal"
+import { useWatchedFields } from "biomethane/providers/watched-fields.provider"
+import { BiomethaneProductionUnit } from "./types"
+import { AnnualDeclarationResetDialog } from "biomethane/components/annual-declaration-reset-dialog"
 
 export const useProductionUnit = () => {
   const entity = useEntity()
@@ -21,23 +25,40 @@ export const useProductionUnit = () => {
   return query
 }
 
-export const useSaveProductionUnit = () => {
+export const useSaveProductionUnit = (
+  productionUnit?: BiomethaneProductionUnit
+) => {
   const notify = useNotify()
   const notifyError = useNotifyError()
   const { t } = useTranslation()
   const entity = useEntity()
-
-  const mutation = useMutation((data) => saveProductionUnit(entity.id, data), {
-    invalidates: ["production-unit"],
-    onSuccess: () => {
-      notify(t("L'unité de production a bien été sauvegardée."), {
-        variant: "success",
-      })
-    },
-    onError: (e) => {
-      notifyError(e)
-    },
-  })
+  const portal = usePortal()
+  const { hasWatchedFieldsChanged } =
+    useWatchedFields<BiomethaneProductionUnit>()
+  const mutation = useMutation(
+    (data) =>
+      saveProductionUnit(entity.id, data).then(() => {
+        if (productionUnit && hasWatchedFieldsChanged(productionUnit, data)) {
+          portal((close) => (
+            <AnnualDeclarationResetDialog
+              onClose={close}
+              onConfirm={() => Promise.resolve()}
+            />
+          ))
+        }
+      }),
+    {
+      invalidates: ["production-unit", "current-annual-declaration"],
+      onSuccess: () => {
+        notify(t("L'unité de production a bien été sauvegardée."), {
+          variant: "success",
+        })
+      },
+      onError: (e) => {
+        notifyError(e)
+      },
+    }
+  )
 
   return mutation
 }

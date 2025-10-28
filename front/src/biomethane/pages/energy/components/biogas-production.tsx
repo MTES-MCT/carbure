@@ -6,11 +6,12 @@ import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
-import { useEnergyContext } from "../energy.hooks"
+import { useSaveEnergy } from "../energy.hooks"
 import {
   BiomethaneProductionUnit,
   InstalledMeters,
 } from "biomethane/pages/production/types"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type BiogasProductionForm = DeepPartial<
   Pick<
@@ -30,7 +31,8 @@ export function BiogasProduction({
 }) {
   const { t } = useTranslation()
   const { bind, value } = useForm<BiogasProductionForm>(energy ?? {})
-  const { saveEnergy, isInDeclarationPeriod } = useEnergyContext()
+  const saveEnergy = useSaveEnergy()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 
@@ -40,7 +42,7 @@ export function BiogasProduction({
       description={t(
         "Ces informations concernent la production de biogaz (avant épuration)"
       )}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
@@ -60,7 +62,7 @@ export function BiogasProduction({
               required
             />
           </Grid>
-          {!productionUnit?.installed_meters?.includes(
+          {productionUnit?.installed_meters?.includes(
             InstalledMeters.FLARING_FLOWMETER
           ) && (
             <NumberInput

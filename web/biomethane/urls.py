@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 
 from .views import (
+    BiomethaneAnnualDeclarationViewSet,
     BiomethaneContractAmendmentViewSet,
     BiomethaneContractViewSet,
     BiomethaneDigestateSpreadingViewSet,
@@ -45,6 +46,12 @@ contract_viewset = BiomethaneContractViewSet.as_view(
     }
 )
 
+contract_watched_fields_viewset = BiomethaneContractViewSet.as_view(
+    {
+        "get": "watched_fields",
+    }
+)
+
 injection_site_viewset = BiomethaneInjectionSiteViewSet.as_view(
     {
         "get": "retrieve",
@@ -59,6 +66,12 @@ production_unit_viewset = BiomethaneProductionUnitViewSet.as_view(
     }
 )
 
+production_unit_watched_fields_viewset = BiomethaneProductionUnitViewSet.as_view(
+    {
+        "get": "watched_fields",
+    }
+)
+
 digestate_viewset = BiomethaneDigestateViewSet.as_view(
     {
         "get": "retrieve",
@@ -66,17 +79,12 @@ digestate_viewset = BiomethaneDigestateViewSet.as_view(
     }
 )
 
-digestate_years_viewset = BiomethaneDigestateViewSet.as_view(
+digestate_optional_fields_viewset = BiomethaneDigestateViewSet.as_view(
     {
-        "get": "get_years",
+        "get": "get_optional_fields",
     }
 )
 
-digestate_validate_viewset = BiomethaneDigestateViewSet.as_view(
-    {
-        "post": "validate_digestate",
-    }
-)
 
 energy_viewset = BiomethaneEnergyViewSet.as_view(
     {
@@ -85,22 +93,16 @@ energy_viewset = BiomethaneEnergyViewSet.as_view(
     }
 )
 
-energy_years_viewset = BiomethaneEnergyViewSet.as_view(
-    {
-        "get": "get_years",
-    }
-)
-
-energy_validate_viewset = BiomethaneEnergyViewSet.as_view(
-    {
-        "post": "validate_energy",
-    }
-)
-
 energy_monthly_report_viewset = BiomethaneEnergyMonthlyReportViewSet.as_view(
     {
         "put": "upsert",
         "get": "list",
+    }
+)
+
+energy_optional_fields_viewset = BiomethaneEnergyViewSet.as_view(
+    {
+        "get": "get_optional_fields",
     }
 )
 
@@ -122,20 +124,46 @@ supply_plan_export_to_excel_viewset = BiomethaneSupplyInputViewSet.as_view(
     }
 )
 
+annual_declaration_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
+    {
+        "get": "retrieve",
+        "patch": "partial_update",
+    }
+)
+
+annual_declaration_validate_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
+    {
+        "post": "validate_annual_declaration",
+    }
+)
+
+annual_declaration_years_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
+    {
+        "get": "get_years",
+    }
+)
+
 urlpatterns = [
     path("contract/", contract_viewset, name="biomethane-contract"),
+    path("contract/watched-fields/", contract_watched_fields_viewset, name="biomethane-contract-watched-fields"),
     path("injection-site/", injection_site_viewset, name="biomethane-injection-site"),
     path("production-unit/", production_unit_viewset, name="biomethane-production-unit"),
+    path(
+        "production-unit/watched-fields/",
+        production_unit_watched_fields_viewset,
+        name="biomethane-production-unit-watched-fields",
+    ),
     path("digestate/", digestate_viewset, name="biomethane-digestate"),
-    path("digestate/years/", digestate_years_viewset, name="biomethane-digestate-years"),
-    path("digestate/validate/", digestate_validate_viewset, name="biomethane-digestate-validate"),
+    path("digestate/optional-fields/", digestate_optional_fields_viewset, name="biomethane-digestate-optional-fields"),
     path("energy/", energy_viewset, name="biomethane-energy"),
-    path("energy/years/", energy_years_viewset, name="biomethane-energy-years"),
-    path("energy/validate/", energy_validate_viewset, name="biomethane-energy-validate"),
     path("energy/monthly-reports/", energy_monthly_report_viewset, name="biomethane-energy-monthly-report"),
+    path("energy/optional-fields/", energy_optional_fields_viewset, name="biomethane-energy-optional-fields"),
     path("supply-plan/years/", supply_plan_years_viewset, name="biomethane-supply-plan-years"),
     path("supply-plan/import/", supply_plan_import_excel_viewset, name="biomethane-supply-plan-import-excel"),
     path("supply-plan/export/", supply_plan_export_to_excel_viewset, name="biomethane-supply-plan-export-excel"),
     path("supply-plan/download-template/", download_template, name="biomethane-supply-plan-dl-template"),
+    path("annual-declaration/", annual_declaration_viewset, name="biomethane-annual-declaration"),
+    path("annual-declaration/validate/", annual_declaration_validate_viewset, name="biomethane-annual-declaration-validate"),
+    path("annual-declaration/years/", annual_declaration_years_viewset, name="biomethane-annual-declaration-years"),
     *router.urls,
 ]

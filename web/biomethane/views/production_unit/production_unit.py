@@ -3,12 +3,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters.production_unit import BiomethaneProductionUnitFilter
 from biomethane.models import BiomethaneProductionUnit
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.production_unit import (
     BiomethaneProductionUnitSerializer,
     BiomethaneProductionUnitUpsertSerializer,
 )
+from biomethane.views.mixins import WatchedFieldsActionMixin
 
 
 @extend_schema(
@@ -22,9 +24,10 @@ from biomethane.serializers.production_unit import (
         ),
     ]
 )
-class BiomethaneProductionUnitViewSet(GenericViewSet):
+class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
     queryset = BiomethaneProductionUnit.objects.all()
     serializer_class = BiomethaneProductionUnitSerializer
+    filterset_class = BiomethaneProductionUnitFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -52,7 +55,7 @@ class BiomethaneProductionUnitViewSet(GenericViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
+            production_unit = self.filter_queryset(self.get_queryset()).get()
             data = self.get_serializer(production_unit, many=False).data
             return Response(data)
 
