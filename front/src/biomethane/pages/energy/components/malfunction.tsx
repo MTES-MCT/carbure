@@ -1,7 +1,7 @@
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { BiomethaneEnergy, MalfunctionTypes } from "../types"
-import { useForm } from "common/components/form2"
+import { MalfunctionTypes } from "../types"
+import { useFormContext } from "common/components/form2"
 import { useSaveEnergy } from "../energy.hooks"
 import { Button } from "common/components/button2"
 import { Grid } from "common/components/scaffold"
@@ -25,9 +25,22 @@ type MalfunctionForm = DeepPartial<
   >
 >
 
-export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
+const extractValues = (energy?: MalfunctionForm) => {
+  return {
+    has_malfunctions: energy?.has_malfunctions,
+    malfunction_cumulative_duration_days:
+      energy?.malfunction_cumulative_duration_days,
+    malfunction_types: energy?.malfunction_types,
+    malfunction_details: energy?.malfunction_details,
+    has_injection_difficulties_due_to_network_saturation:
+      energy?.has_injection_difficulties_due_to_network_saturation,
+    injection_impossibility_hours: energy?.injection_impossibility_hours,
+  }
+}
+
+export const Malfunction = () => {
   const { t } = useTranslation()
-  const { bind, value } = useForm<MalfunctionForm>(energy ?? {})
+  const { bind, value } = useFormContext<MalfunctionForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
 
@@ -60,7 +73,9 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveEnergy.execute(value)}>
+        <EditableCard.Form
+          onSubmit={() => saveEnergy.execute(extractValues(value))}
+        >
           <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}

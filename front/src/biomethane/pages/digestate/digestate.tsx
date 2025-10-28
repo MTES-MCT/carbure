@@ -58,7 +58,7 @@ export const Digestate = () => {
           DigestateValorizationMethods.SPREADING
         ) && (
           <>
-            <SpreadingDistance digestate={digestate?.data} />
+            <SpreadingDistance />
             <Spreading digestate={digestate?.data} />
           </>
         )}
@@ -73,7 +73,7 @@ export const Digestate = () => {
 
         {productionUnit?.spreading_management_methods?.includes(
           SpreadingManagementMethods.SALE
-        ) && <Sale digestate={digestate?.data} />}
+        ) && <Sale />}
       </SectionsManagerProvider>
     </FormContext.Provider>
   )

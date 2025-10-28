@@ -3,7 +3,7 @@ import { NumberInput, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../../types"
 import { useSaveEnergy } from "../../energy.hooks"
@@ -26,7 +26,18 @@ type EnergyEfficiencyForm = DeepPartial<
     | "fossil_fuel_consumed_kwh"
   >
 >
-
+const extractValues = (energy?: EnergyEfficiencyForm) => {
+  return {
+    purified_biogas_quantity_nm3: energy?.purified_biogas_quantity_nm3,
+    purification_electric_consumption_kwe:
+      energy?.purification_electric_consumption_kwe,
+    total_unit_electric_consumption_kwe:
+      energy?.total_unit_electric_consumption_kwe,
+    self_consumed_biogas_nm3: energy?.self_consumed_biogas_nm3,
+    butane_or_propane_addition: energy?.butane_or_propane_addition,
+    fossil_fuel_consumed_kwh: energy?.fossil_fuel_consumed_kwh,
+  }
+}
 export function EnergyEfficiency({
   energy,
   contract,
@@ -36,11 +47,11 @@ export function EnergyEfficiency({
 }) {
   const { t } = useTranslation()
 
-  const { bind, value } = useForm<EnergyEfficiencyForm>(energy ?? {})
+  const { bind, value } = useFormContext<EnergyEfficiencyForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSubmit = async () => saveEnergy.execute(value)
+  const handleSubmit = async () => saveEnergy.execute(extractValues(value))
 
   const isTariffReference2023 =
     contract?.tariff_reference === TariffReference.Value2023
