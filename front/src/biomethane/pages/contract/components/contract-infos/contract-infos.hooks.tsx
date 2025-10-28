@@ -80,7 +80,11 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
         }
       }),
     {
-      invalidates: ["contract-infos", "user-settings"],
+      invalidates: [
+        "contract-infos",
+        "user-settings",
+        "current-annual-declaration",
+      ],
       onSuccess: () => {
         notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
       },

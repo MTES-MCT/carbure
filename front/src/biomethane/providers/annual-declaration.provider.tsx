@@ -17,6 +17,9 @@ export interface AnnualDeclarationContextValue {
   isDeclarationValidated: boolean
   /** Whether the annual declaration can be edited */
   canEditDeclaration: boolean
+
+  /** Whether the annual declaration has missing objects (digestate or energy) */
+  hasAnnualDeclarationMissingObjects: boolean
 }
 
 export const AnnualDeclarationContext =
@@ -59,11 +62,17 @@ export function AnnualDeclarationProvider({
 
   // Use year from url if provided, otherwise selected year is current year
   const year = _year ? parseInt(_year) : currentYear
+
   const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
   const isDeclarationValidated =
     currentAnnualDeclaration?.status === AnnualDeclarationStatus.DECLARED
   const canEditDeclaration =
     !isDeclarationValidated && isInDeclarationPeriod && entity.canWrite()
+
+  const hasAnnualDeclarationMissingObjects =
+    currentAnnualDeclaration?.missing_fields?.digestate_missing_fields ===
+      null ||
+    currentAnnualDeclaration?.missing_fields?.energy_missing_fields === null
 
   const value: AnnualDeclarationContextValue = {
     selectedYear: year,
@@ -71,6 +80,7 @@ export function AnnualDeclarationProvider({
     isInDeclarationPeriod,
     isDeclarationValidated,
     canEditDeclaration,
+    hasAnnualDeclarationMissingObjects,
   }
 
   return (
