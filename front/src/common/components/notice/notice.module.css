@@ -34,8 +34,7 @@
 }
 
 .notice__body-content:has(.notice__title) {
-  align-items: flex-start;
-  gap: 0;
+  display: block;
 }
 
 .notice__close {

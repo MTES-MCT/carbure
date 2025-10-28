@@ -62,7 +62,7 @@ export function BiogasProduction({
               required
             />
           </Grid>
-          {!productionUnit?.installed_meters?.includes(
+          {productionUnit?.installed_meters?.includes(
             InstalledMeters.FLARING_FLOWMETER
           ) && (
             <NumberInput
