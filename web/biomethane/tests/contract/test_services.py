@@ -132,3 +132,98 @@ class BiomethaneContractServiceTests(TestCase):
             current_tracked_types,
             [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
         )
+
+    def test_validate_contract_creation_requires_tariff_reference(self):
+        """Test that validate_contract requires tariff_reference for new contracts."""
+        validated_data = {
+            "cmax": 150.0,
+            "buyer": self.producer_entity,
+        }
+
+        errors, required_fields = BiomethaneContractService.validate_contract(None, validated_data)
+
+        self.assertIn("tariff_reference", required_fields)
+        self.assertIsInstance(required_fields, list)
+
+    def test_validate_contract_with_rule_1_tariff(self):
+        """Test that validate_contract returns correct required fields for TARIFF_RULE_1."""
+        validated_data = {
+            "tariff_reference": "2011",  # TARIFF_RULE_1
+            "cmax": 150.0,
+        }
+
+        errors, required_fields = BiomethaneContractService.validate_contract(None, validated_data)
+
+        # Should require TARIFF_RULE_1 fields
+        self.assertIn("cmax", required_fields)
+        self.assertIn("cmax_annualized", required_fields)
+        self.assertIn("installation_category", required_fields)
+        self.assertIn("buyer", required_fields)
+
+        # Should not require TARIFF_RULE_2 fields
+        self.assertNotIn("pap_contracted", required_fields)
+
+    def test_validate_contract_with_rule_2_tariff(self):
+        """Test that validate_contract returns correct required fields for TARIFF_RULE_2."""
+        validated_data = {
+            "tariff_reference": "2021",  # TARIFF_RULE_2
+            "pap_contracted": 25.0,
+        }
+
+        errors, required_fields = BiomethaneContractService.validate_contract(None, validated_data)
+
+        # Should require TARIFF_RULE_2 fields
+        self.assertIn("pap_contracted", required_fields)
+        self.assertIn("installation_category", required_fields)
+        self.assertIn("buyer", required_fields)
+
+        # Should not require TARIFF_RULE_1 fields
+        self.assertNotIn("cmax", required_fields)
+        self.assertNotIn("cmax_annualized", required_fields)
+
+    def test_clear_fields_based_on_tariff_rule_1(self):
+        """Test that clear_fields_based_on_tariff clears pap_contracted for TARIFF_RULE_1."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            tariff_reference="2011",  # TARIFF_RULE_1
+            cmax=150.0,
+            pap_contracted=25.0,  # Should be cleared
+        )
+
+        update_data = BiomethaneContractService.clear_fields_based_on_tariff(contract)
+
+        self.assertIn("pap_contracted", update_data)
+        self.assertIsNone(update_data["pap_contracted"])
+
+    def test_clear_fields_based_on_tariff_rule_2(self):
+        """Test that clear_fields_based_on_tariff clears cmax fields for TARIFF_RULE_2."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            tariff_reference="2021",  # TARIFF_RULE_2
+            pap_contracted=25.0,
+            cmax=150.0,  # Should be cleared
+            cmax_annualized=True,  # Should be cleared
+        )
+
+        update_data = BiomethaneContractService.clear_fields_based_on_tariff(contract)
+
+        self.assertIn("cmax", update_data)
+        self.assertIn("cmax_annualized", update_data)
+        self.assertIn("cmax_annualized_value", update_data)
+        self.assertIsNone(update_data["cmax"])
+        self.assertFalse(update_data["cmax_annualized"])
+
+    def test_clear_fields_based_on_tariff_clears_annualized_value_when_false(self):
+        """Test that clear_fields_based_on_tariff clears cmax_annualized_value when cmax_annualized is False."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            tariff_reference="2011",  # TARIFF_RULE_1
+            cmax=150.0,
+            cmax_annualized=False,
+            cmax_annualized_value=100.0,  # Should be cleared
+        )
+
+        update_data = BiomethaneContractService.clear_fields_based_on_tariff(contract)
+
+        self.assertIn("cmax_annualized_value", update_data)
+        self.assertIsNone(update_data["cmax_annualized_value"])
