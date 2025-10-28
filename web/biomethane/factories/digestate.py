@@ -4,7 +4,7 @@ import factory
 from faker import Faker
 
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 from entity.factories.entity import EntityFactory
 
@@ -16,7 +16,7 @@ class BiomethaneDigestateFactory(factory.django.DjangoModelFactory):
         model = BiomethaneDigestate
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
-    year = factory.LazyFunction(get_declaration_period)
+    year = factory.LazyFunction(BiomethaneAnnualDeclarationService.get_declaration_period)
 
     # Production de digestat
     raw_digestate_tonnage_produced = factory.Faker("random_number", digits=4)

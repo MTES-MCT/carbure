@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.annual_declaration.annual_declaration import BiomethaneAnnualDeclarationViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
@@ -27,7 +27,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
             [(self.producer_entity, "RW")],
         )
 
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
         self.annual_declaration_url = reverse("biomethane-annual-declaration")
         self.base_params = {"entity_id": self.producer_entity.id}
 

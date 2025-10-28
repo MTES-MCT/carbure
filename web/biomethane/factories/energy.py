@@ -5,7 +5,7 @@ from faker import Faker
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.models.biomethane_energy_monthly_report import BiomethaneEnergyMonthlyReport
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 from entity.factories.entity import EntityFactory
 
@@ -107,7 +107,7 @@ def create_monthly_reports_for_energy(energy):
 def create_biomethane_energy(producer=None, **kwargs):
     if producer is None:
         producer = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER)
-    year = get_declaration_period()
+    year = BiomethaneAnnualDeclarationService.get_declaration_period()
     previous_year = year - 1
 
     # Create energy declaration for the current year and the previous year

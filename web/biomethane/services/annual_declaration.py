@@ -1,3 +1,5 @@
+from datetime import date
+
 from biomethane.models import (
     BiomethaneContract,
     BiomethaneDigestate,
@@ -5,10 +7,30 @@ from biomethane.models import (
     BiomethaneProductionUnit,
 )
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
-from biomethane.utils import get_declaration_period
 
 
 class BiomethaneAnnualDeclarationService:
+    @staticmethod
+    def get_declaration_period():
+        """
+        Determines the current declaration interval based on the current date.
+
+        The declaration period extends from April 1st to March 31st of the following year.
+        The year to declare depends on the current month:
+        - If the current month is January-March: declare for the previous year
+        - If the current month is April-December: declare for the current year
+
+        Returns:
+            int: The year corresponding to the current declaration period.
+        """
+        current_date = date.today()
+        current_year = current_date.year
+        current_month = current_date.month
+
+        declaration_year = current_year - 1 if current_month < 4 else current_year
+
+        return declaration_year
+
     @staticmethod
     def get_missing_fields(declaration):
         """
@@ -179,7 +201,9 @@ class BiomethaneAnnualDeclarationService:
 
         """
         try:
-            declaration = BiomethaneAnnualDeclaration.objects.get(producer=producer, year=get_declaration_period())
+            declaration = BiomethaneAnnualDeclaration.objects.get(
+                producer=producer, year=BiomethaneAnnualDeclarationService.get_declaration_period()
+            )
             if declaration.status != BiomethaneAnnualDeclaration.IN_PROGRESS:
                 declaration.status = BiomethaneAnnualDeclaration.IN_PROGRESS
                 declaration.save(update_fields=["status"])

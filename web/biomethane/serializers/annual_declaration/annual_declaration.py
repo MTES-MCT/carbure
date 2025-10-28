@@ -3,7 +3,6 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.services import BiomethaneAnnualDeclarationService
-from biomethane.utils import get_declaration_period
 
 
 class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
@@ -49,7 +48,7 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["producer"] = self.context["entity"]
-        validated_data["year"] = get_declaration_period()
+        validated_data["year"] = BiomethaneAnnualDeclarationService.get_declaration_period()
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
