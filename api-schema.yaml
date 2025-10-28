@@ -13233,7 +13233,7 @@ components:
           maxLength: 64
         producer:
           allOf:
-            - $ref: "#/components/schemas/EntitySummary"
+            - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
         production_site:
           $ref: "#/components/schemas/ProductionSiteResource"

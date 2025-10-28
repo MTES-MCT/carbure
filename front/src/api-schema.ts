@@ -3885,7 +3885,7 @@ export interface components {
         DoubleCountingRegistrationResource: {
             readonly id: number;
             certificate_id: string;
-            readonly producer: components["schemas"]["EntitySummary"];
+            readonly producer: components["schemas"]["EntityPreview"];
             production_site: components["schemas"]["ProductionSiteResource"];
         };
         DoubleCountingSourcing: {

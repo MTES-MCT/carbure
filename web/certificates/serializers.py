@@ -1,15 +1,9 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from core.serializers import BiofuelSerializer, EntitySummarySerializer, FeedStockSerializer
+from core.serializers import BiofuelSerializer, EntityPreviewSerializer, EntitySummarySerializer, FeedStockSerializer
 from doublecount.models import DoubleCountingProduction
-from doublecount.serializers import (
-    BiofuelSerializer,
-    CountrySerializer,
-    DoubleCountingApplicationSerializer,
-    EntitySummarySerializer,
-    FeedStockSerializer,
-)
+from doublecount.serializers import CountrySerializer, DoubleCountingApplicationSerializer
 
 from .models import DoubleCountingRegistration
 
@@ -155,6 +149,6 @@ class DoubleCountingRegistrationResourceSerializer(serializers.ModelSerializer):
             "production_site",
         ]
 
-    @extend_schema_field(EntitySummarySerializer())
+    @extend_schema_field(EntityPreviewSerializer())
     def get_producer(self, obj):
-        return EntitySummarySerializer(obj.production_site.producer).data if obj.production_site else None
+        return EntityPreviewSerializer(obj.production_site.producer).data if obj.production_site else None
