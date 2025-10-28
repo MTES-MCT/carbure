@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from biomethane.models import BiomethaneAnnualDeclaration
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -37,7 +37,7 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         """Test successful validation via API endpoint."""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=get_declaration_period(),
+            year=BiomethaneAnnualDeclarationService.get_declaration_period(),
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
@@ -59,7 +59,7 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         """Test validation when declaration is incomplete."""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=get_declaration_period(),
+            year=BiomethaneAnnualDeclarationService.get_declaration_period(),
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 

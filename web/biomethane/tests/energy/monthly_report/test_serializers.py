@@ -3,7 +3,7 @@ from django.test.testcases import TestCase
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.models.biomethane_energy_monthly_report import BiomethaneEnergyMonthlyReport
 from biomethane.serializers.energy.monthly_report import BiomethaneEnergyMonthlyReportInputSerializer
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data
 
@@ -14,7 +14,7 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
         self.energy = BiomethaneEnergy.objects.create(
             producer=self.producer_entity,
             year=self.current_year,

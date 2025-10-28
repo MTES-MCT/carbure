@@ -3,6 +3,7 @@ from datetime import date
 from django.utils.translation import gettext as _
 
 from biomethane.models import BiomethaneContract
+from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 
 
 class BiomethaneContractService:
@@ -22,10 +23,10 @@ class BiomethaneContractService:
     ]
 
     @staticmethod
-    def validate_tariff_reference(validated_data, errors):
+    def validate_tariff_reference(validated_data, required_fields):
         """Validate tariff reference is provided for contract creation."""
         if "tariff_reference" not in validated_data:
-            errors["tariff_reference"] = [_("Ce champ est obligatoire pour la création d'un contrat.")]
+            required_fields.append("tariff_reference")
 
     @staticmethod
     def validate_contract_document_fields(contract, validated_data, errors):
@@ -152,7 +153,7 @@ class BiomethaneContractService:
 
         # Validate tariff reference for contract creation
         if not contract:
-            BiomethaneContractService.validate_tariff_reference(validated_data, errors)
+            BiomethaneContractService.validate_tariff_reference(validated_data, required_fields)
 
         # Validate contract document fields
         BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
@@ -194,3 +195,78 @@ class BiomethaneContractService:
         if is_red_ii is False and ((cmax and cmax <= 200) or (pap_contracted and pap_contracted <= 19.5)):
             producer.is_red_ii = is_red_ii
             producer.save(update_fields=["is_red_ii"])
+
+    @staticmethod
+    def clear_fields_based_on_tariff(contract):
+        """
+        Clear specific contract fields based on tariff reference and boolean values.
+
+        This method determines which fields should be cleared based on the tariff rules:
+        - TARIFF_RULE_1 (2011, 2020): clears pap_contracted
+        - TARIFF_RULE_2 (2021, 2023): clears cmax, cmax_annualized, cmax_annualized_value
+        - When cmax_annualized is False: clears cmax_annualized_value
+
+        Args:
+            contract: The BiomethaneContract instance to update
+
+        Returns:
+            dict: Dictionary of fields to update with their new values
+        """
+        fields_to_clear = []
+
+        # Clear fields based on tariff reference rules
+        if contract.tariff_reference in BiomethaneContract.TARIFF_RULE_1:
+            fields_to_clear.append("pap_contracted")
+        elif contract.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
+            fields_to_clear.extend(["cmax_annualized", "cmax_annualized_value", "cmax"])
+
+        # Clear cmax_annualized_value if cmax_annualized is explicitly set to False
+        # and it's not already in the list to be cleared
+        if contract.cmax_annualized is False and "cmax_annualized_value" not in fields_to_clear:
+            fields_to_clear.append("cmax_annualized_value")
+
+        update_data = {}
+        if fields_to_clear:
+            for field in fields_to_clear:
+                # Special case: cmax_annualized should be set to False, not None
+                new_value = False if field == "cmax_annualized" else None
+                update_data[field] = new_value
+
+        return update_data
+
+    @staticmethod
+    def get_tracked_amendment_types(contract, validated_data):
+        """
+        Determine which amendment types should be tracked based on contract changes.
+
+        This method compares the current contract values with the validated data
+        to identify which types of amendments need to be tracked for regulatory purposes.
+
+        Args:
+            contract: The BiomethaneContract instance being updated
+            validated_data: The new validated data to be applied
+
+        Returns:
+            list: Sorted list of amendment types (from BiomethaneContractAmendment) to track
+        """
+        current_tracked_types = set(contract.tracked_amendment_types or [])
+        validated_buyer = validated_data.get("buyer", None)
+
+        # Track CMAX/PAP updates
+        if contract.cmax != validated_data.get("cmax", None) or contract.pap_contracted != validated_data.get(
+            "pap_contracted", None
+        ):
+            current_tracked_types.add(BiomethaneContractAmendment.CMAX_PAP_UPDATE)
+
+        # Track CMAX annualization changes
+        if contract.cmax_annualized != validated_data.get("cmax_annualized", False):
+            current_tracked_types.add(BiomethaneContractAmendment.CMAX_ANNUALIZATION)
+
+        # Track buyer changes
+        if validated_buyer is not None and contract.buyer != validated_buyer:
+            current_tracked_types.add(BiomethaneContractAmendment.PRODUCER_BUYER_INFO_CHANGE)
+
+        result = list(current_tracked_types)
+        result.sort()
+
+        return result

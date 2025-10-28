@@ -1,10 +1,10 @@
 from django.test import TestCase
 
-from biomethane.factories import BiomethaneDigestateFactory
+from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
+from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.energy import BiomethaneEnergyFactory
 from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
-from biomethane.utils import get_declaration_period
 from core.models import Entity
 
 
@@ -14,7 +14,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
 
     def test_get_missing_fields_both_models_exist(self):
         """Test get_missing_fields structure when both digestate and energy exist"""
@@ -148,3 +148,72 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         # Assert it's editable (can create new)
         self.assertTrue(is_editable)
+
+    def test_get_watched_fields_structure(self):
+        """Test get_watched_fields returns correct structure"""
+        watched_fields = BiomethaneAnnualDeclarationService.get_watched_fields()
+
+        self.assertIsInstance(watched_fields, dict)
+        self.assertIn("production_unit", watched_fields)
+        self.assertIn("contract", watched_fields)
+        self.assertIsInstance(watched_fields["production_unit"], list)
+        self.assertIsInstance(watched_fields["contract"], list)
+
+        # Verify some known watched fields
+        self.assertIn("installed_meters", watched_fields["production_unit"])
+        self.assertIn("tariff_reference", watched_fields["contract"])
+
+    def test_has_watched_field_changed_production_unit(self):
+        """Test has_watched_field_changed detects production unit field changes"""
+        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+
+        # Test with watched field
+        changed_fields = ["installed_meters", "name"]
+        result = BiomethaneAnnualDeclarationService.has_watched_field_changed(production_unit, changed_fields)
+        self.assertTrue(result)
+
+        # Test with non-watched field only
+        changed_fields = ["name", "description"]
+        result = BiomethaneAnnualDeclarationService.has_watched_field_changed(production_unit, changed_fields)
+        self.assertFalse(result)
+
+    def test_has_watched_field_changed_contract(self):
+        """Test has_watched_field_changed detects contract field changes"""
+        contract = BiomethaneContractFactory.create(producer=self.producer_entity)
+
+        # Test with watched field
+        changed_fields = ["tariff_reference", "status"]
+        result = BiomethaneAnnualDeclarationService.has_watched_field_changed(contract, changed_fields)
+        self.assertTrue(result)
+
+        # Test with non-watched field only
+        changed_fields = ["status", "notes"]
+        result = BiomethaneAnnualDeclarationService.has_watched_field_changed(contract, changed_fields)
+        self.assertFalse(result)
+
+    def test_reset_annual_declaration_status(self):
+        """Test reset_annual_declaration_status updates status to IN_PROGRESS"""
+        # Create declaration with DECLARED status
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.DECLARED,
+        )
+
+        # Reset status
+        BiomethaneAnnualDeclarationService.reset_annual_declaration_status(self.producer_entity)
+
+        # Verify status was reset
+        declaration.refresh_from_db()
+        self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
+
+    def test_reset_annual_declaration_status_no_declaration(self):
+        """Test reset_annual_declaration_status handles missing declaration gracefully"""
+        # Verify no declaration exists initially
+        self.assertEqual(BiomethaneAnnualDeclaration.objects.filter(producer=self.producer_entity).count(), 0)
+
+        # Should not raise exception when declaration doesn't exist
+        BiomethaneAnnualDeclarationService.reset_annual_declaration_status(self.producer_entity)
+
+        # Verify no declaration was created
+        self.assertEqual(BiomethaneAnnualDeclaration.objects.filter(producer=self.producer_entity).count(), 0)

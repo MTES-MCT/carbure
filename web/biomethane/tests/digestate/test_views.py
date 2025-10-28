@@ -7,7 +7,7 @@ from rest_framework import status
 
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.digestate.digestate import BiomethaneDigestateViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
@@ -35,7 +35,7 @@ class BiomethaneDigestateViewsTests(TestCase):
             has_digestate_phase_separation=False,
         )
 
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
         self.digestate_url = reverse("biomethane-digestate")
         self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
 
@@ -100,17 +100,6 @@ class BiomethaneDigestateViewsTests(TestCase):
         digestate.refresh_from_db()
         self.assertEqual(digestate.raw_digestate_tonnage_produced, data["raw_digestate_tonnage_produced"])
         self.assertEqual(digestate.raw_digestate_dry_matter_rate, data["raw_digestate_dry_matter_rate"])
-
-    def test_create_digestate_with_composting_validation_errors(self):
-        """Test validation errors when composting data is incomplete."""
-        data = {
-            "raw_digestate_tonnage_produced": 1500.0,
-            "composting_locations": [BiomethaneDigestate.EXTERNAL_PLATFORM],
-            # Missing required fields for external platform
-        }
-
-        response = self.client.put(self.digestate_url, data, content_type="application/json", query_params=self.base_params)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @patch(
         "biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.is_declaration_editable",

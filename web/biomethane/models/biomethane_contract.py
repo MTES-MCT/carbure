@@ -105,24 +105,9 @@ def clear_contract_fields_on_save(sender, instance, **kwargs):
     This signal is triggered when a BiomethaneContract is saved and clears fields
     that should be reset based on the tariff configuration.
     """
-    fields_to_clear = []
+    from biomethane.services.contract import BiomethaneContractService
 
-    # Clear fields based on tariff reference rules
-    if instance.tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-        fields_to_clear.append("pap_contracted")
-    elif instance.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-        fields_to_clear.extend(["cmax_annualized", "cmax_annualized_value", "cmax"])
+    update_data = BiomethaneContractService.clear_fields_based_on_tariff(instance)
 
-    # Clear cmax_annualized_value if cmax_annualized is explicitly set to False
-    # and it's not already in the list to be cleared
-    if instance.cmax_annualized is False and "cmax_annualized_value" not in fields_to_clear:
-        fields_to_clear.append("cmax_annualized_value")
-
-    if fields_to_clear:
-        update_data = {}
-        for field in fields_to_clear:
-            # Special case: cmax_annualized should be set to False, not None
-            new_value = False if field == "cmax_annualized" else None
-            update_data[field] = new_value
-
+    if update_data:
         BiomethaneContract.objects.filter(pk=instance.pk).update(**update_data)

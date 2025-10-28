@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Pays
 from core.serializers import CountrySerializer
 
@@ -49,16 +49,14 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
                 {"dry_matter_ratio_percent": "Le ratio de matière sèche est requis pour l'unité 'Sèche'"}
             )
 
-        if material_unit == BiomethaneSupplyInput.WET and dry_matter_ratio_percent is not None:
-            raise serializers.ValidationError(
-                {"dry_matter_ratio_percent": "Le ratio de matière sèche ne doit pas être renseigné pour l'unité 'Brute'"}
-            )
+        if material_unit == BiomethaneSupplyInput.WET:
+            validated_data["dry_matter_ratio_percent"] = None
 
         return validated_data
 
     def create(self, validated_data):
         entity = self.context.get("entity")
-        year = get_declaration_period()
+        year = BiomethaneAnnualDeclarationService.get_declaration_period()
 
         # Get or create the supply plan for the entity and year
         supply_plan, created = BiomethaneSupplyPlan.objects.get_or_create(
