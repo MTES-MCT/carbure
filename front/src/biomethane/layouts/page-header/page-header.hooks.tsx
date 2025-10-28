@@ -3,7 +3,7 @@ import { usePortal } from "common/components/portal"
 import { Confirm } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import {
   correctAnnualDeclaration,
   validateAnnualDeclaration,

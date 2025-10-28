@@ -1,4 +1,4 @@
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationStatus } from "biomethane/types"
 import { Notice } from "common/components/notice"
 import { useTranslation } from "react-i18next"

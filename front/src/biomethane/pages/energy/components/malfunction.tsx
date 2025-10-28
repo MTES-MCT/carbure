@@ -10,7 +10,7 @@ import { getYesNoOptions } from "common/utils/normalizers"
 import { useMemo } from "react"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergyInputRequest } from "../types"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type MalfunctionForm = DeepPartial<
   Pick<

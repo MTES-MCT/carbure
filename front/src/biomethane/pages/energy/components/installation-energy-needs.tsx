@@ -10,7 +10,7 @@ import {
   BiomethaneContract,
   TariffReference,
 } from "biomethane/pages/contract/types"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type InstallationEnergyNeedsForm = DeepPartial<
   Pick<

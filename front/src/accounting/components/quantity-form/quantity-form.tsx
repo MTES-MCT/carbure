@@ -216,32 +216,34 @@ const QuantitySection = ({
       value.avoided_emissions_min > 0 &&
       value.avoided_emissions_max > 0 ? (
         <Notice noColor variant="info">
-          {value.avoided_emissions_min === value.avoided_emissions_max ? (
-            <Trans
-              components={{ strong: <strong /> }}
-              t={t}
-              values={{
-                quantity: formatUnit(value.quantity!, {
-                  fractionDigits: 10,
-                }),
-                value: value.avoided_emissions_min,
-              }}
-              defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
-            />
-          ) : (
-            <Trans
-              components={{ strong: <strong /> }}
-              t={t}
-              values={{
-                quantity: formatUnit(value.quantity!, {
-                  fractionDigits: 10,
-                }),
-                min: value.avoided_emissions_min,
-                max: value.avoided_emissions_max,
-              }}
-              defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
-            />
-          )}
+          <div>
+            {value.avoided_emissions_min === value.avoided_emissions_max ? (
+              <Trans
+                components={{ strong: <strong /> }}
+                t={t}
+                values={{
+                  quantity: formatUnit(value.quantity!, {
+                    fractionDigits: 10,
+                  }),
+                  value: value.avoided_emissions_min,
+                }}
+                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
+              />
+            ) : (
+              <Trans
+                components={{ strong: <strong /> }}
+                t={t}
+                values={{
+                  quantity: formatUnit(value.quantity!, {
+                    fractionDigits: 10,
+                  }),
+                  min: value.avoided_emissions_min,
+                  max: value.avoided_emissions_max,
+                }}
+                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
+              />
+            )}
+          </div>
         </Notice>
       ) : null}
     </>

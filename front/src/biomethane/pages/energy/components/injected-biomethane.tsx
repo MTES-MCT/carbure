@@ -9,7 +9,7 @@ import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
 import { useSaveEnergy } from "../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { isTariffReference2011Or2020 } from "biomethane/pages/contract"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type InjectedBiomethaneForm = DeepPartial<
   Pick<
