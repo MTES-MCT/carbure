@@ -9,7 +9,6 @@ import { BiomethaneEnergyInputRequest } from "../types"
 import { useSaveEnergy } from "../energy.hooks"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type AcceptabilityForm = DeepPartial<
   Pick<
@@ -42,7 +41,7 @@ export function Acceptability() {
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}
@@ -74,7 +73,7 @@ export function Acceptability() {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

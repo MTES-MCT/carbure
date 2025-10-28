@@ -10,7 +10,6 @@ import { useSaveEnergy } from "../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { isTariffReference2011Or2020 } from "biomethane/pages/contract"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type InjectedBiomethaneForm = DeepPartial<
   Pick<
@@ -56,7 +55,7 @@ export function InjectedBiomethane({
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <NumberInput
             readOnly={!isEditing}
             label={t("Quantité de biométhane injecté (GWhPCS/an)")}
@@ -114,7 +113,7 @@ export function InjectedBiomethane({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

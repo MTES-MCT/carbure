@@ -7,7 +7,6 @@ import { DeepPartial } from "common/types"
 import { BiomethaneDigestateInputRequest } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type SpreadingDistanceForm = DeepPartial<
   Pick<
@@ -39,7 +38,7 @@ export function SpreadingDistance() {
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <NumberInput
             readOnly={!isEditing}
             label={t("Distance moyenne de valorisation d'épandage (km)")}
@@ -51,7 +50,7 @@ export function SpreadingDistance() {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

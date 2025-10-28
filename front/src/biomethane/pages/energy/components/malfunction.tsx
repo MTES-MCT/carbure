@@ -11,7 +11,6 @@ import { useMemo } from "react"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergyInputRequest } from "../types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type MalfunctionForm = DeepPartial<
   Pick<
@@ -73,7 +72,7 @@ export const Malfunction = () => {
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form
+        <ManagedEditableCard.Form
           onSubmit={() => saveEnergy.execute(extractValues(value))}
         >
           <Grid cols={2} gap="lg">
@@ -142,7 +141,7 @@ export const Malfunction = () => {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

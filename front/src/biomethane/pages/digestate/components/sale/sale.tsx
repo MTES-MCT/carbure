@@ -8,7 +8,6 @@ import { DeepPartial } from "common/types"
 import { BiomethaneDigestateInputRequest } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type SaleForm = DeepPartial<
   Pick<BiomethaneDigestateInputRequest, "acquiring_companies" | "sold_volume">
@@ -36,7 +35,7 @@ export function Sale() {
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             <TextInput
               readOnly={!isEditing}
@@ -63,7 +62,7 @@ export function Sale() {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )
