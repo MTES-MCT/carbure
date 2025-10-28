@@ -5,7 +5,6 @@ from biomethane.models.biomethane_contract_amendment import BiomethaneContractAm
 from biomethane.serializers.contract.contract_amendment import BiomethaneContractAmendmentSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.services.contract import BiomethaneContractService
-from biomethane.utils.contract import get_tracked_amendment_types
 from core.serializers import check_fields_required
 
 
@@ -56,7 +55,7 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         BiomethaneContractService.handle_is_red_ii(validated_data, instance.producer)
 
-        tracked_types = get_tracked_amendment_types(instance, validated_data)
+        tracked_types = BiomethaneContractService.get_tracked_amendment_types(instance, validated_data)
         validated_data["tracked_amendment_types"] = tracked_types
 
         # Check if annual declaration needs to be reset

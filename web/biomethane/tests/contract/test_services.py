@@ -1,5 +1,7 @@
 from django.test import TestCase
 
+from biomethane.models.biomethane_contract import BiomethaneContract
+from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.services.contract import BiomethaneContractService
 from core.models import Entity
 
@@ -72,3 +74,61 @@ class BiomethaneContractServiceTests(TestCase):
 
         self.producer_entity.refresh_from_db()
         self.assertTrue(self.producer_entity.is_red_ii)  # Should remain True
+
+    def test_get_tracked_amendment_types_appends_multiple_types(self):
+        """Test that tracked_amendment_types is updated with existing types and new values, sorted alphabetically."""
+        buyer_entity = Entity.objects.create(
+            name="Buyer",
+            entity_type=Entity.OPERATOR,
+        )
+        new_buyer = Entity.objects.create(
+            name="New Buyer",
+            entity_type=Entity.OPERATOR,
+        )
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            buyer=buyer_entity,
+            cmax=100.0,
+            tracked_amendment_types=[BiomethaneContractAmendment.INPUT_BONUS_UPDATE],
+        )
+
+        current_tracked_types = BiomethaneContractService.get_tracked_amendment_types(
+            contract, {"cmax": 150.0, "cmax_annualized": True, "buyer": new_buyer}
+        )
+
+        self.assertEqual(
+            current_tracked_types,
+            [
+                BiomethaneContractAmendment.CMAX_ANNUALIZATION,
+                BiomethaneContractAmendment.CMAX_PAP_UPDATE,
+                BiomethaneContractAmendment.INPUT_BONUS_UPDATE,
+                BiomethaneContractAmendment.PRODUCER_BUYER_INFO_CHANGE,
+            ],
+        )
+
+    def test_get_tracked_amendment_types_add_value_to_none_list(self):
+        """Test that tracked_amendment_types is updated with CMAX_PAP_UPDATE."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+        )
+
+        current_tracked_types = BiomethaneContractService.get_tracked_amendment_types(contract, {"cmax": 150.0})
+
+        self.assertEqual(
+            current_tracked_types,
+            [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
+        )
+
+    def test_get_tracked_amendment_types_returns_same_list_if_no_change(self):
+        """Test that tracked_amendment_types is returned unchanged if same tracked_amendment_types are provided."""
+        contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            tracked_amendment_types=[BiomethaneContractAmendment.CMAX_PAP_UPDATE],
+        )
+
+        current_tracked_types = BiomethaneContractService.get_tracked_amendment_types(contract, {"cmax": 150.0})
+
+        self.assertEqual(
+            current_tracked_types,
+            [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
+        )
