@@ -23,10 +23,10 @@ class BiomethaneContractService:
     ]
 
     @staticmethod
-    def validate_tariff_reference(validated_data, errors):
+    def validate_tariff_reference(validated_data, required_fields):
         """Validate tariff reference is provided for contract creation."""
         if "tariff_reference" not in validated_data:
-            errors["tariff_reference"] = [_("Ce champ est obligatoire pour la création d'un contrat.")]
+            required_fields.append("tariff_reference")
 
     @staticmethod
     def validate_contract_document_fields(contract, validated_data, errors):
@@ -153,7 +153,7 @@ class BiomethaneContractService:
 
         # Validate tariff reference for contract creation
         if not contract:
-            BiomethaneContractService.validate_tariff_reference(validated_data, errors)
+            BiomethaneContractService.validate_tariff_reference(validated_data, required_fields)
 
         # Validate contract document fields
         BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
