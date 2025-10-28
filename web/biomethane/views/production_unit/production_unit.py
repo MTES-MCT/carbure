@@ -55,7 +55,7 @@ class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
+            production_unit = self.filter_queryset(self.get_queryset()).get()
             data = self.get_serializer(production_unit, many=False).data
             return Response(data)
 
