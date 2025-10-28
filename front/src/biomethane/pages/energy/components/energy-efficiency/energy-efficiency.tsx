@@ -1,7 +1,7 @@
 import { Button } from "common/components/button2"
 import { NumberInput, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
@@ -13,6 +13,7 @@ import {
 } from "biomethane/pages/contract/types"
 import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -56,7 +57,8 @@ export function EnergyEfficiency({
   })
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="energy-efficiency"
       title={t("Efficacité énergétique")}
       description={t(
         "Ces informations permettent de vérifier le respect des obligations en termes d'efficacité énergétique"
@@ -155,6 +157,6 @@ export function EnergyEfficiency({
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

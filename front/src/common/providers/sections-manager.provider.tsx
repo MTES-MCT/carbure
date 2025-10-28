@@ -38,7 +38,7 @@ export const SectionsManagerProvider = ({
   defaultSections = {},
 }: SectionsManagerProviderProps) => {
   const [sections, setSections] = useState<SectionState>(defaultSections)
-  console.log("sections", sections)
+
   const toggleSection = (sectionId: string) => {
     setSections((prev) => ({
       ...prev,
@@ -74,10 +74,15 @@ export const SectionsManagerProvider = ({
   }
 
   const registerSection = (sectionId: string, expanded: boolean = false) => {
-    setSections((prev) => ({
-      ...prev,
-      [sectionId]: expanded,
-    }))
+    // Register a section only if it is not already registered
+    setSections((prev) => {
+      if (prev[sectionId]) return prev
+
+      return {
+        ...prev,
+        [sectionId]: expanded,
+      }
+    })
   }
 
   const isSectionExpanded = (sectionId: string) => {

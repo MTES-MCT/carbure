@@ -5,6 +5,10 @@ import { useEffect } from "react"
 type ManagedEditableCardProps = EditableCardProps & {
   sectionId: string
 }
+
+/**
+ * A wrapper around the EditableCard component that will register the section in the sections manager.
+ */
 export const ManagedEditableCard = ({
   sectionId,
   ...props

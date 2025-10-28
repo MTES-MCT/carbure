@@ -1,4 +1,4 @@
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { BiomethaneEnergy, MalfunctionTypes } from "../types"
 import { useForm } from "common/components/form2"
@@ -11,6 +11,7 @@ import { useMemo } from "react"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergyInputRequest } from "../types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type MalfunctionForm = DeepPartial<
   Pick<
@@ -53,7 +54,8 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
   )
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="malfunction"
       title={t("Dysfonctionnements")}
       readOnly={!canEditDeclaration}
     >
@@ -127,6 +129,6 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

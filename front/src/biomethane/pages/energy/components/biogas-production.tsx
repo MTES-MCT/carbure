@@ -1,17 +1,18 @@
 import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
+import { BiomethaneEnergyInputRequest } from "../types"
 import { useSaveEnergy } from "../energy.hooks"
 import {
   BiomethaneProductionUnit,
   InstalledMeters,
 } from "biomethane/pages/production/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type BiogasProductionForm = DeepPartial<
   Pick<
@@ -23,21 +24,20 @@ type BiogasProductionForm = DeepPartial<
 >
 
 export function BiogasProduction({
-  energy,
   productionUnit,
 }: {
-  energy?: BiomethaneEnergy
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<BiogasProductionForm>(energy ?? {})
+  const { bind, value } = useFormContext<BiogasProductionForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="biogas-production"
       title={t("Production de biogaz")}
       description={t(
         "Ces informations concernent la production de biogaz (avant épuration)"
@@ -86,6 +86,6 @@ export function BiogasProduction({
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

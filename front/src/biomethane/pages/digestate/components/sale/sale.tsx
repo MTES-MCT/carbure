@@ -1,7 +1,7 @@
 import { Button } from "common/components/button2"
 import { TextInput, NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
@@ -11,6 +11,7 @@ import {
 } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type SaleForm = DeepPartial<
   Pick<BiomethaneDigestateInputRequest, "acquiring_companies" | "sold_volume">
@@ -32,7 +33,11 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
   const handleSave = async () => saveDigestate.execute(value)
 
   return (
-    <EditableCard title={t("Vente")} readOnly={!canEditDeclaration}>
+    <ManagedEditableCard
+      sectionId="sale"
+      title={t("Vente")}
+      readOnly={!canEditDeclaration}
+    >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
@@ -63,6 +68,6 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

@@ -1,7 +1,7 @@
 import { Button } from "common/components/button2"
 import { NumberInput, RadioGroup } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useForm } from "common/components/form2"
 import { DeepPartial } from "common/types"
@@ -9,6 +9,7 @@ import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
 import { useSaveEnergy } from "../energy.hooks"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type AcceptabilityForm = DeepPartial<
   Pick<
@@ -27,7 +28,11 @@ export function Acceptability({ energy }: { energy?: BiomethaneEnergy }) {
   const handleSave = async () => saveEnergy.execute(value)
 
   return (
-    <EditableCard title={t("Acceptabilité")} readOnly={!canEditDeclaration}>
+    <ManagedEditableCard
+      sectionId="acceptability"
+      title={t("Acceptabilité")}
+      readOnly={!canEditDeclaration}
+    >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
@@ -63,6 +68,6 @@ export function Acceptability({ energy }: { energy?: BiomethaneEnergy }) {
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

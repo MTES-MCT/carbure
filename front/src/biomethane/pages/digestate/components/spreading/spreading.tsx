@@ -1,6 +1,6 @@
 import { Button } from "common/components/button2"
 import { Table } from "common/components/table2"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useSpreadingColumns } from "./spreading.hooks"
 import { BiomethaneDigestate } from "../../types"
@@ -34,7 +34,8 @@ export const Spreading = ({
   )
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="spreading"
       title={t("Épandage")}
       description={
         <>
@@ -68,6 +69,6 @@ export const Spreading = ({
           {t("Aucun département d'épandage déclaré")}
         </Notice>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

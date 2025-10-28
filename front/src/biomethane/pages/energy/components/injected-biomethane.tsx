@@ -1,15 +1,16 @@
 import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
+import { BiomethaneEnergyInputRequest } from "../types"
 import { useSaveEnergy } from "../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { isTariffReference2011Or2020 } from "biomethane/pages/contract"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { EditableCard } from "common/molecules/editable-card"
 
 type InjectedBiomethaneForm = DeepPartial<
   Pick<
@@ -23,21 +24,20 @@ type InjectedBiomethaneForm = DeepPartial<
 >
 
 export function InjectedBiomethane({
-  energy,
   contract,
 }: {
-  energy?: BiomethaneEnergy
   contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<InjectedBiomethaneForm>(energy ?? {})
+  const { bind, value } = useFormContext<InjectedBiomethaneForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
 
   const handleSave = async () => saveEnergy.execute(value)
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="injected-biomethane"
       title={t("Biométhane injecté dans le réseau")}
       description={t(
         "Ces informations concernent la production finale de biométhane de votre installation"
@@ -105,6 +105,6 @@ export function InjectedBiomethane({
           )}
         </EditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

@@ -1,24 +1,35 @@
 import { Notice } from "common/components/notice"
 import { useMissingFieldsMessages } from "./missing-fields.hooks"
 import { FormManager } from "common/components/form2"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useEffect } from "react"
 
-type Page = "digestate" | "energy"
-
-export interface MissingFieldsProps<FormType extends object> {
+export interface MissingFieldsProps<FormType extends object | undefined> {
   form: FormManager<FormType>
-  page: Page
 }
 
-export const MissingFields = <FormType extends object>({
+export const MissingFields = <FormType extends object | undefined>({
   form,
 }: MissingFieldsProps<FormType>) => {
-  const { errorMessage, digestateCount, energyCount } =
+  const { errorMessage, digestateCount, energyCount, showMissingFields } =
     useMissingFieldsMessages(form)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // Clear the hash when the missing fields are shown
+  useEffect(() => {
+    if (location.hash.includes("missing-fields")) {
+      showMissingFields()
+      navigate({
+        hash: "",
+      })
+    }
+  }, [location.hash])
 
   if (digestateCount === 0 && energyCount === 0) return null
   return (
     <Notice variant="alert" icon="fr-icon-error-line">
-      {errorMessage}
+      <div>{errorMessage}</div>
     </Notice>
   )
 }
