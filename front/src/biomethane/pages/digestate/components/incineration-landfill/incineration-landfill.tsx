@@ -1,7 +1,6 @@
 import { Button } from "common/components/button2"
 import { TextInput, NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
@@ -50,7 +49,7 @@ export function IncinerationLandfill({
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             <NumberInput
               readOnly={!isEditing}
@@ -91,7 +90,7 @@ export function IncinerationLandfill({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

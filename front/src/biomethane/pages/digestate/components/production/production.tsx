@@ -1,7 +1,6 @@
 import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
@@ -48,7 +47,7 @@ export function Production({
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             {!productionUnit.has_digestate_phase_separation && (
               <>
@@ -99,7 +98,7 @@ export function Production({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

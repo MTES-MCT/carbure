@@ -16,7 +16,6 @@ import {
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type CompostingForm = DeepPartial<
   Pick<
@@ -39,6 +38,7 @@ const extractValues = (digestate?: CompostingForm) => {
       digestate?.on_site_composted_digestate_volume,
     external_platform_digestate_volume:
       digestate?.external_platform_digestate_volume,
+    composting_locations: digestate?.composting_locations,
   }
 }
 
@@ -76,13 +76,14 @@ export function Composting() {
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <CheckboxGroup
             options={compostingOptions}
             {...bind("composting_locations")}
             readOnly={!isEditing}
             label={t("Lieu du compostage")}
             orientation="horizontal"
+            required
           />
           {isExternalPlatformSelected && (
             <Grid cols={2} gap="lg">
@@ -134,7 +135,7 @@ export function Composting() {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

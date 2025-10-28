@@ -13,7 +13,6 @@ import {
 } from "biomethane/pages/contract/types"
 import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -77,7 +76,7 @@ export function EnergyEfficiency({
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSubmit}>
+        <ManagedEditableCard.Form onSubmit={handleSubmit}>
           <Grid cols={1} gap="lg">
             {!isTariffReference2023 && (
               <>
@@ -166,7 +165,7 @@ export function EnergyEfficiency({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

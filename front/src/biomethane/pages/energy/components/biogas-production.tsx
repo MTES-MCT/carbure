@@ -12,7 +12,6 @@ import {
   InstalledMeters,
 } from "biomethane/pages/production/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type BiogasProductionForm = DeepPartial<
   Pick<
@@ -52,7 +51,7 @@ export function BiogasProduction({
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             <NumberInput
               readOnly={!isEditing}
@@ -91,7 +90,7 @@ export function BiogasProduction({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )

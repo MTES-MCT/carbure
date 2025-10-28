@@ -11,7 +11,6 @@ import {
   TariffReference,
 } from "biomethane/pages/contract/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { EditableCard } from "common/molecules/editable-card"
 
 type InstallationEnergyNeedsForm = DeepPartial<
   Pick<
@@ -65,7 +64,7 @@ export function InstallationEnergyNeeds({
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSubmit}>
+        <ManagedEditableCard.Form onSubmit={handleSubmit}>
           {!isTariffReference2023 && (
             <>
               <Checkbox
@@ -145,7 +144,7 @@ export function InstallationEnergyNeeds({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
     </ManagedEditableCard>
   )
