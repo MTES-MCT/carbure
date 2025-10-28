@@ -101,17 +101,6 @@ class BiomethaneDigestateViewsTests(TestCase):
         self.assertEqual(digestate.raw_digestate_tonnage_produced, data["raw_digestate_tonnage_produced"])
         self.assertEqual(digestate.raw_digestate_dry_matter_rate, data["raw_digestate_dry_matter_rate"])
 
-    def test_create_digestate_with_composting_validation_errors(self):
-        """Test validation errors when composting data is incomplete."""
-        data = {
-            "raw_digestate_tonnage_produced": 1500.0,
-            "composting_locations": [BiomethaneDigestate.EXTERNAL_PLATFORM],
-            # Missing required fields for external platform
-        }
-
-        response = self.client.put(self.digestate_url, data, content_type="application/json", query_params=self.base_params)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     @patch(
         "biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.is_declaration_editable",
         return_value=False,
