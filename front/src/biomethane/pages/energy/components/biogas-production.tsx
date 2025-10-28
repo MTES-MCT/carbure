@@ -11,7 +11,7 @@ import {
   BiomethaneProductionUnit,
   InstalledMeters,
 } from "biomethane/pages/production/types"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type BiogasProductionForm = DeepPartial<
   Pick<

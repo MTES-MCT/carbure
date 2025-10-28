@@ -15,7 +15,7 @@ import { MonthlyBiomethaneInjection } from "./components/monthy-biomethane-injec
 import { isTariffReference2011Or2020 } from "../contract"
 import { Acceptability } from "./components/acceptability"
 import { Malfunction } from "./components/malfunction"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const Energy = () => {
   const { t } = useTranslation()

@@ -17,7 +17,7 @@ import { Sale } from "./components/sale"
 import { useGetContractInfos } from "../contract/contract.hooks"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const Digestate = () => {
   const { t } = useTranslation()

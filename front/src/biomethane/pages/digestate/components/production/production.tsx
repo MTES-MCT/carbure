@@ -11,7 +11,7 @@ import {
 } from "../../types"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { useSaveDigestate } from "../../digestate.hooks"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type ProductionForm = DeepPartial<
   Pick<

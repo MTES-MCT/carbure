@@ -4,16 +4,18 @@ import { contractData } from "biomethane/pages/contract/tests/contract.data"
 import { energyData } from "../../tests/energy.data"
 import { TariffReference } from "biomethane/pages/contract/types"
 import { userEvent, waitFor, within } from "@storybook/test"
-import { AnnualDeclarationProvider } from "biomethane/providers/annual-declaration.provider"
+import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
+import mswHandlers from "@storybook/mocks"
+import { mergeDeepRight } from "ramda"
 
 const meta: Meta<typeof EnergyEfficiency> = {
   title: "modules/biomethane/pages/energy/components/EnergyEfficiency",
   component: EnergyEfficiency,
-  render: (args) => (
-    <AnnualDeclarationProvider>
-      <EnergyEfficiency {...args} />
-    </AnnualDeclarationProvider>
-  ),
+  ...mergeDeepRight(AnnualDeclarationStoryUtils, {
+    parameters: {
+      msw: [...AnnualDeclarationStoryUtils.parameters.msw, ...mswHandlers],
+    },
+  }),
 }
 
 export default meta

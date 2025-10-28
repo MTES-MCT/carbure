@@ -1,7 +1,7 @@
 import {
   AnnualDeclarationContext,
   AnnualDeclarationContextValue,
-} from "biomethane/providers/annual-declaration.provider"
+} from "biomethane/providers/annual-declaration"
 import { AnnualDeclaration, AnnualDeclarationStatus } from "biomethane/types"
 
 export const createMockAnnualDeclaration = (

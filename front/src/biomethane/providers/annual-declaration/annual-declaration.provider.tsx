@@ -29,8 +29,6 @@ interface AnnualDeclarationProviderProps {
   children: ReactNode
 }
 
-const currentYear = new Date().getFullYear()
-
 /**
  * Provider for managing biomethane annual declaration context.
  *
@@ -45,6 +43,8 @@ const currentYear = new Date().getFullYear()
 export function AnnualDeclarationProvider({
   children,
 }: AnnualDeclarationProviderProps) {
+  // We need to use the current year inside the provider to mock the date when the provider is mounted
+  const currentYear = new Date().getFullYear()
   const entity = useEntity()
   const {
     result: currentAnnualDeclaration,
@@ -68,7 +68,6 @@ export function AnnualDeclarationProvider({
     currentAnnualDeclaration?.status === AnnualDeclarationStatus.DECLARED
   const canEditDeclaration =
     !isDeclarationValidated && isInDeclarationPeriod && entity.canWrite()
-
   const hasAnnualDeclarationMissingObjects =
     currentAnnualDeclaration?.missing_fields?.digestate_missing_fields ===
       null ||

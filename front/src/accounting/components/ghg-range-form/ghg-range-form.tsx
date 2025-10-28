@@ -99,28 +99,32 @@ export const GHGRangeForm = ({ balance }: GHGRangeFormComponentProps) => {
             max={ghgReductionMax}
           />
           <Notice noColor variant="info">
-            {t("Solde disponible pour ces taux de réduction")}
+            <div>
+              {t("Solde disponible pour ces taux de réduction")}
+              {" : "}
+              <b>
+                {formatUnit(availableBalance, {
+                  fractionDigits: 0,
+                })}
+              </b>
+            </div>
+          </Notice>
+        </>
+      ) : (
+        <Notice noColor variant="info">
+          <div>
+            {t("Solde disponible")}
             {" : "}
             <b>
               {formatUnit(availableBalance, {
                 fractionDigits: 0,
               })}
             </b>
-          </Notice>
-        </>
-      ) : (
-        <Notice noColor variant="info">
-          {t("Solde disponible")}
-          {" : "}
-          <b>
-            {formatUnit(availableBalance, {
-              fractionDigits: 0,
-            })}
-          </b>
-          <br />
-          {t("Pour un taux de réduction GES de")}
-          {" : "}
-          <b>{ghgReductionMin}%</b>
+            <br />
+            {t("Pour un taux de réduction GES de")}
+            {" : "}
+            <b>{ghgReductionMin}%</b>
+          </div>
         </Notice>
       )}
     </>

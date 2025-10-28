@@ -16,7 +16,7 @@ import {
 } from "../../types"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { useSaveDigestate } from "../../digestate.hooks"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type CompostingForm = DeepPartial<
   Pick<

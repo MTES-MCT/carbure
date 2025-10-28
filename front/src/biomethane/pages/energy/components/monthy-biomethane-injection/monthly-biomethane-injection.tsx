@@ -4,7 +4,7 @@ import { Button } from "common/components/button2"
 import { DeclareMonthlyQuantity } from "./declare-monthly-quantity"
 import HashRoute from "common/components/hash-route"
 import { BiomethaneEnergy } from "../../types"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const MonthlyBiomethaneInjection = ({
   energy,

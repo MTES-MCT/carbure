@@ -14,7 +14,7 @@ import {
   InstallationCategory,
 } from "biomethane/pages/contract/types"
 import { useSaveDigestate } from "../../digestate.hooks"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type IncinerationLandfillForm = DeepPartial<
   Pick<

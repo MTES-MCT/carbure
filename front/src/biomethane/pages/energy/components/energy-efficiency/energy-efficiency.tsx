@@ -12,7 +12,7 @@ import {
   TariffReference,
 } from "biomethane/pages/contract/types"
 import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
