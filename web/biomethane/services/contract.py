@@ -3,6 +3,7 @@ from datetime import date
 from django.utils.translation import gettext as _
 
 from biomethane.models import BiomethaneContract
+from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 
 
 class BiomethaneContractService:
@@ -232,3 +233,40 @@ class BiomethaneContractService:
                 update_data[field] = new_value
 
         return update_data
+
+    @staticmethod
+    def get_tracked_amendment_types(contract, validated_data):
+        """
+        Determine which amendment types should be tracked based on contract changes.
+
+        This method compares the current contract values with the validated data
+        to identify which types of amendments need to be tracked for regulatory purposes.
+
+        Args:
+            contract: The BiomethaneContract instance being updated
+            validated_data: The new validated data to be applied
+
+        Returns:
+            list: Sorted list of amendment types (from BiomethaneContractAmendment) to track
+        """
+        current_tracked_types = set(contract.tracked_amendment_types or [])
+        validated_buyer = validated_data.get("buyer", None)
+
+        # Track CMAX/PAP updates
+        if contract.cmax != validated_data.get("cmax", None) or contract.pap_contracted != validated_data.get(
+            "pap_contracted", None
+        ):
+            current_tracked_types.add(BiomethaneContractAmendment.CMAX_PAP_UPDATE)
+
+        # Track CMAX annualization changes
+        if contract.cmax_annualized != validated_data.get("cmax_annualized", False):
+            current_tracked_types.add(BiomethaneContractAmendment.CMAX_ANNUALIZATION)
+
+        # Track buyer changes
+        if validated_buyer is not None and contract.buyer != validated_buyer:
+            current_tracked_types.add(BiomethaneContractAmendment.PRODUCER_BUYER_INFO_CHANGE)
+
+        result = list(current_tracked_types)
+        result.sort()
+
+        return result
