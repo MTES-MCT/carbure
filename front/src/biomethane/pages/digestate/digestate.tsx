@@ -22,8 +22,9 @@ import { SectionsManagerProvider } from "common/providers/sections-manager.provi
 import { MissingFields } from "biomethane/components/missing-fields"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneDigestate } from "./types"
+import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
 
-export const Digestate = () => {
+const DigestatePage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { selectedYear } = useAnnualDeclaration()
@@ -41,6 +42,7 @@ export const Digestate = () => {
   const { result: contract } = useGetContractInfos()
 
   usePrivateNavigation(t("Digestat"))
+  useMissingFields(form)
 
   if (loading && !digestate) return <LoaderOverlay />
 
@@ -50,31 +52,37 @@ export const Digestate = () => {
 
   return (
     <FormContext.Provider value={form}>
-      <SectionsManagerProvider>
-        <MissingFields form={form} />
-        {productionUnit && <Production productionUnit={productionUnit} />}
+      <MissingFields />
+      {productionUnit && <Production productionUnit={productionUnit} />}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.SPREADING
-        ) && (
-          <>
-            <SpreadingDistance />
-            <Spreading digestate={digestate?.data} />
-          </>
-        )}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.SPREADING
+      ) && (
+        <>
+          <SpreadingDistance />
+          <Spreading digestate={digestate?.data} />
+        </>
+      )}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.COMPOSTING
-        ) && <Composting />}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.COMPOSTING
+      ) && <Composting />}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.INCINERATION_LANDFILLING
-        ) && <IncinerationLandfill contract={contract} />}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.INCINERATION_LANDFILLING
+      ) && <IncinerationLandfill contract={contract} />}
 
-        {productionUnit?.spreading_management_methods?.includes(
-          SpreadingManagementMethods.SALE
-        ) && <Sale />}
-      </SectionsManagerProvider>
+      {productionUnit?.spreading_management_methods?.includes(
+        SpreadingManagementMethods.SALE
+      ) && <Sale />}
     </FormContext.Provider>
+  )
+}
+
+export const Digestate = () => {
+  return (
+    <SectionsManagerProvider>
+      <DigestatePage />
+    </SectionsManagerProvider>
   )
 }

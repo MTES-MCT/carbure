@@ -17,14 +17,18 @@ export const BiomethanePageHeader = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const years = useYears("biomethane", getAnnualDeclarationYears)
+
   const {
     selectedYear,
     currentAnnualDeclaration,
     isInDeclarationPeriod,
     hasAnnualDeclarationMissingObjects,
   } = useAnnualDeclaration()
-  const { openValidateDeclarationDialog, correctAnnualDeclarationMutation } =
-    usePageHeaderActions()
+  const {
+    openValidateDeclarationDialog,
+    openMissingFieldsDialog,
+    correctAnnualDeclarationMutation,
+  } = usePageHeaderActions()
 
   const status =
     currentAnnualDeclaration?.status ?? AnnualDeclarationStatus.IN_PROGRESS
@@ -54,7 +58,11 @@ export const BiomethanePageHeader = () => {
           })}
           {status === AnnualDeclarationStatus.IN_PROGRESS && (
             <Button
-              onClick={openValidateDeclarationDialog}
+              onClick={
+                currentAnnualDeclaration?.is_complete
+                  ? openValidateDeclarationDialog
+                  : openMissingFieldsDialog
+              }
               iconId="ri-file-text-line"
               asideX
               disabled={hasAnnualDeclarationMissingObjects}

@@ -2,9 +2,9 @@ import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclaration } from "biomethane/types"
 import { Button } from "common/components/button2"
 import { FormManager } from "common/components/form2"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { getMissingFieldsSectionIds } from "./missing-fields.config"
 import { useSectionsManager } from "common/providers/sections-manager.provider"
 import { focusMissingField } from "./missing-fields.utils"
@@ -37,19 +37,46 @@ const mapping: Record<Page, keyof AnnualDeclaration["missing_fields"]> = {
   [Page.DIGESTATE]: "digestate_missing_fields",
   [Page.ENERGY]: "energy_missing_fields",
 }
+
+export const MISSING_FIELDS_HASH = "missing-fields"
+
+export const useNavigateToMissingFields = () => {
+  const navigate = useNavigate()
+
+  const navigateToMissingFields = useCallback(() => {
+    navigate({
+      hash: `${MISSING_FIELDS_HASH}`,
+    })
+  }, [navigate])
+
+  return { navigateToMissingFields }
+}
+
 /**
  * Hook to get missing fields for a given page
  * Warning : useMissingFields is used in the common page header and we don't know the type of the form
  * @param form - The form manager
  * @returns The missing fields for the given page and a function to show the missing fields
  */
-const useMissingFields = <FormType extends object | undefined>(
+export const useMissingFields = <FormType extends object | undefined>(
   form: FormManager<FormType>
 ) => {
   const { currentAnnualDeclaration } = useAnnualDeclaration()
   const { t } = useTranslation()
   const { currentPage } = usePageDetection()
   const sectionsManager = useSectionsManager()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // Clear the hash when the missing fields are shown
+  useEffect(() => {
+    if (location.hash.includes(MISSING_FIELDS_HASH)) {
+      showMissingFields()
+      navigate({
+        hash: "",
+      })
+    }
+  }, [location.hash])
 
   const showMissingFields = useCallback(() => {
     if (!currentPage) {
@@ -85,25 +112,27 @@ const useMissingFields = <FormType extends object | undefined>(
 
   return {
     showMissingFields,
-    digestateCount:
-      currentAnnualDeclaration.missing_fields?.digestate_missing_fields
-        ?.length ?? 0,
-    energyCount:
-      currentAnnualDeclaration.missing_fields?.energy_missing_fields?.length ??
-      0,
   }
 }
 
-export const useMissingFieldsMessages = <FormType extends object | undefined>(
-  form: FormManager<FormType>
-) => {
+/**
+ * @param onPageClick - Function to call when a link is clicked in the error message
+ */
+export const useMissingFieldsMessages = ({
+  onPageClick,
+}: {
+  onPageClick?: (page: string) => void
+} = {}) => {
   const { t } = useTranslation()
-  const { digestateCount, energyCount, showMissingFields } =
-    useMissingFields(form)
   const routes = useRoutes()
-  const { selectedYear } = useAnnualDeclaration()
+  const { selectedYear, currentAnnualDeclaration } = useAnnualDeclaration()
 
   const biomethaneRoutes = routes.BIOMETHANE(selectedYear)
+  const digestateCount =
+    currentAnnualDeclaration.missing_fields?.digestate_missing_fields?.length ??
+    0
+  const energyCount =
+    currentAnnualDeclaration.missing_fields?.energy_missing_fields?.length ?? 0
 
   const errorMessage = useMemo(() => {
     const pages: { page: string; count: number; url: string }[] = []
@@ -126,7 +155,10 @@ export const useMissingFieldsMessages = <FormType extends object | undefined>(
                 // @ts-ignore children is propagated to the button by i18next
                 <Button
                   customPriority="link"
-                  linkProps={{ to: `${url}#missing-fields` }}
+                  linkProps={{
+                    to: `${url}#${MISSING_FIELDS_HASH}`,
+                    onClick: () => onPageClick?.(page),
+                  }}
                 />
               ),
             }}
@@ -154,7 +186,10 @@ export const useMissingFieldsMessages = <FormType extends object | undefined>(
                 // @ts-ignore children is propagated to the button by i18next
                 <Button
                   customPriority="link"
-                  linkProps={{ to: `${url}#missing-fields` }}
+                  linkProps={{
+                    to: `${url}#${MISSING_FIELDS_HASH}`,
+                    onClick: () => onPageClick?.(page),
+                  }}
                 />
               ),
             }}
@@ -186,7 +221,8 @@ export const useMissingFieldsMessages = <FormType extends object | undefined>(
     t,
     biomethaneRoutes.DIGESTATE,
     biomethaneRoutes.ENERGY,
+    onPageClick,
   ])
 
-  return { errorMessage, digestateCount, energyCount, showMissingFields }
+  return { errorMessage, digestateCount, energyCount }
 }
