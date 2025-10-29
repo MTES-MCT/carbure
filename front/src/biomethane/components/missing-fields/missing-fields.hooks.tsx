@@ -7,7 +7,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { getMissingFieldsSectionIds } from "./missing-fields.config"
 import { useSectionsManager } from "common/providers/sections-manager.provider"
-import { focusMissingField } from "./missing-fields.utils"
+import { focusFirstMissingField } from "./missing-fields.utils"
 import { useRoutes } from "common/hooks/routes"
 
 enum Page {
@@ -76,6 +76,8 @@ export const useMissingFields = <FormType extends object | undefined>(
         hash: "",
       })
     }
+    // We want to show missing fields only when the hash is present in the url
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash])
 
   const showMissingFields = useCallback(() => {
@@ -99,8 +101,7 @@ export const useMissingFields = <FormType extends object | undefined>(
     })
 
     if (missingFields.length > 0) {
-      const firstMissingField = missingFields[0]
-      focusMissingField(firstMissingField)
+      focusFirstMissingField(missingFields)
     }
   }, [
     currentPage,
@@ -139,7 +140,7 @@ export const useMissingFieldsMessages = ({
     const messages = [
       (page: string, count: number, url: string) => {
         const missingFieldsFirstMessage = t(
-          "Champs manquants : il y a <strong>{{count}} champs manquants</strong> dans la section <CustomLink>{{page}}</CustomLink>",
+          "Champs manquants : il y a <strong>{{count}} champs manquants</strong> dans la page <CustomLink>{{page}}</CustomLink>",
           {
             count,
             page,
@@ -169,7 +170,7 @@ export const useMissingFieldsMessages = ({
       },
       (page: string, count: number, url: string) => {
         const missingFieldsAdditionalMessage = t(
-          " et <strong>{{count}} champs manquants</strong> dans la section <CustomLink>{{page}}</CustomLink>",
+          " et <strong>{{count}} champs manquants</strong> dans la page <CustomLink>{{page}}</CustomLink>",
           {
             page,
             count,

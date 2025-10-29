@@ -1,5 +1,5 @@
 /**
- * Focuses on a specific form field and scrolls it into view.
+ * Focuses on the first available missing field from a list and scrolls it into view.
  *
  * This function handles dynamic component loading by using a two-step approach:
  * 1. First attempts to find and focus the field using requestAnimationFrame
@@ -9,19 +9,25 @@
  * This is particularly useful when dealing with dynamically loaded sections
  * where form fields are not immediately available in the DOM.
  *
- * @param missingField - The name attribute of the form field to focus on
+ * @param missingFields - An array of name attributes of form fields to focus on.
+ *                        The function will focus on the first available field in the array.
+ *                        If the array is empty, the function returns immediately.
  */
-export const focusMissingField = (missingField?: string) => {
-  if (!missingField) return
+export const focusFirstMissingField = (missingFields: string[]) => {
+  if (missingFields.length === 0) return
 
   const tryFocus = (): boolean => {
-    const input = document.querySelector(
-      `[name="${missingField}"]`
-    ) as HTMLElement
-    if (input) {
-      input.scrollIntoView({ behavior: "smooth", block: "center" })
+    const missingFieldsSelector = missingFields
+      .map((field) => `[name="${field}"]`)
+      .join(",")
+    const inputs = document.querySelectorAll(missingFieldsSelector)
 
-      input.focus()
+    if (inputs.length > 0 && inputs[0]) {
+      const firstInput = inputs[0] as HTMLElement
+
+      firstInput.scrollIntoView({ behavior: "smooth", block: "center" })
+      firstInput.focus()
+
       return true
     }
     return false

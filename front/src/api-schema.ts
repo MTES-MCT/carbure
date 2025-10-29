@@ -259,23 +259,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/biomethane/contract/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Retrieve the contract for the current entity. Returns a single contract object. */
-        get: operations["biomethane_contract_retrieve_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/biomethane/contract/amendments/": {
         parameters: {
             query?: never;
@@ -505,23 +488,6 @@ export interface paths {
         get: operations["biomethane_production_unit_retrieve"];
         /** @description Create or update the production unit for the current entity (upsert operation). */
         put: operations["biomethane_production_unit_update"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/biomethane/production-unit/{id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Retrieve the production unit for the current entity. Returns a single production unit object. */
-        get: operations["biomethane_production_unit_retrieve_2"];
-        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -6219,39 +6185,6 @@ export interface operations {
             };
         };
     };
-    biomethane_contract_retrieve_2: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Biométhane - Contrat d'achat. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Contract details for the entity */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BiomethaneContract"];
-                };
-            };
-            /** @description Contract not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     biomethane_contract_amendments_list: {
         parameters: {
             query: {
@@ -6969,39 +6902,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneProductionUnit"];
                 };
-            };
-        };
-    };
-    biomethane_production_unit_retrieve_2: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Biométhane - Unité de Production. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Production unit details for the entity */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BiomethaneProductionUnit"];
-                };
-            };
-            /** @description Production unit not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
