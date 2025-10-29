@@ -629,38 +629,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneContract"
           description: ""
-  /api/biomethane/contract/{id}/:
-    get:
-      operationId: biomethane_contract_retrieve_2
-      description: Retrieve the contract for the current entity. Returns a single
-        contract object.
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Biométhane - Contrat d'achat.
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BiomethaneContract"
-          description: Contract details for the entity
-        "404":
-          description: Contract not found for this entity.
   /api/biomethane/contract/amendments/:
     get:
       operationId: biomethane_contract_amendments_list
@@ -1467,39 +1435,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneProductionUnit"
           description: Production unit created successfully
-  /api/biomethane/production-unit/{id}/:
-    get:
-      operationId: biomethane_production_unit_retrieve_2
-      description: Retrieve the production unit for the current entity. Returns a
-        single production unit object.
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Biométhane - Unité de
-            Production.
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BiomethaneProductionUnit"
-          description: Production unit details for the entity
-        "404":
-          description: Production unit not found for this entity.
   /api/biomethane/production-unit/watched-fields/:
     get:
       operationId: biomethane_production_unit_watched_fields_retrieve

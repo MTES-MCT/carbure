@@ -92,8 +92,9 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
 export type BiomethaneSectionId = keyof typeof BIOMETHANE_SECTIONS_CONFIG
 
 export const getMissingFieldsSectionIds = (missingFields: string[]) => {
+  const missingFieldsSet = new Set(missingFields)
   const config = Object.entries(BIOMETHANE_SECTIONS_CONFIG).filter(
-    ([, fields]) => fields.some((field) => missingFields.includes(field))
+    ([, fields]) => fields.some((field) => missingFieldsSet.has(field))
   )
   return config.map(([sectionId]) => sectionId)
 }
