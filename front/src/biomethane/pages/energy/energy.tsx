@@ -20,8 +20,9 @@ import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneEnergy } from "./types"
 import { MissingFields } from "biomethane/components/missing-fields"
+import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
 
-export const Energy = () => {
+const EnergyPage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const form = useForm<BiomethaneEnergy | undefined>(undefined)
@@ -37,6 +38,7 @@ export const Energy = () => {
   })
 
   usePrivateNavigation(t("Énergie"))
+  useMissingFields(form)
 
   if (loading && !energy) return <LoaderOverlay />
 
@@ -45,18 +47,24 @@ export const Energy = () => {
   }
   return (
     <FormContext.Provider value={form}>
-      <SectionsManagerProvider>
-        {energy && <MissingFields form={form} />}
-        <InjectedBiomethane contract={contract} />
-        <BiogasProduction productionUnit={productionUnit} />
-        <InstallationEnergyNeeds contract={contract} />
-        <EnergyEfficiency energy={energy} contract={contract} />
-        {isTariffReference2011Or2020(contract?.tariff_reference) && (
-          <MonthlyBiomethaneInjection energy={energy} />
-        )}
-        <Acceptability />
-        <Malfunction />
-      </SectionsManagerProvider>
+      <MissingFields />
+      <InjectedBiomethane contract={contract} />
+      <BiogasProduction productionUnit={productionUnit} />
+      <InstallationEnergyNeeds contract={contract} />
+      <EnergyEfficiency energy={energy} contract={contract} />
+      {isTariffReference2011Or2020(contract?.tariff_reference) && (
+        <MonthlyBiomethaneInjection energy={energy} />
+      )}
+      <Acceptability />
+      <Malfunction />
     </FormContext.Provider>
+  )
+}
+
+export const Energy = () => {
+  return (
+    <SectionsManagerProvider>
+      <EnergyPage />
+    </SectionsManagerProvider>
   )
 }
