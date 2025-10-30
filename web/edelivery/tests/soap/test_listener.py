@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from edelivery.soap.listener import Listener
 
 
+@patch.dict("os.environ", {"WITH_EDELIVERY": "True"})
 class ListenerTest(TestCase):
     def setUp(self):
         self.patched_ListPendingMessages = patch("edelivery.soap.listener.ListPendingMessages").start()
@@ -69,6 +70,26 @@ class ListenerTest(TestCase):
         except Warning:
             self.patched_sleep.assert_called_with(1)
             self.assertEqual(["list", "list", "list"], commands_called)
+
+    @patch.dict("os.environ", {"WITH_EDELIVERY": "False"})
+    def test_does_not_poll_if_feature_flag_not_set(self):
+        commands_called = []
+
+        def log_list_pending_messages_call():
+            commands_called.append("list")
+            return Mock()
+
+        self.patched_ListPendingMessages.return_value.perform = log_list_pending_messages_call
+        self.patched_sleep.side_effect = [None, None, Warning()]
+
+        try:
+            listener = Listener()
+            self.assertEqual([], commands_called)
+            listener.start()
+
+            self.fail("sleep() should have been called")
+        except Warning:
+            self.assertEqual([], commands_called)
 
     def test_registers_to_service_pub_sub_channel_at_initialization(self):
         subscribe = self.patched_PubSubAdapter.return_value.subscribeToServiceChannel

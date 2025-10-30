@@ -107,6 +107,7 @@ INSTALLED_APPS = [
     "tiruert",
     "user",
     "biomethane",
+    "edelivery",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
