@@ -10,7 +10,7 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { usePortal } from "common/components/portal"
 import { AnnualDeclarationResetDialog } from "biomethane/components/annual-declaration-reset-dialog"
-import { useWatchedFields } from "biomethane/providers/watched-fields.provider"
+import { useWatchedFields } from "biomethane/providers/watched-fields"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useTariffReferenceOptions = () => {

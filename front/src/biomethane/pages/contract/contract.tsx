@@ -5,8 +5,8 @@ import { useGetContractInfos } from "./contract.hooks"
 import { ErrorTrackedAmendmentTypes } from "./components/tracked-amendment-types"
 import { LoaderOverlay } from "common/components/scaffold"
 import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
-import { WatchedFieldsProvider } from "biomethane/providers/watched-fields.provider"
 import { getContractWatchedFields } from "./api"
+import { WatchedFieldsProvider } from "biomethane/providers/watched-fields"
 
 export const BiomethaneContractPage = () => {
   const { result: contractInfos, loading } = useGetContractInfos()
