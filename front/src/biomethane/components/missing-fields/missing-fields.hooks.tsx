@@ -93,7 +93,11 @@ export const useMissingFields = <FormType extends object | undefined>(
     // Get the section ids that have missing fields
     const sectionIds = getMissingFieldsSectionIds(missingFields)
     sectionIds.forEach((sectionId) => {
+      // If the user is redirected on a new page, the section is not registered yet, so we need to register it
       sectionsManager.registerSection(sectionId, true)
+
+      // If the user is on the same page, the section is already registered, so we need to expand it
+      sectionsManager.setSectionExpanded(sectionId, true)
     })
 
     missingFields.forEach((field) => {

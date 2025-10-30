@@ -17,12 +17,14 @@ export const focusFirstMissingField = (missingFields: string[]) => {
   if (missingFields.length === 0) return
 
   const tryFocus = (): boolean => {
-    const missingFieldsSelector = missingFields
-      .map((field) => `[name="${field}"]`)
-      .join(",")
-    const inputs = document.querySelectorAll(missingFieldsSelector)
+    const { inputs, inputsByName } = findMissingFieldInputs(missingFields)
 
-    if (inputs.length > 0 && inputs[0]) {
+    // If all the missing fields are found in the DOM, focus on the first one
+    if (
+      inputs.length > 0 &&
+      inputs[0] &&
+      inputsByName.size === missingFields.length
+    ) {
       const firstInput = inputs[0] as HTMLElement
 
       firstInput.scrollIntoView({ behavior: "smooth", block: "center" })
@@ -49,4 +51,24 @@ export const focusFirstMissingField = (missingFields: string[]) => {
       setTimeout(() => observer.disconnect(), 2000)
     }
   })
+}
+
+const findMissingFieldInputs = (missingFields: string[]) => {
+  const missingFieldsSelector = missingFields
+    .map((field) => `[name="${field}"]`)
+    .join(",")
+  const inputs = document.querySelectorAll(missingFieldsSelector)
+  const inputsByName = inputs
+    .values()
+    .reduce((acc: Set<string>, input: Element) => {
+      const name = input.getAttribute("name") ?? ""
+
+      if (name) {
+        acc.add(name)
+      }
+
+      return acc
+    }, new Set<string>())
+
+  return { inputs, inputsByName }
 }
