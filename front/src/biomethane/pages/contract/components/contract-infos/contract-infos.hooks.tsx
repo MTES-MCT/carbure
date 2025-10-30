@@ -11,6 +11,7 @@ import useEntity from "common/hooks/entity"
 import { usePortal } from "common/components/portal"
 import { AnnualDeclarationResetDialog } from "biomethane/components/annual-declaration-reset-dialog"
 import { useWatchedFields } from "biomethane/providers/watched-fields.provider"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useTariffReferenceOptions = () => {
   const { t } = useTranslation()
@@ -66,6 +67,7 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
   const entity = useEntity()
   const portal = usePortal()
   const { hasWatchedFieldsChanged } = useWatchedFields<BiomethaneContract>()
+  const { currentAnnualDeclaration } = useAnnualDeclaration()
 
   const mutation = useMutation(
     (data) =>
@@ -75,6 +77,7 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
             <AnnualDeclarationResetDialog
               onClose={close}
               onConfirm={() => Promise.resolve()}
+              annualDeclarationStatus={currentAnnualDeclaration?.status}
             />
           ))
         }

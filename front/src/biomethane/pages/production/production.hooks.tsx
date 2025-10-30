@@ -14,6 +14,7 @@ import { usePortal } from "common/components/portal"
 import { useWatchedFields } from "biomethane/providers/watched-fields.provider"
 import { BiomethaneProductionUnit } from "./types"
 import { AnnualDeclarationResetDialog } from "biomethane/components/annual-declaration-reset-dialog"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useProductionUnit = () => {
   const entity = useEntity()
@@ -35,6 +36,8 @@ export const useSaveProductionUnit = (
   const portal = usePortal()
   const { hasWatchedFieldsChanged } =
     useWatchedFields<BiomethaneProductionUnit>()
+  const { currentAnnualDeclaration } = useAnnualDeclaration()
+
   const mutation = useMutation(
     (data) =>
       saveProductionUnit(entity.id, data).then(() => {
@@ -43,6 +46,7 @@ export const useSaveProductionUnit = (
             <AnnualDeclarationResetDialog
               onClose={close}
               onConfirm={() => Promise.resolve()}
+              annualDeclarationStatus={currentAnnualDeclaration?.status}
             />
           ))
         }
