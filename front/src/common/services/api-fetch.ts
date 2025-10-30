@@ -27,8 +27,6 @@ export class HttpError extends Error {
   }
 }
 
-const API_ROOT = `${window.location.origin}/api`
-
 const middleware: Middleware = {
   async onRequest({ request }) {
     const csrfToken = getCookie("csrftoken")
@@ -51,10 +49,14 @@ const middleware: Middleware = {
   },
 }
 
+export const API_PREFIX = "api"
+const API_ROOT = `${window.location.origin}/${API_PREFIX}`
+
 export const api = createClient<newPaths>({
-  baseUrl: `${window.location.origin}/api`,
+  baseUrl: API_ROOT,
   bodySerializer: (data) => toFormData(data),
 })
+
 api.use(middleware)
 
 /**

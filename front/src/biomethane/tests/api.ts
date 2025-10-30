@@ -1,7 +1,16 @@
-import { http, HttpResponse } from "msw"
-import { currentAnnualDeclaration } from "./data"
+import { HttpResponse } from "msw"
+import {
+  currentAnnualDeclaration,
+  currentAnnualDeclarationMissingFields,
+} from "./data"
+import { http } from "common/__test__/http"
 
 export const getCurrentAnnualDeclarationOk = http.get(
-  "/api/biomethane/annual-declaration/",
+  "/biomethane/annual-declaration/",
   () => HttpResponse.json(currentAnnualDeclaration)
+)
+
+export const getCurrentAnnualDeclarationMissingFields = http.get(
+  "/biomethane/annual-declaration/",
+  () => HttpResponse.json(currentAnnualDeclarationMissingFields)
 )
