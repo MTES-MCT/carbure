@@ -1,9 +1,8 @@
 import useEntity from "common/hooks/entity"
 import { lazy } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
-import { BiomethanePageHeader } from "./layouts/page-header"
 import { getDeclarationInterval } from "./utils"
-import { AnnualDeclarationProvider } from "./providers/annual-declaration"
+import { AnnualDeclarationLayout } from "./layouts/annual-declaration-layout"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -19,14 +18,7 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      <Route
-        path=":year"
-        element={
-          <AnnualDeclarationProvider>
-            <BiomethanePageHeader />
-          </AnnualDeclarationProvider>
-        }
-      >
+      <Route path=":year" element={<AnnualDeclarationLayout />}>
         <Route index element={<Navigate replace to="digestate" />} />
         <Route path="digestate" element={<Digestate />} />
         <Route path="energy" element={<Energy />} />
