@@ -1,9 +1,20 @@
 from django_filters import CharFilter, FilterSet
 
-from biomethane.models import BiomethaneProductionUnit
 
+class EntityProducerFilter(FilterSet):
+    """
+    Generic FilterSet for biomethane models with producer field.
+    Can be used directly without subclassing if no additional filters needed.
 
-class BiomethaneProductionUnitFilter(FilterSet):
+    Usage in ViewSet:
+        filterset_class = EntityProducerFilter
+        queryset = BiomethaneEnergy.objects.all()
+
+    Filter logic:
+    - Producer: ?entity_id=123 → filters on producer__id=123
+    - DREAL: ?entity_id=456&producer_id=789 → filters on producer__id=789
+    """
+
     entity_id = CharFilter(method="filter_by_entity")
     producer_id = CharFilter(field_name="producer__id", lookup_expr="exact")
 
@@ -21,5 +32,11 @@ class BiomethaneProductionUnitFilter(FilterSet):
             return queryset.filter(producer__id=value)
 
     class Meta:
-        model = BiomethaneProductionUnit
         fields = ["entity_id", "producer_id"]
+
+
+class EntityProducerYearFilter(EntityProducerFilter):
+    year = CharFilter(field_name="year", lookup_expr="exact")
+
+    class Meta:
+        fields = ["entity_id", "producer_id", "year"]
