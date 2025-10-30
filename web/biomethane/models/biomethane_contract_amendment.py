@@ -65,3 +65,8 @@ class BiomethaneContractAmendment(models.Model):
         db_table = "biomethane_contract_amendment"
         verbose_name = "Biométhane - Avenant au contrat"
         verbose_name_plural = "Biométhane - Avenants au contrat"
+
+    @property
+    def production_unit(self):
+        if hasattr(self, "contract") and self.contract:
+            return getattr(self.contract.producer, "biomethane_production_unit", None)

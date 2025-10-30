@@ -16,5 +16,9 @@ class BiomethaneSupplyPlan(models.Model):
         verbose_name_plural = "Biométhane - Plans d'approvisionnement"
         unique_together = ["producer", "year"]
 
+    @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
+
     def __str__(self):
         return f"Plan d'approvisionnement {self.year} - {self.producer.name}"

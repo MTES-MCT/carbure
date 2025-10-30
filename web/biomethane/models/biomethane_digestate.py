@@ -70,6 +70,10 @@ class BiomethaneDigestate(models.Model):
         verbose_name_plural = "Biométhane - Digestats"
 
     @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
+
+    @property
     def optional_fields(self):
         from biomethane.services import BiomethaneDigestateService
 

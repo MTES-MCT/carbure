@@ -25,8 +25,10 @@ from core.models import (
     CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
+    Department,
     Entity,
     EntityCertificate,
+    ExternalAdminDepartments,
     ExternalAdminRights,
     GenericCertificate,
     GenericError,
@@ -213,6 +215,15 @@ admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
 admin.site.register(TransactionDistance, TransactionDistanceAdmin)
 
 
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    """Admin for Department model - required for autocomplete in ExternalAdminDepartmentsInline"""
+
+    list_display = ("code_dept", "name")
+    search_fields = ("code_dept", "name")
+    ordering = ("code_dept",)
+
+
 # authtool custom user model
 User = get_user_model()
 
@@ -321,12 +332,35 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
+class ExternalAdminDepartmentsInline(admin.TabularInline):
+    """Inline admin to manage departments accessible by DREAL"""
+
+    model = ExternalAdminDepartments
+    extra = 1
+    autocomplete_fields = ["department"]
+
+
 @admin.register(ExternalAdminRights)
 class ExtAdminRightsAdmin(admin.ModelAdmin):
     list_display = (
         "entity",
         "right",
+        "get_departments_display",
     )
+    list_filter = ("right",)
+    inlines = [ExternalAdminDepartmentsInline]
+
+    def get_departments_display(self, obj):
+        """Display accessible departments for DREAL, 'All' for others"""
+        if obj.right == ExternalAdminRights.DREAL:
+            depts = obj.get_accessible_departments()
+            dept_codes = list(depts.values_list("code_dept", flat=True)[:5])
+            if depts.count() > 5:
+                return ", ".join(dept_codes) + "..."
+            return ", ".join(dept_codes) if dept_codes else "None"
+        return "All"
+
+    get_departments_display.short_description = "Departments"
 
 
 class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):

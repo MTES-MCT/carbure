@@ -72,6 +72,10 @@ class BiomethaneContract(models.Model):
         verbose_name = "Biométhane - Contrat d'achat"
         verbose_name_plural = "Biométhane - Contrats d'achat"
 
+    @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
+
     def does_contract_exist(self):
         return bool(self.signature_date)
 

@@ -45,6 +45,10 @@ class BiomethaneInjectionSite(models.Model):
         verbose_name = "Biométhane - Site d'injection"
         verbose_name_plural = "Biométhane - Sites d'injection"
 
+    @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
+
 
 @receiver(post_save, sender=BiomethaneInjectionSite)
 def clear_injection_site_fields_on_save(sender, instance, **kwargs):
