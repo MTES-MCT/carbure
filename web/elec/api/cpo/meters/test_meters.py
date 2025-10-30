@@ -202,3 +202,32 @@ class ElecMeterTest(TestCase):
         data = response.json()
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert data["error"] == "CP_NOT_FOUND_ON_CPO"
+
+    def test_delete_elec_meter_failure(self):
+        url = reverse("elec-cpo-meters-delete-meter")
+        data = {"charge_point_id": self.charge_point.pk, "entity_id": self.cpo.id}
+
+        response = self.client.post(url, data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json()["error"] == "READINGS_ALREADY_REGISTERED"
+
+    def test_delete_elec_meter_success(self):
+        meter3 = ElecMeter.objects.create(
+            charge_point=self.charge_point,
+            initial_index=2000,
+            initial_index_date=datetime.date(2024, 2, 15),
+            mid_certificate="MID_MNOP",
+        )
+
+        self.charge_point.current_meter = meter3
+        self.charge_point.save()
+
+        url = reverse("elec-cpo-meters-delete-meter")
+        data = {"charge_point_id": self.charge_point.pk, "entity_id": self.cpo.id}
+
+        response = self.client.post(url, data)
+        self.charge_point.refresh_from_db()
+
+        assert response.status_code == status.HTTP_200_OK
+        assert ElecMeter.objects.filter(pk=meter3.pk).count() == 0
+        assert self.charge_point.current_meter is None
