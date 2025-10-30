@@ -6,14 +6,14 @@ import { Select } from "common/components/selects2"
 import { useTranslation } from "react-i18next"
 import useYears from "common/hooks/years-2"
 import { getAnnualDeclarationYears } from "biomethane/api"
-import { Outlet } from "react-router-dom"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationStatus } from "biomethane/types"
 import { usePageHeaderActions } from "./page-header.hooks"
 import useEntity from "common/hooks/entity"
+import { PropsWithChildren } from "react"
 
 // Digestate and Energy pages share the same page header and the same declaration validation logic
-export const BiomethanePageHeader = () => {
+export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const years = useYears("biomethane", getAnnualDeclarationYears)
@@ -83,9 +83,7 @@ export const BiomethanePageHeader = () => {
           )}
         </Notice>
       )}
-      <Content marginTop>
-        <Outlet />
-      </Content>
+      <Content marginTop>{children}</Content>
     </Main>
   )
 }

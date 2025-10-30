@@ -21,11 +21,12 @@ import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneEnergy } from "./types"
 import { MissingFields } from "biomethane/components/missing-fields"
 import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
+import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const form = useForm<BiomethaneEnergy | undefined>(undefined)
+  const form = useForm<BiomethaneEnergy | undefined | object>(undefined)
   const { selectedYear } = useAnnualDeclaration()
   const { result: contract } = useGetContractInfos()
   const { result: productionUnit } = useProductionUnit()
@@ -34,6 +35,10 @@ const EnergyPage = () => {
     params: [entity.id, selectedYear],
     onSuccess: (energy) => {
       form.setValue(energy)
+    },
+    onError: () => {
+      // If the energy is not found, we need to set an empty object to the form
+      form.setValue({})
     },
   })
 
@@ -46,18 +51,20 @@ const EnergyPage = () => {
     return <SettingsNotFilled />
   }
   return (
-    <FormContext.Provider value={form}>
-      <MissingFields />
-      <InjectedBiomethane contract={contract} />
-      <BiogasProduction productionUnit={productionUnit} />
-      <InstallationEnergyNeeds contract={contract} />
-      <EnergyEfficiency energy={energy} contract={contract} />
-      {isTariffReference2011Or2020(contract?.tariff_reference) && (
-        <MonthlyBiomethaneInjection energy={energy} />
-      )}
-      <Acceptability />
-      <Malfunction />
-    </FormContext.Provider>
+    <BiomethanePageHeader>
+      <FormContext.Provider value={form}>
+        <MissingFields />
+        <InjectedBiomethane contract={contract} />
+        <BiogasProduction productionUnit={productionUnit} />
+        <InstallationEnergyNeeds contract={contract} />
+        <EnergyEfficiency energy={energy} contract={contract} />
+        {isTariffReference2011Or2020(contract?.tariff_reference) && (
+          <MonthlyBiomethaneInjection energy={energy} />
+        )}
+        <Acceptability />
+        <Malfunction />
+      </FormContext.Provider>
+    </BiomethanePageHeader>
   )
 }
 
