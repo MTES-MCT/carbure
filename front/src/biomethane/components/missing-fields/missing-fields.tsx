@@ -1,7 +1,7 @@
 import { Notice } from "common/components/notice"
 import { useMissingFieldsMessages } from "./missing-fields.hooks"
 
-interface MissingFieldsProps {
+export interface MissingFieldsProps {
   onPageClick?: (page: string) => void
 }
 export const MissingFields = ({ onPageClick }: MissingFieldsProps) => {
