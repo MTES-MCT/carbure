@@ -1,3 +1,5 @@
 from .optional_fields import OptionalFieldsActionMixin
+from .retrieve import RetrieveSingleObjectMixin
 from .watched_fields import WatchedFieldsActionMixin
 from .years import YearsActionMixin
+from .retrieve import RetrieveSingleObjectMixin

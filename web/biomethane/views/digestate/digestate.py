@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters.digestate import BiomethaneDigestateFilter, BiomethaneDigestateRetrieveFilter
+from biomethane.filters.mixins import EntityProducerFilter, EntityProducerYearFilter
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.digestate import (
@@ -13,6 +13,7 @@ from biomethane.serializers.digestate import (
 )
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import OptionalFieldsActionMixin
+from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
 
 
 @extend_schema(
@@ -26,10 +27,10 @@ from biomethane.views.mixins import OptionalFieldsActionMixin
         ),
     ]
 )
-class BiomethaneDigestateViewSet(GenericViewSet, OptionalFieldsActionMixin):
+class BiomethaneDigestateViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMixin, GenericViewSet):
     queryset = BiomethaneDigestate.objects.all()
     serializer_class = BiomethaneDigestateSerializer
-    filterset_class = BiomethaneDigestateFilter
+    filterset_class = EntityProducerFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -51,43 +52,19 @@ class BiomethaneDigestateViewSet(GenericViewSet, OptionalFieldsActionMixin):
             return BiomethaneDigestateInputSerializer
         return super().get_serializer_class()
 
+    def get_filterset_class(self):
+        if self.action == "retrieve":
+            return EntityProducerYearFilter
+        elif self.action in ["upsert", "get_optional_fields"]:
+            return EntityProducerFilter
+        return None
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.action == "retrieve":
-            return BiomethaneDigestateRetrieveFilter(self.request.GET, queryset=queryset).qs
-        elif self.action in ["upsert", "get_optional_fields"]:
+        if self.action in ["upsert", "get_optional_fields"]:
             # force filtering by current declaration year
             queryset = queryset.filter(year=self.request.year)
-            return BiomethaneDigestateFilter(self.request.GET, queryset=queryset).qs
         return queryset
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="year",
-                type=OpenApiTypes.INT,
-                location=OpenApiParameter.QUERY,
-                description="Declaration year.",
-                required=True,
-            ),
-        ],
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneDigestateSerializer,
-                description="Digestate details for the entity",
-            ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Digestate not found for this entity."),
-        },
-        description="Retrieve the digestate for the current entity and the current year. Returns a single digestate object.",
-    )
-    def retrieve(self, request, *args, **kwargs):
-        try:
-            digestate = self.get_queryset().get()
-            data = self.get_serializer(digestate, many=False).data
-            return Response(data)
-
-        except BiomethaneDigestate.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
     @extend_schema(
         responses={
@@ -111,7 +88,7 @@ class BiomethaneDigestateViewSet(GenericViewSet, OptionalFieldsActionMixin):
             )
 
         try:
-            digestate = self.get_queryset().get()
+            digestate = self.get_filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(digestate, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneDigestate.DoesNotExist:

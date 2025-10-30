@@ -19,5 +19,5 @@ class BiomethanePermissionsMixinTests(TestCase):
     def test_get_permissions_with_read_action(self):
         """Test that get_permissions returns the correct permission for a read action"""
         permissions = get_biomethane_permissions(["upsert", "validate"], "retrieve")
-        self.assertEqual(permissions[0].role, None)
-        self.assertEqual(permissions[0].entity_type, [Entity.BIOMETHANE_PRODUCER])
+        self.assertEqual(permissions[0].op1.role, None)
+        self.assertEqual(permissions[0].op1.entity_type, [Entity.BIOMETHANE_PRODUCER])

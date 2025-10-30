@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters import BiomethaneAnnualDeclarationFilter
+from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
@@ -27,7 +27,7 @@ from .mixins import ValidateActionMixin
 class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin, YearsActionMixin):
     queryset = BiomethaneAnnualDeclaration.objects.all()
     serializer_class = BiomethaneAnnualDeclarationSerializer
-    filterset_class = BiomethaneAnnualDeclarationFilter
+    filterset_class = EntityProducerFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -61,6 +61,7 @@ class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin, Ye
     def retrieve(self, request, *args, **kwargs):
         """Retrieve the declaration for the current entity and current period or create it if it does not exist."""
         try:
+            print("Trying to retrieve declaration...")
             declaration = self.filter_queryset(self.get_queryset()).get()
             status_code = status.HTTP_200_OK
         except BiomethaneAnnualDeclaration.DoesNotExist:
