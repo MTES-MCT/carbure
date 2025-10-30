@@ -16,12 +16,14 @@ export type ValidDetailsDialogProps = {
   file: File
   fileData: DoubleCountingFileInfo
   onClose: () => void
+  onSuccess: () => void
 }
 
 export const ValidDetailsDialog = ({
   file,
   fileData,
   onClose,
+  onSuccess,
 }: ValidDetailsDialogProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
@@ -34,7 +36,7 @@ export const ValidDetailsDialog = ({
         file={file}
         fileData={fileData}
         extraFiles={extraFiles}
-        onSuccess={onClose}
+        onSuccess={onSuccess}
         onClose={close}
       />
     ))
