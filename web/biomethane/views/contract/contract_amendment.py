@@ -40,3 +40,12 @@ class BiomethaneContractAmendmentViewSet(
         if self.action == "create":
             return BiomethaneContractAmendmentAddSerializer
         return BiomethaneContractAmendmentSerializer
+
+    def list(self, request, *args, **kwargs):
+        # Apply filterset and check permissions on the first contract
+        queryset = self.filter_queryset(self.get_queryset())
+        first_amendment = queryset.first()
+        if first_amendment:
+            self.check_object_permissions(request, first_amendment.contract)
+
+        return super().list(request, *args, **kwargs)

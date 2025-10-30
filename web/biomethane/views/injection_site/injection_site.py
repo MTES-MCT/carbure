@@ -57,7 +57,7 @@ class BiomethaneInjectionSiteViewSet(RetrieveSingleObjectMixin, GenericViewSet):
     def upsert(self, request, *args, **kwargs):
         """Create or update injection site using upsert logic."""
         try:
-            injection_site = BiomethaneInjectionSite.objects.get(producer=request.entity)
+            injection_site = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(injection_site, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneInjectionSite.DoesNotExist:
