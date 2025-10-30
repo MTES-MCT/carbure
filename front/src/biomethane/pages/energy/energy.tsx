@@ -17,8 +17,10 @@ import { SectionsManagerProvider } from "common/providers/sections-manager.provi
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneEnergy } from "./types"
-import { MissingFields } from "biomethane/components/missing-fields"
-import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
+import {
+  MissingFields,
+  useMissingFields,
+} from "biomethane/components/missing-fields"
 import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
 

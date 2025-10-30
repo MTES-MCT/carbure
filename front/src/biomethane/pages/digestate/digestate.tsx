@@ -16,10 +16,12 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
-import { MissingFields } from "biomethane/components/missing-fields"
+import {
+  MissingFields,
+  useMissingFields,
+} from "biomethane/components/missing-fields"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneDigestate } from "./types"
-import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
 import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
 

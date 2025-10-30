@@ -1,5 +1,5 @@
 import { Notice } from "common/components/notice"
-import { useMissingFieldsMessages } from "./missing-fields.hooks"
+import { useMissingFieldsMessages } from "./hooks/use-missing-fields-message"
 
 export interface MissingFieldsProps {
   onPageClick?: (page: string) => void
