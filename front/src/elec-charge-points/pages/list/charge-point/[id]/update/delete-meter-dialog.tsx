@@ -1,6 +1,11 @@
 import { Confirm } from "common/components/dialog2"
 import { Col } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
+import { deleteMeter } from "./api"
+import useEntity from "common/hooks/entity"
+import { useNotify } from "common/components/notifications"
+import { useMutation } from "common/hooks/async"
+import { AxiosError } from "axios"
 
 interface DeleteMeterDialogProps {
   chargePointId: number
@@ -13,9 +18,34 @@ export const DeleteMeterDialog = ({
 }: DeleteMeterDialogProps) => {
   const { t } = useTranslation()
 
-  async function onConfirmDelete() {
-    console.log(chargePointId)
-  }
+  const notify = useNotify()
+  const entity = useEntity()
+  const deletion = useMutation(deleteMeter, {
+    invalidates: ["charge-points-details"],
+    onSuccess: () => {
+      onClose()
+      notify(t("Le compteur a bien été supprimé."), {
+        variant: "success",
+      })
+    },
+    onError: (e) => {
+      const error = (e as AxiosError<{ error: string }>).response?.data.error
+
+      if (error === "READINGS_ALREADY_REGISTERED") {
+        notify(
+          t(
+            "Impossible de supprimer le compteur, des relevés y sont déjà associés. Veuillez contacter l'administration."
+          ),
+          { variant: "danger" }
+        )
+      } else {
+        notify(
+          t("Une erreur est survenue lors de la suppression du compteur."),
+          { variant: "danger" }
+        )
+      }
+    },
+  })
 
   return (
     <Confirm
@@ -37,7 +67,7 @@ export const DeleteMeterDialog = ({
         </Col>
       }
       confirm={t("Supprimer")}
-      onConfirm={onConfirmDelete}
+      onConfirm={() => deletion.execute(entity.id, chargePointId)}
       onClose={onClose}
     />
   )
