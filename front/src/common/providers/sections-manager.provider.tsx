@@ -76,7 +76,7 @@ export const SectionsManagerProvider = ({
   const registerSection = (sectionId: string, expanded: boolean = false) => {
     // Register a section only if it is not already registered
     setSections((prev) => {
-      if (prev[sectionId]) return prev
+      if (sectionId in prev) return prev
 
       return {
         ...prev,
