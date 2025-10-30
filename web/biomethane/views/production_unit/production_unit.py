@@ -43,6 +43,12 @@ class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
             return BiomethaneProductionUnitUpsertSerializer
         return BiomethaneProductionUnitSerializer
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = queryset.get()
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     @extend_schema(
         responses={
             status.HTTP_200_OK: OpenApiResponse(
@@ -55,7 +61,7 @@ class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
     )
     def retrieve(self, request, *args, **kwargs):
         try:
-            production_unit = self.filter_queryset(self.get_queryset()).get()
+            production_unit = self.get_object()
             data = self.get_serializer(production_unit, many=False).data
             return Response(data)
 
