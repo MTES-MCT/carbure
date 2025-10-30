@@ -110,7 +110,7 @@ Dialog.Description = DialogDescription
 Dialog.Section = DialogSection
 export default Dialog
 
-export interface ConfirmProps {
+export interface ConfirmProps extends Pick<DialogProps, "size"> {
   title: string
   description: ReactNode
   confirm: string
@@ -123,6 +123,7 @@ export interface ConfirmProps {
   onConfirm: () => Promise<any>
   onClose: () => void
 }
+
 export const Confirm = ({
   title,
   description,
@@ -133,6 +134,7 @@ export const Confirm = ({
   icon,
   onConfirm,
   onClose,
+  size,
 }: ConfirmProps) => {
   const { t } = useTranslation()
   const confirmAction = useMutation(onConfirm)
@@ -145,6 +147,7 @@ export const Confirm = ({
   }
   return (
     <Dialog
+      size={size}
       onClose={onClose}
       header={<DialogTitle>{title}</DialogTitle>}
       footer={

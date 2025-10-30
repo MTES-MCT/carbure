@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next"
 import { EditableCardProvider, useEditableCard } from "./editable-card.provider"
 import { Form, FormProps } from "common/components/form2"
 
-interface EditableCardProps {
+export interface EditableCardProps {
   title: string
   description?: ReactNode
 
@@ -123,7 +123,9 @@ const EditableCardContent = ({
       <Divider noMargin />
 
       <div className={css["editable-card__content"]}>
-        {typeof children === "function" ? children({ isEditing }) : children}
+        {typeof children === "function"
+          ? children({ isEditing: currentIsEditing })
+          : children}
       </div>
     </div>
   )

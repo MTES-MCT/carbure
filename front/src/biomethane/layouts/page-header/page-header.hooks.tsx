@@ -3,20 +3,28 @@ import { usePortal } from "common/components/portal"
 import { Confirm } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import {
+  AnnualDeclarationContext,
+  useAnnualDeclaration,
+} from "biomethane/providers/annual-declaration"
 import {
   correctAnnualDeclaration,
   validateAnnualDeclaration,
 } from "biomethane/api"
 import useEntity from "common/hooks/entity"
 import { HttpError } from "common/services/api-fetch"
+import { MissingFields } from "biomethane/components/missing-fields"
+import { Text } from "common/components/text"
+import { useNavigateToMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
 
 export const usePageHeaderActions = () => {
   const { t } = useTranslation()
   const portal = usePortal()
   const notify = useNotify()
   const entity = useEntity()
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const annualDeclarationData = useAnnualDeclaration()
+  const { navigateToMissingFields } = useNavigateToMissingFields()
+
   const validateAnnualDeclarationMutation = useMutation(
     () => validateAnnualDeclaration(entity.id),
     {
@@ -66,6 +74,8 @@ export const usePageHeaderActions = () => {
     }
   )
 
+  const { currentAnnualDeclaration } = annualDeclarationData
+
   const openValidateDeclarationDialog = () => {
     portal((close) => (
       <Confirm
@@ -88,9 +98,38 @@ export const usePageHeaderActions = () => {
       />
     ))
   }
+  const openMissingFieldsDialog = () => {
+    portal((close) => (
+      <Confirm
+        onClose={close}
+        confirm={t("Corriger")}
+        onConfirm={() => {
+          close()
+          navigateToMissingFields()
+          return Promise.resolve()
+        }}
+        title={t("Erreurs sur votre déclaration annuelle")}
+        size="medium"
+        description={
+          <>
+            <AnnualDeclarationContext.Provider value={annualDeclarationData}>
+              <MissingFields onPageClick={close} />
+            </AnnualDeclarationContext.Provider>
+            <Text>
+              {t(
+                "Veuillez remplir ces champs et soumettre votre déclaration à nouveau."
+              )}
+            </Text>
+          </>
+        }
+        hideCancel
+      />
+    ))
+  }
 
   return {
     openValidateDeclarationDialog,
+    openMissingFieldsDialog,
     correctAnnualDeclarationMutation,
   }
 }

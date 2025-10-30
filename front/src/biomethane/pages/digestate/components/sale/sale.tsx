@@ -1,14 +1,11 @@
 import { Button } from "common/components/button2"
 import { TextInput, NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestateInputRequest,
-} from "../../types"
+import { BiomethaneDigestateInputRequest } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
@@ -16,25 +13,29 @@ type SaleForm = DeepPartial<
   Pick<BiomethaneDigestateInputRequest, "acquiring_companies" | "sold_volume">
 >
 
-export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
+const extractValues = (digestate?: SaleForm) => {
+  return {
+    acquiring_companies: digestate?.acquiring_companies,
+    sold_volume: digestate?.sold_volume,
+  }
+}
+
+export function Sale() {
   const { t } = useTranslation()
-  const { bind, value } = useForm<SaleForm>(
-    digestate
-      ? {
-          acquiring_companies: digestate.acquiring_companies,
-          sold_volume: digestate.sold_volume,
-        }
-      : {}
-  )
+  const { bind, value } = useFormContext<SaleForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveDigestate.execute(value)
+  const handleSave = async () => saveDigestate.execute(extractValues(value))
 
   return (
-    <EditableCard title={t("Vente")} readOnly={!canEditDeclaration}>
+    <ManagedEditableCard
+      sectionId="sale"
+      title={t("Vente")}
+      readOnly={!canEditDeclaration}
+    >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             <TextInput
               readOnly={!isEditing}
@@ -61,8 +62,8 @@ export function Sale({ digestate }: { digestate?: BiomethaneDigestate }) {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

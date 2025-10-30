@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { Button } from "common/components/button2"
 import { DeclareMonthlyQuantity } from "./declare-monthly-quantity"
 import HashRoute from "common/components/hash-route"
@@ -15,7 +15,8 @@ export const MonthlyBiomethaneInjection = ({
   const { canEditDeclaration } = useAnnualDeclaration()
   return (
     <>
-      <EditableCard
+      <ManagedEditableCard
+        sectionId="monthly-biomethane-injection"
         title={t("Production mensuelle de biométhane injecté")}
         headerActions={
           !energy ? (
@@ -41,7 +42,7 @@ export const MonthlyBiomethaneInjection = ({
           : t(
               "Déclarez ou modifiez les volumes mensuels de biométhane injecté"
             )}
-      </EditableCard>
+      </ManagedEditableCard>
       <HashRoute
         path="monthly-reports"
         element={<DeclareMonthlyQuantity isReadOnly={!canEditDeclaration} />}

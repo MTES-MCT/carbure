@@ -1,20 +1,17 @@
 import { Button } from "common/components/button2"
 import { TextInput, NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestateInputRequest,
-} from "../../types"
+import { BiomethaneDigestateInputRequest } from "../../types"
 import {
   BiomethaneContract,
   InstallationCategory,
 } from "biomethane/pages/contract/types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
 type IncinerationLandfillForm = DeepPartial<
   Pick<
@@ -25,37 +22,34 @@ type IncinerationLandfillForm = DeepPartial<
   >
 >
 
+const extractValues = (digestate?: IncinerationLandfillForm) => {
+  return {
+    annual_eliminated_volume: digestate?.annual_eliminated_volume,
+    incinerator_landfill_center_name:
+      digestate?.incinerator_landfill_center_name,
+    wwtp_materials_to_incineration: digestate?.wwtp_materials_to_incineration,
+  }
+}
 export function IncinerationLandfill({
-  digestate,
   contract,
 }: {
-  digestate?: BiomethaneDigestate
   contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<IncinerationLandfillForm>(
-    digestate
-      ? {
-          annual_eliminated_volume: digestate.annual_eliminated_volume,
-          incinerator_landfill_center_name:
-            digestate.incinerator_landfill_center_name,
-          wwtp_materials_to_incineration:
-            digestate.wwtp_materials_to_incineration,
-        }
-      : {}
-  )
+  const { bind, value } = useFormContext<IncinerationLandfillForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveDigestate.execute(value)
+  const handleSave = async () => saveDigestate.execute(extractValues(value))
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="incineration-landfill"
       title={t("Incinération / Enfouissement")}
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             <NumberInput
               readOnly={!isEditing}
@@ -96,8 +90,8 @@ export function IncinerationLandfill({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

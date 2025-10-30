@@ -18,19 +18,36 @@ import { useGetContractInfos } from "../contract/contract.hooks"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
+import { MissingFields } from "biomethane/components/missing-fields"
+import { FormContext, useForm } from "common/components/form2"
+import { BiomethaneDigestate } from "./types"
+import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
+import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 
-export const Digestate = () => {
+const DigestatePage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { selectedYear } = useAnnualDeclaration()
+  const form = useForm<BiomethaneDigestate | undefined | object>(undefined)
+
   const { result: digestate, loading } = useQuery(getDigestate, {
     key: "digestate",
     params: [entity.id, selectedYear],
+    onSuccess: (data) => {
+      form.setValue(data?.data)
+    },
+    onError: () => {
+      // If the digestate is not found, we need to set an empty object to the form
+      form.setValue({})
+    },
   })
 
   const { result: productionUnit } = useProductionUnit()
   const { result: contract } = useGetContractInfos()
+
   usePrivateNavigation(t("Digestat"))
+  useMissingFields(form)
 
   if (loading && !digestate) return <LoaderOverlay />
 
@@ -39,36 +56,40 @@ export const Digestate = () => {
   }
 
   return (
-    <>
-      {productionUnit && (
-        <Production
-          digestate={digestate?.data}
-          productionUnit={productionUnit}
-        />
-      )}
+    <BiomethanePageHeader>
+      <FormContext.Provider value={form}>
+        <MissingFields />
+        {productionUnit && <Production productionUnit={productionUnit} />}
 
-      {productionUnit?.digestate_valorization_methods?.includes(
-        DigestateValorizationMethods.SPREADING
-      ) && (
-        <>
-          <SpreadingDistance digestate={digestate?.data} />
-          <Spreading digestate={digestate?.data} />
-        </>
-      )}
+        {productionUnit?.digestate_valorization_methods?.includes(
+          DigestateValorizationMethods.SPREADING
+        ) && (
+          <>
+            <SpreadingDistance />
+            <Spreading digestate={digestate?.data} />
+          </>
+        )}
 
-      {productionUnit?.digestate_valorization_methods?.includes(
-        DigestateValorizationMethods.COMPOSTING
-      ) && <Composting digestate={digestate?.data} />}
+        {productionUnit?.digestate_valorization_methods?.includes(
+          DigestateValorizationMethods.COMPOSTING
+        ) && <Composting />}
 
-      {productionUnit?.digestate_valorization_methods?.includes(
-        DigestateValorizationMethods.INCINERATION_LANDFILLING
-      ) && (
-        <IncinerationLandfill digestate={digestate?.data} contract={contract} />
-      )}
+        {productionUnit?.digestate_valorization_methods?.includes(
+          DigestateValorizationMethods.INCINERATION_LANDFILLING
+        ) && <IncinerationLandfill contract={contract} />}
 
-      {productionUnit?.spreading_management_methods?.includes(
-        SpreadingManagementMethods.SALE
-      ) && <Sale digestate={digestate?.data} />}
-    </>
+        {productionUnit?.spreading_management_methods?.includes(
+          SpreadingManagementMethods.SALE
+        ) && <Sale />}
+      </FormContext.Provider>
+    </BiomethanePageHeader>
+  )
+}
+
+export const Digestate = () => {
+  return (
+    <SectionsManagerProvider>
+      <DigestatePage />
+    </SectionsManagerProvider>
   )
 }
