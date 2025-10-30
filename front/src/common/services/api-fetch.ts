@@ -39,13 +39,13 @@ const middleware: Middleware = {
   },
   onResponse: async ({ response }) => {
     if (!response.ok) {
+      let message = undefined
       try {
-        const message = await response.json()
-        throw new HttpError(JSON.stringify(message), response.status, message)
+        message = await response.json()
       } catch {
-        // If the response is not JSON, throw a generic error
-        throw new HttpError(response.statusText, response.status)
+        message = response.statusText
       }
+      throw new HttpError(JSON.stringify(message), response.status, message)
     }
     return response
   },
