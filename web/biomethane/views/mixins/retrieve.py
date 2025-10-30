@@ -3,10 +3,9 @@ from rest_framework import status
 from rest_framework.response import Response
 
 
-class RetrieveSingleObjectMixin:
+class GetObjectMixin:
     """
-    Mixin for ViewSets that retrieve a single object without ID in URL.
-    Uses filterset to get the object and checks object-level permissions.
+    Mixin that provides get_object() method with filterset and permission checks.
 
     The ViewSet must have:
     - filterset_class configured
@@ -21,6 +20,17 @@ class RetrieveSingleObjectMixin:
         obj = queryset.get()
         self.check_object_permissions(self.request, obj)
         return obj
+
+
+class RetrieveSingleObjectMixin(GetObjectMixin):
+    """
+    Mixin for ViewSets that retrieve a single object without ID in URL.
+    Uses filterset to get the object and checks object-level permissions.
+
+    The ViewSet must have:
+    - filterset_class configured
+    - queryset defined
+    """
 
     @extend_schema(
         responses={

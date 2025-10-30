@@ -9,6 +9,7 @@ from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import YearsActionMixin
+from biomethane.views.mixins.retrieve import GetObjectMixin
 
 from .mixins import ValidateActionMixin
 
@@ -24,7 +25,7 @@ from .mixins import ValidateActionMixin
         ),
     ]
 )
-class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin, YearsActionMixin):
+class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, YearsActionMixin, GenericViewSet):
     queryset = BiomethaneAnnualDeclaration.objects.all()
     serializer_class = BiomethaneAnnualDeclarationSerializer
     filterset_class = EntityProducerFilter
@@ -61,8 +62,7 @@ class BiomethaneAnnualDeclarationViewSet(GenericViewSet, ValidateActionMixin, Ye
     def retrieve(self, request, *args, **kwargs):
         """Retrieve the declaration for the current entity and current period or create it if it does not exist."""
         try:
-            print("Trying to retrieve declaration...")
-            declaration = self.filter_queryset(self.get_queryset()).get()
+            declaration = self.get_object()
             status_code = status.HTTP_200_OK
         except BiomethaneAnnualDeclaration.DoesNotExist:
             serializer = self.get_serializer(data={})
