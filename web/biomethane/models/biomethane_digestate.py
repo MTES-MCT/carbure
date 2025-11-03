@@ -21,7 +21,7 @@ class BiomethaneDigestate(models.Model):
     raw_digestate_dry_matter_rate = models.FloatField(null=True, blank=True)
     # Tonnage de digestat solide (t)
     solid_digestate_tonnage = models.FloatField(null=True, blank=True)
-    # Quantité digestat liquide (en m3)
+    # Quantité digestat liquide (t)
     liquid_digestate_quantity = models.FloatField(null=True, blank=True)
     # Distance moyenne de valorisation d'épandage (km)
     average_spreading_valorization_distance = models.FloatField(null=True, blank=True)
