@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="biomethaneenergy",
             name="malfunction_types",
-            field=models.JSONField(blank=True, default=list),
+            field=models.JSONField(null=True, blank=True, default=list),
         ),
     ]

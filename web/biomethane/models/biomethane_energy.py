@@ -124,7 +124,8 @@ class BiomethaneEnergy(models.Model):
         (MALFUNCTION_TYPE_OTHER, "Autres (à préciser)"),
     ]
 
-    malfunction_types = models.JSONField(blank=True, default=list)
+    # Types de dysfonctionnement (peut contenir plusieurs valeurs)
+    malfunction_types = models.JSONField(null=True, blank=True, default=list)
 
     # Précisions sur les dysfonctionnements
     malfunction_details = models.TextField(null=True, blank=True)
