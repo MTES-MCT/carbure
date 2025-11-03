@@ -16,63 +16,9 @@
  *     return HttpResponse.json(data) // type-checked against ResponseType<..., "get">
  *   })
  *
- * Notes:
- * - If a route is missing from `newPaths`, add it there so types line up.
- * - Use `apiCall(method, path, resolver, options)` only when the method is dynamic;
- *   otherwise prefer the method-specific helpers.
  */
-
-import {
-  http as mswHttp,
-  PathParams,
-  DefaultBodyType,
-  HttpResponseResolver,
-} from "msw"
-import {
-  HttpMethod,
-  ResponseType,
-  newPaths,
-} from "common/services/api-fetch.types"
+import { createOpenApiHttp } from "openapi-msw"
 import { API_PREFIX } from "common/services/api-fetch"
+import { newPaths } from "common/services/api-fetch.types"
 
-export function apiCall<
-  Method extends HttpMethod,
-  Params extends PathParams<keyof Params> = PathParams,
-  RequestBodyType extends DefaultBodyType = DefaultBodyType,
-  Path extends keyof newPaths = keyof newPaths,
->(
-  method: Method,
-  path: Path,
-  resolver: HttpResponseResolver<
-    Params,
-    RequestBodyType,
-    ResponseType<Path, "get"> extends DefaultBodyType
-      ? ResponseType<Path, "get">
-      : DefaultBodyType
-  >,
-  options?: Parameters<(typeof mswHttp)[Method]>[2]
-) {
-  return mswHttp[method](`/${API_PREFIX}${path}`, resolver, options)
-}
-type Tail<T extends any[]> = T extends [any, ...infer R] ? R : never
-
-type Params<Method extends HttpMethod> = Tail<
-  Parameters<typeof apiCall<Method>>
->
-const get = (...params: Params<"get">) => apiCall("get", ...params)
-const post = (...params: Params<"post">) => apiCall("post", ...params)
-const put = (...params: Params<"put">) => apiCall("put", ...params)
-const patch = (...params: Params<"patch">) => apiCall("patch", ...params)
-const httpDelete = (...params: Params<"delete">) => apiCall("delete", ...params)
-const options = (...params: Params<"options">) => apiCall("options", ...params)
-const head = (...params: Params<"head">) => apiCall("head", ...params)
-
-export const http = {
-  get,
-  post,
-  put,
-  patch,
-  delete: httpDelete,
-  options,
-  head,
-}
+export const http = createOpenApiHttp<newPaths>({ baseUrl: `/${API_PREFIX}` })
