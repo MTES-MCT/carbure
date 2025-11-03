@@ -160,7 +160,6 @@ export function EnergyEfficiency({
               iconId="ri-save-line"
               asideX
               loading={saveEnergy.loading}
-              disabled={Boolean(energyEfficiencyCoefficient.error)}
             >
               {t("Sauvegarder")}
             </Button>

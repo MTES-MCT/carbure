@@ -47,7 +47,7 @@ class BiomethaneEnergy(models.Model):
     # J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d’origine fossile.
     attest_no_fossil_for_digester_heating_and_purification = models.BooleanField(default=False)
 
-    # Énergie utilisée pour le chauffage du digesteur
+    # Type d'énergie utilisée pour le chauffage du digesteur
     energy_used_for_digester_heating = models.CharField(max_length=255, null=True, blank=True)
 
     # Précisions (si utilisation d’énergie d’origine fossile)
@@ -58,7 +58,7 @@ class BiomethaneEnergy(models.Model):
     # J'atteste que les besoins en énergie cités ci-dessus ont pas satisfaits par une énergie d’origine fossile.
     attest_no_fossil_for_installation_needs = models.BooleanField(default=False)
 
-    # Énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
+    # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
     # le chauffage du digesteur et l’épuration du biogaz
     energy_used_for_installation_needs = models.CharField(max_length=255, null=True, blank=True)
 
