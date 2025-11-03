@@ -23,8 +23,5 @@ class ListWithObjectPermissionsMixin:
         queryset = self.filter_queryset(self.get_queryset())
         first_obj = queryset.first()
         permission_obj = self.get_permission_object(first_obj)
-
-        if permission_obj is not None:
-            self.check_object_permissions(request, permission_obj)
-
+        self.check_object_permissions(request, permission_obj)
         return super().list(request, *args, **kwargs)
