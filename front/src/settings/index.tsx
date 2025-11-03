@@ -17,6 +17,7 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { useRoutes } from "common/hooks/routes"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { lazy } from "react"
+import { AnnualDeclarationLayout } from "biomethane/layouts/annual-declaration-layout"
 
 const BiomethaneContractPage = lazy(() => import("biomethane/pages/contract"))
 const BiomethaneInjectionPage = lazy(() => import("biomethane/pages/injection"))
@@ -134,20 +135,12 @@ const Settings = () => {
             <Route path="users" element={<EntityUserRights />} />
           )}
           {isBiomethaneProducer && (
-            <>
-              <Route
-                path="biomethane/contract"
-                element={<BiomethaneContractPage />}
-              />
-              <Route
-                path="biomethane/production"
-                element={<BiomethaneProductionPage />}
-              />
-              <Route
-                path="biomethane/injection"
-                element={<BiomethaneInjectionPage />}
-              />
-            </>
+            <Route path="biomethane" element={<AnnualDeclarationLayout />}>
+              <Route path="contract" element={<BiomethaneContractPage />} />
+              <Route path="production" element={<BiomethaneProductionPage />} />
+              <Route path="injection" element={<BiomethaneInjectionPage />} />
+              <Route index element={<Navigate replace to="contract" />} />
+            </Route>
           )}
           <Route path="*" element={<Navigate replace to={defaultTab} />} />
         </Routes>

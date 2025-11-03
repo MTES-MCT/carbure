@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { Button } from "common/components/button2"
 import { DeclareMonthlyQuantity } from "./declare-monthly-quantity"
 import HashRoute from "common/components/hash-route"
-import { useEnergyContext } from "../../energy.hooks"
 import { BiomethaneEnergy } from "../../types"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const MonthlyBiomethaneInjection = ({
   energy,
@@ -12,10 +12,11 @@ export const MonthlyBiomethaneInjection = ({
   energy?: BiomethaneEnergy
 }) => {
   const { t } = useTranslation()
-  const { isInDeclarationPeriod } = useEnergyContext()
+  const { canEditDeclaration } = useAnnualDeclaration()
   return (
     <>
-      <EditableCard
+      <ManagedEditableCard
+        sectionId="monthly-biomethane-injection"
         title={t("Production mensuelle de biométhane injecté")}
         headerActions={
           !energy ? (
@@ -29,22 +30,22 @@ export const MonthlyBiomethaneInjection = ({
                 to: { hash: "monthly-reports" },
               }}
             >
-              {!isInDeclarationPeriod
+              {!canEditDeclaration
                 ? t("Visualiser mes volumes mensuels")
                 : t("Déclarer mes volumes mensuels")}
             </Button>
           )
         }
       >
-        {!isInDeclarationPeriod
+        {!canEditDeclaration
           ? t("Visualisez les volumes mensuels de biométhane injecté")
           : t(
               "Déclarez ou modifiez les volumes mensuels de biométhane injecté"
             )}
-      </EditableCard>
+      </ManagedEditableCard>
       <HashRoute
         path="monthly-reports"
-        element={<DeclareMonthlyQuantity isReadOnly={!isInDeclarationPeriod} />}
+        element={<DeclareMonthlyQuantity isReadOnly={!canEditDeclaration} />}
       />
     </>
   )

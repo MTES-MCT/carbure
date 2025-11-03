@@ -4,15 +4,6 @@ import {
   BiomethaneEnergyMonthlyReportDataRequest,
 } from "./types"
 
-export const getYears = (entity_id: number) =>
-  api.GET("/biomethane/energy/years/", {
-    params: {
-      query: {
-        entity_id,
-      },
-    },
-  })
-
 export const getEnergy = (entity_id: number, year: number) =>
   api
     .GET("/biomethane/energy/", {
@@ -36,15 +27,6 @@ export const saveEnergy = (
       },
     },
     body,
-  })
-
-export const validateEnergy = (entity_id: number) =>
-  api.POST("/biomethane/energy/validate/", {
-    params: {
-      query: {
-        entity_id,
-      },
-    },
   })
 
 export const getMonthlyReports = (entity_id: number, year: number) =>

@@ -37,10 +37,7 @@ export const okEntitySearch = http.get("/api/resources/entities", () => {
 })
 
 export const okCountrySearch = http.get("/api/resources/countries", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: [country],
-  })
+  return HttpResponse.json([country])
 })
 
 export const okBiocarburantsSearch = http.get("/api/resources/biofuels", () => {

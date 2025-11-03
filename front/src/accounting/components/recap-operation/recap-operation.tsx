@@ -2,7 +2,6 @@ import { Balance } from "accounting/types"
 import { OperationText } from "../operation-text"
 import { formatSector } from "accounting/utils/formatters"
 import { useTranslation } from "react-i18next"
-import { useUnit } from "common/hooks/unit"
 import { Grid } from "common/components/scaffold"
 import { ExtendedUnit, Unit } from "common/types"
 
@@ -11,12 +10,8 @@ type RecapOperationProps = {
   unit?: Unit | ExtendedUnit
 }
 
-export const RecapOperation = ({
-  balance,
-  unit: customUnit,
-}: RecapOperationProps) => {
+export const RecapOperation = ({ balance }: RecapOperationProps) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit(customUnit)
 
   return (
     <>
@@ -31,18 +26,6 @@ export const RecapOperation = ({
       <OperationText
         title={t("Biocarburant")}
         description={balance.biofuel ? balance.biofuel.code : ""}
-      />
-      <OperationText
-        title={t("Solde disponible {{biofuel}}", {
-          biofuel: balance.biofuel?.code,
-        })}
-        description={
-          balance.available_balance
-            ? formatUnit(balance.available_balance, {
-                fractionDigits: 0,
-              })
-            : ""
-        }
       />
     </>
   )

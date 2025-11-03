@@ -2,6 +2,7 @@ from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateFromExcelSerializer, BiomethaneUploadExcelSerializer
 from core.excel_importer import ExcelImporter, ExcelValidationError
 
@@ -73,7 +74,11 @@ class ExcelImportActionMixin:
                 nb_rows=len(data),
             )
 
-            # If all validations passed, save all instances using bulk save
+            # If all validations passed, deleted all previous entries for this entity/year
+            supply_plan = self.get_queryset()
+            BiomethaneSupplyInput.objects.filter(supply_plan=supply_plan).delete() if supply_plan else None
+
+            # Then save all instances using bulk save
             serializer.save()
 
             # Upload the file to S3 for backup

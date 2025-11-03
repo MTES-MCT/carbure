@@ -6,8 +6,10 @@ from biomethane.filters import BiomethaneSupplyPlanYearsFilter
 from biomethane.models import BiomethaneSupplyPlan
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneSupplyPlanSerializer
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from biomethane.views.mixins import YearsActionMixin
 
-from .mixins import ExcelImportActionMixin, YearsActionMixin
+from .mixins import ExcelImportActionMixin
 
 
 @extend_schema(
@@ -34,3 +36,15 @@ class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin, ExcelImportA
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
         return context
+
+    def get_queryset(self):
+        if self.action == "import_supply_plan_from_excel":
+            try:
+                return (
+                    super()
+                    .get_queryset()
+                    .get(producer=self.request.entity, year=BiomethaneAnnualDeclarationService.get_declaration_period())
+                )
+            except BiomethaneSupplyPlan.DoesNotExist:
+                return None
+        return super().get_queryset()

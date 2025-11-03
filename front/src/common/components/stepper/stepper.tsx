@@ -36,11 +36,19 @@ type StepperNextButtonProps = Pick<
   "disabled" | "loading" | "nativeButtonProps" | "onClick" | "type"
 >
 
-const StepperNextButton = ({ loading, ...props }: StepperNextButtonProps) => {
-  const { nextStep, mutation } = useStepper()
+const StepperNextButton = ({
+  loading,
+  disabled: _disabled,
+  ...props
+}: StepperNextButtonProps) => {
+  const { currentStep, nextStep, mutation } = useStepper()
   const { t } = useTranslation()
 
   if (!nextStep) return null
+
+  const isButtonDisabled =
+    (currentStep.allowNextStep !== undefined && !currentStep.allowNextStep) ||
+    _disabled
 
   return (
     <Button
@@ -49,6 +57,7 @@ const StepperNextButton = ({ loading, ...props }: StepperNextButtonProps) => {
       iconPosition="right"
       type="submit"
       loading={loading ?? mutation.loading}
+      disabled={isButtonDisabled}
       {...props}
     >
       {t("Suivant")}

@@ -1,7 +1,7 @@
-from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneInjectionSite
+from core.serializers import check_fields_required
 
 
 class BiomethaneInjectionSiteSerializer(serializers.ModelSerializer):
@@ -22,19 +22,15 @@ class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
     def validate(self, data):
         validated_data = super().validate(data)
 
-        errors = {}
+        required_fields = []
 
-        if validated_data.get("is_shared_injection_site") and not validated_data.get("meter_number"):
-            errors["meter_number"] = [_("Ce champ est obligatoire.")]
+        if validated_data.get("is_shared_injection_site"):
+            required_fields.append("meter_number")
 
         if validated_data.get("is_different_from_production_site"):
-            required_fields = ["company_address", "city", "postal_code"]
-            for field in required_fields:
-                if not validated_data.get(field):
-                    errors[field] = [_("Ce champ est obligatoire.")]
+            required_fields.extend(["company_address", "city", "postal_code"])
 
-        if errors:
-            raise serializers.ValidationError(errors)
+        check_fields_required(validated_data, required_fields)
 
         return validated_data
 

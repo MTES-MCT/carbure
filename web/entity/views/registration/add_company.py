@@ -19,6 +19,7 @@ from core.models import (
     Pays,
     UserRightsRequests,
 )
+from core.serializers import check_fields_required
 from core.utils import CarbureEnv
 
 
@@ -49,8 +50,12 @@ class EntityCompanySerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        attrs.pop("certificate_type", None)
+        entity_type = attrs.get("entity_type")
+        if entity_type == Entity.TRADER:
+            check_fields_required(attrs, ["certificate_type", "certificate_id"])
+
         attrs.pop("certificate_id", None)
+        attrs.pop("certificate_type", None)
         return attrs
 
 
@@ -110,7 +115,11 @@ def add_company_view(request):
     certificate_id = request.data.get("certificate_id")
     certificate_type = request.data.get("certificate_type")
 
-    if validated_data["entity_type"] not in [Entity.AIRLINE, Entity.CPO] and certificate_id and certificate_type:
+    if (
+        validated_data["entity_type"] not in [Entity.AIRLINE, Entity.CPO, Entity.SAF_TRADER]
+        and certificate_id
+        and certificate_type
+    ):
         try:
             original_certificate = GenericCertificate.objects.get(
                 certificate_type=certificate_type, certificate_id=certificate_id

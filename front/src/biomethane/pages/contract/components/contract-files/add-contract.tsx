@@ -122,12 +122,10 @@ export const AddContract = (props: AddContractProps) => {
     {
       key: "general",
       title: t("Conditions générales"),
-      allowNextStep: Boolean(form.value.general_conditions_file),
     },
     {
       key: "specific",
       title: t("Conditions particulières"),
-      allowNextStep: Boolean(form.value.specific_conditions_file),
     },
   ]
   return (

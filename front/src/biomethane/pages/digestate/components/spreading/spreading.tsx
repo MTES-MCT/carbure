@@ -1,13 +1,13 @@
 import { Button } from "common/components/button2"
 import { Table } from "common/components/table2"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useSpreadingColumns } from "./spreading.hooks"
 import { BiomethaneDigestate } from "../../types"
 import { Notice } from "common/components/notice"
 import { usePortal } from "common/components/portal"
 import { AddSpreadingDepartment } from "./add-spreading-department"
-import { useDigestateContext } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const Spreading = ({
   digestate,
@@ -17,7 +17,7 @@ export const Spreading = ({
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
   const portal = usePortal()
-  const { isInDeclarationPeriod } = useDigestateContext()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const openAddSpreadingDepartmentDialog = () => {
     portal((close) => (
@@ -34,7 +34,8 @@ export const Spreading = ({
   )
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="spreading"
       title={t("Épandage")}
       description={
         <>
@@ -47,12 +48,12 @@ export const Spreading = ({
         <Button
           iconId="ri-add-line"
           onClick={openAddSpreadingDepartmentDialog}
-          disabled={!digestate || !isInDeclarationPeriod}
+          disabled={!digestate || !canEditDeclaration}
         >
           {t("Ajouter un département")}
         </Button>
       }
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {digestate && digestate?.spreadings.length > 0 ? (
         <>
@@ -68,6 +69,6 @@ export const Spreading = ({
           {t("Aucun département d'épandage déclaré")}
         </Notice>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

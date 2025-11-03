@@ -8,6 +8,7 @@ import { Button } from "common/components/button2"
 import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
 import { TransfertDialog } from "./transfert-dialog"
+import { ExportationDialog } from "./exportation-dialog"
 
 interface DebitOperationDialogProps {
   onClose: () => void
@@ -19,14 +20,24 @@ export const DebitOperationDialog = ({
   balance,
 }: DebitOperationDialogProps) => {
   const portal = usePortal()
-  const [currentOperation, setCurrentOperation] =
-    useState<OperationType.TRANSFERT>(OperationType.TRANSFERT)
+  const [currentOperation, setCurrentOperation] = useState<
+    OperationType.TRANSFERT | OperationType.EXPORTATION
+  >(OperationType.TRANSFERT)
 
   const handleNext = () => {
     switch (currentOperation) {
       case OperationType.TRANSFERT:
         portal((close) => (
           <TransfertDialog
+            onClose={close}
+            balance={balance}
+            onOperationCreated={onClose}
+          />
+        ))
+        break
+      case OperationType.EXPORTATION:
+        portal((close) => (
+          <ExportationDialog
             onClose={close}
             balance={balance}
             onOperationCreated={onClose}
@@ -63,6 +74,10 @@ export const DebitOperationDialog = ({
               {
                 label: formatOperationType(OperationType.TRANSFERT),
                 value: OperationType.TRANSFERT,
+              },
+              {
+                label: formatOperationType(OperationType.EXPORTATION),
+                value: OperationType.EXPORTATION,
               },
             ]}
             onChange={setCurrentOperation}

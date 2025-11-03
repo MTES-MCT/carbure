@@ -27,8 +27,6 @@ export interface ImportErrorResponse {
   total_rows_processed: number
 }
 
-const FILE_PATH = "/templates/plan_approvisionnement_non_red.xlsx"
-
 export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -73,6 +71,8 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
     bind("supplyPlanFile").onChange(file || null)
   }
 
+  const filePath = "/api/biomethane/supply-plan/download-template/"
+
   return (
     <Dialog
       header={
@@ -102,7 +102,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
           <Trans>
             Le template du fichier attendu est disponible{" "}
             <Button
-              linkProps={{ to: FILE_PATH, target: "_blank" }}
+              linkProps={{ to: filePath, target: "_blank" }}
               customPriority="link"
             >
               sur ce lien

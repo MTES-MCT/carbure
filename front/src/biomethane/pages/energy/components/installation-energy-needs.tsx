@@ -1,15 +1,16 @@
 import { Button } from "common/components/button2"
 import { Checkbox, TextInput } from "common/components/inputs2"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../types"
-import { useEnergyContext } from "../energy.hooks"
+import { BiomethaneEnergyInputRequest } from "../types"
+import { useSaveEnergy } from "../energy.hooks"
 import {
   BiomethaneContract,
   TariffReference,
 } from "biomethane/pages/contract/types"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type InstallationEnergyNeedsForm = DeepPartial<
   Pick<
@@ -23,32 +24,47 @@ type InstallationEnergyNeedsForm = DeepPartial<
   >
 >
 
+const extractValues = (energy?: InstallationEnergyNeedsForm) => {
+  return {
+    attest_no_fossil_for_digester_heating_and_purification:
+      energy?.attest_no_fossil_for_digester_heating_and_purification,
+    energy_used_for_digester_heating: energy?.energy_used_for_digester_heating,
+    fossil_details_for_digester_heating:
+      energy?.fossil_details_for_digester_heating,
+    attest_no_fossil_for_installation_needs:
+      energy?.attest_no_fossil_for_installation_needs,
+    energy_used_for_installation_needs:
+      energy?.energy_used_for_installation_needs,
+    fossil_details_for_installation_needs:
+      energy?.fossil_details_for_installation_needs,
+  }
+}
 export function InstallationEnergyNeeds({
-  energy,
   contract,
 }: {
-  energy?: BiomethaneEnergy
   contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
 
-  const { bind, value } = useForm<InstallationEnergyNeedsForm>(energy ?? {})
-  const { saveEnergy, isInDeclarationPeriod } = useEnergyContext()
+  const { bind, value } = useFormContext<InstallationEnergyNeedsForm>()
+  const saveEnergy = useSaveEnergy()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSubmit = async () => saveEnergy.execute(value)
+  const handleSubmit = async () => saveEnergy.execute(extractValues(value))
 
   const isTariffReference2023 =
     contract?.tariff_reference === TariffReference.Value2023
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="installation-energy-needs"
       title={t(
         "Nature de l’énergie utilisée pour les besoins de l'installation"
       )}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSubmit}>
+        <ManagedEditableCard.Form onSubmit={handleSubmit}>
           {!isTariffReference2023 && (
             <>
               <Checkbox
@@ -128,8 +144,8 @@ export function InstallationEnergyNeeds({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

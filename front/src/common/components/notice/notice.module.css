@@ -28,6 +28,13 @@
 
 .notice__body-content {
   width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1w);
+}
+
+.notice__body-content:has(.notice__title) {
+  display: block;
 }
 
 .notice__close {

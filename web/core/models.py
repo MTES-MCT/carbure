@@ -40,6 +40,26 @@ class Pays(models.Model):
         ordering = ["name"]
 
 
+class Department(models.Model):
+    code_dept = models.CharField(max_length=3)
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return f"{self.code_dept} - {self.name}"
+
+    def natural_key(self):
+        return {
+            "code_dept": self.code_dept,
+            "name": self.name,
+        }
+
+    class Meta:
+        db_table = "departements"
+        verbose_name = "Département"
+        verbose_name_plural = "Départements"
+        ordering = ["code_dept"]
+
+
 class Entity(models.Model):
     PRODUCER = "Producteur"
     OPERATOR = "Opérateur"

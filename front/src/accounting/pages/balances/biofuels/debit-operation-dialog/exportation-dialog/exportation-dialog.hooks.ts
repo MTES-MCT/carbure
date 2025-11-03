@@ -1,11 +1,7 @@
 import { Balance, CreateOperationType } from "accounting/types"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import useEntity from "common/hooks/entity"
-import { useNotify } from "common/components/notifications"
-import { useTranslation } from "react-i18next"
-import { useUnit } from "common/hooks/unit"
-import { createOperationWithSimulation } from "accounting/api/biofuels/operations"
-import { useMutation } from "common/hooks/async"
+import { useCreateOperation } from "accounting/hooks/useCreateOperation.hooks"
 
 type ExportationDialogProps = {
   balance: Balance
@@ -20,49 +16,24 @@ export const useExportationDialog = ({
   onOperationCreated,
 }: ExportationDialogProps) => {
   const entity = useEntity()
-  const notify = useNotify()
-  const { t } = useTranslation()
-  const { formatUnit } = useUnit()
 
-  const onSubmit = () =>
-    createOperationWithSimulation(entity.id, {
-      simulation: {
-        target_volume: values.quantity!,
-        target_emission: values.avoided_emissions!,
-        unit: balance.unit,
-      },
-      operation: {
-        type: CreateOperationType.EXPORTATION,
-        from_depot: values.from_depot?.id,
-        credited_entity: values.credited_entity?.id,
-      },
+  const createOperation = useCreateOperation({
+    onOperationCreated,
+    data: {
+      type: values.country?.is_in_europe
+        ? CreateOperationType.EXPEDITION
+        : CreateOperationType.EXPORTATION,
+      from_depot: values.from_depot?.id,
+      export_recipient: values.export_recipient,
       customs_category: balance.customs_category,
       biofuel: balance.biofuel?.id ?? null,
       debited_entity: entity.id,
-      from_depot: values.from_depot?.id,
-    })
-
-  return useMutation(onSubmit, {
-    invalidates: ["balances"],
-    onSuccess: () => {
-      onClose()
-      onOperationCreated()
-      notify(
-        t(
-          "L'exportation d'une quantité de {{quantity}} a été réalisée avec succès",
-          {
-            quantity: formatUnit(values.quantity!, {
-              fractionDigits: 0,
-            }),
-          }
-        ),
-        { variant: "success" }
-      )
+      lots: values.selected_lots!,
+      export_country: values.country?.code_pays ?? "",
     },
-    onError: () => {
-      notify(t("Une erreur est survenue lors de l'exportation"), {
-        variant: "danger",
-      })
-    },
+    quantity: values.quantity!,
+    onClose,
   })
+
+  return createOperation
 }

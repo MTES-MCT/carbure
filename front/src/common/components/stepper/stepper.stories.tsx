@@ -101,3 +101,24 @@ export const StepperWithFormValidate: Story = {
     await StepperWithForm.play?.(props)
   },
 }
+
+export const StepperWithNextButtonDisabled: Story = {
+  ...StepperWithForm,
+  decorators: [
+    loadStepsDecorator([
+      {
+        key: "step-1",
+        title: "Step 1",
+        allowNextStep: false,
+      },
+      {
+        key: "step-2",
+        title: "Step 2",
+      },
+      {
+        key: "step-3",
+        title: "Step 3",
+      },
+    ]),
+  ],
+}

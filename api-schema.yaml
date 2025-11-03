@@ -453,6 +453,123 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/biomethane/annual-declaration/:
+    get:
+      operationId: biomethane_annual_declaration_retrieve
+      description: Retrieve the declaration. Returns a single declaration object.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: Declaration details for the entity
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: Declaration created for the entity
+    patch:
+      operationId: biomethane_annual_declaration_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneAnnualDeclarationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneAnnualDeclarationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedBiomethaneAnnualDeclarationRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: ""
+  /api/biomethane/annual-declaration/validate/:
+    post:
+      operationId: biomethane_annual_declaration_validate_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: No response body
+        "400":
+          description: No response body
+        "404":
+          description: No response body
+  /api/biomethane/annual-declaration/years/:
+    get:
+      operationId: biomethane_annual_declaration_years_retrieve
+      description: Return a sorted list of distinct years from the queryset.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfYearsResponse.:
+                  value:
+                    - 2020
+                    - 2021
+                    - 2022
+                    - 2023
+                    - 2024
+                  summary: Example of years response.
+          description: ""
   /api/biomethane/contract/:
     get:
       operationId: biomethane_contract_retrieve
@@ -620,6 +737,30 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneContractAmendment"
           description: ""
+  /api/biomethane/contract/watched-fields/:
+    get:
+      operationId: biomethane_contract_watched_fields_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+          description: List of watched fields
   /api/biomethane/digestate/:
     get:
       operationId: biomethane_digestate_retrieve
@@ -892,6 +1033,34 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/biomethane/digestate/optional-fields/:
+    get:
+      operationId: biomethane_digestate_optional_fields_retrieve
+      description: Return the optional fields for the first object in the queryset.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                description: List of optional field names
+          description: ""
+        "404":
+          description: Not found for this entity.
   /api/biomethane/digestate/spreading/:
     post:
       operationId: biomethane_digestate_spreading_create
@@ -951,57 +1120,6 @@ paths:
       responses:
         "204":
           description: No response body
-  /api/biomethane/digestate/validate/:
-    post:
-      operationId: biomethane_digestate_validate_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          description: No response body
-  /api/biomethane/digestate/years/:
-    get:
-      operationId: biomethane_digestate_years_retrieve
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: integer
-              examples:
-                ExampleOfFiltersResponse.:
-                  value:
-                    - 2020
-                    - 2021
-                    - 2022
-                    - 2023
-                    - 2024
-                  summary: Example of filters response.
-          description: ""
   /api/biomethane/energy/:
     get:
       operationId: biomethane_energy_retrieve
@@ -1156,33 +1274,16 @@ paths:
       responses:
         "201":
           description: Monthly reports created or updated successfully
-  /api/biomethane/energy/validate/:
-    post:
-      operationId: biomethane_energy_validate_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - biomethane
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          description: No response body
-  /api/biomethane/energy/years/:
+  /api/biomethane/energy/optional-fields/:
     get:
-      operationId: biomethane_energy_years_retrieve
+      operationId: biomethane_energy_optional_fields_retrieve
+      description: Return the optional fields for the first object in the queryset.
       parameters:
         - in: query
           name: entity_id
           schema:
             type: integer
-          description: Entity ID
+          description: Authorised entity ID.
           required: true
       tags:
         - biomethane
@@ -1196,17 +1297,11 @@ paths:
               schema:
                 type: array
                 items:
-                  type: integer
-              examples:
-                ExampleOfFiltersResponse.:
-                  value:
-                    - 2020
-                    - 2021
-                    - 2022
-                    - 2023
-                    - 2024
-                  summary: Example of filters response.
+                  type: string
+                description: List of optional field names
           description: ""
+        "404":
+          description: Not found for this entity.
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
@@ -1340,6 +1435,30 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneProductionUnit"
           description: Production unit created successfully
+  /api/biomethane/production-unit/watched-fields/:
+    get:
+      operationId: biomethane_production_unit_watched_fields_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+          description: List of watched fields
   /api/biomethane/supply-input/:
     get:
       operationId: biomethane_supply_input_list
@@ -1669,6 +1788,24 @@ paths:
                     - year
                   summary: Example of filters response.
           description: ""
+  /api/biomethane/supply-plan/download-template/:
+    get:
+      operationId: biomethane_supply_plan_download_template_retrieve
+      description: Download Supply Plan Excel Template
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Fichier Excel généré
   /api/biomethane/supply-plan/export/:
     get:
       operationId: biomethane_supply_plan_export_retrieve
@@ -1759,6 +1896,7 @@ paths:
   /api/biomethane/supply-plan/years/:
     get:
       operationId: biomethane_supply_plan_years_retrieve
+      description: Return a sorted list of distinct years from the queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1780,14 +1918,14 @@ paths:
                 items:
                   type: integer
               examples:
-                ExampleOfFiltersResponse.:
+                ExampleOfYearsResponse.:
                   value:
                     - 2020
                     - 2021
                     - 2022
                     - 2023
                     - 2024
-                  summary: Example of filters response.
+                  summary: Example of years response.
           description: ""
   /api/double-counting/agreements/:
     get:
@@ -8730,6 +8868,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -8743,6 +8882,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -9361,6 +9501,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9374,6 +9515,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -9619,6 +9761,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9632,6 +9775,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -9913,6 +10057,7 @@ paths:
                 - CESSION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
+                - EXPEDITION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9926,6 +10071,7 @@ paths:
             * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
             * `MAC_BIO` - MAC_BIO
             * `EXPORTATION` - EXPORTATION
+            * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
@@ -10700,6 +10846,46 @@ components:
         - code
         - name
         - name_en
+    BiomethaneAnnualDeclaration:
+      type: object
+      properties:
+        year:
+          type: integer
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        missing_fields:
+          type: object
+          properties:
+            digestate_missing_fields:
+              type: array
+              items:
+                type: string
+              nullable: true
+              description: List of missing fields for digestate
+            energy_missing_fields:
+              type: array
+              items:
+                type: string
+              nullable: true
+              description: List of missing fields for energy
+          description: Missing fields grouped by type
+          readOnly: true
+        is_complete:
+          type: boolean
+          readOnly: true
+      required:
+        - is_complete
+        - missing_fields
+        - year
+    BiomethaneAnnualDeclarationStatusEnum:
+      enum:
+        - IN_PROGRESS
+        - DECLARED
+      type: string
+      description: |-
+        * `IN_PROGRESS` - IN_PROGRESS
+        * `DECLARED` - DECLARED
     BiomethaneContract:
       type: object
       properties:
@@ -10914,8 +11100,6 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
         raw_digestate_tonnage_produced:
           type: number
           format: double
@@ -10981,7 +11165,6 @@ components:
         - id
         - producer
         - spreadings
-        - status
         - year
     BiomethaneDigestateInputRequest:
       type: object
@@ -11109,14 +11292,6 @@ components:
         - spread_parcels_area
         - spread_quantity
         - spreading_department
-    BiomethaneDigestateStatusEnum:
-      enum:
-        - PENDING
-        - VALIDATED
-      type: string
-      description: |-
-        * `PENDING` - PENDING
-        * `VALIDATED` - VALIDATED
     BiomethaneDigestateStorage:
       type: object
       properties:
@@ -11187,8 +11362,6 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneDigestateStatusEnum"
         injected_biomethane_gwh_pcs_per_year:
           type: number
           format: double
@@ -14782,8 +14955,12 @@ components:
           readOnly: true
           title: " depot"
         export_country:
-          type: integer
-          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        export_recipient:
+          type: string
+          maxLength: 255
         created_at:
           type: string
           format: date-time
@@ -14823,6 +15000,7 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - export_country
         - from_depot
         - id
         - quantity
@@ -14896,8 +15074,12 @@ components:
           type: integer
           nullable: true
         export_country:
-          type: integer
+          type: string
+          minLength: 1
           nullable: true
+        export_recipient:
+          type: string
+          maxLength: 255
         lots:
           type: array
           items:
@@ -15024,6 +15206,7 @@ components:
         - LIVRAISON_DIRECTE
         - MAC_BIO
         - EXPORTATION
+        - EXPEDITION
         - DEVALUATION
         - CUSTOMS_CORRECTION
         - TRANSFERT
@@ -15035,6 +15218,7 @@ components:
         * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
         * `MAC_BIO` - MAC_BIO
         * `EXPORTATION` - EXPORTATION
+        * `EXPEDITION` - EXPEDITION
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
@@ -15395,6 +15579,11 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedBiomethaneAnnualDeclarationRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
     PatchedBiomethaneDigestateStorageInputRequest:
       type: object
       properties:

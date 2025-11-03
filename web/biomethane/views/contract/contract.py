@@ -10,6 +10,7 @@ from biomethane.serializers.contract import (
     BiomethaneContractInputSerializer,
     BiomethaneContractSerializer,
 )
+from biomethane.views.mixins import WatchedFieldsActionMixin
 
 # from .mixins import ActionMixin
 
@@ -25,7 +26,7 @@ from biomethane.serializers.contract import (
         ),
     ]
 )
-class BiomethaneContractViewSet(GenericViewSet):
+class BiomethaneContractViewSet(GenericViewSet, WatchedFieldsActionMixin):
     queryset = BiomethaneContract.objects.all()
     filterset_class = BiomethaneContractFilter
     serializer_class = BiomethaneContractSerializer

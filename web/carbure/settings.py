@@ -107,6 +107,7 @@ INSTALLED_APPS = [
     "tiruert",
     "user",
     "biomethane",
+    "edelivery",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -421,7 +422,6 @@ SPECTACULAR_SETTINGS = {
         "ObjectiveSectorCodeEnum": "tiruert.models.Operation.SECTOR_CODE_CHOICES",
         "ElecOperationStatusEnum": "tiruert.models.ElecOperation.OPERATION_STATUSES",
         "ElecOperationTypeEnum": "tiruert.models.ElecOperation.OPERATION_TYPES",
-        "BiomethaneDigestateStatusEnum": "biomethane.models.BiomethaneDigestate.DIGESTATE_STATUS",
         "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
     },
     "COMPONENT_SPLIT_REQUEST": True,

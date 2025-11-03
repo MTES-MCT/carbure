@@ -2,17 +2,23 @@
 
 import datetime
 
+from django.forms.models import model_to_dict
 from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import serializers
 
 from core.models import Entity, EntityCertificate, GenericCertificate, Pays, UserRights, UserRightsRequests
-from core.tests_utils import setup_current_user
+from core.tests_utils import assert_object_contains_data, setup_current_user
+from entity.factories.entity import EntityFactory
 from entity.services.enable_entity import enable_entity
+from entity.views.registration.add_company import EntityCompanySerializer
+from transactions.factories.certificate import GenericCertificateFactory
 
 
 class EntityRegistrationAddCompanyTest(TestCase):
     def setUp(self):
+        self.country = Pays.objects.create(code_pays="FR", name="France", name_en="France")
         self.cpo = Entity.objects.create(name="CPO", entity_type=Entity.CPO, has_elec=True)
 
         self.user = setup_current_user(
@@ -21,9 +27,13 @@ class EntityRegistrationAddCompanyTest(TestCase):
             "Tester",
             "gogogo",
         )
+        self.certificate = GenericCertificateFactory.create()
+        self.entity_data = model_to_dict(EntityFactory.build(entity_type=Entity.PRODUCER))
+        self.entity_data["registered_country"] = "FR"
+        self.entity_data.pop("id")
+        self.entity_data.pop("parent_entity")
 
     def test_register_company(self):
-        Pays.objects.create(code_pays="FR", name="France", name_en="France")
         GenericCertificate.objects.create(
             certificate_id="EU-ISCC-Cert-PL123-12345678",
             certificate_type="ISCC",
@@ -31,20 +41,9 @@ class EntityRegistrationAddCompanyTest(TestCase):
             valid_until=datetime.date(2021, 1, 1),
         )
         params = {
-            "activity_description": "Du blabla dur la société",
+            **self.entity_data,
             "certificate_id": "EU-ISCC-Cert-PL123-12345678",
             "certificate_type": "ISCC",
-            "entity_type": "Opérateur",
-            "name": "Mon entreprise test",
-            "legal_name": "Mon entreprise test",
-            "registered_address": "1 rue de la paix",
-            "registered_city": "Paris",
-            "registered_country": "FR",
-            "registered_zipcode": "75001",
-            "registration_id": "542051180",
-            "sustainability_officer": "Officer Test",
-            "sustainability_officer_email": "officer@test.com",
-            "sustainability_officer_phone_number": "0123456789",
         }
 
         response = self.client.post(
@@ -54,25 +53,23 @@ class EntityRegistrationAddCompanyTest(TestCase):
         # # check new entity created
 
         assert response.status_code == 200
-        entity = Entity.objects.get(legal_name="Mon entreprise test", registration_id="542051180")
-        assert entity.registered_address == "1 rue de la paix"
+        entity = Entity.objects.get(legal_name=params["legal_name"], registration_id=params["registration_id"])
+        assert entity.registered_address == params["registered_address"]
 
         # check certificate created
         entity_certificate = EntityCertificate.objects.get(
-            certificate__certificate_id="EU-ISCC-Cert-PL123-12345678", entity=entity
+            certificate__certificate_id=params["certificate_id"], entity=entity
         )
         assert entity.id == entity_certificate.entity.id
-        assert entity.default_certificate == "EU-ISCC-Cert-PL123-12345678"
+        assert entity.default_certificate == params["certificate_id"]
 
         # duplicated company name error
         response = self.client.post(
             reverse("api-entity-registration-add-company"),
-            params,
+            self.entity_data,
         )
         assert response.status_code == 400
         data = response.json()
-        # error_code = data["message"]
-        # assert error_code == "COMPANY_NAME_ALREADY_USED"
         assert "name" in data
 
         # UserRightRequest created with status PENDING
@@ -96,3 +93,38 @@ class EntityRegistrationAddCompanyTest(TestCase):
         ## entity should be enabled
         entity.refresh_from_db()
         assert entity.is_enabled is True
+
+    # When a company is a trader, it must have a certificate
+    def test_create_foreign_entity_without_certificate_throw_error(self):
+        data = {**self.entity_data, "entity_type": Entity.TRADER}
+        serializer = EntityCompanySerializer()
+
+        with self.assertRaises(serializers.ValidationError) as context:
+            serializer.validate(data)
+
+        errors = context.exception.detail
+        self.assertIn("certificate_id", errors)
+        self.assertIn("certificate_type", errors)
+
+    # Certificate is not saved for cpo, airline or saf trader
+    def test_create_foreign_entity_without_certificate_cpo_or_airline(self):
+        allowed_entities = [Entity.AIRLINE, Entity.CPO, Entity.SAF_TRADER]
+
+        for entity_type in allowed_entities:
+            custom_data = {
+                **self.entity_data,
+                "name": entity_type,
+                "entity_type": entity_type,
+                "certificate_id": self.certificate.certificate_id,
+                "certificate_type": self.certificate.certificate_type,
+            }
+
+            self.client.post(reverse("api-entity-registration-add-company"), custom_data)
+
+            entity = Entity.objects.filter(name=entity_type).first()
+
+            assert_object_contains_data(
+                self,
+                entity,
+                {"default_certificate": ""},
+            )

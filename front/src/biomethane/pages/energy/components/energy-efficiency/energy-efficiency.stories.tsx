@@ -3,17 +3,35 @@ import { EnergyEfficiency } from "./energy-efficiency"
 import { contractData } from "biomethane/pages/contract/tests/contract.data"
 import { energyData } from "../../tests/energy.data"
 import { TariffReference } from "biomethane/pages/contract/types"
-import { EnergyProvider } from "../../energy.hooks"
 import { userEvent, waitFor, within } from "@storybook/test"
+import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
+import mswHandlers from "@storybook/mocks"
+import { mergeDeepRight } from "ramda"
+import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
+import { FormContext, useForm } from "common/components/form2"
+import { BiomethaneEnergy } from "../../types"
 
 const meta: Meta<typeof EnergyEfficiency> = {
   title: "modules/biomethane/pages/energy/components/EnergyEfficiency",
   component: EnergyEfficiency,
-  render: (args) => (
-    <EnergyProvider year={2025}>
-      <EnergyEfficiency {...args} />
-    </EnergyProvider>
-  ),
+  ...mergeDeepRight(AnnualDeclarationStoryUtils, {
+    parameters: {
+      msw: [...AnnualDeclarationStoryUtils.parameters.msw, ...mswHandlers],
+    },
+  }),
+  decorators: [
+    ...AnnualDeclarationStoryUtils.decorators,
+    (Story, { args }) => {
+      const form = useForm<BiomethaneEnergy | object>(args?.energy ?? {})
+      return (
+        <FormContext.Provider value={form}>
+          <SectionsManagerProvider>
+            <Story />
+          </SectionsManagerProvider>
+        </FormContext.Provider>
+      )
+    },
+  ],
 }
 
 export default meta

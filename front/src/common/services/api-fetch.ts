@@ -39,8 +39,12 @@ const middleware: Middleware = {
   },
   onResponse: async ({ response }) => {
     if (!response.ok) {
-      const message = await response.json()
-
+      let message = undefined
+      try {
+        message = await response.json()
+      } catch {
+        message = response.statusText
+      }
       throw new HttpError(JSON.stringify(message), response.status, message)
     }
     return response
