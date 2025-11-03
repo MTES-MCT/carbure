@@ -17,8 +17,8 @@ class EnergyContext:
         return getattr(self.instance, "has_malfunctions", False)
 
     @property
-    def malfunction_types(self) -> Optional[str]:
-        return getattr(self.instance, "malfunction_types", None)
+    def malfunction_types(self) -> Optional[list]:
+        return getattr(self.instance, "malfunction_types", None) or []
 
     @property
     def has_injection_difficulties(self) -> bool:
@@ -130,8 +130,8 @@ class BiomethaneEnergyService:
             fields_to_clear.extend(BiomethaneEnergyService.MALFUNCTION_FIELDS)
         else:
             # Has malfunctions → check malfunction type
-            if context.malfunction_types and context.malfunction_types != BiomethaneEnergy.MALFUNCTION_TYPE_OTHER:
-                # Not "OTHER" type → details field is optional
+            if context.malfunction_types and BiomethaneEnergy.MALFUNCTION_TYPE_OTHER not in context.malfunction_types:
+                # "OTHER" not in types → details field is optional
                 fields_to_clear.extend(BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD)
 
     @staticmethod
