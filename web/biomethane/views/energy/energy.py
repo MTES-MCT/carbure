@@ -87,7 +87,7 @@ class BiomethaneEnergyViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMix
             )
 
         try:
-            energy = self.get_filter_queryset(self.get_queryset()).get()
+            energy = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(energy, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneEnergy.DoesNotExist:

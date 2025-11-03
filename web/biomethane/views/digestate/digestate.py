@@ -88,7 +88,7 @@ class BiomethaneDigestateViewSet(OptionalFieldsActionMixin, RetrieveSingleObject
             )
 
         try:
-            digestate = self.get_filter_queryset(self.get_queryset()).get()
+            digestate = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(digestate, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneDigestate.DoesNotExist:
