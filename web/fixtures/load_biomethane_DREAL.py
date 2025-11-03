@@ -6,7 +6,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import Department, Entity, ExternalAdminDepartments, ExternalAdminRights  # noqa: E402
+from core.models import Department, Entity, EntityDepartments, ExternalAdminRights  # noqa: E402
 
 filename = "%s/web/fixtures/csv/biomethane_DREAL.csv" % (os.environ["CARBURE_HOME"])
 
@@ -39,7 +39,7 @@ with open(filename) as csvfile:
         )
 
         # 3. Link DREAL to the department
-        dept, created = ExternalAdminDepartments.objects.get_or_create(
-            external_admin_right=dreal_external_admin_right,
+        dept, created = EntityDepartments.objects.get_or_create(
+            entity=entity,
             department=department,
         )

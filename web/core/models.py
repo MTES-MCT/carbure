@@ -186,6 +186,12 @@ class Entity(models.Model):
         self.hash = hash
         super(Entity, self).save(*args, **kwargs)
 
+    def get_accessible_departments(self):
+        """
+        Returns the departments accessible by this entity.
+        """
+        return Department.objects.filter(entities__entity=self)
+
     class Meta:
         db_table = "entities"
         verbose_name = "Entity"
@@ -598,35 +604,25 @@ class ExternalAdminRights(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)
 
-    def get_accessible_departments(self):
-        """
-        Returns the departments accessible by this external admin.
-        For DREAL, returns only assigned departments. For others, returns all departments.
-        """
-        if self.right != self.DREAL:
-            return Department.objects.all()
-        return Department.objects.filter(external_admins__external_admin_right=self)
-
     class Meta:
         db_table = "ext_admin_rights"
         verbose_name = "External Admin Right"
         verbose_name_plural = "External Admin Rights"
 
 
-class ExternalAdminDepartments(models.Model):
+class EntityDepartments(models.Model):
     """
-    Defines the departments accessible by an external admin entity.
+    Defines the departments accessible by an entity.
     Used notably for DREAL which manage specific departments.
     """
 
-    external_admin_right = models.ForeignKey(ExternalAdminRights, on_delete=models.CASCADE, related_name="admin_departments")
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="external_admins")
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="departments")
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="entities")
 
     class Meta:
-        db_table = "ext_admin_departments"
-        unique_together = [["external_admin_right", "department"]]
-        verbose_name = "External Admin Departement"
-        verbose_name_plural = "Externals Admin Departement"
+        db_table = "entity_department"
+        unique_together = [["entity", "department"]]
+        verbose_name = "Entity Departement"
 
 
 class CarbureLot(models.Model):

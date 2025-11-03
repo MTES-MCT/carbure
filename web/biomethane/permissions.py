@@ -23,14 +23,12 @@ class HasDrealRights(HasAdminRights):
 
         if entity.entity_type != Entity.EXTERNAL_ADMIN:
             return False
-        # Get the DREAL right for this entity
-        try:
-            dreal_right = ExternalAdminRights.objects.get(entity=entity, right=ExternalAdminRights.DREAL)
-        except ExternalAdminRights.DoesNotExist:
+
+        if not entity.has_external_admin_right(ExternalAdminRights.DREAL):
             return False
 
         # Get accessible departments
-        accessible_dept_codes = dreal_right.get_accessible_departments().values_list("code_dept", flat=True)
+        accessible_dept_codes = entity.get_accessible_departments().values_list("code_dept", flat=True)
 
         # Get the department - either directly or via production_unit property
         obj_dept = None
