@@ -8,6 +8,7 @@ from biomethane.serializers import (
     BiomethaneDigestateStorageInputSerializer,
     BiomethaneDigestateStorageSerializer,
 )
+from biomethane.views.mixins import ListWithObjectPermissionsMixin
 
 
 @extend_schema(
@@ -21,7 +22,7 @@ from biomethane.serializers import (
         ),
     ]
 )
-class BiomethaneDigestateStorageViewSet(ModelViewSet):
+class BiomethaneDigestateStorageViewSet(ListWithObjectPermissionsMixin, ModelViewSet):
     queryset = BiomethaneDigestateStorage.objects.all()
     filterset_class = EntityProducerFilter
     serializer_class = BiomethaneDigestateStorageSerializer
@@ -39,12 +40,3 @@ class BiomethaneDigestateStorageViewSet(ModelViewSet):
         if self.action in ["create", "update", "partial_update"]:
             return BiomethaneDigestateStorageInputSerializer
         return BiomethaneDigestateStorageSerializer
-
-    def list(self, request, *args, **kwargs):
-        # Apply filterset and check permissions on the first report
-        queryset = self.filter_queryset(self.get_queryset())
-        first_storage = queryset.first()
-        if first_storage:
-            self.check_object_permissions(request, first_storage)
-
-        return super().list(request, *args, **kwargs)

@@ -16,6 +16,9 @@ class HasDrealRights(HasAdminRights):
         """
         Verifies that the object (production unit or related object) belongs to an accessible department.
         """
+        if obj is None:
+            return False
+
         entity = request.entity
 
         if entity.entity_type != Entity.EXTERNAL_ADMIN:

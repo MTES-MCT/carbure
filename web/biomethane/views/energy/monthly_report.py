@@ -14,6 +14,7 @@ from biomethane.serializers.energy import (
     BiomethaneEnergyMonthlyReportSerializer,
 )
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from biomethane.views.mixins import ListWithObjectPermissionsMixin
 
 
 @extend_schema(
@@ -27,12 +28,16 @@ from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationSe
         ),
     ]
 )
-class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin):
+class BiomethaneEnergyMonthlyReportViewSet(ListWithObjectPermissionsMixin, GenericViewSet, ListModelMixin):
     queryset = BiomethaneEnergyMonthlyReport.objects.all()
     pagination_class = None
 
     def get_permissions(self):
         return get_biomethane_permissions(["upsert"], self.action)
+
+    def get_permission_object(self, first_obj):
+        """Check permissions on the energy of the monthly reports."""
+        return first_obj.energy if first_obj else None
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
@@ -68,15 +73,6 @@ class BiomethaneEnergyMonthlyReportViewSet(GenericViewSet, ListModelMixin):
         if self.action == "upsert":
             return self.queryset.filter(energy__year=self.request.year)
         return super().get_queryset()
-
-    def list(self, request, *args, **kwargs):
-        # Apply filterset and check permissions on the first report
-        queryset = self.filter_queryset(self.get_queryset())
-        first_report = queryset.first()
-        if first_report:
-            self.check_object_permissions(request, first_report.energy)
-
-        return super().list(request, *args, **kwargs)
 
     @extend_schema(
         responses={

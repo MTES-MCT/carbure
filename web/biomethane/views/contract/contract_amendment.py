@@ -5,6 +5,7 @@ from biomethane.filters import BiomethaneContractAmendmentFilter
 from biomethane.models import BiomethaneContractAmendment
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneContractAmendmentAddSerializer, BiomethaneContractAmendmentSerializer
+from biomethane.views.mixins import ListWithObjectPermissionsMixin
 
 
 @extend_schema(
@@ -19,6 +20,7 @@ from biomethane.serializers import BiomethaneContractAmendmentAddSerializer, Bio
     ]
 )
 class BiomethaneContractAmendmentViewSet(
+    ListWithObjectPermissionsMixin,
     GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -31,6 +33,10 @@ class BiomethaneContractAmendmentViewSet(
     def get_permissions(self):
         return get_biomethane_permissions(["create"], self.action)
 
+    def get_permission_object(self, first_obj):
+        """Check permissions on the contract of the amendment."""
+        return first_obj.contract if first_obj else None
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
@@ -40,12 +46,3 @@ class BiomethaneContractAmendmentViewSet(
         if self.action == "create":
             return BiomethaneContractAmendmentAddSerializer
         return BiomethaneContractAmendmentSerializer
-
-    def list(self, request, *args, **kwargs):
-        # Apply filterset and check permissions on the first contract
-        queryset = self.filter_queryset(self.get_queryset())
-        first_amendment = queryset.first()
-        if first_amendment:
-            self.check_object_permissions(request, first_amendment.contract)
-
-        return super().list(request, *args, **kwargs)
