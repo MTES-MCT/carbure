@@ -32,6 +32,7 @@ export type SelectDsfrProps<T, V = T> = Omit<
     onChange?: (value: V | undefined) => void
     normalize?: Normalizer<T, V>
     label?: LabelProps["label"]
+    name?: string
   } & Pick<InputProps, "state">
 
 export const SelectDsfr = <T, V = T>({
@@ -45,6 +46,7 @@ export const SelectDsfr = <T, V = T>({
   title,
   state,
   className,
+  name,
   ...props
 }: SelectDsfrProps<T, V>) => {
   const normalizedOptions = options?.map((option) => {
@@ -52,6 +54,7 @@ export const SelectDsfr = <T, V = T>({
     return {
       label: normalized.label,
       value: getValue(normalized.value),
+      name: getValue(normalized.value),
     }
   })
 
@@ -78,6 +81,7 @@ export const SelectDsfr = <T, V = T>({
         value: selectedOption?.value,
         onChange: onChange ? (e) => onChange(e.target.value as V) : undefined,
         required: props.required,
+        name,
       }}
       options={normalizedOptions}
       label={

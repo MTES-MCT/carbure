@@ -4,7 +4,9 @@ import { StoryFn } from "@storybook/react"
 
 export const AnnualDeclarationStoryUtils = {
   parameters: {
-    msw: [getCurrentAnnualDeclarationOk],
+    msw: {
+      handlers: [getCurrentAnnualDeclarationOk],
+    },
     mockingDate: new Date(2025, 2, 1),
   },
   decorators: [

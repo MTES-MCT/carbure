@@ -17,12 +17,13 @@ import {
   EntityDepot,
   OwnershipType,
   Biofuel,
+  Country,
 } from "common/types"
 import { mergeDeepRight } from "ramda"
 
 // COUNTRIES
 
-export const country = {
+export const country: Country = {
   code_pays: "FR",
   name: "France",
   name_en: "France",

@@ -36,12 +36,14 @@ export const NoMissingFields: Story = {}
 // Shows missing fields only for digestate.
 export const DisplayOnlyDigestateMissingFields: Story = {
   parameters: {
-    msw: [
-      buildCurrentAnnualDeclarationHandler({
-        digestate_missing_fields: ["digestate_field_1"],
-        energy_missing_fields: [],
-      }),
-    ],
+    msw: {
+      handlers: [
+        buildCurrentAnnualDeclarationHandler({
+          digestate_missing_fields: ["digestate_field_1"],
+          energy_missing_fields: [],
+        }),
+      ],
+    },
   },
   play: async ({ canvasElement, args }) => {
     await clickOnLink(canvasElement, "Digestat", args.onPageClick)
@@ -51,12 +53,14 @@ export const DisplayOnlyDigestateMissingFields: Story = {
 // Shows missing fields only for energy.
 export const DisplayOnlyEnergyMissingFields: Story = {
   parameters: {
-    msw: [
-      buildCurrentAnnualDeclarationHandler({
-        digestate_missing_fields: [],
-        energy_missing_fields: ["energy_field_1"],
-      }),
-    ],
+    msw: {
+      handlers: [
+        buildCurrentAnnualDeclarationHandler({
+          digestate_missing_fields: [],
+          energy_missing_fields: ["energy_field_1"],
+        }),
+      ],
+    },
   },
   play: async ({ canvasElement, args }) => {
     await clickOnLink(canvasElement, "Energie", args.onPageClick)
@@ -66,11 +70,13 @@ export const DisplayOnlyEnergyMissingFields: Story = {
 // Displays missing fields for both energy and digestate.
 export const DisplayBothEnergyAndDigestateMissingFields: Story = {
   parameters: {
-    msw: [
-      buildCurrentAnnualDeclarationHandler({
-        digestate_missing_fields: ["digestate_field_1"],
-        energy_missing_fields: ["energy_field_1"],
-      }),
-    ],
+    msw: {
+      handlers: [
+        buildCurrentAnnualDeclarationHandler({
+          digestate_missing_fields: ["digestate_field_1"],
+          energy_missing_fields: ["energy_field_1"],
+        }),
+      ],
+    },
   },
 }

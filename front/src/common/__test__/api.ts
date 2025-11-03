@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw"
+import { http as mswHttp, HttpResponse } from "msw"
 import { EntityType } from "common/types"
 
 import {
@@ -14,40 +14,27 @@ import {
   entitySite,
 } from "./data"
 import { mockGetWithResponseData } from "./helpers"
+import { http } from "./http"
 
-export const okStats = http.get("/api/home-stats", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: {
-      total_volume: 1000000,
-      entities: {
-        [EntityType.Operator]: 25,
-        [EntityType.Producer]: 25,
-        [EntityType.Trader]: 25,
-      },
-    },
-  })
+export const okEntitySearch = http.get("/resources/entities", () => {
+  return HttpResponse.json([producer, trader, operator])
 })
 
-export const okEntitySearch = http.get("/api/resources/entities", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: [producer, trader, operator],
-  })
-})
-
-export const okCountrySearch = http.get("/api/resources/countries", () => {
+export const okCountrySearch = mswHttp.get("/api/resources/countries", () => {
   return HttpResponse.json([country])
 })
 
-export const okBiocarburantsSearch = http.get("/api/resources/biofuels", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: [biocarburant],
-  })
-})
+export const okBiocarburantsSearch = mswHttp.get(
+  "/api/resources/biofuels",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: [biocarburant],
+    })
+  }
+)
 
-export const okMatierePremiereSearch = http.get(
+export const okMatierePremiereSearch = mswHttp.get(
   "/api/resources/feedstocks",
   () => {
     return HttpResponse.json({
@@ -57,7 +44,7 @@ export const okMatierePremiereSearch = http.get(
   }
 )
 
-export const okProductionSitesSearch = http.get(
+export const okProductionSitesSearch = mswHttp.get(
   "/api/resources/production-sites",
   () => {
     return HttpResponse.json({
@@ -67,18 +54,21 @@ export const okProductionSitesSearch = http.get(
   }
 )
 
-export const okGetDeliverySites = http.get("/api/entities/depots", () => {
+export const okGetDeliverySites = mswHttp.get("/api/entities/depots", () => {
   return HttpResponse.json([entitySite])
 })
 
-export const okDeliverySitesSearch = http.get("/api/resources/depots", () => {
-  return HttpResponse.json({
-    status: "success",
-    data: [deliverySite],
-  })
-})
+export const okDeliverySitesSearch = mswHttp.get(
+  "/api/resources/depots",
+  () => {
+    return HttpResponse.json({
+      status: "success",
+      data: [deliverySite],
+    })
+  }
+)
 
-export const okUnauthorizedUser = http.get("/api/user", () => {
+export const okUnauthorizedUser = mswHttp.get("/api/user", () => {
   return new HttpResponse(null, { status: 401 })
 })
 

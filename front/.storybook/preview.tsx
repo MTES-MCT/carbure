@@ -45,9 +45,6 @@ const withData = (Story) => {
   const entityId = user?.user?.rights[0]?.entity.id
   const entity = useEntityManager(user, entityId)
 
-  if (user.loading) {
-    return <LoaderOverlay />
-  }
   return (
     <Suspense fallback={<LoaderOverlay />}>
       <MatomoProvider>
