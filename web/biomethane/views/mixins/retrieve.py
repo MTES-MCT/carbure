@@ -1,4 +1,3 @@
-from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -32,15 +31,6 @@ class RetrieveSingleObjectMixin(GetObjectMixin):
     - queryset defined
     """
 
-    @extend_schema(
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                description="Object details for the entity",
-            ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Object not found for this entity."),
-        },
-        description="Retrieve the object for the current entity. Returns a single object.",
-    )
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a single object based on query parameters."""
         try:

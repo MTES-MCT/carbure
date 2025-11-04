@@ -1,5 +1,5 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -26,6 +26,19 @@ from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
             required=True,
         ),
     ]
+)
+@extend_schema_view(
+    retrieve=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="year",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Year of the energy declaration.",
+                required=True,
+            ),
+        ],
+    )
 )
 class BiomethaneDigestateViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMixin, GenericViewSet):
     queryset = BiomethaneDigestate.objects.all()
