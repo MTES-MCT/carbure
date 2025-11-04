@@ -29,7 +29,7 @@ class BiomethaneDigestateStorageViewSet(ListWithObjectPermissionsMixin, ModelVie
     pagination_class = None
 
     def get_permissions(self):
-        return get_biomethane_permissions(["create", "destroy", "destoy", "partial_update"], self.action)
+        return get_biomethane_permissions(["create", "destroy", "partial_update", "update"], self.action)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

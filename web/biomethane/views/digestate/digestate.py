@@ -47,7 +47,7 @@ class BiomethaneDigestateViewSet(OptionalFieldsActionMixin, RetrieveSingleObject
     pagination_class = None
 
     def get_permissions(self):
-        return get_biomethane_permissions(["upsert", "validate_digestate"], self.action)
+        return get_biomethane_permissions(["upsert"], self.action)
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
