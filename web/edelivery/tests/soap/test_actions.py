@@ -8,11 +8,8 @@ from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessag
 
 class ListPendingMessagesTest(TestCase):
     def setUp(self):
-        self.http_response = MagicMock()
-        self.http_response.text = "<response/>"
-
-        self.send_callback = MagicMock()
-        self.send_callback.return_value = self.http_response
+        self.http_response = MagicMock(text="<response/>")
+        self.send_callback = MagicMock(return_value=self.http_response)
 
     def test_sends_payload_to_eDelivery_service(self):
         action = ListPendingMessages(send_callback=self.send_callback)
@@ -78,8 +75,8 @@ class SubmitMessageTest(TestCase):
     def test_knows_its_payload(self, patched_new_uuid, patched_timestamp):
         patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
         patched_timestamp.return_value = "2025-07-15T13:00:00+00:00"
-        request = MagicMock()
-        request.zipped_encoded.return_value = "abcdef"
+
+        request = MagicMock(**{"zipped_encoded.return_value": "abcdef"})
         action = SubmitMessage("responder_id", request)
 
         expected_payload = """\
