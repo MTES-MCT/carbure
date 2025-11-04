@@ -11358,6 +11358,10 @@ components:
         id:
           type: integer
           readOnly: true
+        malfunction_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/MalfunctionTypesEnum"
         year:
           type: integer
           maximum: 2147483647
@@ -11450,10 +11454,6 @@ components:
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
-        malfunction_types:
-          allOf:
-            - $ref: "#/components/schemas/MalfunctionTypesEnum"
-          nullable: true
         malfunction_details:
           type: string
           nullable: true
@@ -11473,6 +11473,10 @@ components:
     BiomethaneEnergyInputRequest:
       type: object
       properties:
+        malfunction_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/MalfunctionTypesEnum"
         injected_biomethane_gwh_pcs_per_year:
           type: number
           format: double
@@ -11560,10 +11564,6 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-          nullable: true
-        malfunction_types:
-          allOf:
-            - $ref: "#/components/schemas/MalfunctionTypesEnum"
           nullable: true
         malfunction_details:
           type: string
@@ -13437,7 +13437,7 @@ components:
           maxLength: 128
         supplier_certificate_name:
           type: string
-          maxLength: 64
+          maxLength: 128
         supplier_certificate:
           type: integer
           nullable: true

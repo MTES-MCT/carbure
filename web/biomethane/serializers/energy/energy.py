@@ -3,17 +3,23 @@ from rest_framework import serializers
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 
 
-class BiomethaneEnergySerializer(serializers.ModelSerializer):
+class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
+    malfunction_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneEnergy.MALFUNCTION_TYPES),
+        required=False,
+    )
+
     class Meta:
         model = BiomethaneEnergy
-        fields = "__all__"
+        exclude = ["producer", "year"]
 
 
-class BiomethaneEnergyInputSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BiomethaneEnergy
-        exclude = ["year", "producer"]
+class BiomethaneEnergySerializer(BaseBiomethaneEnergySerializer):
+    class Meta(BaseBiomethaneEnergySerializer.Meta):
+        exclude = []
 
+
+class BiomethaneEnergyInputSerializer(BaseBiomethaneEnergySerializer):
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")
