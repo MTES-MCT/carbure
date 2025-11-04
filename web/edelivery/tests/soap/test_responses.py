@@ -23,7 +23,8 @@ def response_error_payload(code, message):
 
 
 class ListPendingMessagesResponseTest(TestCase):
-    def response_payload(_, message_ids):
+    @staticmethod
+    def response_payload(message_ids):
         message_ids_to_XML = [f"""<messageID>{id}</messageID>""" for id in message_ids]
 
         return f"""\
@@ -50,7 +51,8 @@ class ListPendingMessagesResponseTest(TestCase):
 
 
 class RetrieveMessageResponseTest(TestCase):
-    def response_payload(_self, attachment_value=""):
+    @staticmethod
+    def response_payload(attachment_value=""):
         return f"""\
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
   <soap:Header>
