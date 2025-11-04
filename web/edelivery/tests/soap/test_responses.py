@@ -5,6 +5,23 @@ from edelivery.ebms.request_responses import BaseRequestResponse
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
+def response_error_payload(code, message):
+    return f"""\
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+  <soap:Body>
+    <soap:Fault>
+      <!-- … -->
+      <soap:Detail>
+        <ns2:FaultDetail xmlns:ns2="http://eu.domibus.wsplugin/">
+          <code>{code}</code>
+          <message>{message}</message>
+        </ns2:FaultDetail>
+      </soap:Detail>
+    </soap:Fault>
+  </soap:Body>
+</soap:Envelope>"""
+
+
 class ListPendingMessagesResponseTest(TestCase):
     def response_payload(_, message_ids):
         message_ids_to_XML = [f"""<messageID>{id}</messageID>""" for id in message_ids]
@@ -67,6 +84,13 @@ class RetrieveMessageResponseTest(TestCase):
         self.patched_unzip.assert_called_with("Base64EncodedZippedArchive")
         self.assertEqual("<response/>", response.contents)
 
+    def test_does_not_extract_response_if_error_response(self):
+        payload = response_error_payload("WS_PLUGIN:1234", "Some error message")
+        response = RetrieveMessageResponse(payload)
+        self.assertIsNone(response.contents)
+        self.assertIsNone(response.request_response)
+        self.assertIsNone(response.request_response_payload)
+
 
 class SubmitMessageResponseTest(TestCase):
     @staticmethod
@@ -80,25 +104,8 @@ class SubmitMessageResponseTest(TestCase):
     </soap:Body>
 </soap:Envelope>"""
 
-    @staticmethod
-    def response_error_payload(code, message):
-        return f"""\
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
-    <soap:Body>
-        <soap:Fault>
-            <!-- … -->
-            <soap:Detail>
-                <ns2:FaultDetail xmlns:ns2="http://eu.domibus.wsplugin/">
-                    <code>{code}</code>
-                    <message>{message}</message>
-                </ns2:FaultDetail>
-            </soap:Detail>
-        </soap:Fault>
-    </soap:Body>
-</soap:Envelope>"""
-
     def test_sets_error_flag_when_error_in_payload(self):
-        payload = self.response_error_payload("EBMS:1234", "Some error message")
+        payload = response_error_payload("EBMS:1234", "Some error message")
         response = SubmitMessageResponse(payload)
         self.assertTrue(response.error)
         self.assertEqual("EBMS:1234 - Some error message", response.error_message)
