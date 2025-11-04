@@ -25,3 +25,8 @@ export const buildCurrentAnnualDeclarationHandler = (missingFields: {
       missing_fields: missingFields,
     })
   )
+
+export const getAnnualDeclarationYearsOk = http.get(
+  "/biomethane/annual-declaration/years/",
+  () => HttpResponse.json([2024, 2025])
+)

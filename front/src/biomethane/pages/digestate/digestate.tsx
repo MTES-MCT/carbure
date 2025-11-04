@@ -22,7 +22,6 @@ import {
 } from "biomethane/components/missing-fields"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneDigestate } from "./types"
-import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
 
 const DigestatePage = () => {
@@ -51,33 +50,31 @@ const DigestatePage = () => {
   if (loading && !digestate) return <LoaderOverlay />
 
   return (
-    <BiomethanePageHeader>
-      <FormContext.Provider value={form}>
-        <MissingFields />
-        {productionUnit && <Production productionUnit={productionUnit} />}
+    <FormContext.Provider value={form}>
+      <MissingFields />
+      {productionUnit && <Production productionUnit={productionUnit} />}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.SPREADING
-        ) && (
-          <>
-            <SpreadingDistance />
-            <Spreading digestate={digestate?.data} />
-          </>
-        )}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.SPREADING
+      ) && (
+        <>
+          <SpreadingDistance />
+          <Spreading digestate={digestate?.data} />
+        </>
+      )}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.COMPOSTING
-        ) && <Composting />}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.COMPOSTING
+      ) && <Composting />}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.INCINERATION_LANDFILLING
-        ) && <IncinerationLandfill contract={contract} />}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.INCINERATION_LANDFILLING
+      ) && <IncinerationLandfill contract={contract} />}
 
-        {productionUnit?.spreading_management_methods?.includes(
-          SpreadingManagementMethods.SALE
-        ) && <Sale />}
-      </FormContext.Provider>
-    </BiomethanePageHeader>
+      {productionUnit?.spreading_management_methods?.includes(
+        SpreadingManagementMethods.SALE
+      ) && <Sale />}
+    </FormContext.Provider>
   )
 }
 

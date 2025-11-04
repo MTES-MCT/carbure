@@ -21,7 +21,6 @@ import {
   MissingFields,
   useMissingFields,
 } from "biomethane/components/missing-fields"
-import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
 
 const EnergyPage = () => {
@@ -49,20 +48,18 @@ const EnergyPage = () => {
   if (loading && !energy) return <LoaderOverlay />
 
   return (
-    <BiomethanePageHeader>
-      <FormContext.Provider value={form}>
-        <MissingFields />
-        <InjectedBiomethane contract={contract} />
-        <BiogasProduction productionUnit={productionUnit} />
-        <InstallationEnergyNeeds contract={contract} />
-        <EnergyEfficiency energy={energy} contract={contract} />
-        {isTariffReference2011Or2020(contract?.tariff_reference) && (
-          <MonthlyBiomethaneInjection energy={energy} />
-        )}
-        <Acceptability />
-        <Malfunction />
-      </FormContext.Provider>
-    </BiomethanePageHeader>
+    <FormContext.Provider value={form}>
+      <MissingFields />
+      <InjectedBiomethane contract={contract} />
+      <BiogasProduction productionUnit={productionUnit} />
+      <InstallationEnergyNeeds contract={contract} />
+      <EnergyEfficiency energy={energy} contract={contract} />
+      {isTariffReference2011Or2020(contract?.tariff_reference) && (
+        <MonthlyBiomethaneInjection energy={energy} />
+      )}
+      <Acceptability />
+      <Malfunction />
+    </FormContext.Provider>
   )
 }
 
