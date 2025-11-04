@@ -22,7 +22,7 @@ import {
 } from "biomethane/components/missing-fields"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneDigestate } from "./types"
-import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
+import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 
 const DigestatePage = () => {
   const { t } = useTranslation()

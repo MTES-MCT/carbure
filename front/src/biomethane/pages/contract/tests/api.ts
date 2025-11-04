@@ -2,6 +2,7 @@ import { http } from "common/__test__/http"
 import { HttpResponse } from "msw"
 import { contractData } from "./contract.data"
 import { mockFormDataToObject } from "common/__test__/helpers"
+import { BiomethaneContract } from "../types"
 
 export const updateContractOk = http.put(
   "/biomethane/contract/",
@@ -13,4 +14,8 @@ export const updateContractOk = http.put(
       ...mockFormDataToObject(body),
     })
   }
+)
+
+export const getContractOk = http.get("/biomethane/contract/", () =>
+  HttpResponse.json<BiomethaneContract>(contractData)
 )

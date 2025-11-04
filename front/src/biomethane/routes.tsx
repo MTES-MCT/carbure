@@ -3,7 +3,7 @@ import { lazy } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { getDeclarationInterval } from "./utils"
 import { AnnualDeclarationLayout } from "./layouts/annual-declaration-layout"
-import { ContractProductionUnitProvider } from "./providers/contract-production-unit.provider"
+import { ContractProductionUnitProvider } from "./providers/contract-production-unit"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))

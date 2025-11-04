@@ -31,7 +31,18 @@ export default meta
 type Story = StoryObj<typeof MissingFields>
 
 // Displays when there are no missing fields.
-export const NoMissingFields: Story = {}
+export const NoMissingFields: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const notice = await waitFor(() =>
+      canvas.queryByTestId("missing-fields-notice")
+    )
+    await expect(notice).toBeNull()
+  },
+}
 
 // Shows missing fields only for digestate.
 export const DisplayOnlyDigestateMissingFields: Story = {
@@ -85,4 +96,11 @@ export const DisplayBothEnergyAndDigestateMissingFields: Story = {
       ],
     },
   },
+}
+
+export const DisplayNothingWhenTheDeclarationIsNotEditable: Story = {
+  parameters: {
+    mockingDate: new Date(2024, 11, 1),
+  },
+  play: NoMissingFields.play,
 }

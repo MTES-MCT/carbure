@@ -9,6 +9,7 @@ import { useShowMissingFields } from "./use-show-missing-fields"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import { MISSING_FIELDS_HASH } from "../missing-fields.constants"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useMissingFields = <FormType extends object | undefined>(
   form: FormManager<FormType>
@@ -16,9 +17,9 @@ export const useMissingFields = <FormType extends object | undefined>(
   const location = useLocation()
   const navigate = useNavigate()
   const { showMissingFields } = useShowMissingFields(form)
-
+  const { canEditDeclaration } = useAnnualDeclaration()
   useEffect(() => {
-    if (location.hash.includes(MISSING_FIELDS_HASH)) {
+    if (canEditDeclaration && location.hash.includes(MISSING_FIELDS_HASH)) {
       showMissingFields()
       navigate({ hash: "" })
     }

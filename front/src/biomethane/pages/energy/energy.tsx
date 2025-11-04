@@ -21,7 +21,7 @@ import {
   MissingFields,
   useMissingFields,
 } from "biomethane/components/missing-fields"
-import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
+import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
