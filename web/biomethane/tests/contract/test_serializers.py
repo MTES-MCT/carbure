@@ -3,7 +3,9 @@ from unittest.mock import patch
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
-from biomethane.models import BiomethaneContract
+from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneSignedContractFactory
+from biomethane.models.biomethane_contract import BiomethaneContract
+from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.serializers import BiomethaneContractInputSerializer
 from core.models import Entity
 
@@ -228,3 +230,28 @@ class BiomethaneContractSerializerTests(TestCase):
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
         self.assertTrue(serializer.is_valid())
+
+    def test_tracked_amendment_types_updated_when_general_conditions_file_updated(self):
+        """Test that tracked_amendment_types is updated when general_conditions_file is updated."""
+        contract = BiomethaneSignedContractFactory(producer=self.producer_entity, tracked_amendment_types=[])
+        data = {
+            "tariff_reference": "2023",
+            "cmax": 100.0,
+        }
+        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
+
+        contract_updated = serializer.update(contract, data)
+
+        self.assertEqual(contract_updated.tracked_amendment_types, [BiomethaneContractAmendment.CMAX_PAP_UPDATE])
+
+    def test_tracked_amendment_types_not_updated_when_general_conditions_file_is_not_set(self):
+        """Test that tracked_amendment_types is not updated when general_conditions_file is not set."""
+        contract = BiomethaneContractFactory(producer=self.producer_entity, tracked_amendment_types=[])
+        data = {
+            "tariff_reference": "2023",
+        }
+        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
+
+        contract_updated = serializer.update(contract, data)
+
+        self.assertEqual(contract_updated.tracked_amendment_types, [])

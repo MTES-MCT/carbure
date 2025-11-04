@@ -37,7 +37,7 @@ class BiomethaneEnergySignalsTests(TestCase):
             **self.base_energy_data,
             has_malfunctions=False,  # No malfunctions
             malfunction_cumulative_duration_days=5,
-            malfunction_types=BiomethaneEnergy.MALFUNCTION_TYPE_MAINTENANCE,
+            malfunction_types=[BiomethaneEnergy.MALFUNCTION_TYPE_MAINTENANCE],
             malfunction_details="Test malfunction",
             has_injection_difficulties_due_to_network_saturation=False,
             injection_impossibility_hours=10,
@@ -56,12 +56,12 @@ class BiomethaneEnergySignalsTests(TestCase):
         self.assertIsNone(energy.injection_impossibility_hours)
 
     def test_biomethane_energy_signal_clears_malfunction_details_when_not_other(self):
-        """Test that malfunction_details is cleared when malfunction_types is not OTHER"""
+        """Test that malfunction_details is cleared when malfunction_types does not contain OTHER"""
 
         energy = BiomethaneEnergy.objects.create(
             **self.base_energy_data,
             has_malfunctions=True,
-            malfunction_types=BiomethaneEnergy.MALFUNCTION_TYPE_MAINTENANCE,  # Not OTHER
+            malfunction_types=[BiomethaneEnergy.MALFUNCTION_TYPE_MAINTENANCE],  # Not OTHER
             malfunction_details="Test malfunction details",
         )
 

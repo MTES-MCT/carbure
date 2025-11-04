@@ -80,7 +80,7 @@ export function Production({
                 />
                 <NumberInput
                   readOnly={!isEditing}
-                  label={t("Quantité digestat liquide (en m3)")}
+                  label={t("Quantité digestat liquide (t)")}
                   type="number"
                   {...bind("liquid_digestate_quantity")}
                   required

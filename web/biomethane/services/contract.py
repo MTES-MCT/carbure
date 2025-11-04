@@ -251,15 +251,18 @@ class BiomethaneContractService:
         """
         current_tracked_types = set(contract.tracked_amendment_types or [])
         validated_buyer = validated_data.get("buyer", None)
+        cmax = validated_data.get("cmax", None)
+        pap_contracted = validated_data.get("pap_contracted", None)
+        cmax_annualized = validated_data.get("cmax_annualized")
 
         # Track CMAX/PAP updates
-        if contract.cmax != validated_data.get("cmax", None) or contract.pap_contracted != validated_data.get(
-            "pap_contracted", None
+        if (cmax is not None and contract.cmax != cmax) or (
+            pap_contracted is not None and contract.pap_contracted != pap_contracted
         ):
             current_tracked_types.add(BiomethaneContractAmendment.CMAX_PAP_UPDATE)
 
         # Track CMAX annualization changes
-        if contract.cmax_annualized != validated_data.get("cmax_annualized", False):
+        if cmax_annualized is not None and contract.cmax_annualized != cmax_annualized:
             current_tracked_types.add(BiomethaneContractAmendment.CMAX_ANNUALIZATION)
 
         # Track buyer changes

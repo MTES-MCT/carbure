@@ -4,6 +4,7 @@ import {
   BiomethaneSupplyInput,
   BiomethaneSupplyInputCategory,
   BiomethaneSupplyInputFilter,
+  BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputQuery,
   BiomethaneSupplyInputSource,
 } from "./types"
@@ -37,8 +38,12 @@ export const useSupplyPlanColumns = () => {
         ),
     },
     {
-      header: t("Volume (t)"),
-      cell: (input) => <Cell text={input.volume} />,
+      header: t("Tonnage"),
+      cell: (input) => (
+        <Cell
+          text={`${input.volume} ${input.material_unit === BiomethaneSupplyInputMaterialUnit.DRY ? "tMS" : "tMB"}`}
+        />
+      ),
     },
   ]
 

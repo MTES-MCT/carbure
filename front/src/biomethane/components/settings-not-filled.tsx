@@ -1,3 +1,5 @@
+import { BiomethaneContract } from "biomethane/pages/contract/types"
+import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { Button } from "common/components/button2"
 import { Text } from "common/components/text"
 import { Title } from "common/components/title"
@@ -6,9 +8,24 @@ import { useTranslation } from "react-i18next"
 /**
  * This component is used to display a message to the user that they have not filled in all the settings for their installation.
  */
-export const SettingsNotFilled = () => {
+export const SettingsNotFilled = ({
+  contractInfos,
+  productionUnit,
+}: {
+  contractInfos?: BiomethaneContract
+  productionUnit?: BiomethaneProductionUnit
+}) => {
   const { t } = useTranslation()
   const routes = useRoutes()
+
+  const routeMissingObject =
+    contractInfos === undefined
+      ? routes.SETTINGS.BIOMETHANE.CONTRACT
+      : productionUnit === undefined
+        ? routes.SETTINGS.BIOMETHANE.PRODUCTION
+        : // Fallback
+          routes.SETTINGS.BIOMETHANE.CONTRACT
+
   return (
     <div
       style={{
@@ -39,7 +56,7 @@ export const SettingsNotFilled = () => {
           )}
         </Text>
         <Button
-          linkProps={{ to: routes.SETTINGS.BIOMETHANE.CONTRACT }}
+          linkProps={{ to: routeMissingObject }}
           iconId="ri-arrow-right-line"
         >
           {t("Accéder aux paramètres")}

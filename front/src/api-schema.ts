@@ -3171,6 +3171,7 @@ export interface components {
         };
         BiomethaneEnergy: {
             readonly id: number;
+            malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             year: number;
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
@@ -3210,13 +3211,13 @@ export interface components {
             estimated_work_days_acceptability?: number | null;
             has_malfunctions?: boolean;
             malfunction_cumulative_duration_days?: number | null;
-            malfunction_types?: components["schemas"]["MalfunctionTypesEnum"] | null;
             malfunction_details?: string | null;
             has_injection_difficulties_due_to_network_saturation?: boolean;
             injection_impossibility_hours?: number | null;
             producer: number;
         };
         BiomethaneEnergyInputRequest: {
+            malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
             /** Format: double */
@@ -3255,7 +3256,6 @@ export interface components {
             estimated_work_days_acceptability?: number | null;
             has_malfunctions?: boolean;
             malfunction_cumulative_duration_days?: number | null;
-            malfunction_types?: components["schemas"]["MalfunctionTypesEnum"] | null;
             malfunction_details?: string | null;
             has_injection_difficulties_due_to_network_saturation?: boolean;
             injection_impossibility_hours?: number | null;

@@ -20,7 +20,7 @@ class BiomethaneEnergyServiceTests(TestCase):
         energy = BiomethaneEnergyFactory.create(
             producer=self.producer_entity,
             has_malfunctions=True,
-            malfunction_types="TECHNICAL",  # Not OTHER
+            malfunction_types=["TECHNICAL"],  # Not OTHER
         )
 
         fields_to_clear = BiomethaneEnergyService.get_fields_to_clear(energy)
