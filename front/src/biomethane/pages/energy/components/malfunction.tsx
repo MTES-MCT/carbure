@@ -5,7 +5,12 @@ import { useFormContext } from "common/components/form2"
 import { useSaveEnergy } from "../energy.hooks"
 import { Button } from "common/components/button2"
 import { Grid } from "common/components/scaffold"
-import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
+import {
+  CheckboxGroup,
+  NumberInput,
+  RadioGroup,
+  TextInput,
+} from "common/components/inputs2"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useMemo } from "react"
 import { DeepPartial } from "common/types"
@@ -17,19 +22,19 @@ type MalfunctionForm = DeepPartial<
     BiomethaneEnergyInputRequest,
     | "has_malfunctions"
     | "malfunction_cumulative_duration_days"
-    | "malfunction_types"
     | "malfunction_details"
     | "has_injection_difficulties_due_to_network_saturation"
     | "injection_impossibility_hours"
   >
->
+> &
+  Pick<BiomethaneEnergyInputRequest, "malfunction_types">
 
 const extractValues = (energy?: MalfunctionForm) => {
   return {
     has_malfunctions: energy?.has_malfunctions,
     malfunction_cumulative_duration_days:
       energy?.malfunction_cumulative_duration_days,
-    malfunction_types: energy?.malfunction_types,
+    malfunction_types: energy?.malfunction_types ?? [],
     malfunction_details: energy?.malfunction_details,
     has_injection_difficulties_due_to_network_saturation:
       energy?.has_injection_difficulties_due_to_network_saturation,
@@ -95,14 +100,16 @@ export const Malfunction = () => {
           </Grid>
           {value.has_malfunctions && (
             <>
-              <RadioGroup
+              <CheckboxGroup
                 readOnly={!isEditing}
                 label={t("Types de dysfonctionnement")}
                 options={dysfunctionOptions}
                 required
-                {...bind("malfunction_types")}
+                {...bind("malfunction_types", {
+                  value: value.malfunction_types ?? [],
+                })}
               />
-              {value.malfunction_types === MalfunctionTypes.OTHER && (
+              {value.malfunction_types?.includes(MalfunctionTypes.OTHER) && (
                 <TextInput
                   readOnly={!isEditing}
                   label={t("Précisions")}

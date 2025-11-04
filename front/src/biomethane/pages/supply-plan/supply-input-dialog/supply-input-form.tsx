@@ -12,8 +12,10 @@ import { SelectDsfr } from "common/components/selects2"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { Form, useForm } from "common/components/form2"
-import { BiomethaneSupplyInput } from "../types"
-import { MaterialUnitEnum } from "api-schema"
+import {
+  BiomethaneSupplyInput,
+  BiomethaneSupplyInputMaterialUnit,
+} from "../types"
 
 type SupplyInputFormValue = Partial<BiomethaneSupplyInput>
 
@@ -73,20 +75,29 @@ export const SupplyInputForm = ({
             orientation="horizontal"
             {...bind("material_unit")}
           />
-          {value?.material_unit === MaterialUnitEnum.DRY && (
+          {value?.material_unit === BiomethaneSupplyInputMaterialUnit.DRY && (
+            <>
+              <NumberInput
+                label={t("Ratio de matière sèche")}
+                min={0}
+                max={100}
+                required
+                {...bind("dry_matter_ratio_percent")}
+              />
+              <NumberInput
+                label={t("Tonnage (tMS)")}
+                required
+                {...bind("volume")}
+              />
+            </>
+          )}
+          {value?.material_unit === BiomethaneSupplyInputMaterialUnit.WET && (
             <NumberInput
-              label={t("Ratio de matière sèche")}
-              min={0}
-              max={100}
+              label={t("Tonnage (tMB)")}
               required
-              {...bind("dry_matter_ratio_percent")}
+              {...bind("volume")}
             />
           )}
-          <NumberInput
-            label={t("Volume (tMB ou tMS en fonction du choix")}
-            required
-            {...bind("volume")}
-          />
         </Dialog.Section>
         <Dialog.Section label="Réception" gap="lg">
           <AutoCompleteCountries

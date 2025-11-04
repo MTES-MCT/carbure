@@ -11,7 +11,6 @@ def round_volumes_to_2_decimals(apps, schema_editor):
     """
     OperationDetail = apps.get_model("tiruert", "OperationDetail")
 
-    # Process in batches to avoid memory issues with large datasets
     batch_size = 1000
     details_to_update = []
 

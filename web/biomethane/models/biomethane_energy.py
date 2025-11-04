@@ -47,7 +47,7 @@ class BiomethaneEnergy(models.Model):
     # J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d’origine fossile.
     attest_no_fossil_for_digester_heating_and_purification = models.BooleanField(default=False)
 
-    # Énergie utilisée pour le chauffage du digesteur
+    # Type d'énergie utilisée pour le chauffage du digesteur
     energy_used_for_digester_heating = models.CharField(max_length=255, null=True, blank=True)
 
     # Précisions (si utilisation d’énergie d’origine fossile)
@@ -58,7 +58,7 @@ class BiomethaneEnergy(models.Model):
     # J'atteste que les besoins en énergie cités ci-dessus ont pas satisfaits par une énergie d’origine fossile.
     attest_no_fossil_for_installation_needs = models.BooleanField(default=False)
 
-    # Énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
+    # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
     # le chauffage du digesteur et l’épuration du biogaz
     energy_used_for_installation_needs = models.CharField(max_length=255, null=True, blank=True)
 
@@ -124,8 +124,8 @@ class BiomethaneEnergy(models.Model):
         (MALFUNCTION_TYPE_OTHER, "Autres (à préciser)"),
     ]
 
-    # Types de dysfonctionnement
-    malfunction_types = models.CharField(max_length=32, choices=MALFUNCTION_TYPES, null=True, blank=True)
+    # Types de dysfonctionnement (peut contenir plusieurs valeurs)
+    malfunction_types = models.JSONField(null=True, blank=True, default=list)
 
     # Précisions sur les dysfonctionnements
     malfunction_details = models.TextField(null=True, blank=True)

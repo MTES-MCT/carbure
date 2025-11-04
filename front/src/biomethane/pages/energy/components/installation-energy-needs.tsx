@@ -82,7 +82,9 @@ export function InstallationEnergyNeeds({
               />
               <TextInput
                 readOnly={!isEditing}
-                label={t("Énergie utilisée pour le chauffage du digesteur")}
+                label={t(
+                  "Type d'énergie utilisée pour le chauffage du digesteur"
+                )}
                 {...bind("energy_used_for_digester_heating")}
                 required
               />
@@ -116,7 +118,7 @@ export function InstallationEnergyNeeds({
               <TextInput
                 readOnly={!isEditing}
                 label={t(
-                  "Énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz "
+                  "Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz "
                 )}
                 {...bind("energy_used_for_installation_needs")}
                 required

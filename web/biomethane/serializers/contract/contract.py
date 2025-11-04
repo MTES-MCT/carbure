@@ -55,9 +55,11 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         BiomethaneContractService.handle_is_red_ii(validated_data, instance.producer)
 
-        # Determine if contract amendment needs to be updated
-        tracked_types = BiomethaneContractService.get_tracked_amendment_types(instance, validated_data)
-        validated_data["tracked_amendment_types"] = tracked_types
+        # If the user has updated the general conditions file, we need to track the amendment types
+        if instance.general_conditions_file:
+            # Determine if contract amendment needs to be updated
+            tracked_types = BiomethaneContractService.get_tracked_amendment_types(instance, validated_data)
+            validated_data["tracked_amendment_types"] = tracked_types
 
         # Check if annual declaration needs to be reset
         if BiomethaneAnnualDeclarationService.has_watched_field_changed(instance, validated_data.keys()):

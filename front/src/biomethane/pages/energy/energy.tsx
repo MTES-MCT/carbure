@@ -3,9 +3,7 @@ import { useTranslation } from "react-i18next"
 import { getEnergy } from "./api"
 import { useQuery } from "common/hooks/async"
 import { usePrivateNavigation } from "common/layouts/navigation"
-import { SettingsNotFilled } from "biomethane/layouts/settings-not-filled"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useGetContractInfos } from "../contract/contract.hooks"
 import { InjectedBiomethane } from "./components/injected-biomethane"
 import { BiogasProduction } from "./components/biogas-production"
 import { useProductionUnit } from "../production/production.hooks"
@@ -22,13 +20,14 @@ import { BiomethaneEnergy } from "./types"
 import { MissingFields } from "biomethane/components/missing-fields"
 import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
 import { BiomethanePageHeader } from "biomethane/layouts/page-header"
+import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const form = useForm<BiomethaneEnergy | undefined | object>(undefined)
   const { selectedYear } = useAnnualDeclaration()
-  const { result: contract } = useGetContractInfos()
+  const { contractInfos: contract } = useContractProductionUnit()
   const { result: productionUnit } = useProductionUnit()
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "energy",
@@ -47,9 +46,6 @@ const EnergyPage = () => {
 
   if (loading && !energy) return <LoaderOverlay />
 
-  if (!loading && contract === undefined) {
-    return <SettingsNotFilled />
-  }
   return (
     <BiomethanePageHeader>
       <FormContext.Provider value={form}>
