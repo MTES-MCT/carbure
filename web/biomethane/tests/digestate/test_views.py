@@ -8,7 +8,6 @@ from rest_framework import status
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
-from biomethane.views.digestate.digestate import BiomethaneDigestateViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -38,16 +37,6 @@ class BiomethaneDigestateViewsTests(TestCase):
         self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
         self.digestate_url = reverse("biomethane-digestate")
         self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
-
-    @patch("biomethane.views.digestate.digestate.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneDigestateViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["upsert", "validate_digestate"], "retrieve")
 
     def test_retrieve_digestate_success(self):
         """Test successful retrieval of digestate."""

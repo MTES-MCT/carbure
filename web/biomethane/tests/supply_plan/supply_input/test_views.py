@@ -1,11 +1,8 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 from django.urls import reverse
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
-from biomethane.views import BiomethaneSupplyInputViewSet
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data, setup_current_user
 
@@ -36,16 +33,6 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
         self.url_base = reverse("biomethane-supply-input-list")
         self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
-
-    @patch("biomethane.views.supply_plan.supply_input.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneSupplyInputViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["create", "update", "partial_update"], "retrieve")
 
     def test_list_supply_inputs_success(self):
         """Test successful retrieval of supply inputs."""

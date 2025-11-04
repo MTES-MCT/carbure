@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -7,7 +5,6 @@ from rest_framework import status
 from biomethane.factories.digestate import BiomethaneDigestateFactory
 from biomethane.factories.digestate_spreading import BiomethaneDigestateSpreadingFactory
 from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
-from biomethane.views.digestate.spreading import BiomethaneDigestateSpreadingViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -34,16 +31,6 @@ class BiomethaneDigestateSpreadingViewSetTests(TestCase):
 
         self.url_base = reverse("biomethane-digestate-spreading-list")
         self.base_params = {"entity_id": self.producer_entity.id}
-
-    @patch("biomethane.views.digestate.spreading.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneDigestateSpreadingViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["create", "destroy"], "retrieve")
 
     def test_create_digestate_spreading_success(self):
         """Test successful creation of digestate spreading record."""

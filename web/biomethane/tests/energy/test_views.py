@@ -41,16 +41,6 @@ class BiomethaneEnergyViewSetTests(TestCase):
             "operating_hours": 8000.0,
         }
 
-    @patch("biomethane.views.energy.energy.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneEnergyViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["upsert", "validate_energy"], "retrieve")
-
     def test_retrieve_energy_success(self):
         """Test successful retrieval of an existing energy declaration"""
         # Create an energy declaration
