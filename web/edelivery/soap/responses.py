@@ -13,6 +13,19 @@ class BaseEdeliveryResponse:
     def __init__(self, text):
         self.text = text
         self.parsed_XML = ET.fromstring(text)
+        self.check_for_errors()
+
+    def check_for_errors(self):
+        self.error = False
+        self.error_message = None
+
+        error_element = self.find_element("soap:Body/soap:Fault")
+        if error_element is not None:
+            self.error = True
+            error_details = self.find_element("soap:Body/soap:Fault/soap:Detail/ws:FaultDetail")
+            code = error_details.find("code").text
+            message = error_details.find("message").text
+            self.error_message = f"{code} - {message}"
 
     def find_element(self, path):
         return self.parsed_XML.find(path, self.NAMESPACES)
@@ -50,16 +63,3 @@ class RetrieveMessageResponse(BaseEdeliveryResponse):
 class SubmitMessageResponse(BaseEdeliveryResponse):
     def __init__(self, text):
         super().__init__(text)
-        self.check_for_errors()
-
-    def check_for_errors(self):
-        self.error = False
-        self.error_message = None
-
-        error_element = self.find_element("soap:Body/soap:Fault")
-        if error_element is not None:
-            self.error = True
-            error_details = self.find_element("soap:Body/soap:Fault/soap:Detail/ws:FaultDetail")
-            code = error_details.find("code").text
-            message = error_details.find("message").text
-            self.error_message = f"{code} - {message}"

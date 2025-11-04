@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from edelivery.ebms.requests import BaseRequest
-from edelivery.soap.actions import ListPendingMessages, RetrieveMessage, SubmitMessage
+from edelivery.soap.actions import EdeliveryError, ListPendingMessages, RetrieveMessage, SubmitMessage
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
@@ -131,3 +131,14 @@ class SubmitMessageTest(TestCase):
 </soap:Envelope>"""
 
         self.assertEqual(action.payload(), expected_payload)
+
+    def test_raises_error_if_message_could_not_submited(self):
+        send_callback = MagicMock()
+        request = BaseRequest("12345", "<request/>")
+        action = SubmitMessage("responder_id", request, send_callback=send_callback)
+        action.response_class = MagicMock(**{"return_value.error": True, "return_value.error_message": "oops"})
+
+        with self.assertRaises(EdeliveryError) as context:
+            action.perform()
+
+        self.assertEqual("oops", str(context.exception))
