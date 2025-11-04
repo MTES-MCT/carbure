@@ -39,8 +39,10 @@ export const DisplayOnlyDigestateMissingFields: Story = {
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
-          digestate_missing_fields: ["digestate_field_1"],
-          energy_missing_fields: [],
+          missing_fields: {
+            digestate_missing_fields: ["digestate_field_1"],
+            energy_missing_fields: [],
+          },
         }),
       ],
     },
@@ -56,8 +58,10 @@ export const DisplayOnlyEnergyMissingFields: Story = {
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
-          digestate_missing_fields: [],
-          energy_missing_fields: ["energy_field_1"],
+          missing_fields: {
+            digestate_missing_fields: [],
+            energy_missing_fields: ["energy_field_1"],
+          },
         }),
       ],
     },
@@ -73,8 +77,10 @@ export const DisplayBothEnergyAndDigestateMissingFields: Story = {
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
-          digestate_missing_fields: ["digestate_field_1"],
-          energy_missing_fields: ["energy_field_1"],
+          missing_fields: {
+            digestate_missing_fields: ["digestate_field_1"],
+            energy_missing_fields: ["energy_field_1"],
+          },
         }),
       ],
     },

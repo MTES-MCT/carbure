@@ -4,6 +4,7 @@ import {
   currentAnnualDeclarationMissingFields,
 } from "./data"
 import { http } from "common/__test__/http"
+import { AnnualDeclaration } from "biomethane/types"
 
 export const getCurrentAnnualDeclarationOk = http.get(
   "/biomethane/annual-declaration/",
@@ -15,14 +16,13 @@ export const getCurrentAnnualDeclarationMissingFields = http.get(
   () => HttpResponse.json(currentAnnualDeclarationMissingFields)
 )
 
-export const buildCurrentAnnualDeclarationHandler = (missingFields: {
-  digestate_missing_fields: string[]
-  energy_missing_fields: string[]
-}) =>
+export const buildCurrentAnnualDeclarationHandler = (
+  declaration: Partial<AnnualDeclaration>
+) =>
   http.get("/biomethane/annual-declaration/", () =>
-    HttpResponse.json({
+    HttpResponse.json<AnnualDeclaration>({
       ...currentAnnualDeclaration,
-      missing_fields: missingFields,
+      ...declaration,
     })
   )
 
