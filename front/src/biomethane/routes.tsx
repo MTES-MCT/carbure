@@ -3,6 +3,7 @@ import { lazy } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { getDeclarationInterval } from "./utils"
 import { AnnualDeclarationLayout } from "./layouts/annual-declaration-layout"
+import { ContractProductionUnitProvider } from "./providers/contract-production-unit.provider"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -18,7 +19,14 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      <Route path=":year" element={<AnnualDeclarationLayout />}>
+      <Route
+        path=":year"
+        element={
+          <ContractProductionUnitProvider>
+            <AnnualDeclarationLayout />
+          </ContractProductionUnitProvider>
+        }
+      >
         <Route index element={<Navigate replace to="digestate" />} />
         <Route path="digestate" element={<Digestate />} />
         <Route path="energy" element={<Energy />} />
