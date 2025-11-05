@@ -68,6 +68,10 @@ const DoubleCountingFilesCheckerDialog = ({
           <ValidDetailsDialog
             fileData={checkedFile}
             onClose={close}
+            onSuccess={() => {
+              close()
+              onClose()
+            }}
             file={value.doubleCountingFile as File}
           />
         ))

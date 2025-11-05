@@ -15,41 +15,41 @@ export function formatPeriodFromDate(date: Date) {
 
 export type FormatNumberOptions = {
   fractionDigits?: number
-  mode?: "round" | "ceil" | "floor"
+  mode?: Intl.NumberFormatOptions["roundingMode"]
+
   // Add zeros to the number if it is less than the fractionDigits
   appendZeros?: boolean
-}
+} & Omit<
+  Intl.NumberFormatOptions,
+  | "minimumFractionDigits"
+  | "maximumFractionDigits"
+  | "useGrouping"
+  | "roundingMode"
+>
 
-export function formatNumber(
-  num: number,
-  customOptions: FormatNumberOptions = {}
-) {
+export function formatNumber(num: number, options: FormatNumberOptions = {}) {
   const defaultOptions: FormatNumberOptions = {
     fractionDigits: 2,
     mode: "floor",
-    appendZeros: true,
+    appendZeros: false,
   }
-  const { fractionDigits, mode, appendZeros } = {
+
+  const { appendZeros, fractionDigits, mode, ...intlOptions } = {
     ...defaultOptions,
-    ...customOptions,
-  }
-  const integer = Math[mode ?? "floor"](num).toFixed(0)
-  let decimal = num % 1
-
-  // add space to separate thousands
-  let numStr = chunk(integer, 3).join(" ")
-  if (!fractionDigits) return numStr
-
-  if (decimal !== 0) {
-    if (decimal < 0) decimal = -decimal
-    let decimalStr = decimal.toFixed(fractionDigits).slice(2)
-    if (!appendZeros) {
-      decimalStr = decimalStr.replace(/\.?0+$/, "")
-    }
-    numStr += decimalStr ? "," + decimalStr : decimalStr
+    ...options,
   }
 
-  return numStr
+  const optionsForIntl: Intl.NumberFormatOptions = {
+    ...intlOptions,
+    minimumFractionDigits: appendZeros ? fractionDigits : 0,
+    maximumFractionDigits: fractionDigits,
+    useGrouping: true,
+    roundingMode: mode,
+  }
+
+  return new Intl.NumberFormat("fr-FR", optionsForIntl)
+    .format(num)
+    .replace(/\u202f/g, " ")
 }
 
 export function roundNumber(num: number, fractionDigits = 2) {

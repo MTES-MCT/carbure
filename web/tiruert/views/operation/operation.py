@@ -126,6 +126,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("to_depot__name")),
                     When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("from_depot__name")),
                     When(Q(type="INCORPORATION") | Q(type="MAC_BIO"), then=F("to_depot__name")),
+                    When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("from_depot__name")),
                     default=Value(None),
                     output_field=CharField(),
                 ),
@@ -134,6 +135,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
                     When(Q(type="TRANSFERT", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
                     When(Q(type="TRANSFERT", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
+                    When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("export_recipient")),
                     default=Value(None),
                     output_field=CharField(),
                 ),
@@ -303,7 +305,13 @@ class OperationViewSet(ModelViewSet, ActionMixin):
     )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.type in [Operation.CESSION, Operation.TENEUR, Operation.TRANSFERT] and instance.status in [
+        if instance.type in [
+            Operation.CESSION,
+            Operation.TENEUR,
+            Operation.TRANSFERT,
+            Operation.EXPORTATION,
+            Operation.EXPEDITION,
+        ] and instance.status in [
             Operation.PENDING,
             Operation.REJECTED,
             Operation.DRAFT,

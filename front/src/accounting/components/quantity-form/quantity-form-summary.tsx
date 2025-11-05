@@ -24,14 +24,12 @@ export const QuantitySummary = ({
         title={t("Quantité")}
         description={formatUnit(values.quantity, {
           fractionDigits: 10,
-          appendZeros: false,
         })}
       />
       <OperationText
         title={t("TCO2 évitées équivalentes")}
         description={formatNumber(values.avoided_emissions, {
           fractionDigits: 10,
-          appendZeros: false,
         })}
       />
       <OperationText

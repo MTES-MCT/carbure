@@ -114,7 +114,7 @@ class DoubleCountingSourcingHistory(models.Model):
     )
     metric_tonnes = models.IntegerField(blank=False, null=False)
     raw_material_supplier = models.CharField(max_length=128, default="")
-    supplier_certificate_name = models.CharField(max_length=64, default="")
+    supplier_certificate_name = models.CharField(max_length=128, default="")
     supplier_certificate = models.ForeignKey(GenericCertificate, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):

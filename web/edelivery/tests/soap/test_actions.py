@@ -15,7 +15,7 @@ class ListPendingMessagesTest(TestCase):
         self.send_callback.return_value = self.http_response
 
     def test_sends_payload_to_eDelivery_service(self):
-        action = ListPendingMessages(self.send_callback)
+        action = ListPendingMessages(send_callback=self.send_callback)
         action.perform()
 
         expectedPayload = """\
@@ -29,7 +29,7 @@ class ListPendingMessagesTest(TestCase):
 
     def test_returns_a_ListPendingMessagesResponse_as_result(self):
         self.http_response.text = "<response>some response</response>"
-        action = ListPendingMessages(self.send_callback)
+        action = ListPendingMessages(send_callback=self.send_callback)
         result = action.perform()
 
         self.assertIsInstance(result, ListPendingMessagesResponse)

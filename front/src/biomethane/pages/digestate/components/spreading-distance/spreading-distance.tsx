@@ -1,14 +1,12 @@
 import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestateInputRequest,
-} from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
+import { BiomethaneDigestateInputRequest } from "../../types"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type SpreadingDistanceForm = DeepPartial<
   Pick<
@@ -17,33 +15,30 @@ type SpreadingDistanceForm = DeepPartial<
   >
 >
 
-export function SpreadingDistance({
-  digestate,
-}: {
-  digestate?: BiomethaneDigestate
-}) {
+const extractValues = (digestate?: SpreadingDistanceForm) => {
+  return {
+    average_spreading_valorization_distance:
+      digestate?.average_spreading_valorization_distance,
+  }
+}
+export function SpreadingDistance() {
   const { t } = useTranslation()
-  const { bind, value } = useForm<SpreadingDistanceForm>(
-    digestate
-      ? {
-          average_spreading_valorization_distance:
-            digestate.average_spreading_valorization_distance,
-        }
-      : {}
-  )
+  const { bind, value } = useFormContext<SpreadingDistanceForm>()
 
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const saveDigestate = useSaveDigestate()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveDigestate.execute(value)
+  const handleSave = async () => saveDigestate.execute(extractValues(value))
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="spreading-distance"
       title={t("Distance d'épandage")}
       description={t("Données par département")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <NumberInput
             readOnly={!isEditing}
             label={t("Distance moyenne de valorisation d'épandage (km)")}
@@ -55,8 +50,8 @@ export function SpreadingDistance({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

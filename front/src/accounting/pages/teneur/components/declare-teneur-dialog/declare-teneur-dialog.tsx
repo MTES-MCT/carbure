@@ -42,8 +42,7 @@ import {
   DeclareTeneurProgressBar,
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
-import { RecapGHGRange } from "accounting/components/recap-ghg-range/recap-ghg-range"
-
+import { useFocusOnAvoidedEmissions } from "accounting/components/quantity-form/quantity-form.hooks"
 interface DeclareTeneurDialogProps {
   onClose: () => void
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective
@@ -72,6 +71,8 @@ const DeclareTeneurDialogContent = ({
     onOperationCreated: () => {},
     values: form.value,
   })
+  const { avoidedEmissionsInputRef, handleQuantityDeclared } =
+    useFocusOnAvoidedEmissions()
 
   const remainingEnergyBeforeLimitOrObjective =
     useRemainingEnergyBeforeLimitOrObjective(objective, form.value)
@@ -132,14 +133,7 @@ const DeclareTeneurDialogContent = ({
           <>
             <Box spacing="md">
               <RecapOperationGrid>
-                <RecapOperation
-                  balance={form.value.balance!}
-                  unit={ExtendedUnit.GJ}
-                />
-                <RecapGHGRange
-                  min={form.value.gesBoundMin}
-                  max={form.value.gesBoundMax}
-                />
+                <RecapOperation balance={form.value.balance!} />
                 {currentStepIndex > 2 && (
                   <QuantitySummary values={form.value} unit={ExtendedUnit.GJ} />
                 )}
@@ -208,18 +202,21 @@ const DeclareTeneurDialogContent = ({
                   <QuantityForm.Quantity
                     balance={form.value.balance!}
                     type={CreateOperationType.TENEUR}
-                    depot_quantity_max={depotQuantityMax}
+                    quantityMax={depotQuantityMax}
                     unit={ExtendedUnit.GJ}
                     backendUnit={Unit.MJ}
                     // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)
                     converter={CONVERSIONS.energy.GJ_TO_MJ}
                     gesBoundMin={form.value.gesBoundMin}
                     gesBoundMax={form.value.gesBoundMax}
+                    onQuantityDeclared={handleQuantityDeclared}
                   />
                 </Box>
                 {form.value.avoided_emissions_min ? (
                   <Box spacing="md">
-                    <QuantityForm.AvoidedEmissions />
+                    <QuantityForm.AvoidedEmissions
+                      inputRef={avoidedEmissionsInputRef}
+                    />
                     {mainObjective && (
                       <DeclareTeneurProgressBar
                         teneurDeclared={mainObjective.teneur_declared}

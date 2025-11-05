@@ -77,8 +77,6 @@ export const OperationDetail = () => {
           value: `${getOperationQuantity(
             operation,
             formatUnit(operation.quantity ?? 0, {
-              fractionDigits: 2,
-              appendZeros: false,
               unit: Unit.MJ,
             })
           )}`,

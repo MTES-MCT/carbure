@@ -7,7 +7,7 @@ from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.digestate.spreading import (
     BiomethaneDigestateSpreadingAddSerializer,
 )
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 
 
 @extend_schema(
@@ -30,7 +30,7 @@ class BiomethaneDigestateSpreadingViewSet(GenericViewSet, CreateModelMixin, Dest
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
-        setattr(request, "year", get_declaration_period())
+        setattr(request, "year", BiomethaneAnnualDeclarationService.get_declaration_period())
         return request
 
     def get_serializer_context(self):

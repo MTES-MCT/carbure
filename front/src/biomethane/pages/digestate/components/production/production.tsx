@@ -1,16 +1,14 @@
 import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneDigestate,
-  BiomethaneDigestateInputRequest,
-} from "../../types"
-import { useDigestateContext } from "../../digestate.hooks"
+import { BiomethaneDigestateInputRequest } from "../../types"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
+import { useSaveDigestate } from "../../digestate.hooks"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
 type ProductionForm = DeepPartial<
   Pick<
@@ -22,37 +20,34 @@ type ProductionForm = DeepPartial<
   >
 >
 
+const extractValues = (digestate?: ProductionForm) => {
+  return {
+    raw_digestate_tonnage_produced: digestate?.raw_digestate_tonnage_produced,
+    raw_digestate_dry_matter_rate: digestate?.raw_digestate_dry_matter_rate,
+    solid_digestate_tonnage: digestate?.solid_digestate_tonnage,
+    liquid_digestate_quantity: digestate?.liquid_digestate_quantity,
+  }
+}
 export function Production({
-  digestate,
   productionUnit,
 }: {
-  digestate?: BiomethaneDigestate
   productionUnit: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { bind, value } = useForm<ProductionForm>(
-    digestate
-      ? {
-          raw_digestate_tonnage_produced:
-            digestate.raw_digestate_tonnage_produced,
-          raw_digestate_dry_matter_rate:
-            digestate.raw_digestate_dry_matter_rate,
-          solid_digestate_tonnage: digestate.solid_digestate_tonnage,
-          liquid_digestate_quantity: digestate.liquid_digestate_quantity,
-        }
-      : {}
-  )
-  const { saveDigestate, isInDeclarationPeriod } = useDigestateContext()
+  const { bind, value } = useFormContext<ProductionForm>()
+  const saveDigestate = useSaveDigestate()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
-  const handleSave = async () => saveDigestate.execute(value)
+  const handleSave = async () => saveDigestate.execute(extractValues(value))
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="production"
       title={t("Production de digestat")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={handleSave}>
+        <ManagedEditableCard.Form onSubmit={handleSave}>
           <Grid cols={2} gap="lg">
             {!productionUnit.has_digestate_phase_separation && (
               <>
@@ -85,7 +80,7 @@ export function Production({
                 />
                 <NumberInput
                   readOnly={!isEditing}
-                  label={t("Quantité digestat liquide (en m3)")}
+                  label={t("Quantité digestat liquide (t)")}
                   type="number"
                   {...bind("liquid_digestate_quantity")}
                   required
@@ -103,8 +98,8 @@ export function Production({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

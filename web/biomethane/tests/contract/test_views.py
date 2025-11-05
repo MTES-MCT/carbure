@@ -112,7 +112,8 @@ class BiomethaneContractViewsTests(TestCase):
         contract.refresh_from_db()
         self.assertEqual(contract.pap_contracted, 75.0)
 
-    def test_patch_contract_signed_cannot_update_contract_fields(self):
+    @patch("biomethane.serializers.contract.contract.check_fields_required", return_value=None)
+    def test_patch_contract_signed_cannot_update_contract_fields(self, _):
         """Test that certain fields cannot be modified on a signed contract."""
         BiomethaneSignedContractFactory.create(
             producer=self.producer_entity,

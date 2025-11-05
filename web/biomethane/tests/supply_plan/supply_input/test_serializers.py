@@ -42,5 +42,5 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
 
         serializer = BiomethaneSupplyInputCreateSerializer(data=valid_data)
 
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("dry_matter_ratio_percent", serializer.errors)
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["dry_matter_ratio_percent"])

@@ -1,5 +1,4 @@
 from django.test import TestCase
-from rest_framework.permissions import IsAuthenticated
 
 from core.tests_utils import PermissionTestMixin
 from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights
@@ -21,7 +20,7 @@ class DoubleCountingApplicationPermissionTest(TestCase, PermissionTestMixin):
                 ),
                 (
                     ["agreements_public_list"],
-                    [IsAuthenticated()],
+                    [],
                 ),
             ],
         )

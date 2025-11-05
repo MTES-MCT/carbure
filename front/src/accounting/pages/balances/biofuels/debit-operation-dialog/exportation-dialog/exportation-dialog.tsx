@@ -8,10 +8,9 @@ import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
-import { Balance } from "accounting/types"
+import { Balance, CreateOperationType } from "accounting/types"
 import Dialog from "common/components/dialog2/dialog"
-import { Form, FormManager, useForm } from "common/components/form2"
-import Portal from "common/components/portal"
+import { FormManager, useForm } from "common/components/form2"
 import { Box, Main } from "common/components/scaffold"
 import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
 import { Trans, useTranslation } from "react-i18next"
@@ -24,12 +23,13 @@ import {
 import { Button } from "common/components/button2"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import { useExportationDialog } from "./exportation-dialog.hooks"
+import { GHGRangeForm } from "accounting/components/ghg-range-form"
 import {
-  ExportationQuantityForm,
-  exportationQuantityFormStep,
-  exportationQuantityFormStepKey,
-  ExportationQuantitySummary,
-} from "./exportation-quantity-form"
+  QuantityForm,
+  quantityFormStepKey,
+  QuantitySummary,
+  useQuantityFormStep,
+} from "accounting/components/quantity-form"
 
 interface ExportationDialogProps {
   onClose: () => void
@@ -55,76 +55,115 @@ export const ExportationDialogContent = ({
     onClose,
     onOperationCreated,
   })
-  return (
-    <Portal>
-      <Dialog
-        fullWidth
-        onClose={onClose}
-        header={
-          <Dialog.Title>
-            <Trans>Réaliser une exportation</Trans>
-          </Dialog.Title>
+
+  // Change the available balance value only if the GHG range step is completed
+  const currentBalance =
+    currentStepIndex > 1
+      ? {
+          ...balance,
+          available_balance: form.value.availableBalance!,
         }
-        footer={
-          <>
-            <Stepper.Previous />
-            <Stepper.Next />
-            {currentStep?.key === "recap" && (
+      : balance
+  return (
+    <Dialog
+      fullWidth
+      onClose={onClose}
+      header={
+        <Dialog.Title>
+          <Trans>Réaliser une exportation</Trans>
+        </Dialog.Title>
+      }
+      footer={
+        <>
+          <Stepper.Previous />
+          <Stepper.Next nativeButtonProps={{ form: "exportation-dialog" }} />
+          {currentStep?.key === "recap" && (
+            <>
               <Button
-                priority="primary"
-                onClick={() => mutation.execute()}
+                priority="secondary"
+                onClick={() => mutation.execute({ draft: true })}
                 loading={mutation.loading}
               >
-                {t("Déclarer une exportation")}
+                {t("Sauvegarder")}
               </Button>
-            )}
-          </>
-        }
-      >
-        <Main>
-          <Stepper />
-          <Box>
-            <RecapOperationGrid>
-              <RecapOperation balance={balance} />
-              {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
-              {currentStepIndex > 2 && (
-                <ExportationQuantitySummary values={form.value} />
-              )}
-              {currentStepIndex > 3 && (
-                <CountryFormSummary values={form.value} />
-              )}
-            </RecapOperationGrid>
-          </Box>
-          {currentStep?.key !== "recap" && (
-            <Box>
-              <Form form={form}>
-                {currentStep?.key === fromDepotStepKey && <FromDepotForm />}
-                {currentStep?.key === exportationQuantityFormStepKey && (
-                  <ExportationQuantityForm
-                    balance={balance}
-                    depot_quantity_max={form.value.from_depot?.quantity.credit}
-                  />
-                )}
-                {currentStep?.key === countryFormStepKey && <CountryForm />}
-              </Form>
-            </Box>
+
+              <Button
+                priority="primary"
+                onClick={() => mutation.execute({ draft: false })}
+                loading={mutation.loading}
+              >
+                {t("Exporter")}
+              </Button>
+            </>
           )}
-        </Main>
-      </Dialog>
-    </Portal>
+        </>
+      }
+    >
+      <Main>
+        <Stepper />
+        <Box>
+          <RecapOperationGrid>
+            <RecapOperation balance={currentBalance} />
+            {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
+            {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
+            {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
+          </RecapOperationGrid>
+        </Box>
+        {currentStep?.key !== "recap" && (
+          <Stepper.Form form={form} id="exportation-dialog">
+            {currentStep?.key === fromDepotStepKey && (
+              <>
+                <Box>
+                  <FromDepotForm />
+                </Box>
+                <Box>
+                  <GHGRangeForm balance={balance} />
+                </Box>
+              </>
+            )}
+            {currentStep?.key === quantityFormStepKey && (
+              <Box>
+                <QuantityForm
+                  balance={balance}
+                  quantityMax={form.value.availableBalance ?? 0}
+                  type={CreateOperationType.EXPORTATION}
+                  gesBoundMin={form.value.gesBoundMin}
+                  gesBoundMax={form.value.gesBoundMax}
+                />
+              </Box>
+            )}
+            {currentStep?.key === countryFormStepKey && (
+              <Box>
+                <CountryForm />
+              </Box>
+            )}
+          </Stepper.Form>
+        )}
+      </Main>
+    </Dialog>
   )
 }
 
 export const ExportationDialog = (props: ExportationDialogProps) => {
   const { t } = useTranslation()
   const form = useForm<ExportationDialogForm>({})
+  const exportationQuantityFormStep = useQuantityFormStep({
+    balance: props.balance,
+    form,
+    overrides: {
+      title: t(
+        "Quantité d'énergie exportée et tonnes de CO2 évitées équivalentes"
+      ),
+    },
+  })
 
   const steps = [
-    fromDepotStep(form.value),
-    exportationQuantityFormStep(form.value),
-    countryFormStep(form.value),
+    fromDepotStep,
+    exportationQuantityFormStep,
+    countryFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]
+
   return (
     <StepperProvider steps={steps}>
       <ExportationDialogContent {...props} form={form} />

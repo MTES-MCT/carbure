@@ -44,7 +44,8 @@ export function GeneralInfo({
     department: productionUnit?.department,
   })
 
-  const { execute: saveProductionUnit, loading } = useSaveProductionUnit()
+  const { execute: saveProductionUnit, loading } =
+    useSaveProductionUnit(productionUnit)
 
   const unitTypeOptions = [
     {

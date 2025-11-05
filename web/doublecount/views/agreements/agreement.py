@@ -1,5 +1,4 @@
 from django.db.models import Prefetch
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from certificates.models import DoubleCountingRegistration
@@ -21,7 +20,7 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
 
     def get_permissions(self):
         if self.action == "agreements_public_list":
-            return [IsAuthenticated()]
+            return []
         elif self.action in ["agreement_admin", "export"]:
             return [HasDoubleCountingAdminRights()]
 

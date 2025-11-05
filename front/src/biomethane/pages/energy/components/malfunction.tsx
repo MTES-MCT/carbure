@@ -1,32 +1,52 @@
-import { EditableCard } from "common/molecules/editable-card"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { BiomethaneEnergy, MalfunctionTypes } from "../types"
-import { useForm } from "common/components/form2"
-import { useEnergyContext } from "../energy.hooks"
+import { MalfunctionTypes } from "../types"
+import { useFormContext } from "common/components/form2"
+import { useSaveEnergy } from "../energy.hooks"
 import { Button } from "common/components/button2"
 import { Grid } from "common/components/scaffold"
-import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
+import {
+  CheckboxGroup,
+  NumberInput,
+  RadioGroup,
+  TextInput,
+} from "common/components/inputs2"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useMemo } from "react"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergyInputRequest } from "../types"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type MalfunctionForm = DeepPartial<
   Pick<
     BiomethaneEnergyInputRequest,
     | "has_malfunctions"
     | "malfunction_cumulative_duration_days"
-    | "malfunction_types"
     | "malfunction_details"
     | "has_injection_difficulties_due_to_network_saturation"
     | "injection_impossibility_hours"
   >
->
+> &
+  Pick<BiomethaneEnergyInputRequest, "malfunction_types">
 
-export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
+const extractValues = (energy?: MalfunctionForm) => {
+  return {
+    has_malfunctions: energy?.has_malfunctions,
+    malfunction_cumulative_duration_days:
+      energy?.malfunction_cumulative_duration_days,
+    malfunction_types: energy?.malfunction_types ?? [],
+    malfunction_details: energy?.malfunction_details,
+    has_injection_difficulties_due_to_network_saturation:
+      energy?.has_injection_difficulties_due_to_network_saturation,
+    injection_impossibility_hours: energy?.injection_impossibility_hours,
+  }
+}
+
+export const Malfunction = () => {
   const { t } = useTranslation()
-  const { bind, value } = useForm<MalfunctionForm>(energy ?? {})
-  const { saveEnergy, isInDeclarationPeriod } = useEnergyContext()
+  const { bind, value } = useFormContext<MalfunctionForm>()
+  const saveEnergy = useSaveEnergy()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
   const dysfunctionOptions = useMemo(
     () => [
@@ -51,12 +71,15 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
   )
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="malfunction"
       title={t("Dysfonctionnements")}
-      readOnly={!isInDeclarationPeriod}
+      readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveEnergy.execute(value)}>
+        <ManagedEditableCard.Form
+          onSubmit={() => saveEnergy.execute(extractValues(value))}
+        >
           <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}
@@ -77,14 +100,16 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
           </Grid>
           {value.has_malfunctions && (
             <>
-              <RadioGroup
+              <CheckboxGroup
                 readOnly={!isEditing}
                 label={t("Types de dysfonctionnement")}
                 options={dysfunctionOptions}
                 required
-                {...bind("malfunction_types")}
+                {...bind("malfunction_types", {
+                  value: value.malfunction_types ?? [],
+                })}
               />
-              {value.malfunction_types === MalfunctionTypes.OTHER && (
+              {value.malfunction_types?.includes(MalfunctionTypes.OTHER) && (
                 <TextInput
                   readOnly={!isEditing}
                   label={t("Précisions")}
@@ -123,8 +148,8 @@ export const Malfunction = ({ energy }: { energy?: BiomethaneEnergy }) => {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

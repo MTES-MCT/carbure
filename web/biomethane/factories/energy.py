@@ -5,7 +5,7 @@ from faker import Faker
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.models.biomethane_energy_monthly_report import BiomethaneEnergyMonthlyReport
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 from entity.factories.entity import EntityFactory
 
@@ -18,7 +18,6 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     year = faker.random_int(2000, 2024)
-    status = factory.LazyAttribute(lambda obj: random.choice([choice[0] for choice in BiomethaneEnergy.ENERGY_STATUS]))
 
     # Biométhane injecté dans le réseau
     injected_biomethane_gwh_pcs_per_year = factory.Faker("pyfloat", min_value=0, max_value=1000, right_digits=2)
@@ -67,13 +66,13 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
         lambda obj: faker.random_int(min=1, max=365) if obj.has_malfunctions else None
     )
     malfunction_types = factory.LazyAttribute(
-        lambda obj: random.choice([choice[0] for choice in BiomethaneEnergy.MALFUNCTION_TYPES])
+        lambda obj: random.sample([choice[0] for choice in BiomethaneEnergy.MALFUNCTION_TYPES], k=random.randint(1, 3))
         if obj.has_malfunctions
         else None
     )
     malfunction_details = factory.LazyAttribute(
         lambda obj: faker.text(max_nb_chars=500)
-        if obj.has_malfunctions and obj.malfunction_types == BiomethaneEnergy.MALFUNCTION_TYPE_OTHER
+        if obj.has_malfunctions and BiomethaneEnergy.MALFUNCTION_TYPE_OTHER in (obj.malfunction_types or [])
         else None
     )
 
@@ -108,7 +107,7 @@ def create_monthly_reports_for_energy(energy):
 def create_biomethane_energy(producer=None, **kwargs):
     if producer is None:
         producer = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER)
-    year = get_declaration_period()
+    year = BiomethaneAnnualDeclarationService.get_declaration_period()
     previous_year = year - 1
 
     # Create energy declaration for the current year and the previous year

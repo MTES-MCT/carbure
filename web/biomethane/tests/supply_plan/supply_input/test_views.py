@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views import BiomethaneSupplyInputViewSet
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data, setup_current_user
@@ -27,11 +27,13 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             [(self.producer_entity, "RW")],
         )
 
-        self.supply_plan = BiomethaneSupplyPlanFactory.create(producer=self.producer_entity, year=get_declaration_period())
+        self.supply_plan = BiomethaneSupplyPlanFactory.create(
+            producer=self.producer_entity, year=BiomethaneAnnualDeclarationService.get_declaration_period()
+        )
 
         self.supply_input = BiomethaneSupplyInputFactory.create(supply_plan=self.supply_plan)
 
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
         self.url_base = reverse("biomethane-supply-input-list")
         self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
 

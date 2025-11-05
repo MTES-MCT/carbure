@@ -33,6 +33,7 @@ import { Depot, ExtendedUnit, UserRole } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { formatOperationType, formatSector } from "accounting/utils/formatters"
 import { OperationsStatus, OperationType } from "accounting/types"
+import { getOperationValidationButtonText } from "./operation-detail.utils"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
@@ -101,13 +102,18 @@ export const OperationDetail = () => {
   } = useMutation(api.patchOperation, {
     invalidates: ["operations"],
     onSuccess: () => {
-      notify(t("Le transfert a été réalisé avec succès."), {
-        variant: "success",
-      })
+      notify(
+        t(
+          "L'opération a bien été envoyée et est en attente de validation par l'administration."
+        ),
+        {
+          variant: "success",
+        }
+      )
       closeDialog()
     },
     onError: () => {
-      notify(t("Une erreur est survenue lors du transfert."), {
+      notify(t("Une erreur est survenue lors de l'opération."), {
         variant: "danger",
       })
     },
@@ -154,16 +160,11 @@ export const OperationDetail = () => {
           label: t("Quantité"),
           value: `${getOperationQuantity(
             operation,
-            formatUnit(operation.quantity, {
-              fractionDigits: 2,
-              appendZeros: false,
-            })
+            formatUnit(operation.quantity)
           )} / ${getOperationQuantity(
             operation,
             formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
-              fractionDigits: 2,
               unit: ExtendedUnit.GJ,
-              appendZeros: false,
             })
           )}`,
         },
@@ -172,10 +173,7 @@ export const OperationDetail = () => {
             label: t("Quantité renouvelable"),
             value: `${getOperationQuantity(
               operation,
-              formatUnit(roundNumber(formatValue(operation.quantity), 2), {
-                fractionDigits: 2,
-                appendZeros: false,
-              })
+              formatUnit(roundNumber(formatValue(operation.quantity), 2))
             )} / ${getOperationQuantity(
               operation,
               formatUnit(
@@ -183,9 +181,7 @@ export const OperationDetail = () => {
                   roundNumber(formatValue(operation.quantity_mj), 2)
                 ),
                 {
-                  fractionDigits: 2,
                   unit: ExtendedUnit.GJ,
-                  appendZeros: false,
                 }
               )
             )}`,
@@ -202,17 +198,31 @@ export const OperationDetail = () => {
           label: t("Expéditeur"),
           value: operation._entity ?? "-",
         },
-        [OperationType.CESSION, OperationType.TRANSFERT].includes(
-          operation.type as OperationType
-        ) &&
+        operation.type === OperationType.TRANSFERT &&
           operation.quantity < 0 && {
             label: t("Destinataire"),
             value: operation._entity ?? "-",
           },
-        operation.type !== OperationType.TENEUR &&
-          operation.type !== OperationType.TRANSFERT && {
-            label: t("Dépôt expéditeur"),
-            value: operation._depot ?? "-",
+        (operation.type === OperationType.EXPORTATION ||
+          operation.type === OperationType.EXPEDITION) && {
+          label: t("Destinataire"),
+          value: operation.export_recipient ?? "-",
+        },
+        [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
+          operation.type as OperationType
+        ) && {
+          label: t("Dépôt expéditeur"),
+          value: operation.from_depot ? operation.from_depot.name : "-",
+        },
+        [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
+          operation.type as OperationType
+        ) &&
+          operation.export_country &&
+          operation.quantity < 0 && {
+            label: t("Pays d'exportation"),
+            value: operation.export_country
+              ? operation.export_country.name
+              : "-",
           },
         operation.type !== OperationType.DEVALUATION &&
           operation.type === OperationType.ACQUISITION &&
@@ -288,30 +298,31 @@ export const OperationDetail = () => {
               )}
 
             {/* Display cancel/transfer button only if operation is a DRAFT transfer */}
-            {operation?.status === OperationsStatus.DRAFT &&
-              operation?.type === OperationType.TRANSFERT && (
-                <>
-                  <Button
-                    customPriority="danger"
-                    iconId="fr-icon-close-line"
-                    onClick={() => deleteOperation(entity.id, operation.id)}
-                    loading={deleteOperationLoading}
-                  >
-                    {t("Annuler la transaction")}
-                  </Button>
-                  <Button
-                    priority="primary"
-                    onClick={() =>
-                      validateDraftTransfer(entity.id, operation.id, {
-                        status: OperationsStatus.PENDING,
-                      })
-                    }
-                    loading={validateDraftTransferLoading}
-                  >
-                    {t("Transférer")}
-                  </Button>
-                </>
-              )}
+            {operation?.status === OperationsStatus.DRAFT && (
+              <>
+                <Button
+                  customPriority="danger"
+                  iconId="fr-icon-close-line"
+                  onClick={() => deleteOperation(entity.id, operation.id)}
+                  loading={deleteOperationLoading}
+                >
+                  {t("Annuler")}
+                </Button>
+                <Button
+                  priority="primary"
+                  onClick={() =>
+                    validateDraftTransfer(entity.id, operation.id, {
+                      status: OperationsStatus.PENDING,
+                    })
+                  }
+                  loading={validateDraftTransferLoading}
+                >
+                  {getOperationValidationButtonText(
+                    operation?.type as OperationType
+                  )}
+                </Button>
+              </>
+            )}
           </>
         }
       >

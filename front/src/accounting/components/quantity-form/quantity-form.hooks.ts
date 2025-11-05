@@ -7,8 +7,9 @@ import { ExtendedUnit, Unit } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { FormManager } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
-import { FromDepotFormProps } from "../from-depot-form"
-import { GHGRangeFormProps } from "../ghg-range-form/ghg-range-form"
+import { GHGRangeFormProps } from "../ghg-range-form"
+import { useRef } from "react"
+// import { GHGRangeFormProps } from "../ghg-range-form"
 
 type UseQuantityFormProps = {
   balance: Balance
@@ -59,7 +60,7 @@ type UseQuantityFormStepProps = {
 
   // Custom conversion function for the backend (default is the value passed as parameter)
   converter?: (value: number) => number
-  form: FormManager<QuantityFormProps & FromDepotFormProps & GHGRangeFormProps>
+  form: FormManager<QuantityFormProps & GHGRangeFormProps>
   overrides?: Parameters<typeof quantityFormStep>[1]
 }
 
@@ -74,6 +75,9 @@ export const useQuantityFormStep = ({
 
   return quantityFormStep(form.value, {
     ...overrides,
+    allowNextStep:
+      form.value.avoided_emissions_min !== undefined &&
+      form.value.avoided_emissions_max !== undefined,
     onSubmit: () => {
       if (!balance) return Promise.resolve()
 
@@ -83,7 +87,6 @@ export const useQuantityFormStep = ({
         debited_entity: entity.id,
         target_volume: converter(form.value.quantity!),
         target_emission: form.value.avoided_emissions ?? 0,
-        from_depot: form.value.from_depot?.id,
         unit: backendUnit,
         ges_bound_min: form.value.gesBoundMin,
         ges_bound_max: form.value.gesBoundMax,
@@ -92,4 +95,20 @@ export const useQuantityFormStep = ({
       })
     },
   })
+}
+
+export const useFocusOnAvoidedEmissions = () => {
+  const avoidedEmissionsInputRef = useRef<HTMLInputElement>(null)
+
+  const handleQuantityDeclared = () => {
+    // Wait for the avoided emissions input to be mounted
+    requestAnimationFrame(() => {
+      avoidedEmissionsInputRef.current?.focus()
+    })
+  }
+
+  return {
+    avoidedEmissionsInputRef,
+    handleQuantityDeclared,
+  }
 }

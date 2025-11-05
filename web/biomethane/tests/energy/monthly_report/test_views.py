@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
-from biomethane.utils import get_declaration_period
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.energy.monthly_report import BiomethaneEnergyMonthlyReportViewSet
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data, setup_current_user
@@ -15,7 +15,7 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
     def setUp(self):
         """Initial setup for tests"""
         self.viewset = BiomethaneEnergyMonthlyReportViewSet()
-        self.current_year = get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
 
         self.producer_entity = Entity.objects.create(
             name="Test Producer",
@@ -26,7 +26,6 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
         self.energy = BiomethaneEnergy.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
-            status=BiomethaneEnergy.PENDING,
         )
 
         self.user = setup_current_user(
