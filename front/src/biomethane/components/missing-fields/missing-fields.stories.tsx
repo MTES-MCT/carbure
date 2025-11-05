@@ -30,9 +30,11 @@ const meta: Meta<typeof MissingFields> = {
 export default meta
 type Story = StoryObj<typeof MissingFields>
 
-// Displays when there are no missing fields.
 export const NoMissingFields: Story = {
   parameters: {
+    docs: {
+      description: "Displays when there are no missing fields.",
+    },
     chromatic: { disableSnapshot: true },
   },
   play: async ({ canvasElement }) => {
@@ -44,9 +46,11 @@ export const NoMissingFields: Story = {
   },
 }
 
-// Shows missing fields only for digestate.
 export const DisplayOnlyDigestateMissingFields: Story = {
   parameters: {
+    docs: {
+      description: "Shows missing fields only for digestate.",
+    },
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
@@ -63,9 +67,11 @@ export const DisplayOnlyDigestateMissingFields: Story = {
   },
 }
 
-// Shows missing fields only for energy.
 export const DisplayOnlyEnergyMissingFields: Story = {
   parameters: {
+    docs: {
+      description: "Shows missing fields only for energy.",
+    },
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
@@ -82,9 +88,11 @@ export const DisplayOnlyEnergyMissingFields: Story = {
   },
 }
 
-// Displays missing fields for both energy and digestate.
 export const DisplayBothEnergyAndDigestateMissingFields: Story = {
   parameters: {
+    docs: {
+      description: "Displays missing fields for both energy and digestate.",
+    },
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({

@@ -75,10 +75,13 @@ export const SecondStep: Story = {
   },
 }
 
-// Second step - Could not switch to the next step when the quantity is not submitted
 export const SecondStepNextStepButtonDisabled: Story = {
   ...SecondStep,
   parameters: {
+    docs: {
+      description:
+        "Second step - Could not switch to the next step when the quantity is not submitted",
+    },
     msw: {
       handlers: [
         okSimulateMinMaxWithZeroValues,

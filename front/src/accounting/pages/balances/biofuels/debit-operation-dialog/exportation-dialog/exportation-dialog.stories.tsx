@@ -74,8 +74,13 @@ export const SecondStep: Story = {
   },
 }
 
-// Second step - Could not switch to the next step when the tCO2 is outside the range
 export const SecondStepNextDisabledWithTCO2OutsideRange: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Second step - Could not switch to the next step when the tCO2 is outside the range",
+    },
+  },
   play: async (canvas) => {
     const { canvasElement } = canvas
 

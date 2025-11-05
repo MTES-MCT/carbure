@@ -36,8 +36,13 @@ export default meta
 
 type Story = StoryObj<typeof ContractInfos>
 
-// When the tariff reference is 2011 or 2020, CMAX field is displayed
 export const WithCMAX: Story = {
+  parameters: {
+    docs: {
+      description:
+        "When the tariff reference is 2011 or 2020, CMAX field is displayed",
+    },
+  },
   args: {
     contract: {
       ...contractData,
@@ -46,8 +51,13 @@ export const WithCMAX: Story = {
   },
 }
 
-// When the CMAX is higher than the threshold, the RED II notice is displayed
 export const CMAXHigherThanThreshold: Story = {
+  parameters: {
+    docs: {
+      description:
+        "When the CMAX is higher than the threshold, the RED II notice is displayed",
+    },
+  },
   args: {
     contract: {
       ...contractData,
@@ -57,15 +67,25 @@ export const CMAXHigherThanThreshold: Story = {
   },
 }
 
-// When the tariff reference is 2021 or 2023, PAP field is displayed
 export const WithPAP: Story = {
+  parameters: {
+    docs: {
+      description:
+        "When the tariff reference is 2021 or 2023, PAP field is displayed",
+    },
+  },
   args: {
     contract: contractData,
   },
 }
 
-// When the PAP is higher than the threshold, the RED II notice is displayed
 export const PAPHigherThanThreshold: Story = {
+  parameters: {
+    docs: {
+      description:
+        "When the PAP is higher than the threshold, the RED II notice is displayed",
+    },
+  },
   args: {
     contract: {
       ...contractData,
@@ -74,11 +94,13 @@ export const PAPHigherThanThreshold: Story = {
   },
 }
 
-// When certain fields that conditionally control the display of other fields on the digestate/energy pages are modified,
-// a modal is displayed after form submission to inform the user that there are new fields to fill out on those pages.
-// This occurs when watched fields (such as tariff_reference or installation_category) change, which may reveal
-// or hide additional fields in the digestate and energy declaration forms.
 export const WatchedFieldsChanged: Story = {
+  parameters: {
+    docs: {
+      description:
+        "When certain fields that conditionally control the display of other fields on the digestate/energy pages are modified, a modal is displayed after form submission to inform the user that there are new fields to fill out on those pages. This occurs when watched fields (such as tariff_reference or installation_category) change, which may reveal or hide additional fields in the digestate and energy declaration forms.",
+    },
+  },
   args: {
     contract: {
       ...contractData,
@@ -124,21 +146,24 @@ export const WatchedFieldsChanged: Story = {
   },
 }
 
-// If the user change a field that is not watched, the modal is not displayed
 export const WatchedFieldsModalIsNotDisplayed: Story = {
   ...WatchedFieldsChanged,
+  parameters: {
+    docs: {
+      description:
+        "If the user change a field that is not watched, the modal is not displayed",
+    },
+  },
+
   decorators: [generateWatchedFieldsProvider(["tariff_reference"])],
 }
 
-// If the current entity is RED II, and the cmax is lower than the threshold, the RED II eligibility modal is displayed
 export const ChooseRedIIEligibilityWithCMAXLowerThanThreshold: Story = {
-  args: {
-    contract: {
-      ...contractData,
-      tariff_reference: TariffReference.Value2011,
-    },
-  },
   parameters: {
+    docs: {
+      description:
+        "If the current entity is RED II, and the cmax is lower than the threshold, the RED II eligibility modal is displayed",
+    },
     msw: {
       handlers: [
         mockUser(EntityType.Producteur_de_biom_thane, {
@@ -150,6 +175,12 @@ export const ChooseRedIIEligibilityWithCMAXLowerThanThreshold: Story = {
         }),
         MOCKS,
       ],
+    },
+  },
+  args: {
+    contract: {
+      ...contractData,
+      tariff_reference: TariffReference.Value2011,
     },
   },
   play: async ({ canvasElement, step }) => {
@@ -176,9 +207,16 @@ export const ChooseRedIIEligibilityWithCMAXLowerThanThreshold: Story = {
   },
 }
 
-// If the current entity is RED II, and the pap is lower than the threshold, the RED II eligibility modal is displayed
 export const ChooseRedIIEligibilityWithPAPLowerThanThreshold: Story = {
   ...ChooseRedIIEligibilityWithCMAXLowerThanThreshold,
+  parameters: {
+    ...ChooseRedIIEligibilityWithCMAXLowerThanThreshold.parameters,
+    docs: {
+      description:
+        "If the current entity is RED II, and the pap is lower than the threshold, the RED II eligibility modal is displayed",
+    },
+  },
+
   args: {
     contract: contractData,
   },

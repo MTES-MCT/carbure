@@ -41,8 +41,13 @@ export default meta
 
 export const DefaultQuantityForm: Story = {}
 
-// Set a value in the quantity input and the validate button should be enabled
 export const ValidateQuantityButtonEnabled: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Set a value in the quantity input and the validate button should be enabled",
+    },
+  },
   play: async ({ canvasElement }) => {
     const { getByRole } = within(canvasElement)
     const input = await waitFor(() => getByRole("spinbutton"))
@@ -51,8 +56,13 @@ export const ValidateQuantityButtonEnabled: Story = {
   },
 }
 
-// Display an error when the quantity is greater than the quantity max available
 export const ShowErrorWhenQuantityIsGreaterThanQuantityMax: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Display an error when the quantity is greater than the quantity max available",
+    },
+  },
   args: {
     quantityMax: 100,
   },
@@ -68,9 +78,12 @@ export const ShowErrorWhenQuantityIsGreaterThanQuantityMax: Story = {
   },
 }
 
-// Show an error when the simulate min max returns zero values
 export const ShowErrorWhenSimulateMinMaxReturnsZeroValues: Story = {
   parameters: {
+    docs: {
+      description:
+        "Show an error when the simulate min max returns zero values",
+    },
     msw: {
       handlers: [okSimulateMinMaxWithZeroValues, ...baseHandlers],
     },
@@ -78,23 +91,34 @@ export const ShowErrorWhenSimulateMinMaxReturnsZeroValues: Story = {
   play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
 }
 
-// Display the avoided emissions component with the range returned by the backend when the quantity is declared
 export const DisplayAvoidedEmissionsWhenQuantityIsDeclared: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Display the avoided emissions component with the range returned by the backend when the quantity is declared",
+    },
+  },
   play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
 }
 
-// Focus on the avoided emissions input when the quantity is declared (visible when the viewport height is small)
 export const FocusOnAvoidedEmissionsWhenQuantityIsDeclared: Story = {
-  play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
   parameters: {
+    docs: {
+      description:
+        "Focus on the avoided emissions input when the quantity is declared (visible when the viewport height is small)",
+    },
     viewport: getViewport("fullModal", { width: "1200px", height: "200px" }),
   },
+  play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
 }
 
-// Display the avoided emissions component with the range returned by the backend when the quantity is declared with equal values
 export const DisplayAvoidedEmissionsWhenQuantityIsDeclaredWithEqualValues: Story =
   {
     parameters: {
+      docs: {
+        description:
+          "Display the avoided emissions component with the range returned by the backend when the quantity is declared with equal values",
+      },
       msw: {
         // Overrides the simulate min max mock api by setting the needed mock as first
         handlers: [okSimulateMinMaxWithEqualValues, ...baseHandlers],
@@ -103,8 +127,13 @@ export const DisplayAvoidedEmissionsWhenQuantityIsDeclaredWithEqualValues: Story
     play: ShowErrorWhenQuantityIsGreaterThanQuantityMax.play,
   }
 
-// When the quantity is declared, the button should be replaced by a reset button that hides the avoided emissions component
 export const ResetQuantityDeclared: Story = {
+  parameters: {
+    docs: {
+      description:
+        "When the quantity is declared, the button should be replaced by a reset button that hides the avoided emissions component",
+    },
+  },
   play: async (props) => {
     const { getByRole } = within(props.canvasElement)
     await ShowErrorWhenQuantityIsGreaterThanQuantityMax.play?.(props)

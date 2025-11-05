@@ -34,12 +34,21 @@ const meta: Meta<typeof BiomethanePageHeader> = {
 export default meta
 type Story = StoryObj<typeof BiomethanePageHeader>
 
-// If the current year is 2025, a notice with a button to validate the declaration should be displayed
-export const DefaultLayoutForTheCurrentYear: Story = {}
+export const DefaultLayoutForTheCurrentYear: Story = {
+  parameters: {
+    docs: {
+      description:
+        "If the current year is 2025, a notice with a button to validate the declaration should be displayed",
+    },
+  },
+}
 
-// If the current year is 2025, but the user is read only, he can't validate the declaration
 export const DefaultLayoutForTheCurrentYearWithReadOnlyPermissions: Story = {
   parameters: {
+    docs: {
+      description:
+        "If the current year is 2025, but the user is read only, he can't validate the declaration",
+    },
     msw: {
       handlers: [
         mockUser(EntityType.Producteur_de_biom_thane, {

@@ -17,9 +17,12 @@ export default meta
 
 type Story = StoryObj<typeof AnnualDeclarationAlert>
 
-// Case 1: Not in declaration period - should not display anything
 export const Default: Story = {
   parameters: {
+    docs: {
+      description:
+        "Case 1: Not in declaration period - should not display anything",
+    },
     chromatic: { disableSnapshot: true },
   },
   play: async ({ canvasElement }) => {
@@ -28,9 +31,15 @@ export const Default: Story = {
   },
 }
 
-// Case 2: In declaration period but declaration in progress - should not display anything
 export const DeclarationInProgress: Story = {
   ...Default,
+  parameters: {
+    ...Default.parameters,
+    docs: {
+      description:
+        "Case 2: In declaration period but declaration in progress - should not display anything",
+    },
+  },
   decorators: [
     generateAnnualDeclarationContextProvider({
       isInDeclarationPeriod: true,
@@ -38,8 +47,13 @@ export const DeclarationInProgress: Story = {
   ],
 }
 
-// Case 3: In declaration period and declaration already submitted - should display alert
 export const DeclarationAlreadySubmitted: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Case 3: In declaration period and declaration already submitted - should display alert",
+    },
+  },
   decorators: [
     generateAnnualDeclarationContextProvider({
       isInDeclarationPeriod: true,

@@ -10,11 +10,13 @@ import useUserManager, { UserContext } from "../src/common/hooks/user"
 import { EntityContext, useEntityManager } from "../src/common/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
 import { MatomoProvider } from "../src/matomo"
+import { Notice } from "../src/common/components/notice"
 
 import "../src/setup-dsfr"
 import "@codegouvfr/react-dsfr/main.css"
 // import css from our app
 import "../src/common/assets/css/index.css"
+import { StoryDescription } from "./components/description"
 
 // Init MSW
 initialize({
@@ -40,11 +42,14 @@ const withI18next = (Story, context) => {
   )
 }
 
-const withData = (Story) => {
+const withData = (Story, { parameters }) => {
   const user = useUserManager()
   const entityId = user?.user?.rights[0]?.entity.id
   const entity = useEntityManager(user, entityId)
 
+  const storyHasDescription = parameters?.docs?.description
+    ? Boolean(parameters?.docs?.description)
+    : false
   return (
     <Suspense fallback={<LoaderOverlay />}>
       <MatomoProvider>
@@ -52,6 +57,11 @@ const withData = (Story) => {
           <EntityContext.Provider value={entity}>
             <PortalProvider>
               <div className="new-dsfr">
+                {storyHasDescription && (
+                  <StoryDescription
+                    description={parameters?.docs?.description}
+                  />
+                )}
                 <Story />
               </div>
             </PortalProvider>

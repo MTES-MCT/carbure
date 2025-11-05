@@ -60,8 +60,13 @@ export default meta
 
 export const Default: Story = {}
 
-// Check an error validation message is displayed after submitting the form
 export const StepperWithForm: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Check an error validation message is displayed after submitting the form",
+    },
+  },
   render: () => {
     const { bind } = useForm<{
       field1?: string
@@ -90,9 +95,14 @@ export const StepperWithForm: Story = {
   },
 }
 
-// Check if the form is validated after filling the input
 export const StepperWithFormValidate: Story = {
   ...StepperWithForm,
+  parameters: {
+    docs: {
+      description: "Check if the form is validated after filling the input",
+    },
+  },
+
   play: async (props) => {
     const { getByRole } = within(props.canvasElement)
     const input = await waitFor(() => getByRole("textbox"))
