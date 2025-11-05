@@ -25,8 +25,10 @@ from core.models import (
     CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
+    Department,
     Entity,
     EntityCertificate,
+    EntityDepartments,
     ExternalAdminRights,
     GenericCertificate,
     GenericError,
@@ -52,11 +54,25 @@ def custom_titled_filter(title):
     return Wrapper
 
 
+class EntityDepartmentsInline(admin.TabularInline):
+    """Inline admin to manage departments accessible by DREAL"""
+
+    model = EntityDepartments
+    extra = 1
+    autocomplete_fields = ["department"]
+
+
 class EntityAdmin(admin.ModelAdmin):
-    list_display = ("entity_type", "name", "parent_entity", "is_enabled")
+    list_display = (
+        "entity_type",
+        "name",
+        "parent_entity",
+        "is_enabled",
+    )
     search_fields = ("entity_type", "name")
     list_filter = ["entity_type"]
     readonly_fields = ["is_enabled"]
+    inlines = [EntityDepartmentsInline]
 
     actions = ["enable_entity"]
 
@@ -327,6 +343,7 @@ class ExtAdminRightsAdmin(admin.ModelAdmin):
         "entity",
         "right",
     )
+    list_filter = ("right",)
 
 
 class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
@@ -685,3 +702,12 @@ class EntityCertificateAdmin(admin.ModelAdmin):
 
     get_valid_until.admin_order_field = "certificate__valid_until"
     get_valid_until.short_description = "Valid Until"
+
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    """Admin for Department model - required for autocomplete in EntityDepartmentsInline"""
+
+    list_display = ("code_dept", "name")
+    search_fields = ("code_dept", "name")
+    ordering = ("code_dept",)

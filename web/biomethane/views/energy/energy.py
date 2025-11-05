@@ -1,10 +1,10 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters.energy import BiomethaneEnergyFilter, BiomethaneEnergyRetrieveFilter
+from biomethane.filters.mixins import EntityProducerFilter, EntityProducerYearFilter
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.energy.energy import (
@@ -13,6 +13,7 @@ from biomethane.serializers.energy.energy import (
 )
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import OptionalFieldsActionMixin
+from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
 
 
 @extend_schema(
@@ -26,7 +27,20 @@ from biomethane.views.mixins import OptionalFieldsActionMixin
         ),
     ]
 )
-class BiomethaneEnergyViewSet(GenericViewSet, OptionalFieldsActionMixin):
+@extend_schema_view(
+    retrieve=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="year",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Year of the energy declaration.",
+                required=True,
+            ),
+        ],
+    )
+)
+class BiomethaneEnergyViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMixin, GenericViewSet):
     queryset = BiomethaneEnergy.objects.all()
     serializer_class = BiomethaneEnergySerializer
     pagination_class = None
@@ -50,43 +64,19 @@ class BiomethaneEnergyViewSet(GenericViewSet, OptionalFieldsActionMixin):
             return BiomethaneEnergyInputSerializer
         return super().get_serializer_class()
 
+    def get_filterset_class(self):
+        if self.action == "retrieve":
+            return EntityProducerYearFilter
+        elif self.action in ["upsert", "get_optional_fields"]:
+            return EntityProducerFilter
+        return None
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.action == "retrieve":
-            return BiomethaneEnergyRetrieveFilter(self.request.GET, queryset=queryset).qs
-        elif self.action in ["upsert", "get_optional_fields"]:
+        if self.action in ["upsert", "get_optional_fields"]:
             # force filtering by current declaration year
             queryset = queryset.filter(year=self.request.year)
-            return BiomethaneEnergyFilter(self.request.GET, queryset=queryset).qs
         return queryset
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="year",
-                type=OpenApiTypes.INT,
-                location=OpenApiParameter.QUERY,
-                description="Declaration year.",
-                required=True,
-            ),
-        ],
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneEnergySerializer,
-                description="Energy declaration details for the entity",
-            ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Energy not found for this entity."),
-        },
-        description="Retrieve the energy declaration for the current entity and year. Returns a single energy object.",
-    )
-    def retrieve(self, request, *args, **kwargs):
-        try:
-            energy = self.get_queryset().get()
-            data = self.get_serializer(energy, many=False).data
-            return Response(data)
-
-        except BiomethaneEnergy.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
     @extend_schema(
         responses={
@@ -110,7 +100,7 @@ class BiomethaneEnergyViewSet(GenericViewSet, OptionalFieldsActionMixin):
             )
 
         try:
-            energy = self.get_queryset().get()
+            energy = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(energy, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneEnergy.DoesNotExist:

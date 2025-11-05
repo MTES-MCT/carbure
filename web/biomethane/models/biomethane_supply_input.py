@@ -88,5 +88,11 @@ class BiomethaneSupplyInput(models.Model):
         verbose_name_plural = "Biométhane - Intrants d'approvisionnement"
         ordering = ["supply_plan", "id"]
 
+    @property
+    def production_unit(self):
+        if hasattr(self, "supply_plan") and self.supply_plan:
+            return getattr(self.supply_plan.producer, "biomethane_production_unit", None)
+        return None
+
     def __str__(self):
         return f"Intrant n°{self.id} - {self.input_type} ({self.supply_plan.year})"

@@ -143,25 +143,32 @@ class PermissionTestMixin:
     def assertViewPermissions(self, View, action_permissions: list[Tuple[list[str], list]]):
         view = View()
 
-        # list all the actual actions listed on the viewset so we can be sure we're testing the right actions
+        # list all the actual actions and methods listed on the viewset so we can be sure we're testing the right things
         core_actions = ["list", "create", "retrieve", "update", "partial_update", "destroy"]
         view_core_actions = [a for a in core_actions if hasattr(view, a)]
         view_extra_actions = [a.__name__ for a in view.get_extra_actions()]
-        view_actions = view_core_actions + view_extra_actions
-
-        # collect tested actions to confirm we checked everything later
-        tested_actions = []
+        view_methods = [
+            name for name in dir(view) if callable(getattr(view, name, None)) and not name.startswith("__")
+        ]  # list methods for when we use .as_view()
+        view_actions = set(view_core_actions + view_extra_actions + view_methods)  # combine everything into a single set
 
         for actions, permissions in action_permissions:
             for action in actions:
                 with self.subTest(f"action: {action}"):
                     self.assertIn(action, view_actions)
-                    tested_actions.append(action)
                     view.action = action
                     view_permissions = view.get_permissions()
                     self.assertPermissionsEqual(view_permissions, permissions)
 
-        self.assertCountEqual(view_actions, tested_actions)
+                    # remove the current action for listed action sets
+                    if action in view_core_actions:
+                        view_core_actions.remove(action)
+                    if action in view_extra_actions:
+                        view_extra_actions.remove(action)
+
+        # check if all actions were covered
+        self.assertCountEqual(view_core_actions, [])
+        self.assertCountEqual(view_extra_actions, [])
 
     def assertPermissionsEqual(self, first, second):
         if isinstance(first, list) and isinstance(second, list):

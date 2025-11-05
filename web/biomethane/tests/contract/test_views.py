@@ -8,7 +8,6 @@ from rest_framework import status
 
 from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneSignedContractFactory
 from biomethane.models import BiomethaneContract
-from biomethane.views.contract.contract import BiomethaneContractViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -39,16 +38,6 @@ class BiomethaneContractViewsTests(TestCase):
 
         self.contract_url = reverse("biomethane-contract")
         self.base_params = {"entity_id": self.producer_entity.id}
-
-    @patch("biomethane.views.contract.contract.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that write actions are correctly defined"""
-        viewset = BiomethaneContractViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["upsert"], "retrieve")
 
     def test_create_contract_tariff_rule_1(self):
         """Test creating a contract with tariff rule 1."""

@@ -158,6 +158,7 @@ ExternalAdmin = Literal[
     "TIRIB",
     "ELEC",
     "TRANSFERRED_ELEC",
+    "DREAL",
 ]
 
 

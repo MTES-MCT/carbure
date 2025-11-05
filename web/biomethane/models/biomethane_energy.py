@@ -142,6 +142,10 @@ class BiomethaneEnergy(models.Model):
         verbose_name = "Biométhane - Énergie"
 
     @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
+
+    @property
     def optional_fields(self):
         from biomethane.services import BiomethaneEnergyService
 

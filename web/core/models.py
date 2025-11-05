@@ -186,6 +186,12 @@ class Entity(models.Model):
         self.hash = hash
         super(Entity, self).save(*args, **kwargs)
 
+    def get_accessible_departments(self):
+        """
+        Returns the departments accessible by this entity.
+        """
+        return Department.objects.filter(entities__entity=self)
+
     class Meta:
         db_table = "entities"
         verbose_name = "Entity"
@@ -583,6 +589,7 @@ class ExternalAdminRights(models.Model):
     ELEC = "ELEC"
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
     BIOFUEL = "BIOFUEL"
+    DREAL = "DREAL"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -592,6 +599,7 @@ class ExternalAdminRights(models.Model):
         (ELEC, ELEC),
         (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
         (BIOFUEL, BIOFUEL),
+        (DREAL, DREAL),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)
@@ -600,6 +608,21 @@ class ExternalAdminRights(models.Model):
         db_table = "ext_admin_rights"
         verbose_name = "External Admin Right"
         verbose_name_plural = "External Admin Rights"
+
+
+class EntityDepartments(models.Model):
+    """
+    Defines the departments accessible by an entity.
+    Used notably for DREAL which manage specific departments.
+    """
+
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="departments")
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="entities")
+
+    class Meta:
+        db_table = "entity_department"
+        unique_together = [["entity", "department"]]
+        verbose_name = "Entity Departement"
 
 
 class CarbureLot(models.Model):
