@@ -29,7 +29,6 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof TicketSourceDetails>
 
-// Mock data pour les props de navigation
 const mockNavigationProps = {
   limit: 10,
   total: 100,
@@ -38,6 +37,11 @@ const mockNavigationProps = {
 }
 
 export const Default: Story = {
+  parameters: {
+    docs: {
+      description: "Mock data pour les props de navigation",
+    },
+  },
   args: {
     ...mockNavigationProps,
   },

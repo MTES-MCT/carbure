@@ -1,3 +1,4 @@
+import { StoryFn } from "@storybook/react"
 import {
   AnnualDeclarationContext,
   AnnualDeclarationContextValue,
@@ -17,15 +18,24 @@ export const createMockAnnualDeclaration = (
   is_complete: false,
 })
 
-export const AnnualDeclarationContextProvider = ({
-  children,
-  ...props
-}: {
-  children: React.ReactNode
-} & AnnualDeclarationContextValue) => {
-  return (
-    <AnnualDeclarationContext.Provider value={props}>
-      {children}
+export const generateAnnualDeclarationContextProvider = (
+  props: Partial<AnnualDeclarationContextValue> = {}
+) => {
+  const defaultProps: AnnualDeclarationContextValue = {
+    selectedYear: 2024,
+    currentAnnualDeclaration: createMockAnnualDeclaration(
+      AnnualDeclarationStatus.IN_PROGRESS
+    ),
+    isInDeclarationPeriod: false,
+    isDeclarationValidated: false,
+    canEditDeclaration: false,
+    hasAnnualDeclarationMissingObjects: false,
+  }
+  const mergedProps = { ...defaultProps, ...props }
+  console.log(mergedProps)
+  return (Story: StoryFn) => (
+    <AnnualDeclarationContext.Provider value={mergedProps}>
+      <Story />
     </AnnualDeclarationContext.Provider>
   )
 }

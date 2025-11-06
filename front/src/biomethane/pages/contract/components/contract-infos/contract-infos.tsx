@@ -41,21 +41,7 @@ export const ContractInfos = ({
   const entity = useEntity()
   const portal = usePortal()
   const [isEditing, setIsEditing] = useState(false)
-  const { bind, value } = useForm<ContractInfosForm>(
-    contract
-      ? {
-          cmax: contract.cmax,
-          cmax_annualized: contract.cmax_annualized,
-          cmax_annualized_value: contract.cmax_annualized_value,
-          pap_contracted: contract.pap_contracted,
-          tariff_reference: contract.tariff_reference,
-          buyer: contract.buyer,
-          installation_category: contract.installation_category,
-        }
-      : {
-          cmax_annualized: false,
-        }
-  )
+  const { bind, value } = useForm<ContractInfosForm>(contract ?? {})
   const tariffReferenceOptions = useTariffReferenceOptions()
   const installationCategoryOptions = useInstallationCategoryOptions()
   const { execute: updateContract, loading } = useMutateContractInfos(contract)
