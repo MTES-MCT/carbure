@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import { Meta, StoryObj } from "@storybook/react-vite"
 
 import { TransfertDialog } from "./transfert-dialog"
 import { balance } from "accounting/__test__/data/balances"
@@ -7,7 +7,7 @@ import {
   getBalancesWithUpdatedAvailableBalance,
   fillGHGRangeForm,
 } from "accounting/components/ghg-range-form/ghg-range-form.stories.utils"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 import { getViewport } from "@storybook/mocks/utils"
 import {
   baseHandlers as quantityBaseHandlers,

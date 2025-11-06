@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import { Meta, StoryObj } from "@storybook/react-vite"
 import { BiomethanePageHeader } from "./page-header"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import {
@@ -9,8 +9,8 @@ import GLOBAL_MOCKS from "@storybook/mocks"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType, UserRole } from "common/types"
 import { AnnualDeclarationStatus } from "biomethane/types"
-import { userEvent, waitFor, within } from "@storybook/test"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
+import { userEvent, waitFor, within } from "storybook/test"
 
 const MOCKS = [
   GLOBAL_MOCKS,

@@ -1,6 +1,6 @@
 import { BiomethanePageHeader } from "biomethane/layouts/page-header"
 import { Digestate } from "./digestate"
-import { Meta, StoryObj } from "@storybook/react"
+import { Meta, StoryObj } from "@storybook/react-vite"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import { ContractProductionUnitProvider } from "biomethane/providers/contract-production-unit"
 import { handlers as contractProductionUnitHandlers } from "biomethane/providers/contract-production-unit/contract-production-unit.stories.utils"
