@@ -109,9 +109,6 @@ def clear_digestate_fields_on_related_model_save(sender, instance, **kwargs):
     fields_to_clear = BiomethaneDigestateService.get_fields_to_clear(digestate_instance)
 
     if fields_to_clear:
-        # Remove duplicates while preserving order
-        fields_to_clear = list(dict.fromkeys(fields_to_clear))
-
         update_data = {}
         for field in fields_to_clear:
             # Special case: composting_locations should be set to empty list, not None
