@@ -1,5 +1,5 @@
 import { memo } from "react"
-import { To } from "react-router-dom"
+import { To } from "react-router"
 import { Lot, LotError } from "transactions/types"
 import Table, {
   Order,

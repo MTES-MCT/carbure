@@ -14,7 +14,7 @@ import {
   DoubleCountingStatus,
 } from "double-counting/types"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 import { useRef } from "react"
 import * as api from "double-counting/api"
 import DoubleCountingUploadDialog from "double-counting/components/upload-dialog"

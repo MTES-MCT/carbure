@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 import { Filter, FilterSelection } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import { Grid, Row } from "common/components/scaffold"

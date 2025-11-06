@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 import { Trans, useTranslation } from "react-i18next"
 
 import styles from "./footer.module.css"

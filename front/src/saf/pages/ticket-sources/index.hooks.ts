@@ -1,4 +1,4 @@
-import { useMatch } from "react-router-dom"
+import { useMatch } from "react-router"
 import { SafTicketSourceStatus } from "../../types"
 
 export function useAutoStatus() {

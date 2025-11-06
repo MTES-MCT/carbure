@@ -1,7 +1,7 @@
 import { PortalProvider } from "common/components/portal"
 import { LoaderOverlay } from "common/components/scaffold"
 import useMissingCompanyInfoModal from "companies/hooks/missing-company-info-modal"
-import { Navigate, Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router"
 import useEntity, { EntityContext, useEntityManager } from "common/hooks/entity"
 import useUserManager, { UserContext, useUser } from "common/hooks/user"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"

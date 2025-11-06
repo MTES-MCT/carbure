@@ -1,10 +1,6 @@
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  createSearchParams,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom"
+import { createSearchParams, useNavigate, useSearchParams } from "react-router"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import Form, { useForm } from "common/components/form"

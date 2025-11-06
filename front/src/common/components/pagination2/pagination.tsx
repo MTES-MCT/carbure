@@ -2,7 +2,7 @@ import {
   Pagination as DsfrPagination,
   PaginationProps as DsfrPaginationProps,
 } from "@codegouvfr/react-dsfr/Pagination"
-import { useLocation, useSearchParams } from "react-router-dom"
+import { useLocation, useSearchParams } from "react-router"
 import cl from "clsx"
 import styles from "./pagination.module.css"
 import useLocalStorage from "common/hooks/storage"

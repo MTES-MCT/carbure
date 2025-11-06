@@ -7,7 +7,7 @@ import { useQuery } from "common/hooks/async"
 import { formatDate, formatDateYear } from "common/utils/formatters"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 import * as api from "../../api"
 import {
   DoubleCountingApplicationOverview,

@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Link, To } from "react-router-dom"
+import { Link, To } from "react-router"
 import useControlledState from "../../hooks/controlled-state"
 import { multipleSelection } from "../../utils/selection"
 import { ChevronRight } from "../icons"
