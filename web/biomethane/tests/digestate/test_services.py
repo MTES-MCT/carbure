@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from django.test import TestCase
 
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
@@ -94,8 +96,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_phase_separation_enabled_rule_fields_and_condition(self):
         """Test phase separation enabled rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         phase_sep_enabled_rule = next(r for r in self.rules if r.name == "phase_separation_enabled")
         self.assertEqual(phase_sep_enabled_rule.fields, BiomethaneDigestateService.RAW_DIGESTATE_FIELDS)
 
@@ -115,8 +115,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_phase_separation_disabled_rule_fields_and_condition(self):
         """Test phase separation disabled rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         phase_sep_disabled_rule = next(r for r in self.rules if r.name == "phase_separation_disabled")
         self.assertEqual(phase_sep_disabled_rule.fields, BiomethaneDigestateService.SEPARATED_DIGESTATE_FIELDS)
 
@@ -136,8 +134,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_spreading_not_selected_rule_fields_and_condition(self):
         """Test spreading rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         spreading_rule = next(r for r in self.rules if r.name == "spreading_not_selected")
         self.assertEqual(spreading_rule.fields, BiomethaneDigestateService.SPREADING_FIELDS)
 
@@ -153,8 +149,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_incineration_not_selected_rule_fields_and_condition(self):
         """Test incineration rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         incineration_rule = next(r for r in self.rules if r.name == "incineration_not_selected")
         expected_fields = BiomethaneDigestateService.INCINERATION_FIELDS + BiomethaneDigestateService.WWTP_FIELDS
         self.assertEqual(incineration_rule.fields, expected_fields)
@@ -171,8 +165,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_composting_disabled_rule_fields_and_condition(self):
         """Test composting disabled rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         composting_disabled_rule = next(r for r in self.rules if r.name == "composting_disabled")
         expected_fields = (
             BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS
@@ -193,8 +185,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_external_platform_not_selected_rule_fields_and_condition(self):
         """Test external platform rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         external_platform_rule = next(r for r in self.rules if r.name == "external_platform_not_selected")
         self.assertEqual(external_platform_rule.fields, BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS)
 
@@ -215,8 +205,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_on_site_not_selected_rule_fields_and_condition(self):
         """Test on-site rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         on_site_rule = next(r for r in self.rules if r.name == "on_site_not_selected")
         self.assertEqual(on_site_rule.fields, BiomethaneDigestateService.ON_SITE_FIELDS)
 
@@ -237,8 +225,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_sale_not_selected_rule_fields_and_condition(self):
         """Test sale rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         sale_rule = next(r for r in self.rules if r.name == "sale_not_selected")
         self.assertEqual(sale_rule.fields, BiomethaneDigestateService.SALE_FIELDS)
 
@@ -254,8 +240,6 @@ class DigestateRulesConfigurationTests(TestCase):
 
     def test_wwtp_category_not_2_rule_fields_and_condition(self):
         """Test WWTP category rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         wwtp_rule = next(r for r in self.rules if r.name == "wwtp_category_not_2")
         self.assertEqual(wwtp_rule.fields, BiomethaneDigestateService.WWTP_FIELDS)
 

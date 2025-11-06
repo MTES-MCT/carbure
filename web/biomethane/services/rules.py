@@ -1,6 +1,6 @@
 """
 Common rule system for biomethane services.
-Provides declarative field clearing rules based on business logic conditions.
+Provides declarative field clearing rules and required field rules based on business logic conditions.
 """
 
 from dataclasses import dataclass
@@ -13,6 +13,15 @@ ContextType = TypeVar("ContextType")
 @dataclass
 class FieldClearingRule:
     """Rule to determine if fields should be cleared based on a condition."""
+
+    name: str
+    fields: list[str]
+    condition: Callable[[ContextType], bool]
+
+
+@dataclass
+class RequiredFieldRule:
+    """Rule to determine if fields should be required based on a condition."""
 
     name: str
     fields: list[str]

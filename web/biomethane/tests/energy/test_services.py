@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from django.test import TestCase
 
 from biomethane.factories import BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
@@ -131,10 +133,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
     def test_flaring_rule_fields_and_condition(self):
         """Test flaring rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
-        from biomethane.models import BiomethaneProductionUnit
-
         flaring_rule = next(r for r in self.rules if r.name == "flaring_not_installed")
         self.assertEqual(flaring_rule.fields, BiomethaneEnergyService.FLARING_FIELDS)
 
@@ -150,8 +148,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
     def test_old_tariff_rule_fields_and_condition(self):
         """Test old tariff rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         old_tariff_rule = next(r for r in self.rules if r.name == "not_old_tariff")
         self.assertEqual(old_tariff_rule.fields, BiomethaneEnergyService.OLD_TARIFF_FIELDS)
 
@@ -166,8 +162,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
     def test_new_tariff_rule_fields_and_condition(self):
         """Test new tariff rule has correct fields and condition logic."""
-        from unittest.mock import Mock
-
         new_tariff_rule = next(r for r in self.rules if r.name == "not_new_tariff")
         self.assertEqual(new_tariff_rule.fields, BiomethaneEnergyService.NEW_TARIFF_FIELDS)
 
@@ -182,8 +176,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
     def test_malfunction_rule_fields_and_condition(self):
         """Test malfunction rules have correct fields and condition logic."""
-        from unittest.mock import Mock
-
         no_malfunctions_rule = next(r for r in self.rules if r.name == "no_malfunctions")
         self.assertEqual(no_malfunctions_rule.fields, BiomethaneEnergyService.MALFUNCTION_FIELDS)
 
@@ -198,8 +190,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
     def test_malfunction_details_rule_condition(self):
         """Test malfunction_details rule condition logic."""
-        from unittest.mock import Mock
-
         malfunction_details_rule = next(r for r in self.rules if r.name == "malfunction_no_other_type")
 
         # Should trigger when has_malfunctions=True but "OTHER" not in types
@@ -218,8 +208,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
     def test_injection_difficulties_rule_condition(self):
         """Test injection difficulties rule condition logic."""
-        from unittest.mock import Mock
-
         injection_rule = next(r for r in self.rules if r.name == "no_injection_difficulties")
 
         # Should trigger when has_injection_difficulties is False
@@ -233,8 +221,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
     def test_fossil_attestation_rules_conditions(self):
         """Test fossil attestation rules condition logic."""
-        from unittest.mock import Mock
-
         digester_heating_rule = next(r for r in self.rules if r.name == "no_fossil_for_digester_heating")
         installation_needs_rule = next(r for r in self.rules if r.name == "no_fossil_for_installation_needs")
 

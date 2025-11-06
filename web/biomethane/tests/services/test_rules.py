@@ -5,7 +5,7 @@ from typing import Optional
 
 from django.test import TestCase
 
-from biomethane.services.rules import FieldClearingRule, RuleBuilder
+from biomethane.services.rules import FieldClearingRule, RequiredFieldRule, RuleBuilder
 
 
 @dataclass
@@ -51,6 +51,36 @@ class FieldClearingRuleTests(TestCase):
         self.assertTrue(rule.condition(context))
 
         context = MockContext(value="other")
+        self.assertFalse(rule.condition(context))
+
+
+class RequiredFieldRuleTests(TestCase):
+    """Tests for RequiredFieldRule dataclass."""
+
+    def test_create_required_field_rule(self):
+        """Test that a RequiredFieldRule can be created with required fields."""
+        rule = RequiredFieldRule(
+            name="test_required_rule",
+            fields=["field1", "field2"],
+            condition=lambda ctx: True,
+        )
+
+        self.assertEqual(rule.name, "test_required_rule")
+        self.assertEqual(rule.fields, ["field1", "field2"])
+        self.assertTrue(callable(rule.condition))
+
+    def test_required_field_rule_condition_execution(self):
+        """Test that the condition function can be executed."""
+        rule = RequiredFieldRule(
+            name="test_required_rule",
+            fields=["field1"],
+            condition=lambda ctx: ctx.value == "required",
+        )
+
+        context = MockContext(value="required")
+        self.assertTrue(rule.condition(context))
+
+        context = MockContext(value="optional")
         self.assertFalse(rule.condition(context))
 
 

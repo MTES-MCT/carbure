@@ -1,10 +1,42 @@
+from dataclasses import dataclass
 from datetime import date
 
 from django.utils.translation import gettext as _
 
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
-from biomethane.services.rules import FieldClearingRule
+from biomethane.services.rules import FieldClearingRule, RequiredFieldRule
+
+
+@dataclass
+class ContractValidationContext:
+    """Context object for contract validation rules."""
+
+    is_creation: bool
+    tariff_reference: str | None
+    cmax_annualized: bool | None
+    has_contract_document: bool
+
+    @classmethod
+    def from_contract_and_data(cls, contract, validated_data):
+        """
+        Factory method to create context from contract and validated data.
+
+        Args:
+            contract: The contract instance (None for creation)
+            validated_data: The validated data dictionary
+
+        Returns:
+            ContractValidationContext instance
+        """
+        return cls(
+            is_creation=contract is None,
+            tariff_reference=validated_data.get("tariff_reference"),
+            cmax_annualized=validated_data.get("cmax_annualized"),
+            has_contract_document=any(
+                field in validated_data for field in BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS
+            ),
+        )
 
 
 class BiomethaneContractService:
@@ -43,12 +75,6 @@ class BiomethaneContractService:
     }
 
     @staticmethod
-    def validate_tariff_reference(validated_data, required_fields):
-        """Validate tariff reference is provided for contract creation."""
-        if "tariff_reference" not in validated_data:
-            required_fields.append("tariff_reference")
-
-    @staticmethod
     def validate_contract_document_fields(contract, validated_data, errors):
         """Validate that contract document fields cannot be updated after contract signing."""
         if contract and contract.does_contract_exist():
@@ -57,30 +83,6 @@ class BiomethaneContractService:
             ]
             for field in not_updatable_fields:
                 errors[field] = [_(f"Le champ {field} ne peut pas être modifié une fois le contrat signé.")]
-
-    @staticmethod
-    def get_required_fields_for_tariff(tariff_reference, required_fields):
-        """
-        Return required fields based on tariff reference.
-
-        Returns:
-            list: Required fields for the given tariff reference
-        """
-        # Tariff rule 1
-        if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-            required_fields.extend(BiomethaneContractService.TARIFF_RULE_1_FIELDS)
-
-        # Tariff rule 2
-        elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-            required_fields.extend(BiomethaneContractService.TARIFF_RULE_2_FIELDS)
-
-    @staticmethod
-    def validate_tariff_rule_1_specific(validated_data, required_fields):
-        """Validate specific rules for tariff rule 1."""
-        cmax_annualized = validated_data.get("cmax_annualized")
-
-        if cmax_annualized:
-            required_fields.append("cmax_annualized_value")
 
     @staticmethod
     def validate_contract_dates(signature_date, effective_date, tariff_reference, errors):
@@ -111,19 +113,6 @@ class BiomethaneContractService:
             ]
 
     @staticmethod
-    def get_required_fields_for_contract_document(validated_data, required_fields):
-        """
-        Return all contract document fields as required if any of them is provided.
-
-        Returns:
-            list: Contract document fields if any is provided, empty list otherwise
-        """
-        for field in BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS:
-            if field in validated_data:
-                required_fields.extend(BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS)
-                break
-
-    @staticmethod
     def validate_contract(contract, validated_data):
         """
         Main validation method for contract data.
@@ -140,23 +129,11 @@ class BiomethaneContractService:
 
         tariff_reference = validated_data.get("tariff_reference")
 
-        # Validate tariff reference for contract creation
-        if not contract:
-            BiomethaneContractService.validate_tariff_reference(validated_data, required_fields)
+        # Get required fields using rule engine
+        required_fields.extend(BiomethaneContractService.get_required_fields(contract, validated_data))
 
         # Validate contract document fields
         BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
-
-        # Get required fields for contract document
-        BiomethaneContractService.get_required_fields_for_contract_document(validated_data, required_fields)
-
-        # Get required fields based on tariff reference
-        if tariff_reference:
-            BiomethaneContractService.get_required_fields_for_tariff(tariff_reference, required_fields)
-
-            # Validate tariff rule 1 specific rules
-            if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-                BiomethaneContractService.validate_tariff_rule_1_specific(validated_data, required_fields)
 
         # Validate contract dates
         signature_date = validated_data.get("signature_date")
@@ -165,6 +142,32 @@ class BiomethaneContractService:
             BiomethaneContractService.validate_contract_dates(signature_date, effective_date, tariff_reference, errors)
 
         return errors, required_fields
+
+    @staticmethod
+    def get_required_fields(contract, validated_data):
+        """
+        Determine required fields based on validated data using rule engine.
+
+        Args:
+            contract: The contract instance (None for creation)
+            validated_data: The data to validate
+
+        Returns:
+            list: List of required field names
+        """
+        # Build context for rules
+        context = ContractValidationContext.from_contract_and_data(contract, validated_data)
+
+        # Get all required field rules
+        rules = _build_required_field_rules()
+
+        # Evaluate rules and collect required fields
+        required_fields = []
+        for rule in rules:
+            if rule.condition(context):
+                required_fields.extend(rule.fields)
+
+        return required_fields
 
     @staticmethod
     def handle_is_red_ii(validated_data, producer):
@@ -284,5 +287,44 @@ def _build_contract_clearing_rules() -> list[FieldClearingRule]:
             name="cmax_not_annualized",
             fields=["cmax_annualized_value"],
             condition=lambda contract: contract.cmax_annualized is False,
+        ),
+    ]
+
+
+# Rule configuration: declarative definition of required field rules
+def _build_required_field_rules() -> list[RequiredFieldRule]:
+    """
+    Build the list of required field rules for contract validation.
+    """
+    return [
+        # Contract creation: tariff_reference is required
+        RequiredFieldRule(
+            name="tariff_reference_on_creation",
+            fields=["tariff_reference"],
+            condition=lambda ctx: ctx.is_creation,
+        ),
+        # TARIFF_RULE_1 (2011, 2020): require specific fields
+        RequiredFieldRule(
+            name="tariff_rule_1_required",
+            fields=BiomethaneContractService.TARIFF_RULE_1_FIELDS,
+            condition=lambda ctx: ctx.tariff_reference in BiomethaneContract.TARIFF_RULE_1,
+        ),
+        # TARIFF_RULE_2 (2021, 2023): require specific fields
+        RequiredFieldRule(
+            name="tariff_rule_2_required",
+            fields=BiomethaneContractService.TARIFF_RULE_2_FIELDS,
+            condition=lambda ctx: ctx.tariff_reference in BiomethaneContract.TARIFF_RULE_2,
+        ),
+        # When cmax_annualized is True: require cmax_annualized_value
+        RequiredFieldRule(
+            name="cmax_annualized_requires_value",
+            fields=["cmax_annualized_value"],
+            condition=lambda ctx: ctx.cmax_annualized is True,
+        ),
+        # When any contract document field is provided: require all document fields
+        RequiredFieldRule(
+            name="contract_document_all_or_nothing",
+            fields=BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS,
+            condition=lambda ctx: ctx.has_contract_document,
         ),
     ]
