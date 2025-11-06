@@ -1,9 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { MissingFields, MissingFieldsProps } from "./missing-fields"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
-import { buildCurrentAnnualDeclarationHandler } from "biomethane/tests/api"
+import {
+  buildCurrentAnnualDeclarationHandler,
+  getCurrentAnnualDeclarationOk,
+} from "biomethane/tests/api"
 import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
+import GLOBAL_MOCKS from "@storybook/mocks"
 
+const MOCKS = [...GLOBAL_MOCKS, getCurrentAnnualDeclarationOk]
 const clickOnLink = async (
   canvasElement: HTMLElement,
   linkName: string,
@@ -22,6 +27,11 @@ const meta: Meta<typeof MissingFields> = {
   title: "modules/biomethane/components/MissingFields",
   component: MissingFields,
   ...AnnualDeclarationStoryUtils,
+  parameters: {
+    msw: {
+      handlers: MOCKS,
+    },
+  },
   args: {
     onPageClick: fn(),
   },
@@ -59,6 +69,7 @@ export const DisplayOnlyDigestateMissingFields: Story = {
             energy_missing_fields: [],
           },
         }),
+        ...MOCKS,
       ],
     },
   },
@@ -80,6 +91,7 @@ export const DisplayOnlyEnergyMissingFields: Story = {
             energy_missing_fields: ["energy_field_1"],
           },
         }),
+        ...MOCKS,
       ],
     },
   },
@@ -101,6 +113,7 @@ export const DisplayBothEnergyAndDigestateMissingFields: Story = {
             energy_missing_fields: ["energy_field_1"],
           },
         }),
+        ...MOCKS,
       ],
     },
   },
@@ -109,6 +122,9 @@ export const DisplayBothEnergyAndDigestateMissingFields: Story = {
 export const DisplayNothingWhenTheDeclarationIsNotEditable: Story = {
   parameters: {
     mockingDate: new Date(2024, 11, 1),
+    docs: {
+      description: "Displays nothing when the declaration is not editable.",
+    },
   },
   play: NoMissingFields.play,
 }
