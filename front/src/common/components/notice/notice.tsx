@@ -49,7 +49,6 @@ export const Notice = ({
   linkHref,
   onAction,
   noColor,
-  ...props
 }: NoticeProps) => {
   const [open, setOpen] = useState(true)
 
@@ -75,7 +74,6 @@ export const Notice = ({
         noColor && css["notice--no-color"]
       )}
       style={style}
-      {...props}
     >
       <div className={css.notice__body}>
         <div className={css["notice__body-content"]}>

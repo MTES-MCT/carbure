@@ -16,7 +16,6 @@ const StoryDescription = ({ description }: { description: ReactNode }) => {
         border: "2px dashed var(--border-default-grey)",
         zIndex: 1000,
       }}
-      data-chromatic="ignore"
       isClosable
     >
       <Text size="sm">{description}</Text>

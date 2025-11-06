@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect } from "react"
 import type { Preview } from "@storybook/react"
+import isChromatic from "chromatic/isChromatic"
 import i18n from "../src/i18n"
 import { LoaderOverlay } from "../src/common/components/scaffold"
 import { I18nextProvider } from "react-i18next"
@@ -60,7 +61,7 @@ const withData = (Story, { parameters }) => {
           <EntityContext.Provider value={entity}>
             <PortalProvider>
               <div className="new-dsfr">
-                {storyHasDescription && (
+                {storyHasDescription && !isChromatic() && (
                   <StoryDescription
                     description={parameters?.docs?.description}
                   />

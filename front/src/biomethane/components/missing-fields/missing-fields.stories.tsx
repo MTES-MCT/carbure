@@ -125,6 +125,7 @@ export const DisplayNothingWhenTheDeclarationIsNotEditable: Story = {
     docs: {
       description: "Displays nothing when the declaration is not editable.",
     },
+    chromatic: { disableSnapshot: true },
   },
   play: NoMissingFields.play,
 }
