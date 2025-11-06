@@ -2,8 +2,90 @@ from django.test import TestCase
 
 from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
-from biomethane.services.contract import BiomethaneContractService
+from biomethane.services.contract import BiomethaneContractService, _build_contract_clearing_rules
 from core.models import Entity
+
+
+class ContractRulesConfigurationTests(TestCase):
+    """Test the _build_contract_clearing_rules function configuration."""
+
+    def setUp(self):
+        self.rules = _build_contract_clearing_rules()
+
+    def test_all_expected_rules_are_configured(self):
+        """Test that all expected rule names are present in the configuration."""
+        expected_rule_names = [
+            "tariff_rule_1_clear_pap",
+            "tariff_rule_2_clear_cmax",
+            "cmax_not_annualized",
+        ]
+
+        actual_rule_names = [rule.name for rule in self.rules]
+        self.assertEqual(expected_rule_names, actual_rule_names)
+
+    def test_tariff_rule_1_clear_pap_fields_and_condition(self):
+        """Test tariff_rule_1_clear_pap has correct fields and condition logic."""
+        from unittest.mock import Mock
+
+        rule = next(r for r in self.rules if r.name == "tariff_rule_1_clear_pap")
+        self.assertEqual(rule.fields, ["pap_contracted"])
+
+        # Should trigger when tariff is in TARIFF_RULE_1 (2011, 2020)
+        mock_contract = Mock()
+        mock_contract.tariff_reference = "2011"
+        self.assertTrue(rule.condition(mock_contract))
+
+        mock_contract.tariff_reference = "2020"
+        self.assertTrue(rule.condition(mock_contract))
+
+        # Should not trigger when tariff is in TARIFF_RULE_2
+        mock_contract.tariff_reference = "2021"
+        self.assertFalse(rule.condition(mock_contract))
+
+        mock_contract.tariff_reference = "2023"
+        self.assertFalse(rule.condition(mock_contract))
+
+    def test_tariff_rule_2_clear_cmax_fields_and_condition(self):
+        """Test tariff_rule_2_clear_cmax has correct fields and condition logic."""
+        from unittest.mock import Mock
+
+        rule = next(r for r in self.rules if r.name == "tariff_rule_2_clear_cmax")
+        self.assertEqual(rule.fields, ["cmax", "cmax_annualized", "cmax_annualized_value"])
+
+        # Should trigger when tariff is in TARIFF_RULE_2 (2021, 2023)
+        mock_contract = Mock()
+        mock_contract.tariff_reference = "2021"
+        self.assertTrue(rule.condition(mock_contract))
+
+        mock_contract.tariff_reference = "2023"
+        self.assertTrue(rule.condition(mock_contract))
+
+        # Should not trigger when tariff is in TARIFF_RULE_1
+        mock_contract.tariff_reference = "2011"
+        self.assertFalse(rule.condition(mock_contract))
+
+        mock_contract.tariff_reference = "2020"
+        self.assertFalse(rule.condition(mock_contract))
+
+    def test_cmax_not_annualized_fields_and_condition(self):
+        """Test cmax_not_annualized has correct fields and condition logic."""
+        from unittest.mock import Mock
+
+        rule = next(r for r in self.rules if r.name == "cmax_not_annualized")
+        self.assertEqual(rule.fields, ["cmax_annualized_value"])
+
+        # Should trigger when cmax_annualized is explicitly False
+        mock_contract = Mock()
+        mock_contract.cmax_annualized = False
+        self.assertTrue(rule.condition(mock_contract))
+
+        # Should not trigger when cmax_annualized is True
+        mock_contract.cmax_annualized = True
+        self.assertFalse(rule.condition(mock_contract))
+
+        # Should not trigger when cmax_annualized is None
+        mock_contract.cmax_annualized = None
+        self.assertFalse(rule.condition(mock_contract))
 
 
 class BiomethaneContractServiceTests(TestCase):
