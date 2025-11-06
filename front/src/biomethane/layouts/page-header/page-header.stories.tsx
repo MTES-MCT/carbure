@@ -10,6 +10,7 @@ import { mockUser } from "common/__test__/helpers"
 import { EntityType, UserRole } from "common/types"
 import { AnnualDeclarationStatus } from "biomethane/types"
 import { userEvent, waitFor, within } from "@storybook/test"
+import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const MOCKS = [
   GLOBAL_MOCKS,
@@ -77,15 +78,19 @@ export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
 
 export const LayoutForThePreviousYear: Story = {
   parameters: {
-    msw: {
-      handlers: [
-        buildCurrentAnnualDeclarationHandler({
-          status: AnnualDeclarationStatus.DECLARED,
-          year: 2024,
-        }),
-        ...MOCKS,
-      ],
+    docs: {
+      description:
+        "If the selected year is 2024, and the current annual declaration year is 2025, the user can't validate the declaration",
     },
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { year: "2024" },
+        path: "/:year",
+      },
+      routing: {
+        path: "/:year",
+      },
+    }),
   },
 }
 
@@ -107,6 +112,13 @@ export const DisplayMissingFieldsDialogIfTheDeclarationIsNotComplete: Story = {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
           is_complete: false,
+          missing_fields: {
+            digestate_missing_fields: ["digestate_missing_field_1"],
+            energy_missing_fields: [
+              "energy_missing_field_1",
+              "energy_missing_field_2",
+            ],
+          },
         }),
         ...MOCKS,
       ],
