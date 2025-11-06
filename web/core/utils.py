@@ -230,22 +230,17 @@ class CarbureEnv:
     is_local = True if env.get("IMAGE_TAG") == "local" else False
     is_dev = True if env.get("IMAGE_TAG") == "dev" else False
 
-    base_url_prod = "https://carbure.beta.gouv.fr"
-    base_url_staging = "https://carbure-staging.incubateur.net"
-    base_url_local = "http://carbure.local:8090"
-    base_url_dev = "https://carbure-dev.incubateur.net"
-
     def get_base_url():
-        if CarbureEnv.is_prod:
-            return CarbureEnv.base_url_prod
-        if CarbureEnv.is_staging:
-            return CarbureEnv.base_url_staging
-        if CarbureEnv.is_local:
-            return CarbureEnv.base_url_local
-        if CarbureEnv.is_dev:
-            return CarbureEnv.base_url_dev
+        # If the PUBLIC_URL is defined, use it, otherwise use the default URL
+        public_url = "https://carbure.beta.gouv.fr" if env.get("PUBLIC_URL") is None else env.get("PUBLIC_URL")
+
+        # If the environment is local, try to use the public URL if defined, otherwise use the local URL
+        base_url_local = "http://carbure.local:8090" if env.get("PUBLIC_URL") is None else env.get("PUBLIC_URL")
+
+        if env.get("IMAGE_TAG") == "local":
+            return base_url_local
         else:
-            return CarbureEnv.base_url_prod
+            return public_url
 
 
 # checks if a pandas DataFrame cell contains a truthy value
