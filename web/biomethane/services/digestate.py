@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
+from biomethane.services.rules import FieldClearingRule, RuleBuilder
 
 
 @dataclass
@@ -42,16 +43,22 @@ class BiomethaneDigestateService:
     @staticmethod
     def _extract_data(instance) -> DigestateContext:
         """Extract data from a digestate instance and return structured context."""
+        from django.core.exceptions import ObjectDoesNotExist
+
         # Extract producer and related objects
         producer = getattr(instance, "producer", None)
         production_unit = None
         contract = None
 
         if producer:
-            production_unit = getattr(producer, "biomethane_production_unit", None)
+            try:
+                production_unit = producer.biomethane_production_unit
+            except ObjectDoesNotExist:
+                production_unit = None
+
             try:
                 contract = producer.biomethane_contract
-            except Exception:
+            except ObjectDoesNotExist:
                 contract = None
 
         # Return structured context
@@ -62,76 +69,6 @@ class BiomethaneDigestateService:
         )
 
     @staticmethod
-    def _apply_phase_separation_rules(production_unit, fields_to_clear):
-        """Apply digestate phase separation rules."""
-        if production_unit.has_digestate_phase_separation:
-            fields_to_clear.extend(BiomethaneDigestateService.RAW_DIGESTATE_FIELDS)
-        else:
-            fields_to_clear.extend(BiomethaneDigestateService.SEPARATED_DIGESTATE_FIELDS)
-
-    @staticmethod
-    def _apply_composting_rules(context: DigestateContext, required_fields, fields_to_clear):
-        """Apply composting rules based on valorization methods and locations."""
-        from biomethane.models import BiomethaneProductionUnit
-
-        all_composting_fields = (
-            BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS
-            + BiomethaneDigestateService.ON_SITE_FIELDS
-            + ["composting_locations"]
-        )
-
-        valorization_methods = (
-            context.production_unit.digestate_valorization_methods or [] if context.production_unit else []
-        )
-
-        if BiomethaneProductionUnit.COMPOSTING not in valorization_methods:
-            # Composting not enabled → all fields should be cleared
-            fields_to_clear.extend(all_composting_fields)
-        else:
-            # Composting enabled → clear fields based on selected locations
-            composting_locations = context.composting_locations
-
-            # EXTERNAL_PLATFORM not selected → clear these fields
-            if BiomethaneDigestate.EXTERNAL_PLATFORM not in composting_locations:
-                fields_to_clear.extend(BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS)
-
-            # ON_SITE not selected → clear these fields
-            if BiomethaneDigestate.ON_SITE not in composting_locations:
-                fields_to_clear.extend(BiomethaneDigestateService.ON_SITE_FIELDS)
-
-    @staticmethod
-    def _apply_valorization_rules(production_unit, fields_to_clear):
-        """Apply rules based on valorization methods."""
-        from biomethane.models import BiomethaneProductionUnit
-
-        valorization_methods = production_unit.digestate_valorization_methods or []
-
-        # Spreading
-        if BiomethaneProductionUnit.SPREADING not in valorization_methods:
-            fields_to_clear.extend(BiomethaneDigestateService.SPREADING_FIELDS)
-
-        # Incineration / Landfilling
-        if BiomethaneProductionUnit.INCINERATION_LANDFILLING not in valorization_methods:
-            fields_to_clear.extend(BiomethaneDigestateService.INCINERATION_FIELDS + BiomethaneDigestateService.WWTP_FIELDS)
-
-    @staticmethod
-    def _apply_spreading_management_rules(production_unit, fields_to_clear):
-        """Apply rules based on spreading management methods."""
-        from biomethane.models import BiomethaneProductionUnit
-
-        spreading_management_methods = production_unit.spreading_management_methods or []
-        if BiomethaneProductionUnit.SALE not in spreading_management_methods:
-            fields_to_clear.extend(BiomethaneDigestateService.SALE_FIELDS)
-
-    @staticmethod
-    def _apply_contract_rules(contract, fields_to_clear):
-        """Apply rules based on contract."""
-        from biomethane.models import BiomethaneContract
-
-        if contract.installation_category != BiomethaneContract.INSTALLATION_CATEGORY_2:
-            fields_to_clear.extend(BiomethaneDigestateService.WWTP_FIELDS)
-
-    @staticmethod
     def _get_fields_to_clear(instance):
         """
         Return the list of fields to clear for a digestate instance.
@@ -139,25 +76,19 @@ class BiomethaneDigestateService:
         Returns:
             list: Fields to clear/empty (also represents optional fields)
         """
-        fields_to_clear = []
-
         # Extract context
         context = BiomethaneDigestateService._extract_data(instance)
 
-        # Apply rules based on production unit
-        if context.production_unit:
-            BiomethaneDigestateService._apply_phase_separation_rules(context.production_unit, fields_to_clear)
+        # Get all configured rules
+        rules = _build_digestate_rules()
 
-            BiomethaneDigestateService._apply_valorization_rules(context.production_unit, fields_to_clear)
+        # Evaluate each rule and collect fields to clear
+        fields_to_clear = []
+        for rule in rules:
+            if rule.condition(context):
+                fields_to_clear.extend(rule.fields)
 
-            BiomethaneDigestateService._apply_composting_rules(context, [], fields_to_clear)
-
-            BiomethaneDigestateService._apply_spreading_management_rules(context.production_unit, fields_to_clear)
-
-        # Apply rules based on contract
-        if context.contract:
-            BiomethaneDigestateService._apply_contract_rules(context.contract, fields_to_clear)
-
+        # Return deduplicated list
         return list(set(fields_to_clear))
 
     @staticmethod
@@ -175,3 +106,81 @@ class BiomethaneDigestateService:
         Used by signals.
         """
         return BiomethaneDigestateService._get_fields_to_clear(instance)
+
+
+# Rule configuration: declarative definition of all field clearing rules
+def _build_digestate_rules() -> list[FieldClearingRule]:
+    """
+    Build the list of field clearing rules for digestate instances.
+    """
+    from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
+
+    return [
+        # Phase separation rules
+        FieldClearingRule(
+            name="phase_separation_enabled",
+            fields=BiomethaneDigestateService.RAW_DIGESTATE_FIELDS,
+            condition=lambda ctx: (ctx.production_unit and ctx.production_unit.has_digestate_phase_separation),
+        ),
+        FieldClearingRule(
+            name="phase_separation_disabled",
+            fields=BiomethaneDigestateService.SEPARATED_DIGESTATE_FIELDS,
+            condition=lambda ctx: (ctx.production_unit and not ctx.production_unit.has_digestate_phase_separation),
+        ),
+        # Valorization method rules
+        RuleBuilder.required_value_not_in_list(
+            lambda ctx: ctx.production_unit.digestate_valorization_methods if ctx.production_unit else [],
+            BiomethaneProductionUnit.SPREADING,
+            BiomethaneDigestateService.SPREADING_FIELDS,
+            "spreading_not_selected",
+        ),
+        RuleBuilder.required_value_not_in_list(
+            lambda ctx: ctx.production_unit.digestate_valorization_methods if ctx.production_unit else [],
+            BiomethaneProductionUnit.INCINERATION_LANDFILLING,
+            BiomethaneDigestateService.INCINERATION_FIELDS + BiomethaneDigestateService.WWTP_FIELDS,
+            "incineration_not_selected",
+        ),
+        # Composting rules
+        # Parent rule: composting disabled → clear all composting fields
+        RuleBuilder.required_value_not_in_list(
+            lambda ctx: ctx.production_unit.digestate_valorization_methods if ctx.production_unit else [],
+            BiomethaneProductionUnit.COMPOSTING,
+            BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS
+            + BiomethaneDigestateService.ON_SITE_FIELDS
+            + ["composting_locations"],
+            "composting_disabled",
+        ),
+        # Child rule 1: external platform not selected
+        FieldClearingRule(
+            name="external_platform_not_selected",
+            fields=BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS,
+            condition=lambda ctx: (
+                ctx.production_unit
+                and BiomethaneProductionUnit.COMPOSTING in (ctx.production_unit.digestate_valorization_methods or [])
+                and BiomethaneDigestate.EXTERNAL_PLATFORM not in ctx.composting_locations
+            ),
+        ),
+        # Child rule 2: on-site not selected
+        FieldClearingRule(
+            name="on_site_not_selected",
+            fields=BiomethaneDigestateService.ON_SITE_FIELDS,
+            condition=lambda ctx: (
+                ctx.production_unit
+                and BiomethaneProductionUnit.COMPOSTING in (ctx.production_unit.digestate_valorization_methods or [])
+                and BiomethaneDigestate.ON_SITE not in ctx.composting_locations
+            ),
+        ),
+        # Spreading management rules
+        RuleBuilder.required_value_not_in_list(
+            lambda ctx: ctx.production_unit.spreading_management_methods if ctx.production_unit else [],
+            BiomethaneProductionUnit.SALE,
+            BiomethaneDigestateService.SALE_FIELDS,
+            "sale_not_selected",
+        ),
+        # Contract rules
+        RuleBuilder.contract_category_not(
+            BiomethaneContract.INSTALLATION_CATEGORY_2,
+            BiomethaneDigestateService.WWTP_FIELDS,
+            "wwtp_category_not_2",
+        ),
+    ]

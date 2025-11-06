@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
+from biomethane.services.rules import FieldClearingRule
 
 
 class BiomethaneContractService:
@@ -21,6 +22,25 @@ class BiomethaneContractService:
         "general_conditions_file",
         "specific_conditions_file",
     ]
+
+    # Tariff date ranges for signature validation: (start_date, end_date, error_message)
+    TARIFF_DATE_RANGES = {
+        "2011": (
+            date(2011, 11, 23),
+            date(2020, 11, 23),
+            _("Pour la référence tarifaire 2011, la date de signature doit être entre le 23/11/2011 et le 23/11/2020."),
+        ),
+        "2020": (
+            date(2020, 11, 23),
+            date(2021, 12, 13),
+            _("Pour la référence tarifaire 2020, la date de signature doit être entre le 23/11/2020 et le 13/12/2021."),
+        ),
+        "2021": (
+            date(2021, 12, 13),
+            date(2023, 6, 10),
+            _("Pour la référence tarifaire 2021, la date de signature doit être entre le 13/12/2021 et le 10/06/2023."),
+        ),
+    }
 
     @staticmethod
     def validate_tariff_reference(validated_data, required_fields):
@@ -78,45 +98,14 @@ class BiomethaneContractService:
     @staticmethod
     def _validate_signature_date_by_tariff(signature_date, tariff_reference, errors):
         """Validate signature date based on tariff reference."""
-        # 2011 : 23/11/2011 et 23/11/2020
-        if tariff_reference == "2011" and not (
-            signature_date >= date(2011, 11, 23) and signature_date <= date(2020, 11, 23)
-        ):
-            errors["signature_date"] = [
-                _(
-                    (
-                        "Pour la référence tarifaire 2011, la date de signature doit être entre "
-                        "le 23/11/2011 et le 23/11/2020."
-                    )
-                )
-            ]
+        # Check date range for tariffs with specific periods
+        if tariff_reference in BiomethaneContractService.TARIFF_DATE_RANGES:
+            start_date, end_date, error_message = BiomethaneContractService.TARIFF_DATE_RANGES[tariff_reference]
+            if not (signature_date >= start_date and signature_date <= end_date):
+                errors["signature_date"] = [error_message]
 
-        # 2020 : 23/11/2020 et 13/12/2021
-        if tariff_reference == "2020" and not (
-            signature_date >= date(2020, 11, 23) and signature_date <= date(2021, 12, 13)
-        ):
-            errors["signature_date"] = [
-                _(
-                    (
-                        "Pour la référence tarifaire 2020, la date de signature doit être entre "
-                        "le 23/11/2020 et le 13/12/2021."
-                    )
-                )
-            ]
-
-        # 2021, 13/12/2021 et 10/06/2023
-        if tariff_reference == "2021" and not (signature_date >= date(2021, 12, 13) and signature_date <= date(2023, 6, 10)):
-            errors["signature_date"] = [
-                _(
-                    (
-                        "Pour la référence tarifaire 2021, la date de signature doit être entre "
-                        "le 13/12/2021 et le 10/06/2023."
-                    )
-                )
-            ]
-
-        # 2023, date de signature > 10/06/2023
-        if tariff_reference == "2023" and not (signature_date and signature_date > date(2023, 6, 10)):
+        # 2023: date de signature > 10/06/2023 (no upper bound)
+        elif tariff_reference == "2023" and not (signature_date and signature_date > date(2023, 6, 10)):
             errors["signature_date"] = [
                 _("Pour la référence tarifaire 2023, la date de signature doit être postérieure au 10/06/2023.")
             ]
@@ -212,19 +201,16 @@ class BiomethaneContractService:
         Returns:
             dict: Dictionary of fields to update with their new values
         """
+        # Get all clearing rules
+        rules = _build_contract_clearing_rules()
+
+        # Evaluate rules and collect fields to clear
         fields_to_clear = []
+        for rule in rules:
+            if rule.condition(contract):
+                fields_to_clear.extend(rule.fields)
 
-        # Clear fields based on tariff reference rules
-        if contract.tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-            fields_to_clear.append("pap_contracted")
-        elif contract.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-            fields_to_clear.extend(["cmax_annualized", "cmax_annualized_value", "cmax"])
-
-        # Clear cmax_annualized_value if cmax_annualized is explicitly set to False
-        # and it's not already in the list to be cleared
-        if contract.cmax_annualized is False and "cmax_annualized_value" not in fields_to_clear:
-            fields_to_clear.append("cmax_annualized_value")
-
+        # Build update dictionary
         update_data = {}
         if fields_to_clear:
             for field in fields_to_clear:
@@ -273,3 +259,30 @@ class BiomethaneContractService:
         result.sort()
 
         return result
+
+
+# Rule configuration: declarative definition of field clearing rules
+def _build_contract_clearing_rules() -> list[FieldClearingRule]:
+    """
+    Build the list of field clearing rules for contract instances.
+    """
+    return [
+        # TARIFF_RULE_1 (2011, 2020): clear pap_contracted
+        FieldClearingRule(
+            name="tariff_rule_1_clear_pap",
+            fields=["pap_contracted"],
+            condition=lambda contract: contract.tariff_reference in BiomethaneContract.TARIFF_RULE_1,
+        ),
+        # TARIFF_RULE_2 (2021, 2023): clear cmax fields
+        FieldClearingRule(
+            name="tariff_rule_2_clear_cmax",
+            fields=["cmax", "cmax_annualized", "cmax_annualized_value"],
+            condition=lambda contract: contract.tariff_reference in BiomethaneContract.TARIFF_RULE_2,
+        ),
+        # Clear cmax_annualized_value when cmax_annualized is False
+        FieldClearingRule(
+            name="cmax_not_annualized",
+            fields=["cmax_annualized_value"],
+            condition=lambda contract: contract.cmax_annualized is False,
+        ),
+    ]
