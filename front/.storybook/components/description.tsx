@@ -3,11 +3,7 @@ import React from "react"
 import { Notice } from "../../src/common/components/notice"
 import { Text } from "../../src/common/components/text"
 
-export const StoryDescription = ({
-  description,
-}: {
-  description: ReactNode
-}) => {
+const StoryDescription = ({ description }: { description: ReactNode }) => {
   if (!description) return null
   return (
     <Notice
@@ -27,3 +23,5 @@ export const StoryDescription = ({
     </Notice>
   )
 }
+
+export default StoryDescription

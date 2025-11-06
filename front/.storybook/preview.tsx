@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from "react"
+import React, { lazy, Suspense, useEffect } from "react"
 import type { Preview } from "@storybook/react"
 import i18n from "../src/i18n"
 import { LoaderOverlay } from "../src/common/components/scaffold"
@@ -10,13 +10,15 @@ import useUserManager, { UserContext } from "../src/common/hooks/user"
 import { EntityContext, useEntityManager } from "../src/common/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
 import { MatomoProvider } from "../src/matomo"
-import { Notice } from "../src/common/components/notice"
 
 import "../src/setup-dsfr"
 import "@codegouvfr/react-dsfr/main.css"
 // import css from our app
 import "../src/common/assets/css/index.css"
-import { StoryDescription } from "./components/description"
+
+// Do not import the component directly to avoid bad css order import during storybook build
+// For more information, replace the line with a simple import and see Missing fields stories in dev and build mode
+const StoryDescription = lazy(() => import("./components/description"))
 
 // Init MSW
 initialize({
@@ -50,6 +52,7 @@ const withData = (Story, { parameters }) => {
   const storyHasDescription = parameters?.docs?.description
     ? Boolean(parameters?.docs?.description)
     : false
+
   return (
     <Suspense fallback={<LoaderOverlay />}>
       <MatomoProvider>
