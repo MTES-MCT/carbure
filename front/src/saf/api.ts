@@ -168,7 +168,8 @@ export function assignSafTicket(
   free_field?: string,
   reception_airport?: number,
   shipping_method?: ShippingMethodEnum,
-  consumption_type?: ConsumptionType
+  consumption_type?: ConsumptionType,
+  pos_poc_number?: string
 ) {
   return api.POST("/saf/ticket-sources/{id}/assign/", {
     params: {
@@ -189,6 +190,7 @@ export function assignSafTicket(
       reception_airport,
       shipping_method,
       consumption_type,
+      pos_poc_number,
     },
   })
 }
@@ -203,7 +205,8 @@ export function groupedAssignSafTicket(
   free_field?: string,
   reception_airport?: number,
   shipping_method?: ShippingMethodEnum,
-  consumption_type?: ConsumptionType
+  consumption_type?: ConsumptionType,
+  pos_poc_number?: string
 ) {
   return api.POST("/saf/ticket-sources/group-assign/", {
     params: {
@@ -221,6 +224,7 @@ export function groupedAssignSafTicket(
       reception_airport,
       shipping_method,
       consumption_type,
+      pos_poc_number,
     },
   })
 }

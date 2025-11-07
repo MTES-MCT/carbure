@@ -43,7 +43,8 @@ export const TicketAssignment = ({
       value.free_field,
       value.reception_airport?.id,
       value.shipping_method,
-      value.consumption_type
+      value.consumption_type,
+      value.pos_poc_number
     )
 
     onTicketAssigned(value.volume!, value.client!.name)
