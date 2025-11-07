@@ -4408,6 +4408,7 @@ export interface components {
          *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
          *     * `BIOFUEL` - BIOFUEL
          *     * `DREAL` - DREAL
+         *     * `DGDDI` - DGDDI
          * @enum {string}
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
@@ -5247,6 +5248,7 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string | null;
             readonly reception_airport: components["schemas"]["Airport"];
+            pos_poc_number?: string | null;
             free_field?: string | null;
             agreement_reference?: string | null;
             readonly carbure_producer: components["schemas"]["EntityPreview"];
@@ -5304,6 +5306,7 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string | null;
             readonly reception_airport: components["schemas"]["Airport"];
+            pos_poc_number?: string | null;
         };
         SafTicketSource: {
             readonly id: number;
@@ -5365,6 +5368,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_poc_number?: string | null;
         };
         SafTicketSourceAssignmentRequest: {
             client_id: number;
@@ -5377,6 +5381,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_poc_number?: string | null;
         };
         SafTicketSourceGroupAssignmentRequest: {
             client_id: number;
@@ -5389,6 +5394,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_poc_number?: string | null;
             ticket_sources_ids: number[];
         };
         SafTicketSourcePreview: {
@@ -6326,7 +6332,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Avenant au contrat. */
+                /** @description A unique integer value identifying this Avenant au contrat. */
                 id: number;
             };
             cookie?: never;
@@ -6491,7 +6497,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6516,7 +6522,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6547,7 +6553,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6571,7 +6577,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6659,7 +6665,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Données d'épandage du digestat. */
+                /** @description A unique integer value identifying this Données d'épandage du digestat. */
                 id: number;
             };
             cookie?: never;
@@ -7049,7 +7055,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                /** @description A unique integer value identifying this Intrant d'approvisionnement. */
                 id: number;
             };
             cookie?: never;
@@ -7074,7 +7080,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                /** @description A unique integer value identifying this Intrant d'approvisionnement. */
                 id: number;
             };
             cookie?: never;
@@ -7105,7 +7111,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                /** @description A unique integer value identifying this Intrant d'approvisionnement. */
                 id: number;
             };
             cookie?: never;
@@ -10323,6 +10329,7 @@ export interface operations {
     saf_clients_list: {
         parameters: {
             query?: {
+                entity_id?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -10353,7 +10360,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                /** @description A unique integer value identifying this Entity. */
+                id: number;
             };
             cookie?: never;
         };
@@ -12860,7 +12868,8 @@ export enum ExtAdminPagesEnum {
     ELEC = "ELEC",
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
     BIOFUEL = "BIOFUEL",
-    DREAL = "DREAL"
+    DREAL = "DREAL",
+    DGDDI = "DGDDI"
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",

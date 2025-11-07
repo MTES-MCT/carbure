@@ -762,8 +762,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Avenant au
-            contrat.
+          description: A unique integer value identifying this Avenant au contrat.
           required: true
       tags:
         - biomethane
@@ -982,8 +981,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1019,8 +1017,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1068,8 +1065,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1116,8 +1112,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1203,8 +1198,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Données
-            d'épandage du digestat.
+          description: A unique integer value identifying this Données d'épandage du
+            digestat.
           required: true
       tags:
         - biomethane
@@ -1704,8 +1699,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Intrant
-            d'approvisionnement.
+          description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
       tags:
         - biomethane
@@ -1741,8 +1735,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Intrant
-            d'approvisionnement.
+          description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
       tags:
         - biomethane
@@ -1790,8 +1783,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Intrant
-            d'approvisionnement.
+          description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
       tags:
         - biomethane
@@ -6588,6 +6580,10 @@ paths:
     get:
       operationId: saf_clients_list
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
         - name: ordering
           required: false
           in: query
@@ -6631,7 +6627,8 @@ paths:
         - in: path
           name: id
           schema:
-            type: string
+            type: integer
+          description: A unique integer value identifying this Entity.
           required: true
       tags:
         - saf
@@ -14511,6 +14508,7 @@ components:
         - TRANSFERRED_ELEC
         - BIOFUEL
         - DREAL
+        - DGDDI
       type: string
       description: |-
         * `DCA` - DCA
@@ -14521,6 +14519,7 @@ components:
         * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
         * `BIOFUEL` - BIOFUEL
         * `DREAL` - DREAL
+        * `DGDDI` - DGDDI
     FeedStock:
       type: object
       properties:
@@ -16337,6 +16336,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
+        pos_poc_number:
+          type: string
+          nullable: true
+          maxLength: 32
         free_field:
           type: string
           nullable: true
@@ -16495,6 +16498,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
+        pos_poc_number:
+          type: string
+          nullable: true
+          maxLength: 32
       required:
         - assignment_period
         - biofuel
@@ -16658,6 +16665,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        pos_poc_number:
+          type: string
+          nullable: true
       required:
         - assignment_period
         - client_id
@@ -16690,6 +16700,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        pos_poc_number:
+          type: string
+          nullable: true
       required:
         - assignment_period
         - client_id
@@ -16720,6 +16733,9 @@ components:
           type: string
           nullable: true
         shipping_method:
+          type: string
+          nullable: true
+        pos_poc_number:
           type: string
           nullable: true
         ticket_sources_ids:
