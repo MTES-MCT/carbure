@@ -38,4 +38,14 @@ def delete_elec_meter(request, entity, entity_id):
         charge_point.current_meter = None
         charge_point.save()
 
+        # un PDC a is_article_2 à True s'il fait partie d'une station ayant au moins un PDC en DC sans compteur MID
+        # donc si après ce changement, j'ai au moins un PDC en DC sans compteur MID sur la station
+        # alors je passe tous les PDC à is_article_2 = True
+
+        station_pdc = ElecChargePoint.objects.filter(station_id=charge_point.station_id)
+        stationc_pdc_dc_without_mid = station_pdc.filter(current_type=ElecChargePoint.DC, current_meter=None)
+
+        if stationc_pdc_dc_without_mid.count() > 0:
+            station_pdc.update(is_article_2=True)
+
     return SuccessResponse()

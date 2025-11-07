@@ -33,9 +33,9 @@ class ElecMeterTest(TestCase):
             [(self.cpo, "RW"), (self.operator, "RW")],
         )
 
-        application = ElecChargePointApplication.objects.create(cpo=self.cpo)
-        application.created_at = datetime.date(2023, 12, 28)
-        application.save()
+        self.application = ElecChargePointApplication.objects.create(cpo=self.cpo)
+        self.application.created_at = datetime.date(2023, 12, 28)
+        self.application.save()
 
         self.reading_application = ElecMeterReadingApplication.objects.create(
             cpo=self.cpo,
@@ -44,7 +44,7 @@ class ElecMeterTest(TestCase):
         )
 
         self.charge_point = ElecChargePoint.objects.create(
-            application=application,
+            application=self.application,
             cpo=self.cpo,
             charge_point_id="FRBBBB222203",
             current_type="AC",
@@ -231,3 +231,43 @@ class ElecMeterTest(TestCase):
         assert response.status_code == status.HTTP_200_OK
         assert ElecMeter.objects.filter(pk=meter3.pk).count() == 0
         assert self.charge_point.current_meter is None
+
+    def test_delete_meter_change_station_article_2(self):
+        application = self.application
+        station_id = "STATION-ARTICLE-2"
+
+        def create_cp(identifier, current_type):
+            cp = ElecChargePoint.objects.create(
+                application=application,
+                cpo=self.cpo,
+                charge_point_id=f"CP-{identifier}",
+                current_type=current_type,
+                installation_date=datetime.date(2024, 1, 1),
+                measure_reference_point_id=f"MRP-{identifier}",
+                station_name="Station Article 2",
+                station_id=station_id,
+                nominal_power=150,
+            )
+            meter = ElecMeter.objects.create(
+                charge_point=cp,
+                initial_index=1000,
+                initial_index_date=datetime.date(2024, 1, 1),
+                mid_certificate=f"MID-{identifier}",
+            )
+            cp.current_meter = meter
+            cp.save()
+            return cp, meter
+
+        create_cp("AC-1", ElecChargePoint.AC)
+        create_cp("AC-2", ElecChargePoint.AC)
+        dc_cp, dc_meter = create_cp("DC-1", ElecChargePoint.DC)
+
+        station_cps = ElecChargePoint.objects.filter(station_id=station_id)
+        assert station_cps.filter(is_article_2=False).count() == 3
+
+        url = reverse("elec-cpo-meters-delete-meter")
+        data = {"charge_point_id": dc_cp.pk, "entity_id": self.cpo.id}
+
+        response = self.client.post(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert station_cps.filter(is_article_2=True).count() == 3
