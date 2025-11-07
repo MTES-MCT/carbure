@@ -52,7 +52,7 @@ export const AssignmentForm = ({
   return (
     <Form<AssignmentFormData>
       id="assign-ticket"
-      onSubmit={(value) => onSubmit(value!)}
+      onSubmit={() => onSubmit(value)}
     >
       <VolumeInput
         remainingVolume={remainingVolume}

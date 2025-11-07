@@ -118,6 +118,13 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
             readOnly
           />
         )}
+        {ticket.pos_poc_number && (
+          <TextInput
+            label={t("Numéro de POS/POC")}
+            value={ticket.pos_poc_number}
+            readOnly
+          />
+        )}
         {"ets_status" in ticket && ticket.ets_status && (
           <TextInput
             label={t("Déclaration ETS")}
