@@ -150,6 +150,7 @@ def create_ticket_from_source(
     reception_airport,
     consumption_type,
     shipping_method,
+    pos_poc_number,
 ):
     year = floor(assignment_period / 100)
 
@@ -189,6 +190,7 @@ def create_ticket_from_source(
         reception_airport=reception_airport,
         consumption_type=consumption_type,
         shipping_method=shipping_method,
+        pos_poc_number=pos_poc_number,
     )
 
     ticket.generate_carbure_id()
