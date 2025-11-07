@@ -6624,6 +6624,10 @@ paths:
     get:
       operationId: saf_clients_list
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
         - name: ordering
           required: false
           in: query
@@ -6667,7 +6671,8 @@ paths:
         - in: path
           name: id
           schema:
-            type: string
+            type: integer
+          description: A unique integer value identifying this Entity.
           required: true
       tags:
         - saf
@@ -16379,6 +16384,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
+        pos_poc_number:
+          type: string
+          nullable: true
+          maxLength: 32
         free_field:
           type: string
           nullable: true
@@ -16537,6 +16546,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
+        pos_poc_number:
+          type: string
+          nullable: true
+          maxLength: 32
       required:
         - assignment_period
         - biofuel
@@ -16700,6 +16713,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        pos_poc_number:
+          type: string
+          nullable: true
       required:
         - assignment_period
         - client_id
@@ -16732,6 +16748,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        pos_poc_number:
+          type: string
+          nullable: true
       required:
         - assignment_period
         - client_id
@@ -16762,6 +16781,9 @@ components:
           type: string
           nullable: true
         shipping_method:
+          type: string
+          nullable: true
+        pos_poc_number:
           type: string
           nullable: true
         ticket_sources_ids:

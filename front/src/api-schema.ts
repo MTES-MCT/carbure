@@ -5266,6 +5266,7 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string | null;
             readonly reception_airport: components["schemas"]["Airport"];
+            pos_poc_number?: string | null;
             free_field?: string | null;
             agreement_reference?: string | null;
             readonly carbure_producer: components["schemas"]["EntityPreview"];
@@ -5323,6 +5324,7 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string | null;
             readonly reception_airport: components["schemas"]["Airport"];
+            pos_poc_number?: string | null;
         };
         SafTicketSource: {
             readonly id: number;
@@ -5384,6 +5386,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_poc_number?: string | null;
         };
         SafTicketSourceAssignmentRequest: {
             client_id: number;
@@ -5396,6 +5399,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_poc_number?: string | null;
         };
         SafTicketSourceGroupAssignmentRequest: {
             client_id: number;
@@ -5408,6 +5412,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_poc_number?: string | null;
             ticket_sources_ids: number[];
         };
         SafTicketSourcePreview: {
@@ -10384,6 +10389,7 @@ export interface operations {
     saf_clients_list: {
         parameters: {
             query?: {
+                entity_id?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -10414,7 +10420,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                /** @description A unique integer value identifying this Entity. */
+                id: number;
             };
             cookie?: never;
         };
