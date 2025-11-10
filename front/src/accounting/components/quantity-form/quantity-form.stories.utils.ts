@@ -14,7 +14,7 @@ export const fillQuantityForm = async (
   }
   const { quantity, tC02 } = { ...defaultOptions, ...options }
 
-  const { getByRole, getAllByRole } = within(canvasElement)
+  const { getByRole, getAllByRole, getByText } = within(canvasElement)
 
   // Fill the quantity input
   const input = await waitFor(() => getByRole("spinbutton"))
@@ -26,7 +26,8 @@ export const fillQuantityForm = async (
   )
   await userEvent.click(button)
 
-  // Fill tC02 input
+  // Await the tCO2 input label is visible
+  await waitFor(() => getByText("Saisir un montant en tCO2 évitées *"))
   const tC02Input = await waitFor(() => getAllByRole("spinbutton")[1])
 
   // Fill tC02 input if it is not null
