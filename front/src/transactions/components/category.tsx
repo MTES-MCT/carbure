@@ -2,10 +2,11 @@ import { useTranslation } from "react-i18next"
 import { Snapshot, Status } from "../types"
 import { formatNumber } from "common/utils/formatters"
 import Tabs from "common/components/tabs"
-import { useMatch, useNavigate } from "react-router"
+import { useMatch, useNavigate, useParams } from "react-router"
 import { useEffect } from "react"
 import { compact } from "common/utils/collection"
 import useEntity from "common/hooks/entity"
+import { useRoutes } from "common/hooks/routes"
 
 interface CategorySwitcherProps {
   category: string
@@ -147,16 +148,24 @@ export function useAutoCategory(
   snapshot: Snapshot | undefined
 ) {
   const navigate = useNavigate()
+  const params = useParams<{ year: string }>()
+  const routes = useRoutes()
+
+  const year = params.year ? parseInt(params.year) : undefined
+  const biofuelUrl = routes.BIOFUELS(year)
   const match = useMatch("/org/:entity/transactions/:year/:status/:category/*") // prettier-ignore
   const category = match?.params.category
 
   useEffect(() => {
     const defaultCategory = getDefaultCategory(status, snapshot)
+
     if (!isStatusCategory(status, category)) {
-      if (status === "stocks") navigate(defaultCategory, { replace: true })
-      else navigate(`${status}/${defaultCategory}`, { replace: true })
+      const path =
+        status === "stocks" ? defaultCategory : `${status}/${defaultCategory}`
+
+      navigate(`${biofuelUrl.ROOT}/${path}`)
     }
-  }, [category, status, snapshot, navigate])
+  }, [category, status, snapshot, navigate, biofuelUrl])
 
   return category ?? getDefaultCategory(status, snapshot)
 }
