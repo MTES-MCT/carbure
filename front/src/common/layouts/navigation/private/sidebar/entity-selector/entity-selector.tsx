@@ -7,7 +7,7 @@ import { EntityType } from "common/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useMatomo } from "matomo"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { ROUTE_URLS } from "common/utils/routes"
 
 export const EntitySelector = ({ className }: { className?: string }) => {

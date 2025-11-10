@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router"
 import { Main } from "common/components/scaffold"
 import Teneur from "./pages/teneur"
 import OperationsBalancesLayout from "./layouts/operations-balances-layout"

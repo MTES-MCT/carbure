@@ -8,7 +8,7 @@ import { AxiosError } from "axios"
 import { useTranslation } from "react-i18next"
 import { HttpError } from "common/services/api-fetch"
 import { useRoutes } from "common/hooks/routes"
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 
 export type Notifier = (
   content: React.ReactNode,

@@ -10,7 +10,7 @@ import {
 import Table, { Cell, Order, selectionColumn } from "common/components/table"
 import StockTag from "./stock-tag"
 import { isRedII } from "lot-add/components/ghg-fields"
-import { To } from "react-router-dom"
+import { To } from "react-router"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
 import { Unit } from "common/types"

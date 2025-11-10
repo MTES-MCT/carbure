@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { TagAutocomplete } from "./tag-autocomplete"
 import { useState } from "react"
 

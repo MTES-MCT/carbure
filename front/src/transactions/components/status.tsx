@@ -1,7 +1,7 @@
 import cl from "clsx"
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useMatch, useNavigate } from "react-router-dom"
+import { useMatch, useNavigate } from "react-router"
 import { Snapshot, Status } from "../types"
 import Tabs from "common/components/tabs"
 import { Bell, Loader } from "common/components/icons"

@@ -1,4 +1,4 @@
-import { matchPath, useLocation, useResolvedPath } from "react-router-dom"
+import { matchPath, useLocation, useResolvedPath } from "react-router"
 import { useRef } from "react"
 import { SectorTabs } from "accounting/types"
 

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { FileArea } from "./filearea"
 import { DashboardLine } from "common/components/icon"
 

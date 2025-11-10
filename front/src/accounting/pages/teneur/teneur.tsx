@@ -22,7 +22,7 @@ import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneu
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { ElecOperationSector } from "accounting/types"
 import { DeclareElecTeneurDialog } from "./components/declare-elec-teneur-dialog"
-import { useOutletContext } from "react-router-dom"
+import { useOutletContext } from "react-router"
 import { TeneurOutletContext } from "accounting/layouts/teneur-layout"
 import { BetaPage } from "common/molecules/beta-page"
 

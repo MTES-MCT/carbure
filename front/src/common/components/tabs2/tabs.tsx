@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom"
+import { NavLink, useLocation } from "react-router"
 import { layout, Layout } from "../scaffold"
 import { useMatcher } from "./tabs.hooks"
 import { useEffect, useState } from "react"

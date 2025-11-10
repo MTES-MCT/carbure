@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Navigate, Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router"
 import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { Main } from "common/components/scaffold"

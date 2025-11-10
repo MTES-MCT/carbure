@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { useQuery } from "common/hooks/async"
 import { LoaderOverlay } from "common/components/scaffold"
 import { invalidate } from "common/hooks/invalidate"

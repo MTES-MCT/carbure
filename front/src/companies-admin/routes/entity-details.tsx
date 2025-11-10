@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router"
 import { ChevronLeft } from "common/components/icons"
 import { Button } from "common/components/button"
 import UserRights from "../components/user-rights"

@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { QuantityForm } from "./quantity-form"
 import { Form, useForm } from "common/components/form2"
 import { CreateOperationType } from "accounting/types"
 import { balance } from "accounting/__test__/data/balances"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 import {
   okSimulateMinMaxWithEqualValues,
   okSimulateMinMaxWithZeroValues,

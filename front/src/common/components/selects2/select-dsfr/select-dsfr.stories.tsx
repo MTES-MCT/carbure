@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { SelectDsfr } from "./select-dsfr"
 import { ReactNode, useState } from "react"
 

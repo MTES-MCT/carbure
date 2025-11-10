@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import { ContractInfos } from "./contract-infos"
 import { contractData } from "../../tests/contract.data"
@@ -7,9 +7,10 @@ import { updateContractOk } from "../../tests/api"
 import { okEntitySearch } from "common/__test__/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
 import { InstallationCategory, TariffReference } from "../../types"
-import { fireEvent, userEvent, waitFor, within } from "@storybook/test"
+import { fireEvent, userEvent, waitFor, within } from "storybook/test"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType } from "common/types"
+import { producer } from "common/__test__/data"
 
 const MOCKS = [
   ...GLOBAL_MOCKS,
@@ -105,6 +106,7 @@ export const WatchedFieldsChanged: Story = {
     contract: {
       ...contractData,
       pap_contracted: 10,
+      buyer: undefined,
     },
   },
   decorators: [
@@ -121,6 +123,13 @@ export const WatchedFieldsChanged: Story = {
         getByRole("button", { name: "Modifier" })
       )
       await userEvent.click(editButton)
+    })
+
+    await step("Change buyer", async () => {
+      const buyerAutocomplete = await waitFor(() => getByRole("textbox"))
+      await userEvent.click(buyerAutocomplete)
+
+      await userEvent.type(buyerAutocomplete, producer.name)
     })
 
     await step("Change installation_category", async () => {
@@ -141,6 +150,7 @@ export const WatchedFieldsChanged: Story = {
       const submitButton = await waitFor(() =>
         getByRole("button", { name: "Sauvegarder" })
       )
+
       await userEvent.click(submitButton)
     })
   },

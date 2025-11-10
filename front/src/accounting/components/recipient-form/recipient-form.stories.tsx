@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import { Meta, StoryObj } from "@storybook/react-vite"
 import { RecipientForm } from "./recipient-form"
 import { Form, useForm } from "common/components/form2"
 import { baseHandlers, fillRecipientForm } from "./recipient-form.stories.utils"

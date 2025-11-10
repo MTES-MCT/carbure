@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import { Meta, StoryObj } from "@storybook/react-vite"
 
 import { TransfertDialog } from "./transfert-dialog"
 import { balance } from "accounting/__test__/data/balances"
@@ -7,13 +7,13 @@ import {
   getBalancesWithUpdatedAvailableBalance,
   fillGHGRangeForm,
 } from "accounting/components/ghg-range-form/ghg-range-form.stories.utils"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 import { getViewport } from "@storybook/mocks/utils"
 import {
   baseHandlers as quantityBaseHandlers,
   fillQuantityForm,
+  fillQuantityInput,
 } from "accounting/components/quantity-form/quantity-form.stories.utils"
-import { okSimulateMinMaxWithZeroValues } from "accounting/__test__/api/biofuels/operations"
 import { fillRecipientForm } from "accounting/components/recipient-form/recipient-form.stories.utils"
 
 const clickNextStepButton = async (canvasElement: HTMLElement) => {
@@ -83,15 +83,19 @@ export const SecondStepNextStepButtonDisabled: Story = {
         "Second step - Could not switch to the next step when the quantity is not submitted",
     },
     msw: {
-      handlers: [
-        okSimulateMinMaxWithZeroValues,
-        ...baseHandlers,
-        ...quantityBaseHandlers,
-      ],
+      handlers: [...baseHandlers, ...quantityBaseHandlers],
     },
   },
   play: async (canvas) => {
-    await SecondStep.play?.(canvas)
+    // Fill the first step
+    await FirstStep.play?.(canvas)
+    // Click on the next step button
+    await clickNextStepButton(canvas.canvasElement)
+
+    // Fill the quantity input
+    await fillQuantityInput(canvas.canvasElement, "1000")
+
+    // Click on the next step button
     await clickNextStepButton(canvas.canvasElement)
   },
 }
