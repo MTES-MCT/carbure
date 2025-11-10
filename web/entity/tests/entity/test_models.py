@@ -1,6 +1,7 @@
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from core.models import Department, Entity, EntityDepartments
+from core.models import Department, Entity, EntityScope
 
 
 class EntityGetAccessibleDepartmentsTest(TestCase):
@@ -15,11 +16,14 @@ class EntityGetAccessibleDepartmentsTest(TestCase):
         # Create entity
         self.entity = Entity.objects.create(name="Test Entity", entity_type=Entity.EXTERNAL_ADMIN)
 
+        # Get content type for Department
+        self.dept_ct = ContentType.objects.get_for_model(Department)
+
     def test_get_accessible_departments_with_multiple_departments(self):
         """Entity with multiple departments returns all accessible departments"""
         # Associate entity with departments 01 and 02
-        EntityDepartments.objects.create(entity=self.entity, department=self.dept_01)
-        EntityDepartments.objects.create(entity=self.entity, department=self.dept_02)
+        EntityScope.objects.create(entity=self.entity, content_type=self.dept_ct, object_id=self.dept_01.id)
+        EntityScope.objects.create(entity=self.entity, content_type=self.dept_ct, object_id=self.dept_02.id)
 
         accessible_depts = self.entity.get_accessible_departments()
 
@@ -31,7 +35,7 @@ class EntityGetAccessibleDepartmentsTest(TestCase):
 
     def test_get_accessible_departments_with_single_department(self):
         """Entity with single department returns only that department"""
-        EntityDepartments.objects.create(entity=self.entity, department=self.dept_01)
+        EntityScope.objects.create(entity=self.entity, content_type=self.dept_ct, object_id=self.dept_01.id)
 
         accessible_depts = self.entity.get_accessible_departments()
 
@@ -47,7 +51,7 @@ class EntityGetAccessibleDepartmentsTest(TestCase):
 
     def test_get_accessible_departments_returns_queryset(self):
         """get_accessible_departments() returns a Department queryset"""
-        EntityDepartments.objects.create(entity=self.entity, department=self.dept_01)
+        EntityScope.objects.create(entity=self.entity, content_type=self.dept_ct, object_id=self.dept_01.id)
 
         accessible_depts = self.entity.get_accessible_departments()
 
@@ -62,11 +66,11 @@ class EntityGetAccessibleDepartmentsTest(TestCase):
         other_entity = Entity.objects.create(name="Other Entity", entity_type=Entity.EXTERNAL_ADMIN)
 
         # Both entities access department 01
-        EntityDepartments.objects.create(entity=self.entity, department=self.dept_01)
-        EntityDepartments.objects.create(entity=other_entity, department=self.dept_01)
+        EntityScope.objects.create(entity=self.entity, content_type=self.dept_ct, object_id=self.dept_01.id)
+        EntityScope.objects.create(entity=other_entity, content_type=self.dept_ct, object_id=self.dept_01.id)
 
         # Only entity2 accesses department 02
-        EntityDepartments.objects.create(entity=other_entity, department=self.dept_02)
+        EntityScope.objects.create(entity=other_entity, content_type=self.dept_ct, object_id=self.dept_02.id)
 
         # Verify each entity sees only its own departments
         entity1_depts = self.entity.get_accessible_departments()

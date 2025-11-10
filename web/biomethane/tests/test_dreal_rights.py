@@ -1,10 +1,11 @@
 from unittest.mock import Mock
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from biomethane.factories import BiomethaneProductionUnitFactory
 from biomethane.permissions import HasDrealRights
-from core.models import Department, Entity, EntityDepartments, ExternalAdminRights
+from core.models import Department, Entity, EntityScope, ExternalAdminRights
 
 
 class HasDrealRightsUnitTest(TestCase):
@@ -19,7 +20,8 @@ class HasDrealRightsUnitTest(TestCase):
         self.dreal = Entity.objects.create(name="DREAL Test", entity_type=Entity.EXTERNAL_ADMIN)
 
         # Associate DREAL entity with department 01
-        EntityDepartments.objects.create(entity=self.dreal, department=self.dept_01)
+        dept_ct = ContentType.objects.get_for_model(Department)
+        EntityScope.objects.create(entity=self.dreal, content_type=dept_ct, object_id=self.dept_01.id)
 
         # Create DREAL rights
         self.dreal_right = ExternalAdminRights.objects.create(entity=self.dreal, right=ExternalAdminRights.DREAL)
@@ -79,7 +81,8 @@ class HasDrealRightsUnitTest(TestCase):
     def test_has_object_permission_with_multiple_accessible_departments(self):
         """has_object_permission works with multiple accessible departments"""
         # Add second department to DREAL entity
-        EntityDepartments.objects.create(entity=self.dreal, department=self.dept_02)
+        dept_ct = ContentType.objects.get_for_model(Department)
+        EntityScope.objects.create(entity=self.dreal, content_type=dept_ct, object_id=self.dept_02.id)
 
         # Should now be able to access both units
         result_01 = self.permission.has_object_permission(self.request, None, self.unit_accessible)

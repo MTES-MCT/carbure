@@ -6,7 +6,10 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import Department, Entity, EntityDepartments, ExternalAdminRights  # noqa: E402
+from django.contrib.contenttypes.models import ContentType  # noqa: E402
+
+from core.models import Department, Entity, ExternalAdminRights  # noqa: E402
+from entity.models import EntityScope  # noqa: E402
 
 filename = "%s/web/fixtures/csv/biomethane_DREAL.csv" % (os.environ["CARBURE_HOME"])
 
@@ -38,8 +41,10 @@ with open(filename) as csvfile:
             right=ExternalAdminRights.DREAL,
         )
 
-        # 3. Link DREAL to the department
-        dept, created = EntityDepartments.objects.get_or_create(
+        # 3. Link DREAL to the department using EntityScope
+        dept_ct = ContentType.objects.get_for_model(Department)
+        scope, created = EntityScope.objects.get_or_create(
             entity=entity,
-            department=department,
+            content_type=dept_ct,
+            object_id=department.id,
         )
