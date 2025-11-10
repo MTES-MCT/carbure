@@ -1,7 +1,8 @@
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from core.models import Department, Entity, EntityScope
+from core.models import Department, Entity
+from entity.models import EntityScope
 
 
 class EntityGetAccessibleDepartmentsTest(TestCase):

@@ -5,7 +5,8 @@ from django.test import TestCase
 
 from biomethane.factories import BiomethaneProductionUnitFactory
 from biomethane.permissions import HasDrealRights
-from core.models import Department, Entity, EntityScope, ExternalAdminRights
+from core.models import Department, Entity, ExternalAdminRights
+from entity.models import EntityScope
 
 
 class HasDrealRightsUnitTest(TestCase):

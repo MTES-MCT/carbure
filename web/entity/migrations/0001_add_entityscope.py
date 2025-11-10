@@ -7,7 +7,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        ("core", "0051_entitydepartments_delete_externaladmindepartments"),
     ]
 
     operations = [
@@ -30,9 +29,6 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Entity Scopes",
                 "db_table": "entity_scopes",
             },
-        ),
-        migrations.DeleteModel(
-            name="EntityDepartments",
         ),
         migrations.AddIndex(
             model_name="entityscope",
