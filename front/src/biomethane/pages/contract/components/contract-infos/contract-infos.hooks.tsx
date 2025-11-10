@@ -73,7 +73,6 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
     (data) =>
       saveContract(entity.id, data).then(() => {
         if (contract && hasWatchedFieldsChanged(contract, data)) {
-          console.log("hasWatchedFieldsChanged")
           portal((close) => (
             <AnnualDeclarationResetDialog
               onClose={close}

@@ -4,6 +4,16 @@ import {
   okSimulateOperation,
 } from "accounting/__test__/api/biofuels/operations"
 
+export const fillQuantityInput = async (
+  canvasElement: HTMLElement,
+  quantity: string
+) => {
+  const { getByRole } = within(canvasElement)
+  const input = await waitFor(() => getByRole("spinbutton"))
+
+  return userEvent.type(input, quantity)
+}
+
 export const fillQuantityForm = async (
   canvasElement: HTMLElement,
   options: { quantity?: string; tC02?: string | null } = {}
@@ -17,10 +27,9 @@ export const fillQuantityForm = async (
   const { getByRole, getAllByRole, getByText } = within(canvasElement)
 
   // Fill the quantity input
-  const input = await waitFor(() => getByRole("spinbutton"))
-  await userEvent.type(input, quantity)
+  await fillQuantityInput(canvasElement, quantity)
 
-  // Click on the validate button0
+  // Click on the validate button
   const button = await waitFor(() =>
     getByRole("button", { name: "Valider la quantité" })
   )
