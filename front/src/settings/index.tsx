@@ -16,14 +16,7 @@ import { EntityUserRights } from "./pages/user-rights"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useRoutes } from "common/hooks/routes"
 import { Navigate, Route, Routes } from "react-router"
-import { lazy } from "react"
-import { AnnualDeclarationLayout } from "biomethane/layouts/annual-declaration-layout"
-
-const BiomethaneContractPage = lazy(() => import("biomethane/pages/contract"))
-const BiomethaneInjectionPage = lazy(() => import("biomethane/pages/injection"))
-const BiomethaneProductionPage = lazy(
-  () => import("biomethane/pages/production")
-)
+import { BiomethaneSettingsRoutes } from "biomethane/routes"
 
 const Settings = () => {
   const { t } = useTranslation()
@@ -62,7 +55,7 @@ const Settings = () => {
             iconActive: "ri-profile-fill",
           },
           entity.hasRights(UserRole.Admin) && {
-            path: "users",
+            path: routes.SETTINGS.USERS,
             key: "users",
             label: t("Utilisateurs"),
             icon: "ri-user-line",
@@ -90,21 +83,21 @@ const Settings = () => {
             iconActive: "ri-todo-fill",
           },
           hasCertificates && {
-            path: "certificates",
+            path: routes.SETTINGS.CERTIFICATES,
             key: "certificates",
             label: t("Certificats"),
             icon: "ri-file-text-line",
             iconActive: "ri-file-text-fill",
           },
           isProducer && {
-            path: "production",
+            path: routes.SETTINGS.PRODUCTION,
             key: "production",
             label: t("Sites de production"),
             icon: "ri-building-line",
             iconActive: "ri-building-fill",
           },
           hasDepot && {
-            path: "depot",
+            path: routes.SETTINGS.DEPOT,
             key: "depot",
             label: t("Dépôts"),
             icon: "ri-building-4-line",
@@ -135,12 +128,7 @@ const Settings = () => {
             <Route path="users" element={<EntityUserRights />} />
           )}
           {isBiomethaneProducer && (
-            <Route path="biomethane" element={<AnnualDeclarationLayout />}>
-              <Route path="contract" element={<BiomethaneContractPage />} />
-              <Route path="production" element={<BiomethaneProductionPage />} />
-              <Route path="injection" element={<BiomethaneInjectionPage />} />
-              <Route index element={<Navigate replace to="contract" />} />
-            </Route>
+            <Route path="biomethane/*" element={<BiomethaneSettingsRoutes />} />
           )}
           <Route path="*" element={<Navigate replace to={defaultTab} />} />
         </Routes>
