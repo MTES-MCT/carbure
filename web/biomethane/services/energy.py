@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
-from biomethane.services.rules import FieldClearingRule, RuleBuilder
+from biomethane.services.rules import FieldClearingRule, RuleBuilder, get_fields_from_applied_rules
 
 
 @dataclass
@@ -118,13 +118,7 @@ class BiomethaneEnergyService:
         rules = _build_energy_rules()
 
         # Evaluate each rule and collect fields to clear
-        fields_to_clear = []
-        for rule in rules:
-            if rule.condition(context):
-                fields_to_clear.extend(rule.fields)
-
-        # Return deduplicated list
-        return list(set(fields_to_clear))
+        return get_fields_from_applied_rules(rules, context)
 
     @staticmethod
     def get_optional_fields(instance):

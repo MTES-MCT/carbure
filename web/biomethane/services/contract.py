@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
-from biomethane.services.rules import FieldClearingRule, RequiredFieldRule
+from biomethane.services.rules import FieldClearingRule, RequiredFieldRule, get_fields_from_applied_rules
 
 
 @dataclass
@@ -162,10 +162,7 @@ class BiomethaneContractService:
         rules = _build_required_field_rules()
 
         # Evaluate rules and collect required fields
-        required_fields = []
-        for rule in rules:
-            if rule.condition(context):
-                required_fields.extend(rule.fields)
+        required_fields = get_fields_from_applied_rules(rules, context)
 
         return required_fields
 
@@ -208,10 +205,7 @@ class BiomethaneContractService:
         rules = _build_contract_clearing_rules()
 
         # Evaluate rules and collect fields to clear
-        fields_to_clear = []
-        for rule in rules:
-            if rule.condition(contract):
-                fields_to_clear.extend(rule.fields)
+        fields_to_clear = get_fields_from_applied_rules(rules, contract)
 
         # Build update dictionary
         update_data = {}

@@ -10,6 +10,14 @@ from typing import Callable, TypeVar
 ContextType = TypeVar("ContextType")
 
 
+def get_fields_from_applied_rules(rules, context):
+    selected_fields = set()
+    for rule in rules:
+        if rule.condition(context):
+            selected_fields.update(rule.fields)
+    return list(selected_fields)
+
+
 @dataclass
 class FieldClearingRule:
     """Rule to determine if fields should be cleared based on a condition."""

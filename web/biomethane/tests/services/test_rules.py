@@ -2,10 +2,9 @@
 
 from dataclasses import dataclass
 from typing import Optional
+from unittest import TestCase
 
-from django.test import TestCase
-
-from biomethane.services.rules import FieldClearingRule, RequiredFieldRule, RuleBuilder
+from biomethane.services.rules import FieldClearingRule, RequiredFieldRule, RuleBuilder, get_fields_from_applied_rules
 
 
 @dataclass
@@ -260,11 +259,7 @@ class RuleBuilderIntegrationTests(TestCase):
 
         # Both rules should clear
         context = MockContext(value="C", items=["OTHER"])
-        fields_to_clear = []
-        for rule in rules:
-            if rule.condition(context):
-                fields_to_clear.extend(rule.fields)
-
+        fields_to_clear = get_fields_from_applied_rules(rules, context)
         self.assertEqual(sorted(fields_to_clear), ["field1", "field2"])
 
     def test_rule_fields_can_overlap(self):
@@ -285,12 +280,19 @@ class RuleBuilderIntegrationTests(TestCase):
         ]
 
         context = MockContext(value="B", items=[])
-        fields_to_clear = []
-        for rule in rules:
-            if rule.condition(context):
-                fields_to_clear.extend(rule.fields)
+        fields_to_clear = get_fields_from_applied_rules(rules, context)
 
         # field2 appears twice but should be deduplicated by caller
-        self.assertIn("field1", fields_to_clear)
-        self.assertIn("field2", fields_to_clear)
-        self.assertIn("field3", fields_to_clear)
+        self.assertCountEqual(["field1", "field2", "field3"], fields_to_clear)
+
+
+class FieldsSelectionTest(TestCase):
+    def test_select_fields_satisfying_condition(self):
+        rules = [
+            RequiredFieldRule(name="always_true", fields=["field1"], condition=(lambda _: True)),
+            RequiredFieldRule(name="never_true", fields=["field2"], condition=(lambda _: False)),
+        ]
+
+        selected_fields = get_fields_from_applied_rules(rules, None)
+        expected_fields = ["field1"]
+        self.assertEqual(expected_fields, selected_fields)
