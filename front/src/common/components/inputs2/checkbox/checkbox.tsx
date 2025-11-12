@@ -11,7 +11,7 @@ import { multipleSelection } from "common/utils/selection"
 import { ChangeEvent, useId } from "react"
 import cl from "clsx"
 import css from "./checkbox.module.css"
-import { Label, LabelProps } from "../base-input"
+import { Label, LabelProps, ReadOnlyValue } from "../base-input"
 
 type CheckboxProps = Omit<CheckboxDSFRProps, "options" | "name"> & {
   value?: boolean
@@ -38,17 +38,6 @@ export const Checkbox = ({
   const id = props.id ?? generatedId
   const options: CheckboxDSFRProps["options"] = [
     {
-      // label: label ? (
-      //   <Label
-      //     label={label}
-      //     readOnly={readOnly}
-      //     hasTooltip={hasTooltip}
-      //     required={props.required}
-      //     title={title}
-      //   />
-      // ) : (
-      //   ""
-      // ),
       label,
       nativeInputProps: {
         checked: value,
@@ -141,9 +130,25 @@ export const CheckboxGroup = <T, V extends string | number>({
         ? { checked: selection.isSelected(option.value) }
         : {}),
       name,
-      disabled: readOnly || disabled,
+      disabled,
     },
   }))
+
+  if (readOnly) {
+    const selectedOptionsLabels = optionsWithNativeInputProps
+      .filter((option) => option.nativeInputProps.checked)
+      .map((option) => option.label ?? "")
+      .join(", ")
+    return (
+      <ReadOnlyValue
+        label={label}
+        readOnly
+        hasTooltip={hasTooltip}
+        title={title}
+        value={selectedOptionsLabels}
+      />
+    )
+  }
 
   return (
     <div style={{ position: "relative" }}>
