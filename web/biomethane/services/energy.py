@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
+from biomethane.services.rules import FieldClearingRule, RuleBuilder, get_fields_from_applied_rules
 
 
 @dataclass
@@ -32,6 +33,10 @@ class EnergyContext:
     def attest_no_fossil_for_installation_needs(self) -> bool:
         return getattr(self.instance, "attest_no_fossil_for_installation_needs", False)
 
+    @property
+    def tariff_reference(self) -> Optional[str]:
+        return getattr(self.contract, "tariff_reference", None) if self.contract else None
+
 
 class BiomethaneEnergyService:
     """
@@ -58,7 +63,7 @@ class BiomethaneEnergyService:
         "total_unit_electric_consumption_kwe",
     ]
 
-    TARRIF_2011_2020_FIELDS = ["injected_biomethane_nm3_per_year"]
+    TARIFF_2011_2020_FIELDS = ["injected_biomethane_nm3_per_year"]
 
     MALFUNCTION_FIELDS = [
         "malfunction_cumulative_duration_days",
@@ -73,16 +78,22 @@ class BiomethaneEnergyService:
     @staticmethod
     def _extract_data(instance) -> EnergyContext:
         """Extract data from an energy instance and return structured context."""
+        from django.core.exceptions import ObjectDoesNotExist
+
         # Extract producer and related objects
         producer = getattr(instance, "producer", None)
         production_unit = None
         contract = None
 
         if producer:
-            production_unit = getattr(producer, "biomethane_production_unit", None)
+            try:
+                production_unit = producer.biomethane_production_unit
+            except ObjectDoesNotExist:
+                production_unit = None
+
             try:
                 contract = producer.biomethane_contract
-            except Exception:
+            except ObjectDoesNotExist:
                 contract = None
 
         # Return structured context
@@ -93,63 +104,6 @@ class BiomethaneEnergyService:
         )
 
     @staticmethod
-    def _apply_flaring_rules(production_unit, fields_to_clear):
-        """Apply flaring rules based on installed meters."""
-        from biomethane.models import BiomethaneProductionUnit
-
-        installed_meters = production_unit.installed_meters if production_unit else []
-
-        if BiomethaneProductionUnit.FLARING_FLOWMETER not in installed_meters:
-            fields_to_clear.extend(BiomethaneEnergyService.FLARING_FIELDS)
-
-    @staticmethod
-    def _apply_tariff_rules(contract, fields_to_clear):
-        """Apply rules based on contract tariff reference."""
-        if not contract:
-            return
-
-        tariff_reference = getattr(contract, "tariff_reference", None)
-
-        # Old tariff fields (2011, 2020, 2021)
-        if tariff_reference not in ["2011", "2020", "2021"]:
-            fields_to_clear.extend(BiomethaneEnergyService.OLD_TARIFF_FIELDS)
-
-        # New tariff fields (2023)
-        if tariff_reference not in ["2023"]:
-            fields_to_clear.extend(BiomethaneEnergyService.NEW_TARIFF_FIELDS)
-
-        # Tariff fields for 2011 and 2020
-        if tariff_reference not in ["2011", "2020"]:
-            fields_to_clear.extend(BiomethaneEnergyService.TARRIF_2011_2020_FIELDS)
-
-    @staticmethod
-    def _apply_malfunction_rules(context: EnergyContext, fields_to_clear):
-        """Apply rules based on malfunction status."""
-        if not context.has_malfunctions:
-            # No malfunctions → all malfunction fields are optional
-            fields_to_clear.extend(BiomethaneEnergyService.MALFUNCTION_FIELDS)
-        else:
-            # Has malfunctions → check malfunction type
-            if context.malfunction_types and BiomethaneEnergy.MALFUNCTION_TYPE_OTHER not in context.malfunction_types:
-                # "OTHER" not in types → details field is optional
-                fields_to_clear.extend(BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD)
-
-    @staticmethod
-    def _apply_injection_difficulty_rules(context: EnergyContext, fields_to_clear):
-        """Apply rules based on injection difficulties status."""
-        if not context.has_injection_difficulties:
-            fields_to_clear.extend(BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS)
-
-    @staticmethod
-    def _apply_installation_energy_needs_rules(context: EnergyContext, fields_to_clear):
-        """Apply rules based on installation energy needs status."""
-        if context.attest_no_fossil_for_digester_heating_and_purification:
-            fields_to_clear.extend(["fossil_details_for_digester_heating"])
-
-        if context.attest_no_fossil_for_installation_needs:
-            fields_to_clear.extend(["fossil_details_for_installation_needs"])
-
-    @staticmethod
     def _get_fields_to_clear(instance):
         """
         Return the list of fields to clear for an energy instance.
@@ -157,25 +111,14 @@ class BiomethaneEnergyService:
         Returns:
             list: Fields to clear/empty (also represents optional fields)
         """
-        fields_to_clear = []
-
         # Extract context
         context = BiomethaneEnergyService._extract_data(instance)
 
-        # Apply rules based on production unit
-        if context.production_unit:
-            BiomethaneEnergyService._apply_flaring_rules(context.production_unit, fields_to_clear)
+        # Get all configured rules
+        rules = _build_energy_rules()
 
-        # Apply rules based on contract
-        if context.contract:
-            BiomethaneEnergyService._apply_tariff_rules(context.contract, fields_to_clear)
-
-        # Apply rules based on context
-        BiomethaneEnergyService._apply_malfunction_rules(context, fields_to_clear)
-        BiomethaneEnergyService._apply_injection_difficulty_rules(context, fields_to_clear)
-        BiomethaneEnergyService._apply_installation_energy_needs_rules(context, fields_to_clear)
-
-        return list(set(fields_to_clear))
+        # Evaluate each rule and collect fields to clear
+        return get_fields_from_applied_rules(rules, context)
 
     @staticmethod
     def get_optional_fields(instance):
@@ -192,3 +135,73 @@ class BiomethaneEnergyService:
         Used by signals.
         """
         return BiomethaneEnergyService._get_fields_to_clear(instance)
+
+
+# Rule configuration: declarative definition of all field clearing rules
+def _build_energy_rules() -> list[FieldClearingRule]:
+    """
+    Build the list of field clearing rules for energy instances.
+    """
+    from biomethane.models import BiomethaneProductionUnit
+
+    return [
+        # Flaring rules
+        RuleBuilder.required_value_not_in_list(
+            lambda ctx: ctx.production_unit.installed_meters if ctx.production_unit else [],
+            BiomethaneProductionUnit.FLARING_FLOWMETER,
+            BiomethaneEnergyService.FLARING_FIELDS,
+            "flaring_not_installed",
+        ),
+        # Tariff rules - Old tariff fields (2011, 2020, 2021)
+        RuleBuilder.value_not_in_list(
+            lambda ctx: ctx.tariff_reference,
+            ["2011", "2020", "2021"],
+            BiomethaneEnergyService.OLD_TARIFF_FIELDS,
+            "not_old_tariff",
+        ),
+        # Tariff rules - New tariff fields (2023)
+        RuleBuilder.value_not_in_list(
+            lambda ctx: ctx.tariff_reference,
+            ["2023"],
+            BiomethaneEnergyService.NEW_TARIFF_FIELDS,
+            "not_new_tariff",
+        ),
+        # Tariff rules - 2011 and 2020 specific fields
+        RuleBuilder.value_not_in_list(
+            lambda ctx: ctx.tariff_reference,
+            ["2011", "2020"],
+            BiomethaneEnergyService.TARIFF_2011_2020_FIELDS,
+            "not_2011_2020_tariff",
+        ),
+        # Malfunction rules - no malfunctions
+        FieldClearingRule(
+            name="no_malfunctions",
+            fields=BiomethaneEnergyService.MALFUNCTION_FIELDS,
+            condition=lambda ctx: not ctx.has_malfunctions,
+        ),
+        # Malfunction rules - malfunction type not "OTHER"
+        FieldClearingRule(
+            name="malfunction_no_other_type",
+            fields=BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD,
+            condition=lambda ctx: (
+                ctx.has_malfunctions and BiomethaneEnergy.MALFUNCTION_TYPE_OTHER not in ctx.malfunction_types
+            ),
+        ),
+        # Injection difficulty rules
+        FieldClearingRule(
+            name="no_injection_difficulties",
+            fields=BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS,
+            condition=lambda ctx: not ctx.has_injection_difficulties,
+        ),
+        # Installation energy needs rules
+        FieldClearingRule(
+            name="no_fossil_for_digester_heating",
+            fields=["fossil_details_for_digester_heating"],
+            condition=lambda ctx: ctx.attest_no_fossil_for_digester_heating_and_purification,
+        ),
+        FieldClearingRule(
+            name="no_fossil_for_installation_needs",
+            fields=["fossil_details_for_installation_needs"],
+            condition=lambda ctx: ctx.attest_no_fossil_for_installation_needs,
+        ),
+    ]

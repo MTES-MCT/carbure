@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 
 from biomethane.factories.contract import BiomethaneContractFactory
@@ -6,7 +8,12 @@ from core.models import Entity
 
 
 class RedIISignalTests(TestCase):
-    """Unit tests for the update_red_ii_status signal."""
+    """
+    Unit tests for the update_red_ii_status signal.
+
+    This signal has specific business logic (RED II status calculation)
+    that needs to be tested directly, not mocked.
+    """
 
     def setUp(self):
         """Initial setup for signal tests."""
@@ -82,198 +89,76 @@ class RedIISignalTests(TestCase):
         self.producer_entity.refresh_from_db()
         self.assertTrue(self.producer_entity.is_red_ii)
 
+    def test_signal_does_not_override_existing_red_ii_true(self):
+        """Signal should not change is_red_ii when already True."""
+        # Set producer as RED II
+        self.producer_entity.is_red_ii = True
+        self.producer_entity.save()
+
+        # Create contract with values below thresholds
+        BiomethaneContractFactory.create(
+            producer=self.producer_entity,
+            buyer=self.buyer_entity,
+            tariff_reference="2011",
+            cmax=100.0,  # <= 200
+        )
+
+        self.producer_entity.refresh_from_db()
+        # Should remain True (signal returns early if already True)
+        self.assertTrue(self.producer_entity.is_red_ii)
+
 
 class ClearFieldsSignalTests(TestCase):
-    """Unit tests for the clear_contract_fields_on_save signal."""
+    """
+    Unit tests for the clear_contract_fields_on_save signal handler.
 
-    def setUp(self):
-        """Initial setup for signal tests."""
-        self.producer_entity = Entity.objects.create(
-            name="Test Producer",
-            entity_type=Entity.BIOMETHANE_PRODUCER,
-        )
+    These tests verify that the handler function correctly:
+    - Calls the service layer to determine fields to clear
+    - Updates the database when service returns field updates
+    - Skips database updates when service returns empty dict
+    """
 
-        self.buyer_entity = Entity.objects.create(
-            name="Test Buyer",
-            entity_type=Entity.OPERATOR,
-        )
+    @patch("biomethane.services.contract.BiomethaneContractService.clear_fields_based_on_tariff")
+    @patch("biomethane.models.biomethane_contract.BiomethaneContract.objects.filter")
+    def test_handler_calls_service_with_instance(self, mock_filter, mock_clear_fields):
+        """Test that handler calls service with contract instance"""
+        from biomethane.factories import BiomethaneContractFactory
+        from biomethane.models.biomethane_contract import clear_contract_fields_on_save
 
-    def test_signal_clears_pap_contracted_for_tariff_rule_1(self):
-        """Signal should clear pap_contracted for tariff reference in RULE_1 (2011-2020)."""
-        # Test for 2011
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2011",
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
-            cmax=150.0,
-            cmax_annualized=True,
-            cmax_annualized_value=100.0,
-            pap_contracted=25.0,  # This should be cleared
-        )
+        mock_clear_fields.return_value = {}
+        contract = BiomethaneContractFactory.create()
 
-        contract.refresh_from_db()
-        self.assertIsNone(contract.pap_contracted)
-        # Other fields should remain
-        self.assertEqual(contract.cmax, 150.0)
-        self.assertTrue(contract.cmax_annualized)
-        self.assertEqual(contract.cmax_annualized_value, 100.0)
+        clear_contract_fields_on_save(sender=BiomethaneContract, instance=contract)
 
-    def test_signal_clears_pap_contracted_for_tariff_2020(self):
-        """Signal should clear pap_contracted for tariff reference 2020."""
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2020",
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
-            cmax=150.0,
-            cmax_annualized=True,
-            cmax_annualized_value=100.0,
-            pap_contracted=25.0,  # This should be cleared
-        )
+        mock_clear_fields.assert_called_with(contract)
 
-        contract.refresh_from_db()
-        self.assertIsNone(contract.pap_contracted)
+    @patch("biomethane.services.contract.BiomethaneContractService.clear_fields_based_on_tariff")
+    @patch("biomethane.models.biomethane_contract.BiomethaneContract.objects.filter")
+    def test_handler_updates_database_when_service_returns_fields(self, mock_filter, mock_clear_fields):
+        """Test that handler updates database when service returns field updates"""
+        from biomethane.factories import BiomethaneContractFactory
+        from biomethane.models.biomethane_contract import clear_contract_fields_on_save
 
-    def test_signal_clears_cmax_fields_for_tariff_rule_2(self):
-        """Signal should clear cmax, cmax_annualized, cmax_annualized_value for tariff reference in RULE_2 (2021-2023)."""
-        # Test for 2021
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2021",
-            cmax=150.0,  # This should be cleared
-            cmax_annualized=True,  # This should be set to False
-            cmax_annualized_value=100.0,  # This should be cleared
-            pap_contracted=25.0,
-        )
+        mock_clear_fields.return_value = {"pap_contracted": None, "cmax_annualized_value": None}
+        contract = BiomethaneContractFactory.create()
 
-        contract.refresh_from_db()
-        self.assertIsNone(contract.cmax)
-        self.assertFalse(contract.cmax_annualized)  # Set to False, not None
-        self.assertIsNone(contract.cmax_annualized_value)
-        # pap_contracted should remain
-        self.assertEqual(contract.pap_contracted, 25.0)
+        mock_queryset = mock_filter.return_value
+        clear_contract_fields_on_save(sender=BiomethaneContract, instance=contract)
 
-    def test_signal_clears_cmax_fields_for_tariff_2023(self):
-        """Signal should clear cmax fields for tariff reference 2023."""
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2023",
-            cmax=150.0,  # This should be cleared
-            cmax_annualized=True,  # This should be set to False
-            cmax_annualized_value=100.0,  # This should be cleared
-            pap_contracted=25.0,
-        )
+        mock_filter.assert_called_with(pk=contract.pk)
+        mock_queryset.update.assert_called_with(pap_contracted=None, cmax_annualized_value=None)
 
-        contract.refresh_from_db()
-        self.assertIsNone(contract.cmax)
-        self.assertFalse(contract.cmax_annualized)
-        self.assertIsNone(contract.cmax_annualized_value)
+    @patch("biomethane.services.contract.BiomethaneContractService.clear_fields_based_on_tariff")
+    @patch("biomethane.models.biomethane_contract.BiomethaneContract.objects.filter")
+    def test_handler_skips_update_when_service_returns_empty_dict(self, mock_filter, mock_clear_fields):
+        """Test that handler skips database update when service returns empty dict"""
+        from biomethane.factories import BiomethaneContractFactory
+        from biomethane.models.biomethane_contract import clear_contract_fields_on_save
 
-    def test_signal_clears_cmax_annualized_value_when_cmax_annualized_false(self):
-        """Signal should clear cmax_annualized_value when cmax_annualized is explicitly False."""
-        # For tariff not in RULE_2, but with cmax_annualized=False
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2011",
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
-            cmax=150.0,
-            cmax_annualized=False,  # Explicitly False
-            cmax_annualized_value=100.0,  # This should be cleared
-            pap_contracted=25.0,
-        )
+        mock_clear_fields.return_value = {}
+        contract = BiomethaneContractFactory.create()
 
-        contract.refresh_from_db()
-        self.assertIsNone(contract.cmax_annualized_value)
-        # Other fields should remain
-        self.assertEqual(contract.cmax, 150.0)
-        self.assertFalse(contract.cmax_annualized)
-        self.assertIsNone(contract.pap_contracted)  # Cleared due to RULE_1
+        clear_contract_fields_on_save(sender=BiomethaneContract, instance=contract)
 
-    def test_signal_no_clearing_for_unknown_tariff(self):
-        """Signal should not clear any fields for unknown tariff references."""
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference=None,
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
-            cmax=150.0,
-            cmax_annualized=True,
-            cmax_annualized_value=100.0,
-            pap_contracted=25.0,
-        )
-
-        contract.refresh_from_db()
-        # All fields should remain unchanged
-        self.assertEqual(contract.cmax, 150.0)
-        self.assertTrue(contract.cmax_annualized)
-        self.assertEqual(contract.cmax_annualized_value, 100.0)
-        self.assertEqual(contract.pap_contracted, 25.0)
-
-    def test_signal_on_contract_update(self):
-        """Signal should trigger on contract updates."""
-        # Create initial contract with tariff 2011
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2011",
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
-            cmax=150.0,
-            cmax_annualized=True,
-            cmax_annualized_value=100.0,
-            pap_contracted=25.0,
-        )
-
-        contract.refresh_from_db()
-        self.assertIsNone(contract.pap_contracted)  # Cleared by RULE_1
-
-        # Update to tariff 2021 - should trigger different clearing rules
-        contract.tariff_reference = "2021"
-        contract.pap_contracted = 30.0  # Set new value
-        contract.save()
-
-        contract.refresh_from_db()
-        # Now RULE_2 should apply
-        self.assertIsNone(contract.cmax)
-        self.assertFalse(contract.cmax_annualized)
-        self.assertIsNone(contract.cmax_annualized_value)
-        self.assertEqual(contract.pap_contracted, 30.0)  # Should remain
-
-    def test_signal_does_not_clear_already_none_fields(self):
-        """Signal should handle None fields gracefully."""
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2021",
-            cmax=None,  # Already None
-            cmax_annualized=False,  # Will be set to False
-            cmax_annualized_value=None,  # Already None
-            pap_contracted=25.0,
-        )
-
-        contract.refresh_from_db()
-        self.assertIsNone(contract.cmax)
-        self.assertFalse(contract.cmax_annualized)
-        self.assertIsNone(contract.cmax_annualized_value)
-        self.assertEqual(contract.pap_contracted, 25.0)
-
-    def test_signal_cmax_annualized_special_case_in_rule_2(self):
-        """Signal should handle the special case where cmax_annualized is set to False in RULE_2."""
-        contract = BiomethaneContract.objects.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            tariff_reference="2021",
-            cmax=150.0,
-            cmax_annualized=True,
-            cmax_annualized_value=100.0,
-            pap_contracted=25.0,
-        )
-
-        contract.refresh_from_db()
-        # In RULE_2, cmax_annualized should be set to False (not None)
-        self.assertFalse(contract.cmax_annualized)
-        self.assertIsNone(contract.cmax)
-        self.assertIsNone(contract.cmax_annualized_value)
+        # Filter should not be called when update_data is empty
+        mock_filter.assert_not_called()
