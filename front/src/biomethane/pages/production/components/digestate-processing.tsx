@@ -152,13 +152,17 @@ export function DigestateProcessing({
               options={spreadingManagementOptions}
               {...bind("spreading_management_methods")}
             />
-            <RadioGroup
-              required
-              readOnly={!isEditing}
-              label={t("En cas de vente du digestat")}
-              options={digestateSaleTypeOptions}
-              {...bind("digestate_sale_type")}
-            />
+            {value.spreading_management_methods?.includes(
+              SpreadingManagementMethods.SALE
+            ) && (
+              <RadioGroup
+                required
+                readOnly={!isEditing}
+                label={t("En cas de vente du digestat")}
+                options={digestateSaleTypeOptions}
+                {...bind("digestate_sale_type")}
+              />
+            )}
           </Grid>
           {isEditing && (
             <Button
