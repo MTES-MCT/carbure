@@ -1,6 +1,6 @@
 import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
-import { useMutation, useQuery } from "common/hooks/async"
+import { useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
 import * as api from "accounting/api/biofuels/operations"
 import { findDepots } from "common/api"
@@ -22,12 +22,12 @@ import {
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
 import {
-  useAcceptOperation,
   useDeleteOperation,
+  usePatchBeforeAcceptOperation,
   useRejectOperation,
+  useValidateDraftTransfer,
 } from "./operation-detail.hooks"
 import { Form, useForm } from "common/components/form2"
-import { useNotify } from "common/components/notifications"
 import { Autocomplete } from "common/components/autocomplete2"
 import { Depot, ExtendedUnit, UserRole } from "common/types"
 import { useUnit } from "common/hooks/unit"
@@ -39,7 +39,6 @@ export const OperationDetail = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { t } = useTranslation()
-  const notify = useNotify()
   const { formatUnit } = useUnit()
   const match = useHashMatch("operation/:id")
   const { value, bind, setField } = useForm<{
@@ -70,75 +69,26 @@ export const OperationDetail = () => {
       onDeleteOperation: closeDialog,
     })
 
-  const { execute: acceptOperation, loading: acceptOperationLoading } =
-    useAcceptOperation({
-      operation,
-      onAcceptOperation: closeDialog,
-    })
-
   const { execute: rejectOperation, loading: rejectOperationLoading } =
     useRejectOperation({
       operation,
       onRejectOperation: closeDialog,
     })
 
-  const { execute: patchOperation, loading: patchOperationLoading } =
-    useMutation(api.patchOperation, {
-      onError: () => {
-        notify(
-          t(
-            "Une erreur est survenue lors de la mise à jour du dépot de livraison."
-          ),
-          {
-            variant: "danger",
-          }
-        )
-      },
-    })
-
   const {
     execute: validateDraftTransfer,
     loading: validateDraftTransferLoading,
-  } = useMutation(api.patchOperation, {
-    invalidates: ["operations"],
-    onSuccess: () => {
-      notify(
-        t(
-          "L'opération a bien été envoyée et est en attente de validation par l'administration."
-        ),
-        {
-          variant: "success",
-        }
-      )
-      closeDialog()
-    },
-    onError: () => {
-      notify(t("Une erreur est survenue lors de l'opération."), {
-        variant: "danger",
-      })
-    },
+  } = useValidateDraftTransfer({
+    onSuccess: closeDialog,
   })
 
-  const onAcceptOperation = () => {
-    const patch = () => {
-      if (
-        operation &&
-        operation.type === OperationType.ACQUISITION &&
-        value.to_depot?.id !== operation?.to_depot?.id
-      ) {
-        return patchOperation(entity.id, operation?.id, {
-          to_depot: value.to_depot?.id,
-        })
-      }
-      return Promise.resolve()
-    }
-
-    patch().then(() => {
-      if (operation) {
-        acceptOperation(entity.id, operation.id)
-      }
-    })
-  }
+  const {
+    execute: onPatchBeforeAcceptOperation,
+    loading: patchBeforeAcceptOperationLoading,
+  } = usePatchBeforeAcceptOperation({
+    operation,
+    onSuccess: closeDialog,
+  })
 
   // Format the value only for the incorporation operation
   const formatValue = (value: number) => {
@@ -277,7 +227,7 @@ export const OperationDetail = () => {
                     customPriority="success"
                     iconId="fr-icon-check-line"
                     nativeButtonProps={{ form: "patch-operation" }}
-                    loading={acceptOperationLoading || patchOperationLoading}
+                    loading={patchBeforeAcceptOperationLoading}
                     type="submit"
                   >
                     {t("Accepter")}
@@ -340,7 +290,7 @@ export const OperationDetail = () => {
                 ))}
                 <Form
                   id="patch-operation"
-                  onSubmit={onAcceptOperation}
+                  onSubmit={() => onPatchBeforeAcceptOperation(value)}
                   className={css["operation-detail-fields-depot"]}
                 >
                   {operation?.type === OperationType.ACQUISITION &&
