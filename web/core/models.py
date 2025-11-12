@@ -4,7 +4,6 @@ from calendar import monthrange
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.signals import post_save, pre_save
@@ -193,18 +192,19 @@ class Entity(models.Model):
         """
         Returns the departments accessible by this entity.
         """
-        dept_ct = ContentType.objects.get_for_model(Department)
-        dept_ids = self.scopes.filter(content_type=dept_ct).values_list("object_id", flat=True)
+        from entity.models import EntityScopeDepartment
+
+        dept_ids = EntityScopeDepartment.objects.filter(entity=self).values_list("object_id", flat=True)
         return Department.objects.filter(id__in=dept_ids)
 
     def get_accessible_depots(self):
         """
         Returns the depots accessible by this entity.
         """
+        from entity.models import EntityScopeDepot
         from transactions.models import Depot
 
-        depot_ct = ContentType.objects.get_for_model(Depot)
-        depot_ids = self.scopes.filter(content_type=depot_ct).values_list("object_id", flat=True)
+        depot_ids = EntityScopeDepot.objects.filter(entity=self).values_list("object_id", flat=True)
         return Depot.objects.filter(id__in=depot_ids)
 
     class Meta:
