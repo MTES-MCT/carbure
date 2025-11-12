@@ -2,7 +2,7 @@ import { Operation, OperationSector, OperationType } from "accounting/types"
 import { country } from "common/__test__/data"
 import { CategoryEnum, Unit } from "common/types"
 
-export const operation: Operation = {
+export const operationCredit: Operation = {
   id: 1,
   type: OperationType.TRANSFERT,
   sector: OperationSector.ESSENCE,
@@ -34,4 +34,11 @@ export const operation: Operation = {
   created_at: "2021-01-01T00:00:00Z",
   quantity_mj: 27000,
   avoided_emissions: 100,
+}
+
+export const operationDebit: Operation = {
+  ...operationCredit,
+  quantity: -1000,
+  quantity_renewable: -1000,
+  quantity_mj: -27000,
 }

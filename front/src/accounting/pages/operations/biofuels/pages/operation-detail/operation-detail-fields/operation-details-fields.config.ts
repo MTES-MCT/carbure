@@ -1,4 +1,4 @@
-import { MappingField } from "./operation-detail.types"
+import { MappingField } from "./operation-details-fields.types"
 import { OperationType } from "accounting/types"
 
 // on crée un mapping en fonction de si on a envoyé ou reçu une opération et du type d'opération

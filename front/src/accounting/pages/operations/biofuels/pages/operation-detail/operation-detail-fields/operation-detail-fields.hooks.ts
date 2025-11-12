@@ -3,15 +3,15 @@ import { formatSector } from "accounting/utils/formatters"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { formatValue, getFields } from "./operation-detail-fields.utils"
-import { CONVERSIONS, formatDate } from "common/utils/formatters"
+import { CONVERSIONS, formatDate, formatNumber } from "common/utils/formatters"
 import { getOperationQuantity } from "../../../operations.utils"
 import { useUnit } from "common/hooks/unit"
 import { ExtendedUnit } from "common/types"
-import { Field, OperationDetailField } from "./operation-detail.types"
+import { Field, OperationDetailField } from "./operation-details-fields.types"
 import {
   MAPPING_FIELDS_RECEIVER,
   MAPPING_FIELDS_SENDER,
-} from "./operation-details.config"
+} from "./operation-details-fields.config"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const commonFields = useCommonFields(operation)
@@ -68,6 +68,16 @@ const useCommonFields = (operation?: Operation) => {
             unit: ExtendedUnit.GJ,
           })
         )}`,
+      },
+      {
+        name: OperationDetailField.AVOIDED_EMISSIONS,
+        label: t("Tonnes CO2 eq evitées"),
+        value: formatNumber(
+          formatValue(operation, operation.avoided_emissions),
+          {
+            fractionDigits: 0,
+          }
+        ),
       },
     ]
   }, [operation, t, formatUnit])

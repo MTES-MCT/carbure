@@ -1,3 +1,4 @@
+import { OperationType } from "accounting/types"
 import { ReactNode } from "react"
 
 export type Field = {

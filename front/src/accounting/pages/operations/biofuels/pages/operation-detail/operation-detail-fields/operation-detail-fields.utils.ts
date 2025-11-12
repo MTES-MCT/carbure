@@ -1,23 +1,23 @@
 import { Operation, OperationType } from "accounting/types"
-import { Field, MappingField } from "./operation-detail.types"
+import { Field, MappingField } from "./operation-details-fields.types"
 
 export const getFields = (
   operation: Operation,
-  // tous les champs conditionnels
-  conditionalFields: Field[],
-  // noms des champs à afficher en fonction du type d'opération
+  // A list of fields
+  allFields: Field[],
+  // A list of fields to display based on the operation type
   mappingFields: MappingField[]
 ) => {
-  // get conditional fields name based on the operation type
-  const conditionalFieldsNames =
+  // Get the fields names to display based on the operation type
+  const fieldsToDisplayNames =
     mappingFields.find(({ type }) => type === operation.type)?.fields ?? []
 
-  // Get conditional fields based on the conditional fields names
-  const computedFields = conditionalFields.filter(({ name }) =>
-    conditionalFieldsNames.includes(name)
+  // Get fields to display based on their names
+  const fieldsToDisplay = allFields.filter(({ name }) =>
+    fieldsToDisplayNames.includes(name)
   )
 
-  return computedFields
+  return fieldsToDisplay
 }
 
 // Format the value only for the incorporation operation
