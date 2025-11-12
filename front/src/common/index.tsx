@@ -9,6 +9,7 @@ import { YearsProvider } from "common/providers/years-provider"
 import { NewNavigationDialog } from "carbure/components/new-navigation-dialog"
 import { lazy, Suspense } from "react"
 import { BiomethaneRoutes } from "biomethane/routes"
+import { useCacheBuster } from "./hooks/cache-buster"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -39,6 +40,8 @@ const ContactPage = lazy(() => import("contact"))
 const ElecCertificates = lazy(() => import("elec/pages/certificates"))
 
 const Carbure = () => {
+  useCacheBuster()
+
   const user = useUserManager()
   const entity = useEntityManager(user)
   const firstEntity = user.getFirstEntity()
