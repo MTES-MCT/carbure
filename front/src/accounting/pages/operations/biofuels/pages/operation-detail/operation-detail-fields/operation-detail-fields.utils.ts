@@ -1,41 +1,16 @@
 import { Operation, OperationType } from "accounting/types"
-import { ReactNode } from "react"
+import { Field, MappingField } from "./operation-detail.types"
 
-export type Field = {
-  name: OperationDetailFields
-  label: ReactNode
-  value: ReactNode
-  condition?: boolean
-}
-
-export enum OperationDetailFields {
-  SECTOR = "SECTOR",
-  TEST = "TEST",
-}
-
-type MappingFields = {
-  type: OperationType
-  fields: OperationDetailFields[]
-}
-
-// on crée un mapping en fonction de si on a envoyé ou reçu une opération et du type d'opération
-const MAPPING_FIELDS_RECEIVER: MappingFields[] = [
-  { type: OperationType.TRANSFERT, fields: [OperationDetailFields.TEST] },
-]
-
-const MAPPING_FIELDS_SENDER: MappingFields[] = [
-  { type: OperationType.TRANSFERT, fields: [OperationDetailFields.SECTOR] },
-]
-
-export const getFields = (operation: Operation, conditionalFields: Field[]) => {
-  // je recois une opération si la quantité est positive
-  const isReceiver = (operation.quantity ?? 0) > 0
-
-  const mapping = isReceiver ? MAPPING_FIELDS_RECEIVER : MAPPING_FIELDS_SENDER
-
+export const getFields = (
+  operation: Operation,
+  // tous les champs conditionnels
+  conditionalFields: Field[],
+  // noms des champs à afficher en fonction du type d'opération
+  mappingFields: MappingField[]
+) => {
   // get conditional fields name based on the operation type
   const conditionalFieldsNames =
-    mapping.find(({ type }) => type === operation.type)?.fields ?? []
+    mappingFields.find(({ type }) => type === operation.type)?.fields ?? []
 
   // Get conditional fields based on the conditional fields names
   const computedFields = conditionalFields.filter(({ name }) =>
@@ -43,4 +18,13 @@ export const getFields = (operation: Operation, conditionalFields: Field[]) => {
   )
 
   return computedFields
+}
+
+// Format the value only for the incorporation operation
+export const formatValue = (operation: Operation, value: number) => {
+  if (!operation) return 0
+
+  return operation.type === OperationType.INCORPORATION
+    ? value * operation.renewable_energy_share
+    : value
 }

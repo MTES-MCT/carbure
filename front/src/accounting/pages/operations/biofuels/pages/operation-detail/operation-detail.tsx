@@ -6,20 +6,13 @@ import * as api from "accounting/api/biofuels/operations"
 import { findDepots } from "common/api"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
-import { getOperationQuantity, isOperationDebit } from "../../operations.utils"
+import { isOperationDebit } from "../../operations.utils"
 import { OperationBadge } from "accounting/components/operation-badge/operation-badge"
 import css from "../../../operations.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
-import {
-  CONVERSIONS,
-  formatDate,
-  formatNumber,
-  roundNumber,
-  formatPeriod,
-} from "common/utils/formatters"
-import { compact } from "common/utils/collection"
+
 import { Button } from "common/components/button2"
 import {
   useDeleteOperation,
@@ -29,17 +22,16 @@ import {
 } from "./operation-detail.hooks"
 import { Form, useForm } from "common/components/form2"
 import { Autocomplete } from "common/components/autocomplete2"
-import { Depot, ExtendedUnit, UserRole } from "common/types"
-import { useUnit } from "common/hooks/unit"
-import { formatOperationType, formatSector } from "accounting/utils/formatters"
+import { Depot, UserRole } from "common/types"
+import { formatOperationType } from "accounting/utils/formatters"
 import { OperationsStatus, OperationType } from "accounting/types"
 import { getOperationValidationButtonText } from "./operation-detail.utils"
+import { useOperationDetailFields } from "./operation-detail-fields/operation-detail-fields.hooks"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
   const match = useHashMatch("operation/:id")
   const { value, bind, setField } = useForm<{
     to_depot?: Pick<Depot, "id" | "name">
@@ -90,102 +82,97 @@ export const OperationDetail = () => {
     onSuccess: closeDialog,
   })
 
-  // Format the value only for the incorporation operation
-  const formatValue = (value: number) => {
-    return operation?.type === OperationType.INCORPORATION
-      ? value * operation.renewable_energy_share
-      : value
-  }
+  const fields = useOperationDetailFields(operation)
 
-  const fields = operation
-    ? compact([
-        { label: t("Filière"), value: formatSector(operation.sector) },
-        {
-          label: t("Date d'opération"),
-          value: formatDate(operation?.created_at),
-        },
-        { label: t("Catégorie"), value: operation.customs_category },
-        { label: t("Biocarburant"), value: operation.biofuel },
-        {
-          label: t("Quantité"),
-          value: `${getOperationQuantity(
-            operation,
-            formatUnit(operation.quantity)
-          )} / ${getOperationQuantity(
-            operation,
-            formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
-              unit: ExtendedUnit.GJ,
-            })
-          )}`,
-        },
-        operation.type === OperationType.INCORPORATION &&
-          operation.renewable_energy_share !== 1 && {
-            label: t("Quantité renouvelable"),
-            value: `${getOperationQuantity(
-              operation,
-              formatUnit(roundNumber(formatValue(operation.quantity), 2))
-            )} / ${getOperationQuantity(
-              operation,
-              formatUnit(
-                CONVERSIONS.energy.MJ_TO_GJ(
-                  roundNumber(formatValue(operation.quantity_mj), 2)
-                ),
-                {
-                  unit: ExtendedUnit.GJ,
-                }
-              )
-            )}`,
-          },
-        {
-          label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(formatValue(operation.avoided_emissions), {
-            fractionDigits: 0,
-          }),
-        },
-        (operation.type === OperationType.ACQUISITION ||
-          (operation.type === OperationType.TRANSFERT &&
-            operation?.quantity > 0)) && {
-          label: t("Expéditeur"),
-          value: operation._entity ?? "-",
-        },
-        operation.type === OperationType.TRANSFERT &&
-          operation.quantity < 0 && {
-            label: t("Destinataire"),
-            value: operation._entity ?? "-",
-          },
-        (operation.type === OperationType.EXPORTATION ||
-          operation.type === OperationType.EXPEDITION) && {
-          label: t("Destinataire"),
-          value: operation.export_recipient ?? "-",
-        },
-        [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
-          operation.type as OperationType
-        ) && {
-          label: t("Dépôt expéditeur"),
-          value: operation.from_depot ? operation.from_depot.name : "-",
-        },
-        [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
-          operation.type as OperationType
-        ) &&
-          operation.export_country &&
-          operation.quantity < 0 && {
-            label: t("Pays d'exportation"),
-            value: operation.export_country
-              ? operation.export_country.name
-              : "-",
-          },
-        operation.type !== OperationType.DEVALUATION &&
-          operation.type === OperationType.ACQUISITION &&
-          operation.status !== OperationsStatus.PENDING && {
-            label: t("Dépôt destinataire"),
-            value: operation._depot ?? "-",
-          },
-        typeof operation.durability_period === "string" && {
-          label: t("Déclaration de durabilité"),
-          value: formatPeriod(operation.durability_period),
-        },
-      ])
-    : []
+  // const fields = operation
+  //   ? compact([
+  //       { label: t("Filière"), value: formatSector(operation.sector) },
+  //       {
+  //         label: t("Date d'opération"),
+  //         value: formatDate(operation?.created_at),
+  //       },
+  //       { label: t("Catégorie"), value: operation.customs_category },
+  //       { label: t("Biocarburant"), value: operation.biofuel },
+  //       {
+  //         label: t("Quantité"),
+  //         value: `${getOperationQuantity(
+  //           operation,
+  //           formatUnit(operation.quantity)
+  //         )} / ${getOperationQuantity(
+  //           operation,
+  //           formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
+  //             unit: ExtendedUnit.GJ,
+  //           })
+  //         )}`,
+  //       },
+  //       operation.type === OperationType.INCORPORATION &&
+  //         operation.renewable_energy_share !== 1 && {
+  //           label: t("Quantité renouvelable"),
+  //           value: `${getOperationQuantity(
+  //             operation,
+  //             formatUnit(roundNumber(formatValue(operation.quantity), 2))
+  //           )} / ${getOperationQuantity(
+  //             operation,
+  //             formatUnit(
+  //               CONVERSIONS.energy.MJ_TO_GJ(
+  //                 roundNumber(formatValue(operation.quantity_mj), 2)
+  //               ),
+  //               {
+  //                 unit: ExtendedUnit.GJ,
+  //               }
+  //             )
+  //           )}`,
+  //         },
+  //       {
+  //         label: t("Tonnes CO2 eq evitées"),
+  //         value: formatNumber(formatValue(operation.avoided_emissions), {
+  //           fractionDigits: 0,
+  //         }),
+  //       },
+  //       (operation.type === OperationType.ACQUISITION ||
+  //         (operation.type === OperationType.TRANSFERT &&
+  //           operation?.quantity > 0)) && {
+  //         label: t("Expéditeur"),
+  //         value: operation._entity ?? "-",
+  //       },
+  //       operation.type === OperationType.TRANSFERT &&
+  //         operation.quantity < 0 && {
+  //           label: t("Destinataire"),
+  //           value: operation._entity ?? "-",
+  //         },
+  //       (operation.type === OperationType.EXPORTATION ||
+  //         operation.type === OperationType.EXPEDITION) && {
+  //         label: t("Destinataire"),
+  //         value: operation.export_recipient ?? "-",
+  //       },
+  //       [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
+  //         operation.type as OperationType
+  //       ) && {
+  //         label: t("Dépôt expéditeur"),
+  //         value: operation.from_depot ? operation.from_depot.name : "-",
+  //       },
+  //       [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
+  //         operation.type as OperationType
+  //       ) &&
+  //         operation.export_country &&
+  //         operation.quantity < 0 && {
+  //           label: t("Pays d'exportation"),
+  //           value: operation.export_country
+  //             ? operation.export_country.name
+  //             : "-",
+  //         },
+  //       operation.type !== OperationType.DEVALUATION &&
+  //         operation.type === OperationType.ACQUISITION &&
+  //         operation.status !== OperationsStatus.PENDING && {
+  //           label: t("Dépôt destinataire"),
+  //           value: operation._depot ?? "-",
+  //         },
+  //       typeof operation.durability_period === "string" && {
+  //         label: t("Déclaration de durabilité"),
+  //         value: formatPeriod(operation.durability_period),
+  //       },
+  //     ])
+  //   : []
 
   return (
     <Portal onClose={closeDialog}>

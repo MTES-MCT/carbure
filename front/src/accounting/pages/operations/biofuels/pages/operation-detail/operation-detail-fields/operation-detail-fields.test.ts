@@ -1,34 +1,47 @@
 import { describe, expect, it } from "vitest"
-import {
-  getFields,
-  OperationDetailFields,
-} from "./operation-detail-fields.utils"
+import { getFields } from "./operation-detail-fields.utils"
 import { operation } from "accounting/__test__/data/biofuels/operation"
+import {
+  Field,
+  MappingField,
+  OperationDetailField,
+} from "./operation-detail.types"
+import { OperationType } from "accounting/types"
 
+// Helper functions to create test fields and mapping fields by avoiding type errors
+const createTestField = (
+  name: string,
+  label: string,
+  value: string
+): Field => ({
+  name: name as OperationDetailField,
+  label,
+  value,
+})
+
+const createTestMapping = (
+  type: OperationType,
+  fields: string[]
+): MappingField => ({
+  type,
+  fields: fields as OperationDetailField[],
+})
 describe("getFields", () => {
-  it("Should return empty array if conditional fields are empty", () => {
-    const fields = getFields(operation, [])
+  it("Should return empty array if conditional fields or mapping fields are empty", () => {
+    const fields = getFields(operation, [], [])
     expect(fields).toEqual([])
   })
 
-  it("Should return fields for receiver operation and operation type TRANSFERT", () => {
-    const fields = getFields(operation, [
-      { name: OperationDetailFields.TEST, label: "Test", value: "Test" },
-      { name: OperationDetailFields.SECTOR, label: "Sector", value: "Sector" },
-    ])
+  it("Should return only the fields that are in the mapping fields for operation type TRANSFERT", () => {
+    const field1 = createTestField("TEST", "Test", "Test")
+    const field2 = createTestField("TEST2", "Test 2", "Test 2")
 
-    expect(fields).toEqual([
-      { name: OperationDetailFields.TEST, label: "Test", value: "Test" },
-    ])
-  })
+    const fields = getFields(
+      operation,
+      [field1, field2],
+      [createTestMapping(OperationType.TRANSFERT, ["TEST2"])]
+    )
 
-  it("Should return fields for sender operation and operation type TRANSFERT", () => {
-    const fields = getFields({ ...operation, quantity: -1000 }, [
-      { name: OperationDetailFields.TEST, label: "Test", value: "Test" },
-      { name: OperationDetailFields.SECTOR, label: "Sector", value: "Sector" },
-    ])
-    expect(fields).toEqual([
-      { name: OperationDetailFields.SECTOR, label: "Sector", value: "Sector" },
-    ])
+    expect(fields).toEqual([field2])
   })
 })
