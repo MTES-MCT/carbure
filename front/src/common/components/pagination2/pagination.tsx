@@ -42,6 +42,8 @@ export const Pagination = ({
     [t]
   )
 
+  if (pageCount <= 1) return null
+
   return (
     <div className={cl(props.className, styles.pagination)}>
       <Select
