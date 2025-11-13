@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { MissingFields, MissingFieldsProps } from "./missing-fields"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import {
   buildCurrentAnnualDeclarationHandler,
   getCurrentAnnualDeclarationOk,
 } from "biomethane/tests/api"
-import { expect, fn, userEvent, waitFor, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 import GLOBAL_MOCKS from "@storybook/mocks"
 
 const MOCKS = [...GLOBAL_MOCKS, getCurrentAnnualDeclarationOk]

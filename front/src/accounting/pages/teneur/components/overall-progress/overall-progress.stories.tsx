@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { OverallProgress } from "./overall-progress"
 import { overallObjective } from "../../__test__/data"
 

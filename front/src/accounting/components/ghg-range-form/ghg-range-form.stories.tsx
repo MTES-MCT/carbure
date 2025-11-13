@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react-vite"
+import { Meta, StoryObj } from "@storybook/react"
 import { GHGRangeForm } from "./ghg-range-form"
 import { Form, useForm } from "common/components/form2"
 import { balance } from "accounting/__test__/data/balances"
