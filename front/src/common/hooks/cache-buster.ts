@@ -47,6 +47,7 @@ async function cacheBuster() {
   const remoteEtag = await fetchRemoteEtag()
 
   if (remoteEtag && cachedEtag != remoteEtag) {
+    console.log("[CACHE BUSTER]", { cachedEtag, remoteEtag })
     if (promptReload()) {
       cacheEtag(remoteEtag)
       window.location.reload()
