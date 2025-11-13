@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     "authtools",
     "huey.contrib.djhuey",
     "core",
+    "entity",
     "producers",
     "certificates",
     "doublecount",

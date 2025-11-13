@@ -192,7 +192,20 @@ class Entity(models.Model):
         """
         Returns the departments accessible by this entity.
         """
-        return Department.objects.filter(entities__entity=self)
+        from entity.models import EntityScopeDepartment
+
+        dept_ids = EntityScopeDepartment.objects.filter(entity=self).values_list("object_id", flat=True)
+        return Department.objects.filter(id__in=dept_ids)
+
+    def get_accessible_depots(self):
+        """
+        Returns the depots accessible by this entity.
+        """
+        from entity.models import EntityScopeDepot
+        from transactions.models import Depot
+
+        depot_ids = EntityScopeDepot.objects.filter(entity=self).values_list("object_id", flat=True)
+        return Depot.objects.filter(id__in=depot_ids)
 
     class Meta:
         db_table = "entities"
@@ -592,6 +605,7 @@ class ExternalAdminRights(models.Model):
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
     BIOFUEL = "BIOFUEL"
     DREAL = "DREAL"
+    DGDDI = "DGDDI"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -602,6 +616,7 @@ class ExternalAdminRights(models.Model):
         (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
         (BIOFUEL, BIOFUEL),
         (DREAL, DREAL),
+        (DGDDI, DGDDI),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)
@@ -610,21 +625,6 @@ class ExternalAdminRights(models.Model):
         db_table = "ext_admin_rights"
         verbose_name = "External Admin Right"
         verbose_name_plural = "External Admin Rights"
-
-
-class EntityDepartments(models.Model):
-    """
-    Defines the departments accessible by an entity.
-    Used notably for DREAL which manage specific departments.
-    """
-
-    entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="departments")
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="entities")
-
-    class Meta:
-        db_table = "entity_department"
-        unique_together = [["entity", "department"]]
-        verbose_name = "Entity Departement"
 
 
 class CarbureLot(models.Model):

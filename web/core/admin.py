@@ -26,9 +26,7 @@ from core.models import (
     CarbureStock,
     CarbureStockTransformation,
     Department,
-    Entity,
     EntityCertificate,
-    EntityDepartments,
     ExternalAdminRights,
     GenericCertificate,
     GenericError,
@@ -40,7 +38,6 @@ from core.models import (
     UserRights,
     UserRightsRequests,
 )
-from entity.services.enable_entity import enable_entity
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
@@ -52,35 +49,6 @@ def custom_titled_filter(title):
             return instance
 
     return Wrapper
-
-
-class EntityDepartmentsInline(admin.TabularInline):
-    """Inline admin to manage departments accessible by DREAL"""
-
-    model = EntityDepartments
-    extra = 1
-    autocomplete_fields = ["department"]
-
-
-class EntityAdmin(admin.ModelAdmin):
-    list_display = (
-        "entity_type",
-        "name",
-        "parent_entity",
-        "is_enabled",
-    )
-    search_fields = ("entity_type", "name")
-    list_filter = ["entity_type"]
-    readonly_fields = ["is_enabled"]
-    inlines = [EntityDepartmentsInline]
-
-    actions = ["enable_entity"]
-
-    def enable_entity(self, request, queryset):
-        for entity in queryset:
-            enable_entity(entity, request)
-
-    enable_entity.short_description = "Activer les sociétés sélectionnées"
 
 
 class UserRightsAdmin(admin.ModelAdmin):
@@ -216,7 +184,6 @@ class TransactionDistanceAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -706,7 +673,7 @@ class EntityCertificateAdmin(admin.ModelAdmin):
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    """Admin for Department model - required for autocomplete in EntityDepartmentsInline"""
+    """Admin for Department model"""
 
     list_display = ("code_dept", "name")
     search_fields = ("code_dept", "name")
