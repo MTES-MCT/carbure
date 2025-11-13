@@ -166,18 +166,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             OperationService.perform_checks_before_create(request, entity_id, selected_lots, validated_data, unit)
 
-            if validated_data["type"] in [Operation.TRANSFERT, Operation.EXPORTATION, Operation.EXPEDITION]:
-                if validated_data.get("status") is not Operation.DRAFT:
-                    validated_data["status"] = Operation.PENDING
-            elif validated_data["type"] in [
-                Operation.INCORPORATION,
-                Operation.MAC_BIO,
-                Operation.LIVRAISON_DIRECTE,
-                Operation.DEVALUATION,
-            ]:
-                validated_data["status"] = Operation.ACCEPTED
-            else:
-                validated_data["status"] = Operation.PENDING
+            OperationService.define_operation_status(validated_data)
 
             # Create the operation
             operation = Operation.objects.create(**validated_data)

@@ -82,3 +82,20 @@ class OperationService:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )
+
+    @staticmethod
+    def define_operation_status(validated_data):
+        """
+        Define the operation status based on the entity type and operation type
+        """
+        auto_accepted_types = [
+            Operation.INCORPORATION,
+            Operation.MAC_BIO,
+            Operation.LIVRAISON_DIRECTE,
+            Operation.DEVALUATION,
+        ]
+
+        if validated_data["type"] in auto_accepted_types:
+            validated_data["status"] = Operation.ACCEPTED
+        elif validated_data.get("status") != Operation.DRAFT:
+            validated_data["status"] = Operation.PENDING
