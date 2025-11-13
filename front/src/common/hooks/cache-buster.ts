@@ -5,8 +5,16 @@ import { useLocation } from "react-router"
 const ETAG_CACHE_KEY = "carbure:cache:etag"
 
 export function useCacheBuster() {
+  useFirstLoad()
   useRouteChange()
   useVisibilityChange()
+}
+
+// Trigger cache buster on first load
+function useFirstLoad() {
+  useEffect(() => {
+    cacheBuster()
+  }, [])
 }
 
 // Watch for change in routes to trigger a cache bust
@@ -44,7 +52,9 @@ async function cacheBuster() {
   const cachedEtag = getCachedEtag()
   const remoteEtag = await fetchRemoteEtag()
 
-  if (remoteEtag && cachedEtag != remoteEtag) {
+  if (!cachedEtag && remoteEtag) {
+    cacheEtag(remoteEtag)
+  } else if (remoteEtag && cachedEtag != remoteEtag) {
     if (promptReload()) {
       cacheEtag(remoteEtag)
       window.location.reload()
