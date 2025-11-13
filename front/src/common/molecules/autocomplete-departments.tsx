@@ -8,7 +8,10 @@ import { useTranslation } from "react-i18next"
 const departmentsOptions = getDepartmentOptions()
 
 export const AutoCompleteDepartments = (
-  props: AutocompleteProps<{ label: string; value: string }, string | undefined>
+  props: AutocompleteProps<
+    { label: string; value: string },
+    string | null | undefined
+  >
 ) => {
   const { t } = useTranslation()
 
