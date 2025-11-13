@@ -1,4 +1,4 @@
-import { userEvent, waitFor, within } from "storybook/test"
+import { userEvent, waitFor, within } from "@storybook/test"
 
 export const fillFromDepotForm = async (canvasElement: HTMLElement) => {
   const { getByRole, getByText } = within(canvasElement)
