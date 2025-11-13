@@ -5,7 +5,6 @@ import { Outlet, useParams } from "react-router-dom"
 import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
 import useEntity from "common/hooks/entity"
-import { useRoutes } from "common/hooks/routes"
 
 const OperationsBalancesLayout = () => {
   const { t } = useTranslation()
@@ -13,11 +12,7 @@ const OperationsBalancesLayout = () => {
 
   // extract current TIRUERT section: "balances" or "operations"
   const params = useParams()
-  const routes = useRoutes()
   const [sector] = (params["*"] ?? "").split("/")
-
-  const operationsPath = routes.ACCOUNTING.ROOT
-
   return (
     <>
       <Tabs
@@ -25,14 +20,14 @@ const OperationsBalancesLayout = () => {
           {
             key: SectorTabs.BIOFUELS,
             label: t("Biocarburants"),
-            path: `${operationsPath}/${sector}/${SectorTabs.BIOFUELS}`,
+            path: `${sector}/${SectorTabs.BIOFUELS}`,
             icon: "fr-icon-gas-station-fill",
           },
           isOperator &&
             has_elec && {
               key: SectorTabs.ELEC,
               label: t("Électricité"),
-              path: `${operationsPath}/${sector}/${SectorTabs.ELEC}`,
+              path: `${sector}/${SectorTabs.ELEC}`,
               icon: "fr-icon-charging-pile-2-fill",
             },
         ])}

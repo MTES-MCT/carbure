@@ -82,7 +82,6 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
 
   if (category === undefined) {
     const defaultCategory = getDefaultCategory(status, snapshot)
-    console.log("category is undefined", status, snapshot, defaultCategory)
     return <Navigate to={`${status}/${defaultCategory}`} />
   }
 
