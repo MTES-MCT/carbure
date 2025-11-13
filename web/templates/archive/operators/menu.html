@@ -1,8 +1,0 @@
-	<aside class="side-menu" role="navigation" style="max-width: 170px;">
-		<ul>
-			<li><a {% if current_url_name == 'operators-index' or current_url_name == 'operators-declaration' %}class="active"{% endif %} href="{% url 'operators-index' operator_name=url_friendly_name %}">Déclarations</a></li>
-			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' operator_name=url_friendly_name %}">Contrôles DGEC
-				{% if nb_controles_dgec > 0 %}<span class="badge badge-red">{{nb_controles_dgec}}</span>{% endif %}</a></li>
-			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>
-		</ul>
-	</aside>

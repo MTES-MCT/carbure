@@ -1,8 +1,0 @@
-	<aside class="side-menu" role="navigation" style="max-width: 170px;">
-		<ul>
-			<li><a {% if current_url_name == 'traders-index' %}class="active"{% endif %} href="{% url 'traders-index' trader_name=url_friendly_name %}">Déclarations</a></li>
-			<li><a {% if current_url_name == 'traders-mb' %}class="active"{% endif %} href="{% url 'traders-mb' trader_name=url_friendly_name %}">Mass Balance</a></li>
-			<li><a {% if current_url_name == 'traders-histo' %}class="active"{% endif %} href="{% url 'traders-histo' trader_name=url_friendly_name %}">Historique</a></li>
-			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>
-		</ul>
-	</aside>
