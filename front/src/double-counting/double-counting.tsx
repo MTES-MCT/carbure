@@ -4,7 +4,7 @@ import { Tabs } from "common/components/tabs2"
 import { useRights } from "common/hooks/entity"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { Navigate, Route, Routes, useNavigate } from "react-router"
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom"
 import { UserRole } from "common/types"
 import { Table } from "common/components/table2"
 import {

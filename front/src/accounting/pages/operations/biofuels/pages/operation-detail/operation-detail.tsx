@@ -1,7 +1,7 @@
 import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { useMutation, useQuery } from "common/hooks/async"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import * as api from "accounting/api/biofuels/operations"
 import { findDepots } from "common/api"
 import useEntity from "common/hooks/entity"

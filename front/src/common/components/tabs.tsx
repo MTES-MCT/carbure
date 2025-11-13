@@ -5,7 +5,7 @@ import {
   resolvePath,
   useLocation,
   useResolvedPath,
-} from "react-router"
+} from "react-router-dom"
 import css from "./tabs.module.css"
 import { Layout, layout } from "./scaffold"
 import { Loader } from "./icons"

@@ -1,7 +1,7 @@
 import useEntity from "common/hooks/entity"
 import { Main } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
-import { Navigate, Route, Routes } from "react-router"
+import { Navigate, Route, Routes } from "react-router-dom"
 import * as api from "./api"
 import { ChargePointsSnapshot } from "./types"
 import ElecMeterReadingsSettings from "./pages/meter-readings"

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import Button from "common/components/button"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import Form, { useForm } from "common/components/form"
 import { Lock, Mail, Refresh, Return, Save } from "common/components/icons"
 import { TextInput } from "common/components/input"

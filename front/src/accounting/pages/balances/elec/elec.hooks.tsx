@@ -11,7 +11,7 @@ import { ElecBalance, ElecOperationsStatus } from "accounting/types"
 import { formatSector } from "accounting/utils/formatters"
 import { addQueryParams } from "common/utils/routes"
 import { useRoutes } from "common/hooks/routes"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 
 export const useBalancesElecColumns = () => {
   const { t } = useTranslation()

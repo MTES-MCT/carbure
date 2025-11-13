@@ -1,4 +1,4 @@
-import { useLocation } from "react-router"
+import { useLocation } from "react-router-dom"
 import pickApi from "../../api"
 import { EntityManager } from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"

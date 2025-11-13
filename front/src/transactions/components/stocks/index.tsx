@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { useLocation } from "react-router"
+import { useLocation } from "react-router-dom"
 import { UserRole } from "common/types"
 import { Snapshot, Stock, StockQuery, Filter } from "../../types"
 import useEntity from "common/hooks/entity"

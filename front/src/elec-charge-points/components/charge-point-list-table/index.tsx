@@ -1,7 +1,7 @@
 import Table, { Order } from "common/components/table"
 import { compact } from "common/utils/collection"
 import { ChargePoint } from "elec-charge-points/types"
-import { To } from "react-router"
+import { To } from "react-router-dom"
 import { useChargePointsColumns } from "./index.hooks"
 
 export type ChargePointsListTableProps = {

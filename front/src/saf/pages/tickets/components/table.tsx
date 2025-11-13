@@ -2,7 +2,7 @@ import { compact } from "common/utils/collection"
 import { formatNumber, formatPeriod } from "common/utils/formatters"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { To } from "react-router"
+import { To } from "react-router-dom"
 import {
   SafTicketPreview,
   SafTicketQueryBuilder,

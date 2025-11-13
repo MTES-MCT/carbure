@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { useSearchParams } from "react-router"
+import { useSearchParams } from "react-router-dom"
 import { QueryFilters } from "./query-builder-2.types"
 import useLocalStorage from "../storage"
 

@@ -1,4 +1,4 @@
-import { useLocation } from "react-router"
+import { useLocation } from "react-router-dom"
 import { Page } from "../missing-fields.constants"
 
 export const usePageDetection = () => {

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Routes, Route } from "react-router"
+import { Routes, Route } from "react-router-dom"
 import EntityDetails from "./routes/entity-details"
 import useTitle from "common/hooks/title"
 import Certificates from "./components/certificates"

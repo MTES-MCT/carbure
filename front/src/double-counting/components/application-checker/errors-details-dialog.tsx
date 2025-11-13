@@ -15,7 +15,7 @@ import { SourcingFullTable } from "../sourcing-table"
 import { ProductionTable } from "../production-table"
 import { ProductionHistoryTable } from "../production-history-table"
 import { t } from "i18next"
-import { useMatch } from "react-router"
+import { useMatch } from "react-router-dom"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import { DoubleCountPeriod } from "./double-count-period"
 

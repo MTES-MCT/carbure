@@ -1,6 +1,6 @@
 import { SectorTabs } from "accounting/types"
 import { lazy, useEffect } from "react"
-import { useNavigate, useParams } from "react-router"
+import { useNavigate, useParams } from "react-router-dom"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { BetaPage } from "common/molecules/beta-page"
 import { useTranslation } from "react-i18next"

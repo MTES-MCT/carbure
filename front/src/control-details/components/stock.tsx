@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import pickApi from "../api"
 import { useQuery } from "common/hooks/async"

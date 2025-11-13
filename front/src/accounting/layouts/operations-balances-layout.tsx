@@ -1,7 +1,7 @@
 import { Content } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import { useTranslation } from "react-i18next"
-import { Outlet, useParams } from "react-router"
+import { Outlet, useParams } from "react-router-dom"
 import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
 import useEntity from "common/hooks/entity"

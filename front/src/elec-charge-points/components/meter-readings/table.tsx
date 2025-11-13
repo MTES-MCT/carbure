@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next"
 import { compact } from "common/utils/collection"
 
-import { To } from "react-router"
+import { To } from "react-router-dom"
 import { Confirm } from "common/components/dialog"
 import { usePortal } from "common/components/portal"
 

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import i18next from "i18next"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router-dom"
 import { DeclarationSummary, LotQuery } from "../types"
 import { Normalizer } from "common/utils/normalize"
 import useEntity from "common/hooks/entity"

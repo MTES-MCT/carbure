@@ -3,7 +3,7 @@ import { formatDate, formatNumber } from "common/utils/formatters"
 import { getApplicationAuditLimitDate } from "elec-auditor/helpers"
 import { ElecAuditorApplication } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
-import { To } from "react-router"
+import { To } from "react-router-dom"
 import ApplicationStatus from "./application-status"
 
 interface ApplicationsTableProps {

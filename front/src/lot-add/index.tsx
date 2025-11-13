@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"

@@ -4,7 +4,7 @@ import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import Portal from "common/components/portal"
 import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import { ROUTE_URLS } from "common/utils/routes"
 import { Notice } from "common/components/notice"
 

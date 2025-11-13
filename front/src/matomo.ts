@@ -1,6 +1,6 @@
 import { isProduction } from "common/utils/production"
 import React, { useContext, useLayoutEffect } from "react"
-import { useLocation } from "react-router"
+import { useLocation } from "react-router-dom"
 
 export type Matomo = Pick<[string, ...any[]][], "push">
 
