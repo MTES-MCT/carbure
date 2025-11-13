@@ -42,15 +42,20 @@ class AcceptActionMixin:
                 {"error": AcceptActionMixinErrors.OPERATION_ALREADY_ACCEPTED_VALIDATED}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        if operation.type == Operation.CESSION or operation.type == Operation.TRANSFERT:
-            operation.status = Operation.ACCEPTED
-        elif operation.type == Operation.INCORPORATION:
-            operation.status = Operation.VALIDATED
-        else:
+        status_by_type = {
+            Operation.CESSION: Operation.ACCEPTED,
+            Operation.TRANSFERT: Operation.ACCEPTED,
+            Operation.INCORPORATION: Operation.VALIDATED,
+        }
+
+        operation_status = status_by_type.get(operation.type, None)
+
+        if not operation_status:
             return Response(
                 {"error": AcceptActionMixinErrors.OPERATION_TYPE_NOT_ALLOWED}, status=status.HTTP_400_BAD_REQUEST
             )
 
+        operation.status = operation_status
         operation.validation_date = datetime.now()
         operation.save()
         return Response({"status": "accepted"}, status=status.HTTP_200_OK)
