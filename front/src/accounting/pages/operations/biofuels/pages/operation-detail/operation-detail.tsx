@@ -34,6 +34,7 @@ import {
 import { formatValue } from "./operation-detail-fields/operation-detail-fields.utils"
 import { compact } from "common/utils/collection"
 import { useUnit } from "common/hooks/unit"
+import { useOperationDetailFields } from "./operation-detail-fields/operation-detail-fields.hooks"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
@@ -88,102 +89,7 @@ export const OperationDetail = () => {
       onSuccess: closeDialog,
     })
 
-  // const fields = useOperationDetailFields(operation)
-
-  const fields = operation
-    ? compact([
-        { label: t("Filière"), value: formatSector(operation.sector) },
-        {
-          label: t("Date d'opération"),
-          value: formatDate(operation?.created_at),
-        },
-        { label: t("Catégorie"), value: operation.customs_category },
-        { label: t("Biocarburant"), value: operation.biofuel },
-        {
-          label: t("Quantité"),
-          value: `${getOperationQuantity(
-            operation,
-            formatUnit(operation.quantity)
-          )} / ${getOperationQuantity(
-            operation,
-            formatUnit(CONVERSIONS.energy.MJ_TO_GJ(operation.quantity_mj), {
-              unit: ExtendedUnit.GJ,
-            })
-          )}`,
-        },
-        operation.type === OperationType.INCORPORATION &&
-          operation.renewable_energy_share !== 1 && {
-            label: t("Quantité renouvelable"),
-            value: `${getOperationQuantity(
-              operation,
-              formatUnit(
-                roundNumber(formatValue(operation, operation.quantity), 2)
-              )
-            )} / ${getOperationQuantity(
-              operation,
-              formatUnit(
-                CONVERSIONS.energy.MJ_TO_GJ(
-                  roundNumber(formatValue(operation, operation.quantity_mj), 2)
-                ),
-                {
-                  unit: ExtendedUnit.GJ,
-                }
-              )
-            )}`,
-          },
-        {
-          label: t("Tonnes CO2 eq evitées"),
-          value: formatNumber(
-            formatValue(operation, operation.avoided_emissions),
-            {
-              fractionDigits: 0,
-            }
-          ),
-        },
-        (operation.type === OperationType.ACQUISITION ||
-          (operation.type === OperationType.TRANSFERT &&
-            operation?.quantity > 0)) && {
-          label: t("Expéditeur"),
-          value: operation._entity ?? "-",
-        },
-        operation.type === OperationType.TRANSFERT &&
-          operation.quantity < 0 && {
-            label: t("Destinataire"),
-            value: operation._entity ?? "-",
-          },
-        (operation.type === OperationType.EXPORTATION ||
-          operation.type === OperationType.EXPEDITION) && {
-          label: t("Destinataire"),
-          value: operation.export_recipient ?? "-",
-        },
-        [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
-          operation.type as OperationType
-        ) && {
-          label: t("Dépôt expéditeur"),
-          value: operation.from_depot ? operation.from_depot.name : "-",
-        },
-        [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
-          operation.type as OperationType
-        ) &&
-          operation.export_country &&
-          operation.quantity < 0 && {
-            label: t("Pays d'exportation"),
-            value: operation.export_country
-              ? operation.export_country.name
-              : "-",
-          },
-        operation.type !== OperationType.DEVALUATION &&
-          operation.type === OperationType.ACQUISITION &&
-          operation.status !== OperationsStatus.PENDING && {
-            label: t("Dépôt destinataire"),
-            value: operation._depot ?? "-",
-          },
-        typeof operation.durability_period === "string" && {
-          label: t("Déclaration de durabilité"),
-          value: formatPeriod(operation.durability_period),
-        },
-      ])
-    : []
+  const fields = useOperationDetailFields(operation)
 
   return (
     <Portal onClose={closeDialog}>

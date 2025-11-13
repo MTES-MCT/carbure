@@ -1,24 +1,7 @@
 import { Operation, OperationType } from "accounting/types"
-import { Field, MappingField } from "./operation-detail-fields.types"
-
-export const getFields = (
-  operation: Operation,
-  // A list of fields
-  allFields: Field[],
-  // A list of fields to display based on the operation type
-  mappingFields: MappingField[]
-) => {
-  // Get the fields names to display based on the operation type
-  const fieldsToDisplayNames =
-    mappingFields.find(({ type }) => type === operation.type)?.fields ?? []
-
-  // Get fields to display based on their names
-  const fieldsToDisplay = allFields.filter(({ name }) =>
-    fieldsToDisplayNames.includes(name)
-  )
-
-  return fieldsToDisplay
-}
+import { getOperationQuantity } from "../../../operations.utils"
+import { CONVERSIONS } from "common/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 // Format the value only for the incorporation operation
 export const formatValue = (operation: Operation, value: number) => {
@@ -27,4 +10,28 @@ export const formatValue = (operation: Operation, value: number) => {
   return operation.type === OperationType.INCORPORATION
     ? value * operation.renewable_energy_share
     : value
+}
+
+export const formatQuantityDisplay = (
+  operation: Operation,
+  formatUnit: any,
+  applyRenewableShare: boolean = false
+) => {
+  const quantity = applyRenewableShare
+    ? formatValue(operation, operation.quantity)
+    : operation.quantity
+
+  const quantityMj = applyRenewableShare
+    ? formatValue(operation, operation.quantity_mj)
+    : operation.quantity_mj
+
+  return `${getOperationQuantity(
+    operation,
+    formatUnit(quantity)
+  )} / ${getOperationQuantity(
+    operation,
+    formatUnit(CONVERSIONS.energy.MJ_TO_GJ(quantityMj), {
+      unit: ExtendedUnit.GJ,
+    })
+  )}`
 }
