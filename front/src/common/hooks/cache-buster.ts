@@ -31,10 +31,8 @@ function useVisibilityChange() {
       }
     }
 
-    window.addEventListener("focus", handler)
     document.addEventListener("visibilitychange", handler)
     return () => {
-      window.removeEventListener("focus", handler)
       document.removeEventListener("visibilitychange", handler)
     }
   }, [])
