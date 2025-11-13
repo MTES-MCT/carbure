@@ -3,7 +3,14 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db.models import Q
-from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter, AllValuesMultipleFilter, MultipleChoiceFilter
+from django_filters import (
+    CharFilter,
+    DateFilter,
+    FilterSet,
+    NumberFilter,
+    AllValuesMultipleFilter,
+    MultipleChoiceFilter,
+)
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ListField
 
