@@ -1,4 +1,4 @@
-from django_filters import CharFilter, FilterSet
+from django_filters import CharFilter, FilterSet, NumberFilter
 
 
 class EntityProducerFilter(FilterSet):
@@ -36,7 +36,7 @@ class EntityProducerFilter(FilterSet):
 
 
 class EntityProducerYearFilter(EntityProducerFilter):
-    year = CharFilter(field_name="year", lookup_expr="exact", required=True)
+    year = NumberFilter(field_name="year", lookup_expr="exact", required=True)
 
     class Meta:
         fields = ["entity_id", "producer_id", "year"]

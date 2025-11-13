@@ -1,4 +1,4 @@
-from django_filters import CharFilter, FilterSet
+from django_filters import CharFilter, FilterSet, NumberFilter
 
 
 class BiomethaneEnergyMonthlyReportFilter(FilterSet):
@@ -23,7 +23,7 @@ class BiomethaneEnergyMonthlyReportFilter(FilterSet):
 
 
 class BiomethaneEnergyMonthlyReportYearFilter(BiomethaneEnergyMonthlyReportFilter):
-    year = CharFilter(field_name="energy__year", lookup_expr="exact", required=True)
+    year = NumberFilter(field_name="energy__year", lookup_expr="exact", required=True)
 
     class Meta:
         fields = ["entity_id", "producer_id", "year"]

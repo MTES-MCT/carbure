@@ -205,6 +205,11 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /** @description Mixin that provides get_object() method with filterset and permission checks.
+         *
+         *     The ViewSet must have:
+         *     - filterset_class configured
+         *     - queryset defined */
         patch: operations["biomethane_annual_declaration_partial_update"];
         trace?: never;
     };
@@ -217,6 +222,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** @description Mixin that provides get_object() method with filterset and permission checks.
+         *
+         *     The ViewSet must have:
+         *     - filterset_class configured
+         *     - queryset defined */
         post: operations["biomethane_annual_declaration_validate_create"];
         delete?: never;
         options?: never;
@@ -248,7 +258,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve the contract for the current entity. Returns a single contract object. */
+        /** @description Retrieve a single object based on query parameters. */
         get: operations["biomethane_contract_retrieve"];
         /** @description Create or update contract using upsert logic. */
         put: operations["biomethane_contract_update"];
@@ -266,8 +276,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description List objects with object-level permission check on the first result. */
         get: operations["biomethane_contract_amendments_list"];
         put?: never;
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         post: operations["biomethane_contract_amendments_create"];
         delete?: never;
         options?: never;
@@ -282,6 +297,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         get: operations["biomethane_contract_amendments_retrieve"];
         put?: never;
         post?: never;
@@ -298,6 +317,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for ViewSets that retrieve a single object without ID in URL.
+         *     Uses filterset to get the object and checks object-level permissions.
+         *
+         *     The ViewSet must have:
+         *     - filterset_class configured
+         *     - queryset defined */
         get: operations["biomethane_contract_watched_fields_retrieve"];
         put?: never;
         post?: never;
@@ -314,7 +339,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve the digestate for the current entity and the current year. Returns a single digestate object. */
+        /** @description Retrieve a single object based on query parameters. */
         get: operations["biomethane_digestate_retrieve"];
         /** @description Create or update the digestate for the current entity (upsert operation). */
         put: operations["biomethane_digestate_update"];
@@ -332,8 +357,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description List objects with object-level permission check on the first result. */
         get: operations["biomethane_digestate_storage_list"];
         put?: never;
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         post: operations["biomethane_digestate_storage_create"];
         delete?: never;
         options?: never;
@@ -348,12 +378,28 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         get: operations["biomethane_digestate_storage_retrieve"];
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         put: operations["biomethane_digestate_storage_update"];
         post?: never;
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         delete: operations["biomethane_digestate_storage_destroy"];
         options?: never;
         head?: never;
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         patch: operations["biomethane_digestate_storage_partial_update"];
         trace?: never;
     };
@@ -413,7 +459,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve the energy declaration for the current entity and year. Returns a single energy object. */
+        /** @description Retrieve a single object based on query parameters. */
         get: operations["biomethane_energy_retrieve"];
         /** @description Create or update the energy declaration for the current entity and the current year. */
         put: operations["biomethane_energy_update"];
@@ -431,7 +477,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve the energy declaration monthly reports for the current entity and year */
+        /** @description List objects with object-level permission check on the first result. */
         get: operations["biomethane_energy_monthly_reports_list"];
         /** @description Create or update monthly reports for the specified energy declaration. */
         put: operations["biomethane_energy_monthly_reports_update"];
@@ -466,7 +512,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve the injection site for the current entity. Returns a single object. */
+        /** @description Retrieve a single object based on query parameters. */
         get: operations["biomethane_injection_site_retrieve"];
         /** @description Create or update the injection site for the current entity (upsert operation). */
         put: operations["biomethane_injection_site_update"];
@@ -484,7 +530,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve the production unit for the current entity. Returns a single production unit object. */
+        /** @description Retrieve a single object based on query parameters. */
         get: operations["biomethane_production_unit_retrieve"];
         /** @description Create or update the production unit for the current entity (upsert operation). */
         put: operations["biomethane_production_unit_update"];
@@ -502,6 +548,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for ViewSets that retrieve a single object without ID in URL.
+         *     Uses filterset to get the object and checks object-level permissions.
+         *
+         *     The ViewSet must have:
+         *     - filterset_class configured
+         *     - queryset defined */
         get: operations["biomethane_production_unit_watched_fields_retrieve"];
         put?: never;
         post?: never;
@@ -518,8 +570,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description List objects with object-level permission check on the first result. */
         get: operations["biomethane_supply_input_list"];
         put?: never;
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         post: operations["biomethane_supply_input_create"];
         delete?: never;
         options?: never;
@@ -534,12 +591,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         get: operations["biomethane_supply_input_retrieve"];
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         put: operations["biomethane_supply_input_update"];
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         patch: operations["biomethane_supply_input_partial_update"];
         trace?: never;
     };
@@ -550,6 +619,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         get: operations["biomethane_supply_input_export_retrieve"];
         put?: never;
         post?: never;
@@ -566,6 +639,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         get: operations["biomethane_supply_input_filters_retrieve"];
         put?: never;
         post?: never;
@@ -599,6 +676,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
         get: operations["biomethane_supply_plan_export_retrieve"];
         put?: never;
         post?: never;
@@ -3261,7 +3342,6 @@ export interface components {
             injection_impossibility_hours?: number | null;
         };
         BiomethaneEnergyMonthlyReport: {
-            readonly id: number;
             month: number;
             /** Format: double */
             injected_volume_nm3?: number;
@@ -3300,12 +3380,12 @@ export interface components {
             installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
+            department?: string;
             unit_name?: string | null;
             siret_number?: string | null;
             company_address?: string | null;
             postal_code?: string | null;
             city?: string | null;
-            department?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3330,12 +3410,12 @@ export interface components {
             installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
+            department?: string;
             unit_name?: string | null;
             siret_number?: string | null;
             company_address?: string | null;
             postal_code?: string | null;
             city?: string | null;
-            department?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -4305,6 +4385,7 @@ export interface components {
          *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
          *     * `SAF Trader` - Trader de SAF
          *     * `Producteur de biométhane` - Producteur de biométhane
+         *     * `Fournisseur de biométhane` - Fournisseur de biométhane
          * @enum {string}
          */
         EntityTypeEnum: EntityTypeEnum;
@@ -4326,6 +4407,7 @@ export interface components {
          *     * `ELEC` - ELEC
          *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
          *     * `BIOFUEL` - BIOFUEL
+         *     * `DREAL` - DREAL
          * @enum {string}
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
@@ -6139,7 +6221,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Contract details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6147,13 +6228,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneContract"];
                 };
-            };
-            /** @description Contract not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -6196,6 +6270,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
+                producer_id?: string;
                 /** @description A search term. */
                 search?: string;
             };
@@ -6296,7 +6371,7 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Declaration year. */
+                /** @description Year of the energy declaration. */
                 year: number;
             };
             header?: never;
@@ -6305,7 +6380,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Digestate details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6313,13 +6387,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneDigestate"];
                 };
-            };
-            /** @description Digestate not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -6368,6 +6435,7 @@ export interface operations {
                 entity_id: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                producer_id?: string;
                 /** @description A search term. */
                 search?: string;
             };
@@ -6612,7 +6680,7 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Declaration year. */
+                /** @description Year of the energy declaration. */
                 year: number;
             };
             header?: never;
@@ -6621,7 +6689,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Energy declaration details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6629,13 +6696,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneEnergy"];
                 };
-            };
-            /** @description Energy not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -6684,9 +6744,9 @@ export interface operations {
                 entity_id: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                producer_id?: string;
                 /** @description A search term. */
                 search?: string;
-                /** @description Declaration year. */
                 year: number;
             };
             header?: never;
@@ -6695,7 +6755,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Energy declaration monthly reports for the year */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6703,13 +6762,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneEnergyMonthlyReport"][];
                 };
-            };
-            /** @description Energy monthly reports not found for this entity and year. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -6731,7 +6783,14 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Monthly reports created or updated successfully */
+            /** @description Monthly reports updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Monthly reports created successfully */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -6781,7 +6840,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Injection site details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6789,13 +6847,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneInjectionSite"];
                 };
-            };
-            /** @description Injection site not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -6849,7 +6900,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Production unit details for the entity */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6857,13 +6907,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneProductionUnit"];
                 };
-            };
-            /** @description Production unit not found for this entity. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -6945,6 +6988,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
+                producer_id?: string;
                 /** @description A search term. */
                 search?: string;
                 /** @description * `INTERNAL` - Interne
@@ -7121,6 +7165,7 @@ export interface operations {
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                producer_id?: string;
                 /** @description A search term. */
                 search?: string;
                 /** @description * `INTERNAL` - Interne
@@ -12417,6 +12462,7 @@ export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
 }
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
     category = "category",
+    producer_id = "producer_id",
     source = "source",
     type = "type",
     year = "year"
@@ -12798,7 +12844,8 @@ export enum EntityTypeEnum {
     Unknown = "Unknown",
     PowerOrHeatProducer = "Power or Heat Producer",
     SAF_Trader = "SAF Trader",
-    Producteur_de_biom_thane = "Producteur de biom\u00E9thane"
+    Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
+    Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane"
 }
 export enum EtsStatusEnum {
     ETS_VALUATION = "ETS_VALUATION",
@@ -12812,7 +12859,8 @@ export enum ExtAdminPagesEnum {
     AIRLINE = "AIRLINE",
     ELEC = "ELEC",
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
-    BIOFUEL = "BIOFUEL"
+    BIOFUEL = "BIOFUEL",
+    DREAL = "DREAL"
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",

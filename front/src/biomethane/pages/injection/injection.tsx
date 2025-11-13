@@ -43,43 +43,42 @@ export const BiomethaneInjectionPage = () => {
             required
             readOnly={!isEditing}
           />
-          <Grid cols={2} gap="lg">
-            <RadioGroup
-              options={yesNoOptions}
-              {...bind("is_shared_injection_site")}
-              label={t("Raccordement à un poste d'injection mutualisé")}
+
+          <RadioGroup
+            options={yesNoOptions}
+            {...bind("is_shared_injection_site")}
+            label={t("Raccordement à un poste d'injection mutualisé")}
+            required
+            readOnly={!isEditing}
+            orientation="horizontal"
+          />
+          {value.is_shared_injection_site && (
+            <TextInput
+              label={t("N° de compteur associé au poste d'injection")}
+              {...bind("meter_number")}
               required
               readOnly={!isEditing}
-              orientation="horizontal"
             />
-            {value.is_shared_injection_site && (
-              <TextInput
-                label={t("N° de compteur associé au poste d'injection")}
-                {...bind("meter_number")}
-                required
-                readOnly={!isEditing}
-              />
+          )}
+          <RadioGroup
+            options={yesNoOptions}
+            {...bind("is_different_from_production_site")}
+            label={t(
+              "Le poste d'injection est différent du poste de production"
             )}
-          </Grid>
-          <Grid cols={2} gap="lg">
-            <RadioGroup
-              options={yesNoOptions}
-              {...bind("is_different_from_production_site")}
-              label={t(
-                "Le poste d'injection est différent du poste de production"
-              )}
-              required
-              readOnly={!isEditing}
-              orientation="horizontal"
-            />
-            {value.is_different_from_production_site && (
-              <>
-                <TextInput
-                  label={t("Adresse du site d'injection (Numéro et rue)")}
-                  {...bind("company_address")}
-                  readOnly={!isEditing}
-                  required
-                />
+            required
+            readOnly={!isEditing}
+            orientation="horizontal"
+          />
+          {value.is_different_from_production_site && (
+            <>
+              <TextInput
+                label={t("Adresse du site d'injection (Numéro et rue)")}
+                {...bind("company_address")}
+                readOnly={!isEditing}
+                required
+              />
+              <Grid cols={2} gap="lg">
                 <TextInput
                   label={t("Code postal")}
                   {...bind("postal_code")}
@@ -92,25 +91,25 @@ export const BiomethaneInjectionPage = () => {
                   required
                   readOnly={!isEditing}
                 />
-              </>
-            )}
-          </Grid>
-          <Grid cols={2} gap="lg">
-            <RadioGroup
-              options={networkTypesOptions}
-              {...bind("network_type")}
-              label={t("Type de réseau")}
-              required
-              readOnly={!isEditing}
-              orientation="horizontal"
-            />
-            <TextInput
-              label={t("Nom du gestionnaire de réseau")}
-              {...bind("network_manager_name")}
-              required
-              readOnly={!isEditing}
-            />
-          </Grid>
+              </Grid>
+            </>
+          )}
+
+          <RadioGroup
+            options={networkTypesOptions}
+            {...bind("network_type")}
+            label={t("Type de réseau")}
+            required
+            readOnly={!isEditing}
+            orientation="horizontal"
+          />
+          <TextInput
+            label={t("Nom du gestionnaire de réseau")}
+            {...bind("network_manager_name")}
+            required
+            readOnly={!isEditing}
+          />
+
           {isEditing && (
             <Button
               type="submit"

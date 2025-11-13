@@ -108,6 +108,9 @@ export function GeneralInfo({
               label={t("Département")}
               required
               {...bind("department")}
+              onChange={(value) => {
+                setField("department", value ?? undefined)
+              }}
             />
             <TextInput
               readOnly={!isEditing}

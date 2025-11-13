@@ -484,6 +484,16 @@ paths:
           description: Declaration created for the entity
     patch:
       operationId: biomethane_annual_declaration_partial_update
+      description: >-
+        Mixin that provides get_object() method with filterset and permission
+        checks.
+
+
+        The ViewSet must have:
+
+        - filterset_class configured
+
+        - queryset defined
       parameters:
         - in: query
           name: entity_id
@@ -517,6 +527,16 @@ paths:
   /api/biomethane/annual-declaration/validate/:
     post:
       operationId: biomethane_annual_declaration_validate_create
+      description: >-
+        Mixin that provides get_object() method with filterset and permission
+        checks.
+
+
+        The ViewSet must have:
+
+        - filterset_class configured
+
+        - queryset defined
       parameters:
         - in: query
           name: entity_id
@@ -573,8 +593,7 @@ paths:
   /api/biomethane/contract/:
     get:
       operationId: biomethane_contract_retrieve
-      description: Retrieve the contract for the current entity. Returns a single
-        contract object.
+      description: Retrieve a single object based on query parameters.
       parameters:
         - in: query
           name: entity_id
@@ -593,9 +612,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneContract"
-          description: Contract details for the entity
-        "404":
-          description: Contract not found for this entity.
+          description: ""
     put:
       operationId: biomethane_contract_update
       description: Create or update contract using upsert logic.
@@ -632,6 +649,7 @@ paths:
   /api/biomethane/contract/amendments/:
     get:
       operationId: biomethane_contract_amendments_list
+      description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
           name: entity_id
@@ -657,6 +675,10 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+        - in: query
+          name: producer_id
+          schema:
+            type: string
         - name: search
           required: false
           in: query
@@ -677,6 +699,15 @@ paths:
           description: ""
     post:
       operationId: biomethane_contract_amendments_create
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -711,6 +742,15 @@ paths:
   /api/biomethane/contract/amendments/{id}/:
     get:
       operationId: biomethane_contract_amendments_retrieve
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -740,6 +780,13 @@ paths:
   /api/biomethane/contract/watched-fields/:
     get:
       operationId: biomethane_contract_watched_fields_retrieve
+      description: |-
+        Mixin for ViewSets that retrieve a single object without ID in URL.
+        Uses filterset to get the object and checks object-level permissions.
+
+        The ViewSet must have:
+        - filterset_class configured
+        - queryset defined
       parameters:
         - in: query
           name: entity_id
@@ -764,8 +811,7 @@ paths:
   /api/biomethane/digestate/:
     get:
       operationId: biomethane_digestate_retrieve
-      description: Retrieve the digestate for the current entity and the current year.
-        Returns a single digestate object.
+      description: Retrieve a single object based on query parameters.
       parameters:
         - in: query
           name: entity_id
@@ -777,7 +823,7 @@ paths:
           name: year
           schema:
             type: integer
-          description: Declaration year.
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -790,9 +836,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneDigestate"
-          description: Digestate details for the entity
-        "404":
-          description: Digestate not found for this entity.
+          description: ""
     put:
       operationId: biomethane_digestate_update
       description: Create or update the digestate for the current entity (upsert operation).
@@ -835,6 +879,7 @@ paths:
   /api/biomethane/digestate-storage/:
     get:
       operationId: biomethane_digestate_storage_list
+      description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
           name: entity_id
@@ -846,6 +891,10 @@ paths:
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producer_id
           schema:
             type: string
         - name: search
@@ -870,6 +919,15 @@ paths:
           description: ""
     post:
       operationId: biomethane_digestate_storage_create
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -904,6 +962,15 @@ paths:
   /api/biomethane/digestate-storage/{id}/:
     get:
       operationId: biomethane_digestate_storage_retrieve
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -932,6 +999,15 @@ paths:
           description: ""
     put:
       operationId: biomethane_digestate_storage_update
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -972,6 +1048,15 @@ paths:
           description: ""
     patch:
       operationId: biomethane_digestate_storage_partial_update
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1011,6 +1096,15 @@ paths:
           description: ""
     delete:
       operationId: biomethane_digestate_storage_destroy
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1123,8 +1217,7 @@ paths:
   /api/biomethane/energy/:
     get:
       operationId: biomethane_energy_retrieve
-      description: Retrieve the energy declaration for the current entity and year.
-        Returns a single energy object.
+      description: Retrieve a single object based on query parameters.
       parameters:
         - in: query
           name: entity_id
@@ -1136,7 +1229,7 @@ paths:
           name: year
           schema:
             type: integer
-          description: Declaration year.
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1149,9 +1242,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneEnergy"
-          description: Energy declaration details for the entity
-        "404":
-          description: Energy not found for this entity.
+          description: ""
     put:
       operationId: biomethane_energy_update
       description: Create or update the energy declaration for the current entity and
@@ -1195,8 +1286,7 @@ paths:
   /api/biomethane/energy/monthly-reports/:
     get:
       operationId: biomethane_energy_monthly_reports_list
-      description: Retrieve the energy declaration monthly reports for the current
-        entity and year
+      description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
           name: entity_id
@@ -1210,6 +1300,10 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: producer_id
+          schema:
+            type: string
         - name: search
           required: false
           in: query
@@ -1220,7 +1314,6 @@ paths:
           name: year
           schema:
             type: integer
-          description: Declaration year.
           required: true
       tags:
         - biomethane
@@ -1235,9 +1328,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BiomethaneEnergyMonthlyReport"
-          description: Energy declaration monthly reports for the year
-        "404":
-          description: Energy monthly reports not found for this entity and year.
+          description: ""
     put:
       operationId: biomethane_energy_monthly_reports_update
       description: Create or update monthly reports for the specified energy declaration.
@@ -1272,8 +1363,10 @@ paths:
         - cookieAuth: []
         - basicAuth: []
       responses:
+        "200":
+          description: Monthly reports updated successfully
         "201":
-          description: Monthly reports created or updated successfully
+          description: Monthly reports created successfully
   /api/biomethane/energy/optional-fields/:
     get:
       operationId: biomethane_energy_optional_fields_retrieve
@@ -1305,8 +1398,7 @@ paths:
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
-      description: Retrieve the injection site for the current entity. Returns a
-        single object.
+      description: Retrieve a single object based on query parameters.
       parameters:
         - in: query
           name: entity_id
@@ -1325,9 +1417,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneInjectionSite"
-          description: Injection site details for the entity
-        "404":
-          description: Injection site not found for this entity.
+          description: ""
     put:
       operationId: biomethane_injection_site_update
       description: Create or update the injection site for the current entity (upsert
@@ -1372,8 +1462,7 @@ paths:
   /api/biomethane/production-unit/:
     get:
       operationId: biomethane_production_unit_retrieve
-      description: Retrieve the production unit for the current entity. Returns a
-        single production unit object.
+      description: Retrieve a single object based on query parameters.
       parameters:
         - in: query
           name: entity_id
@@ -1392,9 +1481,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BiomethaneProductionUnit"
-          description: Production unit details for the entity
-        "404":
-          description: Production unit not found for this entity.
+          description: ""
     put:
       operationId: biomethane_production_unit_update
       description: Create or update the production unit for the current entity (upsert
@@ -1438,6 +1525,13 @@ paths:
   /api/biomethane/production-unit/watched-fields/:
     get:
       operationId: biomethane_production_unit_watched_fields_retrieve
+      description: |-
+        Mixin for ViewSets that retrieve a single object without ID in URL.
+        Uses filterset to get the object and checks object-level permissions.
+
+        The ViewSet must have:
+        - filterset_class configured
+        - queryset defined
       parameters:
         - in: query
           name: entity_id
@@ -1462,6 +1556,7 @@ paths:
   /api/biomethane/supply-input/:
     get:
       operationId: biomethane_supply_input_list
+      description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
           name: category
@@ -1503,6 +1598,10 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+        - in: query
+          name: producer_id
+          schema:
+            type: string
         - name: search
           required: false
           in: query
@@ -1542,6 +1641,15 @@ paths:
           description: ""
     post:
       operationId: biomethane_supply_input_create
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1576,6 +1684,15 @@ paths:
   /api/biomethane/supply-input/{id}/:
     get:
       operationId: biomethane_supply_input_retrieve
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1604,6 +1721,15 @@ paths:
           description: ""
     put:
       operationId: biomethane_supply_input_update
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1644,6 +1770,15 @@ paths:
           description: ""
     patch:
       operationId: biomethane_supply_input_partial_update
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1684,6 +1819,15 @@ paths:
   /api/biomethane/supply-input/export/:
     get:
       operationId: biomethane_supply_input_export_retrieve
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -1706,6 +1850,15 @@ paths:
   /api/biomethane/supply-input/filters/:
     get:
       operationId: biomethane_supply_input_filters_retrieve
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: category
@@ -1735,6 +1888,7 @@ paths:
             type: string
             enum:
               - category
+              - producer_id
               - source
               - type
               - year
@@ -1744,6 +1898,10 @@ paths:
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: producer_id
           schema:
             type: string
         - name: search
@@ -1783,6 +1941,7 @@ paths:
                 ExampleOfFiltersResponse.:
                   value:
                     - category
+                    - producer_id
                     - source
                     - type
                     - year
@@ -1809,6 +1968,15 @@ paths:
   /api/biomethane/supply-plan/export/:
     get:
       operationId: biomethane_supply_plan_export_retrieve
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
       parameters:
         - in: query
           name: entity_id
@@ -11578,9 +11746,6 @@ components:
     BiomethaneEnergyMonthlyReport:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         month:
           type: integer
           maximum: 2147483647
@@ -11598,7 +11763,6 @@ components:
           type: integer
       required:
         - energy
-        - id
         - month
     BiomethaneInjectionSite:
       type: object
@@ -11700,6 +11864,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+        department:
+          type: string
         unit_name:
           type: string
           nullable: true
@@ -11720,10 +11886,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        department:
-          type: string
-          nullable: true
-          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -11802,6 +11964,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+        department:
+          type: string
+          minLength: 1
         unit_name:
           type: string
           nullable: true
@@ -11822,10 +11987,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        department:
-          type: string
-          nullable: true
-          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -14296,6 +14457,7 @@ components:
         - Power or Heat Producer
         - SAF Trader
         - Producteur de biométhane
+        - Fournisseur de biométhane
       type: string
       description: |-
         * `Producteur` - Producteur
@@ -14310,6 +14472,7 @@ components:
         * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
         * `SAF Trader` - Trader de SAF
         * `Producteur de biométhane` - Producteur de biométhane
+        * `Fournisseur de biométhane` - Fournisseur de biométhane
       x-enum-varnames:
         - Producer
         - Operator
@@ -14347,6 +14510,7 @@ components:
         - ELEC
         - TRANSFERRED_ELEC
         - BIOFUEL
+        - DREAL
       type: string
       description: |-
         * `DCA` - DCA
@@ -14356,6 +14520,7 @@ components:
         * `ELEC` - ELEC
         * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
         * `BIOFUEL` - BIOFUEL
+        * `DREAL` - DREAL
     FeedStock:
       type: object
       properties:
