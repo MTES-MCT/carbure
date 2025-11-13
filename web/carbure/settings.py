@@ -40,6 +40,7 @@ env = environ.Env(
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(str, ""),
     METABASE_SECRET_KEY=(str, ""),
+    FAKE_PROD=(bool, False),
 )
 
 # False if not in os.environ
@@ -66,11 +67,11 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 5  # 5 days
 SESSION_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod")
+SESSION_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod") and not env("FAKE_PROD")
 
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 CSRF_COOKIE_SAMESITE = "Strict"
-CSRF_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod")
+CSRF_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod") and not env("FAKE_PROD")
 
 # OTP Email Configuration
 OTP_EMAIL_TOKEN_VALIDITY = 1800  # 30 minutes
@@ -226,7 +227,7 @@ if env("IMAGE_TAG") in ["dev", "staging", "prod"]:
 
 
 DEFAULT_FROM_EMAIL = "noreply@carbure.beta.gouv.fr"
-if env("IMAGE_TAG") in ["dev", "staging", "prod"]:
+if env("IMAGE_TAG") in ["dev", "staging", "prod"] and not env("FAKE_PROD"):
     EMAIL_HOST = env("EMAIL_HOST")
     EMAIL_PORT = env("EMAIL_PORT")
     EMAIL_HOST_USER = env("EMAIL_HOST_USER")

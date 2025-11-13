@@ -11,9 +11,6 @@ services:
       ENV: ${IMAGE_TAG}
     volumes:
       - carburedb:/var/lib/mysql
-    ports:
-      - 127.0.0.1:3306:3306
-      - 127.0.0.1:33060:33060
 
   carbure-redis:
     image: redis:latest
@@ -21,29 +18,6 @@ services:
     <<: *common-settings
     volumes:
       - carbureredis:/data
-
-  carbure-frontend:
-    image: carbure_frontend:local
-    container_name: carbure_frontend
-    <<: *common-settings
-    environment:
-      VITE_SENTRY_DSN: ${SENTRY_DSN}
-      VITE_APP_ENV: ${IMAGE_TAG}
-    build:
-      context: ./front
-    volumes:
-      - ./front:/app
-      - /app/node_modules
-
-  carbure-test:
-    image: carbure_test:local
-    container_name: carbure_test
-    profiles: [test]
-    extends:
-      carbure-django
-    environment:
-      TEST: 1
-    command: "pipenv run test web"
 
   carbure-django:
     image: carbure_app:local
@@ -53,28 +27,16 @@ services:
       - carbure-redis
     build:
       context: .
-      dockerfile: ./web/Dockerfile
+      dockerfile: ./web/Dockerfile.prod
     <<: *common-settings
     environment:
+      DEBUG: 0
+      FAKE_PROD: 1
+      IMAGE_TAG: prod
       DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
       REDIS_URL: redis://carbure-redis:6379
       CARBURE_HOME: /app
       PYTHONPATH: /app:/app/web
-    volumes:
-      - ./web:/app/web
-      - ./scripts:/app/scripts
-      - ./front:/app/front
-      - uploadedfiles:/app/files
-
-  carbure-web-proxy:
-    image: nginx:latest
-    container_name: carbure_web
-    depends_on:
-      - carbure-frontend
-      - carbure-django
-    <<: *common-settings
-    volumes:
-      - ./gateway:/etc/nginx/conf.d
     ports:
       - 8090:80
 
