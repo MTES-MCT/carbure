@@ -1,5 +1,5 @@
 import { Operation, OperationType } from "accounting/types"
-import { Field, MappingField } from "./operation-details-fields.types"
+import { Field, MappingField } from "./operation-detail-fields.types"
 
 export const getFields = (
   operation: Operation,

@@ -7,11 +7,11 @@ import { CONVERSIONS, formatDate, formatNumber } from "common/utils/formatters"
 import { getOperationQuantity } from "../../../operations.utils"
 import { useUnit } from "common/hooks/unit"
 import { ExtendedUnit } from "common/types"
-import { Field, OperationDetailField } from "./operation-details-fields.types"
+import { Field, OperationDetailField } from "./operation-detail-fields.types"
 import {
   MAPPING_FIELDS_RECEIVER,
   MAPPING_FIELDS_SENDER,
-} from "./operation-details-fields.config"
+} from "./operation-detail-fields.config"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const commonFields = useCommonFields(operation)
@@ -20,6 +20,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
   const fields = useMemo<Field[]>(() => {
     if (!operation) return []
 
+    // Combine common and conditional fields, filtering out fields with condition === false or undefined
     return [...commonFields, ...conditionalFields].filter(
       ({ condition }) => condition === undefined || condition
     )
@@ -28,6 +29,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
   return fields
 }
 
+// Fields that are always displayed regardless of operation type or receiving/sending operation
 const useCommonFields = (operation?: Operation) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
@@ -83,6 +85,7 @@ const useCommonFields = (operation?: Operation) => {
   }, [operation, t, formatUnit])
 }
 
+// Fields that are conditionally displayed based on operation type and receiving/sending operation
 const useConditionalFields = (operation?: Operation) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
@@ -90,6 +93,7 @@ const useConditionalFields = (operation?: Operation) => {
   return useMemo<Field[]>(() => {
     if (!operation) return []
 
+    // Define all possible conditional fields
     const fields = [
       {
         name: OperationDetailField.RENEWABLE_ENERGY_QUANTITY,
@@ -114,12 +118,13 @@ const useConditionalFields = (operation?: Operation) => {
       },
     ]
 
-    // je recois une opération si la quantité est positive
+    // Determine operation direction: positive quantity = receiving, negative = sending
     const isReceiver = (operation.quantity ?? 0) > 0
     const mappingFields = isReceiver
       ? MAPPING_FIELDS_RECEIVER
       : MAPPING_FIELDS_SENDER
 
+    // Filter fields based on the configuration mapping for this operation type and direction
     return getFields(operation, fields, mappingFields)
   }, [operation, t, formatUnit])
 }

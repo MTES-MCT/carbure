@@ -5,7 +5,7 @@ import {
   Field,
   MappingField,
   OperationDetailField,
-} from "./operation-details-fields.types"
+} from "./operation-detail-fields.types"
 import { OperationType } from "accounting/types"
 
 // Helper functions to create test fields and mapping fields by avoiding type errors
