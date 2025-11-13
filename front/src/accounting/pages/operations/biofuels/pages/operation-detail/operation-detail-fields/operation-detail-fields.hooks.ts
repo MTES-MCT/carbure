@@ -5,29 +5,16 @@ import { useTranslation } from "react-i18next"
 import {
   formatQuantityDisplay,
   formatValue,
-  getFields,
 } from "./operation-detail-fields.utils"
-import {
-  CONVERSIONS,
-  formatDate,
-  formatNumber,
-  formatPeriod,
-  roundNumber,
-} from "common/utils/formatters"
-import { getOperationQuantity } from "../../../operations.utils"
+import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { useUnit } from "common/hooks/unit"
-import { ExtendedUnit } from "common/types"
 import { compact } from "common/utils/collection"
 
 export const useOperationDetailFields = (operation?: Operation) => {
-  const fields = useFields(operation)
-
-  return fields
-}
-
-const useFields = (operation?: Operation) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
+  const exportationOrExpeditionFields =
+    useExportationOrExpeditionFields(operation)
 
   return useMemo(() => {
     if (!operation) return []
@@ -73,24 +60,7 @@ const useFields = (operation?: Operation) => {
           label: t("Destinataire"),
           value: operation._entity ?? "-",
         },
-      (operation.type === OperationType.EXPORTATION ||
-        operation.type === OperationType.EXPEDITION) && {
-        label: t("Destinataire"),
-        value: operation.export_recipient ?? "-",
-      },
-      [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
-        operation.type as OperationType
-      ) && {
-        label: t("Dépôt expéditeur"),
-        value: operation.from_depot ? operation.from_depot.name : "-",
-      },
-      [OperationType.EXPORTATION, OperationType.EXPEDITION].includes(
-        operation.type as OperationType
-      ) &&
-        operation.export_country && {
-          label: t("Pays d'exportation"),
-          value: operation.export_country ? operation.export_country.name : "-",
-        },
+      ...exportationOrExpeditionFields,
       typeof operation.durability_period === "string" && {
         label: t("Déclaration de durabilité"),
         value: formatPeriod(operation.durability_period),
@@ -98,5 +68,33 @@ const useFields = (operation?: Operation) => {
     ])
 
     return fields
-  }, [operation, t, formatUnit])
+  }, [operation, t, formatUnit, exportationOrExpeditionFields])
+}
+
+const useExportationOrExpeditionFields = (operation?: Operation) => {
+  const { t } = useTranslation()
+
+  return useMemo(() => {
+    const isExportationOrExpedition = [
+      OperationType.EXPORTATION,
+      OperationType.EXPEDITION,
+    ].includes(operation?.type as OperationType)
+
+    if (!operation || !isExportationOrExpedition) return []
+
+    return [
+      {
+        label: t("Destinataire"),
+        value: operation.export_recipient ?? "-",
+      },
+      {
+        label: t("Dépôt expéditeur"),
+        value: operation.from_depot ? operation.from_depot.name : "-",
+      },
+      operation.export_country && {
+        label: t("Pays d'exportation"),
+        value: operation.export_country ? operation.export_country.name : "-",
+      },
+    ]
+  }, [operation, t])
 }

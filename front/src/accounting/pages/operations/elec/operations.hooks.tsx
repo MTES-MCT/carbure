@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import { getOperationEntity, isOperationDebit } from "./operations.utils"
+import { getOperationEntity, isSendingOperation } from "./operations.utils"
 import * as api from "accounting/api/elec/operations"
 import {
   ElecOperation,
@@ -68,7 +68,7 @@ export const useOperationsElecColumns = () => {
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       key: ElecOperationOrder.quantity,
       cell: (item) =>
-        isOperationDebit(item.type) ? (
+        isSendingOperation(item.type) ? (
           <Text
             size="sm"
             fontWeight="semibold"

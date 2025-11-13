@@ -5,89 +5,30 @@ import { useNavigate } from "react-router-dom"
 import * as api from "accounting/api/biofuels/operations"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
-import { getOperationQuantity, isOperationDebit } from "../../operations.utils"
 import { OperationBadge } from "accounting/components/operation-badge/operation-badge"
 import css from "../../../operations.module.css"
 import { Text } from "common/components/text"
-import { useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
 
-import { Button } from "common/components/button2"
-import {
-  useDeleteOperation,
-  usePatchBeforeAcceptOperation,
-  useRejectOperation,
-  useValidateDraftTransfer,
-} from "./operation-detail.hooks"
-import { useForm } from "common/components/form2"
-import { Depot, ExtendedUnit, UserRole } from "common/types"
-import { formatOperationType, formatSector } from "accounting/utils/formatters"
-import { OperationsStatus, OperationType } from "accounting/types"
-import { getOperationValidationButtonText } from "./operation-detail.utils"
-import {
-  CONVERSIONS,
-  formatDate,
-  formatNumber,
-  formatPeriod,
-  roundNumber,
-} from "common/utils/formatters"
-import { formatValue } from "./operation-detail-fields/operation-detail-fields.utils"
-import { compact } from "common/utils/collection"
-import { useUnit } from "common/hooks/unit"
-import { useOperationDetailFields } from "./operation-detail-fields/operation-detail-fields.hooks"
+import { formatOperationType } from "accounting/utils/formatters"
+import { useOperationDetailFields } from "./operation-detail-fields"
+import { OperationDetailActions } from "./operation-detail-actions"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
   const entity = useEntity()
-  const { t } = useTranslation()
   const match = useHashMatch("operation/:id")
-  const { formatUnit } = useUnit()
-  const { setField } = useForm<{
-    to_depot?: Pick<Depot, "id" | "name">
-  }>({
-    to_depot: undefined,
-  })
 
   const { result, loading } = useQuery(api.getOperationDetail, {
     key: "operation-detail",
     params: [entity.id, parseInt(match?.params.id ?? "")],
-    onSuccess: (result) => {
-      setField("to_depot", result?.data?.to_depot)
-    },
   })
 
   const operation = result?.data
-  const canUpdateOperation =
-    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
-  console.log("operation", canUpdateOperation)
+
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
-
-  const { execute: deleteOperation, loading: deleteOperationLoading } =
-    useDeleteOperation({
-      operation,
-      onDeleteOperation: closeDialog,
-    })
-
-  const { execute: rejectOperation, loading: rejectOperationLoading } =
-    useRejectOperation({
-      operation,
-      onRejectOperation: closeDialog,
-    })
-
-  const {
-    execute: validateDraftTransfer,
-    loading: validateDraftTransferLoading,
-  } = useValidateDraftTransfer({
-    onSuccess: closeDialog,
-  })
-
-  const { loading: patchBeforeAcceptOperationLoading } =
-    usePatchBeforeAcceptOperation({
-      operation,
-      onSuccess: closeDialog,
-    })
 
   const fields = useOperationDetailFields(operation)
 
@@ -106,78 +47,10 @@ export const OperationDetail = () => {
           )
         }
         footer={
-          <>
-            {/* Display reject/accept button in two cases :
-             - Acquisition operation
-             - Transfer operation only if it's a credit operation
-            */}
-            {(operation?.type === OperationType.ACQUISITION ||
-              (operation?.type === OperationType.TRANSFERT &&
-                !isOperationDebit(operation?.quantity))) &&
-              operation?.status === OperationsStatus.PENDING &&
-              canUpdateOperation && (
-                <>
-                  <Button
-                    customPriority="danger"
-                    iconId="fr-icon-close-line"
-                    onClick={() => {
-                      rejectOperation(entity.id, operation.id)
-                    }}
-                    loading={rejectOperationLoading}
-                  >
-                    {t("Refuser")}
-                  </Button>
-                  <Button
-                    customPriority="success"
-                    iconId="fr-icon-check-line"
-                    nativeButtonProps={{ form: "patch-operation" }}
-                    loading={patchBeforeAcceptOperationLoading}
-                    type="submit"
-                  >
-                    {t("Accepter")}
-                  </Button>
-                </>
-              )}
-            {isOperationDebit(operation?.quantity ?? 0) &&
-              operation?.status === OperationsStatus.PENDING &&
-              canUpdateOperation && (
-                <Button
-                  customPriority="danger"
-                  iconId="fr-icon-close-line"
-                  onClick={() => deleteOperation(entity.id, operation.id)}
-                  loading={deleteOperationLoading}
-                >
-                  {t("Annuler le certificat")}
-                </Button>
-              )}
-
-            {/* Display cancel/transfer button only if operation is a DRAFT transfer */}
-            {operation?.status === OperationsStatus.DRAFT && (
-              <>
-                <Button
-                  customPriority="danger"
-                  iconId="fr-icon-close-line"
-                  onClick={() => deleteOperation(entity.id, operation.id)}
-                  loading={deleteOperationLoading}
-                >
-                  {t("Annuler")}
-                </Button>
-                <Button
-                  priority="primary"
-                  onClick={() =>
-                    validateDraftTransfer(entity.id, operation.id, {
-                      status: OperationsStatus.PENDING,
-                    })
-                  }
-                  loading={validateDraftTransferLoading}
-                >
-                  {getOperationValidationButtonText(
-                    operation?.type as OperationType
-                  )}
-                </Button>
-              </>
-            )}
-          </>
+          <OperationDetailActions
+            operation={operation}
+            closeDialog={closeDialog}
+          />
         }
       >
         <Main>
@@ -192,66 +65,7 @@ export const OperationDetail = () => {
                     <Text className={css["field-value"]}>{value}</Text>
                   </div>
                 ))}
-                {/* <Form
-                  id="patch-operation"
-                  onSubmit={() => onPatchBeforeAcceptOperation(value)}
-                  className={css["operation-detail-fields-depot"]}
-                >
-                  {operation?.type === OperationType.ACQUISITION &&
-                    operation?.status === OperationsStatus.PENDING &&
-                    canUpdateOperation && (
-                      <div>
-                        <Autocomplete
-                          autoFocus
-                          label={t("Dépot de livraison")}
-                          hintText={t(
-                            "Si le dépôt de livraison renseigné est inexact, vous pouvez le corriger ici."
-                          )}
-                          required
-                          placeholder={t("Rechercher un site de livraison...")}
-                          defaultOptions={
-                            value.to_depot ? [value.to_depot] : []
-                          }
-                          getOptions={findDepots}
-                          normalize={(depot) => ({
-                            label: depot.name,
-                            value: depot,
-                          })}
-                          {...bind("to_depot")}
-                        />
-                      </div>
-                    )}
-                </Form> */}
               </Grid>
-              {/* {operation?.type === OperationType.ACQUISITION &&
-                operation?.status === OperationsStatus.PENDING &&
-                canUpdateOperation && (
-                  <>
-                    <Text>{t("Voulez-vous accepter ce certificat ?")}</Text>
-                    <div>
-                      <Text>
-                        <Trans defaults="<b>Si vous l’acceptez</b>, celui-ci sera comptabilisé en acquisition et viendra alimenter votre solde." />
-                      </Text>
-                      <Text>
-                        <Trans defaults="Si vous le <b>refusez</b>, celui-ci n’apparaîtra plus dans vos opérations en attente." />
-                      </Text>
-                    </div>
-                  </>
-                )}
-              {operation?.type === OperationType.CESSION &&
-                operation?.status === OperationsStatus.PENDING &&
-                canUpdateOperation && (
-                  <>
-                    <Text>
-                      {t("Voulez-vous annuler ce certificat de cession ?")}
-                    </Text>
-                    <Text>
-                      {t(
-                        "Vous pouvez annuler un certificat de cession, tant que celui-ci est encore en attente côté redevable."
-                      )}
-                    </Text>
-                  </>
-                )} */}
             </>
           )}
         </Main>
