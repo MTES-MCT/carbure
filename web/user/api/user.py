@@ -8,6 +8,7 @@ from core.models import UserRights, UserRightsRequests
 @ensure_csrf_cookie
 @otp_or_403
 def get_settings(request):
+    print("Hello there")
     # user-rights
     rights = UserRights.objects.filter(user=request.user).select_related("user", "entity")
     request.session["rights"] = {ur.entity.id: ur.role for ur in rights}
