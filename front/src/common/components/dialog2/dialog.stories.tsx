@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { Confirm, Dialog } from "./dialog"
 import { Button } from "../button2"
 

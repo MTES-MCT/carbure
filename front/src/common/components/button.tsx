@@ -2,7 +2,7 @@ import cl from "clsx"
 import { Loader, Upload } from "common/components/icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
-import { Link, To } from "react-router"
+import { Link, To } from "react-router-dom"
 
 export type ButtonVariant =
   | "primary"

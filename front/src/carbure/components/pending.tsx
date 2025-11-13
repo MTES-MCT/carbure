@@ -1,4 +1,4 @@
-import { Navigate } from "react-router"
+import { Navigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
 import { useUser } from "common/hooks/user"
 import css from "./pending.module.css"

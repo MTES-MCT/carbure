@@ -5,7 +5,7 @@ import { useRoutes } from "common/hooks/routes"
 import { apiTypes } from "common/services/api-fetch.types"
 import { addQueryParams } from "common/utils/routes"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import { DebitOperationDialog } from "./debit-operation-dialog"
 import {
   BalancesFilter,

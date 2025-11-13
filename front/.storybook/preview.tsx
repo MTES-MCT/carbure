@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useEffect } from "react"
+import type { Preview } from "@storybook/react"
 import isChromatic from "chromatic/isChromatic"
-import type { Preview } from "@storybook/react-vite"
 import i18n from "../src/i18n"
 import { LoaderOverlay } from "../src/common/components/scaffold"
 import { I18nextProvider } from "react-i18next"

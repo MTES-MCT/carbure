@@ -11,7 +11,7 @@ import { BiomethaneEnergyMonthlyReportDataRequest } from "../../types"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useDeclareMonthlyQuantityColumns } from "./declare-monthly-quantity.hooks"
 import { useNotify, useNotifyError } from "common/components/notifications"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type BiomethaneEnergyMonthlyReportForm = Partial<

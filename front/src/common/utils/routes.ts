@@ -23,7 +23,6 @@ export const ROUTE_URLS = {
     const baseUrl = urlWithOrgId(entity_id, "/accounting")
 
     return {
-      ROOT: baseUrl,
       OPERATIONS: {
         ROOT: `${baseUrl}/operations`,
         BIOFUELS: `${baseUrl}/operations/biofuels`,
@@ -42,7 +41,6 @@ export const ROUTE_URLS = {
     const baseUrl = urlWithOrgId(entity_id, `/transactions/${year}`)
 
     return {
-      ROOT: baseUrl,
       DRAFT: `${baseUrl}/drafts`,
       RECEIVED: `${baseUrl}/in`,
       STOCKS: `${baseUrl}/stocks`,

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Route, Routes } from "react-router"
+import { Route, Routes } from "react-router-dom"
 import HashRoute from "common/components/hash-route"
 import { Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"

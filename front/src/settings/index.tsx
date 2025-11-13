@@ -15,7 +15,7 @@ import CompanyOptions from "./pages/company-options"
 import { EntityUserRights } from "./pages/user-rights"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useRoutes } from "common/hooks/routes"
-import { Navigate, Route, Routes } from "react-router"
+import { Navigate, Route, Routes } from "react-router-dom"
 import { BiomethaneSettingsRoutes } from "biomethane/routes"
 
 const Settings = () => {

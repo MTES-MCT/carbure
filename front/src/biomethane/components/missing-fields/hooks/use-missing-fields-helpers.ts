@@ -7,7 +7,7 @@
  */
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useCallback } from "react"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import { MISSING_FIELDS_HASH } from "../missing-fields.constants"
 
 export const useMissingFieldCounts = () => {

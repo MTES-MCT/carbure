@@ -5,7 +5,7 @@ import { Row } from "./scaffold"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
 import Select from "./select"
-import { useSearchParams } from "react-router"
+import { useSearchParams } from "react-router-dom"
 
 export interface PaginationProps {
   total: number

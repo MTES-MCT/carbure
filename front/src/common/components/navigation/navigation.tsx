@@ -7,7 +7,7 @@ import { getNeighborsInfos } from "./navigation.utils"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import css from "./navigation.module.css"
-import { useSearchParams } from "react-router"
+import { useSearchParams } from "react-router-dom"
 
 const getItemsIds = (items: { id: number }[]) => items.map((item) => item.id)
 

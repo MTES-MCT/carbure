@@ -6,7 +6,7 @@
  */
 import { FormManager } from "common/components/form2"
 import { useShowMissingFields } from "./use-show-missing-fields"
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import { MISSING_FIELDS_HASH } from "../missing-fields.constants"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"

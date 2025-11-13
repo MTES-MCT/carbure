@@ -4,7 +4,7 @@ import useEntity from "common/hooks/entity"
 import { getAmendment } from "biomethane/pages/contract/api"
 import { useHashMatch } from "common/components/hash-route"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
 
 export const AmendmentDetail = () => {

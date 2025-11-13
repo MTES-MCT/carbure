@@ -17,7 +17,7 @@ import {
 import ChargePointsApplicationsTable from "elec-charge-points/components/charge-points/table"
 import { ElecChargePointsApplication } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
-import { useLocation, useMatch } from "react-router"
+import { useLocation, useMatch } from "react-router-dom"
 import * as apiAudit from "../../api"
 import FilterMultiSelect from "common/molecules/filter-select"
 import ChargePointsApplicationDetailsDialog from "./details"

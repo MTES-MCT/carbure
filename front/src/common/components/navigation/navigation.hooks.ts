@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useHashMatch } from "../hash-route"
 import { useCallback, useEffect } from "react"
 import { getNeighborsInfos } from "./navigation.utils"

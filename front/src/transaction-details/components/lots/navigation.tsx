@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router-dom"
 import Button from "common/components/button"
 import { ChevronLeft, ChevronRight, Return } from "common/components/icons"
 import { useHashMatch } from "common/components/hash-route"

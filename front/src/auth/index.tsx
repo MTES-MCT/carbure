@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Navigate, Route, Routes } from "react-router"
+import { Navigate, Route, Routes } from "react-router-dom"
 import Login from "./components/login"
 import OTP from "./components/otp"
 import {

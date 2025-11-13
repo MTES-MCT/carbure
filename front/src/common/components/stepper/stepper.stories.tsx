@@ -1,7 +1,7 @@
-import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryFn, StoryObj } from "@storybook/react"
 import { Stepper } from "./stepper"
 import { Step, StepperProvider, useStepper } from "./stepper.provider"
-import { userEvent, waitFor, within } from "storybook/test"
+import { userEvent, waitFor, within } from "@storybook/test"
 import { TextInput } from "../inputs2"
 import { useForm } from "../form2"
 

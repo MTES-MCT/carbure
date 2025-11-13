@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react"
 import { AnnualDeclarationAlert } from "./annual-declaration-alert"
 import {
   createMockAnnualDeclaration,
   generateAnnualDeclarationContextProvider,
 } from "./annual-declaration-alert.stories.utils"
-import { expect, within } from "storybook/test"
+import { expect, within } from "@storybook/test"
 import { AnnualDeclarationStatus } from "biomethane/types"
 
 const meta: Meta<typeof AnnualDeclarationAlert> = {

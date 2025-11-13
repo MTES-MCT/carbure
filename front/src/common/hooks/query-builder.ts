@@ -3,7 +3,7 @@ import { useLimit } from "common/components/pagination"
 import { Order } from "common/components/table"
 import { useMemo } from "react"
 import useStore from "./store"
-import { useSearchParams } from "react-router"
+import { useSearchParams } from "react-router-dom"
 
 /* Types */
 export type CBSnapshot = Record<string, number>

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Navigate, Route, Routes } from "react-router"
+import { Navigate, Route, Routes } from "react-router-dom"
 import HashRoute from "common/components/hash-route"
 import { UserRole } from "common/types"
 import useEntity from "common/hooks/entity"

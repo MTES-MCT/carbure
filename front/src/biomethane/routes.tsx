@@ -1,6 +1,6 @@
 import useEntity from "common/hooks/entity"
 import { lazy } from "react"
-import { Navigate, Outlet, Route, Routes } from "react-router"
+import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { getDeclarationInterval } from "./utils"
 import { AnnualDeclarationLayout } from "./layouts/annual-declaration-layout"
 import { ContractProductionUnitProvider } from "./providers/contract-production-unit"

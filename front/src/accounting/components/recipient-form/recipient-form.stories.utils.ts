@@ -1,4 +1,4 @@
-import { userEvent, waitFor, within } from "storybook/test"
+import { userEvent, waitFor, within } from "@storybook/test"
 import { okFindEligibleTiruertEntities } from "./__test__/api"
 
 export const fillRecipientForm = async (canvasElement: HTMLElement) => {

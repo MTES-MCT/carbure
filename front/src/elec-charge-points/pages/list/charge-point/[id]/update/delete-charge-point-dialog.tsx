@@ -7,7 +7,7 @@ import { PortalInstance } from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { ChargePoint } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "./api"
 
 type DeleteChargePointDialogProps = {

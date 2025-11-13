@@ -14,7 +14,7 @@ import { groupBy, sortBy } from "common/utils/collection"
 import { EntityType } from "common/types"
 import { formatPeriod } from "common/utils/formatters"
 import i18next from "i18next"
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 import { normalizePeriod } from "common/utils/normalizers"
 import NoResult from "common/components/no-result"
 

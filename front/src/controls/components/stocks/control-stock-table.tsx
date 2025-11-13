@@ -2,7 +2,7 @@ import { memo } from "react"
 import { Stock } from "transactions/types"
 import Table, { Order, selectionColumn } from "common/components/table"
 import { useStockColumns } from "transactions/components/stocks/stock-table"
-import { To } from "react-router"
+import { To } from "react-router-dom"
 import { compact } from "common/utils/collection"
 
 export interface ControlStockTableProps {

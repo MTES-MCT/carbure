@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 import cl from "clsx"
 import Dropdown from "./dropdown"
 import { ChevronDown } from "./icons"
