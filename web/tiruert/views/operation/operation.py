@@ -1,6 +1,6 @@
 from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -92,8 +92,17 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         context["entity_id"] = entity.id
         if getattr(self.request, "unit", None):
             context["unit"] = self.request.unit
-        context["details"] = self.request.GET.get("details", "0") == "1"
+        context["details"] = self.request.GET.get("details", "0") == "1"  # For debugging purposes
         return context
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return OperationSerializer
+        elif self.action == "create":
+            return OperationInputSerializer
+        elif self.action == "partial_update":
+            return OperationUpdateSerializer
+        return super().get_serializer_class()
 
     def get_queryset(self):
         multiplicators = {
@@ -175,80 +184,9 @@ class OperationViewSet(ModelViewSet, ActionMixin):
 
         return queryset
 
-    @extend_schema(
-        operation_id="list_operations",
-        description="Retrieve a list of operations with optional filtering and pagination.",
-        filters=True,
-        parameters=[
-            OpenApiParameter(
-                name="details",
-                type=bool,
-                location=OpenApiParameter.QUERY,
-                description="Include detailed information if set to `1`.",
-                default="0",
-            )
-        ],
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(response=OperationListSerializer, description="A list of operations.")
-        },
-    )
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @extend_schema(
-        operation_id="get_operation",
-        description="Retrieve one specific operation.",
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(response=OperationSerializer, description="Details of specific operation.")
-        },
-    )
-    def retrieve(self, request, *args, **kwargs):
-        self.serializer_class = OperationSerializer
-        return super().retrieve(request, *args, **kwargs)
-
-    @extend_schema(
-        operation_id="create_operation",
-        description="Create a new operation.",
-        request=OperationInputSerializer,
-        responses={
-            status.HTTP_201_CREATED: OpenApiResponse(
-                response=OperationListSerializer, description="The newly created operation."
-            ),
-            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid input data."),
-        },
-        examples=[
-            OpenApiExample(
-                name="Create Operation Example",
-                value={
-                    "type": "TENEUR",
-                    "customs_category": "CONV",
-                    "biofuel": 33,
-                    "credited_entity": "",
-                    "debited_entity": 2,
-                    "depot": "",
-                    "lots": [
-                        {"id": 10, "volume": 39462, "emission_rate_per_mj": 5.25},
-                        {"id": 11, "volume": 723.2, "emission_rate_per_mj": 30.2},
-                    ],
-                },
-            )
-        ],
-    )
     def create(self, request):
         entity_id = request.entity.id
-        serializer = OperationInputSerializer(
-            data=request.data,
-            context={"request": request},
-        )
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             operation = serializer.save()
             return Response(
@@ -257,32 +195,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(
-        operation_id="update_operation",
-        description="Update a part of operation.",
-        request=OperationUpdateSerializer,
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(response=OperationSerializer, description="The updated operation."),
-            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid input data."),
-        },
-        examples=[
-            OpenApiExample(
-                name="Update Operation Example",
-                value={
-                    "to_depot": 10,
-                },
-            )
-        ],
-    )
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
         entity_id = self.request.GET.get("entity_id")
-        serializer = OperationUpdateSerializer(
-            instance,
-            data=request.data,
-            context={"request": request},
-            partial=True,
-        )
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         if serializer.is_valid():
             operation = serializer.save()
             return Response(
@@ -291,16 +207,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(
-        operation_id="delete_operation",
-        description="Delete an operation. Only allowed for certain types and statuses.",
-        responses={
-            status.HTTP_204_NO_CONTENT: OpenApiResponse(description="Operation deleted successfully."),
-            status.HTTP_403_FORBIDDEN: OpenApiResponse(
-                description="Forbidden. The operation type or status does not allow deletion."
-            ),
-        },
-    )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.type in [
