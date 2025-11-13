@@ -48,7 +48,7 @@ class AcceptActionMixin:
             Operation.INCORPORATION: Operation.VALIDATED,
         }
 
-        operation_status = status_by_type.get(operation.type, None)
+        operation_status = status_by_type.get(operation.type)
 
         if not operation_status:
             return Response(

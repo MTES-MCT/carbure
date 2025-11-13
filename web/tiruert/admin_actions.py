@@ -7,16 +7,20 @@ def perform_bulk_operations_validation(modeladmin, request, queryset):
     """
     Validates all selected 'INCORPORATION', 'CESSION', 'EXPORTATION' or 'EXPEDITION' operations in bulk.
     """
+    status_by_type = {
+        Operation.INCORPORATION: Operation.VALIDATED,
+        Operation.EXPORTATION: Operation.VALIDATED,
+        Operation.EXPEDITION: Operation.VALIDATED,
+        Operation.CESSION: Operation.ACCEPTED,
+    }
+
     with transaction.atomic():
         for obj in queryset:
             if obj.status == Operation.PENDING:
-                if obj.type in [Operation.INCORPORATION, Operation.EXPORTATION, Operation.EXPEDITION]:
-                    obj.status = Operation.VALIDATED
-                elif obj.type == Operation.CESSION:
-                    obj.status = Operation.ACCEPTED
-                else:
-                    continue  # Skip all other operation types
-                obj.save()
+                new_status = status_by_type.get(obj.type)
+                if new_status:
+                    obj.status = new_status
+                    obj.save()
 
     modeladmin.message_user(request, "Les opérations ont été validées avec succès.")
 
