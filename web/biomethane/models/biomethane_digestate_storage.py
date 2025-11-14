@@ -21,8 +21,8 @@ class BiomethaneDigestateStorage(models.Model):
 
     class Meta:
         db_table = "biomethane_digestate_storage"
-        verbose_name = "Biométhane - Stockage de Digestat"
-        verbose_name_plural = "Biométhane - Stockages de Digestat"
+        verbose_name = "Stockage de Digestat"
+        verbose_name_plural = "Stockages de Digestat"
 
     @property
     def production_unit(self):

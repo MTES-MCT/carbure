@@ -63,8 +63,8 @@ class BiomethaneContractAmendment(models.Model):
 
     class Meta:
         db_table = "biomethane_contract_amendment"
-        verbose_name = "Biométhane - Avenant au contrat"
-        verbose_name_plural = "Biométhane - Avenants au contrat"
+        verbose_name = "Avenant au contrat"
+        verbose_name_plural = "Avenants au contrat"
 
     @property
     def production_unit(self):

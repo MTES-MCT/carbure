@@ -12,8 +12,8 @@ class BiomethaneSupplyPlan(models.Model):
 
     class Meta:
         db_table = "biomethane_supply_plan"
-        verbose_name = "Biométhane - Plan d'approvisionnement"
-        verbose_name_plural = "Biométhane - Plans d'approvisionnement"
+        verbose_name = "Plan d'approvisionnement"
+        verbose_name_plural = "Plans d'approvisionnement"
         unique_together = ["producer", "year"]
 
     @property

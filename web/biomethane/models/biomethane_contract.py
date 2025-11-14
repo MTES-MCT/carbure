@@ -69,8 +69,8 @@ class BiomethaneContract(models.Model):
 
     class Meta:
         db_table = "biomethane_contract"
-        verbose_name = "Biométhane - Contrat d'achat"
-        verbose_name_plural = "Biométhane - Contrats d'achat"
+        verbose_name = "Contrat d'achat"
+        verbose_name_plural = "Contrats d'achat"
 
     @property
     def production_unit(self):

@@ -17,7 +17,7 @@ class BiomethaneEnergyMonthlyReport(models.Model):
 
     class Meta:
         db_table = "biomethane_energy_monthly_report"
-        verbose_name = "Biométhane - Énergie - Relevés mensuels Biométhane injecté"
+        verbose_name = "Énergie - Relevés mensuels Biométhane injecté"
 
     @property
     def production_unit(self):

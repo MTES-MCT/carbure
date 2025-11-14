@@ -202,8 +202,8 @@ class BiomethaneProductionUnit(models.Model):
 
     class Meta:
         db_table = "biomethane_production_unit"
-        verbose_name = "Biométhane - Unité de Production"
-        verbose_name_plural = "Biométhane - Unités de Production"
+        verbose_name = "Unité de Production"
+        verbose_name_plural = "Unités de Production"
 
     @property
     def watched_fields(self):

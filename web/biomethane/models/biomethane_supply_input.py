@@ -84,8 +84,8 @@ class BiomethaneSupplyInput(models.Model):
 
     class Meta:
         db_table = "biomethane_supply_input"
-        verbose_name = "Biométhane - Intrant d'approvisionnement"
-        verbose_name_plural = "Biométhane - Intrants d'approvisionnement"
+        verbose_name = "Intrant d'approvisionnement"
+        verbose_name_plural = "Intrants d'approvisionnement"
         ordering = ["supply_plan", "id"]
 
     @property
