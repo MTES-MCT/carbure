@@ -142,6 +142,17 @@ class Operation(models.Model):
     def volume(self):
         return sum([detail.volume for detail in self.details.all()])
 
+    @property
+    def volume_l(self):
+        if getattr(self, "_volume", None) is not None:
+            return self._volume
+
+        return self.volume
+
+    @property
+    def avoided_emissions(self):
+        return round(sum(detail.avoided_emissions for detail in self.details.all()), 2)  # in tCO2
+
     class Meta:
         db_table = "tiruert_operations"
         verbose_name = "Opération"
@@ -156,6 +167,13 @@ class Operation(models.Model):
         if self.credited_entity is None:
             return False
         return self.credited_entity.id == int(entity_id) and self.type == Operation.CESSION
+
+    def quantity(self, unit="l"):
+        if getattr(self, "_quantity", None) is not None:
+            return round(self._quantity, 2)
+
+        volume = self.volume_l
+        return round(self.volume_to_quantity(volume, unit), 2)
 
     def volume_to_quantity(self, volume, unit):
         if unit == "mj":
