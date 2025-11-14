@@ -66,8 +66,8 @@ class BiomethaneDigestate(models.Model):
     class Meta:
         db_table = "biomethane_digestate"
         unique_together = ["producer", "year"]
-        verbose_name = "Biométhane - Digestat"
-        verbose_name_plural = "Biométhane - Digestats"
+        verbose_name = "Digestat"
+        verbose_name_plural = "Digestats"
 
     @property
     def production_unit(self):
