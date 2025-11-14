@@ -14,6 +14,7 @@ from tiruert.models import MacFossilFuel, Objective, Operation
 from tiruert.models.elec_operation import ElecOperation
 from tiruert.serializers import ObjectiveAdminInputSerializer, ObjectiveInputSerializer, ObjectiveOutputSerializer
 from tiruert.services.objective import ObjectiveService
+from tiruert.views.mixins import UnitMixin
 
 
 @extend_schema(
@@ -48,7 +49,7 @@ from tiruert.services.objective import ObjectiveService
         ),
     ]
 )
-class ObjectiveViewSet(GenericViewSet):
+class ObjectiveViewSet(UnitMixin, GenericViewSet):
     queryset = Objective.objects.all()
     filterset_class = ObjectiveFilter
     serializer_class = ObjectiveOutputSerializer
@@ -56,25 +57,6 @@ class ObjectiveViewSet(GenericViewSet):
     http_method_names = ["get"]
     pagination_class = None
     _execution_cache = {}
-
-    def initialize_request(self, request, *args, **kwargs):
-        request = super().initialize_request(request, *args, **kwargs)
-        # Get unit from request params or entity preference or default to liters
-        entity = getattr(request, "entity", None)
-        unit = (
-            request.POST.get("unit", request.GET.get("unit")) or (entity.preferred_unit.lower() if entity else None) or "l"
-        )
-        setattr(request, "unit", unit.lower())
-
-        return request
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        entity = self.request.entity
-        context["entity_id"] = entity.id
-        if getattr(self.request, "unit", None):
-            context["unit"] = self.request.unit
-        return context
 
     def get_permissions(self):
         if self.action in ["get_objectives_admin_view", "get_agregated_objectives_admin_view"]:

@@ -17,6 +17,7 @@ from tiruert.serializers import (
     OperationSerializer,
     OperationUpdateSerializer,
 )
+from tiruert.views.mixins import UnitMixin
 
 from .mixins import ActionMixin
 
@@ -52,7 +53,7 @@ class OperationPagination(MetadataPageNumberPagination):
         ),
     ]
 )
-class OperationViewSet(ModelViewSet, ActionMixin):
+class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
     queryset = Operation.objects.all()
     serializer_class = OperationListSerializer
     filterset_class = OperationFilter
@@ -67,31 +68,19 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "simulate",
             "simulate_min_max",
             "create",
+            "update",
             "partial_update",
             "destroy",
             "export_operations_to_excel",
+            "declare_teneur",
         ]:
             return [HasOperatorWriteRights()]
         elif self.action == "correct":
             return [HasDgddiWriteRights()]
         return [(HasOperatorRights | HasDgddiWriteRights)()]
 
-    def initialize_request(self, request, *args, **kwargs):
-        request = super().initialize_request(request, *args, **kwargs)
-        # Get unit from request params or entity preference or default to liters
-        entity = getattr(request, "entity", None)
-        unit = (
-            request.POST.get("unit", request.GET.get("unit")) or (entity.preferred_unit.lower() if entity else None) or "l"
-        )
-        setattr(request, "unit", unit.lower())
-        return request
-
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        entity = self.request.entity
-        context["entity_id"] = entity.id
-        if getattr(self.request, "unit", None):
-            context["unit"] = self.request.unit
         context["details"] = self.request.GET.get("details", "0") == "1"  # For debugging purposes
         return context
 
