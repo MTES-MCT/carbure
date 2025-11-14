@@ -36,17 +36,11 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _depot = serializers.CharField(read_only=True)
 
     def get_volume_l(self, instance) -> float:
-        if getattr(instance, "_volume", None) is not None:
-            return instance._volume
-
-        return instance.volume
+        return instance.volume_l
 
     def get_quantity(self, instance) -> float:
-        if getattr(instance, "_quantity", None) is not None:
-            return round(instance._quantity, 2)
-
-        volume = self.get_volume_l(instance)
-        return round(instance.volume_to_quantity(volume, self.context.get("unit")), 2)
+        unit = self.context.get("unit")
+        return instance.quantity(unit=unit)
 
     def get_unit(self, instance) -> str:
         return self.context.get("unit")
@@ -117,11 +111,10 @@ class OperationSerializer(BaseOperationSerializer):
     export_country = CountrySerializer(read_only=True)
 
     def get_avoided_emissions(self, instance) -> float:
-        return round(sum(detail.avoided_emissions for detail in instance.details.all()), 2)
+        return instance.avoided_emissions
 
     def get_quantity_mj(self, instance) -> float:
-        volume = self.get_volume_l(instance)
-        return round(instance.volume_to_quantity(volume, "mj"), 2)
+        return instance.quantity(unit="mj")
 
 
 class OperationLotSerializer(serializers.Serializer):
