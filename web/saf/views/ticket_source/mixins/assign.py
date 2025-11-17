@@ -1,5 +1,3 @@
-import traceback
-
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
@@ -11,6 +9,7 @@ from rest_framework.response import Response
 from core.models import CarbureNotification
 from saf.models import SafTicketSource, create_ticket_from_source
 from saf.serializers import SafTicketSourceAssignmentSerializer
+from saf.services.is_shipping_route_available import is_shipping_route_available
 
 from .utils import SafTicketAssignError
 
@@ -64,37 +63,36 @@ class AssignActionMixin:
         if assignment_period < ticket_source.delivery_period:
             raise ValidationError({"message": SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY})
 
-        try:
-            with transaction.atomic():
-                ticket = create_ticket_from_source(
-                    ticket_source,
-                    client_id=client_id,
-                    volume=volume,
-                    agreement_date=agreement_date,
-                    agreement_reference=agreement_reference,
-                    assignment_period=assignment_period,
-                    free_field=free_field,
-                    reception_airport=reception_airport,
-                    consumption_type=consumption_type,
-                    shipping_method=shipping_method,
-                    pos_poc_number=pos_poc_number,
-                )
+        if not is_shipping_route_available(ticket_source.origin_lot_site, reception_airport, shipping_method):
+            raise ValidationError({"message": SafTicketAssignError.SHIPPING_ROUTE_NOT_REGISTERED})
 
-                CarbureNotification.objects.create(
-                    type=CarbureNotification.SAF_TICKET_RECEIVED,
-                    dest_id=client_id,
-                    send_by_email=False,
-                    meta={
-                        "supplier": ticket.supplier.name,
-                        "ticket_id": ticket.id,
-                        "year": ticket.year,
-                    },
-                )
+        with transaction.atomic():
+            ticket = create_ticket_from_source(
+                ticket_source,
+                client_id=client_id,
+                volume=volume,
+                agreement_date=agreement_date,
+                agreement_reference=agreement_reference,
+                assignment_period=assignment_period,
+                free_field=free_field,
+                reception_airport=reception_airport,
+                consumption_type=consumption_type,
+                shipping_method=shipping_method,
+                pos_poc_number=pos_poc_number,
+            )
 
-                ticket_source.assigned_volume += ticket.volume
-                ticket_source.save()
+            CarbureNotification.objects.create(
+                type=CarbureNotification.SAF_TICKET_RECEIVED,
+                dest_id=client_id,
+                send_by_email=False,
+                meta={
+                    "supplier": ticket.supplier.name,
+                    "ticket_id": ticket.id,
+                    "year": ticket.year,
+                },
+            )
 
-            return Response({}, status=status.HTTP_200_OK)
-        except Exception:
-            traceback.print_exc()
-            raise ValidationError({"message": SafTicketAssignError.TICKET_CREATION_FAILED})
+            ticket_source.assigned_volume += ticket.volume
+            ticket_source.save()
+
+        return Response({}, status=status.HTTP_200_OK)
