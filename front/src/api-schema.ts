@@ -5443,13 +5443,18 @@ export interface components {
             certificate_id: string;
         };
         /**
-         * @description * `PIPELINE` - PIPELINE
-         *     * `TRUCK` - TRUCK
-         *     * `TRAIN` - TRAIN
-         *     * `BARGE` - BARGE
+         * @description * `TRUCK` - Routier
+         *     * `BARGE` - Barge
+         *     * `TRAIN` - Train
+         *     * `PIPELINE` - Oléoduc
+         *     * `PIPELINE_DMM` - Oléoduc DMM
+         *     * `PIPELINE_LHP` - Oléoduc LHP
+         *     * `PIPELINE_ODC` - Oléoduc ODC
+         *     * `PIPELINE_SPMR` - Oléoduc SPMR
+         *     * `PIPELINE_SPSE` - Oléoduc SPSE
          * @enum {string}
          */
-        ShippingMethodEnum: ShippingMethodEnum;
+        ShippingMethodEnum: PathsApiResourcesAirportsGetParametersQueryShipping_method;
         SimulationInputRequest: {
             customs_category: components["schemas"]["MPCategoriesEnum"];
             biofuel: number | null;
@@ -10174,10 +10179,19 @@ export interface operations {
     resources_airports_list: {
         parameters: {
             query?: {
-                /** @description Public Only */
+                origin_depot_id?: number;
                 public_only?: boolean;
-                /** @description Search within the fields `name`, `icao_code` and `city` */
                 query?: string;
+                /** @description * `TRUCK` - TRUCK
+                 *     * `BARGE` - BARGE
+                 *     * `TRAIN` - TRAIN
+                 *     * `PIPELINE` - PIPELINE
+                 *     * `PIPELINE_DMM` - PIPELINE_DMM
+                 *     * `PIPELINE_LHP` - PIPELINE_LHP
+                 *     * `PIPELINE_ODC` - PIPELINE_ODC
+                 *     * `PIPELINE_SPMR` - PIPELINE_SPMR
+                 *     * `PIPELINE_SPSE` - PIPELINE_SPSE */
+                shipping_method?: PathsApiResourcesAirportsGetParametersQueryShipping_method;
             };
             header?: never;
             path?: never;
@@ -12634,6 +12648,17 @@ export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
     used_in_tiruert = "used_in_tiruert",
     year = "year"
 }
+export enum PathsApiResourcesAirportsGetParametersQueryShipping_method {
+    TRUCK = "TRUCK",
+    BARGE = "BARGE",
+    TRAIN = "TRAIN",
+    PIPELINE = "PIPELINE",
+    PIPELINE_DMM = "PIPELINE_DMM",
+    PIPELINE_LHP = "PIPELINE_LHP",
+    PIPELINE_ODC = "PIPELINE_ODC",
+    PIPELINE_SPMR = "PIPELINE_SPMR",
+    PIPELINE_SPSE = "PIPELINE_SPSE"
+}
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
     ValueMinusadded_by = "-added_by",
     ValueMinusfeedstock = "-feedstock",
@@ -13020,12 +13045,6 @@ export enum RoleEnum {
     ReadWrite = "RW",
     Admin = "ADMIN",
     Auditor = "AUDITOR"
-}
-export enum ShippingMethodEnum {
-    PIPELINE = "PIPELINE",
-    TRUCK = "TRUCK",
-    TRAIN = "TRAIN",
-    BARGE = "BARGE"
 }
 export enum SiteTypeEnum {
     OTHER = "OTHER",
