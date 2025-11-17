@@ -26,6 +26,13 @@ export function addMeter(entity_id: number, query: AddMeterQuery) {
   })
 }
 
+export function deleteMeter(entity_id: number, charge_point_id: number) {
+  return api.post<Api<undefined>>("elec/cpo/meters/delete-meter", {
+    entity_id,
+    charge_point_id,
+  })
+}
+
 export function changeMeasureReferencePoint(
   entity_id: number,
   query: ChangeMeasureReferencePointQuery
