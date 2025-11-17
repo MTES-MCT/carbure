@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import { isOperationDebit } from "./operations.utils"
+import { isSendingOperation } from "./operations.utils"
 import * as api from "accounting/api/biofuels/operations"
 import {
   OperationDebitOrCredit,
@@ -97,7 +97,7 @@ export const useOperationsBiofuelsColumns = ({
       key: OperationOrder.quantity,
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       cell: (item) =>
-        isOperationDebit(item.quantity) ? (
+        isSendingOperation(item.quantity) ? (
           <Text
             size="sm"
             fontWeight="semibold"

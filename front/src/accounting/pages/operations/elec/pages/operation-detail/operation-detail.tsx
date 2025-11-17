@@ -8,7 +8,7 @@ import { useHashMatch } from "common/components/hash-route"
 import {
   getOperationEntity,
   getOperationQuantity,
-  isOperationDebit,
+  isSendingOperation,
 } from "../../operations.utils"
 import { OperationBadge } from "accounting/components/operation-badge"
 import css from "../../../operations.module.css"
@@ -141,7 +141,7 @@ export const OperationDetail = () => {
                   </Button>
                 </>
               )}
-            {isOperationDebit(operation?.type ?? "") &&
+            {isSendingOperation(operation?.type ?? "") &&
               operation?.status === ElecOperationsStatus.PENDING &&
               canUpdateOperation && (
                 <Button
