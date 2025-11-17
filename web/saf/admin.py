@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from saf.models.saf_logistics import SafLogistics
+
 from .models import SafTicket, SafTicketSource
 
 
@@ -72,4 +74,25 @@ class SafTicketAdmin(admin.ModelAdmin):
         "reception_airport",
         "origin_lot",
         "origin_lot_site",
+    ]
+
+
+@admin.register(SafLogistics)
+class SafLogicticsAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "origin_depot__name",
+        "destination_airport__name",
+        "has_intermediary_depot",
+        "shipping_method",
+    ]
+    list_filter = [
+        "origin_depot__name",
+        "destination_airport__name",
+        "has_intermediary_depot",
+        "shipping_method",
+    ]
+    search_fields = [
+        "origin_depot__name",
+        "destination_airport__name",
     ]
