@@ -5,25 +5,16 @@ Uses bulk_update() and batch processing to optimize performance
 when handling large amounts of data.
 """
 
-from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
-User = get_user_model()
+from core.services.data_anonymization.entities import EntityAnonymizer
+from core.services.data_anonymization.users import UserAnonymizer
+from core.services.data_anonymization.utils import strikethrough
 
 # Batch size for processing records in chunks to optimize memory usage
 BATCH_SIZE = 2000
-
-
-def _strikethrough(text):
-    """
-    Adds Unicode strikethrough characters to text for display purposes.
-
-    This is used to visually show the old value when displaying modifications
-    in verbose mode.
-    """
-    return "\u0336".join(str(text)) + "\u0336"
 
 
 class DataAnonymizationService:
@@ -54,38 +45,11 @@ class DataAnonymizationService:
         self.verbose = verbose
         self.dry_run = dry_run
 
-    def _update_field_if_exists(self, model_instance, field_name, new_value):
-        """
-        Updates a field on a model instance if it exists and has a value.
+    def _process_anonymizer(self, anonymizer):
+        queryset = anonymizer.get_queryset()
+        updated_fields = anonymizer.get_updated_fields()
+        model_name = anonymizer.get_model_name()
 
-        This method checks if the field exists and is not empty before updating it.
-        This prevents overwriting None or empty values unnecessarily.
-        """
-        current_value = getattr(model_instance, field_name, None)
-
-        if current_value is not None and current_value != "":
-            setattr(model_instance, field_name, new_value)
-            return True
-
-        return False
-
-    def _update_fields_if_exist(self, model_instance, fields_dict):
-        """
-        Updates multiple fields on a model instance and tracks modifications.
-
-        This method attempts to update all specified fields and returns a dictionary
-        of all modifications made (old value -> new value pairs).
-        """
-        modifications = {}
-        for field_name, new_value in fields_dict.items():
-            old_value = getattr(model_instance, field_name, None)
-            updated = self._update_field_if_exists(model_instance, field_name, new_value)
-
-            if updated:
-                modifications[field_name] = (old_value, new_value)
-        return modifications
-
-    def _process_in_batches(self, queryset, process_model_object, updated_fields, model_name):
         total = queryset.count()
         if total == 0:
             print(f"   → {model_name}: Aucun enregistrement à traiter")
@@ -106,7 +70,7 @@ class DataAnonymizationService:
 
             # Process each object in the current batch
             for object_item in batch:
-                updated_object_item, modifications = process_model_object(object_item)
+                updated_object_item, modifications = anonymizer.process(object_item)
                 if updated_object_item:
                     updated_objects.append(updated_object_item)
 
@@ -115,7 +79,7 @@ class DataAnonymizationService:
                         object_id = getattr(object_item, "id", "N/A")
                         print(f"\n      [{model_name} #{object_id}]")
                         for field_name, (old_value, new_value) in modifications.items():
-                            old_display = _strikethrough(old_value)
+                            old_display = strikethrough(old_value)
                             print(f"         {field_name}: {old_display} → {new_value}")
 
             # Save all modifications in bulk for better performance
@@ -149,19 +113,17 @@ class DataAnonymizationService:
         """
         # Execute anonymization methods in the correct order
         # Order matters: anonymize dependent models first if needed
-        self.anonymize_users()
+        # self.anonymize_users()
+        self.anonymize_entities()
 
     def anonymize_users(self):
-        print("📝 Anonymisation des utilisateurs...")
+        print("📝 -------- Anonymisation des utilisateurs...   -------- ")
+        user_anonymizer = UserAnonymizer(self.fake)
+        self._process_anonymizer(user_anonymizer)
+        print("📝 -------- Fin anonymisation des utilisateurs...   -------- ")
 
-        def process_user(user):
-            modifications = self._update_fields_if_exist(
-                user,
-                {
-                    "email": f"user{user.id}@anonymized.local",
-                    "name": f"Utilisateur {user.id}",
-                },
-            )
-            return user, modifications
-
-        self._process_in_batches(User.objects.all(), process_user, ["email", "name"], "Users")
+    def anonymize_entities(self):
+        print("🏢 -------- Anonymisation des entités...   -------- ")
+        entity_anonymizer = EntityAnonymizer(self.fake)
+        self._process_anonymizer(entity_anonymizer)
+        print("🏢 -------- Fin anonymisation des entités...   -------- ")
