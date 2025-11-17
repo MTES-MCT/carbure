@@ -56,17 +56,14 @@ class DataAnonymizationService:
         self.fake = Faker("fr_FR")
         self.batch_size = batch_size
 
-        # Mapping pour cohérence (optionnel, pour maintenir des relations)
-        self.entity_names = {}
-        self.user_emails = {}
-
-    def _process_in_batches(self, queryset, process_func, model_name):
+    def _process_in_batches(self, queryset, process_func, updated_fields, model_name):
         """
         Traite un queryset par batch pour éviter de charger trop de données en mémoire.
 
         Args:
             queryset: QuerySet à traiter
             process_func: Fonction qui prend un batch d'objets et retourne les objets modifiés
+            updated_fields: Liste des champs à mettre à jour
             model_name: Nom du modèle pour les logs
         """
         total = queryset.count()
@@ -88,13 +85,7 @@ class DataAnonymizationService:
 
             # Sauvegarder en bulk
             if updated_objects:
-                # Déterminer les champs à mettre à jour
-                update_fields = list(updated_objects[0].__dict__.keys())
-                # Retirer les champs Django internes
-                update_fields = [f for f in update_fields if not f.startswith("_") and f != "id"]
-
-                # Utiliser bulk_update
-                type(updated_objects[0]).objects.bulk_update(updated_objects, update_fields, batch_size=self.batch_size)
+                type(updated_objects[0]).objects.bulk_update(updated_objects, updated_fields, batch_size=self.batch_size)
 
             total_processed += len(updated_objects)
 
@@ -135,7 +126,6 @@ class DataAnonymizationService:
             for user in batch:
                 user.email = f"user{user.id}@anonymized.local"
                 user.name = f"Utilisateur {user.id}"
-                self.user_emails[user.id] = user.email
                 updated.append(user)
             return updated
 
@@ -171,7 +161,6 @@ class DataAnonymizationService:
                 entity.website = self.fake.url()
                 entity.activity_description = self.fake.text(max_nb_chars=200)
 
-                self.entity_names[entity.id] = entity.name
                 updated.append(entity)
             return updated
 
