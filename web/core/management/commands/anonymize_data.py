@@ -1,15 +1,12 @@
 """
 Commande Django management pour anonymiser les données sensibles.
 
-Usage:
-    python manage.py anonymize_data --dry-run
-    python manage.py anonymize_data --seed 42
 """
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from core.services.data_anonymization import DataAnonymizationService
+from core.services.data_anonymization_final import DataAnonymizationService
 
 
 class Command(BaseCommand):
@@ -21,6 +18,18 @@ class Command(BaseCommand):
             type=int,
             default=2000,
             help="Taille des batches pour le traitement (défaut: 2000)",
+        )
+        parser.add_argument(
+            "--verbose",
+            default=False,
+            action="store_true",
+            help="Affiche les modifications en détail",
+        )
+        parser.add_argument(
+            "--dry-run",
+            default=False,
+            action="store_true",
+            help="Simule l'anonymisation sans modifier les données (mode test)",
         )
 
     def handle(self, *args, **options):
@@ -34,13 +43,28 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING("Opération annulée"))
                 return
 
+        # Afficher le mode dry-run si activé
+        if options["dry_run"]:
+            self.stdout.write(
+                self.style.WARNING("\n🔍 MODE DRY-RUN: Aucune modification ne sera appliquée à la base de données\n")
+            )
+
         # Créer le service
-        service = DataAnonymizationService(batch_size=options["batch_size"])
+        service = DataAnonymizationService(
+            batch_size=options["batch_size"],
+            verbose=options["verbose"],
+            dry_run=options["dry_run"],
+        )
 
         # Exécuter l'anonymisation
         try:
             service.anonymize_all()
-            self.stdout.write(self.style.SUCCESS("\n✅ Anonymisation terminée avec succès!"))
+            if options["dry_run"]:
+                self.stdout.write(
+                    self.style.SUCCESS("\n✅ Simulation terminée avec succès! (Aucune modification appliquée)")
+                )
+            else:
+                self.stdout.write(self.style.SUCCESS("\n✅ Anonymisation terminée avec succès!"))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"\n❌ Erreur lors de l'anonymisation: {e}"))
             import traceback
