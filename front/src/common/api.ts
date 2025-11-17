@@ -2,6 +2,7 @@ import { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
 import { api as apiFetch } from "common/services/api-fetch"
 import { EntityType } from "./types"
+import { SafShippingMethod } from "saf/types"
 
 export function getUserSettings() {
   return apiFetch.GET("/user/")
@@ -123,9 +124,14 @@ export async function findDepots(query?: string, public_only?: boolean) {
   return res.data ?? []
 }
 
-export async function findAirports(query?: string, public_only?: boolean) {
+export async function findAirports(
+  query?: string,
+  public_only?: boolean,
+  origin_depot_id?: number,
+  shipping_method?: SafShippingMethod
+) {
   const res = await apiFetch.GET("/resources/airports", {
-    params: { query: { query, public_only } },
+    params: { query: { query, public_only, origin_depot_id, shipping_method } },
   })
 
   return res.data ?? []

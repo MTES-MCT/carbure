@@ -5,9 +5,10 @@ import {
   SafTicketQuery,
   ConsumptionType,
   SafTicketSourceQuery,
+  SafShippingMethod,
 } from "./types"
 import { QUERY_RESET } from "common/hooks/query-builder-2"
-import { EtsStatusEnum, ShippingMethodEnum } from "api-schema"
+import { EtsStatusEnum } from "api-schema"
 
 export function getYears(entity_id: number) {
   return api.GET("/saf/years/", {
@@ -167,7 +168,7 @@ export function assignSafTicket(
   i?: string,
   free_field?: string,
   reception_airport?: number,
-  shipping_method?: ShippingMethodEnum,
+  shipping_method?: SafShippingMethod,
   consumption_type?: ConsumptionType,
   pos_poc_number?: string
 ) {
@@ -204,7 +205,7 @@ export function groupedAssignSafTicket(
   i: string,
   free_field?: string,
   reception_airport?: number,
-  shipping_method?: ShippingMethodEnum,
+  shipping_method?: SafShippingMethod,
   consumption_type?: ConsumptionType,
   pos_poc_number?: string
 ) {
