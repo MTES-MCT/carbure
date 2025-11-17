@@ -6,9 +6,9 @@ import useEntity, { EntityContext, useEntityManager } from "common/hooks/entity"
 import useUserManager, { UserContext, useUser } from "common/hooks/user"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { YearsProvider } from "common/providers/years-provider"
-import { NewNavigationDialog } from "carbure/components/new-navigation-dialog"
 import { lazy, Suspense } from "react"
 import { BiomethaneRoutes } from "biomethane/routes"
+import { ApplicationDownDialog } from "carbure/components/application-down"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -94,7 +94,7 @@ const Carbure = () => {
                       <Route path="*" element={<Navigate replace to="/" />} />
                     )}
                   </Routes>
-                  <NewNavigationDialog />
+                  <ApplicationDownDialog />
                 </Suspense>
               </NavigationLayout>
 
