@@ -61,4 +61,4 @@ class ElecProvisionCertificateQualichargeViewSet(
         if entity.entity_type == Entity.CPO:
             queryset = ElecProvisionCertificateQualicharge.objects.filter(cpo=entity)
 
-        return queryset.select_related("cpo").order_by("id")
+        return queryset.select_related("cpo").filter(cpo__isnull=False).order_by("id")
