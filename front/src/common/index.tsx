@@ -8,7 +8,6 @@ import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { YearsProvider } from "common/providers/years-provider"
 import { lazy, Suspense } from "react"
 import { BiomethaneRoutes } from "biomethane/routes"
-import { ApplicationDownDialog } from "carbure/components/application-down"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -94,7 +93,6 @@ const Carbure = () => {
                       <Route path="*" element={<Navigate replace to="/" />} />
                     )}
                   </Routes>
-                  <ApplicationDownDialog />
                 </Suspense>
               </NavigationLayout>
 
