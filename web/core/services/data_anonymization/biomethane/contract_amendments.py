@@ -30,7 +30,7 @@ class BiomethaneContractAmendmentAnonymizer(Anonymizer):
         return anonymize_fields_and_collect_modifications(
             amendment,
             {
-                "amendment_file": "fake_file.txt",
+                "amendment_file": "fake-file.txt",
                 "amendment_details": self.fake.text(max_nb_chars=500),
             },
         )

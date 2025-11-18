@@ -18,7 +18,7 @@ class EntityAnonymizer(Anonymizer):
         return Entity
 
     def get_queryset(self):
-        return Entity.objects.filter(id=1)
+        return Entity.objects.exclude(name__icontains="test")
 
     def get_updated_fields(self):
         return [

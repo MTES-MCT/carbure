@@ -30,8 +30,8 @@ class BiomethaneContractAnonymizer(Anonymizer):
         return anonymize_fields_and_collect_modifications(
             contract,
             {
-                "general_conditions_file": "fake_file.txt",
-                "specific_conditions_file": "fake_file.txt",
+                "general_conditions_file": "fake-file.txt",
+                "specific_conditions_file": "fake-file.txt",
             },
         )
 

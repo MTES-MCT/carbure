@@ -45,8 +45,8 @@ class ProductionSiteAnonymizer(Anonymizer):
             "manager_email": f"manager{production_site.id}@anonymized.local",
             "manager_phone": self.fake.phone_number(),
             "site_id": self.fake.bothify(text="SITE-####"),
-            "dc_number": self.fake.bothify(text="DC-####") if production_site.eligible_dc else None,
-            "dc_reference": self.fake.bothify(text="DC-REF-####") if production_site.eligible_dc else None,
+            "dc_number": self.fake.bothify(text="DC-####") if production_site.eligible_dc else "",
+            "dc_reference": self.fake.bothify(text="DC-REF-####") if production_site.eligible_dc else "",
             "gps_coordinates": get_french_coordinates(),
         }
 
