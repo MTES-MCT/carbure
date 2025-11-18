@@ -383,7 +383,7 @@
                           La période de declaration des relevés trimestriels T{{meter_readings_app_started.meta.quarter}}
                           {{meter_readings_app_started.meta.year}} a débuté, vous avez jusqu'au
                           {{meter_readings_app_started.meta.deadline}} pour transmettre votre relevé dans votre espace.<br />
-                          <a href="https://{{ domain }}/org/{{entity.id}}/charge-points/meter-readings">Transmettre mon relevé trimestriel</a>
+                          <a href="{{base_url}}/org/{{entity.id}}/charge-points/meter-readings">Transmettre mon relevé trimestriel</a>
                         </p>
                         {% endif %}
 
@@ -392,7 +392,7 @@
                           La période de declaration des relevés trimestriels T{{meter_readings_app_ending_soon.meta.quarter}}
                           {{meter_readings_app_ending_soon.meta.year}} arrive à sa fin, pensez à
                           transmettre votre relevé.<br />
-                          <a href="https://{{ domain }}/org/{{entity.id}}/charge-points/meter-readings">Transmettre mon relevé trimestriel</a>
+                          <a href="{{base_url}}/org/{{entity.id}}/charge-points/meter-readings">Transmettre mon relevé trimestriel</a>
                         </p>
                         {% endif %}
 
@@ -401,7 +401,7 @@
                           Demandes de corrections: <br />
                           {% for cr in correction_requests %}
                           Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a
-                            href="https://{{ domain }}/org/{{entity.id}}/transactions/{{cr.meta.year}}/out/correction">Voir</a>
+                            href="{{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/out/correction">Voir</a>
                           {% endfor %}
                         </p>
                         {% endif %}
@@ -410,7 +410,7 @@
                           Lots corrigés par vos fournisseurs: <br />
                           {% for cr in correction_done %}
                           Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a
-                            href="https://{{ domain }}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/correction">Voir</a>
+                            href="{{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/correction">Voir</a>
                           {% endfor %}
                         </p>
                         {% endif %}
@@ -419,7 +419,7 @@
                           Lots refusés par vos clients: <br />
                           {% for cr in lots_rejected %}
                           Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} <a
-                            href="https://{{ domain }}/org/{{entity.id}}/transactions/{{cr.meta.year}}/out/correction">Voir</a>
+                            href="{{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/out/correction">Voir</a>
                           {% endfor %}
                         </p>
                         {% endif %}
@@ -428,7 +428,7 @@
                           Lots reçus: <br />
                           {% for cr in lots_received %}
                           Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} <a
-                            href="https://{{ domain }}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/pending">Voir</a>
+                            href="{{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/pending">Voir</a>
                           {% endfor %}
                         </p>
                         {% endif %}
@@ -437,7 +437,7 @@
                           Lots rappelés par vos fournisseurs: <br />
                           {% for cr in lots_recalled %}
                           Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien <a
-                            href="https://{{ domain }}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/pending">Voir</a>
+                            href="{{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/pending">Voir</a>
                           {% endfor %}
                         </p>
                         {% endif %}
@@ -446,7 +446,7 @@
                         <p>
                           {% for cr in certificate_rejected %}
                           L'administration a rejeté votre certificat : {{cr.meta.certificate}} <a
-                            href="https://{{ domain }}/org/{{entity.id}}/settings/certificates">Voir</a>
+                            href="{{base_url}}/org/{{entity.id}}/settings/certificates">Voir</a>
                           {% endfor %}
                         </p>
                         {% endif %}
