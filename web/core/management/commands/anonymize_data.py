@@ -3,7 +3,8 @@ Commande Django management pour anonymiser les données sensibles.
 
 """
 
-from django.conf import settings
+import os
+
 from django.core.management.base import BaseCommand
 
 from core.services.data_anonymization_final import DataAnonymizationService
@@ -33,11 +34,17 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        # Vérification de sécurité
-        if not settings.DEBUG:
+        env = os.environ["IMAGE_TAG"]
+
+        if env not in ["dev", "local"]:
             self.stdout.write(
                 self.style.ERROR("⚠️  ATTENTION: Cette commande ne doit être exécutée qu'en environnement de développement!")
             )
+            return
+
+        # Vérification de sécurité
+        if not options["dry_run"]:
+            self.stdout.write(self.style.ERROR("⚠️  ATTENTION: Vous allez modifier toute la base de données."))
             response = input("Êtes-vous sûr de vouloir continuer? (oui/non): ")
             if response.lower() != "oui":
                 self.stdout.write(self.style.WARNING("Opération annulée"))

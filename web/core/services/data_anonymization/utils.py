@@ -6,6 +6,8 @@ effectuer des opérations communes comme la mise à jour de champs
 ou le formatage de l'affichage.
 """
 
+import random
+
 
 def strikethrough(text):
     """
@@ -62,3 +64,7 @@ def process_object_item(object_item, anonymizer, model_name, verbose):
             print(f"         {field_name}: {old_display} → {new_value}")
 
     return updated_object_item
+
+
+def get_french_coordinates():
+    return f"{42 + random.uniform(0, 9):.6f}, {random.uniform(-5, 10):.6f}"
