@@ -11,8 +11,8 @@ User = get_user_model()
 
 
 class UserAnonymizer(Anonymizer):
-    def get_model_name(self):
-        return "Users"
+    def get_model(self):
+        return User
 
     def get_queryset(self):
         return User.objects.all()

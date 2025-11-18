@@ -48,7 +48,8 @@ class DataAnonymizationService:
     def _process_anonymizer(self, anonymizer):
         queryset = anonymizer.get_queryset()
         updated_fields = anonymizer.get_updated_fields()
-        model_name = anonymizer.get_model_name()
+        model = anonymizer.get_model()
+        model_name = model.__name__
 
         total = queryset.count()
         if total == 0:
@@ -85,7 +86,7 @@ class DataAnonymizationService:
             # Save all modifications in bulk for better performance
             # Skip saving if in dry-run mode
             if updated_objects and not self.dry_run:
-                type(updated_objects[0]).objects.bulk_update(updated_objects, updated_fields, batch_size=self.batch_size)
+                model.objects.bulk_update(updated_objects, updated_fields, batch_size=self.batch_size)
 
             total_processed += len(updated_objects)
 
@@ -113,12 +114,12 @@ class DataAnonymizationService:
         """
         # Execute anonymization methods in the correct order
         # Order matters: anonymize dependent models first if needed
-        # self.anonymize_users()
+        self.anonymize_users()
         self.anonymize_entities()
 
     def anonymize_users(self):
         print("📝 -------- Anonymisation des utilisateurs...   -------- ")
-        user_anonymizer = UserAnonymizer(self.fake)
+        user_anonymizer = UserAnonymizer()
         self._process_anonymizer(user_anonymizer)
         print("📝 -------- Fin anonymisation des utilisateurs...   -------- ")
 

@@ -14,8 +14,8 @@ class EntityAnonymizer(Anonymizer):
     def __init__(self, fake: Faker):
         self.fake = fake
 
-    def get_model_name(self):
-        return "Entity"
+    def get_model(self):
+        return Entity
 
     def get_queryset(self):
         return Entity.objects.filter(id=1)
@@ -51,7 +51,7 @@ class EntityAnonymizer(Anonymizer):
             "vat_number": self.fake.bothify(text="FR#############"),
             "accise_number": self.fake.bothify(text="##########"),
             "website": self.fake.url(),
-            "activity_description": self.fake.text(max_nb_chars=200),
+            "activity_description": "Activity description",
         }
 
         return anonymize_fields_and_collect_modifications(entity, fields_to_anonymize)

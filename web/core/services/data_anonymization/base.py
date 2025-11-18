@@ -18,14 +18,14 @@ class Anonymizer(ABC):
         """
         pass
 
-    def get_model_name(self):
+    def get_model(self):
         """
         Returns the model name for display.
 
         Returns:
             Model name (model class name)
         """
-        return self.get_queryset().model.__name__
+        return self.get_queryset().model
 
     @abstractmethod
     def get_updated_fields(self):
