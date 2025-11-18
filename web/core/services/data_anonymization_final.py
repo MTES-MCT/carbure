@@ -17,6 +17,13 @@ from core.services.data_anonymization.depots import DepotAnonymizer
 from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
 from core.services.data_anonymization.double_counting.doc_files import DoubleCountingDocFileAnonymizer
 from core.services.data_anonymization.double_counting.sourcing_history import DoubleCountingSourcingHistoryAnonymizer
+from core.services.data_anonymization.elec.charge_points import ElecChargePointAnonymizer
+from core.services.data_anonymization.elec.meters import ElecMeterAnonymizer
+from core.services.data_anonymization.elec.provision_certificates import ElecProvisionCertificateAnonymizer
+from core.services.data_anonymization.elec.provision_certificates_qualicharge import (
+    ElecProvisionCertificateQualichargeAnonymizer,
+)
+from core.services.data_anonymization.elec.transfer_certificates import ElecTransferCertificateAnonymizer
 from core.services.data_anonymization.entities import EntityAnonymizer
 from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
 from core.services.data_anonymization.sites import SiteAnonymizer
@@ -128,6 +135,11 @@ class DataAnonymizationService:
             DoubleCountingApplicationAnonymizer(self.fake),
             DoubleCountingDocFileAnonymizer(self.fake),
             DoubleCountingSourcingHistoryAnonymizer(self.fake),
+            ElecChargePointAnonymizer(self.fake),
+            ElecMeterAnonymizer(self.fake),
+            ElecTransferCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateQualichargeAnonymizer(self.fake),
         ]
 
         # Process each anonymizer
