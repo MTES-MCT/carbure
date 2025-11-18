@@ -14,7 +14,7 @@ class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer)
 
 class StationSerializer(serializers.Serializer):
     id = serializers.RegexField(regex=r"^FR[A-Z]{3}P.*", min_length=7)
-    energy = serializers.FloatField(min_value=1)
+    energy = serializers.FloatField()
     is_controlled = serializers.BooleanField()
 
 

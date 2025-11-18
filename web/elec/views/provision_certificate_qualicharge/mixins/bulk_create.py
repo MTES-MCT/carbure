@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from core.models import Entity
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ProvisionCertificateBulkSerializer
+from elec.services.qualicharge import handle_bulk_create_validation_errors
 
 
 class BulkCreateMixin:
@@ -25,7 +26,10 @@ class BulkCreateMixin:
     )
     def bulk_create(self, request, *args, **kwargs):
         serializer = ProvisionCertificateBulkSerializer(data=request.data, many=True)
-        serializer.is_valid(raise_exception=True)
+
+        if not serializer.is_valid():
+            handle_bulk_create_validation_errors(request, serializer)
+
         errors = []
 
         all_double_validated_certificates = set(
@@ -39,9 +43,10 @@ class BulkCreateMixin:
                 siren = item["siren"]
                 try:
                     cpo = Entity.objects.get(registration_id=siren)
+                    unknown_siren = None
                 except Entity.DoesNotExist:
-                    errors.append({"siren": siren, "error": "Entity not found"})
-                    continue
+                    cpo = None
+                    unknown_siren = siren
 
                 for unit in item["operational_units"]:
                     code = unit["code"]
@@ -70,6 +75,7 @@ class BulkCreateMixin:
                                 date_to=date_to,
                                 defaults={
                                     "cpo": cpo,
+                                    "unknown_siren": unknown_siren,
                                     "year": year,
                                     "operating_unit": code,
                                     "energy_amount": energy_amount,
@@ -81,4 +87,9 @@ class BulkCreateMixin:
                             errors.append({"station_id": station_id, "error": str(e)})
                             continue
 
-        return Response({"status": "success", "errors": errors}, status=status.HTTP_201_CREATED)
+            # If some business errors are detected, rollback the transaction
+            if errors:
+                transaction.set_rollback(True)
+                return Response({"status": "error", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"status": "success"}, status=status.HTTP_201_CREATED)
