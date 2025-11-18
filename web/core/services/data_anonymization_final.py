@@ -9,6 +9,10 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
+from core.services.data_anonymization.biomethane.contract_amendments import BiomethaneContractAmendmentAnonymizer
+from core.services.data_anonymization.biomethane.contracts import BiomethaneContractAnonymizer
+from core.services.data_anonymization.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
+from core.services.data_anonymization.biomethane.production_units import BiomethaneProductionUnitAnonymizer
 from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
 from core.services.data_anonymization.utils import process_object_item
 
@@ -110,6 +114,10 @@ class DataAnonymizationService:
             # SiteAnonymizer(self.fake),
             # DepotAnonymizer(self.fake),
             ProductionSiteAnonymizer(self.fake),
+            BiomethaneContractAnonymizer(self.fake),
+            BiomethaneContractAmendmentAnonymizer(self.fake),
+            BiomethaneInjectionSiteAnonymizer(self.fake),
+            BiomethaneProductionUnitAnonymizer(self.fake),
         ]
 
         # Process each anonymizer
