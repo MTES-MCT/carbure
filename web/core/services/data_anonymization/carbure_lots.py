@@ -47,10 +47,10 @@ class CarbureLotAnonymizer(Anonymizer):
             "unknown_production_site": self.fake.bothify(text="SITE-####"),
             "unknown_supplier": self.fake.company(),
             "unknown_client": self.fake.company(),
-            "unknown_dispatch_site": self.fake.bothify(text="DISPATCH-####"),
-            "unknown_delivery_site": self.fake.bothify(text="DELIVERY-####"),
+            "unknown_dispatch_site": self.fake.bothify(text="DISPATCH-SITE-####"),
+            "unknown_delivery_site": self.fake.bothify(text="DELIVERY-SITE-####"),
             "production_site_certificate": self.fake.bothify(text="CERT-####-####"),
-            "production_site_certificate_type": self.fake.bothify(text="TYPE-####"),
+            "production_site_certificate_type": self.fake.bothify(text="CERT-TYPE-####"),
             "production_site_double_counting_certificate": self.fake.bothify(text="DC-CERT-####"),
             "supplier_certificate": self.fake.bothify(text="SUP-CERT-####"),
             "supplier_certificate_type": self.fake.bothify(text="SUP-TYPE-####"),
@@ -63,7 +63,7 @@ class CarbureLotAnonymizer(Anonymizer):
         return anonymize_fields_and_collect_modifications(lot, fields_to_anonymize)
 
     def get_display_name(self):
-        return "carbure lots"
+        return "Lots de biocarburant"
 
     def get_emoji(self):
         return "📦"
