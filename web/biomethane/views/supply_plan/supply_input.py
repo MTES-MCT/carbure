@@ -12,6 +12,7 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputExportSerializer,
     BiomethaneSupplyInputSerializer,
 )
+from biomethane.views.mixins import ListWithObjectPermissionsMixin
 from core.filters import FiltersActionFactory
 from core.pagination import MetadataPageNumberPagination
 
@@ -34,6 +35,7 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
     ]
 )
 class BiomethaneSupplyInputViewSet(
+    ListWithObjectPermissionsMixin,
     GenericViewSet,
     CreateModelMixin,
     UpdateModelMixin,
@@ -49,6 +51,10 @@ class BiomethaneSupplyInputViewSet(
 
     def get_permissions(self):
         return get_biomethane_permissions(["create", "update", "partial_update"], self.action)
+
+    def get_permission_object(self, first_obj):
+        """Check permissions on the supply plan of the supply inputs."""
+        return first_obj.supply_plan if first_obj else None
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

@@ -58,6 +58,7 @@
     "i18next-parser": "^9.3.0",
     "jsdom": "^27.0.0",
     "msw-storybook-addon": "^2.0.5",
+    "openapi-msw": "^2.0.0",
     "openapi-typescript": "^7.8.0",
     "prettier": "^3.6.0",
     "storybook": "^8.6.14",

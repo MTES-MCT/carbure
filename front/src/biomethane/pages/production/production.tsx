@@ -6,7 +6,7 @@ import { ProductionSite } from "./components/production-site"
 import { SanitaryAgreement } from "./components/sanitary-agreement"
 import { useProductionUnit } from "./production.hooks"
 import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
-import { WatchedFieldsProvider } from "biomethane/providers/watched-fields.provider"
+import { WatchedFieldsProvider } from "biomethane/providers/watched-fields"
 import { getProductionUnitWatchedFields } from "./api"
 
 export const BiomethaneProductionPage = () => {

@@ -21,6 +21,7 @@ import { ChangeMeasureReferencePoint } from "./change-prm"
 import { DeleteChargePointDialog } from "./delete-charge-point-dialog"
 import { MetersHistory } from "./meters-history"
 import { AxiosError } from "axios"
+import { DeleteMeterDialog } from "./delete-meter-dialog"
 
 const UpdateChargePointDialog = () => {
   const entity = useEntity()
@@ -100,6 +101,14 @@ const UpdateChargePointDialog = () => {
     chargePointDetailQuery.result?.data.data?.initial_index !=
     value.initial_index
 
+  const openDeleteMeterDialog = () => {
+    if (!chargePointDetail) return
+
+    portal((close) => (
+      <DeleteMeterDialog onClose={close} chargePointId={chargePointDetail.id} />
+    ))
+  }
+
   const openChangeMeterDialog = () => {
     if (!chargePointDetail) return
 
@@ -177,7 +186,17 @@ const UpdateChargePointDialog = () => {
                           label={t("Numéro du certificat (MID)")}
                           readOnly
                           {...bind("mid_id")}
+                          rightContent={
+                            <Button
+                              variant="danger"
+                              action={openDeleteMeterDialog}
+                              disabled={isReadOnly}
+                            >
+                              {t("Suppr. compteur")}
+                            </Button>
+                          }
                         />
+
                         <NumberInput
                           label={`${t("Index initial relevé (kWh)")}${value.initial_index_date ? ` - ${formatDate(value.initial_index_date)}` : ""}`}
                           readOnly={isReadOnly}

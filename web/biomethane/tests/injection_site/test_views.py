@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -7,7 +5,6 @@ from rest_framework import status
 
 from biomethane.factories.injection_site import BiomethaneInjectionSiteFactory
 from biomethane.models import BiomethaneInjectionSite
-from biomethane.views.injection_site import BiomethaneInjectionSiteViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -34,16 +31,6 @@ class BiomethaneInjectionSiteViewsTests(TestCase):
         self.injection_site_url = reverse("biomethane-injection-site")
 
         self.base_params = {"entity_id": self.producer_entity.id}
-
-    @patch("biomethane.views.injection_site.injection_site.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneInjectionSiteViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["upsert"], "retrieve")
 
     def test_retrieve_injection_site_success(self):
         """Test successful retrieval of injection site."""

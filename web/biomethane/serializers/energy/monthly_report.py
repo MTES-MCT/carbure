@@ -7,7 +7,7 @@ from biomethane.models import BiomethaneEnergyMonthlyReport
 class BiomethaneEnergyMonthlyReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneEnergyMonthlyReport
-        fields = "__all__"
+        exclude = ["id"]
 
 
 class MonthlyReportDataSerializer(serializers.Serializer):

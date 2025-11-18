@@ -16,12 +16,13 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
-import { MissingFields } from "biomethane/components/missing-fields"
+import {
+  MissingFields,
+  useMissingFields,
+} from "biomethane/components/missing-fields"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneDigestate } from "./types"
-import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
-import { BiomethanePageHeader } from "biomethane/layouts/page-header"
-import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
+import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 
 const DigestatePage = () => {
   const { t } = useTranslation()
@@ -49,33 +50,31 @@ const DigestatePage = () => {
   if (loading && !digestate) return <LoaderOverlay />
 
   return (
-    <BiomethanePageHeader>
-      <FormContext.Provider value={form}>
-        <MissingFields />
-        {productionUnit && <Production productionUnit={productionUnit} />}
+    <FormContext.Provider value={form}>
+      <MissingFields />
+      {productionUnit && <Production productionUnit={productionUnit} />}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.SPREADING
-        ) && (
-          <>
-            <SpreadingDistance />
-            <Spreading digestate={digestate?.data} />
-          </>
-        )}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.SPREADING
+      ) && (
+        <>
+          <SpreadingDistance />
+          <Spreading digestate={digestate?.data} />
+        </>
+      )}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.COMPOSTING
-        ) && <Composting />}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.COMPOSTING
+      ) && <Composting />}
 
-        {productionUnit?.digestate_valorization_methods?.includes(
-          DigestateValorizationMethods.INCINERATION_LANDFILLING
-        ) && <IncinerationLandfill contract={contract} />}
+      {productionUnit?.digestate_valorization_methods?.includes(
+        DigestateValorizationMethods.INCINERATION_LANDFILLING
+      ) && <IncinerationLandfill contract={contract} />}
 
-        {productionUnit?.spreading_management_methods?.includes(
-          SpreadingManagementMethods.SALE
-        ) && <Sale />}
-      </FormContext.Provider>
-    </BiomethanePageHeader>
+      {productionUnit?.spreading_management_methods?.includes(
+        SpreadingManagementMethods.SALE
+      ) && <Sale />}
+    </FormContext.Provider>
   )
 }
 

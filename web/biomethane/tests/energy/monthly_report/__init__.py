@@ -1,2 +1,0 @@
-from .test_views import BiomethaneEnergyMonthlyReportViewSetTests
-from .test_serializers import BiomethaneEnergyMonthlyReportInputSerializerTests

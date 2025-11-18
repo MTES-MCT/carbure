@@ -15,7 +15,7 @@ import useEntity from "common/hooks/entity"
 import { HttpError } from "common/services/api-fetch"
 import { MissingFields } from "biomethane/components/missing-fields"
 import { Text } from "common/components/text"
-import { useNavigateToMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
+import { useNavigateToMissingFields } from "biomethane/components/missing-fields"
 
 export const usePageHeaderActions = () => {
   const { t } = useTranslation()

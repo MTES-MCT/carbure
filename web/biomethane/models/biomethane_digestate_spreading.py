@@ -11,5 +11,11 @@ class BiomethaneDigestateSpreading(models.Model):
 
     class Meta:
         db_table = "biomethane_digestate_spreading"
-        verbose_name = "Biométhane - Données d'épandage du digestat"
-        verbose_name_plural = "Biométhane - Données d'épandage du digestat"
+        verbose_name = "Données d'épandage du digestat"
+        verbose_name_plural = "Données d'épandage du digestat"
+
+    @property
+    def production_unit(self):
+        if hasattr(self, "digestate") and self.digestate:
+            return getattr(self.digestate.producer, "biomethane_production_unit", None)
+        return None

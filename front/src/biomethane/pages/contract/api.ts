@@ -10,7 +10,7 @@ import {
 export const findBuyerBiomethaneEntities = async (query: string) =>
   findEntities(query, {
     is_enabled: true,
-    entity_type: [EntityType.Producer],
+    entity_type: [EntityType.Fournisseur_de_biom_thane],
   })
 
 export const getContract = async (entity_id: number) => {

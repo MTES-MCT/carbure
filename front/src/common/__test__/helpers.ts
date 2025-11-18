@@ -56,3 +56,13 @@ export const mockPostWithResponseData = (
 
 export const mockUser = (...params: Parameters<typeof generateUser>) =>
   mockGetWithResponseData("/user", generateUser(...params))
+
+export const mockFormDataToObject = (formData: FormData) => {
+  return formData.entries().reduce(
+    (acc, [key, value]) => {
+      acc[key] = value
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+}

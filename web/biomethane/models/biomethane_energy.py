@@ -139,7 +139,11 @@ class BiomethaneEnergy(models.Model):
     class Meta:
         db_table = "biomethane_energy"
         unique_together = ["producer", "year"]
-        verbose_name = "Biométhane - Énergie"
+        verbose_name = "Énergie"
+
+    @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
 
     @property
     def optional_fields(self):

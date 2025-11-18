@@ -1,9 +1,42 @@
+from dataclasses import dataclass
 from datetime import date
 
 from django.utils.translation import gettext as _
 
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
+from biomethane.services.rules import FieldClearingRule, RequiredFieldRule, get_fields_from_applied_rules
+
+
+@dataclass
+class ContractValidationContext:
+    """Context object for contract validation rules."""
+
+    is_creation: bool
+    tariff_reference: str | None
+    cmax_annualized: bool | None
+    has_contract_document: bool
+
+    @classmethod
+    def from_contract_and_data(cls, contract, validated_data):
+        """
+        Factory method to create context from contract and validated data.
+
+        Args:
+            contract: The contract instance (None for creation)
+            validated_data: The validated data dictionary
+
+        Returns:
+            ContractValidationContext instance
+        """
+        return cls(
+            is_creation=contract is None,
+            tariff_reference=validated_data.get("tariff_reference"),
+            cmax_annualized=validated_data.get("cmax_annualized"),
+            has_contract_document=any(
+                field in validated_data for field in BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS
+            ),
+        )
 
 
 class BiomethaneContractService:
@@ -22,11 +55,24 @@ class BiomethaneContractService:
         "specific_conditions_file",
     ]
 
-    @staticmethod
-    def validate_tariff_reference(validated_data, required_fields):
-        """Validate tariff reference is provided for contract creation."""
-        if "tariff_reference" not in validated_data:
-            required_fields.append("tariff_reference")
+    # Tariff date ranges for signature validation: (start_date, end_date, error_message)
+    TARIFF_DATE_RANGES = {
+        "2011": (
+            date(2011, 11, 23),
+            date(2020, 11, 23),
+            _("Pour la référence tarifaire 2011, la date de signature doit être entre le 23/11/2011 et le 23/11/2020."),
+        ),
+        "2020": (
+            date(2020, 11, 23),
+            date(2021, 12, 13),
+            _("Pour la référence tarifaire 2020, la date de signature doit être entre le 23/11/2020 et le 13/12/2021."),
+        ),
+        "2021": (
+            date(2021, 12, 13),
+            date(2023, 6, 10),
+            _("Pour la référence tarifaire 2021, la date de signature doit être entre le 13/12/2021 et le 10/06/2023."),
+        ),
+    }
 
     @staticmethod
     def validate_contract_document_fields(contract, validated_data, errors):
@@ -37,30 +83,6 @@ class BiomethaneContractService:
             ]
             for field in not_updatable_fields:
                 errors[field] = [_(f"Le champ {field} ne peut pas être modifié une fois le contrat signé.")]
-
-    @staticmethod
-    def get_required_fields_for_tariff(tariff_reference, required_fields):
-        """
-        Return required fields based on tariff reference.
-
-        Returns:
-            list: Required fields for the given tariff reference
-        """
-        # Tariff rule 1
-        if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-            required_fields.extend(BiomethaneContractService.TARIFF_RULE_1_FIELDS)
-
-        # Tariff rule 2
-        elif tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-            required_fields.extend(BiomethaneContractService.TARIFF_RULE_2_FIELDS)
-
-    @staticmethod
-    def validate_tariff_rule_1_specific(validated_data, required_fields):
-        """Validate specific rules for tariff rule 1."""
-        cmax_annualized = validated_data.get("cmax_annualized")
-
-        if cmax_annualized:
-            required_fields.append("cmax_annualized_value")
 
     @staticmethod
     def validate_contract_dates(signature_date, effective_date, tariff_reference, errors):
@@ -78,61 +100,17 @@ class BiomethaneContractService:
     @staticmethod
     def _validate_signature_date_by_tariff(signature_date, tariff_reference, errors):
         """Validate signature date based on tariff reference."""
-        # 2011 : 23/11/2011 et 23/11/2020
-        if tariff_reference == "2011" and not (
-            signature_date >= date(2011, 11, 23) and signature_date <= date(2020, 11, 23)
-        ):
-            errors["signature_date"] = [
-                _(
-                    (
-                        "Pour la référence tarifaire 2011, la date de signature doit être entre "
-                        "le 23/11/2011 et le 23/11/2020."
-                    )
-                )
-            ]
+        # Check date range for tariffs with specific periods
+        if tariff_reference in BiomethaneContractService.TARIFF_DATE_RANGES:
+            start_date, end_date, error_message = BiomethaneContractService.TARIFF_DATE_RANGES[tariff_reference]
+            if not (signature_date >= start_date and signature_date <= end_date):
+                errors["signature_date"] = [error_message]
 
-        # 2020 : 23/11/2020 et 13/12/2021
-        if tariff_reference == "2020" and not (
-            signature_date >= date(2020, 11, 23) and signature_date <= date(2021, 12, 13)
-        ):
-            errors["signature_date"] = [
-                _(
-                    (
-                        "Pour la référence tarifaire 2020, la date de signature doit être entre "
-                        "le 23/11/2020 et le 13/12/2021."
-                    )
-                )
-            ]
-
-        # 2021, 13/12/2021 et 10/06/2023
-        if tariff_reference == "2021" and not (signature_date >= date(2021, 12, 13) and signature_date <= date(2023, 6, 10)):
-            errors["signature_date"] = [
-                _(
-                    (
-                        "Pour la référence tarifaire 2021, la date de signature doit être entre "
-                        "le 13/12/2021 et le 10/06/2023."
-                    )
-                )
-            ]
-
-        # 2023, date de signature > 10/06/2023
-        if tariff_reference == "2023" and not (signature_date and signature_date > date(2023, 6, 10)):
+        # 2023: date de signature > 10/06/2023 (no upper bound)
+        elif tariff_reference == "2023" and not (signature_date and signature_date > date(2023, 6, 10)):
             errors["signature_date"] = [
                 _("Pour la référence tarifaire 2023, la date de signature doit être postérieure au 10/06/2023.")
             ]
-
-    @staticmethod
-    def get_required_fields_for_contract_document(validated_data, required_fields):
-        """
-        Return all contract document fields as required if any of them is provided.
-
-        Returns:
-            list: Contract document fields if any is provided, empty list otherwise
-        """
-        for field in BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS:
-            if field in validated_data:
-                required_fields.extend(BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS)
-                break
 
     @staticmethod
     def validate_contract(contract, validated_data):
@@ -151,23 +129,11 @@ class BiomethaneContractService:
 
         tariff_reference = validated_data.get("tariff_reference")
 
-        # Validate tariff reference for contract creation
-        if not contract:
-            BiomethaneContractService.validate_tariff_reference(validated_data, required_fields)
+        # Get required fields using rule engine
+        required_fields.extend(BiomethaneContractService.get_required_fields(contract, validated_data))
 
         # Validate contract document fields
         BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
-
-        # Get required fields for contract document
-        BiomethaneContractService.get_required_fields_for_contract_document(validated_data, required_fields)
-
-        # Get required fields based on tariff reference
-        if tariff_reference:
-            BiomethaneContractService.get_required_fields_for_tariff(tariff_reference, required_fields)
-
-            # Validate tariff rule 1 specific rules
-            if tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-                BiomethaneContractService.validate_tariff_rule_1_specific(validated_data, required_fields)
 
         # Validate contract dates
         signature_date = validated_data.get("signature_date")
@@ -176,6 +142,29 @@ class BiomethaneContractService:
             BiomethaneContractService.validate_contract_dates(signature_date, effective_date, tariff_reference, errors)
 
         return errors, required_fields
+
+    @staticmethod
+    def get_required_fields(contract, validated_data):
+        """
+        Determine required fields based on validated data using rule engine.
+
+        Args:
+            contract: The contract instance (None for creation)
+            validated_data: The data to validate
+
+        Returns:
+            list: List of required field names
+        """
+        # Build context for rules
+        context = ContractValidationContext.from_contract_and_data(contract, validated_data)
+
+        # Get all required field rules
+        rules = _build_required_field_rules()
+
+        # Evaluate rules and collect required fields
+        required_fields = get_fields_from_applied_rules(rules, context)
+
+        return required_fields
 
     @staticmethod
     def handle_is_red_ii(validated_data, producer):
@@ -212,19 +201,13 @@ class BiomethaneContractService:
         Returns:
             dict: Dictionary of fields to update with their new values
         """
-        fields_to_clear = []
+        # Get all clearing rules
+        rules = _build_contract_clearing_rules()
 
-        # Clear fields based on tariff reference rules
-        if contract.tariff_reference in BiomethaneContract.TARIFF_RULE_1:
-            fields_to_clear.append("pap_contracted")
-        elif contract.tariff_reference in BiomethaneContract.TARIFF_RULE_2:
-            fields_to_clear.extend(["cmax_annualized", "cmax_annualized_value", "cmax"])
+        # Evaluate rules and collect fields to clear
+        fields_to_clear = get_fields_from_applied_rules(rules, contract)
 
-        # Clear cmax_annualized_value if cmax_annualized is explicitly set to False
-        # and it's not already in the list to be cleared
-        if contract.cmax_annualized is False and "cmax_annualized_value" not in fields_to_clear:
-            fields_to_clear.append("cmax_annualized_value")
-
+        # Build update dictionary
         update_data = {}
         if fields_to_clear:
             for field in fields_to_clear:
@@ -273,3 +256,69 @@ class BiomethaneContractService:
         result.sort()
 
         return result
+
+
+# Rule configuration: declarative definition of field clearing rules
+def _build_contract_clearing_rules() -> list[FieldClearingRule]:
+    """
+    Build the list of field clearing rules for contract instances.
+    """
+    return [
+        # TARIFF_RULE_1 (2011, 2020): clear pap_contracted
+        FieldClearingRule(
+            name="tariff_rule_1_clear_pap",
+            fields=["pap_contracted"],
+            condition=lambda contract: contract.tariff_reference in BiomethaneContract.TARIFF_RULE_1,
+        ),
+        # TARIFF_RULE_2 (2021, 2023): clear cmax fields
+        FieldClearingRule(
+            name="tariff_rule_2_clear_cmax",
+            fields=["cmax", "cmax_annualized", "cmax_annualized_value"],
+            condition=lambda contract: contract.tariff_reference in BiomethaneContract.TARIFF_RULE_2,
+        ),
+        # Clear cmax_annualized_value when cmax_annualized is False
+        FieldClearingRule(
+            name="cmax_not_annualized",
+            fields=["cmax_annualized_value"],
+            condition=lambda contract: contract.cmax_annualized is False,
+        ),
+    ]
+
+
+# Rule configuration: declarative definition of required field rules
+def _build_required_field_rules() -> list[RequiredFieldRule]:
+    """
+    Build the list of required field rules for contract validation.
+    """
+    return [
+        # Contract creation: tariff_reference is required
+        RequiredFieldRule(
+            name="tariff_reference_on_creation",
+            fields=["tariff_reference"],
+            condition=lambda ctx: ctx.is_creation,
+        ),
+        # TARIFF_RULE_1 (2011, 2020): require specific fields
+        RequiredFieldRule(
+            name="tariff_rule_1_required",
+            fields=BiomethaneContractService.TARIFF_RULE_1_FIELDS,
+            condition=lambda ctx: ctx.tariff_reference in BiomethaneContract.TARIFF_RULE_1,
+        ),
+        # TARIFF_RULE_2 (2021, 2023): require specific fields
+        RequiredFieldRule(
+            name="tariff_rule_2_required",
+            fields=BiomethaneContractService.TARIFF_RULE_2_FIELDS,
+            condition=lambda ctx: ctx.tariff_reference in BiomethaneContract.TARIFF_RULE_2,
+        ),
+        # When cmax_annualized is True: require cmax_annualized_value
+        RequiredFieldRule(
+            name="cmax_annualized_requires_value",
+            fields=["cmax_annualized_value"],
+            condition=lambda ctx: ctx.cmax_annualized is True,
+        ),
+        # When any contract document field is provided: require all document fields
+        RequiredFieldRule(
+            name="contract_document_all_or_nothing",
+            fields=BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS,
+            condition=lambda ctx: ctx.has_contract_document,
+        ),
+    ]

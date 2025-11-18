@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from core.models import Entity
+from core.models import Department, Entity
 
 
 class BiomethaneProductionUnit(models.Model):
@@ -19,7 +19,7 @@ class BiomethaneProductionUnit(models.Model):
     company_address = models.CharField(max_length=256, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     city = models.CharField(max_length=128, null=True, blank=True)
-    department = models.CharField(max_length=5, null=True, blank=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
 
     # légende
     AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS"
@@ -202,8 +202,8 @@ class BiomethaneProductionUnit(models.Model):
 
     class Meta:
         db_table = "biomethane_production_unit"
-        verbose_name = "Biométhane - Unité de Production"
-        verbose_name_plural = "Biométhane - Unités de Production"
+        verbose_name = "Unité de Production"
+        verbose_name_plural = "Unités de Production"
 
     @property
     def watched_fields(self):

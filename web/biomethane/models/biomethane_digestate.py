@@ -66,8 +66,12 @@ class BiomethaneDigestate(models.Model):
     class Meta:
         db_table = "biomethane_digestate"
         unique_together = ["producer", "year"]
-        verbose_name = "Biométhane - Digestat"
-        verbose_name_plural = "Biométhane - Digestats"
+        verbose_name = "Digestat"
+        verbose_name_plural = "Digestats"
+
+    @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
 
     @property
     def optional_fields(self):
@@ -105,9 +109,6 @@ def clear_digestate_fields_on_related_model_save(sender, instance, **kwargs):
     fields_to_clear = BiomethaneDigestateService.get_fields_to_clear(digestate_instance)
 
     if fields_to_clear:
-        # Remove duplicates while preserving order
-        fields_to_clear = list(dict.fromkeys(fields_to_clear))
-
         update_data = {}
         for field in fields_to_clear:
             # Special case: composting_locations should be set to empty list, not None

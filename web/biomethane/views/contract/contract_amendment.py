@@ -5,6 +5,7 @@ from biomethane.filters import BiomethaneContractAmendmentFilter
 from biomethane.models import BiomethaneContractAmendment
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneContractAmendmentAddSerializer, BiomethaneContractAmendmentSerializer
+from biomethane.views.mixins import ListWithObjectPermissionsMixin
 
 
 @extend_schema(
@@ -19,6 +20,7 @@ from biomethane.serializers import BiomethaneContractAmendmentAddSerializer, Bio
     ]
 )
 class BiomethaneContractAmendmentViewSet(
+    ListWithObjectPermissionsMixin,
     GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -30,6 +32,10 @@ class BiomethaneContractAmendmentViewSet(
 
     def get_permissions(self):
         return get_biomethane_permissions(["create"], self.action)
+
+    def get_permission_object(self, first_obj):
+        """Check permissions on the contract of the amendment."""
+        return first_obj.contract if first_obj else None
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

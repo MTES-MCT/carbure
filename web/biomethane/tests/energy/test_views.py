@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
+from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.energy.energy import BiomethaneEnergyViewSet
@@ -20,12 +21,29 @@ class BiomethaneEnergyViewSetTests(TestCase):
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
 
+        self.buyer_entity = Entity.objects.create(
+            name="Test Buyer",
+            entity_type=Entity.OPERATOR,
+        )
+
         self.user = setup_current_user(
             self,
             "tester@carbure.local",
             "Tester",
             "gogogo",
             [(self.producer_entity, "RW")],
+        )
+
+        # Create production unit and contract to avoid field clearing by service
+        self.production_unit = BiomethaneProductionUnit.objects.create(
+            producer=self.producer_entity,
+            unit_name="Test Unit",
+        )
+
+        self.contract = BiomethaneContract.objects.create(
+            producer=self.producer_entity,
+            buyer=self.buyer_entity,
+            tariff_reference="2011",  # Use 2011 to support injected_biomethane_nm3_per_year
         )
 
         self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
@@ -40,16 +58,6 @@ class BiomethaneEnergyViewSetTests(TestCase):
             "injected_biomethane_pcs_kwh_per_nm3": 10.5,
             "operating_hours": 8000.0,
         }
-
-    @patch("biomethane.views.energy.energy.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneEnergyViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["upsert", "validate_energy"], "retrieve")
 
     def test_retrieve_energy_success(self):
         """Test successful retrieval of an existing energy declaration"""

@@ -5,9 +5,30 @@ from edelivery.ebms.request_responses import BaseRequestResponse
 
 
 class BaseEdeliveryResponse:
+    NAMESPACES = {
+        "soap": "http://www.w3.org/2003/05/soap-envelope",
+        "ws": "http://eu.domibus.wsplugin/",
+    }
+
     def __init__(self, text):
         self.text = text
         self.parsed_XML = ET.fromstring(text)
+        self.check_for_errors()
+
+    def check_for_errors(self):
+        self.error = False
+        self.error_message = None
+
+        error_element = self.find_element("soap:Body/soap:Fault")
+        if error_element is not None:
+            self.error = True
+            error_details = self.find_element("soap:Body/soap:Fault/soap:Detail/ws:FaultDetail")
+            code = error_details.find("code").text
+            message = error_details.find("message").text
+            self.error_message = f"{code} - {message}"
+
+    def find_element(self, path):
+        return self.parsed_XML.find(path, self.NAMESPACES)
 
 
 class ListPendingMessagesResponse(BaseEdeliveryResponse):
@@ -28,19 +49,20 @@ class ListPendingMessagesResponse(BaseEdeliveryResponse):
 
 
 class RetrieveMessageResponse(BaseEdeliveryResponse):
-    NAMESPACES = {
-        "soap": "http://www.w3.org/2003/05/soap-envelope",
-        "ws": "http://eu.domibus.wsplugin/",
-    }
-
     def __init__(self, text):
         super().__init__(text)
-        self.contents = unzip_base64_encoded_stream(self.attachment_value())
-        self.request_response = BaseRequestResponse(self.contents)
-        self.request_response_payload = self.request_response.payload
+
+        self.contents = None
+        self.request_response = None
+        self.request_response_payload = None
+
+        if not self.error:
+            self.contents = unzip_base64_encoded_stream(self.attachment_value())
+            self.request_response = BaseRequestResponse(self.contents)
+            self.request_response_payload = self.request_response.payload
 
     def attachment_value(self):
-        value_element = self.parsed_XML.find("soap:Body/ws:retrieveMessageResponse/payload/value", self.NAMESPACES)
+        value_element = self.find_element("soap:Body/ws:retrieveMessageResponse/payload/value")
         return value_element.text
 
 

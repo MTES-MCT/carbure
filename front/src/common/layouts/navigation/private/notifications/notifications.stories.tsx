@@ -19,8 +19,12 @@ type Story = StoryObj<typeof Notifications>
 
 export default meta
 
-// First display when notifications are not acked
 export const FirstTimeNotifications: Story = {
+  parameters: {
+    docs: {
+      description: "First display when notifications are not acked",
+    },
+  },
   play: async ({ canvasElement }) => {
     const { getByRole } = within(canvasElement)
     const button = await waitFor(() =>
@@ -31,9 +35,13 @@ export const FirstTimeNotifications: Story = {
   },
 }
 
-// Second display when notifications are acked
 export const SecondTimeNotifications: Story = {
   ...FirstTimeNotifications,
+  parameters: {
+    docs: {
+      description: "Second display when notifications are acked",
+    },
+  },
   play: async (props) => {
     // Open the dropdown
     await FirstTimeNotifications.play?.(props)

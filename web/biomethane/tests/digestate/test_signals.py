@@ -1,218 +1,182 @@
+from unittest.mock import Mock, patch
+
 from django.test import TestCase
 
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.digestate import BiomethaneDigestateFactory
 from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
 from biomethane.models.biomethane_contract import BiomethaneContract
-from biomethane.models.biomethane_digestate import BiomethaneDigestate
+from biomethane.models.biomethane_digestate import BiomethaneDigestate, clear_digestate_fields_on_related_model_save
 from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
 from core.models import Entity
 
 
-class BiomethaneDigestateSignalTests(TestCase):
+class ClearDigestateFieldsSignalTests(TestCase):
+    """
+    Unit tests for clear_digestate_fields_on_related_model_save signal handler.
+
+    These tests verify the signal handler's logic without testing Django's signal mechanism itself.
+    Business logic is tested in test_services.py.
+    """
+
     def setUp(self):
-        """Initial setup for signal tests."""
         self.producer_entity = Entity.objects.create(
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
 
-        # Create production unit with spreading valorization
-        self.production_unit = BiomethaneProductionUnitFactory.create(
-            producer=self.producer_entity,
-            digestate_valorization_methods=[BiomethaneProductionUnit.SPREADING, BiomethaneProductionUnit.COMPOSTING],
-            has_digestate_phase_separation=True,
+    @patch("biomethane.services.digestate.BiomethaneDigestateService.get_fields_to_clear")
+    @patch("biomethane.models.biomethane_digestate.BiomethaneDigestate.objects.filter")
+    def test_handler_with_digestate_sender_calls_service_and_updates(self, mock_filter, mock_get_fields):
+        """Test handler correctly processes BiomethaneDigestate as sender."""
+        # Setup
+        digestate = BiomethaneDigestateFactory.create(producer=self.producer_entity)
+
+        # Configure mocks after creation
+        mock_get_fields.reset_mock()
+        mock_filter.reset_mock()
+        mock_get_fields.return_value = ["field1", "field2"]
+        mock_queryset = Mock()
+        mock_filter.return_value = mock_queryset
+
+        # Execute
+        clear_digestate_fields_on_related_model_save(
+            sender=BiomethaneDigestate,
+            instance=digestate,
         )
 
-        self.buyer_entity = Entity.objects.create(
-            name="Test Buyer",
-            entity_type=Entity.OPERATOR,
+        # Verify service was called with digestate instance
+        mock_get_fields.assert_called_once_with(digestate)
+
+        # Verify update was called with correct data
+        mock_filter.assert_called_once_with(pk=digestate.pk)
+        mock_queryset.update.assert_called_once_with(field1=None, field2=None)
+
+    @patch("biomethane.services.digestate.BiomethaneDigestateService.get_fields_to_clear")
+    @patch("biomethane.models.biomethane_digestate.BiomethaneDigestate.objects.filter")
+    def test_handler_with_production_unit_sender_gets_latest_digestate(self, mock_filter, mock_get_fields):
+        """Test handler retrieves latest digestate when sender is BiomethaneProductionUnit."""
+        # Setup - create multiple digestates with different years
+        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2022)
+        BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2023)
+        digestate_2024 = BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2024)
+
+        # Configure mocks after creation
+        mock_get_fields.reset_mock()
+        mock_get_fields.return_value = ["field1"]
+
+        # Execute
+        clear_digestate_fields_on_related_model_save(
+            sender=BiomethaneProductionUnit,
+            instance=production_unit,
         )
 
-    def test_clear_phase_separation_fields_when_disabled(self):
-        """Test phase separation fields are cleared when phase separation is disabled."""
-        # Create digestate with phase separation data
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            solid_digestate_tonnage=500.0,
-            liquid_digestate_quantity=1000.0,
+        # Verify service was called with the latest digestate (year 2024)
+        mock_get_fields.assert_called_once_with(digestate_2024)
+
+    @patch("biomethane.services.digestate.BiomethaneDigestateService.get_fields_to_clear")
+    @patch("biomethane.models.biomethane_digestate.BiomethaneDigestate.objects.filter")
+    def test_handler_with_contract_sender_gets_latest_digestate(self, mock_filter, mock_get_fields):
+        """Test handler retrieves latest digestate when sender is BiomethaneContract."""
+        # Setup - create multiple digestates with different years
+        buyer = Entity.objects.create(name="Buyer", entity_type=Entity.OPERATOR)
+        contract = BiomethaneContractFactory.create(producer=self.producer_entity, buyer=buyer)
+        BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2022)
+        BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2023)
+        digestate_2024 = BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2024)
+
+        # Configure mocks after creation
+        mock_get_fields.reset_mock()
+        mock_get_fields.return_value = ["field1"]
+
+        # Execute
+        clear_digestate_fields_on_related_model_save(
+            sender=BiomethaneContract,
+            instance=contract,
         )
 
-        # Disable phase separation
-        self.production_unit.has_digestate_phase_separation = False
-        self.production_unit.save()
+        # Verify service was called with the latest digestate (year 2024)
+        mock_get_fields.assert_called_once_with(digestate_2024)
 
-        # Reload digestate and verify phase separation fields are cleared
-        digestate.refresh_from_db()
-        self.assertIsNone(digestate.solid_digestate_tonnage)
-        self.assertIsNone(digestate.liquid_digestate_quantity)
+    @patch("biomethane.services.digestate.BiomethaneDigestateService.get_fields_to_clear")
+    @patch("biomethane.models.biomethane_digestate.BiomethaneDigestate.objects.filter")
+    def test_handler_does_nothing_when_no_digestate_exists(self, mock_filter, mock_get_fields):
+        """Test handler exits gracefully when no digestate instance exists."""
+        # Setup - production unit without any digestate
+        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        # No digestate created
 
-    def test_clear_raw_digestate_fields_when_enabled(self):
-        """Test raw digestate fields are cleared when phase separation is enabled."""
-        # Create digestate with raw digestate data
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            raw_digestate_tonnage_produced=800.0,
-            raw_digestate_dry_matter_rate=20.0,
+        # Execute
+        clear_digestate_fields_on_related_model_save(
+            sender=BiomethaneProductionUnit,
+            instance=production_unit,
         )
 
-        # Update production unit to enable phase separation
-        self.production_unit.has_digestate_phase_separation = True
-        self.production_unit.save()
+        # Verify service was NOT called
+        mock_get_fields.assert_not_called()
+        mock_filter.assert_not_called()
 
-        # Reload digestate and verify raw digestate fields are cleared
-        digestate.refresh_from_db()
-        self.assertIsNone(digestate.raw_digestate_tonnage_produced)
-        self.assertIsNone(digestate.raw_digestate_dry_matter_rate)
+    @patch("biomethane.services.digestate.BiomethaneDigestateService.get_fields_to_clear")
+    @patch("biomethane.models.biomethane_digestate.BiomethaneDigestate.objects.filter")
+    def test_handler_does_not_update_when_no_fields_to_clear(self, mock_filter, mock_get_fields):
+        """Test handler does not call update when service returns empty list."""
+        # Setup
+        digestate = BiomethaneDigestateFactory.create(producer=self.producer_entity)
 
-    def test_clear_spreading_fields_when_not_in_valorization_methods(self):
-        """Test spreading fields are cleared when spreading is not in valorization methods."""
-        # Create digestate with spreading data
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            average_spreading_valorization_distance=50.0,
+        # Configure mocks after creation
+        mock_get_fields.reset_mock()
+        mock_filter.reset_mock()
+        mock_get_fields.return_value = []  # No fields to clear
+
+        # Execute
+        clear_digestate_fields_on_related_model_save(
+            sender=BiomethaneDigestate,
+            instance=digestate,
         )
 
-        # Update production unit to remove spreading from valorization methods
-        self.production_unit.digestate_valorization_methods = [BiomethaneProductionUnit.COMPOSTING]
-        self.production_unit.save()
+        # Verify service was called
+        mock_get_fields.assert_called_once_with(digestate)
 
-        # Reload digestate and verify spreading field is cleared
-        digestate.refresh_from_db()
-        self.assertIsNone(digestate.average_spreading_valorization_distance)
+        # Verify update was NOT called
+        mock_filter.assert_not_called()
 
-    def test_clear_composting_fields_when_not_in_valorization_methods(self):
-        """Test composting fields are cleared when composting is not in valorization methods."""
-        # Create digestate with composting data
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            composting_locations=[BiomethaneDigestate.ON_SITE, BiomethaneDigestate.EXTERNAL_PLATFORM],
-            on_site_composted_digestate_volume=300.0,
-            external_platform_name="Test Platform",
-            external_platform_digestate_volume=200.0,
-            external_platform_department="75",
-            external_platform_municipality="Paris",
+    @patch("biomethane.services.digestate.BiomethaneDigestateService.get_fields_to_clear")
+    @patch("biomethane.models.biomethane_digestate.BiomethaneDigestate.objects.filter")
+    def test_handler_sets_composting_locations_to_empty_list(self, mock_filter, mock_get_fields):
+        """Test handler sets composting_locations to empty list instead of None."""
+        # Setup
+        digestate = BiomethaneDigestateFactory.create(producer=self.producer_entity)
+
+        # Configure mocks after creation
+        mock_get_fields.reset_mock()
+        mock_filter.reset_mock()
+        mock_get_fields.return_value = ["composting_locations", "other_field"]
+        mock_queryset = Mock()
+        mock_filter.return_value = mock_queryset
+
+        # Execute
+        clear_digestate_fields_on_related_model_save(
+            sender=BiomethaneDigestate,
+            instance=digestate,
         )
 
-        # Update production unit to remove composting from valorization methods
-        self.production_unit.digestate_valorization_methods = [BiomethaneProductionUnit.SPREADING]
-        self.production_unit.save()
+        # Verify update was called with empty list for composting_locations
+        mock_queryset.update.assert_called_once_with(composting_locations=[], other_field=None)
 
-        # Reload digestate and verify composting fields are cleared
-        digestate.refresh_from_db()
-        self.assertEqual(digestate.composting_locations, [])
-        self.assertIsNone(digestate.on_site_composted_digestate_volume)
-        self.assertIsNone(digestate.external_platform_name)
-        self.assertIsNone(digestate.external_platform_digestate_volume)
-        self.assertIsNone(digestate.external_platform_department)
-        self.assertIsNone(digestate.external_platform_municipality)
+    @patch("biomethane.services.digestate.BiomethaneDigestateService.get_fields_to_clear")
+    @patch("biomethane.models.biomethane_digestate.BiomethaneDigestate.objects.filter")
+    def test_handler_ignores_unknown_sender(self, mock_filter, mock_get_fields):
+        """Test handler exits early when sender is not a recognized model."""
+        # Setup
+        entity = Entity.objects.create(name="Random Entity", entity_type=Entity.OPERATOR)
 
-    def test_clear_on_site_composting_field_when_location_removed(self):
-        """Test on-site composting field is cleared when location is removed."""
-        # Create digestate with both composting locations
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            composting_locations=[BiomethaneDigestate.ON_SITE, BiomethaneDigestate.EXTERNAL_PLATFORM],
-            on_site_composted_digestate_volume=300.0,
-            external_platform_name="Test Platform",
-            external_platform_digestate_volume=200.0,
-            external_platform_department="75",
-            external_platform_municipality="Paris",
+        # Execute with unknown sender
+        clear_digestate_fields_on_related_model_save(
+            sender=Entity,  # Not BiomethaneDigestate, BiomethaneProductionUnit, or BiomethaneContract
+            instance=entity,
         )
 
-        # Update digestate to only have external platform
-        digestate.composting_locations = [BiomethaneDigestate.EXTERNAL_PLATFORM]
-        digestate.save()
-
-        # Reload and verify only on-site field is cleared
-        digestate.refresh_from_db()
-        self.assertIsNone(digestate.on_site_composted_digestate_volume)
-        # External platform fields should remain
-        self.assertEqual(digestate.external_platform_name, "Test Platform")
-        self.assertEqual(digestate.external_platform_digestate_volume, 200.0)
-
-    def test_clear_external_platform_fields_when_location_removed(self):
-        """Test external platform fields are cleared when location is removed."""
-        # Create digestate with both composting locations
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            composting_locations=[BiomethaneDigestate.ON_SITE, BiomethaneDigestate.EXTERNAL_PLATFORM],
-            on_site_composted_digestate_volume=300.0,
-            external_platform_name="Test Platform",
-            external_platform_digestate_volume=200.0,
-            external_platform_department="75",
-            external_platform_municipality="Paris",
-        )
-
-        # Update digestate to only have on-site
-        digestate.composting_locations = [BiomethaneDigestate.ON_SITE]
-        digestate.save()
-
-        # Reload and verify only external platform fields are cleared
-        digestate.refresh_from_db()
-        self.assertEqual(digestate.on_site_composted_digestate_volume, 300.0)
-        # External platform fields should be cleared
-        self.assertIsNone(digestate.external_platform_name)
-        self.assertIsNone(digestate.external_platform_digestate_volume)
-        self.assertIsNone(digestate.external_platform_department)
-        self.assertIsNone(digestate.external_platform_municipality)
-
-    def test_clear_incineration_fields_when_not_in_valorization_methods(self):
-        """Test incineration fields are cleared when incineration is not in valorization methods."""
-        # Create digestate with incineration data
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            annual_eliminated_volume=100.0,
-            incinerator_landfill_center_name="Test Center",
-            wwtp_materials_to_incineration=50.0,
-        )
-
-        # Update production unit to not include incineration (it's not in default valorization methods)
-        self.production_unit.digestate_valorization_methods = [BiomethaneProductionUnit.SPREADING]
-        self.production_unit.save()
-
-        # Reload digestate and verify incineration fields are cleared
-        digestate.refresh_from_db()
-        self.assertIsNone(digestate.annual_eliminated_volume)
-        self.assertIsNone(digestate.incinerator_landfill_center_name)
-        self.assertIsNone(digestate.wwtp_materials_to_incineration)
-
-    def test_clear_wwtp_materials_when_contract_not_category_2(self):
-        """Test WWTP materials field is cleared when contract is not installation category 2."""
-        # Create digestate with WWTP materials data
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            wwtp_materials_to_incineration=75.0,
-        )
-
-        # Create contract with category different from 2
-        contract = BiomethaneContractFactory.create(
-            producer=self.producer_entity,
-            buyer=self.buyer_entity,
-            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
-        )
-
-        # Save contract to trigger signal
-        contract.save()
-
-        # Reload digestate and verify WWTP materials field is cleared
-        digestate.refresh_from_db()
-        self.assertIsNone(digestate.wwtp_materials_to_incineration)
-
-    def test_clear_sale_fields_when_not_in_spreading_management_methods(self):
-        """Test sale fields are cleared when sale is not in spreading management methods."""
-        # Create digestate with sale data
-        digestate = BiomethaneDigestateFactory.create(
-            producer=self.producer_entity,
-            sold_volume=200.0,
-            acquiring_companies="Company A, Company B",
-        )
-
-        # Update production unit to not include sale in spreading management methods
-        self.production_unit.spreading_management_methods = [BiomethaneProductionUnit.DIRECT_SPREADING]
-        self.production_unit.save()
-
-        # Reload digestate and verify sale fields are cleared
-        digestate.refresh_from_db()
-        self.assertIsNone(digestate.sold_volume)
-        self.assertIsNone(digestate.acquiring_companies)
+        # Verify nothing was called
+        mock_get_fields.assert_not_called()
+        mock_filter.assert_not_called()

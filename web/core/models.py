@@ -73,6 +73,7 @@ class Entity(models.Model):
     POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
     SAF_TRADER = "SAF Trader"
     BIOMETHANE_PRODUCER = "Producteur de biométhane"
+    BIOMETHANE_PROVIDER = "Fournisseur de biométhane"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -86,6 +87,7 @@ class Entity(models.Model):
         (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
         (SAF_TRADER, "Trader de SAF"),
         (BIOMETHANE_PRODUCER, "Producteur de biométhane"),
+        (BIOMETHANE_PROVIDER, "Fournisseur de biométhane"),
     )
     UNIT_CHOICE = (("l", "litres"), ("kg", "kg"), ("MJ", "MJ"))
 
@@ -185,6 +187,25 @@ class Entity(models.Model):
         hash = hashlib.md5(data.encode("utf-8")).hexdigest()
         self.hash = hash
         super(Entity, self).save(*args, **kwargs)
+
+    def get_accessible_departments(self):
+        """
+        Returns the departments accessible by this entity.
+        """
+        from entity.models import EntityScopeDepartment
+
+        dept_ids = EntityScopeDepartment.objects.filter(entity=self).values_list("object_id", flat=True)
+        return Department.objects.filter(id__in=dept_ids)
+
+    def get_accessible_depots(self):
+        """
+        Returns the depots accessible by this entity.
+        """
+        from entity.models import EntityScopeDepot
+        from transactions.models import Depot
+
+        depot_ids = EntityScopeDepot.objects.filter(entity=self).values_list("object_id", flat=True)
+        return Depot.objects.filter(id__in=depot_ids)
 
     class Meta:
         db_table = "entities"
@@ -583,6 +604,8 @@ class ExternalAdminRights(models.Model):
     ELEC = "ELEC"
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
     BIOFUEL = "BIOFUEL"
+    DREAL = "DREAL"
+    DGDDI = "DGDDI"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -592,6 +615,8 @@ class ExternalAdminRights(models.Model):
         (ELEC, ELEC),
         (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
         (BIOFUEL, BIOFUEL),
+        (DREAL, DREAL),
+        (DGDDI, DGDDI),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)

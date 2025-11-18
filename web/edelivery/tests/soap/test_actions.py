@@ -2,17 +2,14 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from edelivery.ebms.requests import BaseRequest
-from edelivery.soap.actions import ListPendingMessages, RetrieveMessage, SubmitMessage
+from edelivery.soap.actions import EdeliveryError, ListPendingMessages, RetrieveMessage, SubmitMessage
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
 class ListPendingMessagesTest(TestCase):
     def setUp(self):
-        self.http_response = MagicMock()
-        self.http_response.text = "<response/>"
-
-        self.send_callback = MagicMock()
-        self.send_callback.return_value = self.http_response
+        self.http_response = MagicMock(text="<response/>")
+        self.send_callback = MagicMock(return_value=self.http_response)
 
     def test_sends_payload_to_eDelivery_service(self):
         action = ListPendingMessages(send_callback=self.send_callback)
@@ -60,7 +57,7 @@ class RetrieveMessageTest(TestCase):
         self.assertEqual(expected_payload, action.payload())
 
 
-@patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "initiator_id", "CARBURE_NTR": "CarbuRe_NTR"})
+@patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "", "CARBURE_NTR": ""})
 class SubmitMessageTest(TestCase):
     def test_knows_its_action_name(self):
         request = BaseRequest("12345", "<request/>")
@@ -78,8 +75,8 @@ class SubmitMessageTest(TestCase):
     def test_knows_its_payload(self, patched_new_uuid, patched_timestamp):
         patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
         patched_timestamp.return_value = "2025-07-15T13:00:00+00:00"
-        request = MagicMock()
-        request.zipped_encoded.return_value = "abcdef"
+
+        request = MagicMock(**{"zipped_encoded.return_value": "abcdef"})
         action = SubmitMessage("responder_id", request)
 
         expected_payload = """\
@@ -131,3 +128,14 @@ class SubmitMessageTest(TestCase):
 </soap:Envelope>"""
 
         self.assertEqual(action.payload(), expected_payload)
+
+    def test_raises_error_if_message_could_not_submited(self):
+        send_callback = MagicMock()
+        request = BaseRequest("12345", "<request/>")
+        action = SubmitMessage("responder_id", request, send_callback=send_callback)
+        action.response_class = MagicMock(**{"return_value.error": True, "return_value.error_message": "oops"})
+
+        with self.assertRaises(EdeliveryError) as context:
+            action.perform()
+
+        self.assertEqual("oops", str(context.exception))

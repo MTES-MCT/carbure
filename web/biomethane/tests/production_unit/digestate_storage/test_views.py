@@ -1,11 +1,8 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
 from biomethane.models import BiomethaneDigestateStorage
-from biomethane.views.production_unit.digestate_storage import BiomethaneDigestateStorageViewSet
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -27,16 +24,6 @@ class BiomethaneDigestateStorageViewsTests(TestCase):
 
         self.digestate_storage_url = reverse("biomethane-digestate-storage-list")
         self.base_params = {"entity_id": self.producer_entity.id}
-
-    @patch("biomethane.views.production_unit.digestate_storage.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneDigestateStorageViewSet()
-        viewset.action = "list"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["create", "destroy", "destoy", "partial_update"], "list")
 
     def test_list_digestate_storages(self):
         """Test listing all digestate storages for a producer."""

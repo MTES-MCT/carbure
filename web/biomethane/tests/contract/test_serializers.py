@@ -29,44 +29,6 @@ class BiomethaneContractSerializerTests(TestCase):
 
         self.test_file = SimpleUploadedFile("test_contract.pdf", b"fake pdf content", content_type="application/pdf")
 
-    def test_tariff_2011_required_fields_validation(self):
-        """Test serializer validation for missing required fields (tariff 2011)."""
-        data = {
-            "tariff_reference": "2011",
-            # Missing: buyer, installation_category, cmax, cmax_annualized
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("installation_category", serializer.errors)
-        self.assertIn("cmax", serializer.errors)
-        self.assertIn("cmax_annualized", serializer.errors)
-        self.assertIn("buyer", serializer.errors)
-
-    def test_tariff_2021_required_fields_validation(self):
-        """Test serializer validation for missing required fields (tariff 2021)."""
-        data = {
-            "tariff_reference": "2021",
-            # Missing: pap_contracted, buyer
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("pap_contracted", serializer.errors)
-        self.assertIn("buyer", serializer.errors)
-
-    def test_cmax_annualized_value_required_when_annualized_true(self):
-        """Test serializer validation when cmax_annualized_value is required."""
-        data = {
-            "tariff_reference": "2011",
-            "cmax_annualized": True,
-            # Missing: cmax_annualized_value
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("cmax_annualized_value", serializer.errors)
-
     def test_invalid_installation_category(self):
         """Test serializer validation for invalid installation category."""
         data = {
@@ -125,20 +87,6 @@ class BiomethaneContractSerializerTests(TestCase):
 
             serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
             self.assertTrue(serializer.is_valid())
-
-    def test_missing_fields_if_signature_date_provided(self):
-        """Test that providing signature_date requires effective_date and files."""
-
-        data_with_signature_only = {
-            "signature_date": "2022-01-15",
-            # Missing: effective_date, general_conditions_file, specific_conditions_file
-        }
-
-        serializer = BiomethaneContractInputSerializer(data=data_with_signature_only, context=self.context)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("effective_date", serializer.errors)
-        self.assertIn("general_conditions_file", serializer.errors)
-        self.assertIn("specific_conditions_file", serializer.errors)
 
     # ========== TESTS FOR DATE VALIDATION ==========
 

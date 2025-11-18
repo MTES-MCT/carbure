@@ -42,8 +42,12 @@ class BiomethaneInjectionSite(models.Model):
 
     class Meta:
         db_table = "biomethane_injection_site"
-        verbose_name = "Biométhane - Site d'injection"
-        verbose_name_plural = "Biométhane - Sites d'injection"
+        verbose_name = "Site d'injection"
+        verbose_name_plural = "Sites d'injection"
+
+    @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)
 
 
 @receiver(post_save, sender=BiomethaneInjectionSite)

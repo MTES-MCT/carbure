@@ -16,7 +16,12 @@ const meta: Meta<typeof EnergyEfficiency> = {
   component: EnergyEfficiency,
   ...mergeDeepRight(AnnualDeclarationStoryUtils, {
     parameters: {
-      msw: [...AnnualDeclarationStoryUtils.parameters.msw, ...mswHandlers],
+      msw: {
+        handlers: [
+          ...AnnualDeclarationStoryUtils.parameters.msw.handlers,
+          ...mswHandlers,
+        ],
+      },
     },
   }),
   decorators: [

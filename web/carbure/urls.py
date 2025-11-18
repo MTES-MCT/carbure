@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -8,11 +8,9 @@ from drf_spectacular.views import (
 )
 
 from auth.views import admin_login_redirect
-from carbure.api.redirect_app import redirect_app
 from carbure.views.token import TokenObtainPairViewWithAPIKey, TokenRefreshViewWithAPIKey
 
 urlpatterns = [
-    re_path("app/(.*)", redirect_app),
     path("admin/login/", admin_login_redirect, name="admin_login_redirect"),
     path("admin/", admin.site.urls),
     # YOUR PATTERNS

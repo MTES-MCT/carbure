@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneProductionUnit
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from core.models import Department
 
 
 class BaseBiomethaneProductionUnitSerializer(serializers.ModelSerializer):
@@ -15,6 +16,11 @@ class BaseBiomethaneProductionUnitSerializer(serializers.ModelSerializer):
     )
     spreading_management_methods = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneProductionUnit.SPREADING_MANAGEMENT_METHODS_CHOICES),
+        required=False,
+    )
+    department = serializers.SlugRelatedField(
+        slug_field="code_dept",
+        queryset=Department.objects.all(),
         required=False,
     )
 

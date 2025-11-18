@@ -1,30 +1,30 @@
 /**
- * Determines the current declaration interval based on the current date.
+ * Determines the declaration interval based on the current system date.
  *
  * The declaration period runs from April 1st to March 31st of the following year.
- * The year being declared depends on the current month:
- * - If current month is January-March: declare for the previous year
- * - If current month is April-December: declare for the current year
+ * The declaration year depends on the current month:
+ * - If the current month is January–March: declare for the previous year
+ * - If the current month is April–December: declare for the current year
  *
- * @param currentDate - The date to calculate the declaration interval from. Defaults to current date.
- * @returns An object containing the start date, end date, and declaration year
+ * @returns An object with the start date, end date, and declaration year
  *
  * @example
- * // On August 21, 2025 - declare for 2025
- * getDeclarationInterval(new Date(2025, 7, 21))
+ * // If the system date is August 21, 2025 → declaration year is 2025
+ * getDeclarationInterval()
  * // Returns: { startDate: 2025-04-01, endDate: 2026-03-31, year: 2025 }
  *
  * @example
- * // On January 12, 2026 - declare for 2025
- * getDeclarationInterval(new Date(2026, 0, 12))
+ * // If the system date is January 12, 2026 → declaration year is 2025
+ * getDeclarationInterval()
  * // Returns: { startDate: 2025-04-01, endDate: 2026-03-31, year: 2025 }
  *
  * @example
- * // On May 12, 2026 - declare for 2026
- * getDeclarationInterval(new Date(2026, 4, 12))
+ * // If the system date is May 12, 2026 → declaration year is 2026
+ * getDeclarationInterval()
  * // Returns: { startDate: 2026-04-01, endDate: 2027-03-31, year: 2026 }
  */
-export function getDeclarationInterval(currentDate: Date = new Date()) {
+export function getDeclarationInterval() {
+  const currentDate = new Date()
   const currentYear = currentDate.getFullYear()
   const currentMonth = currentDate.getMonth()
 

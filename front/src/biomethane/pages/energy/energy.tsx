@@ -17,10 +17,11 @@ import { SectionsManagerProvider } from "common/providers/sections-manager.provi
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneEnergy } from "./types"
-import { MissingFields } from "biomethane/components/missing-fields"
-import { useMissingFields } from "biomethane/components/missing-fields/missing-fields.hooks"
-import { BiomethanePageHeader } from "biomethane/layouts/page-header"
-import { useContractProductionUnit } from "biomethane/providers/contract-production-unit.provider"
+import {
+  MissingFields,
+  useMissingFields,
+} from "biomethane/components/missing-fields"
+import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
@@ -47,20 +48,18 @@ const EnergyPage = () => {
   if (loading && !energy) return <LoaderOverlay />
 
   return (
-    <BiomethanePageHeader>
-      <FormContext.Provider value={form}>
-        <MissingFields />
-        <InjectedBiomethane contract={contract} />
-        <BiogasProduction productionUnit={productionUnit} />
-        <InstallationEnergyNeeds contract={contract} />
-        <EnergyEfficiency energy={energy} contract={contract} />
-        {isTariffReference2011Or2020(contract?.tariff_reference) && (
-          <MonthlyBiomethaneInjection energy={energy} />
-        )}
-        <Acceptability />
-        <Malfunction />
-      </FormContext.Provider>
-    </BiomethanePageHeader>
+    <FormContext.Provider value={form}>
+      <MissingFields />
+      <InjectedBiomethane contract={contract} />
+      <BiogasProduction productionUnit={productionUnit} />
+      <InstallationEnergyNeeds contract={contract} />
+      <EnergyEfficiency energy={energy} contract={contract} />
+      {isTariffReference2011Or2020(contract?.tariff_reference) && (
+        <MonthlyBiomethaneInjection energy={energy} />
+      )}
+      <Acceptability />
+      <Malfunction />
+    </FormContext.Provider>
   )
 }
 

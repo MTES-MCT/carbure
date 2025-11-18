@@ -32,11 +32,21 @@ type Story = StoryObj<typeof GHGRangeForm>
 
 export default meta
 
-// Display the available balance when the component is mounted
-export const Default: Story = {}
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Display the available balance when the component is mounted",
+    },
+  },
+}
 
-// Get the new available balance when the range is changed
 export const AvailableBalanceWhenRangeIsChanged: Story = {
+  parameters: {
+    docs: {
+      description: "Get the new available balance when the range is changed",
+    },
+  },
   play: async ({ canvasElement }) => {
     // For an unknown reason, the test pass but the range is not visually updated in the screenshot
     // However, this range is also used in another story, and it works there, so it's not a problem with the range itself

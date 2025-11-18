@@ -3,9 +3,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneInjectionSite
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneInjectionSiteInputSerializer, BiomethaneInjectionSiteSerializer
+from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
 
 
 @extend_schema(
@@ -19,9 +21,10 @@ from biomethane.serializers import BiomethaneInjectionSiteInputSerializer, Biome
         ),
     ]
 )
-class BiomethaneInjectionSiteViewSet(GenericViewSet):
+class BiomethaneInjectionSiteViewSet(RetrieveSingleObjectMixin, GenericViewSet):
     queryset = BiomethaneInjectionSite.objects.all()
     serializer_class = BiomethaneInjectionSiteSerializer
+    filterset_class = EntityProducerFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -41,24 +44,6 @@ class BiomethaneInjectionSiteViewSet(GenericViewSet):
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 response=BiomethaneInjectionSiteSerializer,
-                description="Injection site details for the entity",
-            ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Injection site not found for this entity."),
-        },
-        description="Retrieve the injection site for the current entity. Returns a single object.",
-    )
-    def retrieve(self, request, *args, **kwargs):
-        try:
-            injection_site = BiomethaneInjectionSite.objects.get(producer=request.entity)
-            data = self.get_serializer(injection_site, many=False).data
-            return Response(data)
-        except BiomethaneInjectionSite.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-    @extend_schema(
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneInjectionSiteSerializer,
                 description="Injection site updated successfully",
             ),
             status.HTTP_201_CREATED: OpenApiResponse(
@@ -72,7 +57,7 @@ class BiomethaneInjectionSiteViewSet(GenericViewSet):
     def upsert(self, request, *args, **kwargs):
         """Create or update injection site using upsert logic."""
         try:
-            injection_site = BiomethaneInjectionSite.objects.get(producer=request.entity)
+            injection_site = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(injection_site, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneInjectionSite.DoesNotExist:

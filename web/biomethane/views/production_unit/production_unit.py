@@ -3,14 +3,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters.production_unit import BiomethaneProductionUnitFilter
+from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneProductionUnit
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.production_unit import (
     BiomethaneProductionUnitSerializer,
     BiomethaneProductionUnitUpsertSerializer,
 )
-from biomethane.views.mixins import WatchedFieldsActionMixin
+from biomethane.views.mixins import RetrieveSingleObjectMixin, WatchedFieldsActionMixin
 
 
 @extend_schema(
@@ -24,10 +24,10 @@ from biomethane.views.mixins import WatchedFieldsActionMixin
         ),
     ]
 )
-class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
+class BiomethaneProductionUnitViewSet(RetrieveSingleObjectMixin, WatchedFieldsActionMixin, GenericViewSet):
     queryset = BiomethaneProductionUnit.objects.all()
     serializer_class = BiomethaneProductionUnitSerializer
-    filterset_class = BiomethaneProductionUnitFilter
+    filterset_class = EntityProducerFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -47,25 +47,6 @@ class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 response=BiomethaneProductionUnitSerializer,
-                description="Production unit details for the entity",
-            ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Production unit not found for this entity."),
-        },
-        description="Retrieve the production unit for the current entity. Returns a single production unit object.",
-    )
-    def retrieve(self, request, *args, **kwargs):
-        try:
-            production_unit = self.filter_queryset(self.get_queryset()).get()
-            data = self.get_serializer(production_unit, many=False).data
-            return Response(data)
-
-        except BiomethaneProductionUnit.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-    @extend_schema(
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneProductionUnitSerializer,
                 description="Production unit updated successfully",
             ),
             status.HTTP_201_CREATED: OpenApiResponse(
@@ -78,7 +59,7 @@ class BiomethaneProductionUnitViewSet(GenericViewSet, WatchedFieldsActionMixin):
     def upsert(self, request, *args, **kwargs):
         """Create or update production unit using upsert logic."""
         try:
-            production_unit = BiomethaneProductionUnit.objects.get(producer=request.entity)
+            production_unit = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(production_unit, data=request.data, partial=True)
             status_code = status.HTTP_200_OK
         except BiomethaneProductionUnit.DoesNotExist:
