@@ -13,6 +13,9 @@ from core.services.data_anonymization.biomethane.contract_amendments import Biom
 from core.services.data_anonymization.biomethane.contracts import BiomethaneContractAnonymizer
 from core.services.data_anonymization.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
 from core.services.data_anonymization.biomethane.production_units import BiomethaneProductionUnitAnonymizer
+from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
+from core.services.data_anonymization.double_counting.doc_files import DoubleCountingDocFileAnonymizer
+from core.services.data_anonymization.double_counting.sourcing_history import DoubleCountingSourcingHistoryAnonymizer
 from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
 from core.services.data_anonymization.utils import process_object_item
 
@@ -118,6 +121,9 @@ class DataAnonymizationService:
             BiomethaneContractAmendmentAnonymizer(self.fake),
             BiomethaneInjectionSiteAnonymizer(self.fake),
             BiomethaneProductionUnitAnonymizer(self.fake),
+            DoubleCountingApplicationAnonymizer(self.fake),
+            DoubleCountingDocFileAnonymizer(self.fake),
+            DoubleCountingSourcingHistoryAnonymizer(self.fake),
         ]
 
         # Process each anonymizer
