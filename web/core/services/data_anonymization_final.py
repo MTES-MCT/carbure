@@ -9,9 +9,6 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
-from core.services.data_anonymization.depots import DepotAnonymizer
-from core.services.data_anonymization.entities import EntityAnonymizer
-from core.services.data_anonymization.sites import SiteAnonymizer
 from core.services.data_anonymization.users import UserAnonymizer
 from core.services.data_anonymization.utils import process_object_item
 
@@ -106,33 +103,18 @@ class DataAnonymizationService:
         """
         Internal method that executes anonymization methods in the correct order.
         """
-        # Execute anonymization methods in the correct order
-        # Order matters: anonymize dependent models first if needed
-        # self.anonymize_users()
-        # self.anonymize_entities()
-        # self.anonymize_sites()
-        self.anonymize_depots()
+        # Define anonymizers with their initialization parameters
+        anonymizers_config = [
+            UserAnonymizer(),
+            # EntityAnonymizer(self.fake),
+            # SiteAnonymizer(self.fake),
+            # DepotAnonymizer(self.fake),
+        ]
 
-    def anonymize_users(self):
-        print("📝 -------- Anonymisation des utilisateurs...   -------- ")
-        user_anonymizer = UserAnonymizer()
-        self._process_anonymizer(user_anonymizer)
-        print("📝 -------- Fin anonymisation des utilisateurs...   -------- ")
-
-    def anonymize_entities(self):
-        print("🏢 -------- Anonymisation des entités...   -------- ")
-        entity_anonymizer = EntityAnonymizer(self.fake)
-        self._process_anonymizer(entity_anonymizer)
-        print("🏢 -------- Fin anonymisation des entités...   -------- ")
-
-    def anonymize_sites(self):
-        print("📍 -------- Anonymisation des sites...   -------- ")
-        site_anonymizer = SiteAnonymizer(self.fake)
-        self._process_anonymizer(site_anonymizer)
-        print("📍 -------- Fin anonymisation des sites...   -------- ")
-
-    def anonymize_depots(self):
-        print("🏪 -------- Anonymisation des dépôts...   -------- ")
-        depot_anonymizer = DepotAnonymizer(self.fake)
-        self._process_anonymizer(depot_anonymizer)
-        print("🏪 -------- Fin anonymisation des dépôts...   -------- ")
+        # Process each anonymizer
+        for anonymizer in anonymizers_config:
+            emoji = anonymizer.get_emoji()
+            name = anonymizer.get_display_name()
+            print(f"{emoji} -------- Anonymisation des {name}...   -------- ")
+            self._process_anonymizer(anonymizer)
+            print(f"{emoji} -------- Fin anonymisation des {name}...   -------- ")

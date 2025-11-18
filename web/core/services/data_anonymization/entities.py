@@ -55,3 +55,9 @@ class EntityAnonymizer(Anonymizer):
         }
 
         return anonymize_fields_and_collect_modifications(entity, fields_to_anonymize)
+
+    def get_display_name(self):
+        return "entités"
+
+    def get_emoji(self):
+        return "🏢"
