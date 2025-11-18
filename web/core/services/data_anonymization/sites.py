@@ -54,3 +54,9 @@ class SiteAnonymizer(Anonymizer):
         }
 
         return anonymize_fields_and_collect_modifications(site, fields_to_anonymize)
+
+    def get_display_name(self):
+        return "sites"
+
+    def get_emoji(self):
+        return "📍"

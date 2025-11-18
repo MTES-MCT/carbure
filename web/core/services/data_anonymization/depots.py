@@ -41,3 +41,9 @@ class DepotAnonymizer(Anonymizer):
         }
 
         return anonymize_fields_and_collect_modifications(depot, fields_to_anonymize)
+
+    def get_display_name(self):
+        return "dépôts"
+
+    def get_emoji(self):
+        return "🏪"

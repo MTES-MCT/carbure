@@ -50,3 +50,23 @@ class Anonymizer(ABC):
             of changes made {field_name: (old_value, new_value)}
         """
         pass
+
+    @abstractmethod
+    def get_display_name(self):
+        """
+        Returns the display name for this anonymizer (used in logs).
+
+        Returns:
+            Display name (e.g., "utilisateurs", "entités", "sites")
+        """
+        pass
+
+    @abstractmethod
+    def get_emoji(self):
+        """
+        Returns the emoji for this anonymizer (used in logs).
+
+        Returns:
+            Emoji string (e.g., "📝", "🏢", "📍")
+        """
+        pass

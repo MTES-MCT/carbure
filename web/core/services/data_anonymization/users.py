@@ -28,3 +28,9 @@ class UserAnonymizer(Anonymizer):
                 "name": f"Utilisateur {user.id}",
             },
         )
+
+    def get_display_name(self):
+        return "utilisateurs"
+
+    def get_emoji(self):
+        return "📝"
