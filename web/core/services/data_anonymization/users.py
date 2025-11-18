@@ -15,7 +15,7 @@ class UserAnonymizer(Anonymizer):
         return User
 
     def get_queryset(self):
-        return User.objects.all()
+        return User.objects.filter(is_staff=False)
 
     def get_updated_fields(self):
         return ["email", "name"]
