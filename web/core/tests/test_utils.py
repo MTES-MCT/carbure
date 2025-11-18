@@ -6,7 +6,7 @@ from core.utils import CarbureEnv
 
 
 class CarbureEnvTest(TestCase):
-    @patch.dict("os.environ", {"IMAGE_TAG": "local"})
+    @patch.dict("os.environ", {"IMAGE_TAG": "local"}, clear=True)
     def test_get_base_url_local_without_public_url(self):
         """Test that get_base_url returns the local URL when IMAGE_TAG=local and PUBLIC_URL is not defined"""
 
@@ -20,7 +20,7 @@ class CarbureEnvTest(TestCase):
 
         self.assertEqual(base_url, "https://custom.local.url")
 
-    @patch.dict("os.environ", {"IMAGE_TAG": "prod"})
+    @patch.dict("os.environ", {"IMAGE_TAG": "prod"}, clear=True)
     def test_get_base_url_default_without_public_url(self):
         """Test that get_base_url returns the default URL when PUBLIC_URL is not defined"""
         base_url = CarbureEnv.get_base_url()
