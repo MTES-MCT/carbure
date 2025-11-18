@@ -13,6 +13,9 @@ from core.services.data_anonymization.biomethane.contract_amendments import Biom
 from core.services.data_anonymization.biomethane.contracts import BiomethaneContractAnonymizer
 from core.services.data_anonymization.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
 from core.services.data_anonymization.biomethane.production_units import BiomethaneProductionUnitAnonymizer
+from core.services.data_anonymization.carbure_lot_comments import CarbureLotCommentAnonymizer
+from core.services.data_anonymization.carbure_lots import CarbureLotAnonymizer
+from core.services.data_anonymization.certificates import CertificateAnonymizer
 from core.services.data_anonymization.depots import DepotAnonymizer
 from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
 from core.services.data_anonymization.double_counting.doc_files import DoubleCountingDocFileAnonymizer
@@ -26,6 +29,7 @@ from core.services.data_anonymization.elec.provision_certificates_qualicharge im
 from core.services.data_anonymization.elec.transfer_certificates import ElecTransferCertificateAnonymizer
 from core.services.data_anonymization.entities import EntityAnonymizer
 from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
+from core.services.data_anonymization.saf.tickets import SafTicketAnonymizer
 from core.services.data_anonymization.sites import SiteAnonymizer
 from core.services.data_anonymization.users import UserAnonymizer
 from core.services.data_anonymization.utils import process_object_item
@@ -140,6 +144,10 @@ class DataAnonymizationService:
             ElecTransferCertificateAnonymizer(self.fake),
             ElecProvisionCertificateAnonymizer(self.fake),
             ElecProvisionCertificateQualichargeAnonymizer(self.fake),
+            SafTicketAnonymizer(self.fake),
+            CarbureLotAnonymizer(self.fake),
+            CertificateAnonymizer(self.fake),
+            CarbureLotCommentAnonymizer(self.fake),
         ]
 
         # Process each anonymizer
