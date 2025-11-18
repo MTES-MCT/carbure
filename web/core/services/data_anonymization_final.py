@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
+from core.services.data_anonymization.depots import DepotAnonymizer
 from core.services.data_anonymization.entities import EntityAnonymizer
 from core.services.data_anonymization.sites import SiteAnonymizer
 from core.services.data_anonymization.users import UserAnonymizer
@@ -109,7 +110,8 @@ class DataAnonymizationService:
         # Order matters: anonymize dependent models first if needed
         # self.anonymize_users()
         # self.anonymize_entities()
-        self.anonymize_sites()
+        # self.anonymize_sites()
+        self.anonymize_depots()
 
     def anonymize_users(self):
         print("📝 -------- Anonymisation des utilisateurs...   -------- ")
@@ -128,3 +130,9 @@ class DataAnonymizationService:
         site_anonymizer = SiteAnonymizer(self.fake)
         self._process_anonymizer(site_anonymizer)
         print("📍 -------- Fin anonymisation des sites...   -------- ")
+
+    def anonymize_depots(self):
+        print("🏪 -------- Anonymisation des dépôts...   -------- ")
+        depot_anonymizer = DepotAnonymizer(self.fake)
+        self._process_anonymizer(depot_anonymizer)
+        print("🏪 -------- Fin anonymisation des dépôts...   -------- ")

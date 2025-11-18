@@ -7,7 +7,7 @@ from faker import Faker
 from transactions.models import Site
 
 from .base import Anonymizer
-from .utils import anonymize_fields_and_collect_modifications
+from .utils import anonymize_fields_and_collect_modifications, get_french_coordinates
 
 
 class SiteAnonymizer(Anonymizer):
@@ -18,7 +18,7 @@ class SiteAnonymizer(Anonymizer):
         return Site
 
     def get_queryset(self):
-        return Site.objects.filter(id=1)
+        return Site.objects.all()
 
     def get_updated_fields(self):
         return [
@@ -44,7 +44,7 @@ class SiteAnonymizer(Anonymizer):
             "address": self.fake.address(),
             "postal_code": self.fake.postcode(),
             "city": self.fake.city(),
-            "gps_coordinates": f"{42 + self.fake.random.uniform(0, 9):.6f}, {self.fake.random.uniform(-5, 10):.6f}",
+            "gps_coordinates": get_french_coordinates(),
             "dc_number": self.fake.bothify(text="DC-####") if site.eligible_dc else None,
             "dc_reference": self.fake.bothify(text="DC-REF-####") if site.eligible_dc else None,
             "manager_name": self.fake.name(),
