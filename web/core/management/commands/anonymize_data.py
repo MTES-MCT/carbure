@@ -7,7 +7,7 @@ import os
 
 from django.core.management.base import BaseCommand
 
-from core.services.data_anonymization_final import DataAnonymizationService
+from core.services.data_anonymization import BATCH_SIZE, DataAnonymizationService
 
 
 class Command(BaseCommand):
@@ -17,7 +17,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--batch-size",
             type=int,
-            default=2000,
+            default=BATCH_SIZE,
             help="Taille des batches pour le traitement (défaut: 2000)",
         )
         parser.add_argument(
@@ -32,6 +32,12 @@ class Command(BaseCommand):
             action="store_true",
             help="Simule l'anonymisation sans modifier les données (mode test)",
         )
+        parser.add_argument(
+            "--force",
+            default=False,
+            action="store_true",
+            help="Force l'anonymisation sans confirmation",
+        )
 
     def handle(self, *args, **options):
         env = os.environ["IMAGE_TAG"]
@@ -43,7 +49,7 @@ class Command(BaseCommand):
             return
 
         # Vérification de sécurité
-        if not options["dry_run"]:
+        if not options["dry_run"] and not options["force"]:
             self.stdout.write(self.style.ERROR("⚠️  ATTENTION: Vous allez modifier toute la base de données."))
             response = input("Êtes-vous sûr de vouloir continuer? (oui/non): ")
             if response.lower() != "oui":
@@ -58,9 +64,7 @@ class Command(BaseCommand):
 
         # Créer le service
         service = DataAnonymizationService(
-            batch_size=options["batch_size"],
-            verbose=options["verbose"],
-            dry_run=options["dry_run"],
+            batch_size=options["batch_size"], verbose=options["verbose"], dry_run=options["dry_run"]
         )
 
         # Exécuter l'anonymisation
