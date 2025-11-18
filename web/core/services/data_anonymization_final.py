@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
-from core.services.data_anonymization.users import UserAnonymizer
+from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
 from core.services.data_anonymization.utils import process_object_item
 
 # Batch size for processing records in chunks to optimize memory usage
@@ -105,10 +105,11 @@ class DataAnonymizationService:
         """
         # Define anonymizers with their initialization parameters
         anonymizers_config = [
-            UserAnonymizer(),
+            # UserAnonymizer(),
             # EntityAnonymizer(self.fake),
             # SiteAnonymizer(self.fake),
             # DepotAnonymizer(self.fake),
+            ProductionSiteAnonymizer(self.fake),
         ]
 
         # Process each anonymizer
