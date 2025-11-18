@@ -10,8 +10,9 @@ from django.db import transaction
 from faker import Faker
 
 from core.services.data_anonymization.entities import EntityAnonymizer
+from core.services.data_anonymization.sites import SiteAnonymizer
 from core.services.data_anonymization.users import UserAnonymizer
-from core.services.data_anonymization.utils import strikethrough
+from core.services.data_anonymization.utils import process_object_item
 
 # Batch size for processing records in chunks to optimize memory usage
 BATCH_SIZE = 2000
@@ -71,17 +72,9 @@ class DataAnonymizationService:
 
             # Process each object in the current batch
             for object_item in batch:
-                updated_object_item, modifications = anonymizer.process(object_item)
+                updated_object_item = process_object_item(object_item, anonymizer, model_name, self.verbose)
                 if updated_object_item:
                     updated_objects.append(updated_object_item)
-
-                    # Display detailed modification history only if verbose mode is enabled
-                    if modifications and self.verbose:
-                        object_id = getattr(object_item, "id", "N/A")
-                        print(f"\n      [{model_name} #{object_id}]")
-                        for field_name, (old_value, new_value) in modifications.items():
-                            old_display = strikethrough(old_value)
-                            print(f"         {field_name}: {old_display} → {new_value}")
 
             # Save all modifications in bulk for better performance
             # Skip saving if in dry-run mode
@@ -114,8 +107,9 @@ class DataAnonymizationService:
         """
         # Execute anonymization methods in the correct order
         # Order matters: anonymize dependent models first if needed
-        self.anonymize_users()
-        self.anonymize_entities()
+        # self.anonymize_users()
+        # self.anonymize_entities()
+        self.anonymize_sites()
 
     def anonymize_users(self):
         print("📝 -------- Anonymisation des utilisateurs...   -------- ")
@@ -128,3 +122,9 @@ class DataAnonymizationService:
         entity_anonymizer = EntityAnonymizer(self.fake)
         self._process_anonymizer(entity_anonymizer)
         print("🏢 -------- Fin anonymisation des entités...   -------- ")
+
+    def anonymize_sites(self):
+        print("📍 -------- Anonymisation des sites...   -------- ")
+        site_anonymizer = SiteAnonymizer(self.fake)
+        self._process_anonymizer(site_anonymizer)
+        print("📍 -------- Fin anonymisation des sites...   -------- ")
