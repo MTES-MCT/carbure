@@ -1174,6 +1174,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/elec/provision-certificates-qualicharge/transfer/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Transfer a Qualicharge provision certificate to another entity with the same registration ID */
+        post: operations["transfer_provision_certificate_qualicharge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/elec/provision-certificates/{id}/": {
         parameters: {
             query?: never;
@@ -4141,6 +4158,7 @@ export interface components {
         ElecProvisionCertificateQualicharge: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
+            unknown_siren?: string | null;
             /** Format: date */
             date_from: string;
             /** Format: date */
@@ -4408,6 +4426,7 @@ export interface components {
          *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
          *     * `BIOFUEL` - BIOFUEL
          *     * `DREAL` - DREAL
+         *     * `DGDDI` - DGDDI
          * @enum {string}
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
@@ -5555,6 +5574,10 @@ export interface components {
          * @enum {string}
          */
         TrackedAmendmentTypesEnum: TrackedAmendmentTypesEnum;
+        TransferCertificateRequest: {
+            certificate_id: number;
+            target_entity_id: number;
+        };
         /**
          * @description * `DAU` - DAU
          *     * `DAE` - DAE
@@ -6326,7 +6349,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Avenant au contrat. */
+                /** @description A unique integer value identifying this Avenant au contrat. */
                 id: number;
             };
             cookie?: never;
@@ -6491,7 +6514,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6516,7 +6539,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6547,7 +6570,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6571,7 +6594,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Stockage de Digestat. */
+                /** @description A unique integer value identifying this Stockage de Digestat. */
                 id: number;
             };
             cookie?: never;
@@ -6659,7 +6682,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Données d'épandage du digestat. */
+                /** @description A unique integer value identifying this Données d'épandage du digestat. */
                 id: number;
             };
             cookie?: never;
@@ -7049,7 +7072,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                /** @description A unique integer value identifying this Intrant d'approvisionnement. */
                 id: number;
             };
             cookie?: never;
@@ -7074,7 +7097,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                /** @description A unique integer value identifying this Intrant d'approvisionnement. */
                 id: number;
             };
             cookie?: never;
@@ -7105,7 +7128,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Biométhane - Intrant d'approvisionnement. */
+                /** @description A unique integer value identifying this Intrant d'approvisionnement. */
                 id: number;
             };
             cookie?: never;
@@ -8138,7 +8161,7 @@ export interface operations {
         };
         responses: {
             /** @description Success message */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8215,6 +8238,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    transfer_provision_certificate_qualicharge: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransferCertificateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TransferCertificateRequest"];
+                "multipart/form-data": components["schemas"]["TransferCertificateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success message */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Error message */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };
@@ -12860,7 +12921,8 @@ export enum ExtAdminPagesEnum {
     ELEC = "ELEC",
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
     BIOFUEL = "BIOFUEL",
-    DREAL = "DREAL"
+    DREAL = "DREAL",
+    DGDDI = "DGDDI"
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",

@@ -1,6 +1,7 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework import mixins, viewsets
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
 from rest_framework_api_key.permissions import HasAPIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -36,9 +37,7 @@ class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination
         ),
     ]
 )
-class ElecProvisionCertificateQualichargeViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, ActionMixin, viewsets.GenericViewSet
-):
+class ElecProvisionCertificateQualichargeViewSet(ListModelMixin, RetrieveModelMixin, ActionMixin, GenericViewSet):
     queryset = ElecProvisionCertificateQualicharge.objects.all()
     serializer_class = ElecProvisionCertificateQualichargeSerializer
     filterset_class = ProvisionCertificateQualichargeFilter

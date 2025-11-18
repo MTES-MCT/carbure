@@ -762,8 +762,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Avenant au
-            contrat.
+          description: A unique integer value identifying this Avenant au contrat.
           required: true
       tags:
         - biomethane
@@ -982,8 +981,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1019,8 +1017,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1068,8 +1065,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1116,8 +1112,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Stockage de
-            Digestat.
+          description: A unique integer value identifying this Stockage de Digestat.
           required: true
       tags:
         - biomethane
@@ -1203,8 +1198,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Données
-            d'épandage du digestat.
+          description: A unique integer value identifying this Données d'épandage du
+            digestat.
           required: true
       tags:
         - biomethane
@@ -1704,8 +1699,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Intrant
-            d'approvisionnement.
+          description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
       tags:
         - biomethane
@@ -1741,8 +1735,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Intrant
-            d'approvisionnement.
+          description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
       tags:
         - biomethane
@@ -1790,8 +1783,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Biométhane - Intrant
-            d'approvisionnement.
+          description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
       tags:
         - biomethane
@@ -3513,7 +3505,7 @@ paths:
       security:
         - jwtAuth: []
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -3673,6 +3665,50 @@ paths:
                     - AMENAGEUR 5
                   summary: Example of filters response.
           description: ""
+  /api/elec/provision-certificates-qualicharge/transfer/:
+    post:
+      operationId: transfer_provision_certificate_qualicharge
+      description: Transfer a Qualicharge provision certificate to another entity with
+        the same registration ID
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferCertificateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TransferCertificateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TransferCertificateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+                message: Certificate transferred successfully
+          description: Success message
+        "400":
+          content:
+            application/json:
+              schema:
+                status: error
+                error: Error message
+          description: Error message
   /api/elec/provision-certificates/{id}/:
     get:
       operationId: elec_provision_certificates_retrieve
@@ -13823,6 +13859,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        unknown_siren:
+          type: string
+          nullable: true
+          maxLength: 16
         date_from:
           type: string
           format: date
@@ -14511,6 +14551,7 @@ components:
         - TRANSFERRED_ELEC
         - BIOFUEL
         - DREAL
+        - DGDDI
       type: string
       description: |-
         * `DCA` - DCA
@@ -14521,6 +14562,7 @@ components:
         * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
         * `BIOFUEL` - BIOFUEL
         * `DREAL` - DREAL
+        * `DGDDI` - DGDDI
     FeedStock:
       type: object
       properties:
@@ -17001,7 +17043,6 @@ components:
         energy:
           type: number
           format: double
-          minimum: 1
         is_controlled:
           type: boolean
       required:
@@ -17104,6 +17145,16 @@ components:
         * `CMAX_PAP_UPDATE` - CMAX_PAP_UPDATE
         * `CMAX_ANNUALIZATION` - CMAX_ANNUALIZATION
         * `PRODUCER_BUYER_INFO_CHANGE` - PRODUCER_BUYER_INFO_CHANGE
+    TransferCertificateRequest:
+      type: object
+      properties:
+        certificate_id:
+          type: integer
+        target_entity_id:
+          type: integer
+      required:
+        - certificate_id
+        - target_entity_id
     TransportDocumentTypeEnum:
       enum:
         - DAU
