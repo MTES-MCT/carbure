@@ -9,29 +9,11 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
-from core.services.data_anonymization.biomethane.contract_amendments import BiomethaneContractAmendmentAnonymizer
-from core.services.data_anonymization.biomethane.contracts import BiomethaneContractAnonymizer
-from core.services.data_anonymization.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
-from core.services.data_anonymization.biomethane.production_units import BiomethaneProductionUnitAnonymizer
 from core.services.data_anonymization.carbure_lot_comments import CarbureLotCommentAnonymizer
 from core.services.data_anonymization.carbure_lots import CarbureLotAnonymizer
 from core.services.data_anonymization.certificates import CertificateAnonymizer
-from core.services.data_anonymization.depots import DepotAnonymizer
-from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
-from core.services.data_anonymization.double_counting.doc_files import DoubleCountingDocFileAnonymizer
-from core.services.data_anonymization.double_counting.sourcing_history import DoubleCountingSourcingHistoryAnonymizer
-from core.services.data_anonymization.elec.charge_points import ElecChargePointAnonymizer
-from core.services.data_anonymization.elec.meters import ElecMeterAnonymizer
-from core.services.data_anonymization.elec.provision_certificates import ElecProvisionCertificateAnonymizer
-from core.services.data_anonymization.elec.provision_certificates_qualicharge import (
-    ElecProvisionCertificateQualichargeAnonymizer,
-)
-from core.services.data_anonymization.elec.transfer_certificates import ElecTransferCertificateAnonymizer
-from core.services.data_anonymization.entities import EntityAnonymizer
-from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
+from core.services.data_anonymization.saf.ticket_sources import SafTicketSourceAnonymizer
 from core.services.data_anonymization.saf.tickets import SafTicketAnonymizer
-from core.services.data_anonymization.sites import SiteAnonymizer
-from core.services.data_anonymization.users import UserAnonymizer
 from core.services.data_anonymization.utils import process_object_item
 
 # Batch size for processing records in chunks to optimize memory usage
@@ -127,24 +109,25 @@ class DataAnonymizationService:
         """
         # Define anonymizers with their initialization parameters
         anonymizers_config = [
-            UserAnonymizer(),
-            EntityAnonymizer(self.fake),
-            SiteAnonymizer(self.fake),
-            DepotAnonymizer(self.fake),
-            ProductionSiteAnonymizer(self.fake),
-            BiomethaneContractAnonymizer(self.fake),
-            BiomethaneContractAmendmentAnonymizer(self.fake),
-            BiomethaneInjectionSiteAnonymizer(self.fake),
-            BiomethaneProductionUnitAnonymizer(self.fake),
-            DoubleCountingApplicationAnonymizer(self.fake),
-            DoubleCountingDocFileAnonymizer(self.fake),
-            DoubleCountingSourcingHistoryAnonymizer(self.fake),
-            ElecChargePointAnonymizer(self.fake),
-            ElecMeterAnonymizer(self.fake),
-            ElecTransferCertificateAnonymizer(self.fake),
-            ElecProvisionCertificateAnonymizer(self.fake),
-            ElecProvisionCertificateQualichargeAnonymizer(self.fake),
+            # UserAnonymizer(),
+            # EntityAnonymizer(self.fake),
+            # SiteAnonymizer(self.fake),
+            # DepotAnonymizer(self.fake),
+            # ProductionSiteAnonymizer(self.fake),
+            # BiomethaneContractAnonymizer(self.fake),
+            # BiomethaneContractAmendmentAnonymizer(self.fake),
+            # BiomethaneInjectionSiteAnonymizer(self.fake),
+            # BiomethaneProductionUnitAnonymizer(self.fake),
+            # DoubleCountingApplicationAnonymizer(self.fake),
+            # DoubleCountingDocFileAnonymizer(self.fake),
+            # DoubleCountingSourcingHistoryAnonymizer(self.fake),
+            # ElecChargePointAnonymizer(self.fake),
+            # ElecMeterAnonymizer(self.fake),
+            # ElecTransferCertificateAnonymizer(self.fake),
+            # ElecProvisionCertificateAnonymizer(self.fake),
+            # ElecProvisionCertificateQualichargeAnonymizer(self.fake),
             SafTicketAnonymizer(self.fake),
+            SafTicketSourceAnonymizer(self.fake),
             CarbureLotAnonymizer(self.fake),
             CertificateAnonymizer(self.fake),
             CarbureLotCommentAnonymizer(self.fake),
