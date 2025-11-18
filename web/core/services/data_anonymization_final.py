@@ -13,10 +13,14 @@ from core.services.data_anonymization.biomethane.contract_amendments import Biom
 from core.services.data_anonymization.biomethane.contracts import BiomethaneContractAnonymizer
 from core.services.data_anonymization.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
 from core.services.data_anonymization.biomethane.production_units import BiomethaneProductionUnitAnonymizer
+from core.services.data_anonymization.depots import DepotAnonymizer
 from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
 from core.services.data_anonymization.double_counting.doc_files import DoubleCountingDocFileAnonymizer
 from core.services.data_anonymization.double_counting.sourcing_history import DoubleCountingSourcingHistoryAnonymizer
+from core.services.data_anonymization.entities import EntityAnonymizer
 from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
+from core.services.data_anonymization.sites import SiteAnonymizer
+from core.services.data_anonymization.users import UserAnonymizer
 from core.services.data_anonymization.utils import process_object_item
 
 # Batch size for processing records in chunks to optimize memory usage
@@ -112,10 +116,10 @@ class DataAnonymizationService:
         """
         # Define anonymizers with their initialization parameters
         anonymizers_config = [
-            # UserAnonymizer(),
-            # EntityAnonymizer(self.fake),
-            # SiteAnonymizer(self.fake),
-            # DepotAnonymizer(self.fake),
+            UserAnonymizer(),
+            EntityAnonymizer(self.fake),
+            SiteAnonymizer(self.fake),
+            DepotAnonymizer(self.fake),
             ProductionSiteAnonymizer(self.fake),
             BiomethaneContractAnonymizer(self.fake),
             BiomethaneContractAmendmentAnonymizer(self.fake),

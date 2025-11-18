@@ -28,8 +28,8 @@ class DoubleCountingDocFileAnonymizer(Anonymizer):
 
     def process(self, doc_file):
         fields_to_anonymize = {
-            "url": "fake_file.txt",
-            "file_name": "fake_file.txt",
+            "url": "fake-file.txt",
+            "file_name": f"{doc_file.file_type}-fake-file.txt",
         }
 
         return anonymize_fields_and_collect_modifications(doc_file, fields_to_anonymize)

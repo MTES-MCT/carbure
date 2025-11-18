@@ -26,7 +26,7 @@ class DoubleCountingApplicationAnonymizer(Anonymizer):
         ]
 
     def process(self, application):
-        fields_to_anonymize = {"download_link": "fake_file.txt"}
+        fields_to_anonymize = {"download_link": "fake-file.txt"}
 
         return anonymize_fields_and_collect_modifications(application, fields_to_anonymize)
 
