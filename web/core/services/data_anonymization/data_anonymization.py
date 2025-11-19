@@ -11,8 +11,35 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
+from core.services.data_anonymization.biomethane.contract_amendments import BiomethaneContractAmendmentAnonymizer
+from core.services.data_anonymization.biomethane.contracts import BiomethaneContractAnonymizer
+from core.services.data_anonymization.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
+from core.services.data_anonymization.biomethane.production_units import BiomethaneProductionUnitAnonymizer
+from core.services.data_anonymization.carbure_lot_comments import CarbureLotCommentAnonymizer
 from core.services.data_anonymization.carbure_lots import CarbureLotAnonymizer
-from core.services.data_anonymization.utils import format_duration, process_object_item
+from core.services.data_anonymization.certificates import CertificateAnonymizer
+from core.services.data_anonymization.depots import DepotAnonymizer
+from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
+from core.services.data_anonymization.double_counting.doc_files import DoubleCountingDocFileAnonymizer
+from core.services.data_anonymization.double_counting.sourcing_history import DoubleCountingSourcingHistoryAnonymizer
+from core.services.data_anonymization.elec.charge_points import ElecChargePointAnonymizer
+from core.services.data_anonymization.elec.meters import ElecMeterAnonymizer
+from core.services.data_anonymization.elec.provision_certificates import ElecProvisionCertificateAnonymizer
+from core.services.data_anonymization.elec.provision_certificates_qualicharge import (
+    ElecProvisionCertificateQualichargeAnonymizer,
+)
+from core.services.data_anonymization.elec.transfer_certificates import ElecTransferCertificateAnonymizer
+from core.services.data_anonymization.entities import EntityAnonymizer
+from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
+from core.services.data_anonymization.saf.ticket_sources import SafTicketSourceAnonymizer
+from core.services.data_anonymization.saf.tickets import SafTicketAnonymizer
+from core.services.data_anonymization.sites import SiteAnonymizer
+from core.services.data_anonymization.truncate_tables import truncate_tables
+from core.services.data_anonymization.users import UserAnonymizer
+from core.services.data_anonymization.utils import (
+    display_anonymization_summary,
+    process_object_item,
+)
 
 # Batch size for processing records in chunks to optimize memory usage
 BATCH_SIZE = 1000
@@ -83,8 +110,7 @@ class DataAnonymizationService:
             total_processed += len(updated_objects)
 
         elapsed_time = time.perf_counter() - start_time
-        formatted_time = format_duration(elapsed_time)
-        print(f"   → {model_name}: {total_processed} enregistrements traités en {formatted_time}")
+        print(f"   → {model_name}: {total_processed} enregistrements traités")
         return total_processed, elapsed_time
 
     def anonymize_all(self):
@@ -110,43 +136,58 @@ class DataAnonymizationService:
 
         # Define anonymizers with their initialization parameters
         anonymizers_config = [
-            # UserAnonymizer(),
-            # EntityAnonymizer(self.fake),
-            # SiteAnonymizer(self.fake),
-            # DepotAnonymizer(self.fake),
-            # ProductionSiteAnonymizer(self.fake),
-            # BiomethaneContractAnonymizer(self.fake),
-            # BiomethaneContractAmendmentAnonymizer(self.fake),
-            # BiomethaneInjectionSiteAnonymizer(self.fake),
-            # BiomethaneProductionUnitAnonymizer(self.fake),
-            # DoubleCountingApplicationAnonymizer(self.fake),
-            # DoubleCountingDocFileAnonymizer(self.fake),
-            # DoubleCountingSourcingHistoryAnonymizer(self.fake),
-            # ElecChargePointAnonymizer(self.fake),
-            # ElecMeterAnonymizer(self.fake),
-            # ElecTransferCertificateAnonymizer(self.fake),
-            # ElecProvisionCertificateAnonymizer(self.fake),
-            # ElecProvisionCertificateQualichargeAnonymizer(self.fake),
-            # SafTicketAnonymizer(self.fake),
-            # SafTicketSourceAnonymizer(self.fake),
+            UserAnonymizer(),
+            EntityAnonymizer(self.fake),
+            SiteAnonymizer(self.fake),
+            DepotAnonymizer(self.fake),
+            ProductionSiteAnonymizer(self.fake),
+            BiomethaneContractAnonymizer(self.fake),
+            BiomethaneContractAmendmentAnonymizer(self.fake),
+            BiomethaneInjectionSiteAnonymizer(self.fake),
+            BiomethaneProductionUnitAnonymizer(self.fake),
+            DoubleCountingApplicationAnonymizer(self.fake),
+            DoubleCountingDocFileAnonymizer(self.fake),
+            DoubleCountingSourcingHistoryAnonymizer(self.fake),
+            ElecChargePointAnonymizer(self.fake),
+            ElecMeterAnonymizer(self.fake),
+            ElecTransferCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateQualichargeAnonymizer(self.fake),
+            SafTicketAnonymizer(self.fake),
+            SafTicketSourceAnonymizer(self.fake),
             CarbureLotAnonymizer(self.fake),
-            # CertificateAnonymizer(self.fake),
-            # CarbureLotCommentAnonymizer(self.fake),
+            CertificateAnonymizer(self.fake),
+            CarbureLotCommentAnonymizer(self.fake),
         ]
 
-        # Process each anonymizer
+        # Process each anonymizer and collect statistics
         total_processed = 0
+        anonymizer_stats = []
         for anonymizer in anonymizers_config:
             emoji = anonymizer.get_emoji()
             name = anonymizer.get_display_name()
             print(f"{emoji} -------- Anonymisation des {name}...   -------- ")
-            processed, _ = self._process_anonymizer(anonymizer)
+            processed, elapsed_time = self._process_anonymizer(anonymizer)
             total_processed += processed
+            anonymizer_stats.append(
+                {
+                    "emoji": emoji,
+                    "name": name,
+                    "processed": processed,
+                    "elapsed_time": elapsed_time,
+                }
+            )
             print(f"{emoji} -------- Fin anonymisation des {name}...   -------- ")
 
+        if not self.dry_run:
+            print("--------------------------------")
+            print("Truncate des tables...")
+            print("--------------------------------")
+            truncate_tables()
+            print("Tables tronquées avec succès")
+            print("--------------------------------")
+
         total_elapsed_time = time.perf_counter() - total_start_time
-        formatted_total_time = format_duration(total_elapsed_time)
-        print(f"\n{'='*60}")
-        print(f"✅ Anonymisation terminée: {total_processed} enregistrements traités")
-        print(f"⏱️  Temps total: {formatted_total_time}")
-        print(f"{'='*60}")
+
+        # Display summary
+        display_anonymization_summary(anonymizer_stats, total_processed, total_elapsed_time)
