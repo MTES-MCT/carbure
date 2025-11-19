@@ -49,7 +49,7 @@ class ElecProvisionCertificateQualichargeViewSet(ListModelMixin, RetrieveModelMi
             self.authentication_classes = [JWTAuthentication]
             self.permission_classes = [HasAPIKey & IsAuthenticated]
         else:
-            self.permission_classes = [IsAuthenticated, HasCpoRights | HasElecAdminRights]
+            self.permission_classes = [HasCpoRights | HasElecAdminRights]
 
         return super().initialize_request(request, *args, **kwargs)
 
