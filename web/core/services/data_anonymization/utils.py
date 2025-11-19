@@ -68,3 +68,18 @@ def process_object_item(object_item, anonymizer, model_name, verbose):
 
 def get_french_coordinates():
     return f"{42 + random.uniform(0, 9):.6f}, {random.uniform(-5, 10):.6f}"
+
+
+def format_duration(seconds):
+    """Format duration in seconds to a human-readable string."""
+    if seconds < 60:
+        return f"{seconds:.2f}s"
+    elif seconds < 3600:
+        minutes = int(seconds // 60)
+        secs = seconds % 60
+        return f"{minutes}m {secs:.2f}s"
+    else:
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        secs = seconds % 60
+        return f"{hours}h {minutes}m {secs:.2f}s"
