@@ -59,3 +59,17 @@ class SafTicketAdmin(admin.ModelAdmin):
         "supplier__name",
         "client__name",
     ]
+    autocomplete_fields = [
+        "biofuel",
+        "feedstock",
+        "country_of_origin",
+        "supplier",
+        "client",
+        "carbure_producer",
+        "carbure_production_site",
+        "production_country",
+        "parent_ticket_source",
+        "reception_airport",
+        "origin_lot",
+        "origin_lot_site",
+    ]
