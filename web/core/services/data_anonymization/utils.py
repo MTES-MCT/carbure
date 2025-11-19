@@ -83,3 +83,26 @@ def format_duration(seconds):
         minutes = int((seconds % 3600) // 60)
         secs = seconds % 60
         return f"{hours}h {minutes}m {secs:.2f}s"
+
+
+def display_anonymization_summary(anonymizer_stats, total_processed, total_elapsed_time):
+    """
+    Display a summary table of anonymization statistics.
+
+    Args:
+        anonymizer_stats: List of dictionaries containing anonymizer statistics.
+                         Each dict should have: emoji, name, processed, elapsed_time
+        total_processed: Total number of records processed across all anonymizers
+        total_elapsed_time: Total elapsed time in seconds
+    """
+    print(f"\n{'='*70}")
+    print("📊 RÉCAPITULATIF DE L'ANONYMISATION")
+    print(f"{'='*70}")
+    for stat in anonymizer_stats:
+        if stat["processed"] > 0:
+            formatted_time = format_duration(stat["elapsed_time"])
+            print(f"{stat['emoji']} {stat['name']:.<50} {stat['processed']:>8} enregistrements  {formatted_time:>12}")
+    print(f"{'-'*70}")
+    formatted_total_time = format_duration(total_elapsed_time)
+    print(f"{'TOTAL':.<50} {total_processed:>8} enregistrements  {formatted_total_time:>12}")
+    print(f"{'='*70}")

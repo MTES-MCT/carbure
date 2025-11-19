@@ -21,7 +21,7 @@ class CarbureLotAnonymizer(Anonymizer):
         # Utiliser only() pour limiter les colonnes chargées depuis la base de données
         # On inclut 'id' (clé primaire nécessaire pour bulk_update) et tous les champs à mettre à jour
         fields_to_load = ["id"] + self.get_updated_fields()
-        return CarbureLot.objects.only(*fields_to_load)[:6000]
+        return CarbureLot.objects.only(*fields_to_load)
 
     def get_updated_fields(self):
         return [

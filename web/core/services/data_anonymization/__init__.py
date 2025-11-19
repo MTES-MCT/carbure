@@ -11,4 +11,4 @@ from .base import Anonymizer
 from .entities import EntityAnonymizer
 from .users import UserAnonymizer
 from .utils import anonymize_fields_and_collect_modifications, set_field_if_has_value, strikethrough
-from .data_anonymization import BATCH_SIZE, DataAnonymizationService, format_duration
+from .data_anonymization import BATCH_SIZE, DataAnonymizationService
