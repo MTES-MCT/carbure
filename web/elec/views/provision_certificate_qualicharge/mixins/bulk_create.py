@@ -4,10 +4,9 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from core.models import Entity
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ProvisionCertificateBulkSerializer
-from elec.services.qualicharge import handle_bulk_create_validation_errors
+from elec.services.qualicharge import handle_bulk_create_validation_errors, process_certificates_batch
 
 
 class BulkCreateMixin:
@@ -16,7 +15,9 @@ class BulkCreateMixin:
         description="Create multiple provision certificates in bulk (from Qualicharge)",
         request=ProvisionCertificateBulkSerializer,
         responses={
-            status.HTTP_200_OK: OpenApiResponse(response={"status": "success", "errors": []}, description="Success message"),
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response={"status": "success", "errors": []}, description="Success message"
+            ),
         },
     )
     @action(
@@ -30,66 +31,23 @@ class BulkCreateMixin:
         if not serializer.is_valid():
             handle_bulk_create_validation_errors(request, serializer)
 
-        errors = []
-
-        all_double_validated_certificates = set(
-            ElecProvisionCertificateQualicharge.objects.filter(
-                validated_by=ElecProvisionCertificateQualicharge.BOTH
-            ).values_list("station_id", "date_from", "date_to")
-        )
+        # Fetch already double-validated certificates to avoid duplicates
+        double_validated = self._get_double_validated_certificates()
 
         with transaction.atomic():
-            for item in serializer.validated_data:
-                siren = item["siren"]
-                try:
-                    cpo = Entity.objects.get(registration_id=siren)
-                    unknown_siren = None
-                except Entity.DoesNotExist:
-                    cpo = None
-                    unknown_siren = siren
+            errors = process_certificates_batch(serializer.validated_data, double_validated)
 
-                for unit in item["operational_units"]:
-                    code = unit["code"]
-                    stations = unit.get("stations", [])
-                    for station in stations:
-                        date_from = unit["from"]
-                        date_to = unit["to"]
-                        year = date_from.year
-                        energy_amount = station["energy"]
-                        station_id = station["id"]
-                        is_controlled_by_qualicharge = station["is_controlled"]
-
-                        if (station_id, date_from, date_to) in all_double_validated_certificates:
-                            errors.append(
-                                {
-                                    "station_id": station_id,
-                                    "error": "Provision certificate already validated and created",
-                                }
-                            )
-                            continue
-
-                        try:
-                            cert, created = ElecProvisionCertificateQualicharge.objects.update_or_create(
-                                station_id=station_id,
-                                date_from=date_from,
-                                date_to=date_to,
-                                defaults={
-                                    "cpo": cpo,
-                                    "unknown_siren": unknown_siren,
-                                    "year": year,
-                                    "operating_unit": code,
-                                    "energy_amount": energy_amount,
-                                    "is_controlled_by_qualicharge": is_controlled_by_qualicharge,
-                                },
-                            )
-
-                        except Exception as e:
-                            errors.append({"station_id": station_id, "error": str(e)})
-                            continue
-
-            # If some business errors are detected, rollback the transaction
+            # If business errors occurred, rollback the transaction
             if errors:
                 transaction.set_rollback(True)
                 return Response({"status": "error", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"status": "success"}, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)
+
+    def _get_double_validated_certificates(self):
+        """Fetch already double-validated certificates to prevent duplicates."""
+        return set(
+            ElecProvisionCertificateQualicharge.objects.filter(
+                validated_by=ElecProvisionCertificateQualicharge.BOTH
+            ).values_list("station_id", "date_from", "date_to")
+        )

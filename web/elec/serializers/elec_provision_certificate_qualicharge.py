@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.models import Entity
 from core.serializers import EntityPreviewSerializer
 from elec.models import ElecProvisionCertificateQualicharge
 
@@ -34,3 +35,43 @@ class ProvisionCertificateBulkSerializer(serializers.Serializer):
 class ProvisionCertificateUpdateBulkSerializer(serializers.Serializer):
     certificate_ids = serializers.ListField(child=serializers.IntegerField(), min_length=1)
     validated_by = serializers.ChoiceField(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES)
+
+
+class TransferCertificateSerializer(serializers.Serializer):
+    certificate_id = serializers.IntegerField(required=True)
+    target_entity_id = serializers.IntegerField(required=True)
+
+    def validate(self, validated_data):
+        certificate_id = validated_data["certificate_id"]
+        target_entity_id = validated_data["target_entity_id"]
+
+        try:
+            certificate = ElecProvisionCertificateQualicharge.objects.get(id=certificate_id)
+        except ElecProvisionCertificateQualicharge.DoesNotExist:
+            raise serializers.ValidationError({"certificate_id": "Certificate not found"})
+
+        if not certificate.cpo:
+            raise serializers.ValidationError({"certificate_id": "Certificate has no CPO assigned"})
+
+        request = self.context.get("request")
+        if request and hasattr(request, "entity") and certificate.cpo != request.entity:
+            raise serializers.ValidationError({"certificate_id": "Certificate does not belong to the caller entity"})
+
+        if certificate.validated_by == ElecProvisionCertificateQualicharge.BOTH:
+            raise serializers.ValidationError({"certificate_id": "Cannot transfer a double-validated certificate"})
+
+        try:
+            target_entity = Entity.objects.get(id=target_entity_id)
+        except Entity.DoesNotExist:
+            raise serializers.ValidationError({"target_entity_id": "Target entity not found"})
+
+        if certificate.cpo.registration_id != target_entity.registration_id:
+            raise serializers.ValidationError(
+                {
+                    "target_entity_id": "Target entity must have the same registration ID as the current CPO",
+                }
+            )
+
+        validated_data["certificate"] = certificate
+        validated_data["target_entity"] = target_entity
+        return validated_data

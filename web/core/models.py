@@ -119,6 +119,11 @@ class Entity(models.Model):
     # Biomethane
     is_red_ii = models.BooleanField(default=False)
 
+    # Qualicharge
+    is_master = models.BooleanField(
+        default=False, help_text="Indique si l'entité est maître (dans le cas de plusieurs CPO avec le même SIREN)"
+    )
+
     hash = models.CharField(max_length=32, null=True, blank=True, default="")
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default="")
     notifications_enabled = models.BooleanField(default=False)
