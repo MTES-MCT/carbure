@@ -5,16 +5,17 @@ Uses bulk_update() and batch processing to optimize performance
 when handling large amounts of data.
 """
 
+import time
+
 from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
-from core.services.data_anonymization.carbure_lot_comments import CarbureLotCommentAnonymizer
-from core.services.data_anonymization.certificates import CertificateAnonymizer
-from core.services.data_anonymization.utils import process_object_item
+from core.services.data_anonymization.carbure_lots import CarbureLotAnonymizer
+from core.services.data_anonymization.utils import format_duration, process_object_item
 
 # Batch size for processing records in chunks to optimize memory usage
-BATCH_SIZE = 3000
+BATCH_SIZE = 1000
 
 
 class DataAnonymizationService:
@@ -46,6 +47,7 @@ class DataAnonymizationService:
         self.dry_run = dry_run
 
     def _process_anonymizer(self, anonymizer):
+        start_time = time.perf_counter()
         queryset = anonymizer.get_queryset()
         updated_fields = anonymizer.get_updated_fields()
         model = anonymizer.get_model()
@@ -54,7 +56,7 @@ class DataAnonymizationService:
         total = queryset.count()
         if total == 0:
             print(f"   → {model_name}: Aucun enregistrement à traiter")
-            return 0
+            return 0, 0.0
 
         dry_run_indicator = " [DRY-RUN]" if self.dry_run else ""
         print(f"   → {model_name}: {total} enregistrements à traiter...{dry_run_indicator}")
@@ -62,28 +64,28 @@ class DataAnonymizationService:
         # Use Paginator to split queryset into manageable batches
         paginator = Paginator(queryset, self.batch_size)
         total_processed = 0
-
         # Process each batch
         for page_num in paginator.page_range:
             page = paginator.page(page_num)
             batch = list(page.object_list)
             updated_objects = []
-
             # Process each object in the current batch
             for object_item in batch:
                 updated_object_item = process_object_item(object_item, anonymizer, model_name, self.verbose)
                 if updated_object_item:
                     updated_objects.append(updated_object_item)
-
             # Save all modifications in bulk for better performance
             # Skip saving if in dry-run mode
             if updated_objects and not self.dry_run:
-                model.objects.bulk_update(updated_objects, updated_fields, batch_size=self.batch_size)
+                with transaction.atomic():
+                    model.objects.bulk_update(updated_objects, updated_fields, batch_size=self.batch_size)
 
             total_processed += len(updated_objects)
 
-        print(f"   → {model_name}: {total_processed} enregistrements traités")
-        return total_processed
+        elapsed_time = time.perf_counter() - start_time
+        formatted_time = format_duration(elapsed_time)
+        print(f"   → {model_name}: {total_processed} enregistrements traités en {formatted_time}")
+        return total_processed, elapsed_time
 
     def anonymize_all(self):
         """
@@ -92,18 +94,20 @@ class DataAnonymizationService:
         Uses transaction.atomic() only when not in dry-run mode to avoid
         unnecessary database transactions during simulation.
         """
-        if self.dry_run:
-            # In dry-run mode, don't use transactions since we're not saving anything
-            self._anonymize_all_internal()
-        else:
-            # In normal mode, use transaction for data integrity
-            with transaction.atomic():
-                self._anonymize_all_internal()
+        # if self.dry_run:
+        #     # In dry-run mode, don't use transactions since we're not saving anything
+        #     self._anonymize_all_internal()
+        # else:
+        #     # In normal mode, use transaction for data integrity
+
+        self._anonymize_all_internal()
 
     def _anonymize_all_internal(self):
         """
         Internal method that executes anonymization methods in the correct order.
         """
+        total_start_time = time.perf_counter()
+
         # Define anonymizers with their initialization parameters
         anonymizers_config = [
             # UserAnonymizer(),
@@ -125,15 +129,24 @@ class DataAnonymizationService:
             # ElecProvisionCertificateQualichargeAnonymizer(self.fake),
             # SafTicketAnonymizer(self.fake),
             # SafTicketSourceAnonymizer(self.fake),
-            # CarbureLotAnonymizer(self.fake),
-            CertificateAnonymizer(self.fake),
-            CarbureLotCommentAnonymizer(self.fake),
+            CarbureLotAnonymizer(self.fake),
+            # CertificateAnonymizer(self.fake),
+            # CarbureLotCommentAnonymizer(self.fake),
         ]
 
         # Process each anonymizer
+        total_processed = 0
         for anonymizer in anonymizers_config:
             emoji = anonymizer.get_emoji()
             name = anonymizer.get_display_name()
             print(f"{emoji} -------- Anonymisation des {name}...   -------- ")
-            self._process_anonymizer(anonymizer)
+            processed, _ = self._process_anonymizer(anonymizer)
+            total_processed += processed
             print(f"{emoji} -------- Fin anonymisation des {name}...   -------- ")
+
+        total_elapsed_time = time.perf_counter() - total_start_time
+        formatted_total_time = format_duration(total_elapsed_time)
+        print(f"\n{'='*60}")
+        print(f"✅ Anonymisation terminée: {total_processed} enregistrements traités")
+        print(f"⏱️  Temps total: {formatted_total_time}")
+        print(f"{'='*60}")
