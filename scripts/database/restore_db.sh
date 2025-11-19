@@ -72,4 +72,9 @@ python web/manage.py migrate
 echo "> Cleaning up..."
 rm -r /tmp/backups
 
+if [ "$IMAGE_TAG" != "staging" ] && [ "$IMAGE_TAG" != "prod" ]; then
+  echo "> Anonymizing database..."
+  python web/manage.py anonymize_data --force
+fi
+
 echo "> DONE"
