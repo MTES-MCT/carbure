@@ -38,6 +38,12 @@ class Command(BaseCommand):
             action="store_true",
             help="Force l'anonymisation sans confirmation",
         )
+        parser.add_argument(
+            "--lots-limit",
+            type=int,
+            default=1000,
+            help="Nombre de lots à garder par année lors de la réduction (défaut: 1000)",
+        )
 
     def handle(self, *args, **options):
         env = os.environ["IMAGE_TAG"]
@@ -64,7 +70,10 @@ class Command(BaseCommand):
 
         # Créer le service
         service = DataAnonymizationService(
-            batch_size=options["batch_size"], verbose=options["verbose"], dry_run=options["dry_run"]
+            batch_size=options["batch_size"],
+            verbose=options["verbose"],
+            dry_run=options["dry_run"],
+            lots_limit=options["lots_limit"],
         )
 
         # Exécuter l'anonymisation
