@@ -54,7 +54,6 @@ class Command(BaseCommand):
             )
             return
 
-        # Vérification de sécurité
         if not options["dry_run"] and not options["force"]:
             self.stdout.write(self.style.ERROR("⚠️  ATTENTION: Vous allez modifier toute la base de données."))
             response = input("Êtes-vous sûr de vouloir continuer? (oui/non): ")
@@ -62,13 +61,11 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING("Opération annulée"))
                 return
 
-        # Afficher le mode dry-run si activé
         if options["dry_run"]:
             self.stdout.write(
                 self.style.WARNING("\n🔍 MODE DRY-RUN: Aucune modification ne sera appliquée à la base de données\n")
             )
 
-        # Créer le service
         service = DataAnonymizationService(
             batch_size=options["batch_size"],
             verbose=options["verbose"],
@@ -76,7 +73,6 @@ class Command(BaseCommand):
             lots_limit=options["lots_limit"],
         )
 
-        # Exécuter l'anonymisation
         try:
             service.anonymize_all()
             if options["dry_run"]:
