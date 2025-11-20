@@ -21,7 +21,7 @@ class CarbureLotDeleter:
     DELETE_BATCH_SIZE = 1000
 
     def __init__(self, limit=1000, dry_run=False):
-        self.limit = 47000
+        self.limit = limit
         self.dry_run = dry_run
 
     def execute(self):

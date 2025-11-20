@@ -44,14 +44,10 @@ def anonymize_fields_and_collect_modifications(model_instance, fields_dict):
     This method attempts to update all specified fields and returns a dictionary
     of all modifications made (old value -> new value pairs).
     """
-    modifications = {}
     for field_name, new_value in fields_dict.items():
-        old_value = getattr(model_instance, field_name, None)
-        updated = set_field_if_has_value(model_instance, field_name, new_value)
+        set_field_if_has_value(model_instance, field_name, new_value)
 
-        if updated:
-            modifications[field_name] = (old_value, new_value)
-    return model_instance, modifications
+    return model_instance
 
 
 def get_french_coordinates():
@@ -71,6 +67,51 @@ def format_duration(seconds):
         minutes = int((seconds % 3600) // 60)
         secs = seconds % 60
         return f"{hours}h {minutes}m {secs:.2f}s"
+
+
+def process_queryset_in_batches(queryset, process_func, batch_size, dry_run=False, model=None, updated_fields=None):
+    """
+    Process objects from a queryset in batches using an iterator to avoid memory issues.
+
+    This function processes the queryset in chunks, applying a processing function
+    to each object and then bulk updating them in batches to prevent memory problems.
+
+    Args:
+        queryset: Django QuerySet of objects to process
+        process_func: Function to apply to each object (should return the updated object or None)
+        batch_size: Number of objects to process per batch
+        dry_run: If True, simulates processing without saving changes to the database
+        model: Model class (required if not in dry_run mode)
+        updated_fields: List of field names to update (required if not in dry_run mode)
+
+    Returns:
+        int: Total number of objects processed
+    """
+    total_to_process = queryset.count()
+    if total_to_process == 0:
+        return 0
+
+    queryset = queryset.order_by("id")
+    total_processed = 0
+    updated_objects = []
+    processed_count = 0
+
+    # Use iterator to process queryset in chunks without loading everything into memory
+    for obj in queryset.iterator(chunk_size=batch_size):
+        updated_obj = process_func(obj)
+        if updated_obj:
+            updated_objects.append(updated_obj)
+        processed_count += 1
+
+        # Process batch when size is reached or when we've processed all items
+        if len(updated_objects) >= batch_size or processed_count >= total_to_process:
+            if updated_objects and not dry_run:
+                with transaction.atomic():
+                    model.objects.bulk_update(updated_objects, updated_fields, batch_size=batch_size)
+            total_processed += len(updated_objects)
+            updated_objects = []
+
+    return total_processed
 
 
 def delete_queryset_in_batches(queryset, batch_size, dry_run=False, item_name="objets"):
