@@ -7,13 +7,36 @@ when handling large amounts of data.
 
 import time
 
-from django.core.paginator import Paginator
-from django.db import transaction
 from faker import Faker
 
+from core.services.data_anonymization.biomethane.contract_amendments import BiomethaneContractAmendmentAnonymizer
+from core.services.data_anonymization.biomethane.contracts import BiomethaneContractAnonymizer
+from core.services.data_anonymization.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
+from core.services.data_anonymization.biomethane.production_units import BiomethaneProductionUnitAnonymizer
+from core.services.data_anonymization.carbure_lot_comments import CarbureLotCommentAnonymizer
+from core.services.data_anonymization.carbure_lots import CarbureLotAnonymizer
+from core.services.data_anonymization.certificates import CertificateAnonymizer
+from core.services.data_anonymization.delete_carbure_lots import CarbureLotDeleter
 from core.services.data_anonymization.delete_orphan_certificates import OrphanCertificateDeleter
+from core.services.data_anonymization.depots import DepotAnonymizer
+from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
+from core.services.data_anonymization.double_counting.doc_files import DoubleCountingDocFileAnonymizer
+from core.services.data_anonymization.double_counting.sourcing_history import DoubleCountingSourcingHistoryAnonymizer
+from core.services.data_anonymization.elec.charge_points import ElecChargePointAnonymizer
+from core.services.data_anonymization.elec.meters import ElecMeterAnonymizer
+from core.services.data_anonymization.elec.provision_certificates import ElecProvisionCertificateAnonymizer
+from core.services.data_anonymization.elec.provision_certificates_qualicharge import (
+    ElecProvisionCertificateQualichargeAnonymizer,
+)
+from core.services.data_anonymization.elec.transfer_certificates import ElecTransferCertificateAnonymizer
+from core.services.data_anonymization.entities import EntityAnonymizer
+from core.services.data_anonymization.production_sites import ProductionSiteAnonymizer
+from core.services.data_anonymization.saf.ticket_sources import SafTicketSourceAnonymizer
+from core.services.data_anonymization.saf.tickets import SafTicketAnonymizer
+from core.services.data_anonymization.sites import SiteAnonymizer
 from core.services.data_anonymization.truncate_tables import truncate_tables
-from core.services.data_anonymization.utils import display_anonymization_summary
+from core.services.data_anonymization.users import UserAnonymizer
+from core.services.data_anonymization.utils import display_anonymization_summary, process_queryset_in_batches
 
 # Batch size for processing records in chunks to optimize memory usage
 BATCH_SIZE = 1000
@@ -64,27 +87,14 @@ class DataAnonymizationService:
         dry_run_indicator = " [DRY-RUN]" if self.dry_run else ""
         print(f"   → {model_name}: {total} enregistrements à traiter...{dry_run_indicator}")
 
-        # Use Paginator to split queryset into manageable batches
-        queryset = queryset.order_by("id")
-        paginator = Paginator(queryset, self.batch_size)
-        total_processed = 0
-        # Process each batch
-        for page_num in paginator.page_range:
-            page = paginator.page(page_num)
-            batch = list(page.object_list)
-            updated_objects = []
-            # Process each object in the current batch
-            for object_item in batch:
-                updated_object_item = anonymizer.process(object_item)
-                if updated_object_item:
-                    updated_objects.append(updated_object_item)
-            # Save all modifications in bulk for better performance
-            # Skip saving if in dry-run mode
-            if updated_objects and not self.dry_run:
-                with transaction.atomic():
-                    model.objects.bulk_update(updated_objects, updated_fields, batch_size=self.batch_size)
-
-            total_processed += len(updated_objects)
+        total_processed = process_queryset_in_batches(
+            queryset=queryset,
+            process_func=anonymizer.process,
+            batch_size=self.batch_size,
+            dry_run=self.dry_run,
+            model=model,
+            updated_fields=updated_fields,
+        )
 
         elapsed_time = time.perf_counter() - start_time
         print(f"   → {model_name}: {total_processed} enregistrements traités")
@@ -96,10 +106,9 @@ class DataAnonymizationService:
         print("=" * 60)
 
         print("Suppression des lots...")
-        # deleter = CarbureLotDeleter(limit=self.lots_limit, dry_run=self.dry_run)
-        # _, deleted_lots, lots_elapsed_time = deleter.execute()
-        deleted_lots = 0
-        lots_elapsed_time = 0
+        deleter = CarbureLotDeleter(limit=self.lots_limit, dry_run=self.dry_run)
+        _, deleted_lots, lots_elapsed_time = deleter.execute()
+
         # Suppression des certificats orphelins
         print("Suppression des certificats orphelins...")
         certificate_deleter = OrphanCertificateDeleter(dry_run=self.dry_run)
@@ -143,28 +152,28 @@ class DataAnonymizationService:
 
         # Define anonymizers with their initialization parameters
         anonymizers_config = [
-            # UserAnonymizer(),
-            # EntityAnonymizer(self.fake),
-            # SiteAnonymizer(self.fake),
-            # DepotAnonymizer(self.fake),
-            # ProductionSiteAnonymizer(self.fake),
-            # BiomethaneContractAnonymizer(self.fake),
-            # BiomethaneContractAmendmentAnonymizer(self.fake),
-            # BiomethaneInjectionSiteAnonymizer(self.fake),
-            # BiomethaneProductionUnitAnonymizer(self.fake),
-            # DoubleCountingApplicationAnonymizer(self.fake),
-            # DoubleCountingDocFileAnonymizer(self.fake),
-            # DoubleCountingSourcingHistoryAnonymizer(self.fake),
-            # ElecChargePointAnonymizer(self.fake),
-            # ElecMeterAnonymizer(self.fake),
-            # ElecTransferCertificateAnonymizer(self.fake),
-            # ElecProvisionCertificateAnonymizer(self.fake),
-            # ElecProvisionCertificateQualichargeAnonymizer(self.fake),
-            # SafTicketAnonymizer(self.fake),
-            # SafTicketSourceAnonymizer(self.fake),
-            # CarbureLotAnonymizer(self.fake),
-            # CertificateAnonymizer(self.fake),
-            # CarbureLotCommentAnonymizer(self.fake),
+            UserAnonymizer(),
+            EntityAnonymizer(self.fake),
+            SiteAnonymizer(self.fake),
+            DepotAnonymizer(self.fake),
+            ProductionSiteAnonymizer(self.fake),
+            BiomethaneContractAnonymizer(self.fake),
+            BiomethaneContractAmendmentAnonymizer(self.fake),
+            BiomethaneInjectionSiteAnonymizer(self.fake),
+            BiomethaneProductionUnitAnonymizer(self.fake),
+            DoubleCountingApplicationAnonymizer(self.fake),
+            DoubleCountingDocFileAnonymizer(self.fake),
+            DoubleCountingSourcingHistoryAnonymizer(self.fake),
+            ElecChargePointAnonymizer(self.fake),
+            ElecMeterAnonymizer(self.fake),
+            ElecTransferCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateQualichargeAnonymizer(self.fake),
+            SafTicketAnonymizer(self.fake),
+            SafTicketSourceAnonymizer(self.fake),
+            CarbureLotAnonymizer(self.fake),
+            CertificateAnonymizer(self.fake),
+            CarbureLotCommentAnonymizer(self.fake),
         ]
 
         # Process each anonymizer and collect statistics
