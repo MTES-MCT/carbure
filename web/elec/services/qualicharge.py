@@ -1,4 +1,8 @@
+from django.db import models
 from rest_framework import serializers
+
+from core.models import Entity
+from elec.models import ElecProvisionCertificate, ElecProvisionCertificateQualicharge
 
 
 def handle_bulk_create_validation_errors(request, serializer):
@@ -52,3 +56,131 @@ def handle_bulk_create_validation_errors(request, serializer):
                             )
 
     raise serializers.ValidationError({"status": "validation_error", "errors": errors})
+
+
+def resolve_cpo(siren):
+    """
+    Resolve CPO entity from SIREN, handling duplicates by selecting the master entity.
+
+    Returns:
+        tuple: (cpo_entity, unknown_siren)
+            - If entity found: (Entity, None)
+            - If not found: (None, siren)
+            - If multiple found and master exists: (master_Entity, None)
+            - If multiple found but no master: (None, siren)
+    """
+    try:
+        return Entity.objects.get(registration_id=siren), None
+    except Entity.DoesNotExist:
+        return None, siren
+    except Entity.MultipleObjectsReturned:
+        try:
+            return Entity.objects.get(registration_id=siren, is_master=True), None
+        except Entity.DoesNotExist:
+            return None, siren
+
+
+def process_certificates_batch(validated_data, double_validated):
+    """
+    Process a batch of certificates and create/update Qualicharge provision certificates.
+
+    Args:
+        validated_data: List of validated items from serializer
+        double_validated: Set of (station_id, date_from, date_to) already double-validated
+
+    Returns:
+        list: List of error dictionaries for certificates that failed to process
+    """
+    errors = []
+
+    for item in validated_data:
+        siren = item["siren"]
+        cpo, unknown_siren = resolve_cpo(siren)
+
+        for unit in item["operational_units"]:
+            unit_errors = _process_operational_unit(unit, cpo, unknown_siren, double_validated)
+            errors.extend(unit_errors)
+
+    return errors
+
+
+def _process_operational_unit(unit, cpo, unknown_siren, double_validated):
+    """
+    Process an operational unit and create/update certificates for its stations.
+
+    Args:
+        unit: Operational unit data
+        cpo: Resolved CPO entity (can be None)
+        unknown_siren: SIREN that couldn't be resolved (can be None)
+        double_validated: Set of already double-validated certificates
+
+    Returns:
+        list: List of error dictionaries for stations that failed to process
+    """
+    errors = []
+    code = unit["code"]
+    date_from = unit["from"]
+    date_to = unit["to"]
+    year = date_from.year
+
+    for station in unit.get("stations", []):
+        station_id = station["id"]
+
+        # Check if already double-validated
+        if (station_id, date_from, date_to) in double_validated:
+            errors.append({"station_id": station_id, "error": "Provision certificate already validated and created"})
+            continue
+
+        # Create or update the certificate
+        try:
+            ElecProvisionCertificateQualicharge.objects.update_or_create(
+                station_id=station_id,
+                date_from=date_from,
+                date_to=date_to,
+                defaults={
+                    "cpo": cpo,
+                    "unknown_siren": unknown_siren,
+                    "year": year,
+                    "operating_unit": code,
+                    "energy_amount": station["energy"],
+                    "is_controlled_by_qualicharge": station["is_controlled"],
+                },
+            )
+        except Exception as e:
+            errors.append({"station_id": station_id, "error": str(e)})
+
+    return errors
+
+
+def create_provision_certificates_from_qualicharge(qualicharge_certificates):
+    """
+    Create provision certificates from Qualicharge data if validated_by is BOTH.
+    Groups certificates by CPO, operating unit, and date range, then creates
+    corresponding provision certificates.
+    """
+    BOTH = ElecProvisionCertificateQualicharge.BOTH
+
+    # Group certificates and calculate total energy amounts
+    grouped_certificates = (
+        qualicharge_certificates.values("cpo", "operating_unit", "date_from", "date_to", "year")
+        .filter(validated_by=BOTH)
+        .annotate(total_energy_amount=models.Sum("energy_amount"))
+        .order_by("cpo", "operating_unit", "date_from", "date_to")
+    )
+
+    provision_certificates_to_create = []
+    for q_certificate in grouped_certificates:
+        provision_certificates_to_create.append(
+            ElecProvisionCertificate(
+                cpo_id=q_certificate["cpo"],
+                operating_unit=q_certificate["operating_unit"],
+                energy_amount=q_certificate["total_energy_amount"],
+                quarter=(q_certificate["date_from"].month - 1) // 3 + 1,
+                year=q_certificate["year"],
+                remaining_energy_amount=q_certificate["total_energy_amount"],
+                compensation=False,
+                source=ElecProvisionCertificate.QUALICHARGE,
+            )
+        )
+
+    ElecProvisionCertificate.objects.bulk_create(provision_certificates_to_create)

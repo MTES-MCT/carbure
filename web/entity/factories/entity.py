@@ -43,6 +43,7 @@ class EntityFactory(factory.django.DjangoModelFactory):
     is_enabled = True
     is_tiruert_liable = False
     is_red_ii = False
+    is_master = False
 
     # Other fields
     hash = ""
