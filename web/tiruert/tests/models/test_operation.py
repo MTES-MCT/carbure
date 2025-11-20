@@ -1,9 +1,3 @@
-"""
-Unit tests for Operation model methods and properties.
-
-Tests the business logic that was moved from serializers to the model.
-"""
-
 from unittest.mock import Mock, PropertyMock, patch
 
 from django.test import TestCase
@@ -112,8 +106,8 @@ class OperationQuantityMethodTest(TestCase):
 class OperationAvoidedEmissionsPropertyTest(TestCase):
     """Tests for Operation.avoided_emissions property."""
 
-    def test_avoided_emissions_sums_all_details(self):
-        """Should sum avoided_emissions from all operation details."""
+    def test_avoided_emissions_sums_all_detail_emissions(self):
+        """Should sum avoided_emissions from all details."""
         operation = Operation()
 
         detail1 = Mock()
@@ -126,9 +120,9 @@ class OperationAvoidedEmissionsPropertyTest(TestCase):
         # Mock the details relationship
         details_mock = Mock()
         details_mock.all = Mock(return_value=[detail1, detail2, detail3])
-        type(operation).details = PropertyMock(return_value=details_mock)
 
-        result = operation.avoided_emissions
+        with patch.object(Operation, "details", PropertyMock(return_value=details_mock)):
+            result = operation.avoided_emissions
 
         self.assertEqual(result, 451.50)
 
@@ -138,9 +132,9 @@ class OperationAvoidedEmissionsPropertyTest(TestCase):
 
         details_mock = Mock()
         details_mock.all = Mock(return_value=[])
-        type(operation).details = PropertyMock(return_value=details_mock)
 
-        result = operation.avoided_emissions
+        with patch.object(Operation, "details", PropertyMock(return_value=details_mock)):
+            result = operation.avoided_emissions
 
         self.assertEqual(result, 0.0)
 
@@ -155,9 +149,9 @@ class OperationAvoidedEmissionsPropertyTest(TestCase):
 
         details_mock = Mock()
         details_mock.all = Mock(return_value=[detail1, detail2])
-        type(operation).details = PropertyMock(return_value=details_mock)
 
-        result = operation.avoided_emissions
+        with patch.object(Operation, "details", PropertyMock(return_value=details_mock)):
+            result = operation.avoided_emissions
 
         # 100.123456 + 200.456789 = 300.580245, rounded to 300.58
         self.assertEqual(result, 300.58)
