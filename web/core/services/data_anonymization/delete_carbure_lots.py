@@ -1,54 +1,80 @@
 """
-Service pour réduire le nombre de lots de carbure.
-- Supprime tous les lots des années ayant moins de 100 lots
-- Pour les autres années, garde seulement 1000 lots par année et supprime les autres.
+Service to reduce the number of carbure lots.
+- Deletes all lots from years with less than 100 lots
+- For other years, keeps only 1000 lots per year and deletes the rest.
 """
 
 import time
 
-from django.core.paginator import Paginator
 from django.db import transaction
 
 from core.models import CarbureLot
 
 
-class CarbureLotReducer:
+class CarbureLotDeleter:
     """
-    Service pour réduire le nombre de lots de carbure dans la base de données.
+    Service to reduce the number of carbure lots in the database.
     """
 
+    # If the number of lots is below this threshold, all lots are deleted
     MIN_LOTS_THRESHOLD = 100
-    DELETE_BATCH_SIZE = 100  # Taille des batches pour les suppressions massives
+
+    DELETE_BATCH_SIZE = 1000
 
     def __init__(self, limit=1000, dry_run=False):
         """
-        Initialise le service de réduction.
+        Initialize the deletion service.
 
         Args:
-            limit: Nombre de lots à garder par année (défaut: 1000)
-            dry_run: Si True, simule la suppression sans modifier les données
+            limit: Number of lots to keep per year (default: 1000)
+            dry_run: If True, simulates deletion without modifying data
         """
-        self.limit = 70000
+        self.limit = 1000
         self.dry_run = dry_run
 
-    def reduce_lots(self):
+    def execute(self):
         """
-        Réduit le nombre de lots de carbure selon les règles définies.
+        Execute the deletion of carbure lots according to the defined rules.
 
         Returns:
-            tuple: (nombre_lots_conservés, nombre_lots_supprimés, temps_écoulé)
+            tuple: (number_of_lots_kept, number_of_lots_deleted, elapsed_time)
         """
         start_time = time.perf_counter()
 
-        # Récupérer toutes les années distinctes
-        # years = CarbureLot.objects.values_list("year", flat=True).distinct().order_by("year")
-        years = [2024]
+        years = self._get_years_to_process()
         if not years:
             print("   → Aucun lot trouvé dans la base de données.")
             elapsed_time = time.perf_counter() - start_time
             return 0, 0, elapsed_time
 
-        # Calculer les statistiques
+        stats_by_year, total_to_keep, total_to_delete = self._calculate_statistics_by_year(years)
+        self._display_statistics(stats_by_year, total_to_keep, total_to_delete)
+
+        if total_to_delete == 0:
+            print("   → Aucun lot à supprimer. Tous les lots sont déjà dans la limite.")
+            elapsed_time = time.perf_counter() - start_time
+            return total_to_keep, 0, elapsed_time
+
+        kept_count, deleted_count = self._delete_lots_by_statistics(stats_by_year)
+        self._display_final_summary(total_to_keep, total_to_delete, kept_count, deleted_count)
+
+        elapsed_time = time.perf_counter() - start_time
+        if self.dry_run:
+            return total_to_keep, total_to_delete, elapsed_time
+        else:
+            return kept_count, deleted_count, elapsed_time
+
+    def _get_years_to_process(self):
+        """Get the list of years to process."""
+        return CarbureLot.objects.values_list("year", flat=True).distinct().order_by("year")
+
+    def _calculate_statistics_by_year(self, years):
+        """
+        Calculate the statistics of deletion by year.
+
+        Returns:
+            tuple: (stats_by_year, total_to_keep, total_to_delete)
+        """
         stats_by_year = []
         total_to_keep = 0
         total_to_delete = 0
@@ -75,12 +101,16 @@ class CarbureLotReducer:
                 }
             )
 
-        # Afficher le résumé par année
+        return stats_by_year, total_to_keep, total_to_delete
+
+    def _display_statistics(self, stats_by_year, total_to_keep, total_to_delete):
+        """Display the statistics by year."""
         print("   → Statistiques par année:")
         for stat in stats_by_year:
             if stat["will_be_deleted"]:
                 print(
-                    f"     • Année {stat['year']}: {stat['total']} lots → TOUS SUPPRIMÉS (< {self.MIN_LOTS_THRESHOLD} lots)"
+                    f"     • Année {stat['year']}: {stat['total']} lots → TOUS SUPPRIMÉS "
+                    f"(< {self.MIN_LOTS_THRESHOLD} lots)"
                 )
             else:
                 print(
@@ -89,12 +119,13 @@ class CarbureLotReducer:
                 )
         print(f"   → Total: {total_to_keep} à garder, {total_to_delete} à supprimer")
 
-        if total_to_delete == 0:
-            print("   → Aucun lot à supprimer. Tous les lots sont déjà dans la limite.")
-            elapsed_time = time.perf_counter() - start_time
-            return total_to_keep, 0, elapsed_time
+    def _delete_lots_by_statistics(self, stats_by_year):
+        """
+        Delete lots according to the calculated statistics.
 
-        # Supprimer les lots
+        Returns:
+            tuple: (kept_count, deleted_count)
+        """
         deleted_count = 0
         kept_count = 0
 
@@ -107,7 +138,10 @@ class CarbureLotReducer:
             kept_count += kept
             deleted_count += deleted
 
-        # Résumé final - utiliser les statistiques calculées au début pour plus de précision
+        return kept_count, deleted_count
+
+    def _display_final_summary(self, total_to_keep, total_to_delete, kept_count, deleted_count):
+        """Display the final summary of the operation."""
         if self.dry_run:
             print(
                 f"   → [DRY-RUN] Simulation terminée: {total_to_delete} lots seraient supprimés, "
@@ -116,23 +150,16 @@ class CarbureLotReducer:
         else:
             print(f"   → Suppression terminée: {deleted_count} lots supprimés, {kept_count} lots conservés")
 
-        elapsed_time = time.perf_counter() - start_time
-        # Retourner les valeurs réelles si on a vraiment supprimé, sinon les valeurs calculées
-        if self.dry_run:
-            return total_to_keep, total_to_delete, elapsed_time
-        else:
-            return kept_count, deleted_count, elapsed_time
-
     def _process_year(self, stat):
-        """Traite une année en supprimant les lots excédentaires par batch."""
+        """Processes a year by deleting excess lots in batches."""
         year = stat["year"]
         to_delete = stat["to_delete"]
 
         print(f"     Année {year}: {stat['total']} lots au total")
 
         if stat["will_be_deleted"]:
-            # Supprimer tous les lots de l'année
-            print(f"       → Suppression complète (année avec < {self.MIN_LOTS_THRESHOLD} lots)")
+            # Delete all lots from the year
+            print(f"       → Complete deletion (year with < {self.MIN_LOTS_THRESHOLD} lots)")
             if self.dry_run:
                 return 0, to_delete
             else:
@@ -140,7 +167,7 @@ class CarbureLotReducer:
                 deleted = self._delete_in_batches(lots_to_delete)
                 return 0, deleted
         else:
-            # Supprimer les lots au-delà de la limite
+            # Delete lots beyond the limit
             if stat["total"] <= self.limit:
                 print(f"       → Aucune suppression nécessaire ({stat['total']} <= {self.limit})")
                 return stat["total"], 0
@@ -161,13 +188,13 @@ class CarbureLotReducer:
 
     def _delete_in_batches(self, queryset):
         """
-        Supprime les lots par batch pour éviter les problèmes de mémoire et de verrous.
+        Deletes lots in batches to avoid memory and lock issues.
 
         Args:
-            queryset: QuerySet des lots à supprimer
+            queryset: QuerySet of lots to delete
 
         Returns:
-            int: Nombre total de lots supprimés
+            int: Total number of lots deleted
         """
         total_to_delete = queryset.count()
         if total_to_delete == 0:
@@ -183,25 +210,33 @@ class CarbureLotReducer:
 
         print(f"       Suppression de {total_to_delete} lots en {total_batches} batch(s)...")
 
-        # Utiliser Paginator pour diviser le queryset en batches gérables
-        paginator = Paginator(queryset, self.DELETE_BATCH_SIZE)
+        # Use iterator to process queryset in chunks without loading everything into memory
+        batch_ids = []
+        batch_num = 0
+        processed_count = 0
 
-        # Traiter chaque batch
-        for page_num in paginator.page_range:
-            page = paginator.page(page_num)
-            batch_ids = [obj.id for obj in page.object_list]
+        for obj in queryset.iterator(chunk_size=self.DELETE_BATCH_SIZE):
+            batch_ids.append(obj.id)
+            processed_count += 1
 
-            if batch_ids:
-                # Supprimer le batch
+            # Process batch when size is reached or when we've processed all items
+            if len(batch_ids) >= self.DELETE_BATCH_SIZE or processed_count >= total_to_delete:
+                batch_num += 1
                 with transaction.atomic():
-                    deleted = CarbureLot.objects.filter(id__in=batch_ids).delete()
-                    deleted_count = deleted[1].get("core.CarbureLot", 0)
+                    deleted_count = self._delete_lots_by_batch(batch_ids, batch_num, total_batches)
                     total_deleted += deleted_count
-
-                    print(
-                        f"         Batch {page_num}/{total_batches}: {deleted_count} lots supprimés "
-                        f"(sur {len(batch_ids)} attendus)"
-                    )
+                batch_ids = []
 
         print(f"       Total supprimé: {total_deleted} lots (sur {total_to_delete} attendus)")
         return total_deleted
+
+    def _delete_lots_by_batch(self, batch_ids, current_batch, total_batches):
+        deleted = CarbureLot.objects.filter(id__in=batch_ids).delete()
+        deleted_count = deleted[1].get("core.CarbureLot", 0)
+
+        print(
+            f"         Batch {current_batch}/{total_batches}: {deleted_count} lots supprimés "
+            f"(sur {len(batch_ids)} attendus)"
+        )
+
+        return deleted_count

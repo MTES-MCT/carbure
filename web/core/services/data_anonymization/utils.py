@@ -52,20 +52,6 @@ def anonymize_fields_and_collect_modifications(model_instance, fields_dict):
     return model_instance, modifications
 
 
-def process_object_item(object_item, anonymizer, model_name, verbose):
-    updated_object_item, modifications = anonymizer.process(object_item)
-
-    # Display detailed modification history only if verbose mode is enabled
-    # if modifications and verbose:
-    #     object_id = getattr(object_item, "id", "N/A")
-    #     print(f"\n      [{model_name} #{object_id}]")
-    #     for field_name, (old_value, new_value) in modifications.items():
-    #         old_display = strikethrough(old_value)
-    #         print(f"         {field_name}: {old_display} → {new_value}")
-
-    return updated_object_item
-
-
 def get_french_coordinates():
     return f"{42 + random.uniform(0, 9):.6f}, {random.uniform(-5, 10):.6f}"
 

@@ -11,13 +11,10 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
-from core.services.data_anonymization.delete_carbure_lots import CarbureLotReducer
+from core.services.data_anonymization.delete_carbure_lots import CarbureLotDeleter
 from core.services.data_anonymization.delete_orphan_certificates import OrphanCertificateDeleter
 from core.services.data_anonymization.truncate_tables import truncate_tables
-from core.services.data_anonymization.utils import (
-    display_anonymization_summary,
-    process_object_item,
-)
+from core.services.data_anonymization.utils import display_anonymization_summary
 
 # Batch size for processing records in chunks to optimize memory usage
 BATCH_SIZE = 1000
@@ -79,7 +76,7 @@ class DataAnonymizationService:
             updated_objects = []
             # Process each object in the current batch
             for object_item in batch:
-                updated_object_item = process_object_item(object_item, anonymizer, model_name, self.verbose)
+                updated_object_item = anonymizer.process(object_item)
                 if updated_object_item:
                     updated_objects.append(updated_object_item)
             # Save all modifications in bulk for better performance
@@ -105,10 +102,9 @@ class DataAnonymizationService:
         print("ÉTAPE 1: Suppression des données")
         print("=" * 60)
 
-        # Réduction des lots de carbure
-        print("Réduction des lots de carbure...")
-        reducer = CarbureLotReducer(limit=self.lots_limit, dry_run=self.dry_run)
-        _, deleted_lots, lots_elapsed_time = reducer.reduce_lots()
+        print("Suppression des lots...")
+        reducer = CarbureLotDeleter(limit=self.lots_limit, dry_run=self.dry_run)
+        _, deleted_lots, lots_elapsed_time = reducer.execute()
 
         # Suppression des certificats orphelins
         print("Suppression des certificats orphelins...")
