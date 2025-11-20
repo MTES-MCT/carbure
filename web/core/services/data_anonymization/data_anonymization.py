@@ -17,6 +17,7 @@ from core.services.data_anonymization.carbure_lot_comments import CarbureLotComm
 from core.services.data_anonymization.carbure_lots import CarbureLotAnonymizer
 from core.services.data_anonymization.certificates import CertificateAnonymizer
 from core.services.data_anonymization.delete_carbure_lots import CarbureLotDeleter
+from core.services.data_anonymization.delete_empty_operations import EmptyOperationDeleter
 from core.services.data_anonymization.delete_orphan_certificates import OrphanCertificateDeleter
 from core.services.data_anonymization.depots import DepotAnonymizer
 from core.services.data_anonymization.double_counting.applications import DoubleCountingApplicationAnonymizer
@@ -114,6 +115,11 @@ class DataAnonymizationService:
         certificate_deleter = OrphanCertificateDeleter(dry_run=self.dry_run)
         deleted_certificates, certificates_elapsed_time = certificate_deleter.delete_orphan_certificates()
 
+        # Suppression des opérations vides
+        print("Suppression des opérations vides...")
+        operation_deleter = EmptyOperationDeleter(dry_run=self.dry_run)
+        deleted_operations, operations_elapsed_time = operation_deleter.delete_empty_operations()
+
         print("Étape 1 terminée\n")
 
         # Retourner les stats pour le récapitulatif
@@ -129,6 +135,12 @@ class DataAnonymizationService:
                 "name": "Suppression des certificats orphelins",
                 "processed": deleted_certificates,
                 "elapsed_time": certificates_elapsed_time,
+            },
+            {
+                "emoji": "⚙️",
+                "name": "Suppression des opérations vides",
+                "processed": deleted_operations,
+                "elapsed_time": operations_elapsed_time,
             },
         ]
 
