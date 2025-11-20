@@ -8,6 +8,8 @@ ou le formatage de l'affichage.
 
 import random
 
+from django.db import transaction
+
 
 def strikethrough(text):
     """
@@ -69,6 +71,66 @@ def format_duration(seconds):
         minutes = int((seconds % 3600) // 60)
         secs = seconds % 60
         return f"{hours}h {minutes}m {secs:.2f}s"
+
+
+def delete_queryset_in_batches(queryset, batch_size, dry_run=False, item_name="objets"):
+    """
+    Delete objects from a queryset in batches using an iterator to avoid memory issues.
+
+    This function processes the queryset in chunks, deleting objects in batches
+    to prevent memory problems and database lock issues.
+
+    Args:
+        queryset: Django QuerySet of objects to delete
+        batch_size: Number of objects to delete per batch
+        dry_run: If True, simulates deletion without modifying data
+        item_name: Name of the items being deleted (for display messages, e.g., "lots", "certificats")
+
+    Returns:
+        int: Total number of objects deleted (or that would be deleted in dry_run mode)
+    """
+    total_to_delete = queryset.count()
+    if total_to_delete == 0:
+        return 0
+
+    if dry_run:
+        num_batches = ((total_to_delete - 1) // batch_size) + 1
+        print(f"       [DRY-RUN] {total_to_delete} {item_name} seraient supprimés en {num_batches} batch(s)")
+        return total_to_delete
+
+    model = queryset.model
+    total_deleted = 0
+    total_batches = ((total_to_delete - 1) // batch_size) + 1
+
+    print(f"       Suppression de {total_to_delete} {item_name} en {total_batches} batch(s)...")
+
+    # Use iterator to process queryset in chunks without loading everything into memory
+    batch_ids = []
+    batch_num = 0
+    processed_count = 0
+
+    for obj in queryset.iterator(chunk_size=batch_size):
+        batch_ids.append(obj.id)
+        processed_count += 1
+
+        # Process batch when size is reached or when we've processed all items
+        if len(batch_ids) >= batch_size or processed_count >= total_to_delete:
+            batch_num += 1
+            with transaction.atomic():
+                deleted = model.objects.filter(id__in=batch_ids).delete()
+                # deleted[1] is a dict mapping model labels to counts
+                # Use model._meta.label which gives the full label (app_label.model_name)
+                deleted_count = deleted[1].get(model._meta.label, deleted[0])
+
+                print(
+                    f"         Batch {batch_num}/{total_batches}: {deleted_count} {item_name} supprimés "
+                    f"(sur {len(batch_ids)} attendus)"
+                )
+                total_deleted += deleted_count
+            batch_ids = []
+
+    print(f"       Total supprimé: {total_deleted} {item_name} (sur {total_to_delete} attendus)")
+    return total_deleted
 
 
 def display_anonymization_summary(anonymizer_stats, total_processed, total_elapsed_time):

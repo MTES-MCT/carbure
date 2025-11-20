@@ -11,7 +11,6 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from faker import Faker
 
-from core.services.data_anonymization.delete_carbure_lots import CarbureLotDeleter
 from core.services.data_anonymization.delete_orphan_certificates import OrphanCertificateDeleter
 from core.services.data_anonymization.truncate_tables import truncate_tables
 from core.services.data_anonymization.utils import display_anonymization_summary
@@ -92,20 +91,15 @@ class DataAnonymizationService:
         return total_processed, elapsed_time
 
     def _delete_data(self):
-        """
-        Supprime les données excédentaires (lots et certificats orphelins).
-
-        Returns:
-            list: Liste des statistiques de suppression
-        """
         print("=" * 60)
         print("ÉTAPE 1: Suppression des données")
         print("=" * 60)
 
         print("Suppression des lots...")
-        reducer = CarbureLotDeleter(limit=self.lots_limit, dry_run=self.dry_run)
-        _, deleted_lots, lots_elapsed_time = reducer.execute()
-
+        # deleter = CarbureLotDeleter(limit=self.lots_limit, dry_run=self.dry_run)
+        # _, deleted_lots, lots_elapsed_time = deleter.execute()
+        deleted_lots = 0
+        lots_elapsed_time = 0
         # Suppression des certificats orphelins
         print("Suppression des certificats orphelins...")
         certificate_deleter = OrphanCertificateDeleter(dry_run=self.dry_run)
@@ -130,12 +124,6 @@ class DataAnonymizationService:
         ]
 
     def _truncate_tables(self):
-        """
-        Vide les tables spécifiées (truncate).
-
-        Returns:
-            list: Liste vide (pas de stats pour le truncate)
-        """
         print("=" * 60)
         print("ÉTAPE 2: Vidage des tables")
         print("=" * 60)
@@ -149,12 +137,6 @@ class DataAnonymizationService:
         return []
 
     def _anonymize_data(self):
-        """
-        Anonymise les données sensibles.
-
-        Returns:
-            list: Liste des statistiques d'anonymisation
-        """
         print("=" * 60)
         print("ÉTAPE 3: Anonymisation des données")
         print("=" * 60)
@@ -214,19 +196,12 @@ class DataAnonymizationService:
         """
         total_start_time = time.perf_counter()
 
-        # ÉTAPE 1: Vidage des tables
         self._truncate_tables()
-
-        # ÉTAPE 2: Suppression des données
         deletion_stats = self._delete_data()
-
-        # ÉTAPE 3: Anonymisation des données
         anonymizer_stats = self._anonymize_data()
 
-        # Calculer les totaux pour le récapitulatif
         total_elapsed_time = time.perf_counter() - total_start_time
         all_stats = deletion_stats + anonymizer_stats
         total_all_processed = sum(stat["processed"] for stat in all_stats)
 
-        # Afficher le récapitulatif
         display_anonymization_summary(all_stats, total_all_processed, total_elapsed_time)
