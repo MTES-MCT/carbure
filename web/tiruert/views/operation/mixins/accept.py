@@ -16,6 +16,16 @@ class AcceptActionMixinErrors:
 
 
 class AcceptActionMixin:
+    @staticmethod
+    def get_status_after_accept(operation_type):
+        """Return the status an operation should have after being accepted."""
+        status_by_type = {
+            Operation.CESSION: Operation.ACCEPTED,
+            Operation.TRANSFERT: Operation.ACCEPTED,
+            Operation.INCORPORATION: Operation.VALIDATED,
+        }
+        return status_by_type.get(operation_type)
+
     @extend_schema(
         operation_id="accept_operation",
         description="Set status operation to ACCEPTED",
@@ -42,13 +52,7 @@ class AcceptActionMixin:
                 {"error": AcceptActionMixinErrors.OPERATION_ALREADY_ACCEPTED_VALIDATED}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        status_by_type = {
-            Operation.CESSION: Operation.ACCEPTED,
-            Operation.TRANSFERT: Operation.ACCEPTED,
-            Operation.INCORPORATION: Operation.VALIDATED,
-        }
-
-        operation_status = status_by_type.get(operation.type)
+        operation_status = self.get_status_after_accept(operation.type)
 
         if not operation_status:
             return Response(
