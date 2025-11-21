@@ -19,6 +19,7 @@ class TicketFilter(django_filters.FilterSet):
     consumption_type = django_filters.MultipleChoiceFilter(
         field_name="consumption_type", choices=SafTicket.CONSUMPTION_TYPES
     )
+    origin_depot = django_filters.AllValuesMultipleFilter(field_name="origin_lot_site__name")
     reception_airport = django_filters.AllValuesMultipleFilter(field_name="reception_airport__name")
 
     order_by = django_filters.OrderingFilter(
@@ -59,4 +60,5 @@ class TicketFilter(django_filters.FilterSet):
             "production_site",
             "consumption_type",
             "reception_airport",
+            "origin_depot",
         ]

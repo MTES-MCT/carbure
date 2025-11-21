@@ -1,8 +1,8 @@
+from core.filters import FiltersActionFactory
 from .accept import AcceptActionMixin
 from .cancel import CancelActionMixin
 from .credit_source import CreditActionMixin
 from .export import ExportActionMixin
-from .filter import FilterActionMixin
 from .reject import RejectActionMixin
 
 
@@ -11,7 +11,7 @@ class ActionMixin(
     CancelActionMixin,
     CreditActionMixin,
     ExportActionMixin,
-    FilterActionMixin,
     RejectActionMixin,
+    FiltersActionFactory(),
 ):
     pass

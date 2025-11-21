@@ -23,7 +23,7 @@ class TicketSourceFilter(django_filters.FilterSet):
     supplier = django_filters.CharFilter(method="filter_supplier")
     country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
     production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
-    delivery_site = django_filters.AllValuesMultipleFilter(field_name="parent_lot__carbure_delivery_site__name")
+    origin_depot = django_filters.AllValuesMultipleFilter(field_name="origin_lot_site__name")
 
     status = django_filters.ChoiceFilter(
         choices=[(item.name, item.value) for item in TicketStatusEnum],
@@ -75,7 +75,7 @@ class TicketSourceFilter(django_filters.FilterSet):
             "supplier",
             "country_of_origin",
             "production_site",
-            "delivery_site",
+            "origin_depot",
             "status",
             "added_by",
         ]
