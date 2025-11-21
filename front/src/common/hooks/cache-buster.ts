@@ -49,6 +49,8 @@ function useVisibilityChange() {
 // compare the currently cached etag with the one fetched from the server
 // and prompt the user for a full reload if a change was detected
 async function cacheBuster() {
+  if (import.meta.env.DEV) return
+
   const cachedEtag = getCachedEtag()
   const remoteEtag = await fetchRemoteEtag()
 
