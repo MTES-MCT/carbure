@@ -27,19 +27,22 @@ class AirportQueryParamsSerializer(serializers.Serializer):
 def get_airports(request, *args, **kwargs):
     serializer = AirportQueryParamsSerializer(data=request.query_params)
     serializer.is_valid(raise_exception=True)
-    params = serializer.validated_data
+
+    public_only = serializer.validated_data.get("public_only", False)
+    query = serializer.validated_data.get("query", None)
+    origin_depot_id = serializer.validated_data.get("origin_depot_id", None)
+    shipping_method = serializer.validated_data.get("shipping_method", None)
 
     sites = Airport.objects.all().order_by("name").filter(is_enabled=True)
 
-    if params.get("public_only"):
+    if public_only:
         sites = sites.filter(private=False)
-    if params.get("query"):
-        query = params["query"]
+    if query:
         sites = sites.filter(Q(name__icontains=query) | Q(customs_id__icontains=query) | Q(city__icontains=query))
-    if params.get("origin_depot_id") and params.get("shipping_method"):
+    if origin_depot_id and shipping_method:
         sites = sites.filter(
-            airport_from_depot_routes__origin_depot_id=params["origin_depot_id"],
-            airport_from_depot_routes__shipping_method=params["shipping_method"],
+            airport_from_depot_routes__origin_depot_id=origin_depot_id,
+            airport_from_depot_routes__shipping_method=shipping_method,
         )
 
     serializer = AirportSerializer(sites, many=True)

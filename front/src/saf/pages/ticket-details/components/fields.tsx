@@ -47,6 +47,13 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={norm.normalizeCountry(ticket.country_of_origin).label}
           readOnly
         />
+        {ticket.origin_lot_site && (
+          <TextInput
+            label={t("Dépôt d'origine")}
+            value={ticket.origin_lot_site.name}
+            readOnly
+          />
+        )}
       </Dialog.Section>
       <Dialog.Section label={t("Producteur")}>
         <TextInput

@@ -82,7 +82,7 @@ export const TicketAssignment = ({
         </p>
 
         <AssignmentForm
-          originDepotId={ticketSource?.origin_lot_site?.id}
+          originDepot={ticketSource?.origin_lot_site}
           deliveryPeriod={ticketSource.delivery_period}
           remainingVolume={remainingVolume}
           onSubmit={assignTicket}

@@ -10,19 +10,19 @@ import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
 import { Autocomplete } from "common/components/autocomplete2"
-import { ConsumptionType, SafShippingMethod } from "saf/types"
+import { ConsumptionType, SafShippingMethod, SafTicketSource } from "saf/types"
 
 export interface AssignmentFormProps {
   deliveryPeriod?: number
   remainingVolume: number
-  originDepotId?: number
+  originDepot?: SafTicketSource["origin_lot_site"]
   onSubmit: (form: AssignmentFormData) => void
 }
 
 export const AssignmentForm = ({
   deliveryPeriod = defaultAssignment.assignment_period,
   remainingVolume,
-  originDepotId,
+  originDepot,
   onSubmit,
 }: AssignmentFormProps) => {
   const { t } = useTranslation()
@@ -45,7 +45,7 @@ export const AssignmentForm = ({
     return apiResources.findAirports(
       query,
       false,
-      originDepotId,
+      originDepot?.id,
       value.shipping_method
     )
   }
@@ -69,7 +69,6 @@ export const AssignmentForm = ({
         deliveryPeriod={deliveryPeriod}
         {...bind("assignment_period")}
       />
-
       <Autocomplete
         required
         label={t("Client")}
@@ -90,6 +89,13 @@ export const AssignmentForm = ({
 
       {(clientIsAirline || clientIsSafTrader) && (
         <>
+          {originDepot && (
+            <TextInput
+              disabled
+              label={t("Dépôt d'origine")}
+              value={originDepot.name}
+            />
+          )}
           <Autocomplete
             label={t("Mode d'expédition")}
             placeholder={t("Sélectionnez un mode")}
@@ -130,14 +136,6 @@ export const AssignmentForm = ({
             {...bind("reception_airport")}
           />
         </>
-      )}
-
-      {clientIsAirline && (
-        <TextInput
-          label={t("Numéro de POS/POC")}
-          placeholder="Ex: PC-ISCC-12345678"
-          {...bind("pos_poc_number")}
-        />
       )}
 
       {/* Si fournisseur == Opérateur & client == Trader ou Cie. aérienne → type de conso

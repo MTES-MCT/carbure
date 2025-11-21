@@ -52,6 +52,13 @@ export const TicketSourceFields = ({
           }
           readOnly
         />
+        {ticketSource.origin_lot_site && (
+          <TextInput
+            readOnly
+            label={t("Dépôt d'origine")}
+            value={ticketSource.origin_lot_site.name}
+          />
+        )}
       </Dialog.Section>
       <Dialog.Section label={t("Production")}>
         <TextInput
