@@ -3665,50 +3665,6 @@ paths:
                     - AMENAGEUR 5
                   summary: Example of filters response.
           description: ""
-  /api/elec/provision-certificates-qualicharge/transfer/:
-    post:
-      operationId: transfer_provision_certificate_qualicharge
-      description: Transfer a Qualicharge provision certificate to another entity with
-        the same registration ID
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-      tags:
-        - elec
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TransferCertificateRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/TransferCertificateRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/TransferCertificateRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: success
-                message: Certificate transferred successfully
-          description: Success message
-        "400":
-          content:
-            application/json:
-              schema:
-                status: error
-                error: Error message
-          description: Error message
   /api/elec/provision-certificates/{id}/:
     get:
       operationId: elec_provision_certificates_retrieve
@@ -6813,14 +6769,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -6872,6 +6820,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -7044,14 +7000,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7103,6 +7051,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -7195,14 +7151,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7220,7 +7168,18 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - added_by
+              - client
+              - country_of_origin
+              - feedstock
+              - order_by
+              - origin_depot
+              - period
+              - production_site
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -7259,6 +7218,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -7322,11 +7289,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - added_by
+                    - client
+                    - country_of_origin
+                    - feedstock
+                    - order_by
                   summary: Example of filters response.
           description: ""
   /api/saf/ticket-sources/group-assign/:
@@ -7480,6 +7447,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -7866,6 +7841,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: period
           schema:
             type: array
@@ -7998,7 +7981,22 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - biofuel
+              - client
+              - consumption_type
+              - country_of_origin
+              - feedstock
+              - order_by
+              - origin_depot
+              - period
+              - production_site
+              - reception_airport
+              - status
+              - supplier
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -8053,6 +8051,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -8125,11 +8131,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - biofuel
+                    - client
+                    - consumption_type
+                    - country_of_origin
+                    - feedstock
                   summary: Example of filters response.
           description: ""
   /api/saf/years/:
@@ -17205,16 +17211,6 @@ components:
         * `CMAX_PAP_UPDATE` - CMAX_PAP_UPDATE
         * `CMAX_ANNUALIZATION` - CMAX_ANNUALIZATION
         * `PRODUCER_BUYER_INFO_CHANGE` - PRODUCER_BUYER_INFO_CHANGE
-    TransferCertificateRequest:
-      type: object
-      properties:
-        certificate_id:
-          type: integer
-        target_entity_id:
-          type: integer
-      required:
-        - certificate_id
-        - target_entity_id
     TransportDocumentTypeEnum:
       enum:
         - DAU

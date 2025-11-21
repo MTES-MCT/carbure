@@ -1174,23 +1174,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/elec/provision-certificates-qualicharge/transfer/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Transfer a Qualicharge provision certificate to another entity with the same registration ID */
-        post: operations["transfer_provision_certificate_qualicharge"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/elec/provision-certificates/{id}/": {
         parameters: {
             query?: never;
@@ -5584,10 +5567,6 @@ export interface components {
          * @enum {string}
          */
         TrackedAmendmentTypesEnum: TrackedAmendmentTypesEnum;
-        TransferCertificateRequest: {
-            certificate_id: number;
-            target_entity_id: number;
-        };
         /**
          * @description * `DAU` - DAU
          *     * `DAE` - DAE
@@ -8252,44 +8231,6 @@ export interface operations {
             };
         };
     };
-    transfer_provision_certificate_qualicharge: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TransferCertificateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TransferCertificateRequest"];
-                "multipart/form-data": components["schemas"]["TransferCertificateRequest"];
-            };
-        };
-        responses: {
-            /** @description Success message */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Error message */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
     elec_provision_certificates_retrieve: {
         parameters: {
             query: {
@@ -10499,7 +10440,6 @@ export interface operations {
                 added_by?: string[];
                 client?: string[];
                 country_of_origin?: string[];
-                delivery_site?: string[];
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
@@ -10518,6 +10458,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -10611,7 +10552,6 @@ export interface operations {
                 added_by?: string[];
                 client?: string[];
                 country_of_origin?: string[];
-                delivery_site?: string[];
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
@@ -10630,6 +10570,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 /** @description A search term. */
@@ -10663,12 +10604,11 @@ export interface operations {
                 added_by?: string[];
                 client?: string[];
                 country_of_origin?: string[];
-                delivery_site?: string[];
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
                 /** @description Filter string to apply */
-                filter?: string;
+                filter: PathsApiSafTicketSourcesFiltersGetParametersQueryFilter;
                 /** @description Ordre
                  *
                  *     * `volume` - Volume
@@ -10684,6 +10624,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 /** @description A search term. */
@@ -10782,6 +10723,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -11016,6 +10958,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 reception_airport?: string[];
@@ -11057,7 +11000,7 @@ export interface operations {
                 entity_id: number;
                 feedstock?: string[];
                 /** @description Filter string to apply */
-                filter?: string;
+                filter: PathsApiSafTicketsFiltersGetParametersQueryFilter;
                 /** @description Ordre
                  *
                  *     * `client` - Client
@@ -11081,6 +11024,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 reception_airport?: string[];
@@ -12675,6 +12619,17 @@ export enum PathsApiSafTicketSourcesGetParametersQueryStatus {
     AVAILABLE = "AVAILABLE",
     HISTORY = "HISTORY"
 }
+export enum PathsApiSafTicketSourcesFiltersGetParametersQueryFilter {
+    added_by = "added_by",
+    client = "client",
+    country_of_origin = "country_of_origin",
+    feedstock = "feedstock",
+    order_by = "order_by",
+    origin_depot = "origin_depot",
+    period = "period",
+    production_site = "production_site",
+    year = "year"
+}
 export enum PathsApiSafTicketsGetParametersQueryConsumption_type {
     MAC = "MAC",
     MAC_DECLASSEMENT = "MAC_DECLASSEMENT"
@@ -12703,6 +12658,21 @@ export enum PathsApiSafTicketsGetParametersQueryStatus {
     ACCEPTED = "ACCEPTED",
     PENDING = "PENDING",
     REJECTED = "REJECTED"
+}
+export enum PathsApiSafTicketsFiltersGetParametersQueryFilter {
+    biofuel = "biofuel",
+    client = "client",
+    consumption_type = "consumption_type",
+    country_of_origin = "country_of_origin",
+    feedstock = "feedstock",
+    order_by = "order_by",
+    origin_depot = "origin_depot",
+    period = "period",
+    production_site = "production_site",
+    reception_airport = "reception_airport",
+    status = "status",
+    supplier = "supplier",
+    year = "year"
 }
 export enum PathsApiTiruertElecOperationsGetParametersQueryOperation {
     ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
