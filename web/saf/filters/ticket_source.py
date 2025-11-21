@@ -33,7 +33,7 @@ class TicketSourceFilter(django_filters.FilterSet):
     order_by = django_filters.OrderingFilter(
         fields=(
             ("total_volume", "volume"),
-            ("delivery_period", "period"),
+            ("delivery_period", "delivery"),
             ("feedstock__code", "feedstock"),
             ("ghg_reduction", "ghg_reduction"),
             ("added_by__name", "added_by"),

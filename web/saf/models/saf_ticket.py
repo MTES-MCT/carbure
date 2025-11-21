@@ -183,6 +183,8 @@ def create_ticket_from_source(
         consumption_type=consumption_type,
         shipping_method=shipping_method,
         pos_poc_number=pos_poc_number,
+        origin_lot=ticket_source.origin_lot,
+        origin_lot_site=ticket_source.origin_lot_site,
     )
 
     ticket.generate_carbure_id()
