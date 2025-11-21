@@ -1,11 +1,13 @@
 import { api, download } from "common/services/api-fetch"
 import { EntityPreview } from "common/types"
 import {
-  SafFilter,
   SafTicketQuery,
   ConsumptionType,
   SafTicketSourceQuery,
   SafShippingMethod,
+  SafTicketSourceFilter,
+  SafTicketFilter,
+  SafFilter,
 } from "./types"
 import { QUERY_RESET } from "common/hooks/query-builder-2"
 import { EtsStatusEnum } from "api-schema"
@@ -36,7 +38,7 @@ export function getTicketFilters(field: SafFilter, query: SafTicketQuery) {
     .GET("/saf/tickets/filters/", {
       params: {
         query: {
-          filter: field,
+          filter: field as unknown as SafTicketFilter,
           ...query,
           ...QUERY_RESET,
         },
@@ -120,7 +122,7 @@ export function getTicketSourceFilters(
     .GET("/saf/ticket-sources/filters/", {
       params: {
         query: {
-          filter: field,
+          filter: field as unknown as SafTicketSourceFilter,
           ...query,
           ...QUERY_RESET,
         },
