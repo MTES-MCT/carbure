@@ -16,16 +16,16 @@ class MeterReadingRepository:
     def get_annotated_applications():
         return ElecMeterReadingApplication.objects.all().annotate(
             charge_point_count=Count("elec_meter_readings__id"),
-            energy_total=Sum("elec_meter_readings__renewable_energy"),
+            energy_total=Sum(
+                "elec_meter_readings__renewable_energy",
+                filter=Q(elec_meter_readings__meter__charge_point__is_article_2=False),
+            ),
         )
 
     @staticmethod
     def get_annotated_applications_details():
         return MeterReadingRepository.get_annotated_applications().annotate(
-            power_total=Sum(
-                "elec_meter_readings__meter__charge_point__nominal_power",
-                filter=Q(elec_meter_readings__meter__charge_point__is_deleted=False),
-            ),
+            power_total=Sum("elec_meter_readings__meter__charge_point__nominal_power"),
         )
 
     @staticmethod
