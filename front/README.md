@@ -115,12 +115,20 @@ We decided to stop testing with react testing library because it didn't check th
 
 ### Workflow
 
-Chromatic offers a free version with 5000 snapshots per month. For the moment, this offer is sufficient, and the significant cost of the paid version (£180/month) forces us to organise ourselves to avoid spending too much on captures.That is why, when developing features, the workflow is as follows :
+When developing features, the workflow is as follows :
 
 - During development, if certain components need to be tested, create a .stories.tsx file next to the component, and follow Storybook's documentation on how to create stories (or check existing stories).
 - Add tests for use cases that are worth testing.
 - Once the tests match expectations and the branch work is complete, open a merge request, which will launch the storybook build and publish the screenshots on Chromatic. (This allows screenshots to be generated only at the time of the merge request and not during the development phase.)
 - Check Chromatic to see if there are any differences in the screenshots. If so, accept/reject the screenshots depending on whether the result matches what was expected.
+
+
+### Thanks
+
+<a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>
+
+Thanks to [Chromatic](https://www.chromatic.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.
+
   
 ## Type safety between frontend and backend
 
