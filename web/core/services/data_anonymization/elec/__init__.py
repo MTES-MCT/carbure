@@ -1,4 +1,0 @@
-"""
-Anonymizers for electricity models.
-"""
-
