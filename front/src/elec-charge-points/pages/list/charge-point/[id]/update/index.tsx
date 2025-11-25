@@ -186,15 +186,6 @@ const UpdateChargePointDialog = () => {
                           label={t("Numéro du certificat (MID)")}
                           readOnly
                           {...bind("mid_id")}
-                          rightContent={
-                            <Button
-                              variant="danger"
-                              action={openDeleteMeterDialog}
-                              disabled={isReadOnly}
-                            >
-                              {t("Suppr. compteur")}
-                            </Button>
-                          }
                         />
 
                         <NumberInput
@@ -222,6 +213,17 @@ const UpdateChargePointDialog = () => {
                     >
                       {t("Mon compteur MID a changé ?")}
                     </Button>
+
+                    {value.mid_id &&
+                      value.initial_index_date == value.measure_date && (
+                        <Button
+                          variant="link"
+                          style={{ color: "var(--red-dark)" }}
+                          label={t("Je souhaite supprimer ce compteur")}
+                          action={openDeleteMeterDialog}
+                          disabled={isReadOnly}
+                        />
+                      )}
                   </Fieldset>
 
                   <Fieldset label={t("PRM")}>
