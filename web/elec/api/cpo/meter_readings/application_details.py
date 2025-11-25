@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django import forms
 from django.views.decorators.http import require_GET
 
@@ -10,7 +8,6 @@ from core.models import Entity
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.services.create_meter_reading_excel import create_meter_readings_excel
-from elec.services.meter_readings_application_quarter import last_day_of_quarter
 
 
 class ApplicationDetailsForm(forms.Form):
@@ -35,10 +32,8 @@ def get_application_details(request, entity: Entity):
     if application.cpo != entity:
         return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
 
-    end_of_quarter = last_day_of_quarter(application.year, application.quarter) + timedelta(days=15)
-
     charge_points = MeterReadingRepository.get_application_charge_points(entity, application)
-    charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points, end_of_quarter)
+    charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points, application.id)
 
     meter_reading_data = []
     for charge_point in charge_points:

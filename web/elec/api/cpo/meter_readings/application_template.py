@@ -47,7 +47,7 @@ def get_application_template(request, entity):
         message = "Le fichier excel n'a pas pu être généré car aucun point de recharge n'a été validé jusqu'à présent. Assurez-vous qu'au moins l'un de vos dossiers d'inscription de point de recharge a déjà été validé par la DGEC."  # noqa: E501
         return ErrorResponse(400, ApplicationTemplateError.NO_CHARGE_POINT_AVAILABLE, message=message)
 
-    charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points, today)
+    charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points)
 
     meter_reading_data = []
     for charge_point in charge_points:
