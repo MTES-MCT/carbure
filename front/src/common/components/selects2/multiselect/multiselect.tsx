@@ -6,7 +6,7 @@ import { useRef, useState } from "react"
 import cl from "clsx"
 import styles from "./multiselect.module.css"
 import { List } from "common/components/list2"
-import { Text } from "common/components/text"
+import Tag from "@codegouvfr/react-dsfr/Tag"
 export interface MultiSelectProps<T, V = T> extends Trigger {
   clear?: boolean
   search?: boolean
@@ -74,9 +74,14 @@ export const MultiSelect = <T, V>({
         size={size}
       >
         {value && value.length > 0 && (
-          <Text is="span" className={styles.count} size="xs">
+          <Tag
+            dismissible
+            small
+            nativeButtonProps={{ onClick: () => onChange?.([]) }}
+            style={{ marginRight: "8px" }}
+          >
             {value.length}
-          </Text>
+          </Tag>
         )}
         <span className={styles.label}>
           {asyncOptions.label || placeholder}
