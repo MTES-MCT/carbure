@@ -1,3 +1,7 @@
 .filter-multiselect__filter {
   max-width: 250px !important;
 }
+
+.filter-multiselect__reset {
+  flex-shrink: 0;
+}
