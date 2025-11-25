@@ -4,28 +4,43 @@ import { useLocation } from "react-router"
 
 const ETAG_CACHE_KEY = "carbure:cache:etag"
 
+const logger = (...args: any[]) => {
+  if (isDevMode) {
+    console.log(...args)
+  }
+}
+
+const isCacheBusterRunning: { current: boolean } = { current: false }
+
+const isDevMode = import.meta.env.DEV
+
 export function useCacheBuster() {
   useFirstLoad()
   useRouteChange()
   useVisibilityChange()
 }
 
-// Trigger cache buster on first load
 function useFirstLoad() {
   useEffect(() => {
-    cacheBuster()
+    logger("----- FIRST LOAD -----")
+
+    cacheBuster(true)
   }, [])
 }
 
-// Watch for change in routes to trigger a cache bust
 function useRouteChange() {
   const lastPath = useRef<string>()
   const location = useLocation()
 
   useEffect(() => {
+    logger("----- ROUTE CHANGE -----")
     if (!lastPath.current || location.pathname != lastPath.current) {
       lastPath.current = location.pathname
-      cacheBuster()
+
+      if (!isCacheBusterRunning) {
+        logger("----- CACHE BUSTER RUN FOR ROUTE CHANGE -----")
+        cacheBuster()
+      }
     }
   }, [location.pathname])
 }
@@ -35,6 +50,7 @@ function useVisibilityChange() {
   useEffect(() => {
     function handler() {
       if (document.visibilityState === "visible") {
+        logger("----- CACHE BUSTER RUN FOR VISIBILITY CHANGE -----")
         cacheBuster()
       }
     }
@@ -48,17 +64,31 @@ function useVisibilityChange() {
 
 // compare the currently cached etag with the one fetched from the server
 // and prompt the user for a full reload if a change was detected
-async function cacheBuster() {
-  const cachedEtag = getCachedEtag()
-  const remoteEtag = await fetchRemoteEtag()
+async function cacheBuster(silentReload = false) {
+  if (isDevMode) return
 
-  if (!cachedEtag && remoteEtag) {
-    cacheEtag(remoteEtag)
-  } else if (remoteEtag && cachedEtag != remoteEtag) {
-    if (promptReload()) {
+  // Éviter les exécutions multiples simultanées
+  if (isCacheBusterRunning.current) {
+    logger("----- CACHE BUSTER ALREADY RUNNING -----")
+    return
+  }
+
+  isCacheBusterRunning.current = true
+
+  try {
+    const cachedEtag = getCachedEtag()
+    const remoteEtag = await fetchRemoteEtag()
+    logger("----- CACHE BUSTER EXECUTED -----", cachedEtag, remoteEtag)
+    if (!cachedEtag && remoteEtag) {
       cacheEtag(remoteEtag)
-      window.location.reload()
+    } else if (remoteEtag && cachedEtag != remoteEtag) {
+      if (silentReload || promptReload()) {
+        cacheEtag(remoteEtag)
+        window.location.reload()
+      }
     }
+  } finally {
+    isCacheBusterRunning.current = false
   }
 }
 

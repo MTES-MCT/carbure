@@ -58,6 +58,9 @@ stock_sort_key_to_django_field = {
     "country_of_origin": "country_of_origin__name",
 }
 
+ADMIN_ENTITIES = [Entity.ADMIN, Entity.EXTERNAL_ADMIN]
+CONTROL_ENTITIES = [*ADMIN_ENTITIES, Entity.AUDITOR]
+
 
 def get_entity_stock(entity_id):
     return CarbureStock.objects.filter(carbure_client_id=entity_id).select_related(
@@ -189,7 +192,7 @@ def get_lots_with_metadata(lots, entity, query):
     total_errors, total_deadline = count_lots_of_interest(lots, entity)
 
     # enrich dataset with additional metadata
-    if entity.entity_type in (Entity.ADMIN, Entity.AUDITOR):
+    if entity.entity_type in CONTROL_ENTITIES:
         serializer = CarbureLotAdminSerializer(returned, many=True)
     else:
         serializer = CarbureLotPublicSerializer(returned, many=True)
@@ -229,7 +232,7 @@ def get_lots_with_errors(lots, entity, will_aggregate=False):
     if will_aggregate:
         # use a subquery so we can later do aggregations on this queryset without wrecking the results
         tx_errors = GenericError.objects.filter(lot=OuterRef("pk"))
-        if entity.entity_type == Entity.ADMIN:
+        if entity.entity_type in ADMIN_ENTITIES:
             filter = Q(display_to_admin=True, acked_by_admin=False)
         elif entity.entity_type == Entity.AUDITOR:
             filter = Q(display_to_auditor=True, acked_by_auditor=False)
@@ -243,7 +246,7 @@ def get_lots_with_errors(lots, entity, will_aggregate=False):
         tx_errors = tx_errors.values("lot").annotate(errors=Count("id")).values("errors")
         return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
     else:
-        if entity.entity_type == Entity.ADMIN:
+        if entity.entity_type in ADMIN_ENTITIES:
             filter = Q(genericerror__display_to_admin=True, genericerror__acked_by_admin=False)
             counter = Count("genericerror", filter=filter)
         elif entity.entity_type == Entity.AUDITOR:
@@ -312,7 +315,7 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=None):
         lots = lots.filter(
             Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]) | Q(lot_status=CarbureLot.REJECTED)
         )
-    elif history != "true" and entity.entity_type not in (Entity.ADMIN, Entity.AUDITOR):
+    elif history != "true" and entity.entity_type not in CONTROL_ENTITIES:
         lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
 
     if lot_status and "lot_status" not in blacklist:
@@ -762,7 +765,7 @@ def sort_stock(stock, query):
 
 def get_lot_errors(lot, entity=None):
     errors = []
-    if entity.entity_type == Entity.ADMIN:
+    if entity.entity_type in ADMIN_ENTITIES:
         errors = lot.genericerror_set.filter(display_to_admin=True)
         return GenericErrorAdminSerializer(errors, many=True, read_only=True).data
     elif entity.entity_type == Entity.AUDITOR:
@@ -779,7 +782,7 @@ def get_lot_errors(lot, entity=None):
 def get_lots_errors(lots, entity):
     lot_ids = list(lots.values_list("id", flat=True))
     errors = GenericError.objects.filter(lot_id__in=lot_ids)
-    if entity.entity_type == Entity.ADMIN:
+    if entity.entity_type in ADMIN_ENTITIES:
         errors = errors.filter(display_to_admin=True, acked_by_admin=False)
     elif entity.entity_type == Entity.AUDITOR:
         errors = errors.filter(display_to_auditor=True, acked_by_auditor=False)
@@ -804,7 +807,7 @@ def get_lot_updates(lot, entity=None):
     if lot is None:
         return []
 
-    if entity and entity.entity_type == Entity.ADMIN:
+    if entity and entity.entity_type in ADMIN_ENTITIES:
         return CarbureLotAdminEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
     context = {"visible_users": None}

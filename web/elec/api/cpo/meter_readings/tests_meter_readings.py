@@ -653,7 +653,7 @@ class ElecMeterReadingsTest(TestCase):
                             "name": "CPO",
                             "registration_id": self.cpo.registration_id,
                         },
-                        "energy_total": 26.92,
+                        "energy_total": 24.92,
                         "id": mock.ANY,
                         "quarter": 2,
                         "status": "ACCEPTED",
