@@ -61,9 +61,7 @@ class ExcelMeterReadings:
         beginning_of_quarter: date = None,
         end_of_quarter: date = None,
     ):
-        charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(
-            charge_points, beginning_of_quarter
-        )
+        charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points)
         charge_point_by_id = {cp.charge_point_id: cp for cp in charge_points}
 
         lines_by_charge_point = defaultdict(list)
