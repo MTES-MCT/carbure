@@ -17,12 +17,26 @@ function useFirstLoad() {
   }, [])
 }
 
-// Watch for change in routes to trigger a cache bust
 function useRouteChange() {
   const lastPath = useRef<string>()
+  const isInitialized = useRef<boolean>(false)
   const location = useLocation()
 
   useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      isInitialized.current = true
+    }, 3500)
+
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      return
+    }
+
     if (!lastPath.current || location.pathname != lastPath.current) {
       lastPath.current = location.pathname
       cacheBuster()
