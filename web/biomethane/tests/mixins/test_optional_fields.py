@@ -34,9 +34,12 @@ class OptionalFieldsActionMixinTests(TestCase):
         mock_instance.optional_fields = ["field1", "field2", "field3"]
 
         # Create a mock queryset that returns the instance
+        mock_filtered_queryset = Mock()
+        mock_filtered_queryset.get.return_value = mock_instance
+
         mock_queryset = Mock()
-        mock_queryset.get.return_value = mock_instance
         self.viewset.queryset = mock_queryset
+        self.viewset.filter_queryset = Mock(return_value=mock_filtered_queryset)
 
         # Execute the action
         response = self.viewset.get_optional_fields(self.request)
@@ -44,7 +47,8 @@ class OptionalFieldsActionMixinTests(TestCase):
         # Verify results
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, ["field1", "field2", "field3"])
-        mock_queryset.get.assert_called_once()
+        self.viewset.filter_queryset.assert_called_once()
+        mock_filtered_queryset.get.assert_called_once()
 
     def test_get_optional_fields_not_found(self):
         """Test that get_optional_fields returns 404 when the object does not exist"""
@@ -52,17 +56,22 @@ class OptionalFieldsActionMixinTests(TestCase):
         mock_model = Mock()
         mock_model.DoesNotExist = Exception
 
+        mock_filtered_queryset = Mock()
+        mock_filtered_queryset.get.side_effect = mock_model.DoesNotExist
+        mock_filtered_queryset.model = mock_model
+
         mock_queryset = Mock()
-        mock_queryset.get.side_effect = mock_model.DoesNotExist
         mock_queryset.model = mock_model
         self.viewset.queryset = mock_queryset
+        self.viewset.filter_queryset = Mock(return_value=mock_filtered_queryset)
 
         # Execute the action
         response = self.viewset.get_optional_fields(self.request)
 
         # Verify results
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        mock_queryset.get.assert_called_once()
+        self.viewset.filter_queryset.assert_called_once()
+        mock_filtered_queryset.get.assert_called_once()
 
     def test_get_optional_fields_empty_list(self):
         """Test that get_optional_fields can return an empty list"""
@@ -70,9 +79,12 @@ class OptionalFieldsActionMixinTests(TestCase):
         mock_instance = Mock()
         mock_instance.optional_fields = []
 
+        mock_filtered_queryset = Mock()
+        mock_filtered_queryset.get.return_value = mock_instance
+
         mock_queryset = Mock()
-        mock_queryset.get.return_value = mock_instance
         self.viewset.queryset = mock_queryset
+        self.viewset.filter_queryset = Mock(return_value=mock_filtered_queryset)
 
         # Execute the action
         response = self.viewset.get_optional_fields(self.request)

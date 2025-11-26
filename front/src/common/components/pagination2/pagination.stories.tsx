@@ -59,3 +59,21 @@ export const WithLimit: Story = {
     )
   },
 }
+
+export const DoNotRenderPaginationWhenThereIsOnlyOnePage: Story = {
+  parameters: {
+    docs: {
+      description: "Do not render pagination when there is only one page",
+    },
+    chromatic: { disableSnapshot: true },
+  },
+  args: {
+    total: 10,
+    limit: 10,
+  },
+  play: async ({ canvasElement }) => {
+    const { queryByRole } = within(canvasElement)
+    const buttonAsSelect = await waitFor(() => queryByRole("button"))
+    await expect(buttonAsSelect).toBeNull()
+  },
+}

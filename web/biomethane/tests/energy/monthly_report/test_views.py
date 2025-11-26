@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -54,16 +52,6 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
                 "injection_hours": 20.0,
             },
         ]
-
-    @patch("biomethane.views.energy.monthly_report.get_biomethane_permissions")
-    def test_endpoints_permissions(self, mock_get_biomethane_permissions):
-        """Test that the write actions are correctly defined"""
-        viewset = BiomethaneEnergyMonthlyReportViewSet()
-        viewset.action = "retrieve"
-
-        viewset.get_permissions()
-
-        mock_get_biomethane_permissions.assert_called_once_with(["upsert"], "retrieve")
 
     def test_list_monthly_reports_success(self):
         """Test successful retrieval of monthly reports"""

@@ -63,7 +63,6 @@ services:
     volumes:
       - ./web:/app/web
       - ./scripts:/app/scripts
-      - ./cron:/app/cron
       - ./front:/app/front
       - uploadedfiles:/app/files
 

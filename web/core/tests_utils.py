@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
 from rest_framework.permissions import AND, OR
+from rest_framework_api_key.models import APIKey
 
 from core.models import UserRights, UserRightsRequests
 from core.permissions import HasAdminRights, HasUserRights
@@ -26,6 +27,25 @@ def setup_current_user(test, email, name, password, entity_rights=None, is_staff
     device, _ = EmailDevice.objects.get_or_create(user=user)
     response = test.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
     assert response.status_code == 200
+
+    return user
+
+
+def setup_current_user_with_jwt(test, email, name, password, entity_rights=None, is_staff=False):
+    if entity_rights is None:
+        entity_rights = []
+    User = get_user_model()
+    user = User.objects.create_user(email=email, name=name, password=password, is_staff=is_staff)
+
+    for entity, role in entity_rights:
+        UserRights.objects.update_or_create(entity=entity, user=user, role=role)
+        UserRightsRequests.objects.update_or_create(entity=entity, user=user, role=role)
+
+    # Create an ApiKey for the user and set it in the test client correctly.
+    api_key, key = APIKey.objects.create_key(name="test")
+    test.client.credentials(HTTP_X_API_KEY=key)
+    # Authenticate (force jwt) the user in the test client
+    test.client.force_authenticate(user=user)
 
     return user
 
@@ -143,25 +163,32 @@ class PermissionTestMixin:
     def assertViewPermissions(self, View, action_permissions: list[Tuple[list[str], list]]):
         view = View()
 
-        # list all the actual actions listed on the viewset so we can be sure we're testing the right actions
+        # list all the actual actions and methods listed on the viewset so we can be sure we're testing the right things
         core_actions = ["list", "create", "retrieve", "update", "partial_update", "destroy"]
         view_core_actions = [a for a in core_actions if hasattr(view, a)]
         view_extra_actions = [a.__name__ for a in view.get_extra_actions()]
-        view_actions = view_core_actions + view_extra_actions
-
-        # collect tested actions to confirm we checked everything later
-        tested_actions = []
+        view_methods = [
+            name for name in dir(view) if callable(getattr(view, name, None)) and not name.startswith("__")
+        ]  # list methods for when we use .as_view()
+        view_actions = set(view_core_actions + view_extra_actions + view_methods)  # combine everything into a single set
 
         for actions, permissions in action_permissions:
             for action in actions:
                 with self.subTest(f"action: {action}"):
                     self.assertIn(action, view_actions)
-                    tested_actions.append(action)
                     view.action = action
                     view_permissions = view.get_permissions()
                     self.assertPermissionsEqual(view_permissions, permissions)
 
-        self.assertCountEqual(view_actions, tested_actions)
+                    # remove the current action for listed action sets
+                    if action in view_core_actions:
+                        view_core_actions.remove(action)
+                    if action in view_extra_actions:
+                        view_extra_actions.remove(action)
+
+        # check if all actions were covered
+        self.assertCountEqual(view_core_actions, [])
+        self.assertCountEqual(view_extra_actions, [])
 
     def assertPermissionsEqual(self, first, second):
         if isinstance(first, list) and isinstance(second, list):

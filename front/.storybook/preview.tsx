@@ -1,5 +1,6 @@
-import React, { Suspense, useEffect } from "react"
+import React, { lazy, Suspense, useEffect } from "react"
 import type { Preview } from "@storybook/react"
+import isChromatic from "chromatic/isChromatic"
 import i18n from "../src/i18n"
 import { LoaderOverlay } from "../src/common/components/scaffold"
 import { I18nextProvider } from "react-i18next"
@@ -15,6 +16,10 @@ import "../src/setup-dsfr"
 import "@codegouvfr/react-dsfr/main.css"
 // import css from our app
 import "../src/common/assets/css/index.css"
+
+// Do not import the component directly to avoid bad css order import during storybook build
+// For more information, replace the line with a simple import and see Missing fields stories in dev and build mode
+const StoryDescription = lazy(() => import("./components/description"))
 
 // Init MSW
 initialize({
@@ -40,14 +45,15 @@ const withI18next = (Story, context) => {
   )
 }
 
-const withData = (Story) => {
+const withData = (Story, { parameters }) => {
   const user = useUserManager()
   const entityId = user?.user?.rights[0]?.entity.id
   const entity = useEntityManager(user, entityId)
 
-  if (user.loading) {
-    return <LoaderOverlay />
-  }
+  const storyHasDescription = parameters?.docs?.description
+    ? Boolean(parameters?.docs?.description)
+    : false
+
   return (
     <Suspense fallback={<LoaderOverlay />}>
       <MatomoProvider>
@@ -55,6 +61,11 @@ const withData = (Story) => {
           <EntityContext.Provider value={entity}>
             <PortalProvider>
               <div className="new-dsfr">
+                {storyHasDescription && !isChromatic() && (
+                  <StoryDescription
+                    description={parameters?.docs?.description}
+                  />
+                )}
                 <Story />
               </div>
             </PortalProvider>

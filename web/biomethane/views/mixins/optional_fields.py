@@ -30,7 +30,7 @@ class OptionalFieldsActionMixin:
     def get_optional_fields(self, request, *args, **kwargs):
         """Return the optional fields for the first object in the queryset."""
         try:
-            instance = self.get_queryset().get()
+            instance = self.filter_queryset(self.get_queryset()).get()
             return Response(instance.optional_fields, status=status.HTTP_200_OK)
-        except self.get_queryset().model.DoesNotExist:
+        except self.queryset.model.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

@@ -4,6 +4,16 @@ import {
   okSimulateOperation,
 } from "accounting/__test__/api/biofuels/operations"
 
+export const fillQuantityInput = async (
+  canvasElement: HTMLElement,
+  quantity: string
+) => {
+  const { getByRole } = within(canvasElement)
+  const input = await waitFor(() => getByRole("spinbutton"))
+
+  return userEvent.type(input, quantity)
+}
+
 export const fillQuantityForm = async (
   canvasElement: HTMLElement,
   options: { quantity?: string; tC02?: string | null } = {}
@@ -14,19 +24,19 @@ export const fillQuantityForm = async (
   }
   const { quantity, tC02 } = { ...defaultOptions, ...options }
 
-  const { getByRole, getAllByRole } = within(canvasElement)
+  const { getByRole, getAllByRole, getByText } = within(canvasElement)
 
   // Fill the quantity input
-  const input = await waitFor(() => getByRole("spinbutton"))
-  await userEvent.type(input, quantity)
+  await fillQuantityInput(canvasElement, quantity)
 
-  // Click on the validate button0
+  // Click on the validate button
   const button = await waitFor(() =>
     getByRole("button", { name: "Valider la quantité" })
   )
   await userEvent.click(button)
 
-  // Fill tC02 input
+  // Await the tCO2 input label is visible
+  await waitFor(() => getByText("Saisir un montant en tCO2 évitées *"))
   const tC02Input = await waitFor(() => getAllByRole("spinbutton")[1])
 
   // Fill tC02 input if it is not null

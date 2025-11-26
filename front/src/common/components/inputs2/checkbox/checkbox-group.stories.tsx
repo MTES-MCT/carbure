@@ -54,3 +54,11 @@ export const Controlled: Story = {
     expect(args.onChange).toHaveBeenCalledWith(["option2", "option1"])
   },
 }
+
+export const ReadOnly: Story = {
+  args: {
+    label: "Mon composant checkbox",
+    readOnly: true,
+    value: ["option1", "option2"],
+  },
+}

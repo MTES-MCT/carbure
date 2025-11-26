@@ -1,0 +1,53 @@
+x-carbure: &common-settings
+  env_file: .env
+  networks: [carbure]
+
+services:
+  carbure-mariadb:
+    image: mysql:8.0.39
+    container_name: carbure_mariadb
+    <<: *common-settings
+    environment:
+      ENV: ${IMAGE_TAG}
+    volumes:
+      - carburedb:/var/lib/mysql
+
+  carbure-redis:
+    image: redis:latest
+    container_name: carbure_redis
+    <<: *common-settings
+    volumes:
+      - carbureredis:/data
+
+  carbure-django:
+    image: carbure_app:local
+    container_name: carbure_app
+    depends_on:
+      - carbure-mariadb
+      - carbure-redis
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile.prod
+    <<: *common-settings
+    environment:
+      DEBUG: 0
+      FAKE_PROD: 1
+      IMAGE_TAG: prod
+      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
+      REDIS_URL: redis://carbure-redis:6379
+      CARBURE_HOME: /app
+      PYTHONPATH: /app:/app/web
+    ports:
+      - 8090:80
+
+volumes:
+  carburedb:
+    name: carbure_carburedb
+  carbureredis:
+    name: carbure_carbureredis
+  uploadedfiles:
+    name: carbure_uploadedfiles
+
+networks:
+  carbure:
+    name: carbure_default

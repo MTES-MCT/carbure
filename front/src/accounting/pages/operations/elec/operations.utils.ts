@@ -1,6 +1,6 @@
 import { ElecOperation, ElecOperationType } from "accounting/types"
 
-export const isOperationDebit = (operation: string) =>
+export const isSendingOperation = (operation: string) =>
   [ElecOperationType.CESSION, ElecOperationType.TENEUR].includes(
     operation as ElecOperationType
   )
@@ -18,6 +18,6 @@ export const getOperationQuantity = (
   operation: ElecOperation,
   formattedQuantity: string
 ) =>
-  isOperationDebit(operation.type)
+  isSendingOperation(operation.type)
     ? `-${formattedQuantity}`
     : `+${formattedQuantity}`

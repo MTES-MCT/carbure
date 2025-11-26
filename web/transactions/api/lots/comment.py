@@ -30,7 +30,7 @@ def add_comment(request, *args, **kwargs):
         if (
             lot.carbure_supplier != entity
             and lot.carbure_client != entity
-            and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]
+            and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN, Entity.EXTERNAL_ADMIN]
         ):
             return JsonResponse(
                 {
@@ -48,7 +48,7 @@ def add_comment(request, *args, **kwargs):
             lot_comment.comment_type = CarbureLotComment.AUDITOR
             if is_visible_by_admin == "true":
                 lot_comment.is_visible_by_admin = True
-        elif entity.entity_type == Entity.ADMIN:
+        elif entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
             lot_comment.comment_type = CarbureLotComment.ADMIN
             if is_visible_by_auditor == "true":
                 lot_comment.is_visible_by_auditor = True

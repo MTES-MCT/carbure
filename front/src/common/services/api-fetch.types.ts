@@ -62,3 +62,22 @@ export type QueryParams<Path extends PathsWithGetMethod> =
   }
     ? P
     : never
+
+// Méthodes HTTP possibles dans l'OpenAPI (optionnel si vous préférez dériver dynamiquement)
+export type HttpMethod =
+  | "get"
+  | "post"
+  | "put"
+  | "patch"
+  | "delete"
+  | "options"
+  | "head"
+
+export type ResponseType<
+  Path extends keyof newPaths,
+  Method extends keyof newPaths[Path],
+> = newPaths[Path][Method] extends {
+  responses: { 200: { content: { "application/json": infer T } } }
+}
+  ? T
+  : never

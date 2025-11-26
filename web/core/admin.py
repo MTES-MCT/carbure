@@ -25,7 +25,7 @@ from core.models import (
     CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
-    Entity,
+    Department,
     EntityCertificate,
     ExternalAdminRights,
     GenericCertificate,
@@ -38,7 +38,6 @@ from core.models import (
     UserRights,
     UserRightsRequests,
 )
-from entity.services.enable_entity import enable_entity
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
@@ -50,21 +49,6 @@ def custom_titled_filter(title):
             return instance
 
     return Wrapper
-
-
-class EntityAdmin(admin.ModelAdmin):
-    list_display = ("entity_type", "name", "parent_entity", "is_enabled")
-    search_fields = ("entity_type", "name")
-    list_filter = ["entity_type"]
-    readonly_fields = ["is_enabled"]
-
-    actions = ["enable_entity"]
-
-    def enable_entity(self, request, queryset):
-        for entity in queryset:
-            enable_entity(entity, request)
-
-    enable_entity.short_description = "Activer les sociétés sélectionnées"
 
 
 class UserRightsAdmin(admin.ModelAdmin):
@@ -200,7 +184,6 @@ class TransactionDistanceAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -327,6 +310,7 @@ class ExtAdminRightsAdmin(admin.ModelAdmin):
         "entity",
         "right",
     )
+    list_filter = ("right",)
 
 
 class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
@@ -685,3 +669,12 @@ class EntityCertificateAdmin(admin.ModelAdmin):
 
     get_valid_until.admin_order_field = "certificate__valid_until"
     get_valid_until.short_description = "Valid Until"
+
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    """Admin for Department model"""
+
+    list_display = ("code_dept", "name")
+    search_fields = ("code_dept", "name")
+    ordering = ("code_dept",)

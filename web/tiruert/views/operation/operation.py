@@ -2,13 +2,12 @@ from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from core.models import Entity, UserRights
+from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
-from core.permissions import HasUserRights
+from entity.permissions import HasDgddiWriteRights, HasOperatorRights, HasOperatorWriteRights
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
@@ -56,10 +55,6 @@ class OperationPagination(MetadataPageNumberPagination):
 class OperationViewSet(ModelViewSet, ActionMixin):
     queryset = Operation.objects.all()
     serializer_class = OperationListSerializer
-    permission_classes = (
-        IsAuthenticated,
-        HasUserRights(None, [Entity.OPERATOR]),
-    )
     filterset_class = OperationFilter
     filter_backends = [DjangoFilterBackend]
     http_method_names = ["get", "post", "patch", "delete"]
@@ -76,8 +71,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "destroy",
             "export_operations_to_excel",
         ]:
-            return [IsAuthenticated(), HasUserRights([UserRights.ADMIN, UserRights.RW], [Entity.OPERATOR])]
-        return super().get_permissions()
+            return [HasOperatorWriteRights()]
+        elif self.action == "correct":
+            return [HasDgddiWriteRights()]
+        return [(HasOperatorRights | HasDgddiWriteRights)()]
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
@@ -104,6 +101,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "kg": "biofuel__masse_volumique",
         }
         multiplicator = multiplicators.get(self.request.unit, None)
+        entity_id = self.request.entity.id
 
         queryset = (
             super()
@@ -118,34 +116,34 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     output_field=CharField(),
                 ),
                 _type=Case(
-                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=Value("ACQUISITION")),
+                    When(Q(type="CESSION", credited_entity_id=entity_id), then=Value("ACQUISITION")),
                     default=F("type"),
                     output_field=CharField(),
                 ),
                 _depot=Case(
-                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("to_depot__name")),
-                    When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("from_depot__name")),
+                    When(Q(type="CESSION", credited_entity_id=entity_id), then=F("to_depot__name")),
+                    When(Q(type="CESSION", debited_entity_id=entity_id), then=F("from_depot__name")),
                     When(Q(type="INCORPORATION") | Q(type="MAC_BIO"), then=F("to_depot__name")),
                     When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("from_depot__name")),
                     default=Value(None),
                     output_field=CharField(),
                 ),
                 _entity=Case(
-                    When(Q(type="CESSION", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
-                    When(Q(type="CESSION", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
-                    When(Q(type="TRANSFERT", credited_entity_id=self.request.entity.id), then=F("debited_entity__name")),
-                    When(Q(type="TRANSFERT", debited_entity_id=self.request.entity.id), then=F("credited_entity__name")),
+                    When(Q(type="CESSION", credited_entity_id=entity_id), then=F("debited_entity__name")),
+                    When(Q(type="CESSION", debited_entity_id=entity_id), then=F("credited_entity__name")),
+                    When(Q(type="TRANSFERT", credited_entity_id=entity_id), then=F("debited_entity__name")),
+                    When(Q(type="TRANSFERT", debited_entity_id=entity_id), then=F("credited_entity__name")),
                     When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("export_recipient")),
                     default=Value(None),
                     output_field=CharField(),
                 ),
                 _quantity=Case(
                     When(
-                        credited_entity_id=self.request.entity.id,
+                        credited_entity_id=entity_id,
                         then=F("total_volume") * (F(multiplicator) if multiplicator else 1),
                     ),
                     When(
-                        debited_entity_id=self.request.entity.id,
+                        debited_entity_id=entity_id,
                         then=F("total_volume") * -1 * (F(multiplicator) if multiplicator else 1),
                     ),
                     default=Value(None),
@@ -153,19 +151,19 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 ),
                 _volume=Case(
                     When(
-                        credited_entity_id=self.request.entity.id,
+                        credited_entity_id=entity_id,
                         then=F("total_volume"),
                     ),
                     When(
-                        debited_entity_id=self.request.entity.id,
+                        debited_entity_id=entity_id,
                         then=F("total_volume") * -1,
                     ),
                     default=Value(None),
                     output_field=FloatField(),
                 ),
                 _transaction=Case(
-                    When(credited_entity_id=self.request.entity.id, then=Value("CREDIT")),
-                    When(debited_entity_id=self.request.entity.id, then=Value("DEBIT")),
+                    When(credited_entity_id=entity_id, then=Value("CREDIT")),
+                    When(debited_entity_id=entity_id, then=Value("DEBIT")),
                     default=Value(None),
                     output_field=CharField(),
                 ),

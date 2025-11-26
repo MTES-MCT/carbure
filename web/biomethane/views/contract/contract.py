@@ -3,14 +3,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters import BiomethaneContractFilter
+from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneContract
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.contract import (
     BiomethaneContractInputSerializer,
     BiomethaneContractSerializer,
 )
-from biomethane.views.mixins import WatchedFieldsActionMixin
+from biomethane.views.mixins import RetrieveSingleObjectMixin, WatchedFieldsActionMixin
 
 # from .mixins import ActionMixin
 
@@ -26,9 +26,9 @@ from biomethane.views.mixins import WatchedFieldsActionMixin
         ),
     ]
 )
-class BiomethaneContractViewSet(GenericViewSet, WatchedFieldsActionMixin):
+class BiomethaneContractViewSet(RetrieveSingleObjectMixin, WatchedFieldsActionMixin, GenericViewSet):
     queryset = BiomethaneContract.objects.all()
-    filterset_class = BiomethaneContractFilter
+    filterset_class = EntityProducerFilter
     serializer_class = BiomethaneContractSerializer
     pagination_class = None
 
@@ -44,25 +44,6 @@ class BiomethaneContractViewSet(GenericViewSet, WatchedFieldsActionMixin):
         if self.action == "upsert":
             return BiomethaneContractInputSerializer
         return BiomethaneContractSerializer
-
-    @extend_schema(
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=BiomethaneContractSerializer,
-                description="Contract details for the entity",
-            ),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Contract not found for this entity."),
-        },
-        description="Retrieve the contract for the current entity. Returns a single contract object.",
-    )
-    def retrieve(self, request, *args, **kwargs):
-        try:
-            contract = self.filter_queryset(self.get_queryset()).get()
-            data = self.get_serializer(contract, many=False).data
-            return Response(data)
-
-        except BiomethaneContract.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
     @extend_schema(
         responses={

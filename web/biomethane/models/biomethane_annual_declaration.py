@@ -19,5 +19,9 @@ class BiomethaneAnnualDeclaration(models.Model):
     class Meta:
         db_table = "biomethane_annual_declaration"
         unique_together = ["producer", "year"]
-        verbose_name = "Biométhane - Déclaration annuelle"
-        verbose_name_plural = "Biométhane - Déclarations annuelles"
+        verbose_name = "Déclaration annuelle"
+        verbose_name_plural = "Déclarations annuelles"
+
+    @property
+    def production_unit(self):
+        return getattr(self.producer, "biomethane_production_unit", None)

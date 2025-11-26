@@ -7,6 +7,10 @@ from edelivery.ebms.access_points import Initiator, Responder
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
+class EdeliveryError(RuntimeError):
+    pass
+
+
 class AbstractSoapAction:
     def __init__(self, name, response_class, send_callback=send_SOAP_request):
         self.name = name
@@ -18,7 +22,11 @@ class AbstractSoapAction:
 
     def perform(self):
         response = self.send_callback(action=self.name, payload=self.payload())
-        return self.response_class(response.text)
+        result = self.response_class(response.text)
+        if result.error:
+            raise EdeliveryError(result.error_message)
+
+        return result
 
 
 class ListPendingMessages(AbstractSoapAction):

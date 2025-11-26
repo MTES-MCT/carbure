@@ -17,12 +17,13 @@ import {
   EntityDepot,
   OwnershipType,
   Biofuel,
+  Country,
 } from "common/types"
 import { mergeDeepRight } from "ramda"
 
 // COUNTRIES
 
-export const country = {
+export const country: Country = {
   code_pays: "FR",
   name: "France",
   name_en: "France",
@@ -137,6 +138,13 @@ export const externalAdmin: Entity = {
   has_trading: false,
 }
 
+export const biomethaneProducer: Entity = {
+  ...company,
+  id: 10,
+  name: "Producteur de biométhane test",
+  entity_type: EntityType.Producteur_de_biom_thane,
+}
+
 // DELIVERY SITES
 
 export const deliverySite: Depot = {
@@ -241,6 +249,7 @@ export const entities = {
   [EntityType.PowerOrHeatProducer]: powerOrHeatProducer,
   [EntityType.Airline]: airline,
   [EntityType.Auditor]: auditor,
+  [EntityType.Producteur_de_biom_thane]: biomethaneProducer,
 }
 
 type PartialUserParam = DeepPartial<{

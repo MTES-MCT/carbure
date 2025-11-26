@@ -2,48 +2,47 @@ Bonjour,
 
 Vous avez {{nb_notifications}} nouvelles notifications sur CarbuRe:
 {% if meter_readings_app_started %}
-La période de declaration des relevés trimestriels T{{meter_readings_app_started.meta.quarter}} {{meter_readings_app_started.meta.year}} a débuté, vous avez jusqu'au {{meter_readings_app_started.meta.deadline}} pour transmettre votre relevé dans votre espace : https://{{ domain }}/app/org/{{entity.id}}/settings#elec-meter-readings
+La période de declaration des relevés trimestriels T{{meter_readings_app_started.meta.quarter}} {{meter_readings_app_started.meta.year}} a débuté, vous avez jusqu'au {{meter_readings_app_started.meta.deadline}} pour transmettre votre relevé dans votre espace : {{base_url}}/org/{{entity.id}}/charge-points/meter-readings
 {% endif %}
 {% if meter_readings_app_ending_soon %}
-La période de declaration des relevés trimestriels T{{meter_readings_app_ending_soon.meta.quarter}} {{meter_readings_app_ending_soon.meta.year}} arrive à sa fin, pensez à transmettre votre relevé: https://{{ domain }}/app/org/{{entity.id}}/settings#elec-meter-readings
+La période de declaration des relevés trimestriels T{{meter_readings_app_ending_soon.meta.quarter}} {{meter_readings_app_ending_soon.meta.year}} arrive à sa fin, pensez à transmettre votre relevé: {{base_url}}/org/{{entity.id}}/charge-points/meter-readings
 {% endif %}
 {% if correction_requests|length > 0 %}
-Demandes de corrections: 
+Demandes de corrections:
 {% for cr in correction_requests %}
-Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction
+Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} {{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/out/correction
 {% endfor %}
 {% endif %}
 {% if correction_done|length > 0 %}
-Lots corrigés par vos fournisseurs: 
+Lots corrigés par vos fournisseurs:
 {% for cr in correction_done %}
-Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/correction
+Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} {{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/correction
 {% endfor %}
 {% endif %}
 {% if lots_rejected|length > 0 %}
-Lots refusés par vos clients: 
+Lots refusés par vos clients:
 {% for cr in lots_rejected %}
-Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/out/correction
+Client {{cr.meta.client}} Lots concernés: {{cr.meta.count}} {{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/out/correction
 {% endfor %}
 {% endif %}
 {% if lots_received|length > 0 %}
 Lots reçus:
 {% for cr in lots_received %}
-Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending
+Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} {{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/pending
 {% endfor %}
 {% endif %}
 {% if lots_recalled|length > 0 %}
 Lots rappelés par vos fournisseurs:
 {% for cr in lots_recalled %}
-Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien https://{{ domain }}/app/org/{{entity.id}}/{{cr.meta.year}}/in/pending
+Fournisseur {{cr.meta.supplier}} Lots concernés: {{cr.meta.count}} Lien {{base_url}}/org/{{entity.id}}/transactions/{{cr.meta.year}}/in/pending
 {% endfor %}
 {% endif %}
 
 {% if certificate_rejected|length > 0 %}
 {% for cr in certificate_rejected %}
-L'administration a rejeté votre certificat : {{cr.meta.certificate}} <a href="https://{{ domain }}/app/org/{{entity.id}}/settings#certificates">Voir</a>
+L'administration a rejeté votre certificat : {{cr.meta.certificate}} <a href="{{base_url}}/org/{{entity.id}}/settings/certificates">Voir</a>
 {% endfor %}
 {% endif %}
 
 Bonne journée,
 L'équipe CarbuRe
-

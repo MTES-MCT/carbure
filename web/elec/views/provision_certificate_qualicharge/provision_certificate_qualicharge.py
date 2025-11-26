@@ -1,6 +1,7 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework import mixins, viewsets
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
 from rest_framework_api_key.permissions import HasAPIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -36,9 +37,7 @@ class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination
         ),
     ]
 )
-class ElecProvisionCertificateQualichargeViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, ActionMixin, viewsets.GenericViewSet
-):
+class ElecProvisionCertificateQualichargeViewSet(ListModelMixin, RetrieveModelMixin, ActionMixin, GenericViewSet):
     queryset = ElecProvisionCertificateQualicharge.objects.all()
     serializer_class = ElecProvisionCertificateQualichargeSerializer
     filterset_class = ProvisionCertificateQualichargeFilter
@@ -50,7 +49,7 @@ class ElecProvisionCertificateQualichargeViewSet(
             self.authentication_classes = [JWTAuthentication]
             self.permission_classes = [HasAPIKey & IsAuthenticated]
         else:
-            self.permission_classes = [IsAuthenticated, HasCpoRights | HasElecAdminRights]
+            self.permission_classes = [HasCpoRights | HasElecAdminRights]
 
         return super().initialize_request(request, *args, **kwargs)
 
@@ -61,4 +60,4 @@ class ElecProvisionCertificateQualichargeViewSet(
         if entity.entity_type == Entity.CPO:
             queryset = ElecProvisionCertificateQualicharge.objects.filter(cpo=entity)
 
-        return queryset.select_related("cpo").order_by("id")
+        return queryset.select_related("cpo").filter(cpo__isnull=False).order_by("id")

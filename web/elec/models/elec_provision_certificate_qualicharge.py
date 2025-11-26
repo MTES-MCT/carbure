@@ -13,7 +13,8 @@ class ElecProvisionCertificateQualicharge(models.Model):
         (BOTH, BOTH),
     )
 
-    cpo = models.ForeignKey("core.Entity", on_delete=models.CASCADE)
+    cpo = models.ForeignKey("core.Entity", on_delete=models.CASCADE, null=True, blank=True)
+    unknown_siren = models.CharField(max_length=16, null=True, blank=True)
     date_from = models.DateField()
     date_to = models.DateField()
     year = models.IntegerField()

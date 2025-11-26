@@ -1,10 +1,12 @@
-import { http, HttpResponse } from "msw"
-import { apiTypes } from "common/services/api-fetch.types"
+import { HttpResponse } from "msw"
+import { http } from "common/__test__/http"
+import { Operation } from "accounting/types"
+import { operationCredit } from "accounting/__test__/data/biofuels/operation"
 
 export const okSimulateMinMax = http.post(
-  "/api/tiruert/operations/simulate/min_max/",
+  "/tiruert/operations/simulate/min_max/",
   () => {
-    return HttpResponse.json<apiTypes["SimulationMinMaxOutput"]>({
+    return HttpResponse.json({
       min_avoided_emissions: 10,
       max_avoided_emissions: 50,
     })
@@ -12,9 +14,9 @@ export const okSimulateMinMax = http.post(
 )
 
 export const okSimulateMinMaxWithEqualValues = http.post(
-  "/api/tiruert/operations/simulate/min_max/",
+  "/tiruert/operations/simulate/min_max/",
   () => {
-    return HttpResponse.json<apiTypes["SimulationMinMaxOutput"]>({
+    return HttpResponse.json({
       min_avoided_emissions: 10,
       max_avoided_emissions: 10.65,
     })
@@ -22,9 +24,9 @@ export const okSimulateMinMaxWithEqualValues = http.post(
 )
 
 export const okSimulateMinMaxWithZeroValues = http.post(
-  "/api/tiruert/operations/simulate/min_max/",
+  "/tiruert/operations/simulate/min_max/",
   () => {
-    return HttpResponse.json<apiTypes["SimulationMinMaxOutput"]>({
+    return HttpResponse.json({
       min_avoided_emissions: 0.1,
       max_avoided_emissions: 0.2,
     })
@@ -32,9 +34,9 @@ export const okSimulateMinMaxWithZeroValues = http.post(
 )
 
 export const okSimulateOperation = http.post(
-  "/api/tiruert/operations/simulate/",
+  "/tiruert/operations/simulate/",
   () => {
-    return HttpResponse.json<apiTypes["SimulationOutput"]>({
+    return HttpResponse.json({
       selected_lots: [
         {
           lot_id: 1,
@@ -51,3 +53,11 @@ export const okSimulateOperation = http.post(
     })
   }
 )
+
+export const generateGetOperationDetail = (operation: Operation) => {
+  return http.get("/tiruert/operations/{id}/", () => {
+    return HttpResponse.json(operation)
+  })
+}
+
+export const okGetOperationDetail = generateGetOperationDetail(operationCredit)

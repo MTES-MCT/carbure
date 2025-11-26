@@ -21,6 +21,7 @@ import { ChangeMeasureReferencePoint } from "./change-prm"
 import { DeleteChargePointDialog } from "./delete-charge-point-dialog"
 import { MetersHistory } from "./meters-history"
 import { AxiosError } from "axios"
+import { DeleteMeterDialog } from "./delete-meter-dialog"
 
 const UpdateChargePointDialog = () => {
   const entity = useEntity()
@@ -100,6 +101,14 @@ const UpdateChargePointDialog = () => {
     chargePointDetailQuery.result?.data.data?.initial_index !=
     value.initial_index
 
+  const openDeleteMeterDialog = () => {
+    if (!chargePointDetail) return
+
+    portal((close) => (
+      <DeleteMeterDialog onClose={close} chargePointId={chargePointDetail.id} />
+    ))
+  }
+
   const openChangeMeterDialog = () => {
     if (!chargePointDetail) return
 
@@ -178,6 +187,7 @@ const UpdateChargePointDialog = () => {
                           readOnly
                           {...bind("mid_id")}
                         />
+
                         <NumberInput
                           label={`${t("Index initial relevé (kWh)")}${value.initial_index_date ? ` - ${formatDate(value.initial_index_date)}` : ""}`}
                           readOnly={isReadOnly}
@@ -203,6 +213,17 @@ const UpdateChargePointDialog = () => {
                     >
                       {t("Mon compteur MID a changé ?")}
                     </Button>
+
+                    {value.mid_id &&
+                      value.initial_index_date == value.measure_date && (
+                        <Button
+                          variant="link"
+                          style={{ color: "var(--red-dark)" }}
+                          label={t("Je souhaite supprimer ce compteur")}
+                          action={openDeleteMeterDialog}
+                          disabled={isReadOnly}
+                        />
+                      )}
                   </Fieldset>
 
                   <Fieldset label={t("PRM")}>
