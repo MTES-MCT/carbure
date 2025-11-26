@@ -236,7 +236,7 @@ class TeneurService:
         return selected_lots, lot_ids, emissions, fun
 
     @staticmethod
-    def get_min_and_max_emissions(entity_id, data, unit):
+    def get_min_and_max_emissions(data, unit):
         """
         Compute minimum and maximum feasible mix emissions.
         Return avoided emissions (tCO2)
