@@ -49,6 +49,7 @@ class Command(BaseCommand):
                 "meter__charge_point__charge_point_id",
                 "application__year",
                 "application__quarter",
+                "meter_id",
                 "reading_date",
             )
             .annotate(
