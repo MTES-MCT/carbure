@@ -6,6 +6,7 @@ import { QueryFilters } from "common/hooks/query-builder-2"
 
 import Tag from "@codegouvfr/react-dsfr/Tag"
 import { useTranslation } from "react-i18next"
+import { useCallback } from "react"
 
 const getEmptyFilters = <Key extends string>(filters: Key[]) => {
   return filters.reduce(
@@ -17,6 +18,10 @@ const getEmptyFilters = <Key extends string>(filters: Key[]) => {
     },
     {} as Record<Key, string[]>
   )
+}
+
+const _hasFiltersValues = (filters: QueryFilters) => {
+  return Object.values(filters ?? {}).some((filter) => filter.length > 0)
 }
 export interface FilterMultiSelectProps2<
   Key extends string,
@@ -41,11 +46,19 @@ export const FilterMultiSelect2 = <
 }: FilterMultiSelectProps2<Key, Value>) => {
   const filters = Object.keys(filterLabels) as Key[]
   const emptyFilters = getEmptyFilters(filters)
+  const hasFiltersValues = useCallback(
+    () => _hasFiltersValues(selected),
+    [selected]
+  )
+
   const { t } = useTranslation()
 
   const elements = [
     <Tag
-      nativeButtonProps={{ onClick: () => onSelect(emptyFilters) }}
+      nativeButtonProps={{
+        onClick: () => onSelect(emptyFilters),
+        disabled: !hasFiltersValues(),
+      }}
       className={styles["filter-multiselect__reset"]}
     >
       {t("Tout réinitialiser")}

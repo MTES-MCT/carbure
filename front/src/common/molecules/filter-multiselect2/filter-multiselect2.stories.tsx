@@ -4,7 +4,6 @@ import { FilterMultiSelect2 } from "./filter-multiselect2"
 const meta: Meta<typeof FilterMultiSelect2> = {
   component: FilterMultiSelect2,
   title: "common/molecules/FilterMultiSelect2",
-  tags: ["IN PROGRESS"],
   parameters: {
     chromatic: { disableSnapshot: true },
   },
@@ -36,3 +35,12 @@ type Story = StoryObj<typeof FilterMultiSelect2>
 export default meta
 
 export const Default: Story = {}
+
+export const WithFilters: Story = {
+  args: {
+    selected: {
+      filtre1: ["1"],
+      filtre2: ["2"],
+    },
+  },
+}
