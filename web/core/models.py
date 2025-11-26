@@ -1330,7 +1330,14 @@ class GenericCertificate(models.Model):
     ISCC = "ISCC"
     REDCERT = "REDCERT"
     DBS = "2BS"
-    CERTIFICATE_TYPES = ((SYSTEME_NATIONAL, SYSTEME_NATIONAL), (ISCC, ISCC), (REDCERT, REDCERT), (DBS, DBS))
+    KZR_INIG = "KZR_INIG"
+    CERTIFICATE_TYPES = (
+        (SYSTEME_NATIONAL, SYSTEME_NATIONAL),
+        (ISCC, ISCC),
+        (REDCERT, REDCERT),
+        (DBS, DBS),
+        (KZR_INIG, KZR_INIG),
+    )
 
     certificate_id = models.CharField(max_length=64, blank=False, null=False)
     certificate_type = models.CharField(max_length=32, null=False, blank=False, choices=CERTIFICATE_TYPES)
