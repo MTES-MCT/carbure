@@ -18,6 +18,7 @@ export interface DropdownProps extends Trigger {
   className?: string
   style?: React.CSSProperties
   openOnHover?: boolean
+  portalRoot?: HTMLElement
 }
 
 export const Dropdown = ({
@@ -31,6 +32,7 @@ export const Dropdown = ({
   onToggle,
   anchor = "bottom start",
   openOnHover = false,
+  portalRoot,
 }: DropdownProps) => {
   const [open, _setOpen] = useControlledState(false, openControlled, onToggle)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -190,7 +192,7 @@ export const Dropdown = ({
   if (!open) return null
 
   return (
-    <Portal onClose={() => setOpen(false)}>
+    <Portal onClose={() => setOpen(false)} root={portalRoot}>
       <div
         ref={dropdownRef}
         data-dropdown

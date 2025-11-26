@@ -6,6 +6,7 @@ type CommonInputProps = {
   inputRef?: React.RefObject<HTMLInputElement>
   label?: InputPropsDSFR["label"] // By default, the label is required in the DSFR
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
 }
 // Props to be exposed to all inputs (text/number/date etc...)
 export type InputProps = Omit<
@@ -33,6 +34,7 @@ export const Input = ({
   inputRef,
   label,
   onKeyDown,
+  onBlur,
   ...props
 }: Omit<InputPropsDSFR.RegularInput, "label"> &
   ExtendedInputProps &
@@ -51,6 +53,7 @@ export const Input = ({
         required: props.required,
         ref: inputRef as RefObject<HTMLInputElement>,
         onKeyDown,
+        onBlur,
       }}
       textArea={false}
       label={label ?? ""}
