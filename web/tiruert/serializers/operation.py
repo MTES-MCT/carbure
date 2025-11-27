@@ -150,6 +150,11 @@ class OperationInputSerializer(serializers.ModelSerializer):
     )
     lots = OperationLotSerializer(many=True, required=True)
 
+    def validate_type(self, value):
+        if value not in Operation.API_CREATABLE_TYPES:
+            raise serializers.ValidationError("error : OPERATION_TYPE_NOT_AUTHORIZED")
+        return value
+
     def create(self, validated_data):
         with transaction.atomic():
             request = self.context.get("request")
