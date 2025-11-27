@@ -19,7 +19,6 @@ export const useMissingFields = <FormType extends object | undefined>(
   const { showMissingFields } = useShowMissingFields(form)
   const { canEditDeclaration } = useAnnualDeclaration()
   useEffect(() => {
-    console.log("location.hash", canEditDeclaration, location.hash)
     if (canEditDeclaration && location.hash.includes(MISSING_FIELDS_HASH)) {
       showMissingFields()
       navigate({ hash: "" })
