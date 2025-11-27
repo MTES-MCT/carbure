@@ -2,8 +2,33 @@ from unittest.mock import Mock, PropertyMock, patch
 
 from django.test import TestCase
 
-from core.models import Biocarburant
+from core.models import Biocarburant, Entity
 from tiruert.models import Operation
+
+
+class OperationConstantsTest(TestCase):
+    """Tests for Operation constants."""
+
+    def test_api_creatable_types_contains_expected_values(self):
+        """Should contain only TRANSFERT, EXPORTATION, EXPEDITION, TENEUR."""
+        expected = [
+            Operation.TRANSFERT,
+            Operation.EXPORTATION,
+            Operation.EXPEDITION,
+            Operation.TENEUR,
+        ]
+        self.assertCountEqual(Operation.API_CREATABLE_TYPES, expected)
+
+    def test_api_deletable_types_contains_expected_values(self):
+        """Should contain only CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION."""
+        expected = [
+            Operation.CESSION,
+            Operation.TENEUR,
+            Operation.TRANSFERT,
+            Operation.EXPORTATION,
+            Operation.EXPEDITION,
+        ]
+        self.assertCountEqual(Operation.API_DELETABLE_TYPES, expected)
 
 
 class OperationVolumePropertyTest(TestCase):
@@ -15,7 +40,6 @@ class OperationVolumePropertyTest(TestCase):
         operation._volume = 1500.0
 
         result = operation.volume_l
-
         self.assertEqual(result, 1500.0)
 
     def test_volume_l_returns_base_volume_when_no_annotation(self):
@@ -27,7 +51,6 @@ class OperationVolumePropertyTest(TestCase):
             mock_volume.return_value = 1000.0
 
             result = operation.volume_l
-
             self.assertEqual(result, 1000.0)
 
     def test_volume_l_handles_none_annotation(self):
@@ -39,7 +62,6 @@ class OperationVolumePropertyTest(TestCase):
             mock_volume.return_value = 2000.0
 
             result = operation.volume_l
-
             self.assertEqual(result, 2000.0)
 
 
@@ -170,7 +192,6 @@ class OperationVolumeToQuantityMethodTest(TestCase):
         operation = Operation(biofuel=biofuel)
 
         result = operation.volume_to_quantity(1000.0, "mj")
-
         self.assertEqual(result, 36000.0)
 
     def test_volume_to_quantity_kg(self):
@@ -183,7 +204,6 @@ class OperationVolumeToQuantityMethodTest(TestCase):
         operation = Operation(biofuel=biofuel)
 
         result = operation.volume_to_quantity(1000.0, "kg")
-
         self.assertEqual(result, 850.0)
 
     def test_volume_to_quantity_liters(self):
@@ -191,7 +211,6 @@ class OperationVolumeToQuantityMethodTest(TestCase):
         operation = Operation()
 
         result = operation.volume_to_quantity(1500.0, "l")
-
         self.assertEqual(result, 1500.0)
 
     def test_volume_to_quantity_unknown_unit(self):
@@ -199,5 +218,162 @@ class OperationVolumeToQuantityMethodTest(TestCase):
         operation = Operation()
 
         result = operation.volume_to_quantity(2000.0, "unknown")
-
         self.assertEqual(result, 2000.0)
+
+
+class OperationSectorPropertyTest(TestCase):
+    """Tests for Operation.sector property."""
+
+    def test_sector_returns_essence_when_compatible_essence(self):
+        """Should return ESSENCE when biofuel is compatible with essence."""
+        biofuel = Biocarburant.objects.create(
+            code="ETH",
+            name="Ethanol",
+            compatible_essence=True,
+            compatible_diesel=False,
+        )
+        operation = Operation(biofuel=biofuel)
+
+        result = operation.sector
+        self.assertEqual(result, Operation.ESSENCE)
+
+    def test_sector_returns_gazole_when_compatible_diesel(self):
+        """Should return GAZOLE when biofuel is compatible with diesel."""
+        biofuel = Biocarburant.objects.create(
+            code="EMHV",
+            name="EMHV",
+            compatible_essence=False,
+            compatible_diesel=True,
+        )
+        operation = Operation(biofuel=biofuel)
+
+        result = operation.sector
+        self.assertEqual(result, Operation.GAZOLE)
+
+    def test_sector_returns_carbureacteur_when_saf_biofuel(self):
+        """Should return CARBUREACTEUR when biofuel code is in SAF_BIOFUEL_TYPES."""
+        from saf.models.constants import SAF_BIOFUEL_TYPES
+
+        # Use the first SAF biofuel type from constants
+        saf_code = list(SAF_BIOFUEL_TYPES)[0]
+        biofuel = Biocarburant.objects.create(
+            code=saf_code,
+            name=f"SAF {saf_code}",
+            compatible_essence=False,
+            compatible_diesel=False,
+        )
+        operation = Operation(biofuel=biofuel)
+
+        result = operation.sector
+        self.assertEqual(result, Operation.CARBUREACTEUR)
+
+    def test_sector_returns_none_when_no_match(self):
+        """Should return None when biofuel doesn't match any sector."""
+        biofuel = Biocarburant.objects.create(
+            code="UNKNOWN",
+            name="Unknown Biofuel",
+            compatible_essence=False,
+            compatible_diesel=False,
+        )
+        operation = Operation(biofuel=biofuel)
+
+        result = operation.sector
+        self.assertIsNone(result)
+
+
+class OperationIsCreditMethodTest(TestCase):
+    """Tests for Operation.is_credit(entity) method."""
+
+    fixtures = [
+        "json/entities.json",
+    ]
+
+    def setUp(self):
+        self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        self.other_entity = Entity.objects.filter(entity_type=Entity.OPERATOR).last()
+
+    def test_is_credit_returns_true_when_credited_entity_matches(self):
+        """Should return True when credited_entity.id matches the given entity."""
+        operation = Operation(credited_entity=self.entity)
+        result = operation.is_credit(self.entity.id)
+        self.assertTrue(result)
+
+    def test_is_credit_returns_false_when_credited_entity_does_not_match(self):
+        """Should return False when credited_entity.id doesn't match."""
+        operation = Operation(credited_entity=self.entity)
+        result = operation.is_credit(self.other_entity.id)
+        self.assertFalse(result)
+
+    def test_is_credit_returns_false_when_credited_entity_is_none(self):
+        """Should return False when credited_entity is None."""
+        operation = Operation(credited_entity=None)
+        result = operation.is_credit(self.entity.id)
+        self.assertFalse(result)
+
+    def test_is_credit_handles_string_entity_id(self):
+        """Should handle entity parameter as string and convert to int."""
+        operation = Operation(credited_entity=self.entity)
+        result = operation.is_credit(str(self.entity.id))
+        self.assertTrue(result)
+
+
+class OperationIsAcquisitionMethodTest(TestCase):
+    """Tests for Operation.is_acquisition(entity_id) method."""
+
+    fixtures = [
+        "json/entities.json",
+    ]
+
+    def setUp(self):
+        self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        self.other_entity = Entity.objects.filter(entity_type=Entity.OPERATOR).last()
+
+    def test_is_acquisition_returns_true_when_credited_entity_matches_and_type_is_cession(self):
+        """Should return True when credited_entity matches and type is CESSION."""
+        operation = Operation(
+            credited_entity=self.entity,
+            type=Operation.CESSION,
+        )
+
+        result = operation.is_acquisition(self.entity.id)
+        self.assertTrue(result)
+
+    def test_is_acquisition_returns_false_when_credited_entity_matches_but_type_is_not_cession(self):
+        """Should return False when credited_entity matches but type is not CESSION."""
+        operation = Operation(
+            credited_entity=self.entity,
+            type=Operation.TENEUR,
+        )
+
+        result = operation.is_acquisition(self.entity.id)
+        self.assertFalse(result)
+
+    def test_is_acquisition_returns_false_when_type_is_cession_but_entity_does_not_match(self):
+        """Should return False when type is CESSION but credited_entity doesn't match."""
+        operation = Operation(
+            credited_entity=self.entity,
+            type=Operation.CESSION,
+        )
+
+        result = operation.is_acquisition(self.other_entity.id)
+        self.assertFalse(result)
+
+    def test_is_acquisition_returns_false_when_credited_entity_is_none(self):
+        """Should return False when credited_entity is None."""
+        operation = Operation(
+            credited_entity=None,
+            type=Operation.CESSION,
+        )
+
+        result = operation.is_acquisition(self.entity.id)
+        self.assertFalse(result)
+
+    def test_is_acquisition_handles_string_entity_id(self):
+        """Should handle entity_id parameter as string and convert to int."""
+        operation = Operation(
+            credited_entity=self.entity,
+            type=Operation.CESSION,
+        )
+
+        result = operation.is_acquisition(str(self.entity.id))
+        self.assertTrue(result)

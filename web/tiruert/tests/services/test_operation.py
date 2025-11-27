@@ -19,8 +19,6 @@ class OperationServiceTestCase(TestCase):
         "json/countries.json",
         "json/entities.json",
         "json/productionsites.json",
-        "json/depots.json",
-        "json/entities_sites.json",
     ]
 
     @classmethod
@@ -358,6 +356,33 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         # Should not raise exception (no target = no check)
         OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
+
+    @patch("tiruert.services.operation.BalanceService.calculate_balance")
+    @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
+    def test_check_services_method_are_called_with_data(self, mock_calculate_target, mock_calculate_balance):
+        """Should call ObjectiveService and BalanceService with correct parameters (MJ unit)."""
+        mock_calculate_target.return_value = 100000  # Dummy target
+
+        mock_request = Mock()
+        mock_request.entity.id = 1
+        mock_request.GET = {}
+
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH")}
+        selected_lots = [{"id": 1, "volume": 1000}]
+        entity_id = 1
+
+        # Call the method
+        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
+
+        # Verify ObjectiveService called with correct parameters
+        mock_calculate_target.assert_called_once_with("CONV", 1)
+
+        # Verify BalanceService called with correct parameters
+        mock_calculate_balance.assert_called_once()
+        called_args = mock_calculate_balance.call_args[0]
+        self.assertEqual(called_args[2], 1)  # entity_id
+        self.assertEqual(called_args[3], None)  # depot_id
+        self.assertEqual(called_args[4], "mj")  # unit
 
     @patch("tiruert.services.operation.CarbureLot")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")

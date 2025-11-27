@@ -206,6 +206,14 @@ class OperationInputSerializerCreateTest(TestCase):
         self.assertEqual(detail1.volume, 500)
         self.assertEqual(detail1.emission_rate_per_mj, 10.5)
 
+    def test_validate_type_accepts_authorized_types(self):
+        """Should accept types in Operation.API_CREATABLE_TYPES."""
+        serializer = OperationInputSerializer()
+
+        # Only test the first one is enough, the whole list is tested in model tests
+        result = serializer.validate_type(Operation.API_CREATABLE_TYPES[0])
+        self.assertEqual(result, Operation.API_CREATABLE_TYPES[0])
+
 
 class OperationUpdateSerializerTest(TestCase):
     """Tests for OperationUpdateSerializer field restrictions."""
