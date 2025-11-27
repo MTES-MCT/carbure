@@ -3,6 +3,9 @@
 from django.db import migrations
 
 
+# Note: migration code should stay fixed in time, the below code is very bad.
+# When importing code that can change over time, it can break the whole migration process.
+# Use django commands instead for one-shot db updates.
 def propagate_saf_origin(apps, schema_editor):
     from core.traceability import bulk_update_traceability_nodes, get_traceability_nodes
 
@@ -25,5 +28,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(propagate_saf_origin, migrations.RunPython.noop),
+        migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop),
     ]
