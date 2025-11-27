@@ -439,14 +439,6 @@ if not env("TEST"):
         }
     }
 
-if env("TEST"):
-    REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
-    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
-    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
-    PASSWORD_HASHERS = [
-        "django.contrib.auth.hashers.MD5PasswordHasher",
-    ]
-
 API_KEY_CUSTOM_HEADER = "HTTP_X_API_KEY"
 
 if env("IMAGE_TAG") in ("dev", "local"):
@@ -460,3 +452,22 @@ if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
     # Disable throtting in local
     REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
+
+
+if env("TEST"):
+    MIDDLEWARE = [
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "carbure.middlewares.entity.EntityMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+    ]
+
+    installed_apps_to_remove = ["django_admin_listfilter_dropdown", "drf_spectacular"]
+    INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in installed_apps_to_remove]
+    REQUEST_LOGGING_HTTP_4XX_LOG_LEVEL = logging.NOTSET
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
