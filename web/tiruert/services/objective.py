@@ -113,6 +113,143 @@ class ObjectiveService:
         return value * ElecOperation.EMISSION_RATE_PER_MJ / 1e6  # tCO2
 
     @staticmethod
+    def calculate_global_objective(objective_per_sector, elec_category, objectives, energy_basis):
+        """
+        Calculate the global objective by aggregating sector balances and applying GHG conversions.
+
+        Returns:
+            dict: Global objective with available_balance, target, pending_teneur, declared_teneur,
+                  unit, target_percent, energy_basis, and penalty.
+        """
+        # Get global objective target and penalty from objectives
+        global_objective_target, global_objective_penalty, global_objective_target_percent = (
+            ObjectiveService.get_global_objective_and_penalty(objectives, energy_basis)
+        )
+
+        # Sum sector values
+        available_balance_sum = sum(sector["available_balance"] for sector in objective_per_sector)
+        pending_teneur_sum = sum(sector["pending_teneur"] for sector in objective_per_sector)
+        declared_teneur_sum = sum(sector["declared_teneur"] for sector in objective_per_sector)
+
+        # Apply GHG conversions for biofuel
+        biofuel_available_balance = ObjectiveService.apply_ghg_conversion(available_balance_sum)
+        biofuel_pending_teneur = ObjectiveService.apply_ghg_conversion(pending_teneur_sum)
+        biofuel_declared_teneur = ObjectiveService.apply_ghg_conversion(declared_teneur_sum)
+
+        # Apply GHG conversions for elec
+        elec_available_balance = ObjectiveService.apply_elec_ghg_conversion(elec_category["available_balance"])
+        elec_pending_teneur = ObjectiveService.apply_elec_ghg_conversion(elec_category["pending_teneur"])
+        elec_declared_teneur = ObjectiveService.apply_elec_ghg_conversion(elec_category["declared_teneur"])
+
+        # Build global objective
+        global_objective = {
+            "available_balance": biofuel_available_balance + elec_available_balance,
+            "target": ObjectiveService.apply_ghg_conversion(global_objective_target),
+            "pending_teneur": biofuel_pending_teneur + elec_pending_teneur,
+            "declared_teneur": biofuel_declared_teneur + elec_declared_teneur,
+            "unit": "tCO2",
+            "target_percent": global_objective_target_percent,
+            "energy_basis": energy_basis,
+        }
+
+        # Calculate penalty
+        penalty = ObjectiveService._calcule_penalty(
+            global_objective_penalty,
+            global_objective["pending_teneur"] + global_objective["declared_teneur"],
+            global_objective["target"],
+            tCO2=True,
+        )
+        global_objective["penalty"] = penalty
+
+        return global_objective
+
+    @staticmethod
+    def aggregate_objectives(objectives_list: list[dict]) -> dict:
+        """
+        Aggregate a list of objectives results into a single aggregated result.
+
+        Args:
+            objectives_list: List of objectives dicts with keys 'main', 'sectors', 'categories'
+
+        Returns:
+            Aggregated objectives dict with same structure
+        """
+        if not objectives_list:
+            return None
+
+        # Initialize aggregated structures
+        aggregated_main = {
+            "available_balance": 0,
+            "target": 0,
+            "pending_teneur": 0,
+            "declared_teneur": 0,
+            "unit": "tCO2",
+            "target_percent": None,
+            "penalty": 0,
+            "energy_basis": 0,
+        }
+        aggregated_sectors = {}
+        aggregated_categories = {}
+
+        # Keys to sum in main
+        main_sum_keys = ["available_balance", "target", "pending_teneur", "declared_teneur", "penalty", "energy_basis"]
+        # Keys to sum in sectors/categories
+        balance_sum_keys = ["pending_teneur", "declared_teneur", "available_balance"]
+        objective_sum_keys = ["target_mj", "penalty"]
+
+        for objectives in objectives_list:
+            # Aggregate main
+            for key in main_sum_keys:
+                if key in objectives["main"]:
+                    aggregated_main[key] += objectives["main"][key]
+
+            # Take first non-None target_percent
+            if aggregated_main["target_percent"] is None and objectives["main"].get("target_percent") is not None:
+                aggregated_main["target_percent"] = objectives["main"]["target_percent"]
+
+            # Aggregate sectors
+            ObjectiveService._aggregate_items(
+                objectives["sectors"], aggregated_sectors, balance_sum_keys, objective_sum_keys
+            )
+
+            # Aggregate categories
+            ObjectiveService._aggregate_items(
+                objectives["categories"], aggregated_categories, balance_sum_keys, objective_sum_keys
+            )
+
+        return {
+            "main": aggregated_main,
+            "sectors": list(aggregated_sectors.values()),
+            "categories": list(aggregated_categories.values()),
+        }
+
+    @staticmethod
+    def _aggregate_items(items: list[dict], aggregated: dict, balance_keys: list, objective_keys: list):
+        """
+        Aggregate a list of sector or category items into the aggregated dict.
+        """
+        for item in items:
+            code = item["code"]
+            if code not in aggregated:
+                aggregated[code] = item.copy()
+                # Deep copy the objective dict to avoid mutation
+                if "objective" in item and item["objective"]:
+                    aggregated[code]["objective"] = item["objective"].copy()
+            else:
+                # Sum balance keys
+                for key in balance_keys:
+                    if key in item:
+                        aggregated[code][key] += item[key]
+
+                # Sum objective keys
+                if "objective" in item and item["objective"]:
+                    for key in objective_keys:
+                        if item["objective"].get(key) is not None:
+                            if aggregated[code]["objective"].get(key) is None:
+                                aggregated[code]["objective"][key] = 0
+                            aggregated[code]["objective"][key] += item["objective"][key]
+
+    @staticmethod
     def get_balances_for_objectives_calculation(operations, entity_id, date_from):
         date_from = make_aware(datetime.strptime(date_from, "%Y-%m-%d"))
 

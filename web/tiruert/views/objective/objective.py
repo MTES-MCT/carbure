@@ -1,8 +1,7 @@
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -56,41 +55,33 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
     filter_backends = [DjangoFilterBackend]
     http_method_names = ["get"]
     pagination_class = None
-    _execution_cache = {}
+
+    def initial(self, request, *args, **kwargs):
+        """Reset execution cache for each request to avoid concurrency issues."""
+        super().initial(request, *args, **kwargs)
+        self._execution_cache = {}
 
     def get_permissions(self):
         if self.action in ["get_objectives_admin_view", "get_agregated_objectives_admin_view"]:
             return [HasAdminRights(allow_external=[ExternalAdminRights.TIRIB_STATS])]
         else:
-            return [
-                IsAuthenticated(),
-                HasUserRights([UserRights.ADMIN, UserRights.RW, UserRights.RO], [Entity.OPERATOR]),
-            ]
+            return [HasUserRights([UserRights.ADMIN, UserRights.RW, UserRights.RO], [Entity.OPERATOR])]
 
-        return super().get_permissions()
-
-    @extend_schema(
-        operation_id="objectives",
-        description="Get all objectives",
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=ObjectiveOutputSerializer,
-                description="All objectives.",
-            ),
-        },
-    )
     def get_objectives(self, request):
+        """Get all objectives"""
+
         data = ObjectiveInputSerializer(data=request.GET)
         if not data.is_valid():
             return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        result = self._get_objectives(request)
+        result = self._get_objectives(request, request.entity.id)
+        if result is None:
+            return Response({}, status=status.HTTP_200_OK)
+
         serializer = self.get_serializer(result)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
-        operation_id="admin_objectives_entity",
-        description="Get objectives for a specific entity - admin view",
         parameters=[
             OpenApiParameter(
                 name="selected_entity_id",
@@ -99,141 +90,60 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
                 description="Entity's objectives.",
                 required=True,
             ),
-        ],
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=ObjectiveOutputSerializer,
-                description="All objectives.",
-            ),
-        },
+        ]
     )
     def get_objectives_admin_view(self, request):
+        """Get objectives for a specific entity - admin view"""
+
         data = ObjectiveAdminInputSerializer(data=request.GET)
         if not data.is_valid():
             return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
 
         selected_entity = data.validated_data.get("selected_entity_id")
 
-        setattr(request, "entity", selected_entity)
-        query_params = request.GET.copy()
-        query_params["entity_id"] = selected_entity.id
+        result = self._get_objectives(request, selected_entity.id)
+        if result is None:
+            return Response({}, status=status.HTTP_200_OK)
 
-        result = self._get_objectives(request, query_params)
         serializer = self.get_serializer(result)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @extend_schema(
-        operation_id="admin_objectives",
-        description="Get agregated objectives for all entities - admin view",
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                response=ObjectiveOutputSerializer,
-                description="All agregated objectives for all liable enttities.",
-            ),
-        },
-    )
     def get_agregated_objectives_admin_view(self, request):
+        """Get agregated objectives for all entities - admin view"""
+
         # Retrieve all entities that are liable for Tiruert
         tiruert_liable_entities = Entity.objects.filter(is_tiruert_liable=True)
         if not tiruert_liable_entities.exists():
             return Response({"error": "No Tiruert liable entities found."}, status=status.HTTP_404_NOT_FOUND)
 
-        aggregated_main = {
-            "available_balance": 0,
-            "target": 0,
-            "pending_teneur": 0,
-            "declared_teneur": 0,
-            "unit": "tCO2",
-            "target_percent": None,
-            "penalty": 0,
-            "energy_basis": 0,
-        }
-
-        aggregated_sectors = {}
-        aggregated_categories = {}
-
-        original_entity = request.entity
-
+        # Collect objectives for each entity
+        objectives_list = []
         for entity in tiruert_liable_entities:
-            setattr(request, "entity", entity)
-            query_params = request.GET.copy()
-            query_params["entity_id"] = entity.id
             try:
-                # Get objectives for the current entity
-                entity_objectives = self._get_objectives(request, query_params)
-                if not entity_objectives:
-                    continue
+                entity_objectives = self._get_objectives(request, entity.id)
+                if entity_objectives:
+                    objectives_list.append(entity_objectives)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-                # Aggregate main objectives
-                for key in ["available_balance", "target", "pending_teneur", "declared_teneur", "penalty", "energy_basis"]:
-                    if key in entity_objectives["main"]:
-                        aggregated_main[key] += entity_objectives["main"][key]
+        if not objectives_list:
+            return Response({}, status=status.HTTP_200_OK)
 
-                # target_percent and energy_basis
-                if aggregated_main["target_percent"] is None and "target_percent" in entity_objectives["main"]:
-                    aggregated_main["target_percent"] = entity_objectives["main"]["target_percent"]
-                if aggregated_main["energy_basis"] == 0 and "energy_basis" in entity_objectives["main"]:
-                    aggregated_main["energy_basis"] = entity_objectives["main"]["energy_basis"]
-
-                # Aggregate sectors
-                for sector in entity_objectives["sectors"]:
-                    code = sector["code"]
-                    if code not in aggregated_sectors:
-                        aggregated_sectors[code] = sector.copy()
-                    else:
-                        for key, value in sector.items():
-                            if key in ["pending_teneur", "declared_teneur", "available_balance"]:
-                                aggregated_sectors[code][key] += value
-                            elif key == "objective":
-                                for objective_key, objective_value in value.items():
-                                    if objective_key in ["target_mj", "penalty"]:
-                                        aggregated_sectors[code]["objective"][objective_key] += objective_value
-
-                # Aggregate categories
-                for category in entity_objectives["categories"]:
-                    code = category["code"]
-                    if code not in aggregated_categories:
-                        aggregated_categories[code] = category.copy()
-                    else:
-                        for key, value in category.items():
-                            if key in ["pending_teneur", "declared_teneur", "available_balance"]:
-                                aggregated_categories[code][key] += value
-                            elif key == "objective":
-                                for objective_key, objective_value in value.items():
-                                    if objective_key in ["target_mj", "penalty"]:
-                                        if objective_key is not None and objective_value is not None:
-                                            aggregated_categories[code]["objective"][objective_key] += objective_value
-
-            except Exception as e:
-                if isinstance(e, ValueError):
-                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-                if isinstance(e, Http404):
-                    return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
-                else:
-                    return Response(
-                        {"error": f"An unexpected error occurred. : {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
-
-        # Restore the original entity
-        setattr(request, "entity", original_entity)
-
-        aggregated_sectors_list = list(aggregated_sectors.values())
-        aggregated_categories_list = list(aggregated_categories.values())
-
-        result = {
-            "main": aggregated_main,
-            "sectors": aggregated_sectors_list,
-            "categories": aggregated_categories_list,
-        }
+        # Aggregate all objectives
+        result = ObjectiveService.aggregate_objectives(objectives_list)
 
         serializer = self.get_serializer(result)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def _get_objectives(self, request, query_params=None):
-        entity_id = request.entity.id
+    def _get_objectives(self, request, target_entity_id):
+        """Internal method to get objectives for a specific entity."""
+
         date_from = request.query_params.get("date_from")
+        query_params = request.GET.copy()
+        query_params["entity_id"] = target_entity_id
 
         # Get queryset with filters for MacFossilFuel, Objective and Operation
+        # Objectives
         if self._execution_cache.get("objectives") is not None:
             objectives = self._execution_cache["objectives"]
         else:
@@ -243,11 +153,12 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
             else:
                 self._execution_cache["objectives"] = objectives
 
-        query_params = query_params or request.GET
+        # MacFossilFuel
         macs = MacFilter(query_params, queryset=MacFossilFuel.objects.all(), request=request).qs
         if not macs.exists():
             return
 
+        # Operations
         operations_qs = Operation.objects.all()
         operations = OperationFilterForBalance(query_params, queryset=operations_qs, request=request).qs
         if not operations.exists():
@@ -258,7 +169,7 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
 
         # 2. Calculate the balances per category and sector
         balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
-            operations, entity_id, date_from
+            operations, target_entity_id, date_from
         )
 
         # 3. Calculate the objectives per category and sector
@@ -278,48 +189,16 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
 
         # 4. Calculate elec category
         elec_ops = ElecOperationFilterForBalance(query_params, queryset=ElecOperation.objects.all(), request=request).qs
-        elec_category = ObjectiveService.get_elec_category(elec_ops, entity_id, date_from)
+        elec_category = ObjectiveService.get_elec_category(elec_ops, target_entity_id, date_from)
 
-        # 5. Calculate the global objective
-        global_objective_target, global_objective_penalty, global_objective_target_percent = (
-            ObjectiveService.get_global_objective_and_penalty(objectives, energy_basis)
+        # 5. Calculate the global objective (aggregated from sectors + elec)
+        global_objective = ObjectiveService.calculate_global_objective(
+            objective_per_sector, elec_category, objectives, energy_basis
         )
 
-        available_balance_sum = sum([sector["available_balance"] for sector in objective_per_sector])
-        pending_teneur_sum = sum([sector["pending_teneur"] for sector in objective_per_sector])
-        declared_teneur_sum = sum([sector["declared_teneur"] for sector in objective_per_sector])
-
-        biofuel_available_balance = ObjectiveService.apply_ghg_conversion(available_balance_sum)
-        biofuel_pending_teneur = ObjectiveService.apply_ghg_conversion(pending_teneur_sum)
-        biofuel_declared_teneur = ObjectiveService.apply_ghg_conversion(declared_teneur_sum)
-
-        elec_available_balance = ObjectiveService.apply_elec_ghg_conversion(elec_category["available_balance"])
-        elec_pending_teneur = ObjectiveService.apply_elec_ghg_conversion(elec_category["pending_teneur"])
-        elec_declared_teneur = ObjectiveService.apply_elec_ghg_conversion(elec_category["declared_teneur"])
-
-        global_objective = {
-            "available_balance": biofuel_available_balance + elec_available_balance,
-            "target": ObjectiveService.apply_ghg_conversion(global_objective_target),
-            "pending_teneur": biofuel_pending_teneur + elec_pending_teneur,
-            "declared_teneur": biofuel_declared_teneur + elec_declared_teneur,
-            "unit": "tCO2",
-            "target_percent": global_objective_target_percent,
-            "energy_basis": energy_basis,
-        }
-        penalty = ObjectiveService._calcule_penalty(
-            global_objective_penalty,
-            global_objective["pending_teneur"] + global_objective["declared_teneur"],
-            global_objective["target"],
-            tCO2=True,
-        )
-
-        global_objective["penalty"] = penalty
-
-        # 5. Return the results
-        result = {
+        # 6. Return the results
+        return {
             "main": global_objective,
             "sectors": objective_per_sector,
             "categories": [*objective_per_category, elec_category],
         }
-
-        return result
