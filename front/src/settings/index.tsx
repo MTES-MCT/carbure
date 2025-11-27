@@ -4,7 +4,7 @@ import DeliverySitesSettings from "./pages/delivery-site"
 import ProductionSitesSettings from "./pages/production-site"
 
 import useEntity from "common/hooks/entity"
-import { UserRole } from "common/types"
+import { ExternalAdminPages, UserRole } from "common/types"
 import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import useTitle from "common/hooks/title"
@@ -30,10 +30,14 @@ const Settings = () => {
     isPowerOrHeatProducer,
     isIndustry,
     isBiomethaneProducer,
+    hasAdminRight,
   } = entity
 
   const hasCertificates = isIndustry
-  const hasDepot = isIndustry || isPowerOrHeatProducer
+  const hasDepot =
+    isIndustry ||
+    isPowerOrHeatProducer ||
+    hasAdminRight(ExternalAdminPages.DGDDI)
   const hasOptions = isIndustry || isBiomethaneProducer
   const defaultTab = hasOptions ? "options" : "info"
   return (

@@ -125,21 +125,43 @@ class DepotProductionSiteSerializer(serializers.ModelSerializer):
         ]
 
 
+# This serializer is used to represent an EntitySite, but it can also represent a Depot
+# (self.get_depot and self.get_site methods are used to handle this)
 class EntitySiteSerializer(serializers.Serializer):
-    ownership_type = serializers.ChoiceField(choices=EntitySite.TYPE_OWNERSHIP, required=True)
-    blending_is_outsourced = serializers.BooleanField()
-    blender = EntityUserEntitySerializer()
+    ownership_type = serializers.ChoiceField(choices=EntitySite.TYPE_OWNERSHIP, required=False)
+    blending_is_outsourced = serializers.BooleanField(required=False)
+    blender = EntityUserEntitySerializer(allow_null=True)
     depot = serializers.SerializerMethodField(allow_null=True)
     site = serializers.SerializerMethodField(allow_null=True)
 
     @extend_schema_field(EntityDepotSerializer)
     def get_depot(self, instance):
-        if instance.site.is_depot():
+        if isinstance(instance, Depot):
+            return EntityDepotSerializer(instance).data
+
+        if hasattr(instance, "site") and instance.site.is_depot():
             return EntityDepotSerializer(instance.site).data
+
         return None
 
     @extend_schema_field(DepotProductionSiteSerializer)
     def get_site(self, instance):
-        if not instance.site.is_depot():
+        if isinstance(instance, Depot):
+            return None
+
+        if hasattr(instance, "site") and not instance.site.is_depot():
             return DepotProductionSiteSerializer(instance.site).data
+
         return None
+
+    def to_representation(self, instance):
+        if isinstance(instance, Depot):
+            return {
+                "ownership_type": None,
+                "blending_is_outsourced": False,
+                "blender": None,
+                "depot": self.get_depot(instance),
+                "site": self.get_site(instance),
+            }
+
+        return super().to_representation(instance)

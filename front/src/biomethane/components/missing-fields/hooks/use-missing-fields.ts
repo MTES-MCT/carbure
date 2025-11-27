@@ -19,10 +19,11 @@ export const useMissingFields = <FormType extends object | undefined>(
   const { showMissingFields } = useShowMissingFields(form)
   const { canEditDeclaration } = useAnnualDeclaration()
   useEffect(() => {
+    console.log("location.hash", canEditDeclaration, location.hash)
     if (canEditDeclaration && location.hash.includes(MISSING_FIELDS_HASH)) {
       showMissingFields()
       navigate({ hash: "" })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash])
+  }, [location.hash, canEditDeclaration])
 }

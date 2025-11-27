@@ -1174,23 +1174,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/elec/provision-certificates-qualicharge/transfer/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Transfer a Qualicharge provision certificate to another entity with the same registration ID */
-        post: operations["transfer_provision_certificate_qualicharge"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/elec/provision-certificates/{id}/": {
         parameters: {
             query?: never;
@@ -4379,9 +4362,9 @@ export interface components {
             site_siret?: string;
         };
         EntitySite: {
-            ownership_type: components["schemas"]["OwnershipTypeEnum"];
-            blending_is_outsourced: boolean;
-            blender: components["schemas"]["UserEntity"];
+            ownership_type?: components["schemas"]["OwnershipTypeEnum"];
+            blending_is_outsourced?: boolean;
+            blender: components["schemas"]["UserEntity"] | null;
             readonly depot: components["schemas"]["EntityDepot"] | null;
             readonly site: components["schemas"]["DepotProductionSite"] | null;
         };
@@ -5579,10 +5562,6 @@ export interface components {
          * @enum {string}
          */
         TrackedAmendmentTypesEnum: TrackedAmendmentTypesEnum;
-        TransferCertificateRequest: {
-            certificate_id: number;
-            target_entity_id: number;
-        };
         /**
          * @description * `DAU` - DAU
          *     * `DAE` - DAE
@@ -8243,44 +8222,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
-                };
-            };
-        };
-    };
-    transfer_provision_certificate_qualicharge: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TransferCertificateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TransferCertificateRequest"];
-                "multipart/form-data": components["schemas"]["TransferCertificateRequest"];
-            };
-        };
-        responses: {
-            /** @description Success message */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Error message */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
                 };
             };
         };

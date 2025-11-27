@@ -3,7 +3,7 @@ from rest_framework import status, viewsets
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
-from core.models import Entity, UserRights
+from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import HasAdminRights, HasUserRights
 from entity.serializers import EntitySiteSerializer
 from transactions.models import Depot, EntitySite
@@ -45,15 +45,18 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
         responses=EntitySiteSerializer(many=True),
     )
     def list(self, request):
-        entity_id = self.request.query_params.get("entity_id")
-        entity = Entity.objects.get(id=entity_id)
-        if entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
-            entity_id = self.request.query_params.get("company_id")
+        entity_id = request.entity.id
+        if request.entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
+            entity_id = self.request.query_params.get("company_id", entity_id)
 
         entity = Entity.objects.get(id=entity_id)
         try:
-            ds = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.all())
-            serializer = EntitySiteSerializer(instance=ds, many=True)
+            if entity.has_external_admin_right(ExternalAdminRights.DGDDI):
+                depots = entity.get_accessible_depots()
+                serializer = EntitySiteSerializer(instance=depots, many=True)
+            else:
+                entity_sites = EntitySite.objects.filter(entity=entity, site__in=Depot.objects.all())
+                serializer = EntitySiteSerializer(instance=entity_sites, many=True)
             return Response(serializer.data)
         except Exception:
             return Response(
