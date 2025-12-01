@@ -774,6 +774,7 @@
   "Rechercher un département...": "Search for a department...",
   "Rechercher un opérateur pétrolier...": "Search for an oil operator...",
   "Les actions effectuées dans cette version n'ont aucun impact réel.": "The actions performed in this version have no real impact.",
+  "Tout réinitialiser": "Reset all",
   "Voir le récapitulatif": "See the summary",
   "Ce SIREN est déjà utilisé par l'entité {{companyName}}. En poursuivant, vous allez enregistrer une nouvelle branche de cette société sur Carbure. Assurez-vous d'utiliser un nom différent.": "This SIREN is already used by the {{companyName}} entity. By continuing, you will register a new branch of this company on Carbure. Be sure to use a different name.",
   "Aucune entreprise n'a été trouvée avec ce numéro de SIREN": "No companies were found with this SIREN number.",

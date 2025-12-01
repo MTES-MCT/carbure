@@ -1,3 +1,13 @@
+.filter-multiselect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1w);
+}
+
 .filter-multiselect__filter {
   max-width: 250px !important;
+}
+
+.filter-multiselect__reset {
+  justify-self: flex-end;
 }
