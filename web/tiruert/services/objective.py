@@ -232,7 +232,6 @@ class ObjectiveService:
             code = item["code"]
             if code not in aggregated:
                 aggregated[code] = item.copy()
-                # Deep copy the objective dict to avoid mutation
                 if "objective" in item and item["objective"]:
                     aggregated[code]["objective"] = item["objective"].copy()
             else:
