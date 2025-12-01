@@ -1,9 +1,5 @@
 import { Button } from "common/components/button2"
-import {
-  CheckboxGroup,
-  NumberInput,
-  RadioGroup,
-} from "common/components/inputs2"
+import { CheckboxGroup, RadioGroup } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { EditableCard } from "common/molecules/editable-card"
 import { getYesNoOptions } from "common/utils/normalizers"
@@ -118,19 +114,6 @@ export function ProductionSite({
             label={t("Procédé méthanisation")}
             options={methanizationProcessOptions}
             {...bind("methanization_process")}
-          />
-          <NumberInput
-            required
-            readOnly={!isEditing}
-            min={0}
-            max={100}
-            label={t(
-              "Rendement de l'installation de production de biométhane (%)"
-            )}
-            hintText={t(
-              "Rendement global de l'installation (comprenant notamment le rendement de l'épurateur)"
-            )}
-            {...bind("production_efficiency")}
           />
           <CheckboxGroup
             readOnly={!isEditing}
