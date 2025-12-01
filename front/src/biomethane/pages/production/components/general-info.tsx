@@ -75,12 +75,6 @@ export function GeneralInfo({
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">
-            <TextInput
-              readOnly={!isEditing}
-              label={t("Nom de l'unité")}
-              required
-              {...bind("unit_name")}
-            />
             <SiretPicker
               label={t("SIRET")}
               required
@@ -94,6 +88,12 @@ export function GeneralInfo({
               }}
               readOnly={!isEditing}
               {...bind("siret_number")}
+            />
+            <TextInput
+              readOnly={!isEditing}
+              label={t("Nom de l'unité")}
+              required
+              {...bind("unit_name")}
             />
           </Grid>
           <TextInput

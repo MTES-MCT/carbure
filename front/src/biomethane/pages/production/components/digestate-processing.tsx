@@ -145,13 +145,18 @@ export function DigestateProcessing({
               options={digestateValorizationOptions}
               {...bind("digestate_valorization_methods")}
             />
-            <CheckboxGroup
-              required
-              readOnly={!isEditing}
-              label={t("Gestion de l'épandage")}
-              options={spreadingManagementOptions}
-              {...bind("spreading_management_methods")}
-            />
+            {value.digestate_valorization_methods?.includes(
+              DigestateValorizationMethods.SPREADING
+            ) && (
+              <CheckboxGroup
+                required
+                readOnly={!isEditing}
+                label={t("Gestion de l'épandage")}
+                options={spreadingManagementOptions}
+                {...bind("spreading_management_methods")}
+              />
+            )}
+
             {value.spreading_management_methods?.includes(
               SpreadingManagementMethods.SALE
             ) && (
