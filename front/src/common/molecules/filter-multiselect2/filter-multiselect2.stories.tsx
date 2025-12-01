@@ -4,9 +4,6 @@ import { FilterMultiSelect2 } from "./filter-multiselect2"
 const meta: Meta<typeof FilterMultiSelect2> = {
   component: FilterMultiSelect2,
   title: "common/molecules/FilterMultiSelect2",
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     filterLabels: {
       filtre1: "Filtre 1",
@@ -23,7 +20,7 @@ const meta: Meta<typeof FilterMultiSelect2> = {
   },
   render: (args) => {
     return (
-      <div style={{ width: "700px", border: "1px solid red" }}>
+      <div style={{ width: "900px" }}>
         <FilterMultiSelect2 {...args} />
       </div>
     )
