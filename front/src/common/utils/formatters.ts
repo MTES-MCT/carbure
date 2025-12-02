@@ -202,4 +202,8 @@ export const CONVERSIONS = {
   euros: {
     centsToKEuros: (value: number) => parseFloat((value / 100000).toFixed(2)),
   },
+  bytes: {
+    MB_TO_BYTES: (value: number) => value * 1000 * 1000,
+    BYTES_TO_MB: (value: number) => value / 1000 / 1000,
+  },
 }

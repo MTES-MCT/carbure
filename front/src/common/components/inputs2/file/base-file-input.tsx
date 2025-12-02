@@ -8,11 +8,15 @@ import i18next from "i18next"
 import { fr } from "@codegouvfr/react-dsfr"
 import { Icon } from "common/components/icon"
 import { Ellipsis } from "common/components/scaffold"
+import { CONVERSIONS } from "common/utils/formatters"
 
 export type BaseFileInputProps = Omit<FieldProps, "children"> & {
   value?: File | FileList
   onChange?: (e?: React.ChangeEvent<HTMLInputElement>) => void
   multiple?: boolean
+
+  // Max size of the file in bytes
+  maxSize?: number
 }
 
 export const BaseFileInput = ({
@@ -27,6 +31,7 @@ export const BaseFileInput = ({
   hasTooltip,
   title,
   label,
+  maxSize = 5000000,
   ...props
 }: BaseFileInputProps) => {
   const { t } = useTranslation()
@@ -34,15 +39,21 @@ export const BaseFileInput = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!inputRef.current) return
+
+    inputRef.current.setCustomValidity("")
+
     const files = e.target.files
 
     if (files === null) return
 
     for (const file of files) {
-      if (file.size > 5000000) {
+      if (file.size > maxSize) {
         const message = t(
-          'La taille du fichier "{{fileName}}" est trop importante pour être analysée (5mo maximum).',
-          { fileName: file.name }
+          'La taille du fichier "{{fileName}}" est trop importante pour être analysée ({{maxSize}}mo maximum).',
+          {
+            fileName: file.name,
+            maxSize: CONVERSIONS.bytes.BYTES_TO_MB(maxSize),
+          }
         )
         inputRef.current.setCustomValidity(message)
         inputRef.current.reportValidity()

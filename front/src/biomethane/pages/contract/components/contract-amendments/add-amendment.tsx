@@ -13,6 +13,7 @@ import { AmendmentObjectEnum } from "api-schema"
 import { useAddAmendmentObjectOptions } from "./add-amendment.hooks"
 import { EditableCard } from "common/molecules/editable-card"
 import { BiomethaneAmendmentAddRequest } from "biomethane/pages/contract/types"
+import { CONVERSIONS } from "common/utils/formatters"
 
 type AddAmendmentForm = Partial<BiomethaneAmendmentAddRequest>
 
@@ -136,6 +137,7 @@ export const AddAmendment = ({
               value={form.value.amendment_file}
               onChange={(value) => form.setField("amendment_file", value)}
               label={t("Avenant au contrat")}
+              maxSize={CONVERSIONS.bytes.MB_TO_BYTES(10)}
             />
           </EditableCard>
         )}

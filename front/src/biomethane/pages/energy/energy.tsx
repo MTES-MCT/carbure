@@ -57,8 +57,8 @@ const EnergyPage = () => {
       {isTariffReference2011Or2020(contract?.tariff_reference) && (
         <MonthlyBiomethaneInjection energy={energy} />
       )}
-      <Miscellaneous />
       <Malfunction />
+      <Miscellaneous />
     </FormContext.Provider>
   )
 }

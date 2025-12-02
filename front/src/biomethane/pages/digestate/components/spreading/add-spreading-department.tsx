@@ -49,9 +49,9 @@ export const AddSpreadingDepartment = ({
     const departmentIds = spreadings.map(
       (spreading) => spreading.spreading_department
     )
-    return departmentOptions.filter(
-      (option) => !departmentIds.includes(option.value)
-    )
+    return departmentOptions
+      .filter((option) => !departmentIds.includes(option.value))
+      .sort((a, b) => a.value.localeCompare(b.value))
   }, [spreadings])
 
   return (

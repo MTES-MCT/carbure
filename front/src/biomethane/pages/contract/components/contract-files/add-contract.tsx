@@ -12,6 +12,7 @@ import {
   BiomethaneContractPatchRequest,
 } from "biomethane/pages/contract/types"
 import { getSignatureDateConstraints } from "./add-contract.utils"
+import { CONVERSIONS } from "common/utils/formatters"
 
 type AddContractForm = ReplaceNullWithUndefined<
   Pick<
@@ -96,6 +97,7 @@ const AddContractContent = ({
               required
               label={t("Conditions générales")}
               {...form.bind("general_conditions_file")}
+              maxSize={CONVERSIONS.bytes.MB_TO_BYTES(10)}
             />
           )}
           {currentStep?.key === "specific" && (
@@ -103,6 +105,7 @@ const AddContractContent = ({
               required
               label={t("Conditions particulières")}
               {...form.bind("specific_conditions_file")}
+              maxSize={CONVERSIONS.bytes.MB_TO_BYTES(10)}
             />
           )}
         </Stepper.Form>
