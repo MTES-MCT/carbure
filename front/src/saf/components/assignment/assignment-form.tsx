@@ -20,16 +20,16 @@ export interface AssignmentFormProps {
 }
 
 export const AssignmentForm = ({
-  deliveryPeriod = defaultAssignment.assignment_period,
+  deliveryPeriod,
   remainingVolume,
   onSubmit,
 }: AssignmentFormProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const { value, bind, setField } = useForm<AssignmentFormData>({
+  const { value, bind, setField, setFieldError } = useForm<AssignmentFormData>({
     ...defaultAssignment,
-    assignment_period: deliveryPeriod,
+    assignment_period: deliveryPeriod ?? defaultAssignment.assignment_period,
   })
 
   const setMaximumVolume = () => {
@@ -44,25 +44,32 @@ export const AssignmentForm = ({
     return apiResources.findAirports(query)
   }
 
+  const handleSubmit = () => {
+    if (value.volume! < 1) {
+      return setFieldError("volume", t("Entrez un volume"))
+    } else {
+      onSubmit(value)
+    }
+  }
+
   const supplierIsOperator = entity.isOperator
   const clientIsOperator = value.client?.entity_type === EntityType.Operator
   const clientIsAirline = value.client?.entity_type === EntityType.Airline
   const clientIsSafTrader = value.client?.entity_type === EntityType.SAF_Trader
 
   return (
-    <Form<AssignmentFormData>
-      id="assign-ticket"
-      onSubmit={() => onSubmit(value)}
-    >
+    <Form<AssignmentFormData> id="assign-ticket" onSubmit={handleSubmit}>
       <VolumeInput
         remainingVolume={remainingVolume}
         onSetMaximumVolume={setMaximumVolume}
         {...bind("volume")}
       />
-      <PeriodSelect
-        deliveryPeriod={deliveryPeriod}
-        {...bind("assignment_period")}
-      />
+      {deliveryPeriod && (
+        <PeriodSelect
+          deliveryPeriod={deliveryPeriod}
+          {...bind("assignment_period")}
+        />
+      )}
 
       <Autocomplete
         required
