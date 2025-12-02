@@ -1174,23 +1174,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/elec/provision-certificates-qualicharge/transfer/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Transfer a Qualicharge provision certificate to another entity with the same registration ID */
-        post: operations["transfer_provision_certificate_qualicharge"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/elec/provision-certificates/{id}/": {
         parameters: {
             query?: never;
@@ -3294,6 +3277,8 @@ export interface components {
             energy_used_for_installation_needs?: string | null;
             fossil_details_for_installation_needs?: string | null;
             /** Format: double */
+            purification_efficiency_percent?: number | null;
+            /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
             /** Format: double */
             purification_electric_consumption_kwe?: number | null;
@@ -3338,6 +3323,8 @@ export interface components {
             attest_no_fossil_for_installation_needs?: boolean;
             energy_used_for_installation_needs?: string | null;
             fossil_details_for_installation_needs?: string | null;
+            /** Format: double */
+            purification_efficiency_percent?: number | null;
             /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
             /** Format: double */
@@ -3653,6 +3640,7 @@ export interface components {
          *     * `ISCC` - ISCC
          *     * `REDCERT` - REDCERT
          *     * `2BS` - 2BS
+         *     * `KZR_INIG` - KZR_INIG
          * @enum {string}
          */
         CertificateTypeEnum: CertificateTypeEnum;
@@ -5574,10 +5562,6 @@ export interface components {
          * @enum {string}
          */
         TrackedAmendmentTypesEnum: TrackedAmendmentTypesEnum;
-        TransferCertificateRequest: {
-            certificate_id: number;
-            target_entity_id: number;
-        };
         /**
          * @description * `DAU` - DAU
          *     * `DAE` - DAE
@@ -8238,44 +8222,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
-                };
-            };
-        };
-    };
-    transfer_provision_certificate_qualicharge: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TransferCertificateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["TransferCertificateRequest"];
-                "multipart/form-data": components["schemas"]["TransferCertificateRequest"];
-            };
-        };
-        responses: {
-            /** @description Success message */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Error message */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
                 };
             };
         };
@@ -12836,7 +12782,8 @@ export enum CertificateTypeEnum {
     SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
     ISCC = "ISCC",
     REDCERT = "REDCERT",
-    Value2BS = "2BS"
+    Value2BS = "2BS",
+    KZR_INIG = "KZR_INIG"
 }
 export enum CompostingLocationsEnum {
     ON_SITE = "ON_SITE",

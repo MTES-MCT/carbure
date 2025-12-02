@@ -67,6 +67,9 @@ class BiomethaneEnergy(models.Model):
 
     ## Efficacité énergétique
 
+    # Rendement moyen annuel de l'épurateur (%)
+    purification_efficiency_percent = models.FloatField(null=True, blank=True)
+
     # Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
     purified_biogas_quantity_nm3 = models.FloatField(null=True, blank=True)
 

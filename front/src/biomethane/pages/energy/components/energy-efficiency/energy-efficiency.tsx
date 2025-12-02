@@ -23,6 +23,7 @@ type EnergyEfficiencyForm = DeepPartial<
     | "total_unit_electric_consumption_kwe"
     | "butane_or_propane_addition"
     | "fossil_fuel_consumed_kwh"
+    | "purification_efficiency_percent"
   >
 >
 const extractValues = (energy?: EnergyEfficiencyForm) => {
@@ -35,6 +36,7 @@ const extractValues = (energy?: EnergyEfficiencyForm) => {
     self_consumed_biogas_nm3: energy?.self_consumed_biogas_nm3,
     butane_or_propane_addition: energy?.butane_or_propane_addition,
     fossil_fuel_consumed_kwh: energy?.fossil_fuel_consumed_kwh,
+    purification_efficiency_percent: energy?.purification_efficiency_percent,
   }
 }
 export function EnergyEfficiency({
@@ -77,6 +79,16 @@ export function EnergyEfficiency({
     >
       {({ isEditing }) => (
         <ManagedEditableCard.Form onSubmit={handleSubmit}>
+          <NumberInput
+            readOnly={!isEditing}
+            label={t("Rendement moyen annuel de l'épurateur (%)")}
+            type="number"
+            min={0}
+            max={100}
+            step={0.01}
+            {...bind("purification_efficiency_percent")}
+            required
+          />
           <Grid cols={1} gap="lg">
             {!isTariffReference2023 && (
               <>
@@ -147,7 +159,7 @@ export function EnergyEfficiency({
               readOnly={!isEditing}
               disabled
               value={energyEfficiencyCoefficient.label}
-              state={energyEfficiencyCoefficient.error ? "error" : "default"}
+              state={energyEfficiencyCoefficient.error ? "info" : "default"}
               stateRelatedMessage={energyEfficiencyCoefficient.error}
               hasTooltip
               title={energyEfficiencyCoefficient.tooltip}

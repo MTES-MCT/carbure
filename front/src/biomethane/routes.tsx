@@ -38,7 +38,14 @@ export const BiomethaneRoutes = () => {
         <Route path="digestate" element={<Digestate />} />
         <Route path="energy" element={<Energy />} />
       </Route>
-      <Route path="supply-plan/:year" element={<SupplyPlan />} />
+      <Route
+        path="supply-plan/:year"
+        element={
+          <ContractProductionUnitProvider>
+            <SupplyPlan />
+          </ContractProductionUnitProvider>
+        }
+      />
       <Route
         path="supply-plan"
         element={<Navigate replace to={`supply-plan/${currentYear}`} />}

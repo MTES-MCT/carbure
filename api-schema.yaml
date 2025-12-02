@@ -3665,50 +3665,6 @@ paths:
                     - AMENAGEUR 5
                   summary: Example of filters response.
           description: ""
-  /api/elec/provision-certificates-qualicharge/transfer/:
-    post:
-      operationId: transfer_provision_certificate_qualicharge
-      description: Transfer a Qualicharge provision certificate to another entity with
-        the same registration ID
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-      tags:
-        - elec
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TransferCertificateRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/TransferCertificateRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/TransferCertificateRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: success
-                message: Certificate transferred successfully
-          description: Success message
-        "400":
-          content:
-            application/json:
-              schema:
-                status: error
-                error: Error message
-          description: Error message
   /api/elec/provision-certificates/{id}/:
     get:
       operationId: elec_provision_certificates_retrieve
@@ -11620,6 +11576,10 @@ components:
         fossil_details_for_installation_needs:
           type: string
           nullable: true
+        purification_efficiency_percent:
+          type: number
+          format: double
+          nullable: true
         purified_biogas_quantity_nm3:
           type: number
           format: double
@@ -11730,6 +11690,10 @@ components:
           maxLength: 255
         fossil_details_for_installation_needs:
           type: string
+          nullable: true
+        purification_efficiency_percent:
+          type: number
+          format: double
           nullable: true
         purified_biogas_quantity_nm3:
           type: number
@@ -12586,12 +12550,14 @@ components:
         - ISCC
         - REDCERT
         - 2BS
+        - KZR_INIG
       type: string
       description: |-
         * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
+        * `KZR_INIG` - KZR_INIG
     ChangePasswordError:
       type: object
       properties:
@@ -17145,16 +17111,6 @@ components:
         * `CMAX_PAP_UPDATE` - CMAX_PAP_UPDATE
         * `CMAX_ANNUALIZATION` - CMAX_ANNUALIZATION
         * `PRODUCER_BUYER_INFO_CHANGE` - PRODUCER_BUYER_INFO_CHANGE
-    TransferCertificateRequest:
-      type: object
-      properties:
-        certificate_id:
-          type: integer
-        target_entity_id:
-          type: integer
-      required:
-        - certificate_id
-        - target_entity_id
     TransportDocumentTypeEnum:
       enum:
         - DAU
