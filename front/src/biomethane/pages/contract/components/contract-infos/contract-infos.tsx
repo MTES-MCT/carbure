@@ -39,7 +39,7 @@ const extractValues = (contract?: BiomethaneContract) => {
     installation_category: contract?.installation_category,
     cmax: contract?.cmax,
     pap_contracted: contract?.pap_contracted,
-    cmax_annualized: contract?.cmax_annualized,
+    cmax_annualized: contract?.cmax_annualized ?? false,
     cmax_annualized_value: contract?.cmax_annualized_value,
   }
 }
@@ -52,9 +52,7 @@ export const ContractInfos = ({
   const entity = useEntity()
   const portal = usePortal()
   const [isEditing, setIsEditing] = useState(false)
-  const { bind, value } = useForm<ContractInfosForm>(
-    contract ? extractValues(contract) : {}
-  )
+  const { bind, value } = useForm<ContractInfosForm>(extractValues(contract))
   const tariffReferenceOptions = useTariffReferenceOptions()
   const installationCategoryOptions = useInstallationCategoryOptions()
   const { execute: updateContract, loading } = useMutateContractInfos(contract)
