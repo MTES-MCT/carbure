@@ -20,7 +20,7 @@
  * - Users are guided to incomplete sections with visual indicators and auto-focus
  */
 
-export const BIOMETHANE_SECTIONS_CONFIG = {
+export const DIGESTATE_SECTIONS_CONFIG = {
   // Page Digestat
   production: [
     "raw_digestate_tonnage_produced",
@@ -29,7 +29,6 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     "liquid_digestate_quantity",
   ],
   "spreading-distance": ["average_spreading_valorization_distance"],
-  spreading: ["spreadings"],
   composting: [
     "external_platform_name",
     "external_platform_department",
@@ -44,7 +43,9 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     "wwtp_materials_to_incineration",
   ],
   sale: ["acquiring_companies", "sold_volume"],
+} as const
 
+export const ENERGY_SECTIONS_CONFIG = {
   // Page Énergie
   "injected-biomethane": [
     "injected_biomethane_gwh_pcs_per_year",
@@ -74,8 +75,7 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     "butane_or_propane_addition",
     "fossil_fuel_consumed_kwh",
   ],
-  "monthly-biomethane-injection": ["monthly_reports"],
-  acceptability: [
+  miscellaneous: [
     "has_opposition_or_complaints_acceptability",
     "estimated_work_days_acceptability",
   ],
@@ -87,6 +87,11 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     "has_injection_difficulties_due_to_network_saturation",
     "injection_impossibility_hours",
   ],
+} as const
+
+export const BIOMETHANE_SECTIONS_CONFIG = {
+  ...DIGESTATE_SECTIONS_CONFIG,
+  ...ENERGY_SECTIONS_CONFIG,
 } as const
 
 export type BiomethaneSectionId = keyof typeof BIOMETHANE_SECTIONS_CONFIG

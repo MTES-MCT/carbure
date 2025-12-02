@@ -49,8 +49,8 @@ class BiomethaneProductionUnitSignalTests(TestCase):
             "sanitary_approval_number": None,
             "hygienization_exemption_type": None,
             "raw_digestate_treatment_steps": None,
-            "liquid_phase_treatment_steps": None,
-            "solid_phase_treatment_steps": None,
+            "liquid_phase_treatment_steps": initial_fields["liquid_phase_treatment_steps"],
+            "solid_phase_treatment_steps": initial_fields["solid_phase_treatment_steps"],
             "spreading_management_methods": [],
         }
         assert_object_contains_data(self, production_unit, expected_fields)
@@ -78,7 +78,7 @@ class BiomethaneProductionUnitSignalTests(TestCase):
         # Reload from database and verify all fields are cleared
         production_unit.refresh_from_db()
         expected_fields = {
-            "raw_digestate_treatment_steps": None,
+            "raw_digestate_treatment_steps": initial_fields["raw_digestate_treatment_steps"],
             "liquid_phase_treatment_steps": None,
             "solid_phase_treatment_steps": None,
         }
@@ -86,23 +86,18 @@ class BiomethaneProductionUnitSignalTests(TestCase):
 
     def test_preserve_fields_when_conditions_remain_true(self):
         """Test fields are preserved when boolean conditions remain True."""
-        production_unit = BiomethaneProductionUnitFactory.create(
-            producer=self.producer_entity,
-            has_sanitary_approval=True,
-            sanitary_approval_number="APPROVAL_PRESERVED",
-            has_hygienization_exemption=True,
-            hygienization_exemption_type=BiomethaneProductionUnit.TOTAL,
-            has_digestate_phase_separation=False,
-            raw_digestate_treatment_steps="Raw treatment preserved",
-            digestate_valorization_methods=[BiomethaneProductionUnit.SPREADING],
-            spreading_management_methods=[BiomethaneProductionUnit.DIRECT_SPREADING],
-        )
 
-        # Verify initial state
-        self.assertEqual(production_unit.sanitary_approval_number, "APPROVAL_PRESERVED")
-        self.assertEqual(production_unit.hygienization_exemption_type, BiomethaneProductionUnit.TOTAL)
-        self.assertEqual(production_unit.raw_digestate_treatment_steps, "Raw treatment preserved")
-        self.assertEqual(production_unit.spreading_management_methods, [BiomethaneProductionUnit.DIRECT_SPREADING])
+        initial_fields = {
+            "has_sanitary_approval": True,
+            "sanitary_approval_number": "APPROVAL_PRESERVED",
+            "has_hygienization_exemption": True,
+            "hygienization_exemption_type": BiomethaneProductionUnit.TOTAL,
+            "has_digestate_phase_separation": False,
+            "raw_digestate_treatment_steps": "Raw treatment preserved",
+            "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
+            "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
+        }
+        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity, **initial_fields)
 
         # Update only unit_name (other fields should remain)
         production_unit.unit_name = "Updated Unit Name"
@@ -110,8 +105,5 @@ class BiomethaneProductionUnitSignalTests(TestCase):
 
         # Reload from database and verify dependent fields are preserved
         production_unit.refresh_from_db()
-        self.assertEqual(production_unit.unit_name, "Updated Unit Name")
-        self.assertEqual(production_unit.sanitary_approval_number, "APPROVAL_PRESERVED")
-        self.assertEqual(production_unit.hygienization_exemption_type, BiomethaneProductionUnit.TOTAL)
-        self.assertEqual(production_unit.raw_digestate_treatment_steps, "Raw treatment preserved")
-        self.assertEqual(production_unit.spreading_management_methods, [BiomethaneProductionUnit.DIRECT_SPREADING])
+
+        assert_object_contains_data(self, production_unit, initial_fields)

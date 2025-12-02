@@ -10,7 +10,7 @@ import { useSaveEnergy } from "../energy.hooks"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
-type AcceptabilityForm = DeepPartial<
+type MiscellaneousForm = DeepPartial<
   Pick<
     BiomethaneEnergyInputRequest,
     | "has_opposition_or_complaints_acceptability"
@@ -18,7 +18,7 @@ type AcceptabilityForm = DeepPartial<
   >
 >
 
-const extractValues = (energy?: AcceptabilityForm) => {
+const extractValues = (energy?: MiscellaneousForm) => {
   return {
     has_opposition_or_complaints_acceptability:
       energy?.has_opposition_or_complaints_acceptability,
@@ -26,9 +26,9 @@ const extractValues = (energy?: AcceptabilityForm) => {
       energy?.estimated_work_days_acceptability,
   }
 }
-export function Acceptability() {
+export function Miscellaneous() {
   const { t } = useTranslation()
-  const { bind, value } = useFormContext<AcceptabilityForm>()
+  const { bind, value } = useFormContext<MiscellaneousForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
 
@@ -36,8 +36,8 @@ export function Acceptability() {
 
   return (
     <ManagedEditableCard
-      sectionId="acceptability"
-      title={t("Acceptabilité")}
+      sectionId="miscellaneous"
+      title={t("Questions diverses")}
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
