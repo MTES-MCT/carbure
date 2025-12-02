@@ -5,13 +5,25 @@ from edelivery.ebms.requests import BaseRequest, GetSourcingContactByIdRequest
 
 
 class BaseRequestTest(TestCase):
+    def test_inserts_request_id(self):
+        request = BaseRequest("12345", "<request/>")
+        expected_body = """\
+<request>
+  <REQUEST_HEADER REQUEST_ID="12345" />
+</request>"""
+        self.assertEqual(request.body, expected_body)
+
     @patch("edelivery.ebms.requests.zip_and_stream_udb_request")
     def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
         patched_zip_and_stream_udb_request.return_value = "abcdef"
         request = BaseRequest("12345", "<request/>")
 
         encoded_request = request.zipped_encoded()
-        patched_zip_and_stream_udb_request.assert_called_with("<request/>")
+        expected_body = """\
+<request>
+  <REQUEST_HEADER REQUEST_ID="12345" />
+</request>"""
+        patched_zip_and_stream_udb_request.assert_called_with(expected_body)
         self.assertEqual("abcdef", encoded_request)
 
 
@@ -31,7 +43,7 @@ class GetSourcingContactByIdRequestTest(TestCase):
         request = GetSourcingContactByIdRequest("99999")
         expected_body = """\
 <udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab"/>
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
   <SC_ID_HEADER>
     <SC_ID>
       <SOURCING_CONTACT_NUMBER>99999</SOURCING_CONTACT_NUMBER>
