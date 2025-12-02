@@ -113,6 +113,31 @@ class BiomethaneContractService:
             ]
 
     @staticmethod
+    def validate_conditions_files(validated_data, errors):
+        """Validate size and format of conditions files."""
+        MAX_FILE_SIZE_MB = 10
+        ALLOWED_CONTENT_TYPES = [
+            "application/pdf",
+        ]
+
+        conditions_files = (
+            (_("Conditions générales"), validated_data.get("general_conditions_file")),
+            (_("Conditions particulières"), validated_data.get("specific_conditions_file")),
+        )
+
+        for file_label, uploaded_file in conditions_files:
+            if uploaded_file:
+                # Validate file size
+                if uploaded_file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+                    errors[file_label] = [_(f"Le fichier ne doit pas dépasser {MAX_FILE_SIZE_MB} Mo.")]
+                    continue
+
+                # Validate content type
+                if uploaded_file.content_type not in ALLOWED_CONTENT_TYPES:
+                    errors[file_label] = [_("Le format du fichier n'est pas supporté.")]
+                    continue
+
+    @staticmethod
     def validate_contract(contract, validated_data):
         """
         Main validation method for contract data.
@@ -140,6 +165,9 @@ class BiomethaneContractService:
         effective_date = validated_data.get("effective_date")
         if tariff_reference:
             BiomethaneContractService.validate_contract_dates(signature_date, effective_date, tariff_reference, errors)
+
+        # Validate uploaded files
+        BiomethaneContractService.validate_conditions_files(validated_data, errors)
 
         return errors, required_fields
 

@@ -1,7 +1,9 @@
 from unittest.mock import Mock
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
+from biomethane.factories.contract import BiomethaneSignedContractFactory
 from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.services.contract import (
@@ -498,3 +500,130 @@ class BiomethaneContractServiceTests(TestCase):
 
         self.assertIn("cmax_annualized_value", update_data)
         self.assertIsNone(update_data["cmax_annualized_value"])
+
+
+class ValidateConditionsFilesTests(TestCase):
+    """Test the validate_conditions_files method."""
+
+    def test_file_exceeds_size_limit(self):
+        """Test that files exceeding 10MB are rejected."""
+        # Create a file larger than 10MB
+        large_content = b"x" * (11 * 1024 * 1024)  # 11MB
+        large_file = SimpleUploadedFile("large.pdf", large_content, content_type="application/pdf")
+
+        validated_data = {
+            "general_conditions_file": large_file,
+        }
+
+        errors = {}
+        BiomethaneContractService.validate_conditions_files(validated_data, errors)
+
+        self.assertIn("Conditions générales", errors)
+        self.assertIn("10 Mo", str(errors["Conditions générales"][0]))
+
+    def test_invalid_file_format(self):
+        """Test that non-PDF files are rejected."""
+        # Create a non-PDF file
+        txt_file = SimpleUploadedFile("document.txt", b"Some text content", content_type="text/plain")
+
+        validated_data = {
+            "specific_conditions_file": txt_file,
+        }
+
+        errors = {}
+        BiomethaneContractService.validate_conditions_files(validated_data, errors)
+
+        self.assertIn("Conditions particulières", errors)
+        self.assertIn("format", str(errors["Conditions particulières"][0]))
+
+    def test_multiple_file_errors(self):
+        """Test that both files can have errors simultaneously."""
+        # Create files with different issues
+        large_file = SimpleUploadedFile("large.pdf", b"x" * (11 * 1024 * 1024), content_type="application/pdf")
+        txt_file = SimpleUploadedFile("document.txt", b"Some text", content_type="text/plain")
+
+        validated_data = {
+            "general_conditions_file": large_file,
+            "specific_conditions_file": txt_file,
+        }
+
+        errors = {}
+        BiomethaneContractService.validate_conditions_files(validated_data, errors)
+
+        self.assertIn("Conditions générales", errors)
+        self.assertIn("Conditions particulières", errors)
+
+    def test_no_files_provided(self):
+        """Test that validation passes when no files are provided."""
+        validated_data = {}
+
+        errors = {}
+        BiomethaneContractService.validate_conditions_files(validated_data, errors)
+
+        self.assertEqual(len(errors), 0)
+
+
+class ValidateContractDocumentFieldsTests(TestCase):
+    """Test the validate_contract_document_fields method."""
+
+    def setUp(self):
+        """Initial setup for contract document fields validation tests."""
+        self.producer_entity = Entity.objects.create(
+            name="Test Producer",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+
+    def test_cannot_update_general_conditions_file_after_signing(self):
+        """Test that general_conditions_file cannot be updated after contract is signed."""
+        contract = BiomethaneSignedContractFactory(producer=self.producer_entity)
+
+        new_file = SimpleUploadedFile("new_general.pdf", b"new content", content_type="application/pdf")
+        validated_data = {
+            "general_conditions_file": new_file,
+        }
+
+        errors = {}
+        BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
+
+        self.assertIn("general_conditions_file", errors)
+
+    def test_cannot_update_specific_conditions_file_after_signing(self):
+        """Test that specific_conditions_file cannot be updated after contract is signed."""
+        contract = BiomethaneSignedContractFactory(producer=self.producer_entity)
+
+        new_file = SimpleUploadedFile("new_specific.pdf", b"new content", content_type="application/pdf")
+        validated_data = {
+            "specific_conditions_file": new_file,
+        }
+
+        errors = {}
+        BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
+
+        self.assertIn("specific_conditions_file", errors)
+
+    def test_cannot_update_multiple_document_fields_after_signing(self):
+        """Test that multiple document fields cannot be updated after contract is signed."""
+        contract = BiomethaneSignedContractFactory(producer=self.producer_entity)
+
+        validated_data = {
+            "signature_date": "2024-01-01",
+            "effective_date": "2024-02-01",
+        }
+
+        errors = {}
+        BiomethaneContractService.validate_contract_document_fields(contract, validated_data, errors)
+
+        self.assertIn("signature_date", errors)
+        self.assertIn("effective_date", errors)
+
+    def test_validation_on_new_contract_creation(self):
+        """Test that validation passes when creating a new contract (contract=None)."""
+        validated_data = {
+            "signature_date": "2023-07-01",
+            "effective_date": "2023-08-01",
+        }
+
+        errors = {}
+        BiomethaneContractService.validate_contract_document_fields(None, validated_data, errors)
+
+        self.assertEqual(len(errors), 0)
