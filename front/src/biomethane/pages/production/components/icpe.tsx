@@ -44,7 +44,10 @@ export function ICPE({
   ]
 
   return (
-    <EditableCard title={t("ICPE")}>
+    <EditableCard
+      title={t("ICPE")}
+      description={t("Numéro ICPE ou AIOT associé aux outils GUNEnv ou GEREP")}
+    >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <TextInput

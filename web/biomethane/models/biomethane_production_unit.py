@@ -225,20 +225,29 @@ def clear_production_unit_fields_on_save(sender, instance, **kwargs):
 
     # Clear sanitary approval number if sanitary approval is not enabled
     if not instance.has_sanitary_approval:
-        fields_to_clear.append("sanitary_approval_number")
+        fields_to_clear.append({"name": "sanitary_approval_number", "value": None})
 
     # Clear hygienization exemption type if hygienization exemption is not enabled
     if not instance.has_hygienization_exemption:
-        fields_to_clear.append("hygienization_exemption_type")
+        fields_to_clear.append({"name": "hygienization_exemption_type", "value": None})
 
     # Clear digestate treatment steps based on phase separation setting
     if instance.has_digestate_phase_separation:
         # If phase separation is enabled, clear raw digestate treatment steps
-        fields_to_clear.append("raw_digestate_treatment_steps")
+        fields_to_clear.append({"name": "raw_digestate_treatment_steps", "value": None})
     else:
         # If phase separation is disabled, clear liquid and solid phase treatment steps
-        fields_to_clear.extend(["liquid_phase_treatment_steps", "solid_phase_treatment_steps"])
+        fields_to_clear.extend(
+            [{"name": "liquid_phase_treatment_steps", "value": None}, {"name": "solid_phase_treatment_steps", "value": None}]
+        )
+
+    # Clear spreading management methods if spreading is not selected
+    if (
+        instance.digestate_valorization_methods
+        and BiomethaneProductionUnit.SPREADING not in instance.digestate_valorization_methods
+    ):
+        fields_to_clear.append({"name": "spreading_management_methods", "value": []})
 
     if fields_to_clear:
-        update_data = {field: None for field in fields_to_clear}
+        update_data = {field["name"]: field["value"] for field in fields_to_clear}
         BiomethaneProductionUnit.objects.filter(pk=instance.pk).update(**update_data)

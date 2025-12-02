@@ -64,7 +64,7 @@ export const SupplyInputForm = ({
             {...bind("input_category")}
           />
           <TextInput
-            label={t("Intrants")} //
+            label={t("Nom des intrants")} //
             required
             {...bind("input_type")}
           />
@@ -78,7 +78,7 @@ export const SupplyInputForm = ({
           {value?.material_unit === BiomethaneSupplyInputMaterialUnit.DRY && (
             <>
               <NumberInput
-                label={t("Ratio de matière sèche")}
+                label={t("Ratio de matière sèche (%)")}
                 min={0}
                 max={100}
                 required
