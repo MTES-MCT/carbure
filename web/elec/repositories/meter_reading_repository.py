@@ -99,7 +99,7 @@ class MeterReadingRepository:
         latest_readings = ElecMeterReading.objects.filter(meter=OuterRef("current_meter")).order_by("-application_id")
 
         if application_id:
-            latest_readings = latest_readings.filter(application_id=application_id)
+            latest_readings = latest_readings.filter(application_id__lte=application_id)
 
         return charge_points.select_related("current_meter").annotate(
             latest_reading_index=Cast(

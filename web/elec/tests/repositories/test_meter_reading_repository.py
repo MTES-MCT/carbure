@@ -227,5 +227,5 @@ class TestAnnotateChargePointsWithLatestReadings(TestCase):
 
         # second_latest_reading should use initial_index because we only filter on application_2
         # (there is only one reading for this application)
-        self.assertEqual(cp_filtered.second_latest_reading_index, 1000.0)
-        self.assertEqual(cp_filtered.second_latest_reading_date, datetime.date(2024, 1, 1))
+        self.assertEqual(cp_filtered.second_latest_reading_index, 1200.0)
+        self.assertEqual(cp_filtered.second_latest_reading_date, datetime.date(2024, 3, 31))
