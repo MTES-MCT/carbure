@@ -168,3 +168,41 @@ class BiomethaneContractAmendmentSerializerTests(TestCase):
         serializer.create(data)
         self.contract.refresh_from_db()
         self.assertEqual(self.contract.tracked_amendment_types, [BiomethaneContractAmendment.CMAX_ANNUALIZATION])
+
+    def test_validate_amendment_file_rejects_non_pdf(self):
+        """Test validate_amendment_file rejects non-PDF files"""
+        doc_file = SimpleUploadedFile("test.doc", b"fake doc content", content_type="application/msword")
+
+        data = {
+            "signature_date": date.today().isoformat(),
+            "effective_date": date.today().isoformat(),
+            "amendment_object": [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
+            "amendment_file": doc_file,
+        }
+
+        context = {"entity": self.producer_entity}
+        serializer = BiomethaneContractAmendmentAddSerializer(data=data, context=context)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("amendment_file", serializer.errors)
+        self.assertIn("format du fichier n'est pas supporté", str(serializer.errors["amendment_file"][0]))
+
+    def test_validate_amendment_file_rejects_oversized(self):
+        """Test validate_amendment_file rejects files larger than 10MB"""
+        # Create a file larger than 10MB (10 * 1024 * 1024 bytes + 1)
+        large_content = b"x" * (10 * 1024 * 1024 + 1)
+        large_file = SimpleUploadedFile("large.pdf", large_content, content_type="application/pdf")
+
+        data = {
+            "signature_date": date.today().isoformat(),
+            "effective_date": date.today().isoformat(),
+            "amendment_object": [BiomethaneContractAmendment.CMAX_PAP_UPDATE],
+            "amendment_file": large_file,
+        }
+
+        context = {"entity": self.producer_entity}
+        serializer = BiomethaneContractAmendmentAddSerializer(data=data, context=context)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("amendment_file", serializer.errors)
+        self.assertIn("trop volumineux", str(serializer.errors["amendment_file"][0]))

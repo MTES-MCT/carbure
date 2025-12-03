@@ -43,6 +43,22 @@ class BiomethaneContractAmendmentAddSerializer(BaseBiomethaneContractAmendmentSe
 
         return validated_data
 
+    def validate_amendment_file(self, value):
+        MAX_FILE_SIZE_MB = 10
+        ALLOWED_CONTENT_TYPES = [
+            "application/pdf",
+        ]
+
+        if hasattr(value, "content_type") and value.content_type:
+            if value.content_type not in ALLOWED_CONTENT_TYPES:
+                raise serializers.ValidationError(_("Le format du fichier n'est pas supporté (autorisé: PDF)"))
+
+        # Check file size (max 10MB)
+        if value.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+            raise serializers.ValidationError(_("Le fichier est trop volumineux (maximum 10MB)"))
+
+        return value
+
     def create(self, validated_data):
         entity = self.context.get("entity")
 

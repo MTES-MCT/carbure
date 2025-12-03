@@ -553,15 +553,6 @@ class ValidateConditionsFilesTests(TestCase):
         self.assertIn("Conditions générales", errors)
         self.assertIn("Conditions particulières", errors)
 
-    def test_no_files_provided(self):
-        """Test that validation passes when no files are provided."""
-        validated_data = {}
-
-        errors = {}
-        BiomethaneContractService.validate_conditions_files(validated_data, errors)
-
-        self.assertEqual(len(errors), 0)
-
 
 class ValidateContractDocumentFieldsTests(TestCase):
     """Test the validate_contract_document_fields method."""

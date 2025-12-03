@@ -134,7 +134,7 @@ class BiomethaneContractService:
 
                 # Validate content type
                 if uploaded_file.content_type not in ALLOWED_CONTENT_TYPES:
-                    errors[file_label] = [_("Le format du fichier n'est pas supporté.")]
+                    errors[file_label] = [_("Le format du fichier n'est pas supporté (autorisé: PDF).")]
                     continue
 
     @staticmethod
