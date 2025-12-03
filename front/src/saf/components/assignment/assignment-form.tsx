@@ -119,7 +119,7 @@ export const AssignmentForm = ({
 
       {clientIsAirline && (
         <TextInput
-          label={t("Numéro de POS/POC")}
+          label={t("Numéro de POS")}
           placeholder="Ex: PC-ISCC-12345678"
           {...bind("pos_poc_number")}
         />
