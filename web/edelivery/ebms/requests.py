@@ -32,3 +32,15 @@ class GetSourcingContactByIdRequest(BaseRequest):
     </SC_ID>
   </SC_ID_HEADER>
 </udb:GetSourcingContactByIDRequest>""")
+
+
+class EOGetTransactionRequest(BaseRequest):
+    def __init__(self, transaction_id):
+        super().__init__(f"""\
+<udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <EO_GET_TRANS_HEADER>
+    <EO_TRANSACTION>
+      <TRANSACTION_ID>{transaction_id}</TRANSACTION_ID>
+    </EO_TRANSACTION>
+  </EO_GET_TRANS_HEADER>
+</udb:EOGetTransactionRequest>""")

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.ebms.requests import BaseRequest, GetSourcingContactByIdRequest
+from edelivery.ebms.requests import BaseRequest, EOGetTransactionRequest, GetSourcingContactByIdRequest
 
 
 class BaseRequestTest(TestCase):
@@ -55,5 +55,26 @@ class GetSourcingContactByIdRequestTest(TestCase):
     </SC_ID>
   </SC_ID_HEADER>
 </udb:GetSourcingContactByIDRequest>"""
+
+        self.assertEqual(expected_body, request.body)
+
+
+class EOGetTransactionRequestTest(TestCase):
+    def setUp(self):
+        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
+
+    def test_injects_transaction_id_in_body(self):
+        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+
+        request = EOGetTransactionRequest("99999")
+        expected_body = """\
+<udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
+  <EO_GET_TRANS_HEADER>
+    <EO_TRANSACTION>
+      <TRANSACTION_ID>99999</TRANSACTION_ID>
+    </EO_TRANSACTION>
+  </EO_GET_TRANS_HEADER>
+</udb:EOGetTransactionRequest>"""
 
         self.assertEqual(expected_body, request.body)
