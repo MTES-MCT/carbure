@@ -14,9 +14,9 @@ class BaseRequest:
         ET.indent(xml)
         return ET.tostring(xml, encoding="utf-8").decode("utf-8")
 
-    def __init__(self, request_id, body):
-        self.id = request_id
-        self.body = self.with_request_id_inserted(request_id, body)
+    def __init__(self, body):
+        self.id = new_uuid()
+        self.body = self.with_request_id_inserted(self.id, body)
 
     def zipped_encoded(self):
         return zip_and_stream_udb_request(self.body)
@@ -24,13 +24,11 @@ class BaseRequest:
 
 class GetSourcingContactByIdRequest(BaseRequest):
     def __init__(self, sourcing_contact_id):
-        request_id = new_uuid()
-        body = f"""\
+        super().__init__(f"""\
 <udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
   <SC_ID_HEADER>
     <SC_ID>
       <SOURCING_CONTACT_NUMBER>{sourcing_contact_id}</SOURCING_CONTACT_NUMBER>
     </SC_ID>
   </SC_ID_HEADER>
-</udb:GetSourcingContactByIDRequest>"""
-        super().__init__(request_id, body)
+</udb:GetSourcingContactByIDRequest>""")

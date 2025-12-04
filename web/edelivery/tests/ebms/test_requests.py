@@ -5,23 +5,28 @@ from edelivery.ebms.requests import BaseRequest, GetSourcingContactByIdRequest
 
 
 class BaseRequestTest(TestCase):
+    def setUp(self):
+        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
+
     def test_inserts_request_id(self):
-        request = BaseRequest("12345", "<request/>")
+        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+        request = BaseRequest("<request/>")
         expected_body = """\
 <request>
-  <REQUEST_HEADER REQUEST_ID="12345" />
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
 </request>"""
         self.assertEqual(request.body, expected_body)
 
     @patch("edelivery.ebms.requests.zip_and_stream_udb_request")
     def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
+        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
         patched_zip_and_stream_udb_request.return_value = "abcdef"
-        request = BaseRequest("12345", "<request/>")
+        request = BaseRequest("<request/>")
 
         encoded_request = request.zipped_encoded()
         expected_body = """\
 <request>
-  <REQUEST_HEADER REQUEST_ID="12345" />
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
 </request>"""
         patched_zip_and_stream_udb_request.assert_called_with(expected_body)
         self.assertEqual("abcdef", encoded_request)
