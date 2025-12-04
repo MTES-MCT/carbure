@@ -78,3 +78,20 @@ class EOGetTransactionRequestTest(TestCase):
 </udb:EOGetTransactionRequest>"""
 
         self.assertEqual(expected_body, request.body)
+
+    def test_injects_several_transaction_ids_at_once(self):
+        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+
+        request = EOGetTransactionRequest("111", "222")
+        expected_body = """\
+<udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
+  <EO_GET_TRANS_HEADER>
+    <EO_TRANSACTION>
+      <TRANSACTION_ID>111</TRANSACTION_ID>
+      <TRANSACTION_ID>222</TRANSACTION_ID>
+    </EO_TRANSACTION>
+  </EO_GET_TRANS_HEADER>
+</udb:EOGetTransactionRequest>"""
+
+        self.assertEqual(expected_body, request.body)
