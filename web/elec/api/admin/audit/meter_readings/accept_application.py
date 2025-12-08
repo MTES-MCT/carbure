@@ -1,7 +1,6 @@
 import pandas as pd
 from django import forms
 from django.conf import settings
-from django.db.models import Sum
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST
 
@@ -13,8 +12,8 @@ from core.models import ExternalAdminRights, UserRights
 from core.utils import CarbureEnv
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point_application import ElecChargePointApplication
-from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
+from elec.models.elec_meter_reading_virtual import ElecMeterReadingVirtual
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 
 
@@ -50,7 +49,9 @@ def accept_application(request: HttpRequest):
     # creer un ElecProvisionCertificate groupant tous les meter readings par charge_poing.operating_unit
 
     ## recuperer tous les MeterReadings de la demande, sauf ceux liés à des PDC de stations DC (gérés par qualicharge)
-    meter_readings = ElecMeterReading.objects.filter(application=application, meter__charge_point__is_article_2=False)
+    meter_readings = ElecMeterReadingVirtual.objects.filter(
+        application=application, charge_point__is_article_2=False
+    ).select_related("charge_point")
     data = [
         {
             "renewable_energy": meter_reading.renewable_energy,
@@ -94,7 +95,8 @@ def accept_application(request: HttpRequest):
 
 def send_email_to_cpo(application: ElecMeterReadingApplication, request: HttpRequest):
     quarter = f"T{application.quarter} {application.year}"
-    total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum("renewable_energy"))["total_energy"], 2)
+    meter_readings = ElecMeterReadingVirtual.objects.filter(application=application)
+    total_energy = round(sum(mr.renewable_energy or 0 for mr in meter_readings), 2)
     meter_reading_count = application.elec_meter_readings.count()
     meter_reading_link = (
         f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec-v2/certificates/{application.year}/provision"
