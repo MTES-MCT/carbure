@@ -56,7 +56,7 @@ export const ProvisionCertificates = ({
 
   const tabs = useTabs(snapshot)
   const filters = useFilters()
-  const columns = useColumns()
+  const columns = useColumns(status)
 
   const provisionCerts = useQuery(getProvisionCertificates, {
     key: "elec-provision-certificates",
