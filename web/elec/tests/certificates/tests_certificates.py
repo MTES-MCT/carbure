@@ -4,12 +4,13 @@ from django.test import TestCase
 from django.urls import reverse
 
 from core.models import Entity
-from core.tests_utils import setup_current_user
+from core.tests_utils import FiltersActionTestMixin, setup_current_user
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
+from elec.views import ProvisionCertificateViewSet, TransferCertificateViewSet
 
 
-class ElecCPOTest(TestCase):
+class ElecCPOTest(TestCase, FiltersActionTestMixin):
     def setUp(self):
         self.cpo = Entity.objects.create(
             name="CPO",
@@ -166,33 +167,19 @@ class ElecCPOTest(TestCase):
         assert json == [2022, 2023]
 
     def test_provision_certificate_filter(self):
-        response = self.client.get(
-            reverse("provision-certificates-filters"),
+        self.assertFilters(
+            ProvisionCertificateViewSet,
             {
-                "entity_id": self.cpo.id,
-                "year": 2022,
-                "filter": "operating_unit",
+                "cpo": [self.cpo.name],
+                "energy_amount": [1000.0, 2000.0, 4000.0],
+                "operating_unit": ["ABCD", "DCBA", "XYZ"],
+                "quarter": [1, 2, 4],
+                "source": [],
+                "year": [2022, 2023],
             },
+            entity=self.cpo,
+            ignore=["order_by"],
         )
-
-        assert response.status_code == 200
-        json = response.json()
-
-        assert json == ["XYZ"]
-
-        response = self.client.get(
-            reverse("provision-certificates-filters"),
-            {
-                "entity_id": self.cpo.id,
-                "year": 2023,
-                "filter": "operating_unit",
-            },
-        )
-
-        assert response.status_code == 200
-        json = response.json()
-
-        assert json == ["ABCD", "DCBA"]
 
     def test_provision_certificates(self):
         response = self.client.get(
@@ -220,33 +207,24 @@ class ElecCPOTest(TestCase):
             transfer_date=datetime.datetime(year=2023, month=6, day=2),
         )
 
-        response = self.client.get(
-            reverse("transfer-certificates-filters"),
+        self.assertFilters(
+            TransferCertificateViewSet,
             {
-                "entity_id": self.cpo.id,
-                "year": 2023,
-                "filter": "cpo",
+                "client": [self.operator.id],
+                "consumption_date": [],
+                "cpo": [self.cpo.name],
+                "energy_amount": [1000.0],
+                "month": [6],
+                "operator": [self.operator.name],
+                "status": [ElecTransferCertificate.PENDING],
+                "supplier": [self.cpo.id],
+                "transfer_date": [datetime.date(2023, 6, 2)],
+                "used_in_tiruert": [False],
+                "year": [2023],
             },
+            entity=self.cpo,
+            ignore=["certificate_id", "order_by"],
         )
-
-        assert response.status_code == 200
-        json = response.json()
-
-        assert json == [self.cpo.name]
-
-        response = self.client.get(
-            reverse("transfer-certificates-filters"),
-            {
-                "entity_id": self.cpo.id,
-                "year": 2023,
-                "filter": "operator",
-            },
-        )
-
-        assert response.status_code == 200
-        json = response.json()
-
-        assert json == [self.operator.name]
 
     def test_transfer_certificates(self):
         ElecTransferCertificate.objects.create(

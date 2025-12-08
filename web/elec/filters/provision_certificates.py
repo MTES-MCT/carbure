@@ -6,10 +6,10 @@ from elec.models import ElecProvisionCertificate
 class ProvisionCertificateFilter(django_filters.FilterSet):
     status = django_filters.CharFilter(method="filter_status")
     year = django_filters.NumberFilter(field_name="year")
-    quarter = django_filters.BaseInFilter(field_name="quarter", lookup_expr="in")
-    operating_unit = django_filters.BaseInFilter(field_name="operating_unit", lookup_expr="in")
-    cpo = django_filters.BaseInFilter(field_name="cpo__name", lookup_expr="in")
-    source = django_filters.BaseInFilter(field_name="source", lookup_expr="in")
+    quarter = django_filters.AllValuesMultipleFilter(field_name="quarter")
+    operating_unit = django_filters.AllValuesMultipleFilter(field_name="operating_unit")
+    cpo = django_filters.AllValuesMultipleFilter(field_name="cpo__name")
+    source = django_filters.AllValuesMultipleFilter(field_name="source")
 
     order_by = django_filters.OrderingFilter(
         fields=(
