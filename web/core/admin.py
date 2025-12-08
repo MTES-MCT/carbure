@@ -11,10 +11,9 @@ from django.db import transaction
 from django.db.models import Q, Sum
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
-from django_admin_listfilter_dropdown.filters import (
-    DropdownFilter,
-    RelatedOnlyDropdownFilter,
-)
+from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedOnlyDropdownFilter
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 
 from auth.validators import validate_name
 from core.models import (
@@ -603,8 +602,18 @@ class CarbureNotificationAdmin(admin.ModelAdmin):
     list_filter = ["acked", "send_by_email", "email_sent", "dest"]
 
 
+class GenericCertificateResource(resources.ModelResource):
+    class Meta:
+        model = GenericCertificate
+        import_id_fields = ["certificate_id"]  # unique field in your model
+        skip_unchanged = True
+        report_skipped = True
+
+
 @admin.register(GenericCertificate)
-class GenericCertificateAdmin(admin.ModelAdmin):
+class GenericCertificateAdmin(ImportExportModelAdmin):
+    resource_classes = [GenericCertificateResource]
+
     list_display = [
         "certificate_id",
         "certificate_type",
