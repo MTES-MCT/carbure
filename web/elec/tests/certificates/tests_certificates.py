@@ -171,7 +171,6 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             ProvisionCertificateViewSet,
             {
                 "cpo": [self.cpo.name],
-                "energy_amount": [1000.0, 2000.0, 4000.0],
                 "operating_unit": ["ABCD", "DCBA", "XYZ"],
                 "quarter": [1, 2, 4],
                 "source": [],
@@ -210,20 +209,15 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
         self.assertFilters(
             TransferCertificateViewSet,
             {
-                "client": [self.operator.id],
-                "consumption_date": [],
-                "cpo": [self.cpo.name],
-                "energy_amount": [1000.0],
-                "month": [6],
-                "operator": [self.operator.name],
                 "status": [ElecTransferCertificate.PENDING],
-                "supplier": [self.cpo.id],
-                "transfer_date": [datetime.date(2023, 6, 2)],
-                "used_in_tiruert": [False],
                 "year": [2023],
+                "month": [6],
+                "cpo": [self.cpo.name],
+                "operator": [self.operator.name],
+                "used_in_tiruert": [False],
             },
             entity=self.cpo,
-            ignore=["certificate_id", "order_by"],
+            ignore=["order_by"],
         )
 
     def test_transfer_certificates(self):

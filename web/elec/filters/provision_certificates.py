@@ -14,6 +14,7 @@ class ProvisionCertificateFilter(django_filters.FilterSet):
     order_by = django_filters.OrderingFilter(
         fields=(
             ("quarter", "quarter"),
+            ("energy_amount", "energy_amount"),
             ("remaining_energy_amount", "remaining_energy_amount"),
             ("cpo__name", "cpo"),
             ("operating_unit", "operating_unit"),
@@ -30,10 +31,10 @@ class ProvisionCertificateFilter(django_filters.FilterSet):
     class Meta:
         model = ElecProvisionCertificate
         fields = [
-            "cpo",
-            "quarter",
+            "status",
             "year",
+            "quarter",
             "operating_unit",
+            "cpo",
             "source",
-            "energy_amount",
         ]

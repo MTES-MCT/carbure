@@ -20,7 +20,6 @@ class TransferCertificateFilter(django_filters.FilterSet):
             ("client__name", "operator"),
             ("certificate_id", "certificate_id"),
             ("transfer_date", "transfer_date"),
-            ("transfer_date", "transfer_date"),
             ("consumption_date", "consumption_date"),
         )
     )
@@ -28,12 +27,10 @@ class TransferCertificateFilter(django_filters.FilterSet):
     class Meta:
         model = ElecTransferCertificate
         fields = [
-            "certificate_id",
             "status",
-            "supplier",
-            "client",
-            "transfer_date",
-            "consumption_date",
-            "energy_amount",
+            "year",
+            "month",
+            "cpo",
+            "operator",
             "used_in_tiruert",
         ]
