@@ -1,25 +1,29 @@
-from datetime import date
-
 from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum, Value
-from django.db.models.fields import DateField, FloatField
-from django.db.models.functions import Cast, Coalesce
+from django.db.models.fields import FloatField
+from django.db.models.functions import Coalesce
 
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter_reading import ElecMeterReading
+from elec.models.elec_meter_reading_virtual import ElecMeterReadingVirtual
 from transactions.models.year_config import YearConfig
 
 
 class MeterReadingRepository:
     @staticmethod
     def get_annotated_applications():
+        # Subquery to calculate total renewable energy from ElecMeterReadingVirtual
+        energy_subquery = (
+            ElecMeterReadingVirtual.objects.filter(application_id=OuterRef("pk"))
+            .values("application_id")
+            .annotate(total=Sum((F("current_index") - F("prev_index")) * F("enr_ratio")))
+            .values("total")
+        )
+
         return ElecMeterReadingApplication.objects.all().annotate(
             charge_point_count=Count("elec_meter_readings__id"),
-            energy_total=Sum(
-                "elec_meter_readings__renewable_energy",
-                filter=Q(elec_meter_readings__meter__charge_point__is_article_2=False),
-            ),
+            energy_total=Coalesce(Subquery(energy_subquery), Value(0.0), output_field=FloatField()),
         )
 
     @staticmethod
@@ -36,9 +40,9 @@ class MeterReadingRepository:
     def get_cpo_application_for_quarter(cpo, year: int, quarter: int):
         return MeterReadingRepository.get_annotated_applications().filter(cpo=cpo, quarter=quarter, year=year).first()
 
-    @staticmethod
-    def get_cpo_meter_readings(cpo: Entity):
-        return ElecMeterReading.objects.filter(cpo=cpo).select_related("meter", "meter__charge_point")
+    # @staticmethod
+    # def get_cpo_meter_readings(cpo: Entity):
+    #    return ElecMeterReading.objects.filter(cpo=cpo).select_related("meter", "meter__charge_point")
 
     @staticmethod
     def get_previous_application(cpo: Entity, quarter=None, year=None):
@@ -47,25 +51,25 @@ class MeterReadingRepository:
             applications = applications.filter(Q(year__lt=year) | (Q(year=year) & Q(quarter__lt=quarter)))
         return applications.order_by("-year", "-quarter").first()
 
-    @staticmethod
-    def get_replaceable_applications(cpo: Entity):
-        return ElecMeterReadingApplication.objects.filter(
-            cpo=cpo, status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.REJECTED]
-        )
+    # @staticmethod
+    # def get_replaceable_applications(cpo: Entity):
+    #    return ElecMeterReadingApplication.objects.filter(
+    #        cpo=cpo, status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.REJECTED]
+    #    )
 
     @staticmethod
     def get_application_meter_readings(cpo: Entity, application: ElecMeterReadingApplication):
-        return ElecMeterReading.objects.filter(
-            cpo=cpo, application=application, meter__charge_point__is_deleted=False
-        ).select_related("meter", "meter__charge_point")
+        return ElecMeterReadingVirtual.objects.filter(
+            cpo=cpo, application=application, charge_point__is_deleted=False
+        ).select_related("charge_point")
 
-    @staticmethod
-    def get_application_meter_readings_summary(cpo: Entity, application: ElecMeterReadingApplication):
-        return (
-            MeterReadingRepository.get_application_meter_readings(cpo, application)
-            .values("extracted_energy", "renewable_energy", "reading_date")
-            .annotate(charge_point_id=F("meter__charge_point__charge_point_id"))
-        )
+    # @staticmethod
+    # def get_application_meter_readings_summary(cpo: Entity, application: ElecMeterReadingApplication):
+    #     return (
+    #         MeterReadingRepository.get_application_meter_readings(cpo, application)
+    #         .values("extracted_energy", "renewable_energy", "reading_date")
+    #         .annotate(charge_point_id=F("meter__charge_point__charge_point_id"))
+    #     )
 
     @staticmethod
     def get_application_charge_points(cpo: Entity, application: ElecMeterReadingApplication):
@@ -95,43 +99,12 @@ class MeterReadingRepository:
         ).filter(app_count=0, meter_readings_charge_points_count__gt=0, entity_type=Entity.CPO)
 
     @staticmethod
-    def annotate_charge_points_with_latest_readings(charge_points: QuerySet[ElecChargePoint], application_id: int = None):
-        latest_readings = ElecMeterReading.objects.filter(meter=OuterRef("current_meter")).order_by("-application_id")
-
-        if application_id:
-            latest_readings = latest_readings.filter(application_id=application_id)
-
-        return charge_points.select_related("current_meter").annotate(
-            latest_reading_index=Cast(
-                Coalesce(
-                    Subquery(latest_readings.values("extracted_energy")[:1]),
-                    F("current_meter__initial_index"),
-                    Value(0.0),
-                ),
-                output_field=FloatField(),
-            ),
-            latest_reading_date=Cast(
-                Coalesce(
-                    Subquery(latest_readings.values("reading_date")[:1]),
-                    F("current_meter__initial_index_date"),
-                    Value(date.min),
-                ),
-                output_field=DateField(),
-            ),
-            second_latest_reading_index=Cast(
-                Coalesce(
-                    Subquery(latest_readings.values("extracted_energy")[1:2]),
-                    F("current_meter__initial_index"),
-                    Value(0.0),
-                ),
-                output_field=FloatField(),
-            ),
-            second_latest_reading_date=Cast(
-                Coalesce(
-                    Subquery(latest_readings.values("reading_date")[1:2]),
-                    F("current_meter__initial_index_date"),
-                    Value(date.min),
-                ),
-                output_field=DateField(),
-            ),
+    def annotate_charge_points_with_latest_index(charge_points: QuerySet[ElecChargePoint]):
+        """Annotate charge points with their latest meter reading index and date from ElecMeterReadingVirtual."""
+        latest_reading_subquery = ElecMeterReadingVirtual.objects.filter(charge_point_id=OuterRef("pk")).order_by(
+            "-current_index_date"
+        )
+        return charge_points.annotate(
+            latest_reading_index=Subquery(latest_reading_subquery.values("current_index")[:1]),
+            latest_reading_date=Subquery(latest_reading_subquery.values("current_index_date")[:1]),
         )
