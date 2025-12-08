@@ -60,7 +60,7 @@ export function useFilters() {
   return filters
 }
 
-export function useColumns() {
+export function useColumns(status: ProvisionCertificateStatus) {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -86,10 +86,15 @@ export function useColumns() {
       header: t("Source"),
       cell: (p) => getSourceLabel(p.source),
     },
-    {
+    status == "available" && {
       key: "remaining_energy_amount",
       header: t("Quantité disponible (MWh)"),
       cell: (p) => `${formatNumber(p.remaining_energy_amount)}`,
+    },
+    status == "history" && {
+      key: "energy_amount",
+      header: t("Quantité fournie (MWh)"),
+      cell: (p) => `${formatNumber(p.energy_amount)}`,
     },
   ]) satisfies Column<ProvisionCertificate>[]
 }
