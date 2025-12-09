@@ -100,11 +100,21 @@ class MeterReadingRepository:
 
     @staticmethod
     def annotate_charge_points_with_latest_index(charge_points: QuerySet[ElecChargePoint]):
-        """Annotate charge points with their latest meter reading index and date from ElecMeterReadingVirtual."""
+        """Annotate charge points with their latest meter reading index and date from ElecMeterReadingVirtual.
+
+        Falls back to current_meter.initial_index/initial_index_date if no reading exists.
+        """
         latest_reading_subquery = ElecMeterReadingVirtual.objects.filter(charge_point_id=OuterRef("pk")).order_by(
             "-current_index_date"
         )
-        return charge_points.annotate(
-            latest_reading_index=Subquery(latest_reading_subquery.values("current_index")[:1]),
-            latest_reading_date=Subquery(latest_reading_subquery.values("current_index_date")[:1]),
+        return charge_points.select_related("current_meter").annotate(
+            latest_reading_index=Coalesce(
+                Subquery(latest_reading_subquery.values("current_index")[:1]),
+                F("current_meter__initial_index"),
+                output_field=FloatField(),
+            ),
+            latest_reading_date=Coalesce(
+                Subquery(latest_reading_subquery.values("current_index_date")[:1]),
+                F("current_meter__initial_index_date"),
+            ),
         )
