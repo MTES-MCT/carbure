@@ -1,4 +1,5 @@
 import re
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -7,8 +8,6 @@ from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
 from rest_framework import status
 from rest_framework.test import APIClient
-
-from core.utils import CarbureEnv
 
 User = get_user_model()
 
@@ -47,10 +46,11 @@ class RequestOTPWithAuthenticatedUserTest(RequestOTPTest):
         self.client.get(self.request_otp_url)
         assert len(mail.outbox) == 1
 
+    @patch.dict("os.environ", {"PUBLIC_URL": "https://carbure.example.com"})
     def test_injects_server_base_url_in_sent_mail(self):
         self.client.get(self.request_otp_url)
         sent_mail = mail.outbox[0]
-        assert re.search(CarbureEnv.get_base_url(), sent_mail.body)
+        assert re.search("https://carbure.example.com", sent_mail.body)
 
     def test_does_not_precede_base_url_by_https(self):
         self.client.get(self.request_otp_url)

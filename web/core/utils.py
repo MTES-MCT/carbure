@@ -228,9 +228,6 @@ class CarbureEnv:
     is_prod = env.get("IMAGE_TAG") == "prod"
     is_local = env.get("IMAGE_TAG") == "local"
 
-    def get_base_url():
-        return env["PUBLIC_URL"]
-
 
 # checks if a pandas DataFrame cell contains a truthy value
 def is_true(df, column):

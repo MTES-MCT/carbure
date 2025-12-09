@@ -1,4 +1,5 @@
 from datetime import datetime
+from os import environ
 
 from django.conf import settings
 from drf_spectacular.utils import (
@@ -179,7 +180,7 @@ def send_email_to_dgec(entity, request):
     subject = subject if CarbureEnv.is_prod else "TEST " + subject
 
     recipient_list = ["carbure@beta.gouv.fr"]  # send to current user to avoid spam all the carbure team
-    admin_link = f"{CarbureEnv.get_base_url()}/admin/core/entity/?is_enabled=False"
+    admin_link = f"{environ.get('PUBLIC_URL')}/admin/core/entity/?is_enabled=False"
     text_message = f"""
     Bonjour,
 

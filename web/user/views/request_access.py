@@ -1,3 +1,5 @@
+from os import environ
+
 from django.conf import settings
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework.decorators import api_view, permission_classes
@@ -7,7 +9,6 @@ from rest_framework.response import Response
 from core.decorators import otp_or_403
 from core.helpers import send_mail
 from core.models import UserRights, UserRightsRequests
-from core.utils import CarbureEnv
 from user.serializers import RequestAccessSerializer, ResponseSuccessSerializer
 
 
@@ -52,7 +53,7 @@ def request_entity_access(request, *args, **kwargs):
             defaults={"comment": comment, "role": role, "status": "PENDING"},
         )
 
-        validation_url = f"{CarbureEnv.get_base_url()}/org/{entity.id}/settings/users"
+        validation_url = f"{environ.get('PUBLIC_URL')}/org/{entity.id}/settings/users"
         email_subject = "Carbure - Demande d'accès"
         message = """
         Bonjour,

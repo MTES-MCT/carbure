@@ -1,3 +1,5 @@
+from os import environ
+
 from django.conf import settings
 from django.template import loader
 from django.utils import timezone
@@ -9,7 +11,6 @@ from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
 from core.helpers import send_mail
-from core.utils import CarbureEnv
 
 
 def create_device(user):
@@ -42,7 +43,7 @@ def send_new_token(request, device):
     expiry = "%s %s" % (device_validity.strftime("%H:%M"), device_validity.tzname())
     email_context = {
         "user": request.user,
-        "domain": CarbureEnv.get_base_url(),
+        "domain": environ.get("PUBLIC_URL"),
         "token": device.token,
         "token_expiry": expiry,
     }

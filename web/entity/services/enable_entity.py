@@ -1,8 +1,9 @@
+from os import environ
+
 from django.conf import settings
 
 from core.helpers import send_mail
 from core.models import UserRights, UserRightsRequests
-from core.utils import CarbureEnv
 
 
 def enable_entity(entity, http_request):
@@ -40,7 +41,7 @@ def enable_entity(entity, http_request):
     Bonjour,
 
     Votre demande d'inscription pour la société {entity.name} a été validée par l'administration.
-    Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {CarbureEnv.get_base_url()}/account
+    Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {environ.get('PUBLIC_URL')}/account
 
     Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/
 

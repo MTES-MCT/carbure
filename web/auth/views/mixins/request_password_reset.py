@@ -1,3 +1,5 @@
+from os import environ
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -10,7 +12,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from core.helpers import send_mail
-from core.utils import CarbureEnv
 
 
 class RequestPasswordResetSerializer(serializers.Serializer):
@@ -22,7 +23,7 @@ def send_notification_mail(user, request):
     email_subject = "Carbure - Réinitialisation du mot de passe"
     email_context = {
         "user": user,
-        "domain": CarbureEnv.get_base_url(),
+        "domain": environ.get("PUBLIC_URL"),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": prtg.make_token(user),
     }
