@@ -1,3 +1,4 @@
+from django_filters import TypedMultipleChoiceFilter
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -113,3 +114,26 @@ def FiltersActionFactory():
             return Response([v for v in values if v is not None])
 
     return FiltersActionMixin
+
+
+class MultipleBooleanFilter(TypedMultipleChoiceFilter):
+    def __init__(self, field_name, **kwargs):
+        super().__init__(
+            field_name=field_name,
+            coerce=strtobool,
+            choices=[("true", "True"), ("false", "False")],
+            **kwargs,
+        )
+
+
+def strtobool(val: str) -> bool:
+    """(imported from the deprecated lib distutils)
+    Convert a string representation of truth to true (1) or false (0).
+    """
+    val = val.lower()
+    if val in ("y", "yes", "t", "true", "on", "1"):
+        return True
+    elif val in ("n", "no", "f", "false", "off", "0"):
+        return False
+    else:
+        raise ValueError(f"invalid truth value {val!r}")

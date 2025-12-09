@@ -1,15 +1,16 @@
 import django_filters
 
+from core.filters import MultipleBooleanFilter
 from elec.models import ElecTransferCertificate
 
 
 class TransferCertificateFilter(django_filters.FilterSet):
-    year = django_filters.NumberFilter(field_name="transfer_date__year")
-    month = django_filters.NumberFilter(field_name="transfer_date__month")
     status = django_filters.CharFilter(field_name="status")
-    cpo = django_filters.BaseInFilter(field_name="supplier__name", lookup_expr="in")
-    operator = django_filters.BaseInFilter(field_name="client__name", lookup_expr="in")
-    used_in_tiruert = django_filters.BooleanFilter(field_name="used_in_tiruert")
+    year = django_filters.NumberFilter(field_name="transfer_date__year")
+    month = django_filters.AllValuesMultipleFilter(field_name="transfer_date__month")
+    cpo = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
+    operator = django_filters.AllValuesMultipleFilter(field_name="client__name")
+    used_in_tiruert = MultipleBooleanFilter(field_name="used_in_tiruert")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -19,7 +20,6 @@ class TransferCertificateFilter(django_filters.FilterSet):
             ("client__name", "operator"),
             ("certificate_id", "certificate_id"),
             ("transfer_date", "transfer_date"),
-            ("transfer_date", "transfer_date"),
             ("consumption_date", "consumption_date"),
         )
     )
@@ -27,12 +27,10 @@ class TransferCertificateFilter(django_filters.FilterSet):
     class Meta:
         model = ElecTransferCertificate
         fields = [
-            "certificate_id",
             "status",
-            "supplier",
-            "client",
-            "transfer_date",
-            "consumption_date",
-            "energy_amount",
+            "year",
+            "month",
+            "cpo",
+            "operator",
             "used_in_tiruert",
         ]

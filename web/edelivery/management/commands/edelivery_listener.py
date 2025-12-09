@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["launch"]:
-            self.stdout.write("Launching eDelivery listener…")
+            self.stdout.write("eDelivery listener launched.")
             Listener().start()
 
         if options["stop"]:

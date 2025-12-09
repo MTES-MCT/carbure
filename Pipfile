@@ -53,6 +53,7 @@ sqlalchemy = "*"
 urllib3 = "2.5.0"
 djangorestframework-api-key = "3.*"
 djangorestframework-simplejwt = "5.*"
+django-import-export = "*"
 
 [dev-packages]
 django-stubs = "*"
