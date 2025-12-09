@@ -1,13 +1,73 @@
-import json
-from collections import defaultdict
-
 import pandas as pd
 from django.core.management.base import BaseCommand
-from django.db.models import CharField, F, Func, Value
-from django.db.models.functions import Concat, Round
+from django.db import connection
 
 from elec.models import ElecMeterReading
-from transactions.models.year_config import YearConfig
+
+
+def _get_real_total_energy_declared(cpo_id):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT
+	SUM((delta_table.current_index - delta_table.prev_index) * delta_table.ratio)
+FROM
+	(
+	SELECT
+			meter_id,
+			ep.charge_point_id,
+			ep.cpo_id,
+			emr.renewable_energy,
+			reading_date as current_index_date,
+			extracted_energy as current_index,
+			emra.year,
+			emra.quarter,
+			COALESCE(
+				(SELECT
+					emr_prev.extracted_energy
+				FROM
+					elec_meter_reading emr_prev
+				WHERE
+					emr_prev.meter_id = emr.meter_id
+					AND emr_prev.id < emr.id
+				ORDER BY
+					emr_prev.id DESC
+				LIMIT 1), em.initial_index) AS prev_index,
+			COALESCE(
+			# (emr.renewable_energy / emr.energy_used_since_last_reading),
+			(SELECT renewable_share / 100 FROM year_config WHERE year=emra.year)) as ratio
+		FROM
+			elec_meter_reading emr
+		INNER JOIN
+			elec_meter em ON em.id = emr.meter_id
+		INNER JOIN
+			elec_charge_point ep ON ep.id = em.charge_point_id
+		INNER JOIN
+			elec_meter_reading_application emra ON emr.application_id = emra.id
+		WHERE
+			emr.cpo_id = %s AND ep.is_deleted = FALSE AND ep.is_article_2 = FALSE AND emra.status = "ACCEPTED"
+		ORDER BY
+			meter_id,
+			current_index_date) as delta_table
+        """,
+            [cpo_id],
+        )
+        result = cursor.fetchone()
+        return result[0] if result and result[0] is not None else 0
+
+
+def _get_certificates_energy_amount(cpo_id):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT SUM(energy_amount) FROM elec_provision_certificate epc
+            WHERE epc.cpo_id = %s AND epc.source = "METER_READINGS"
+            """,
+            [cpo_id],
+        )
+        result = cursor.fetchone()
+
+        return result[0] * 1000 if result and result[0] is not None else 0
 
 
 class Command(BaseCommand):
@@ -32,109 +92,63 @@ class Command(BaseCommand):
             action="store_true",
             help="Store meter reading details in a CSV file at /tmp/readings.csv",
         )
+        parser.add_argument(
+            "--cpo",
+            type=int,
+            default=None,
+            help="Cpo to filter readings",
+        )
 
     def handle(self, *args, **options):
-        year = options.get("year")
         log = options.get("log")
         csv = options.get("csv")
+        cpo = options.get("cpo")
 
-        year_configs = YearConfig.objects.all()
-        enr_ratio_per_year = {c.year: c.renewable_share for c in year_configs}
+        cpo_with_readings = ElecMeterReading.objects.select_related("cpo").values("cpo_id", "cpo__name")
 
-        readings = (
-            ElecMeterReading.objects.select_related("cpo", "application", "meter", "meter__charge_point")
-            .filter(meter__charge_point__is_deleted=False)
-            .order_by(
-                "cpo__name",
-                "meter__charge_point__charge_point_id",
-                "application__year",
-                "application__quarter",
-                "meter_id",
-                "reading_date",
-            )
-            .annotate(
-                cpo_name=F("cpo__name"),
-                charge_point_id=F("meter__charge_point__charge_point_id"),
-                current_meter=Concat(F("meter_id"), Value("-"), F("meter__mid_certificate"), output_field=CharField()),
-                year=F("application__year"),
-                quarter=F("application__quarter"),
-                current_index=Round(F("extracted_energy"), 2),
-                current_date=Func(F("reading_date"), Value("%Y-%m-%d"), function="DATE_FORMAT", output_field=CharField()),
-                saved_index_delta=Round(F("energy_used_since_last_reading"), 2),
-                saved_renewable=Round(F("renewable_energy"), 2),
-                initial_index=F("meter__initial_index"),
-                initial_index_date=F("meter__initial_index_date"),
-            )
-        )
+        if cpo is not None:
+            cpo_with_readings = cpo_with_readings.filter(cpo_id=cpo)
 
-        readings = readings.values(
-            "cpo_name",
-            "charge_point_id",
-            "current_meter",
-            "year",
-            "quarter",
-            "current_index",
-            "current_date",
-            "initial_index",
-            "initial_index_date",
-            "saved_index_delta",
-            "saved_renewable",
-        )
-
-        if csv:
-            df = pd.DataFrame(list(readings))
-            df.to_csv("/tmp/readings.csv", index=False)
-
-        by_cpo = defaultdict(lambda: defaultdict(list))
-        for reading in readings:
-            by_cpo[reading["cpo_name"]][reading["charge_point_id"]].append(reading)
+        cpo_with_readings = cpo_with_readings.distinct()
 
         report = {}
         total_surplus = 0
+        for cpo in cpo_with_readings:
+            real_total_energy_must_be_declared = _get_real_total_energy_declared(cpo["cpo_id"])
+            total_renewable_energy_declared = _get_certificates_energy_amount(cpo["cpo_id"])
+            diff = total_renewable_energy_declared - real_total_energy_must_be_declared
 
-        for cpo, charge_points in by_cpo.items():
-            total_cpo_surplus = 0
-
-            for _charge_point, readings in charge_points.items():
-                previous = None
-                for reading in readings:
-                    previous_energy = None
-
-                    # grab the last index from the previous reading of the current meter
-                    # otherwise directly use the meter initial index
-                    if previous is not None and previous["current_meter"] == reading["current_meter"]:
-                        previous_energy = previous["current_index"]
-                    else:
-                        previous_energy = reading["initial_index"]
-
-                    current_date = reading["current_date"]
-                    current_index = reading["current_index"]
-                    saved_renewable = reading["saved_renewable"]
-                    saved_index_delta = reading["saved_index_delta"]
-
-                    # for old readings when we didn't compute energy_used_since_last_reading yet
-                    if round(saved_index_delta) == 0:
-                        enr_ratio = enr_ratio_per_year[reading["year"]] / 100
-                        saved_index_delta = saved_renewable / enr_ratio
-                    else:
-                        enr_ratio = saved_renewable / saved_index_delta
-
-                    expected_index_delta = round(current_index - previous_energy, 2)
-                    surplus = saved_index_delta - expected_index_delta
-
-                    if year is None or current_date.startswith(str(year)):
-                        total_cpo_surplus += surplus * enr_ratio
-
-                    previous = reading
-
-            if total_cpo_surplus != 0:
-                total_surplus += total_cpo_surplus
-                report[cpo] = round(total_cpo_surplus, 3)
+            if diff > 0.1 or diff < -0.1:
+                total_surplus += diff
+                report[cpo["cpo__name"]] = {
+                    "certificats": total_renewable_energy_declared,
+                    "real_energy_must_be_declared": real_total_energy_must_be_declared,
+                    "surplus": round(diff, 3),
+                }
 
         if log:
-            df = pd.DataFrame(report.items(), columns=["Aménageur", "Surplus (kWh)"])
+            items = []
+            for cpo, data in report.items():
+                items.append(
+                    {
+                        "Aménageur": cpo,
+                        "Energie générée par certificats (kWh)": data["certificats"],
+                        "Énergie déclarée (kWh)": data["real_energy_must_be_declared"],
+                        "Surplus (kWh)": data["surplus"],
+                    }
+                )
+            df = pd.DataFrame(items)
+
             pd.options.display.float_format = "{:,.3f}".format
             print(df.to_string(index=False))
             print(f"Soit un total de {round(total_surplus / 1000, 1):,} MWh\n")
 
-        return json.dumps(report)
+        if csv:
+            arr = []
+            for cpo, data in report.items():
+                arr.append([cpo, data["certificats"], data["real_energy_must_be_declared"], data["surplus"]])
+            df = pd.DataFrame(
+                arr,
+                columns=["Aménageur", "Energie générée par certificats (kWh)", "Énergie déclarée (kWh)", "Surplus (kWh)"],
+            )
+            df.to_csv("/tmp/readings.csv", index=False)
