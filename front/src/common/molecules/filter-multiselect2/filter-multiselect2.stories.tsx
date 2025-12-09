@@ -4,10 +4,6 @@ import { FilterMultiSelect2 } from "./filter-multiselect2"
 const meta: Meta<typeof FilterMultiSelect2> = {
   component: FilterMultiSelect2,
   title: "common/molecules/FilterMultiSelect2",
-  tags: ["IN PROGRESS"],
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
   args: {
     filterLabels: {
       filtre1: "Filtre 1",
@@ -24,7 +20,7 @@ const meta: Meta<typeof FilterMultiSelect2> = {
   },
   render: (args) => {
     return (
-      <div style={{ width: "700px", border: "1px solid red" }}>
+      <div style={{ width: "900px" }}>
         <FilterMultiSelect2 {...args} />
       </div>
     )
@@ -36,3 +32,12 @@ type Story = StoryObj<typeof FilterMultiSelect2>
 export default meta
 
 export const Default: Story = {}
+
+export const WithFilters: Story = {
+  args: {
+    selected: {
+      filtre1: ["1"],
+      filtre2: ["2"],
+    },
+  },
+}

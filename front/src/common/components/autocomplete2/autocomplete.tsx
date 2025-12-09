@@ -54,7 +54,7 @@ export function Autocomplete<T, V>({
   ...props
 }: AutocompleteProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
-
+  const containerRef = useRef<HTMLDivElement>(null)
   const autocomplete = useAutocomplete({
     value,
     options,
@@ -69,7 +69,7 @@ export function Autocomplete<T, V>({
   })
 
   return (
-    <>
+    <div ref={containerRef}>
       <TextInput
         {...props}
         placeholder={props.readOnly ? undefined : props.placeholder}
@@ -78,11 +78,27 @@ export function Autocomplete<T, V>({
         inputRef={triggerRef}
         value={autocomplete.query}
         onChange={autocomplete.onQuery}
+        onBlur={(e) => {
+          // This function is used to reset the autocomplete input when the user clicks outside the autocomplete and there are no suggestions
+
+          // If the user clicks inside the autocomplete, do nothing
+          if (containerRef.current?.contains(e.relatedTarget)) {
+            return
+          }
+
+          // If there are no suggestions, reset the autocomplete input
+          if (autocomplete.suggestions.length === 0) {
+            autocomplete.onQuery(undefined)
+            autocomplete.onSelect(undefined)
+            onSelect?.(undefined)
+          }
+        }}
         iconId="ri-arrow-down-s-line"
       />
 
       {!props.disabled && !props.readOnly && (
         <Dropdown
+          portalRoot={containerRef.current ?? undefined}
           open={autocomplete.open && autocomplete.suggestions.length > 0}
           triggerRef={triggerRef}
           onOpen={autocomplete.execute}
@@ -112,7 +128,7 @@ export function Autocomplete<T, V>({
           )}
         </Dropdown>
       )}
-    </>
+    </div>
   )
 }
 
@@ -180,20 +196,25 @@ export function useAutocomplete<T, V>({
     )
   }
 
-  function matchQuery(
+  function onMatchQuery(
     query: string,
     options: T[],
     create?: (query: string) => V
   ) {
-    const isQuery = createQueryFilter<T, V>(query, true)
-    const itemMatches = normalizeItems(options, normalize, isQuery)
-    const match = itemMatches.length > 0 ? itemMatches[0] : undefined
-
+    const match = matchQuery(query, options)
     if (match && !matches(match.value, value)) {
       onChange?.(match.value)
     } else if (create) {
       onChange?.(create(query))
     }
+  }
+
+  function matchQuery(query: string, options: T[]) {
+    const isQuery = createQueryFilter<T, V>(query, true)
+    const itemMatches = normalizeItems(options, normalize, isQuery)
+    const match = itemMatches.length > 0 ? itemMatches[0] : undefined
+
+    return match
   }
 
   const defaultQuery = query
@@ -214,13 +235,13 @@ export function useAutocomplete<T, V>({
 
     // set them as suggestions and check if one of them matches the query exactly
     setSuggestions(suggestions)
-    matchQuery(query, suggestions, create)
+    onMatchQuery(query, suggestions, create)
 
     // if we fetch the options asyncly, start it now
     if (getOptions) {
       const setOptions = async () => {
         const nextOptions = await asyncOptions.execute(query)
-        if (nextOptions) matchQuery(query, nextOptions)
+        if (nextOptions) onMatchQuery(query, nextOptions)
       }
 
       if (!debounce) setOptions()
@@ -254,6 +275,7 @@ export function useAutocomplete<T, V>({
     setOpen,
     execute: () => asyncOptions.execute(query),
     onQuery: onQueryChange,
+    matchQuery,
     onSelect,
   }
 }

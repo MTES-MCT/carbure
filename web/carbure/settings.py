@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "authtools",
     "huey.contrib.djhuey",
+    "import_export",
     "core",
     "entity",
     "producers",
