@@ -489,7 +489,7 @@ class ElecMeterReadingsTest(TestCase):
                         "line": 9,
                         "meta": {
                             "reading_date": [
-                                "Un relevé plus récent est déjà enregistré pour ce point de recharge: 500.0kWh, 28/03/2024",
+                                "Un relevé plus récent est déjà enregistré pour ce point de recharge: 500kWh, 28/03/2024",
                                 "La date du relevé ne correspond pas au trimestre traité actuellement.",
                             ],
                         },

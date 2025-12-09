@@ -108,8 +108,8 @@ class ExcelMeterReadingValidator(Validator):
         elif meter:
             previous_extracted_energy = meter.initial_index or 0
 
-        new_extracted_energy = meter_reading["extracted_energy"]
-        energy_used_since_last_reading = new_extracted_energy - previous_extracted_energy
+        new_extracted_energy = round(meter_reading.get("extracted_energy", 0), 3)
+        energy_used_since_last_reading = round(new_extracted_energy - previous_extracted_energy, 3)
 
         previous_reading_date = date.min
         operating_unit = None
@@ -145,11 +145,8 @@ class ExcelMeterReadingValidator(Validator):
                     "Ce point de recharge n'a pas de compteur associé, veuillez en ajouter un depuis la page dédiée."  # noqa
                 ),
             )
-        elif meter_reading.get("extracted_energy", 0) < previous_extracted_energy:
-            self.add_error(
-                "extracted_energy",
-                _("La quantité d'énergie soutirée est inférieure au précédent relevé."),
-            )
+        elif new_extracted_energy < previous_extracted_energy:
+            self.add_error("extracted_energy", _("La quantité d'énergie soutirée est inférieure au précédent relevé."))
 
         if len(lines) > 1:
             self.add_error(
@@ -161,7 +158,7 @@ class ExcelMeterReadingValidator(Validator):
         if reading_date < previous_reading_date:
             self.add_error(
                 "reading_date",
-                _("Un relevé plus récent est déjà enregistré pour ce point de recharge: %(energy)skWh, %(date)s")
+                _("Un relevé plus récent est déjà enregistré pour ce point de recharge: %(energy)gkWh, %(date)s")
                 % {"energy": previous_extracted_energy, "date": previous_reading_date.strftime("%d/%m/%Y")},
             )
 
