@@ -229,12 +229,7 @@ class CarbureEnv:
     is_local = env.get("IMAGE_TAG") == "local"
 
     def get_base_url():
-        if env.get("IMAGE_TAG") == "local":
-            # If the environment is local, try to use the public URL if defined, otherwise use the local URL
-            return env.get("PUBLIC_URL", "http://carbure.local:8090")
-        else:
-            # If the PUBLIC_URL is defined, use it, otherwise use the default URL
-            return env.get("PUBLIC_URL", "https://carbure.beta.gouv.fr")
+        return env["PUBLIC_URL"]
 
 
 # checks if a pandas DataFrame cell contains a truthy value
