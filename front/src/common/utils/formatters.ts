@@ -30,7 +30,6 @@ export type FormatNumberOptions = {
 export function formatNumber(num: number, options: FormatNumberOptions = {}) {
   const defaultOptions: FormatNumberOptions = {
     fractionDigits: 2,
-    mode: "floor",
     appendZeros: false,
   }
 
