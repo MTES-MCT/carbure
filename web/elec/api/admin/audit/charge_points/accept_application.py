@@ -59,7 +59,7 @@ def accept_application(request: HttpRequest):
 
 def send_email_to_cpo(application: ElecChargePointApplication, request: HttpRequest):
     charge_point_count = application.elec_charge_points.count()
-    charge_point_link = f"{environ.get('PUBLIC_URL')}/org/{application.cpo.pk}/charge-points/list/accepted"
+    charge_point_link = f"{environ.get('BASE_URL')}/org/{application.cpo.pk}/charge-points/list/accepted"
     recipients = [
         r.user.email for r in UserRights.objects.filter(entity=application.cpo, role=UserRights.ADMIN).select_related("user")
     ]

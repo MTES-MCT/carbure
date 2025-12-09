@@ -42,7 +42,7 @@ def send_email_change_token(request, device, new_email):
 
     email_context = {
         "user": request.user,
-        "domain": environ.get("PUBLIC_URL"),
+        "domain": environ.get("BASE_URL"),
         "otp_token": device.token,
         "token_expiry": expiry,
         "new_email": new_email,

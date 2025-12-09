@@ -37,7 +37,7 @@ class RequestPasswordResetTests(TestCase):
         self.client.post(self.request_password_reset_url, {"username": "testuser@example.com"})
         assert "Réinitialisation du mot de passe" in mail.outbox[0].subject
 
-    @patch.dict("os.environ", {"PUBLIC_URL": "https://carbure.example.com"})
+    @patch.dict("os.environ", {"BASE_URL": "https://carbure.example.com"})
     def test_injects_server_base_url_in_sent_mail(self):
         self.client.post(self.request_password_reset_url, {"username": "testuser@example.com"})
         sent_mail = mail.outbox[0]

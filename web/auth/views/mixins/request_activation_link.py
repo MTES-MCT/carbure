@@ -30,7 +30,7 @@ def send_notification_mail(user, request):
     email_subject = "Carbure - Activation de compte"
     email_context = {
         "user": user,
-        "domain": environ.get("PUBLIC_URL"),
+        "domain": environ.get("BASE_URL"),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": account_activation_token.make_token(user),
     }

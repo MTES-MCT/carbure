@@ -15,7 +15,7 @@ def send_email(user, request, subject, email_type, extra_context):
     email_subject = subject
     email_context = {
         "user": user,
-        "domain": environ.get("PUBLIC_URL"),
+        "domain": environ.get("BASE_URL"),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": account_activation_token.make_token(user),
     } | extra_context

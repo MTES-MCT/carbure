@@ -43,7 +43,7 @@ def send_new_token(request, device):
     expiry = "%s %s" % (device_validity.strftime("%H:%M"), device_validity.tzname())
     email_context = {
         "user": request.user,
-        "domain": environ.get("PUBLIC_URL"),
+        "domain": environ.get("BASE_URL"),
         "token": device.token,
         "token_expiry": expiry,
     }

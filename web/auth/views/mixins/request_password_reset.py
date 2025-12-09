@@ -23,7 +23,7 @@ def send_notification_mail(user, request):
     email_subject = "Carbure - Réinitialisation du mot de passe"
     email_context = {
         "user": user,
-        "domain": environ.get("PUBLIC_URL"),
+        "domain": environ.get("BASE_URL"),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": prtg.make_token(user),
     }

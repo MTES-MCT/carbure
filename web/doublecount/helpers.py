@@ -85,7 +85,7 @@ def send_dca_confirmation_email(dca, request):
     Une nouvelle demande d'agrément double comptage vient d'être déposée par le producteur {dca.producer.name}
     à la date du {dca_created_at}.
 
-    Le dossier est disponible ici {os.environ.get('PUBLIC_URL')}/org/{dca.producer_id}/double-counting/applications.
+    Le dossier est disponible ici {os.environ.get('BASE_URL')}/org/{dca.producer_id}/double-counting/applications.
 
     Bonne journée,
     L'équipe CarbuRe

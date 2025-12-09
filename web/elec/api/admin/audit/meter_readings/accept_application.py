@@ -98,7 +98,7 @@ def send_email_to_cpo(application: ElecMeterReadingApplication, request: HttpReq
     total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum("renewable_energy"))["total_energy"], 2)
     meter_reading_count = application.elec_meter_readings.count()
     meter_reading_link = (
-        f"{environ.get('PUBLIC_URL')}/org/{application.cpo.pk}/elec-v2/certificates/{application.year}/provision"
+        f"{environ.get('BASE_URL')}/org/{application.cpo.pk}/elec-v2/certificates/{application.year}/provision"
     )
     recipients = [
         r.user.email for r in UserRights.objects.filter(entity=application.cpo, role=UserRights.ADMIN).select_related("user")

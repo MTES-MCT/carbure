@@ -33,7 +33,7 @@ class RequestActivationLinkTest(TestCase):
         self.client.post(self.request_activation_link_url, {"email": "testuser@example.com"})
         assert len(mail.outbox) == 1
 
-    @patch.dict("os.environ", {"PUBLIC_URL": "https://carbure.example.com"})
+    @patch.dict("os.environ", {"BASE_URL": "https://carbure.example.com"})
     def test_injects_server_base_url_in_sent_mail(self):
         self.client.post(self.request_activation_link_url, {"email": "testuser@example.com"})
         sent_mail = mail.outbox[0]

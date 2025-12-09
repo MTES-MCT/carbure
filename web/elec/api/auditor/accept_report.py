@@ -118,7 +118,7 @@ def send_email_to_dgec(audit_sample: ElecAuditSample, request: HttpRequest):
     cpo = audit_sample.cpo.name
     year = audit_sample.created_at.year
 
-    admin_link = f"{environ.get('PUBLIC_URL')}/org/9/elec-admin-audit/{year}"
+    admin_link = f"{environ.get('BASE_URL')}/org/9/elec-admin-audit/{year}"
 
     if audit_sample.charge_point_application is not None:
         application_id = audit_sample.charge_point_application.pk

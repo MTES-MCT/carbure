@@ -46,7 +46,7 @@ class RequestOTPWithAuthenticatedUserTest(RequestOTPTest):
         self.client.get(self.request_otp_url)
         assert len(mail.outbox) == 1
 
-    @patch.dict("os.environ", {"PUBLIC_URL": "https://carbure.example.com"})
+    @patch.dict("os.environ", {"BASE_URL": "https://carbure.example.com"})
     def test_injects_server_base_url_in_sent_mail(self):
         self.client.get(self.request_otp_url)
         sent_mail = mail.outbox[0]

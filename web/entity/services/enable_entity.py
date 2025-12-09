@@ -41,7 +41,7 @@ def enable_entity(entity, http_request):
     Bonjour,
 
     Votre demande d'inscription pour la société {entity.name} a été validée par l'administration.
-    Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {environ.get('PUBLIC_URL')}/account
+    Vous pouvez désormais accéder à la société dans votre espace en tant qu'administrateur : {environ.get('BASE_URL')}/account
 
     Pour plus d'information veuillez consulter notre guide d'utilisation : https://carbure-1.gitbook.io/faq/
 
