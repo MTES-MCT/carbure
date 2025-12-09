@@ -103,21 +103,22 @@ class ExcelMeterReadingValidator(Validator):
         charge_point_power = charge_point.nominal_power if charge_point else 0
 
         previous_extracted_energy = 0
-        if charge_point:
+        if charge_point and charge_point.latest_reading_index is not None:
             previous_extracted_energy = charge_point.latest_reading_index
         elif meter:
-            previous_extracted_energy = meter.initial_index
+            previous_extracted_energy = meter.initial_index or 0
 
         new_extracted_energy = meter_reading["extracted_energy"]
         energy_used_since_last_reading = new_extracted_energy - previous_extracted_energy
 
         previous_reading_date = date.min
-        if charge_point:
+        operating_unit = None
+        if charge_point and charge_point.latest_reading_date is not None:
             previous_reading_date = charge_point.latest_reading_date
-            operating_unit = charge_point.operating_unit
+            operating_unit = charge_point.charge_point_id[:5]
         elif meter:
-            previous_reading_date = meter.initial_index_date
-            operating_unit = meter.charge_point.operating_unit
+            previous_reading_date = meter.initial_index_date or date.min
+            operating_unit = meter.charge_point.charge_point_id[:5] if meter.charge_point else None
 
         meter_reading["operating_unit"] = operating_unit
 
