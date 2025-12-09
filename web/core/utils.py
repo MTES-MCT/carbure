@@ -225,10 +225,8 @@ class Validator(forms.Form):
 
 
 class CarbureEnv:
-    is_prod = True if env.get("IMAGE_TAG") == "prod" else False
-    is_staging = True if env.get("IMAGE_TAG") == "staging" else False
-    is_local = True if env.get("IMAGE_TAG") == "local" else False
-    is_dev = True if env.get("IMAGE_TAG") == "dev" else False
+    is_prod = env.get("IMAGE_TAG") == "prod"
+    is_local = env.get("IMAGE_TAG") == "local"
 
     def get_base_url():
         if env.get("IMAGE_TAG") == "local":
