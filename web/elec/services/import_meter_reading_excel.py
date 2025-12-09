@@ -89,16 +89,12 @@ class ExcelMeterReadingValidator(Validator):
 
     def extend(self, meter_reading):
         meter_reading["meter"] = None
-        # meter_reading["energy_used_since_last_reading"] = 0
-        # meter_reading["days_since_last_reading"] = 0
-        # meter_reading["facteur_de_charge"] = 0
-        # meter_reading["renewable_energy"] = 0
+        meter_reading["operating_unit"] = None
         return meter_reading
 
     def validate(self, meter_reading):
         charge_point_id = meter_reading.get("charge_point_id")
 
-        # renewable_share = self.context.get("renewable_share")
         charge_point = self.context.get("charge_point_by_id").get(charge_point_id)
 
         lines = self.context.get("lines_by_charge_point").get(charge_point_id)
@@ -118,8 +114,12 @@ class ExcelMeterReadingValidator(Validator):
         previous_reading_date = date.min
         if charge_point:
             previous_reading_date = charge_point.latest_reading_date
+            operating_unit = charge_point.operating_unit
         elif meter:
             previous_reading_date = meter.initial_index_date
+            operating_unit = meter.charge_point.operating_unit
+
+        meter_reading["operating_unit"] = operating_unit
 
         new_reading_date = meter_reading["reading_date"]
         days_since_last_reading = (new_reading_date - previous_reading_date).days
@@ -129,11 +129,6 @@ class ExcelMeterReadingValidator(Validator):
             facteur_de_charge = energy_used_since_last_reading / (charge_point_power * days_since_last_reading * 24)
 
         meter_reading["meter"] = meter
-        print("meter reading : ", meter_reading)
-        # meter_reading["energy_used_since_last_reading"] = energy_used_since_last_reading
-        # meter_reading["days_since_last_reading"] = days_since_last_reading
-        # meter_reading["facteur_de_charge"] = facteur_de_charge
-        # meter_reading["renewable_energy"] = energy_used_since_last_reading * renewable_share
 
         reading_date = meter_reading.get("reading_date")
 
