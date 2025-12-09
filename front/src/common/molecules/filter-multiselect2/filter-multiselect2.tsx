@@ -67,15 +67,17 @@ export const FilterMultiSelect2 = <
           clear
         />
       ))}
-      <Button
-        onClick={() => onSelect(emptyFilters)}
-        disabled={!hasFiltersValues()}
-        priority="secondary"
-        className={styles["filter-multiselect__reset"]}
-        iconId="ri-close-line"
-      >
-        {t("Tout réinitialiser")}
-      </Button>
+      {hasFiltersValues() && (
+        <Button
+          onClick={() => onSelect(emptyFilters)}
+          disabled={!hasFiltersValues()}
+          priority="secondary"
+          className={styles["filter-multiselect__reset"]}
+          iconId="ri-close-line"
+        >
+          {t("Tout réinitialiser")}
+        </Button>
+      )}
     </div>
   )
 }
