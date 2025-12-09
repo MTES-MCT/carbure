@@ -175,11 +175,11 @@ class ElecMeterReadingsTest(TestCase):
 
         self.meter_reading_2 = ElecMeterReading.objects.create(
             extracted_energy=600,
-            renewable_energy=24.92,
             reading_date=datetime.date(2024, 5, 21),
             meter=self.meter2,
             cpo=self.cpo,
             application=self.meter_reading_application,
+            enr_ratio=0.2492,
         )
 
     def test_get_applications(self):

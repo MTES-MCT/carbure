@@ -569,7 +569,7 @@ class ElecCharginPointsTest(TestCase):
 
         ElecMeterReading.objects.create(
             extracted_energy=40,
-            renewable_energy=20,
+            enr_ratio=0.25,
             reading_date=datetime.date(2024, 9, 30),
             meter=self.meter,
             cpo=self.cpo,
@@ -578,7 +578,7 @@ class ElecCharginPointsTest(TestCase):
 
         ElecMeterReading.objects.create(
             extracted_energy=4,
-            renewable_energy=2,
+            enr_ratio=0.25,
             reading_date=datetime.date(2024, 8, 29),
             meter=self.meter,
             cpo=self.cpo,
@@ -823,7 +823,7 @@ class ElecCharginPointsTest(TestCase):
 
         ElecMeterReading.objects.create(
             extracted_energy=40,
-            renewable_energy=20,
+            enr_ratio=0.25,
             reading_date=datetime.date(2024, 9, 30),
             meter=self.meter,
             cpo=self.cpo,
@@ -832,7 +832,7 @@ class ElecCharginPointsTest(TestCase):
 
         ElecMeterReading.objects.create(
             extracted_energy=4,
-            renewable_energy=2,
+            enr_ratio=0.25,
             reading_date=datetime.date(2024, 9, 29),
             meter=self.meter,
             cpo=self.cpo,

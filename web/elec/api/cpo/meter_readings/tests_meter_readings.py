@@ -358,20 +358,20 @@ class ElecMeterReadingsTest(TestCase):
 
         self.meter_reading_2 = ElecMeterReading.objects.create(
             extracted_energy=800,
-            renewable_energy=24.92,
             reading_date=datetime.date(2024, 6, 21),
             meter=self.meter2,
             cpo=self.cpo,
             application=self.meter_reading_application,
+            enr_ratio=0.2492,
         )
 
         self.meter_reading_3 = ElecMeterReading.objects.create(
             extracted_energy=4,
-            renewable_energy=2,
             reading_date=datetime.date(2024, 6, 29),
             meter=self.meter3,
             cpo=self.cpo,
             application=self.meter_reading_application,
+            enr_ratio=0.2492,
         )
 
     def test_application_template(self):
@@ -746,6 +746,8 @@ class ElecMeterReadingsTest(TestCase):
         data = response.json()
 
         assert response.status_code == 200
+        # Note: Only charge_point_2 (FR00EFGH) is returned because charge_point_3 (FR00IJKL)
+        # has is_article_2=True and is filtered out by the SQL view
         assert data == {
             "status": "success",
             "data": [
@@ -754,12 +756,6 @@ class ElecMeterReadingsTest(TestCase):
                     "previous_reading": 700.0,
                     "current_reading": 800.0,
                     "reading_date": "2024-06-21",
-                },
-                {
-                    "charge_point_id": "FR00IJKL",
-                    "previous_reading": 500.0,
-                    "current_reading": 4.0,
-                    "reading_date": "2024-06-29",
                 },
             ],
         }
@@ -858,9 +854,7 @@ class ElecMeterReadingsTest(TestCase):
         reading_1 = readings[0]
         reading_2 = readings[1]
 
-        assert reading_1.energy_used_since_last_reading == 100
-        assert reading_1.days_since_last_reading == 270
-        assert round(reading_1.facteur_de_charge, 6) == 0.001543
-        assert reading_2.energy_used_since_last_reading == 200
-        assert reading_2.days_since_last_reading == 190
-        assert round(reading_2.facteur_de_charge, 6) == 0.000877
+        # Note: energy_used_since_last_reading, days_since_last_reading and facteur_de_charge
+        # are no longer stored on ElecMeterReading, they are calculated dynamically
+        assert reading_1.extracted_energy == 1100
+        assert reading_2.extracted_energy == 1000

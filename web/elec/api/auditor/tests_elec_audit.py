@@ -116,26 +116,26 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
         meter_reading_1 = ElecMeterReading.objects.create(
             extracted_energy=1234,
-            renewable_energy=2345,
             reading_date=datetime.date(2023, 8, 29),
             application=meter_reading_application,
             cpo=self.cpo,
+            enr_ratio=0.25,
         )
 
         meter_reading_2 = ElecMeterReading.objects.create(
             extracted_energy=8900,
-            renewable_energy=2000,
             reading_date=datetime.date(2023, 9, 1),
             application=meter_reading_application,
             cpo=self.cpo,
+            enr_ratio=0.25,
         )
 
         meter_reading_3 = ElecMeterReading.objects.create(
             extracted_energy=10900,
-            renewable_energy=2400,
             reading_date=datetime.date(2023, 9, 1),
             application=meter_reading_application,
             cpo=self.cpo,
+            enr_ratio=0.25,
         )
 
         meter_reading_audit_sample = ElecAuditSample.objects.create(
