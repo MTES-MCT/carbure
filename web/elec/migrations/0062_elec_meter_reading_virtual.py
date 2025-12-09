@@ -3,7 +3,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("elec", "0060_elecmeterreadingvirtual_and_more"),
+        ("elec", "0061_populate_elec_meter_reading_enr_ratio"),
     ]
 
     operations = [
@@ -15,8 +15,10 @@ class Migration(migrations.Migration):
                     emr.application_id,
                     emr.cpo_id,
                     ecp.id AS charge_point_id,
+                    emr.operating_unit,
                     emr.meter_id,
                     emr.reading_date AS current_index_date,
+                    emr.enr_ratio,
                     COALESCE(
                         (
                             SELECT emr_prev.reading_date
@@ -40,9 +42,7 @@ class Migration(migrations.Migration):
                             LIMIT 1
                         ),
                         em.initial_index
-                    ) AS prev_index,
-
-                    (SELECT renewable_share / 100 FROM year_config WHERE year=emra.year) as enr_ratio
+                    ) AS prev_index
 
                 FROM elec_meter_reading emr
                 INNER JOIN elec_meter em ON em.id = emr.meter_id
