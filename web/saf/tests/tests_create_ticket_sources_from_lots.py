@@ -17,21 +17,21 @@ class CreateTicketSourcesFromLotsTest(TestCase):
         "json/entities_sites.json",
     ]
 
-    @classmethod
-    def setUpClass(cls):
-        cls.entity = EntityFactory.create(entity_type=Entity.OPERATOR, has_saf=True)
-        cls.hvoc = Biocarburant.objects.get(code="HVOC")
-        cls.eth = Biocarburant.objects.get(code="ETH")
+    def setUp(self):
+        self.entity = EntityFactory.create(entity_type=Entity.OPERATOR, has_saf=True)
+        self.hvoc = Biocarburant.objects.get(code="HVOC")
+        self.eth = Biocarburant.objects.get(code="ETH")
 
     def create_lot(self, **kwargs):
-        params = {
-            "biofuel": self.hvoc,
-            "carbure_client": self.entity,
-            "lot_status": CarbureLot.ACCEPTED,
-            "delivery_type": CarbureLot.BLENDING,
-            **kwargs,
-        }
-        return CarbureLotFactory.create(**params)
+        return CarbureLotFactory.create(
+            **{
+                "biofuel": self.hvoc,
+                "carbure_client": self.entity,
+                "lot_status": CarbureLot.ACCEPTED,
+                "delivery_type": CarbureLot.BLENDING,
+                **kwargs,
+            }
+        )
 
     def test_only_valid_saf_lots_are_turned_into_ticket_source(self):
         valid_lot_1 = self.create_lot(delivery_type=CarbureLot.DIRECT)
