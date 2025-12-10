@@ -13,10 +13,13 @@ from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 class ObjectiveService:
     @staticmethod
-    def calculate_energy_basis(mac_queryset, year=datetime.now().year):
+    def calculate_energy_basis(mac_queryset, year=None):
         """
         Calculate the energy basis (from fossil fuels mac), used for all objectives calculations
         """
+        if year is None:
+            year = timezone.now().year
+
         total_energy = mac_queryset.annotate(
             energy=models.F("volume")
             * models.F("fuel__fuel_category__pci_litre")
