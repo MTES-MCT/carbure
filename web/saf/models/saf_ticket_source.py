@@ -2,6 +2,7 @@ from django.db import models, transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
+from core.models import CarbureLot
 from core.utils import bulk_update_or_create
 
 
@@ -104,7 +105,11 @@ def create_ticket_sources_from_lots(lots):
     ticket_source_data = []
 
     # make sure we only have declared lots of SAF in the queryset
-    saf_lots = lots.filter(lot_status__in=["ACCEPTED", "FROZEN"]).filter(biofuel__code__in=SAF)
+    saf_lots = lots.filter(
+        biofuel__code__in=SAF,
+        lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
+        delivery_type__in=[CarbureLot.BLENDING, CarbureLot.DIRECT],
+    )
 
     if not saf_lots:
         return []
