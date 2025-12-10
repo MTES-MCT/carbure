@@ -17,8 +17,10 @@ class OperationServiceTestCase(TestCase):
         "json/biofuels.json",
         "json/feedstock.json",
         "json/countries.json",
+        "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     @classmethod
@@ -357,11 +359,20 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Should not raise exception (no target = no check)
         OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
 
+    @patch("tiruert.services.operation.CarbureLot")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
-    def test_check_services_method_are_called_with_data(self, mock_calculate_target, mock_calculate_balance):
+    def test_check_services_method_are_called_with_data(
+        self, mock_calculate_target, mock_calculate_balance, mock_carbure_lot
+    ):
         """Should call ObjectiveService and BalanceService with correct parameters (MJ unit)."""
         mock_calculate_target.return_value = 100000  # Dummy target
+        mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
+
+        # Mock CarbureLot.objects.get to return a lot with pci_litre
+        mock_lot = Mock()
+        mock_lot.biofuel.pci_litre = 21.3
+        mock_carbure_lot.objects.get.return_value = mock_lot
 
         mock_request = Mock()
         mock_request.entity.id = 1
@@ -380,9 +391,9 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Verify BalanceService called with correct parameters
         mock_calculate_balance.assert_called_once()
         called_args = mock_calculate_balance.call_args[0]
-        self.assertEqual(called_args[2], 1)  # entity_id
-        self.assertEqual(called_args[3], None)  # depot_id
-        self.assertEqual(called_args[4], "mj")  # unit
+        self.assertEqual(called_args[1], 1)  # entity_id
+        self.assertEqual(called_args[2], None)  # depot_id
+        self.assertEqual(called_args[3], "mj")  # unit
 
     @patch("tiruert.services.operation.CarbureLot")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")

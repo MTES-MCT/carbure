@@ -394,8 +394,10 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         "json/biofuels.json",
         "json/feedstock.json",
         "json/countries.json",
+        "json/depots.json",
         "json/entities.json",
         "json/productionsites.json",
+        "json/entities_sites.json",
     ]
 
     def setUp(self):
