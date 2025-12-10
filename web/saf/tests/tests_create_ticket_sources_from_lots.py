@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 
 from core.models import Biocarburant, CarbureLot, Entity
 from entity.factories.entity import EntityFactory
