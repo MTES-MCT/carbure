@@ -146,3 +146,21 @@ def check_declaration_already_validated(lot: CarbureLot, prefetched_data):
             is_blocking=True,
             field="delivery_date",
         )
+
+
+def check_missing_delivery_type(lot: CarbureLot):
+    """
+    Some of the lots are created without specifying a carbure_client.
+    This means that there's no manual press on the "Accept" buttons that set the delivery_type field on the lot.
+    Without this check, we can end up with accepted lots that have a delivery_type = UNKNOWN
+    """
+
+    if lot.delivery_type != CarbureLot.UNKNOWN or lot.carbure_client is not None:
+        return
+
+    return generic_error(
+        error=CarbureSanityCheckErrors.MISSING_DELIVERY_TYPE,
+        lot=lot,
+        is_blocking=True,
+        field="delivery_type",
+    )
