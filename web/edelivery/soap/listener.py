@@ -1,6 +1,8 @@
 from os import environ
 from time import sleep
 
+import sentry_sdk
+
 from edelivery.adapters.pub_sub_adapter import PubSubAdapter
 from edelivery.soap.actions import ListPendingMessages, RetrieveMessage
 
@@ -38,14 +40,19 @@ class Listener:
         self.started = True
 
         while True:
-            message = self.pub_sub_adapter.next_message()
-            if message == Listener.STOP_SERVICE_COMMAND:
-                self.started = False
+            try:
+                message = self.pub_sub_adapter.next_message()
+                if message == Listener.STOP_SERVICE_COMMAND:
+                    self.started = False
 
-            if message == Listener.START_SERVICE_COMMAND:
-                self.started = True
+                if message == Listener.START_SERVICE_COMMAND:
+                    self.started = True
 
-            if self.started:
-                self.poll_once()
+                if self.started:
+                    self.poll_once()
 
-            sleep(1)
+            except Exception as e:
+                sentry_sdk.capture_exception(e)
+
+            finally:
+                sleep(1)

@@ -54,6 +54,7 @@ class GroupAssignActionMixin:
         reception_airport = serializer.validated_data.get("reception_airport")
         consumption_type = serializer.validated_data.get("consumption_type")
         shipping_method = serializer.validated_data.get("shipping_method")
+        pos_poc_number = serializer.validated_data.get("pos_poc_number")
 
         ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by(
             "created_at"
@@ -108,6 +109,7 @@ class GroupAssignActionMixin:
                         reception_airport=reception_airport,
                         consumption_type=consumption_type,
                         shipping_method=shipping_method,
+                        pos_poc_number=pos_poc_number,
                     )
 
                     CarbureNotification.objects.create(

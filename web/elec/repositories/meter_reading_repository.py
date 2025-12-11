@@ -95,11 +95,11 @@ class MeterReadingRepository:
         ).filter(app_count=0, meter_readings_charge_points_count__gt=0, entity_type=Entity.CPO)
 
     @staticmethod
-    def annotate_charge_points_with_latest_readings(charge_points: QuerySet[ElecChargePoint], reference_date: date):
-        latest_readings = ElecMeterReading.objects.filter(
-            meter=OuterRef("current_meter"),
-            reading_date__lte=reference_date,
-        ).order_by("-reading_date", "-id")
+    def annotate_charge_points_with_latest_readings(charge_points: QuerySet[ElecChargePoint], application_id: int = None):
+        latest_readings = ElecMeterReading.objects.filter(meter=OuterRef("current_meter")).order_by("-application_id")
+
+        if application_id:
+            latest_readings = latest_readings.filter(application_id__lte=application_id)
 
         return charge_points.select_related("current_meter").annotate(
             latest_reading_index=Cast(

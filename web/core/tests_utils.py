@@ -1,13 +1,29 @@
 from typing import Tuple
 
 from django.contrib.auth import get_user_model
-from django.urls import reverse
-from django_otp.plugins.otp_email.models import EmailDevice
 from rest_framework.permissions import AND, OR
+from rest_framework.test import APIRequestFactory
 from rest_framework_api_key.models import APIKey
 
 from core.models import UserRights, UserRightsRequests
 from core.permissions import HasAdminRights, HasUserRights
+
+
+# Patch is_verified() to always return True during tests
+# This method is added by django_otp, we override it for tests
+def _patch_is_verified():
+    User = get_user_model()
+    if not hasattr(User, "_is_verified_patched"):
+        # Save the original method if it exists
+        if hasattr(User, "is_verified"):
+            User._is_verified_original = User.is_verified
+        # Replace with a method that always returns True
+        User.is_verified = lambda self: True
+        User._is_verified_patched = True
+
+
+# Apply the patch as soon as the module is imported
+_patch_is_verified()
 
 
 def setup_current_user(test, email, name, password, entity_rights=None, is_staff=False):
@@ -15,18 +31,11 @@ def setup_current_user(test, email, name, password, entity_rights=None, is_staff
         entity_rights = []
     User = get_user_model()
     user = User.objects.create_user(email=email, name=name, password=password, is_staff=is_staff)
-    loggedin = test.client.login(username=user.email, password=password)
-    assert loggedin
+    test.client.force_login(user)
 
     for entity, role in entity_rights:
         UserRights.objects.update_or_create(entity=entity, user=user, role=role)
         UserRightsRequests.objects.update_or_create(entity=entity, user=user, role=role)
-
-    response = test.client.get(reverse("auth-request-otp"))
-    assert response.status_code == 200
-    device, _ = EmailDevice.objects.get_or_create(user=user)
-    response = test.client.post(reverse("auth-verify-otp"), {"otp_token": device.token})
-    assert response.status_code == 200
 
     return user
 
@@ -210,3 +219,86 @@ class PermissionTestMixin:
 
         else:
             self.assertEqual(type(first), type(second))
+
+
+class FiltersActionTestMixin:
+    """
+    Add this mixin to a test case to quickly assert behavior of real FiltersActionFactory viewsets.
+
+    Usage:
+
+    class MyFiltersTest(TestCase, FiltersActionTestMixin):
+        def test_filters(self):
+            # test all filters at once
+            self.assertFilters(
+                MyViewSet,
+                {
+                    "year": [2023, 2024],
+                    "supplier": ["Supplier 1", "Supplier 2"]
+                }
+                entity=my_entity # necessary for viewsets that use request.entity
+                ignore=["certificate"] # skip those filters
+            )
+
+            # test one specific filter with more context
+            self.assertFiltersOptions(
+                MyViewSet,
+                "year",
+                [2024],
+                entity=my_entity
+                params={"supplier": "Supplier 2"}
+            )
+    """
+
+    def assertFilters(self, ViewSet, filters_config, entity=None, ignore=None):
+        ignore = ignore or []
+        available_filters = self.get_available_filters(ViewSet, entity=entity)
+        for ignored in ignore:
+            self.assertIn(ignored, available_filters)
+
+        expected_filters = [f for f in available_filters if f not in ignore]
+        config_filters = list(filters_config.keys())
+        self.assertCountEqual(config_filters, expected_filters)
+
+        for filter_name, case in filters_config.items():
+            self.assertFilterOptions(
+                ViewSet,
+                filter_name,
+                case,
+                params=None,
+                entity=entity,
+            )
+
+    def assertFilterOptions(self, ViewSet, filter_name, expected_values, params=None, entity=None):
+        params = dict(params or {})
+        params["filter"] = filter_name
+        self.assertIn(filter_name, self.get_available_filters(ViewSet, entity=entity))
+        view = self.build_filters_view(ViewSet, params=params, entity=entity)
+        response = view.filters(view.request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_values)
+
+    def get_available_filters(self, ViewSet, entity=None):
+        view = self.build_filters_view(ViewSet, entity=entity)
+        return view.get_available_filter_fields()
+
+    def build_filters_view(self, ViewSet, params=None, entity=None, path="/filters"):
+        request = self.api_factory.get(path, data=params or {})
+        if entity is not None:
+            setattr(request, "entity", entity)
+        view = ViewSet()
+        if not hasattr(view, "action_map"):
+            view.action_map = {}
+        view.request = view.initialize_request(request)
+        if entity is not None:
+            setattr(view.request, "entity", entity)
+        view.args = ()
+        view.kwargs = {}
+        view.action = "filters"
+        return view
+
+    @property
+    def api_factory(self):
+        if not hasattr(self, "_filters_api_factory"):
+            self._filters_api_factory = APIRequestFactory()
+        return self._filters_api_factory

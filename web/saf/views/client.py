@@ -17,6 +17,7 @@ class ClientViewSet(
     GenericViewSet,
 ):
     lookup_field = "id"
+    queryset = Entity.objects.none()
     permission_classes = (IsAuthenticated,)
     serializer_class = EntityPreviewSerializer
     filterset_class = ClientFilter

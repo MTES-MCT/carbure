@@ -58,6 +58,12 @@ check-frontend:
     - npm run lint
     - npm run test
     - npm run build
+    - |
+      if [[ "$CI_COMMIT_BRANCH" != "dev" ]]; then
+        npm run chromatic
+      else
+        echo "Skipping Chromatic on dev branch"
+      fi
   interruptible: true
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_AUTO_MERGE_ENABLED == "true"
