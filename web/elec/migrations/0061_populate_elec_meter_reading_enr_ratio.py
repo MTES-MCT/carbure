@@ -10,8 +10,9 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql="""
                 UPDATE elec_meter_reading emr
-                INNER JOIN year_config yc ON yc.year = YEAR(emr.reading_date)
-                SET emr.enr_ratio = yc.renewable_share / 100;
+                INNER JOIN elec_meter_reading_application emra ON emra.id = emr.application_id
+                INNER JOIN year_config yc ON yc.year =  emra.year
+                SET emr.enr_ratio = yc.renewable_share / 100.0;
             """,
             reverse_sql="""
                 UPDATE elec_meter_reading
