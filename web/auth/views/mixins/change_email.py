@@ -1,3 +1,5 @@
+from os import environ
+
 from django.conf import settings
 from django.template import loader
 from django.utils import timezone
@@ -11,7 +13,6 @@ from rest_framework.serializers import CharField
 
 from auth.serializers import ChangeEmailErrors, ConfirmEmailChangeSerializer, RequestEmailChangeSerializer
 from core.helpers import send_mail
-from core.utils import CarbureEnv
 
 
 def create_email_change_device(user, new_email):
@@ -41,7 +42,7 @@ def send_email_change_token(request, device, new_email):
 
     email_context = {
         "user": request.user,
-        "domain": CarbureEnv.get_base_url(),
+        "domain": environ.get("BASE_URL"),
         "otp_token": device.token,
         "token_expiry": expiry,
         "new_email": new_email,

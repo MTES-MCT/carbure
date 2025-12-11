@@ -8,8 +8,6 @@ from rest_framework import status
 from rest_framework.serializers import ValidationError
 from rest_framework.test import APITestCase
 
-from core.utils import CarbureEnv
-
 User = get_user_model()
 
 
@@ -40,6 +38,7 @@ class RegisterTest(APITestCase):
         self.client.post(self.url, data)
         assert len(mail.outbox) == 1
 
+    @patch.dict("os.environ", {"BASE_URL": "https://carbure.example.com"})
     def test_injects_server_base_url_in_sent_mail(self):
         data = {
             "name": "newuser",
@@ -49,7 +48,7 @@ class RegisterTest(APITestCase):
         }
         self.client.post(self.url, data)
         sent_mail = mail.outbox[0]
-        assert re.search(CarbureEnv.get_base_url(), sent_mail.body)
+        assert re.search("https://carbure.example.com", sent_mail.body)
 
     def test_does_not_precede_base_url_by_https(self):
         data = {

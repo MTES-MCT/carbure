@@ -1,10 +1,11 @@
+from os import environ
+
 from django.conf import settings
 from django.http import JsonResponse
 
 from core.decorators import otp_or_403
 from core.helpers import send_mail
 from core.models import Entity, UserRights, UserRightsRequests
-from core.utils import CarbureEnv
 
 
 @otp_or_403
@@ -36,7 +37,7 @@ def request_entity_access(request):
             user=request.user, entity=entity, defaults={"comment": comment, "role": role, "status": "PENDING"}
         )
 
-        validation_url = f"{CarbureEnv.get_base_url()}/org/{entity_id}/settings/users"
+        validation_url = f"{environ.get('BASE_URL')}/org/{entity_id}/settings/users"
         email_subject = "Carbure - Demande d'accès"
         message = """
         Bonjour,
