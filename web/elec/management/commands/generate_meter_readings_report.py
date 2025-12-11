@@ -5,50 +5,16 @@ from django.db import connection
 from elec.models import ElecMeterReading
 
 
+# mettre à jour avec la vue elec_meter_reading_virtual
 def _get_real_total_energy_declared(cpo_id):
     with connection.cursor() as cursor:
         cursor.execute(
             """
-            SELECT
-	SUM((delta_table.current_index - delta_table.prev_index) * delta_table.ratio)
-FROM
-	(
-	SELECT
-			meter_id,
-			ep.charge_point_id,
-			ep.cpo_id,
-			emr.renewable_energy,
-			reading_date as current_index_date,
-			extracted_energy as current_index,
-			emra.year,
-			emra.quarter,
-			COALESCE(
-				(SELECT
-					emr_prev.extracted_energy
-				FROM
-					elec_meter_reading emr_prev
-				WHERE
-					emr_prev.meter_id = emr.meter_id
-					AND emr_prev.id < emr.id
-				ORDER BY
-					emr_prev.id DESC
-				LIMIT 1), em.initial_index) AS prev_index,
-			COALESCE(
-			# (emr.renewable_energy / emr.energy_used_since_last_reading),
-			(SELECT renewable_share / 100 FROM year_config WHERE year=emra.year)) as ratio
-		FROM
-			elec_meter_reading emr
-		INNER JOIN
-			elec_meter em ON em.id = emr.meter_id
-		INNER JOIN
-			elec_charge_point ep ON ep.id = em.charge_point_id
-		INNER JOIN
-			elec_meter_reading_application emra ON emr.application_id = emra.id
-		WHERE
-			emr.cpo_id = %s AND ep.is_deleted = FALSE AND ep.is_article_2 = FALSE AND emra.status = "ACCEPTED"
-		ORDER BY
-			meter_id,
-			current_index_date) as delta_table
+            SELECT SUM((current_index - prev_index) * enr_ratio)
+            FROM elec_meter_reading_virtual emrv
+            INNER JOIN elec_meter_reading_application emra
+            ON emra.id = emrv.application_id
+            WHERE emrv.cpo_id = %s AND emra.status = "ACCEPTED"
         """,
             [cpo_id],
         )
@@ -137,7 +103,9 @@ class Command(BaseCommand):
                         "Surplus (kWh)": data["surplus"],
                     }
                 )
-            df = pd.DataFrame(items)
+
+            sorted_items = sorted(items, key=lambda x: x["Surplus (kWh)"], reverse=True)
+            df = pd.DataFrame(sorted_items)
 
             pd.options.display.float_format = "{:,.3f}".format
             print(df.to_string(index=False))

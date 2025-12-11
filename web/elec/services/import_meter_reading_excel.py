@@ -108,6 +108,7 @@ class ExcelMeterReadingValidator(Validator):
         elif meter:
             previous_extracted_energy = meter.initial_index or 0
 
+        previous_extracted_energy = round(previous_extracted_energy, 3)
         new_extracted_energy = round(meter_reading.get("extracted_energy", 0), 3)
         energy_used_since_last_reading = round(new_extracted_energy - previous_extracted_energy, 3)
 
