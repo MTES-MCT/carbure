@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
             """,
             reverse_sql="""
                 UPDATE elec_provision_certificate
-                SET source = "MANUAL"
+                INNER JOIN entities ON entities.id = elec_provision_certificate.cpo_id
+                SET elec_provision_certificate.source = "MANUAL"
                 WHERE entities.name = "Modulo (Mobilité durable locale)"
                 AND elec_provision_certificate.operating_unit = "FRS37"
                 AND elec_provision_certificate.year = 2024
