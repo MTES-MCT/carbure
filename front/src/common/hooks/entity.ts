@@ -89,7 +89,7 @@ export function useEntityManager(
     is_red_ii: entity?.is_red_ii ?? false,
 
     hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) =>
-      entity?.ext_admin_pages?.includes(page as ExternalAdminPages) ?? false,
+      hasAdminRight(page, entity),
 
     hasRights: (...roles: UserRole[]) =>
       entityRights?.role ? roles.includes(entityRights.role) : false,
@@ -123,6 +123,13 @@ export function useRights() {
   }
 
   return { is }
+}
+
+export function hasAdminRight(
+  page: ExternalAdminPages | `${ExternalAdminPages}`,
+  entity?: Entity
+) {
+  return entity?.ext_admin_pages?.includes(page as ExternalAdminPages) ?? false
 }
 
 export default useEntity

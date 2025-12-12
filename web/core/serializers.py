@@ -13,7 +13,6 @@ from core.models import (
     CarbureStockTransformation,
     Entity,
     EntityCertificate,
-    EntityDepot,
     ExternalAdminRights,
     GenericCertificate,
     GenericError,
@@ -170,22 +169,6 @@ class DepotSerializer(serializers.ModelSerializer):
             "electrical_efficiency",
             "thermal_efficiency",
             "useful_temperature",
-        ]
-
-
-class EntityDepotSerializer(serializers.ModelSerializer):
-    depot = DepotSerializer(read_only=True)
-    entity = EntitySerializer(read_only=True)
-    blender = EntitySerializer(read_only=True)
-
-    class Meta:
-        model = EntityDepot
-        fields = [
-            "entity",
-            "depot",
-            "ownership_type",
-            "blending_is_outsourced",
-            "blender",
         ]
 
 

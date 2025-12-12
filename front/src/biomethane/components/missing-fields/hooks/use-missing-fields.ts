@@ -24,5 +24,5 @@ export const useMissingFields = <FormType extends object | undefined>(
       navigate({ hash: "" })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash])
+  }, [location.hash, canEditDeclaration])
 }
