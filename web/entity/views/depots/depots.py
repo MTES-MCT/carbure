@@ -45,11 +45,13 @@ class DepotViewSet(ListModelMixin, viewsets.GenericViewSet, DepotActionMixin):
         responses=EntitySiteSerializer(many=True),
     )
     def list(self, request):
-        entity_id = request.entity.id
-        if request.entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
-            entity_id = self.request.query_params.get("company_id", entity_id)
+        entity = request.entity
 
-        entity = Entity.objects.get(id=entity_id)
+        if entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN] and (
+            company_id := self.request.query_params.get("company_id")
+        ):
+            entity = Entity.objects.filter(id=company_id).first() or entity
+
         try:
             if entity.has_external_admin_right(ExternalAdminRights.DGDDI):
                 depots = entity.get_accessible_depots()
