@@ -14,13 +14,14 @@ filename = "%s/web/fixtures/csv/biomethane_providers.csv" % (os.environ["CARBURE
 
 with open(filename) as csvfile:
     reader = csv.reader(csvfile, quotechar='"')
+    entity_type = Entity.BIOMETHANE_PROVIDER
+
     for row in reader:
         name = row[0]
         if name == "name":
             # header
             continue
         siren = row[1]
-        entity_type = Entity.BIOMETHANE_PROVIDER
         try:
             Entity.objects.get_or_create(
                 registration_id=siren,
@@ -36,3 +37,19 @@ with open(filename) as csvfile:
                 )
             except Exception:
                 pass
+
+    # Wrong sirens correction
+    siren_corrections = {
+        "947688099": "813273554",
+        "814450151": "891588154",
+        "915720015": "984306357",
+        "491911400": "38 76 56 04 (CVR)",
+        "530609668": "833755598",
+        "314119504": "844431387",
+        "428766976": "622037083",
+        "493467591": "521913798",
+        "442395448": "434582540",
+    }
+
+    for old_siren, new_siren in siren_corrections.items():
+        Entity.objects.filter(registration_id=old_siren, entity_type=entity_type).update(registration_id=new_siren)
