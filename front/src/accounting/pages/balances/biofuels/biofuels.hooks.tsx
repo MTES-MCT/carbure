@@ -86,7 +86,7 @@ export const useBalancesBiofuelsColumns = () => {
         ),
       key: OperationOrder.pending_operations,
     },
-    canTransfer && {
+    {
       header: t("Céder"),
       cell: (balance) => (
         <Button
@@ -99,6 +99,7 @@ export const useBalancesBiofuelsColumns = () => {
               <DebitOperationDialog onClose={close} balance={balance} />
             ))
           }
+          disabled={!canTransfer}
         />
       ),
     },

@@ -15,7 +15,11 @@ const currentYear = new Date().getFullYear()
 
 function useYears(
   root: string,
-  getYears: (entity_id: number) => Promise<FetchResponseType<number[]>>
+  getYears: (entity_id: number) => Promise<FetchResponseType<number[]>>,
+  options: {
+    // If true, the years will be fetched, but if the selected year is not in the list of years, it will not be changed
+    readOnly?: boolean
+  } = {}
 ) {
   const location = useLocation()
   const params = useParams<"year">()
@@ -50,7 +54,7 @@ function useYears(
     // select the latest year if the selected one isn't available anymore
     onSuccess: (res) => {
       const years = listYears(res.data)
-      if (!years.includes(selected)) {
+      if (!options.readOnly && !years.includes(selected)) {
         setYear(Math.max(...years))
       } else {
         setSelectedYear(selected)

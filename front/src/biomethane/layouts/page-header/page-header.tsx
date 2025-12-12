@@ -4,11 +4,12 @@ import { Notice } from "common/components/notice"
 import { Content, Main, Row } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { useTranslation } from "react-i18next"
-import useYears from "common/hooks/years-2"
-import { getAnnualDeclarationYears } from "biomethane/api"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationStatus } from "biomethane/types"
-import { usePageHeaderActions } from "./page-header.hooks"
+import {
+  useAnnualDeclarationYears,
+  usePageHeaderActions,
+} from "./page-header.hooks"
 import useEntity from "common/hooks/entity"
 import { PropsWithChildren } from "react"
 
@@ -16,7 +17,7 @@ import { PropsWithChildren } from "react"
 export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const years = useYears("biomethane", getAnnualDeclarationYears)
+  const years = useAnnualDeclarationYears()
 
   const {
     selectedYear,
@@ -24,6 +25,7 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
     isInDeclarationPeriod,
     hasAnnualDeclarationMissingObjects,
   } = useAnnualDeclaration()
+
   const {
     openValidateDeclarationDialog,
     openMissingFieldsDialog,
