@@ -77,11 +77,7 @@ class SimulateActionMixin:
             data = serializer.validated_data
 
             try:
-                min, max = TeneurService.get_min_and_max_emissions(
-                    data["debited_entity"].id,
-                    data,
-                    request.unit,
-                )
+                min, max = TeneurService.get_min_and_max_emissions(data, request.unit)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
