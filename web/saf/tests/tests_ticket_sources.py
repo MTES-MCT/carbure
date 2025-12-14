@@ -126,6 +126,7 @@ class SafTicketSourcesTest(TestCase):
             },
             "ghg_reduction": 65.0,
             "parent_lot": None,
+            "origin_lot": None,
             "assigned_tickets": [
                 {
                     "agreement_date": "2022-06-20",
@@ -151,5 +152,5 @@ class SafTicketSourcesTest(TestCase):
         response_ticket_source.pop("created_at")
         response_ticket_source["assigned_tickets"][0].pop("created_at")
 
-        assert response_ticket_source == expected_ticket_source
-        assert response.json()["count"] == 2
+        self.assertEqual(response_ticket_source, expected_ticket_source)
+        self.assertEqual(response.json()["count"], 2)

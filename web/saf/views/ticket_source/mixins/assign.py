@@ -55,11 +55,20 @@ class AssignActionMixin:
         consumption_type = serializer.validated_data.get("consumption_type")
         shipping_method = serializer.validated_data.get("shipping_method")
 
+        pos_number = serializer.validated_data.get("pos_number")
+        origin_lot_pos_number = ticket_source.origin_lot.pos_number if ticket_source.origin_lot else None
+
         if volume > (ticket_source.total_volume - ticket_source.assigned_volume):
             raise ValidationError({"message": SafTicketAssignError.VOLUME_TOO_BIG})
 
         if assignment_period < ticket_source.delivery_period:
             raise ValidationError({"message": SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY})
+
+        if not pos_number and not origin_lot_pos_number:
+            raise ValidationError({"message": SafTicketAssignError.MISSING_POS_NUMBER})
+
+        if pos_number and origin_lot_pos_number and pos_number != origin_lot_pos_number:
+            raise ValidationError({"message": SafTicketAssignError.POS_NUMBER_MISMATCH})
 
         with transaction.atomic():
             ticket = create_ticket_from_source(
@@ -78,6 +87,11 @@ class AssignActionMixin:
             ticket_source.assigned_volume += ticket.volume
             ticket_source.save()
 
+            # save pos_number on origin lot so it can be automatically reused on any other ticket based on it
+            if ticket_source.origin_lot and origin_lot_pos_number != pos_number:
+                ticket_source.origin_lot.pos_number = pos_number
+                ticket_source.origin_lot.save()
+
             CarbureNotification.objects.create(
                 type=CarbureNotification.SAF_TICKET_RECEIVED,
                 dest_id=client_id,
@@ -89,4 +103,4 @@ class AssignActionMixin:
                 },
             )
 
-            return Response({}, status=status.HTTP_200_OK)
+        return Response({}, status=status.HTTP_200_OK)
