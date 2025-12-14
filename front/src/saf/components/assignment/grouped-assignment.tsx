@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
 import { SafTicketSourcePreview } from "saf/types"
 import { AssignmentForm, AssignmentFormData } from "./assignment-form"
+import { Notice } from "common/components/notice"
 
 export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSourcePreview[]
@@ -48,8 +49,7 @@ const TicketsGroupedAssignment = ({
       value.free_field,
       value.reception_airport?.id,
       value.shipping_method,
-      value.consumption_type,
-      value.pos_poc_number
+      value.consumption_type
     )
 
     if (response.data) {
@@ -62,6 +62,10 @@ const TicketsGroupedAssignment = ({
     }
   }
 
+  const ticketSourceWithMissingPosNumber = ticketSources.filter(
+    (ts) => !ts.origin_lot?.pos_number
+  )
+
   return (
     <Portal onClose={onClose}>
       <Dialog
@@ -71,6 +75,7 @@ const TicketsGroupedAssignment = ({
         }
         footer={
           <Button
+            disabled={ticketSourceWithMissingPosNumber.length > 0}
             iconId="ri-send-plane-line"
             priority="primary"
             nativeButtonProps={{
@@ -83,6 +88,19 @@ const TicketsGroupedAssignment = ({
         }
         fitContent
       >
+        {ticketSourceWithMissingPosNumber.length > 0 && (
+          <Notice
+            variant="warning"
+            title={t(
+              "Certains des volumes sélectionnés n'ont pas de numéro de POS associé."
+            )}
+          >
+            {t(
+              "Merci d'utiliser le formulaire d'affectation individuel pour ces volumes."
+            )}
+          </Notice>
+        )}
+
         <p>
           {t(
             "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume des lots :"
@@ -120,6 +138,7 @@ const TicketsGroupedAssignment = ({
         </Collapse>
 
         <AssignmentForm
+          grouped
           deliveryPeriod={lastDeliveryPeriod}
           remainingVolume={remainingVolume}
           onSubmit={groupedAssignTicket}
