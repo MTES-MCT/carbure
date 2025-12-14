@@ -55,7 +55,6 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
             "ets_status",
             "created_at",
             "reception_airport",
-            "pos_poc_number",
         ]
 
     def to_representation(self, instance):
@@ -109,7 +108,6 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
             "child_ticket_sources",
             "origin_lot",
             "origin_lot_site",
-            "pos_poc_number",
         ]
 
     @extend_schema_field(SafRelatedTicketSourceSerializer(many=True))

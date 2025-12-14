@@ -20,7 +20,6 @@ class SafAssignTicketTest(TestCase):
             "agreement_reference": "AGREF",
             "agreement_date": "2022-06-01",
             "assignment_period": 202203,
-            "pos_poc_number": "ABCDEFG",
         }
 
         datetime.today()
@@ -72,7 +71,6 @@ class SafAssignTicketTest(TestCase):
         assert ticket.ghg_reference == self.ticket_source.ghg_reference
         assert ticket.ghg_reduction == self.ticket_source.ghg_reduction
         assert ticket.parent_ticket_source_id == self.ticket_source.id
-        assert ticket.pos_poc_number == "ABCDEFG"
 
     def test_assign_saf_ticket_fail_if_too_big(self):
         query = {

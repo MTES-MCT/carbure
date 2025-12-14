@@ -156,7 +156,6 @@ class SafTicketDetailsTest(TestCase):
             "child_ticket_sources": [],
             "origin_lot": None,
             "origin_lot_site": None,
-            "pos_poc_number": None,
         }
 
         data = response.json()
