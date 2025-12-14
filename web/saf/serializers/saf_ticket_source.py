@@ -20,6 +20,7 @@ class SafParentLotSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "carbure_id",
+            "pos_number",
         ]
 
 

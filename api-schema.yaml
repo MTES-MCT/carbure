@@ -8101,7 +8101,7 @@ paths:
           description: ""
   /api/tiruert/admin-objectives/:
     get:
-      operationId: admin_objectives
+      operationId: tiruert_admin_objectives_retrieve
       description: Get agregated objectives for all entities - admin view
       parameters:
         - in: query
@@ -8141,10 +8141,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All agregated objectives for all liable enttities.
+          description: ""
   /api/tiruert/admin-objectives-entity/:
     get:
-      operationId: admin_objectives_entity
+      operationId: tiruert_admin_objectives_entity_retrieve
       description: Get objectives for a specific entity - admin view
       parameters:
         - in: query
@@ -8190,7 +8190,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All objectives.
+          description: ""
   /api/tiruert/elec-operations/:
     get:
       operationId: list_elec_operations
@@ -8913,7 +8913,7 @@ paths:
           description: ""
   /api/tiruert/objectives/:
     get:
-      operationId: objectives
+      operationId: tiruert_objectives_retrieve
       description: Get all objectives
       parameters:
         - in: query
@@ -8953,11 +8953,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All objectives.
+          description: ""
   /api/tiruert/operations/:
     get:
-      operationId: list_operations
-      description: Retrieve a list of operations with optional filtering and pagination.
+      operationId: tiruert_operations_list
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: biofuel
@@ -9006,12 +9022,6 @@ paths:
             items:
               type: string
               minLength: 1
-        - in: query
-          name: details
-          schema:
-            type: boolean
-            default: "0"
-          description: Include detailed information if set to `1`.
         - in: query
           name: entity_id
           schema:
@@ -9209,10 +9219,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedOperationListList"
-          description: A list of operations.
+          description: ""
     post:
-      operationId: create_operation
-      description: Create a new operation.
+      operationId: tiruert_operations_create
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9236,23 +9262,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/OperationInputRequest"
-            examples:
-              CreateOperationExample:
-                value:
-                  type: TENEUR
-                  customs_category: CONV
-                  biofuel: 33
-                  credited_entity: ""
-                  debited_entity: 2
-                  depot: ""
-                  lots:
-                    - id: 10
-                      volume: 39462
-                      emission_rate_per_mj: 5.25
-                    - id: 11
-                      volume: 723.2
-                      emission_rate_per_mj: 30.2
-                summary: Create Operation Example
           application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/OperationInputRequest"
@@ -9268,31 +9277,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationList"
-              examples:
-                CreateOperationExample:
-                  value:
-                    type: TENEUR
-                    customs_category: CONV
-                    biofuel: 33
-                    credited_entity: ""
-                    debited_entity: 2
-                    depot: ""
-                    lots:
-                      - id: 10
-                        volume: 39462
-                        emission_rate_per_mj: 5.25
-                      - id: 11
-                        volume: 723.2
-                        emission_rate_per_mj: 30.2
-                  summary: Create Operation Example
-          description: The newly created operation.
-        "400":
-          description: Invalid input data.
+                $ref: "#/components/schemas/OperationInput"
+          description: ""
   /api/tiruert/operations/{id}/:
     get:
-      operationId: get_operation
-      description: Retrieve one specific operation.
+      operationId: tiruert_operations_retrieve
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9326,10 +9332,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Operation"
-          description: Details of specific operation.
+          description: ""
     patch:
-      operationId: update_operation
-      description: Update a part of operation.
+      operationId: tiruert_operations_partial_update
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9359,11 +9381,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PatchedOperationUpdateRequest"
-            examples:
-              UpdateOperationExample:
-                value:
-                  to_depot: 10
-                summary: Update Operation Example
           application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/PatchedOperationUpdateRequest"
@@ -9378,18 +9395,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Operation"
-              examples:
-                UpdateOperationExample:
-                  value:
-                    to_depot: 10
-                  summary: Update Operation Example
-          description: The updated operation.
-        "400":
-          description: Invalid input data.
+                $ref: "#/components/schemas/OperationUpdate"
+          description: ""
     delete:
-      operationId: delete_operation
-      description: Delete an operation. Only allowed for certain types and statuses.
+      operationId: tiruert_operations_destroy
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9419,9 +9445,7 @@ paths:
         - basicAuth: []
       responses:
         "204":
-          description: Operation deleted successfully.
-        "403":
-          description: Forbidden. The operation type or status does not allow deletion.
+          description: No response body
   /api/tiruert/operations/{id}/accept/:
     post:
       operationId: accept_operation
@@ -10105,6 +10129,23 @@ paths:
   /api/tiruert/operations/export/:
     get:
       operationId: tiruert_operations_export_retrieve
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -15219,6 +15260,46 @@ components:
       required:
         - id
         - name
+    OperationInput:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/OperationTypeEnum"
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        biofuel:
+          type: integer
+          nullable: true
+        credited_entity:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        from_depot:
+          type: integer
+          nullable: true
+        to_depot:
+          type: integer
+          nullable: true
+        export_country:
+          type: string
+          nullable: true
+        export_recipient:
+          type: string
+          maxLength: 255
+        lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationLot"
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
+      required:
+        - biofuel
+        - customs_category
+        - debited_entity
+        - lots
+        - type
     OperationInputRequest:
       type: object
       properties:
@@ -15331,6 +15412,21 @@ components:
         - to_depot
         - type
         - unit
+    OperationLot:
+      type: object
+      properties:
+        id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - emission_rate_per_mj
+        - id
+        - volume
     OperationLotRequest:
       type: object
       properties:
@@ -15390,6 +15486,14 @@ components:
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
+    OperationUpdate:
+      type: object
+      properties:
+        to_depot:
+          type: integer
+          nullable: true
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
     OperationalUnitRequest:
       type: object
       properties:
@@ -16241,6 +16345,10 @@ components:
         carbure_id:
           type: string
           maxLength: 64
+        pos_number:
+          type: string
+          nullable: true
+          maxLength: 64
       required:
         - id
     SafParentTicket:
@@ -16340,10 +16448,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
-        pos_poc_number:
-          type: string
-          nullable: true
-          maxLength: 32
         free_field:
           type: string
           nullable: true
@@ -16502,10 +16606,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
-        pos_poc_number:
-          type: string
-          nullable: true
-          maxLength: 32
       required:
         - assignment_period
         - biofuel
@@ -16669,9 +16769,6 @@ components:
         shipping_method:
           type: string
           nullable: true
-        pos_poc_number:
-          type: string
-          nullable: true
       required:
         - assignment_period
         - client_id
@@ -16704,9 +16801,6 @@ components:
         shipping_method:
           type: string
           nullable: true
-        pos_poc_number:
-          type: string
-          nullable: true
       required:
         - assignment_period
         - client_id
@@ -16737,9 +16831,6 @@ components:
           type: string
           nullable: true
         shipping_method:
-          type: string
-          nullable: true
-        pos_poc_number:
           type: string
           nullable: true
         ticket_sources_ids:
