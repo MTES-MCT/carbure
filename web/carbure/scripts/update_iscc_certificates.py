@@ -61,7 +61,7 @@ def download_iscc_certificates(test: bool, latest: bool) -> None:
     # Sauvegarde
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, str(date.today()))
     pd.DataFrame.to_csv(cleaned_data, filename, index=False)
-
+    
     ## Comparaison pour extraire les doublons
     # 1) Création d'un historique
     files = [f for f in listdir(DESTINATION_FOLDER) if isfile("%s/%s" % (DESTINATION_FOLDER, f))]
@@ -265,8 +265,10 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
 
     # extraction de la balise HTML
     allData["certificate_holder"] = allData["certificate_holder"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
-
+    
     scope_definitions = get_scope_abbreviations(soup)
+    # Replace None/NaN with empty string before processing
+    allData["scope"] = allData["scope"].fillna("")
     allData["scope"] = allData["scope"].str.replace(
         r"<span[^>]*>(.*?)<\/span>", "\\1", regex=True
     )  # get html scope abbreviation
@@ -285,7 +287,7 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
 
 # transform "BG, MB" into "Biogas plant, Biomethane plant"
 def get_full_scope_definitions(abbreviations: str, scope_definitions: dict) -> str:
-    abbreviations: list = abbreviations.split(", ")
+    abbreviations: list = abbreviations.split(", ") if abbreviations else []
     full_names = []
     for abbreviation in abbreviations:
         if abbreviation in scope_definitions:
@@ -293,17 +295,42 @@ def get_full_scope_definitions(abbreviations: str, scope_definitions: dict) -> s
     return ", ".join(full_names)
 
 
-def get_scope_abbreviations(soup: BeautifulSoup) -> list:
+def get_scope_abbreviations(soup: BeautifulSoup) -> dict:
     content = soup.find(class_="wp-block-group__inner-container")
-    definitions = content.find_all("sup")
+    
+    if not content:
+        print("Warning: Could not find wp-block-group__inner-container")
+        return {}
+    
+    # Le nouveau format utilise <strong>ABBR</strong> = Definition<br/>
+    # Ou parfois <strong>ABBR =</strong> Definition<br/>
     dic = {}
-    for definition in definitions:
-        text_parts = definition.get_text(strip=True).split("=")
-        if len(text_parts) == 2:
-            key = text_parts[0].strip()
-            value = text_parts[1].strip()
-            dic[key] = value
-
+    
+    # On parcourt tous les <strong> tags
+    for strong_tag in content.find_all("strong"):
+        # Récupérer le contenu du <strong>
+        strong_text = strong_tag.get_text(strip=True)
+        
+        # Cas 1: Le "=" est dans le <strong> tag (ex: "FSA =")
+        if "=" in strong_text:
+            abbr = strong_text.replace("=", "").strip()
+            # La définition est dans le texte suivant
+            next_text = strong_tag.next_sibling
+            if next_text and isinstance(next_text, str):
+                definition = next_text.strip()
+                if definition:
+                    dic[abbr] = definition
+        # Cas 2: Le "=" est après le <strong> tag (ex: <strong>LC</strong> = Logistic Center)
+        else:
+            abbr = strong_text
+            next_text = strong_tag.next_sibling
+            if next_text and isinstance(next_text, str):
+                # Le texte est du type " = Logistic Center"
+                parts = next_text.split("=", 1)
+                if len(parts) == 2:
+                    definition = parts[1].strip()
+                    dic[abbr] = definition
+    
     return dic
 
 
