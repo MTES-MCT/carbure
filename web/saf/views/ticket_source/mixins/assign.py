@@ -64,9 +64,6 @@ class AssignActionMixin:
         if assignment_period < ticket_source.delivery_period:
             raise ValidationError({"message": SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY})
 
-        if not pos_number and not origin_lot_pos_number:
-            raise ValidationError({"message": SafTicketAssignError.MISSING_POS_NUMBER})
-
         if pos_number and origin_lot_pos_number and pos_number != origin_lot_pos_number:
             raise ValidationError({"message": SafTicketAssignError.POS_NUMBER_MISMATCH})
 

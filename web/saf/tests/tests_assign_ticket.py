@@ -139,24 +139,6 @@ class SafAssignTicketTest(TestCase):
 
         self.assertEqual(response.json()["message"], "POS_NUMBER_MISMATCH")
 
-    def test_assign_saf_ticket_fail_if_missing_pos_number(self):
-        self.lot.pos_number = None
-        self.lot.save()
-
-        body = {
-            "entity_id": self.entity.id,
-            "ticket_source_id": self.ticket_source.id,
-            "client_id": self.ticket_client.id,
-            "volume": 1000,
-            "agreement_reference": "AGREF",
-            "agreement_date": "2022-06-01",
-            "assignment_period": 202203,
-        }
-
-        response = self.assign_ticket(body)
-
-        self.assertEqual(response.json()["message"], "MISSING_POS_NUMBER")
-
     def test_assign_saf_ticket_sets_pos_number_on_origin_lot(self):
         self.lot.pos_number = None
         self.lot.save()
