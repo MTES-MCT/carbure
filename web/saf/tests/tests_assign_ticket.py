@@ -11,6 +11,14 @@ class SafAssignTicketTest(TestCase):
         super().setUp()
         SafTicket.objects.all().delete()
 
+    def assign_ticket(self, body, ticket_source_id=None):
+        kwargs = {"id": ticket_source_id or self.ticket_source.id}
+        return self.client.post(
+            reverse("saf-ticket-sources-assign", kwargs=kwargs),
+            body,
+            query_params={"entity_id": self.entity.id},
+        )
+
     def test_assign_saf_ticket(self):
         query = {
             "entity_id": self.entity.id,

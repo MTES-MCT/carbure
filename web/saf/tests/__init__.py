@@ -48,7 +48,8 @@ class TestCase(DjangoTestCase):
             delivery_period=202202,
             total_volume=30000,
             assigned_volume=10000,
-            parent_lot=self.lot
+            parent_lot=self.lot,
+            origin_lot=self.lot
         )
 
         SafTicket.objects.all().delete()
