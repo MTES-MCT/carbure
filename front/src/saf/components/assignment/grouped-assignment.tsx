@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
 import { SafTicketSourcePreview } from "saf/types"
 import { AssignmentForm, AssignmentFormData } from "./assignment-form"
-import { Notice } from "common/components/notice"
 
 export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSourcePreview[]
@@ -62,10 +61,6 @@ const TicketsGroupedAssignment = ({
     }
   }
 
-  const hasMissingPosNumber = ticketSources.some(
-    (ts) => !ts.origin_lot?.pos_number
-  )
-
   return (
     <Portal onClose={onClose}>
       <Dialog
@@ -75,7 +70,6 @@ const TicketsGroupedAssignment = ({
         }
         footer={
           <Button
-            disabled={hasMissingPosNumber}
             iconId="ri-send-plane-line"
             priority="primary"
             nativeButtonProps={{
@@ -88,19 +82,6 @@ const TicketsGroupedAssignment = ({
         }
         fitContent
       >
-        {hasMissingPosNumber && (
-          <Notice
-            variant="warning"
-            title={t(
-              "Certains des volumes sélectionnés n'ont pas de numéro de POS associé."
-            )}
-          >
-            {t(
-              "Merci d'utiliser le formulaire d'affectation individuel pour ces volumes."
-            )}
-          </Notice>
-        )}
-
         <p>
           {t(
             "Veuillez remplir le formulaire ci-dessous afin d'affecter une partie ou tout le volume des lots :"
