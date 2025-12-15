@@ -2,7 +2,7 @@ from django.db import models, transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
-from core.models import CarbureLot
+from core.models import CarbureLot, Entity
 from core.utils import bulk_update_or_create
 
 
@@ -109,6 +109,8 @@ def create_ticket_sources_from_lots(lots):
         biofuel__code__in=SAF,
         lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
         delivery_type__in=[CarbureLot.BLENDING, CarbureLot.DIRECT],
+        carbure_client__entity_type=Entity.OPERATOR,
+        carbure_client__has_saf=True,
     )
 
     if not saf_lots:

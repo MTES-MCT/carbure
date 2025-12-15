@@ -18,7 +18,10 @@ class CreateTicketSourcesFromLotsTest(TestCase):
     ]
 
     def setUp(self):
-        self.entity = EntityFactory.create(entity_type=Entity.OPERATOR, has_saf=True)
+        self.saf_operator = EntityFactory.create(entity_type=Entity.OPERATOR, has_saf=True)
+        self.some_trader = EntityFactory.create(entity_type=Entity.TRADER)
+        self.some_operator = EntityFactory.create(entity_type=Entity.OPERATOR, has_saf=False)
+
         self.hvoc = Biocarburant.objects.get(code="HVOC")
         self.eth = Biocarburant.objects.get(code="ETH")
 
@@ -26,7 +29,7 @@ class CreateTicketSourcesFromLotsTest(TestCase):
         return CarbureLotFactory.create(
             **{
                 "biofuel": self.hvoc,
-                "carbure_client": self.entity,
+                "carbure_client": self.saf_operator,
                 "lot_status": CarbureLot.ACCEPTED,
                 "delivery_type": CarbureLot.BLENDING,
                 **kwargs,
@@ -40,8 +43,10 @@ class CreateTicketSourcesFromLotsTest(TestCase):
         self.create_lot(biofuel=self.eth)  # ignored biofuel
         self.create_lot(lot_status=CarbureLot.PENDING)  # ignored status
         self.create_lot(delivery_type=CarbureLot.EXPORT)  # ignored delivery type
+        self.create_lot(carbure_client=self.some_trader)  # ignore non-operators
+        self.create_lot(carbure_client=self.some_operator)  # ignore non-saf operators
 
-        lots = CarbureLot.objects.filter(carbure_client=self.entity)
+        lots = CarbureLot.objects.filter(carbure_client=self.saf_operator)
         ticket_sources = create_ticket_sources_from_lots(lots)
 
         self.assertEqual(len(ticket_sources), 2)
