@@ -40,7 +40,7 @@ def invalidate_declaration(request, *args, **kwargs):
 
     # grab the list of all the lots related to this declaration
     declaration_lots = (
-        CarbureLot.objects.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
+        CarbureLot.objects.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
         .filter(period=period)
         .filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id))
     )
