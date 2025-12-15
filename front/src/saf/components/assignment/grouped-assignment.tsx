@@ -62,7 +62,7 @@ const TicketsGroupedAssignment = ({
     }
   }
 
-  const ticketSourceWithMissingPosNumber = ticketSources.filter(
+  const hasMissingPosNumber = ticketSources.some(
     (ts) => !ts.origin_lot?.pos_number
   )
 
@@ -75,7 +75,7 @@ const TicketsGroupedAssignment = ({
         }
         footer={
           <Button
-            disabled={ticketSourceWithMissingPosNumber.length > 0}
+            disabled={hasMissingPosNumber}
             iconId="ri-send-plane-line"
             priority="primary"
             nativeButtonProps={{
@@ -88,7 +88,7 @@ const TicketsGroupedAssignment = ({
         }
         fitContent
       >
-        {ticketSourceWithMissingPosNumber.length > 0 && (
+        {hasMissingPosNumber && (
           <Notice
             variant="warning"
             title={t(
