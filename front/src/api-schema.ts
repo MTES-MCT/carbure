@@ -3685,6 +3685,7 @@ export interface components {
          *     * `ISCC` - ISCC
          *     * `REDCERT` - REDCERT
          *     * `2BS` - 2BS
+         *     * `KZR_INIG` - KZR_INIG
          * @enum {string}
          */
         CertificateTypeEnum: CertificateTypeEnum;
@@ -5401,6 +5402,7 @@ export interface components {
             parent_lot?: components["schemas"]["CarbureLotPublic"];
             parent_ticket?: components["schemas"]["SafParentTicket"];
             readonly added_by: components["schemas"]["EntityPreview"];
+            origin_lot?: components["schemas"]["SafParentLot"];
             readonly carbure_producer: components["schemas"]["EntityPreview"];
             unknown_producer?: string | null;
             readonly carbure_production_site: components["schemas"]["ProductionSite"];
@@ -5427,7 +5429,6 @@ export interface components {
             eee?: number;
             /** Format: double */
             ghg_total?: number;
-            origin_lot?: components["schemas"]["SafParentLot"];
             origin_lot_site?: components["schemas"]["Site"];
         };
         SafTicketSourceAssignment: {
@@ -5441,6 +5442,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_number?: string;
         };
         SafTicketSourceAssignmentRequest: {
             client_id: number;
@@ -5453,6 +5455,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_number?: string;
         };
         SafTicketSourceGroupAssignmentRequest: {
             client_id: number;
@@ -5465,6 +5468,7 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            pos_number?: string;
             ticket_sources_ids: number[];
         };
         SafTicketSourcePreview: {
@@ -5487,6 +5491,7 @@ export interface components {
             readonly parent_lot: components["schemas"]["SafParentLot"];
             parent_ticket?: components["schemas"]["SafParentTicket"];
             readonly added_by: components["schemas"]["EntityPreview"];
+            readonly origin_lot: components["schemas"]["SafParentLot"];
         };
         SeachCompanyRequest: {
             registration_id: string;
@@ -8075,17 +8080,16 @@ export interface operations {
     elec_provision_certificates_list: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Ordre
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
+                 *     * `energy_amount` - Energy amount
+                 *     * `-energy_amount` - Energy amount (décroissant)
                  *     * `remaining_energy_amount` - Remaining energy amount
                  *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
@@ -8101,11 +8105,16 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `1` - T1
+                 *     * `2` - T2
+                 *     * `3` - T3
+                 *     * `4` - T4 */
                 quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[];
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `MANUAL` - MANUAL
+                 *     * `METER_READINGS` - METER_READINGS
+                 *     * `QUALICHARGE` - QUALICHARGE */
                 source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
                 status?: string;
                 year?: number;
@@ -8369,19 +8378,18 @@ export interface operations {
     elec_provision_certificates_filters_retrieve: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Ordre
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
+                 *     * `energy_amount` - Energy amount
+                 *     * `-energy_amount` - Energy amount (décroissant)
                  *     * `remaining_energy_amount` - Remaining energy amount
                  *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
@@ -8393,11 +8401,16 @@ export interface operations {
                 order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `1` - T1
+                 *     * `2` - T2
+                 *     * `3` - T3
+                 *     * `4` - T4 */
                 quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[];
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `MANUAL` - MANUAL
+                 *     * `METER_READINGS` - METER_READINGS
+                 *     * `QUALICHARGE` - QUALICHARGE */
                 source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
                 status?: string;
                 year?: number;
@@ -8481,16 +8494,10 @@ export interface operations {
     elec_transfer_certificates_list: {
         parameters: {
             query: {
-                certificate_id?: string;
-                client?: number;
-                consumption_date?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
-                month?: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                month?: string[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8518,9 +8525,9 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 status?: string;
-                supplier?: number;
-                transfer_date?: string;
-                used_in_tiruert?: boolean;
+                /** @description * `true` - True
+                 *     * `false` - False */
+                used_in_tiruert?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 year?: number;
             };
             header?: never;
@@ -8673,18 +8680,12 @@ export interface operations {
     elec_transfer_certificates_filters_retrieve: {
         parameters: {
             query: {
-                certificate_id?: string;
-                client?: number;
-                consumption_date?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
-                month?: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                month?: string[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8708,9 +8709,9 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 status?: string;
-                supplier?: number;
-                transfer_date?: string;
-                used_in_tiruert?: boolean;
+                /** @description * `true` - True
+                 *     * `false` - False */
+                used_in_tiruert?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 year?: number;
             };
             header?: never;
@@ -12539,11 +12540,13 @@ export enum PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by 
 }
 export enum PathsApiElecProvisionCertificatesGetParametersQueryOrder_by {
     ValueMinuscpo = "-cpo",
+    ValueMinusenergy_amount = "-energy_amount",
     ValueMinusoperating_unit = "-operating_unit",
     ValueMinusquarter = "-quarter",
     ValueMinusremaining_energy_amount = "-remaining_energy_amount",
     ValueMinussource = "-source",
     cpo = "cpo",
+    energy_amount = "energy_amount",
     operating_unit = "operating_unit",
     quarter = "quarter",
     remaining_energy_amount = "remaining_energy_amount",
@@ -12576,7 +12579,6 @@ export enum PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQuer
 }
 export enum PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter {
     cpo = "cpo",
-    energy_amount = "energy_amount",
     operating_unit = "operating_unit",
     order_by = "order_by",
     quarter = "quarter",
@@ -12599,18 +12601,16 @@ export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     status = "status",
     transfer_date = "transfer_date"
 }
+export enum PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert {
+    false = "false",
+    true = "true"
+}
 export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
-    certificate_id = "certificate_id",
-    client = "client",
-    consumption_date = "consumption_date",
     cpo = "cpo",
-    energy_amount = "energy_amount",
     month = "month",
     operator = "operator",
     order_by = "order_by",
     status = "status",
-    supplier = "supplier",
-    transfer_date = "transfer_date",
     used_in_tiruert = "used_in_tiruert",
     year = "year"
 }
@@ -12823,7 +12823,8 @@ export enum CertificateTypeEnum {
     SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
     ISCC = "ISCC",
     REDCERT = "REDCERT",
-    Value2BS = "2BS"
+    Value2BS = "2BS",
+    KZR_INIG = "KZR_INIG"
 }
 export enum CompostingLocationsEnum {
     ON_SITE = "ON_SITE",

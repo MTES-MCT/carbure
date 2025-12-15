@@ -3216,14 +3216,8 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -3236,8 +3230,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -3247,11 +3240,13 @@ paths:
               type: string
               enum:
                 - -cpo
+                - -energy_amount
                 - -operating_unit
                 - -quarter
                 - -remaining_energy_amount
                 - -source
                 - cpo
+                - energy_amount
                 - operating_unit
                 - quarter
                 - remaining_energy_amount
@@ -3261,6 +3256,8 @@ paths:
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
             * `remaining_energy_amount` - Remaining energy amount
             * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
@@ -3300,8 +3297,12 @@ paths:
                 - 2
                 - 3
                 - 4
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `1` - T1
+            * `2` - T2
+            * `3` - T3
+            * `4` - T4
+          explode: true
           style: form
         - name: search
           required: false
@@ -3321,8 +3322,11 @@ paths:
                 - METER_READINGS
                 - null
                 - QUALICHARGE
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+          explode: true
           style: form
         - in: query
           name: status
@@ -3753,14 +3757,8 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -3773,7 +3771,6 @@ paths:
             type: string
             enum:
               - cpo
-              - energy_amount
               - operating_unit
               - order_by
               - quarter
@@ -3787,8 +3784,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -3798,11 +3794,13 @@ paths:
               type: string
               enum:
                 - -cpo
+                - -energy_amount
                 - -operating_unit
                 - -quarter
                 - -remaining_energy_amount
                 - -source
                 - cpo
+                - energy_amount
                 - operating_unit
                 - quarter
                 - remaining_energy_amount
@@ -3812,6 +3810,8 @@ paths:
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
             * `remaining_energy_amount` - Remaining energy amount
             * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
@@ -3839,8 +3839,12 @@ paths:
                 - 2
                 - 3
                 - 4
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `1` - T1
+            * `2` - T2
+            * `3` - T3
+            * `4` - T4
+          explode: true
           style: form
         - name: search
           required: false
@@ -3860,8 +3864,11 @@ paths:
                 - METER_READINGS
                 - null
                 - QUALICHARGE
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+          explode: true
           style: form
         - in: query
           name: status
@@ -3888,10 +3895,10 @@ paths:
                 ExampleOfFiltersResponse.:
                   value:
                     - cpo
-                    - energy_amount
                     - operating_unit
                     - order_by
                     - quarter
+                    - source
                   summary: Example of filters response.
           description: ""
   /api/elec/provision-certificates/import/:
@@ -3968,32 +3975,13 @@ paths:
       operationId: elec_transfer_certificates_list
       parameters:
         - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: client
-          schema:
-            type: integer
-        - in: query
-          name: consumption_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: cpo
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -4003,15 +3991,18 @@ paths:
         - in: query
           name: month
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: operator
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4082,18 +4073,19 @@ paths:
           schema:
             type: string
         - in: query
-          name: supplier
-          schema:
-            type: integer
-        - in: query
-          name: transfer_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: used_in_tiruert
           schema:
-            type: boolean
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4263,32 +4255,13 @@ paths:
       operationId: elec_transfer_certificates_filters_retrieve
       parameters:
         - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: client
-          schema:
-            type: integer
-        - in: query
-          name: consumption_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: cpo
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -4300,17 +4273,11 @@ paths:
           schema:
             type: string
             enum:
-              - certificate_id
-              - client
-              - consumption_date
               - cpo
-              - energy_amount
               - month
               - operator
               - order_by
               - status
-              - supplier
-              - transfer_date
               - used_in_tiruert
               - year
           description: Filter string to apply
@@ -4318,15 +4285,18 @@ paths:
         - in: query
           name: month
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: operator
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4385,18 +4355,19 @@ paths:
           schema:
             type: string
         - in: query
-          name: supplier
-          schema:
-            type: integer
-        - in: query
-          name: transfer_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: used_in_tiruert
           schema:
-            type: boolean
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4417,11 +4388,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - certificate_id
-                    - client
-                    - consumption_date
                     - cpo
-                    - energy_amount
+                    - month
+                    - operator
+                    - order_by
+                    - status
                   summary: Example of filters response.
           description: ""
   /api/entities/:
@@ -12588,12 +12559,14 @@ components:
         - ISCC
         - REDCERT
         - 2BS
+        - KZR_INIG
       type: string
       description: |-
         * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
+        * `KZR_INIG` - KZR_INIG
     ChangePasswordError:
       type: object
       properties:
@@ -16675,6 +16648,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        origin_lot:
+          $ref: "#/components/schemas/SafParentLot"
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -16725,8 +16700,6 @@ components:
         ghg_total:
           type: number
           format: double
-        origin_lot:
-          $ref: "#/components/schemas/SafParentLot"
         origin_lot_site:
           $ref: "#/components/schemas/Site"
       required:
@@ -16769,6 +16742,8 @@ components:
         shipping_method:
           type: string
           nullable: true
+        pos_number:
+          type: string
       required:
         - assignment_period
         - client_id
@@ -16801,6 +16776,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        pos_number:
+          type: string
+          minLength: 1
       required:
         - assignment_period
         - client_id
@@ -16833,6 +16811,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        pos_number:
+          type: string
+          minLength: 1
         ticket_sources_ids:
           type: array
           items:
@@ -16901,6 +16882,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        origin_lot:
+          allOf:
+            - $ref: "#/components/schemas/SafParentLot"
+          readOnly: true
       required:
         - added_by
         - assigned_tickets
@@ -16911,6 +16896,7 @@ components:
         - delivery_period
         - feedstock
         - id
+        - origin_lot
         - parent_lot
         - total_volume
         - year
