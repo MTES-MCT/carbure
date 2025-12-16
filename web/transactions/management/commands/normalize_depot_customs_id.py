@@ -15,12 +15,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--dry-run",
-            action="store_true",
+            choices=["true", "false"],
+            default="true",
             help="Simulate changes without saving to database",
         )
 
     def handle(self, *args, **options):
-        dry_run = options.get("dry_run", True)
+        dry_run = options.get("dry_run") == "true"
 
         # Load DGDDI depots file
         carbure_home = os.environ.get("CARBURE_HOME")
@@ -83,28 +84,38 @@ class Command(BaseCommand):
                     accise = found_depot[0][0]
                 elif "W" in customs_id:
                     found_depot = df_dgddi.loc[
-                        df_dgddi["NUMERO AGREMENT DU TITULAIRE DU DEPOT"] == customs_id, ["NUMERO DU DEPOT"]
+                        df_dgddi["NUMERO AGREMENT DU TITULAIRE DU DEPOT"] == customs_id,
+                        ["NUMERO DU DEPOT"],
                     ].values
 
                     if len(found_depot) > 0:
                         accise = customs_id
                         customs_id = found_depot[0][0]
+                    else:
+                        self.stdout.write(
+                            self.style.WARNING(f" - No matching depot found in DGDDI file for customs ID '{customs_id}'")
+                        )
+                else:
+                    self.stdout.write(
+                        self.style.WARNING(f" - No matching depot found in DGDDI file for customs ID '{customs_id}'")
+                    )
 
                 # Update depot
                 changed = False
                 if depot.customs_id != customs_id:
                     depot.customs_id = customs_id
                     changed = True
+                    self.stdout.write(self.style.SUCCESS(f" - Updated (customs_id: {customs_id})"))
 
                 if accise and depot.accise != accise:
                     depot.accise = accise
                     changed = True
+                    self.stdout.write(self.style.SUCCESS(f" - Updated (accise: {accise or 'N/A'})"))
 
                 if changed:
                     if not dry_run:
                         depot.save()
                     stats["updated"] += 1
-                    self.stdout.write(self.style.SUCCESS(f" - Updated (accise: {accise or 'N/A'})"))
 
         # Print summary
         self.stdout.write("\n" + "=" * 50)
