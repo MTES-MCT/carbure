@@ -60,11 +60,6 @@ class Department(models.Model):
         ordering = ["code_dept"]
 
 
-class EntityManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(closed_at__isnull=True)
-
-
 class Entity(models.Model):
     PRODUCER = "Producteur"
     OPERATOR = "Opérateur"
@@ -119,7 +114,6 @@ class Entity(models.Model):
     registered_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.CASCADE)
 
     is_enabled = models.BooleanField(default=True)
-    closed_at = models.DateTimeField(null=True, blank=True)
     is_tiruert_liable = models.BooleanField(default=False)
 
     # Biomethane
@@ -223,9 +217,6 @@ class Entity(models.Model):
         verbose_name = "Entity"
         verbose_name_plural = "Entities"
         ordering = ["name"]
-
-    objects = EntityManager()
-    all_objects = models.Manager()
 
 
 class UserPreferences(models.Model):

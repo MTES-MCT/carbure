@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib import admin
-from django.utils import timezone
 
-from core.models import Department, Entity, UserRights, UserRightsRequest
+from core.models import Department, Entity
 from entity.models import EntityScopeDepartment, EntityScopeDepot
 from entity.services.enable_entity import enable_entity
 from transactions.models import Depot
@@ -96,38 +95,23 @@ class EntityDepotInline(admin.TabularInline):
 
 class EntityAdmin(admin.ModelAdmin):
     list_display = (
-        "name",
         "entity_type",
+        "name",
         "parent_entity",
         "is_enabled",
-        "closed_at",
     )
     search_fields = ("entity_type", "name")
     list_filter = ["entity_type"]
     readonly_fields = ["is_enabled"]
     inlines = [EntityDepartmentInline, EntityDepotInline]
 
-    actions = ["enable_entity", "deactivate_entity"]
-
-    def get_queryset(self, request):
-        return Entity.all_objects.get_queryset()
+    actions = ["enable_entity"]
 
     def enable_entity(self, request, queryset):
         for entity in queryset:
             enable_entity(entity, request)
 
-    enable_entity.short_description = "Valider les sociétés sélectionnées"
-
-    def deactivate_entity(self, request, queryset):
-        for entity in queryset:
-            entity.closed_at = timezone.now()
-            entity.save()
-
-            # Remove all UserRightsRequests and UserRights for this entity
-            UserRightsRequest.objects.filter(entity=entity).delete()
-            UserRights.objects.filter(entity=entity).delete()
-
-    deactivate_entity.short_description = "Désactiver les sociétés (fermées) sélectionnées"
+    enable_entity.short_description = "Activer les sociétés sélectionnées"
 
 
 admin.site.register(Entity, EntityAdmin)
