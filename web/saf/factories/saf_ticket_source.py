@@ -29,7 +29,7 @@ class SafTicketSourceFactory(factory.django.DjangoModelFactory):
     carbure_producer = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))
     unknown_producer = factory.Faker("company")
 
-    carbure_production_site = factory.Iterator(ProductionSite.objects.all())
+    carbure_production_site = factory.LazyFunction(lambda: ProductionSite.objects.first())
     unknown_production_site = factory.Faker("company")
     production_country = factory.Iterator(Pays.objects.all())
     production_site_commissioning_date = factory.Faker("date_this_century")

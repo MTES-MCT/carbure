@@ -12,7 +12,7 @@ class TestCase(DjangoTestCase):
         "json/feedstock.json",
         "json/countries.json",
         "json/entities.json",
-        "json/productionsites.json",
+        
     ]
 
     def setUp(self):

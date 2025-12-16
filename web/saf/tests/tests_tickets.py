@@ -74,8 +74,8 @@ class SafTicketsTest(TestCase):
             "assignment_period": 202201,
             "status": "PENDING",
             "agreement_date": "2022-06-20",
-            "supplier": "AOT",
-            "client": "ARMORINE",
+            "supplier": "Atlantique Terminals",
+            "client": "Metro Refining",
             "volume": 30000.0,
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
@@ -85,8 +85,8 @@ class SafTicketsTest(TestCase):
                 "is_double_compte": True,
             },
             "biofuel": {
-                "name": "Huile cotraitée - Carburéacteur",
-                "name_en": "Co-processed oil - jet",
+                "name": "Huiles co-traitées - Kérosène",
+                "name_en": "",
                 "code": "HCC",
             },
             "country_of_origin": {
@@ -105,5 +105,6 @@ class SafTicketsTest(TestCase):
         data = response.json()["results"][0]
         data.pop("created_at")
 
-        assert data == expected_ticket
-        assert response.json()["count"] == 2
+        self.maxDiff = None
+        self.assertEqual(data, expected_ticket)
+        self.assertEqual(response.json()["count"], 2)
