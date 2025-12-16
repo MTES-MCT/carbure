@@ -5,7 +5,6 @@ from django.conf import settings
 
 from core.helpers import send_mail
 from core.models import UserRights
-from core.utils import CarbureEnv
 
 
 def enable_depot(depot, request):
@@ -29,9 +28,13 @@ def enable_depot(depot, request):
 
 def send_email_to_admin_users(entity, depot, admins, request):
     today = datetime.now().strftime("%d/%m/%Y")
-    subject = f"[CarbuRe][Votre demande de création du dépôt {depot.name}  a été acceptée]"
-    subject = subject if CarbureEnv.is_prod else "TEST " + subject
-    recipient_list = [admin.user.email for admin in admins] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
+    subject = f"[CarbuRe][Votre demande de création du dépôt {depot.name} a été acceptée]"
+    recipient_list = [admin.user.email for admin in admins]
+
+    if settings.WITH_EMAIL_DECORATED_AS_TEST:
+        subject = f"TEST {subject}"
+        recipient_list = ["carbure@beta.gouv.fr"]
+
     text_message = f"""
     Bonjour,
 
