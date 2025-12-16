@@ -21,7 +21,6 @@ from core.models import (
     UserRightsRequests,
 )
 from core.serializers import check_fields_required
-from core.utils import CarbureEnv
 
 
 class EntityCompanySerializer(serializers.ModelSerializer):
@@ -181,9 +180,10 @@ def send_email_to_user(entity, request):
 def send_email_to_dgec(entity, request):
     today = datetime.now().strftime("%d/%m/%Y")
     subject = "Demande d'inscription de la société " + entity.name
-    subject = subject if CarbureEnv.is_prod else "TEST " + subject
+    if settings.WITH_EMAIL_DECORATED_AS_TEST:
+        subject = f"TEST {subject}"
 
-    recipient_list = ["carbure@beta.gouv.fr"]  # send to current user to avoid spam all the carbure team
+    recipient_list = ["carbure@beta.gouv.fr"]
     admin_link = f"{environ.get('BASE_URL')}/admin/core/entity/?is_enabled=False"
     text_message = f"""
     Bonjour,
