@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils import timezone
 
-from core.models import Department, Entity, UserRights, UserRightsRequest
+from core.models import Department, Entity, UserRights, UserRightsRequests
 from entity.models import EntityScopeDepartment, EntityScopeDepot
 from entity.services.enable_entity import enable_entity
 from transactions.models import Depot
@@ -124,7 +124,7 @@ class EntityAdmin(admin.ModelAdmin):
             entity.save()
 
             # Remove all UserRightsRequests and UserRights for this entity
-            UserRightsRequest.objects.filter(entity=entity).delete()
+            UserRightsRequests.objects.filter(entity=entity).delete()
             UserRights.objects.filter(entity=entity).delete()
 
     deactivate_entity.short_description = "Désactiver les sociétés (fermées) sélectionnées"
