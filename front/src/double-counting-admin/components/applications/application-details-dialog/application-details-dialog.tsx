@@ -90,7 +90,9 @@ export const ApplicationDetailsDialog = () => {
     if (
       !application ||
       !entity ||
-      entity?.entity_type !== EntityType.Administration
+      ![EntityType.Administration, EntityType.ExternalAdmin].includes(
+        entity.entity_type
+      )
     ) {
       return
     }
