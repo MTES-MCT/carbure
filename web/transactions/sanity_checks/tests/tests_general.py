@@ -8,6 +8,7 @@ from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from transactions.factories import CarbureLotFactory
 from transactions.models import Depot, EntitySite, YearConfig
+from transactions.sanity_checks.general import check_missing_delivery_type
 
 from ..helpers import enrich_lot, get_prefetched_data, has_error
 from ..sanity_checks import sanity_checks
@@ -258,3 +259,30 @@ class GeneralSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot2, prefetched_data)
         assert has_error(error, error_list)
+
+    def test_missing_delivery_type(self):
+        lot1 = self.create_lot(
+            carbure_client=self.producer,
+            delivery_type=CarbureLot.UNKNOWN,
+        )
+
+        error1 = check_missing_delivery_type(lot1)
+        assert error1 is None
+
+        lot2 = self.create_lot(
+            carbure_client=None,
+            unknown_client="Client",
+            delivery_type=CarbureLot.BLENDING,
+        )
+
+        error2 = check_missing_delivery_type(lot2)
+        assert error2 is None
+
+        lot3 = self.create_lot(
+            carbure_client=None,
+            unknown_client="Client",
+            delivery_type=CarbureLot.UNKNOWN,
+        )
+
+        error3 = check_missing_delivery_type(lot3)
+        assert error3.error == "MISSING_DELIVERY_TYPE"

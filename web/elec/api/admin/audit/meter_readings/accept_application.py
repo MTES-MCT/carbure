@@ -1,3 +1,5 @@
+from os import environ
+
 import pandas as pd
 from django import forms
 from django.conf import settings
@@ -10,7 +12,6 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_admin_rights
 from core.helpers import send_mail
 from core.models import ExternalAdminRights, UserRights
-from core.utils import CarbureEnv
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter_reading import ElecMeterReading
@@ -97,7 +98,7 @@ def send_email_to_cpo(application: ElecMeterReadingApplication, request: HttpReq
     total_energy = round(application.elec_meter_readings.aggregate(total_energy=Sum("renewable_energy"))["total_energy"], 2)
     meter_reading_count = application.elec_meter_readings.count()
     meter_reading_link = (
-        f"{CarbureEnv.get_base_url()}/org/{application.cpo.pk}/elec-v2/certificates/{application.year}/provision"
+        f"{environ.get('BASE_URL')}/org/{application.cpo.pk}/elec-v2/certificates/{application.year}/provision"
     )
     recipients = [
         r.user.email for r in UserRights.objects.filter(entity=application.cpo, role=UserRights.ADMIN).select_related("user")

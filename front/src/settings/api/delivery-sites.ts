@@ -58,9 +58,9 @@ export function createNewDeliverySite(
       electrical_efficiency,
       thermal_efficiency,
       useful_temperature,
-      blending_is_outsourced,
+      blending_is_outsourced: blending_is_outsourced!,
       blending_entity_id: blender?.id,
-      ownership_type,
+      ownership_type: ownership_type!,
     },
   })
 }

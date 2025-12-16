@@ -1,8 +1,12 @@
+from copy import copy
+from decimal import Decimal
+
+from django.db import transaction
 from rest_framework import serializers
 
-from core.models import CarbureLot
+from core.models import CarbureLot, MatierePremiere
 from tiruert.filters import OperationFilterForBalance
-from tiruert.models import Operation
+from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
@@ -82,3 +86,131 @@ class OperationService:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )
+
+    @staticmethod
+    def define_operation_status(validated_data):
+        """
+        Define the operation status based on the entity type and operation type
+        """
+        auto_accepted_types = [
+            Operation.INCORPORATION,
+            Operation.MAC_BIO,
+            Operation.LIVRAISON_DIRECTE,
+            Operation.DEVALUATION,
+        ]
+
+        if validated_data["type"] in auto_accepted_types:
+            validated_data["status"] = Operation.ACCEPTED
+        elif validated_data.get("status") != Operation.DRAFT:
+            validated_data["status"] = Operation.PENDING
+
+    @staticmethod
+    @transaction.atomic
+    def create_operations_from_lots(lots):
+        """
+        Create TIRUERT operations from CarbureLots.
+
+        Groups lots by delivery_type, feedstock category, biofuel and depot,
+        then creates one operation per group with associated details.
+        """
+        valid_lots = OperationService.filter_valid_lots(lots)
+        valid_lots = OperationService.remove_existing_lots(valid_lots)
+
+        if not valid_lots:
+            return []
+
+        valid_lots = list(valid_lots)
+        valid_lots = OperationService.process_ep2_lots(valid_lots)
+
+        # Group validated_lots by delivery_type, feedstock, biofuel and depot
+        lots_by_delivery_type = {}
+        for lot in valid_lots:
+            key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code, lot.carbure_delivery_site)
+            if key not in lots_by_delivery_type:
+                lots_by_delivery_type[key] = []
+            lots_by_delivery_type[key].append(lot)
+
+        matching_types = {
+            CarbureLot.RFC: Operation.MAC_BIO,
+            CarbureLot.BLENDING: Operation.INCORPORATION,
+            CarbureLot.DIRECT: Operation.LIVRAISON_DIRECTE,
+        }
+
+        for key, lots in lots_by_delivery_type.items():
+            operation = Operation.objects.create(
+                type=matching_types[key[0]],
+                status=Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
+                customs_category=key[1],
+                biofuel=lots[0].biofuel,
+                credited_entity=lots[0].carbure_client,
+                debited_entity=None,
+                from_depot=None,
+                to_depot=lots[0].carbure_delivery_site,
+                renewable_energy_share=lots[0].biofuel.renewable_energy_share,
+                durability_period=lots[0].period,
+            )
+
+            lots_bulk = []
+
+            for lot in lots:
+                lots_bulk.append(
+                    {
+                        "operation": operation,
+                        "lot": lot,
+                        "volume": round(lot.volume, 2),  # litres
+                        "emission_rate_per_mj": lot.ghg_total,  # gCO2/MJ (input algo d'optimisation)
+                    }
+                )
+
+            OperationDetail.objects.bulk_create([OperationDetail(**data) for data in lots_bulk])
+
+    @staticmethod
+    def filter_valid_lots(lots):
+        """
+        Keep only lots compatible with TIRUERT.
+
+        Valid lots must have:
+        - lot_status in ["ACCEPTED", "FROZEN"]
+        - delivery_type in [RFC, BLENDING, DIRECT]
+        """
+        DELIVERY_TYPES_ACCEPTED = [CarbureLot.RFC, CarbureLot.BLENDING, CarbureLot.DIRECT]
+        return lots.filter(lot_status__in=["ACCEPTED", "FROZEN"], delivery_type__in=DELIVERY_TYPES_ACCEPTED)
+
+    @staticmethod
+    def remove_existing_lots(lots):
+        """
+        Remove lots that already have an operation to avoid duplicates.
+        """
+        existing_lots = OperationDetail.objects.filter(lot__in=lots).values_list("lot_id").distinct()
+        return lots.exclude(id__in=existing_lots)
+
+    @staticmethod
+    def process_ep2_lots(lots):
+        """
+        Split EP2 lots into two new lots (not saved to database).
+
+        EP2 lots are split as:
+        - 40% of volume → CONV category
+        - 60% of volume → EP2AM category
+        """
+        result_lots = []
+
+        for lot in lots:
+            if lot.feedstock.code == "EP2":
+                new_lot_conv = copy(lot)
+                new_lot_conv.feedstock = copy(lot.feedstock)
+                new_lot_conv.feedstock.category = MatierePremiere.CONV
+                volume_decimal = Decimal(str(lot.volume))
+                new_lot_conv.volume = round(float(volume_decimal * Decimal("0.4")), 2)
+
+                new_lot_ep2 = copy(lot)
+                new_lot_ep2.feedstock = copy(lot.feedstock)
+                new_lot_ep2.feedstock.category = MatierePremiere.EP2AM
+                new_lot_ep2.volume = round(float(volume_decimal * Decimal("0.6")), 2)
+
+                result_lots.append(new_lot_conv)
+                result_lots.append(new_lot_ep2)
+            else:
+                result_lots.append(lot)
+
+        return result_lots

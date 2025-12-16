@@ -21,7 +21,7 @@ MAX_NOTIF_PER_HOUR = 20
 
 def send_notification_emails(test: bool = False) -> None:
     entities = Entity.objects.annotate(num_notifs=Count("carburenotification")).order_by("-num_notifs")
-    base_url = os.environ["PUBLIC_URL"]
+    base_url = os.environ.get("BASE_URL")
     one_hour_ago = pytz.utc.localize(datetime.datetime.now() - datetime.timedelta(hours=1))
     email_notif_sent = 0
     entity_oldest_notif = {}

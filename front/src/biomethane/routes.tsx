@@ -1,10 +1,13 @@
 import useEntity from "common/hooks/entity"
 import { lazy } from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
-import { getDeclarationInterval } from "./utils"
 import { AnnualDeclarationLayout } from "./layouts/annual-declaration-layout"
 import { ContractProductionUnitProvider } from "./providers/contract-production-unit"
-import { AnnualDeclarationProvider } from "./providers/annual-declaration"
+import {
+  AnnualDeclarationProvider,
+  useAnnualDeclaration,
+} from "./providers/annual-declaration"
+import { useRoutes } from "common/hooks/routes"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -17,7 +20,20 @@ const BiomethaneProductionPage = lazy(
 )
 
 const currentYear = new Date().getFullYear()
-const declarationYear = getDeclarationInterval().year
+
+/**
+ * Composant de redirection qui utilise l'année de déclaration courante
+ * récupérée depuis le backend via AnnualDeclarationProvider
+ */
+const RedirectToCurrentYear = ({ path }: { path: "digestate" | "energy" }) => {
+  const biomethaneRoutes = useRoutes().BIOMETHANE()
+  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const year = currentAnnualDeclaration?.year
+
+  if (!year) return null
+
+  return <Navigate to={`${biomethaneRoutes.ROOT}/${year}/${path}`} />
+}
 
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer } = useEntity()
@@ -26,6 +42,24 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
+      {/* Routes sans année qui redirigent vers l'année de déclaration courante */}
+      <Route
+        path="digestate"
+        element={
+          <AnnualDeclarationProvider>
+            <RedirectToCurrentYear path="digestate" />
+          </AnnualDeclarationProvider>
+        }
+      />
+      <Route
+        path="energy"
+        element={
+          <AnnualDeclarationProvider>
+            <RedirectToCurrentYear path="energy" />
+          </AnnualDeclarationProvider>
+        }
+      />
+
       <Route
         path=":year"
         element={
@@ -46,7 +80,11 @@ export const BiomethaneRoutes = () => {
 
       <Route
         path=""
-        element={<Navigate replace to={`${declarationYear}/digestate`} />}
+        element={
+          <AnnualDeclarationProvider>
+            <RedirectToCurrentYear path="digestate" />
+          </AnnualDeclarationProvider>
+        }
       />
     </Routes>
   )

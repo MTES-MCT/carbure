@@ -225,18 +225,8 @@ class Validator(forms.Form):
 
 
 class CarbureEnv:
-    is_prod = True if env.get("IMAGE_TAG") == "prod" else False
-    is_staging = True if env.get("IMAGE_TAG") == "staging" else False
-    is_local = True if env.get("IMAGE_TAG") == "local" else False
-    is_dev = True if env.get("IMAGE_TAG") == "dev" else False
-
-    def get_base_url():
-        if env.get("IMAGE_TAG") == "local":
-            # If the environment is local, try to use the public URL if defined, otherwise use the local URL
-            return env.get("PUBLIC_URL", "http://carbure.local:8090")
-        else:
-            # If the PUBLIC_URL is defined, use it, otherwise use the default URL
-            return env.get("PUBLIC_URL", "https://carbure.beta.gouv.fr")
+    is_prod = env.get("IMAGE_TAG") == "prod"
+    is_local = env.get("IMAGE_TAG") == "local"
 
 
 # checks if a pandas DataFrame cell contains a truthy value

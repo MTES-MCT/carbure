@@ -75,7 +75,7 @@ class BalanceService:
         """
         Updates the balance entry with the details of the operation
         """
-        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
+        quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
 
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
@@ -88,8 +88,6 @@ class BalanceService:
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["quantity"][quantity_type] = round(balance[key]["quantity"][quantity_type], 2)
 
-        return balance
-
     @staticmethod
     def _update_available_balance(balance, key, operation, detail, credit_operation, conversion_factor):
         """
@@ -98,7 +96,7 @@ class BalanceService:
         from tiruert.services.teneur import TeneurService
 
         volume_sign = 1 if credit_operation else -1
-        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
+        quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
         balance[key]["available_balance"] += quantity * volume_sign
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["available_balance"] = round(balance[key]["available_balance"], 2)
@@ -111,7 +109,11 @@ class BalanceService:
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["saved_emissions"] = round(balance[key]["saved_emissions"], 2)
-        return
+
+    @staticmethod
+    def _calculate_quantity(operation, detail, conversion_factor):
+        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
+        return quantity
 
     @staticmethod
     def _update_ghg_min_max(balance, key, detail):
@@ -125,7 +127,6 @@ class BalanceService:
         balance[key]["ghg_reduction_max"] = max(
             filter(None, [balance[key].get("ghg_reduction_max"), detail.lot.ghg_reduction_red_ii])
         )
-        return
 
     @staticmethod
     def calculate_balance(operations, entity_id, group_by, unit, date_from=None, ges_bound_min=None, ges_bound_max=None):
