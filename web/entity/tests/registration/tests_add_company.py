@@ -28,10 +28,10 @@ class EntityRegistrationAddCompanyTest(TestCase):
             "gogogo",
         )
         self.certificate = GenericCertificateFactory.create()
-        self.entity_data = model_to_dict(EntityFactory.build(entity_type=Entity.PRODUCER))
+        self.entity_data = model_to_dict(
+            EntityFactory.build(entity_type=Entity.PRODUCER), exclude=["id", "parent_entity", "closed_at"]
+        )
         self.entity_data["registered_country"] = "FR"
-        self.entity_data.pop("id")
-        self.entity_data.pop("parent_entity")
 
     def test_register_company(self):
         GenericCertificate.objects.create(
