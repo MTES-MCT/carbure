@@ -69,6 +69,7 @@ types-six = "*"
 pre-commit = "*"
 ruff = "0.8.6"
 pip-audit = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.12"
