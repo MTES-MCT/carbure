@@ -153,8 +153,12 @@ def send_email_to_user(entity, request):
     # send email to user
     today = datetime.now().strftime("%d/%m/%Y")
     subject = "Demande d'inscription de société enregistrée"
-    subject = subject if CarbureEnv.is_prod else "TEST " + subject
-    recipient_list = [request.user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
+    recipient_list = [request.user.email]
+
+    if settings.WITH_EMAIL_DECORATED_AS_TEST:
+        subject = f"TEST {subject}"
+        recipient_list = ["carbure@beta.gouv.fr"]
+
     text_message = f"""
     Bonjour,
 
