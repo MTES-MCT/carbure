@@ -5,8 +5,6 @@ import {
   ConsumptionType,
   SafTicketSourceQuery,
   SafShippingMethod,
-  SafTicketSourceFilter,
-  SafTicketFilter,
   SafFilter,
 } from "./types"
 import { QUERY_RESET } from "common/hooks/query-builder-2"
@@ -38,7 +36,7 @@ export function getTicketFilters(field: SafFilter, query: SafTicketQuery) {
     .GET("/saf/tickets/filters/", {
       params: {
         query: {
-          filter: field as unknown as SafTicketFilter,
+          filter: field,
           ...query,
           ...QUERY_RESET,
         },
@@ -122,7 +120,7 @@ export function getTicketSourceFilters(
     .GET("/saf/ticket-sources/filters/", {
       params: {
         query: {
-          filter: field as unknown as SafTicketSourceFilter,
+          filter: field,
           ...query,
           ...QUERY_RESET,
         },

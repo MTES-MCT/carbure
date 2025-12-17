@@ -12,6 +12,7 @@ import {
   PathsApiSafTicketsGetParametersQueryStatus as SafTicketStatus,
   PathsApiSafTicketsGetParametersQueryConsumption_type as ConsumptionType,
   PathsApiSafTicketSourcesGetParametersQueryStatus as SafTicketSourceStatus,
+  PathsApiResourcesAirportsGetParametersQueryShipping_method as SafShippingMethod,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -21,6 +22,7 @@ export {
   SafTicketSourceOrder,
   SafTicketStatus,
   ConsumptionType,
+  SafShippingMethod,
 }
 
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator
