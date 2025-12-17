@@ -1,5 +1,3 @@
-import traceback
-
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
@@ -56,7 +54,9 @@ class AssignActionMixin:
         reception_airport = serializer.validated_data.get("reception_airport")
         consumption_type = serializer.validated_data.get("consumption_type")
         shipping_method = serializer.validated_data.get("shipping_method")
-        pos_poc_number = serializer.validated_data.get("pos_poc_number")
+
+        pos_number = serializer.validated_data.get("pos_number")
+        origin_lot_pos_number = ticket_source.origin_lot.pos_number if ticket_source.origin_lot else None
 
         if volume > (ticket_source.total_volume - ticket_source.assigned_volume):
             raise ValidationError({"message": SafTicketAssignError.VOLUME_TOO_BIG})
@@ -64,37 +64,40 @@ class AssignActionMixin:
         if assignment_period < ticket_source.delivery_period:
             raise ValidationError({"message": SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY})
 
-        try:
-            with transaction.atomic():
-                ticket = create_ticket_from_source(
-                    ticket_source,
-                    client_id=client_id,
-                    volume=volume,
-                    agreement_date=agreement_date,
-                    agreement_reference=agreement_reference,
-                    assignment_period=assignment_period,
-                    free_field=free_field,
-                    reception_airport=reception_airport,
-                    consumption_type=consumption_type,
-                    shipping_method=shipping_method,
-                    pos_poc_number=pos_poc_number,
-                )
+        if pos_number and origin_lot_pos_number and pos_number != origin_lot_pos_number:
+            raise ValidationError({"message": SafTicketAssignError.POS_NUMBER_MISMATCH})
 
-                CarbureNotification.objects.create(
-                    type=CarbureNotification.SAF_TICKET_RECEIVED,
-                    dest_id=client_id,
-                    send_by_email=False,
-                    meta={
-                        "supplier": ticket.supplier.name,
-                        "ticket_id": ticket.id,
-                        "year": ticket.year,
-                    },
-                )
+        with transaction.atomic():
+            ticket = create_ticket_from_source(
+                ticket_source,
+                client_id=client_id,
+                volume=volume,
+                agreement_date=agreement_date,
+                agreement_reference=agreement_reference,
+                assignment_period=assignment_period,
+                free_field=free_field,
+                reception_airport=reception_airport,
+                consumption_type=consumption_type,
+                shipping_method=shipping_method,
+            )
 
-                ticket_source.assigned_volume += ticket.volume
-                ticket_source.save()
+            ticket_source.assigned_volume += ticket.volume
+            ticket_source.save()
 
-            return Response({}, status=status.HTTP_200_OK)
-        except Exception:
-            traceback.print_exc()
-            raise ValidationError({"message": SafTicketAssignError.TICKET_CREATION_FAILED})
+            # save pos_number on origin lot so it can be automatically reused on any other ticket based on it
+            if ticket_source.origin_lot and origin_lot_pos_number != pos_number:
+                ticket_source.origin_lot.pos_number = pos_number
+                ticket_source.origin_lot.save()
+
+            CarbureNotification.objects.create(
+                type=CarbureNotification.SAF_TICKET_RECEIVED,
+                dest_id=client_id,
+                send_by_email=False,
+                meta={
+                    "supplier": ticket.supplier.name,
+                    "ticket_id": ticket.id,
+                    "year": ticket.year,
+                },
+            )
+
+        return Response({}, status=status.HTTP_200_OK)

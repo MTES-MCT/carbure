@@ -99,7 +99,6 @@ class SafTicketsTest(TestCase):
             "consumption_type": "MAC",
             "ets_status": None,
             "reception_airport": None,
-            "pos_poc_number": None,
         }
 
         data = response.json()["results"][0]

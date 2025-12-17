@@ -810,6 +810,9 @@ class CarbureLot(models.Model):
     # scoring
     data_reliability_score = models.CharField(max_length=1, default="F")
 
+    # saf
+    pos_number = models.CharField(max_length=64, null=True)
+
     class Meta:
         db_table = "carbure_lots"
         indexes = [

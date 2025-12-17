@@ -20,6 +20,7 @@ class SafParentLotSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "carbure_id",
+            "pos_number",
         ]
 
 
@@ -68,6 +69,7 @@ class SafTicketSourcePreviewSerializer(serializers.ModelSerializer):
             "parent_lot",
             "parent_ticket",
             "added_by",
+            "origin_lot",
         ]
 
     feedstock = FeedStockSerializer(read_only=True)
@@ -77,6 +79,7 @@ class SafTicketSourcePreviewSerializer(serializers.ModelSerializer):
     parent_lot = SafParentLotSerializer(read_only=True, required=False)
     parent_ticket = SafParentTicketSerializer(required=False)
     added_by = EntityPreviewSerializer(read_only=True)
+    origin_lot = SafParentLotSerializer(read_only=True, required=False)
 
     @extend_schema_field(SafAssignedTicketSerializer(many=True))
     def get_assigned_tickets(self, obj):
