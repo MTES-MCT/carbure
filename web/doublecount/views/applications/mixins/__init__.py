@@ -8,6 +8,7 @@ from .lists import ListActionMixin
 from .reject_application import RejectActionMixin
 from .update_quotas import UpdateQuotaActionMixin
 from .filter import FilterActionMixin
+from .download_all import DownloadAllDocumentsMixin
 
 
 class ActionMixin(
@@ -21,5 +22,6 @@ class ActionMixin(
     RejectActionMixin,
     UpdateQuotaActionMixin,
     FilterActionMixin,
+    DownloadAllDocumentsMixin,
 ):
     pass
