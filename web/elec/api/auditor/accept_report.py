@@ -1,3 +1,5 @@
+from os import environ
+
 from django import forms
 from django.conf import settings
 from django.db import transaction
@@ -9,7 +11,6 @@ from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.helpers import send_mail
 from core.models import Entity
-from core.utils import CarbureEnv
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point_application import ElecChargePointApplication
@@ -117,7 +118,7 @@ def send_email_to_dgec(audit_sample: ElecAuditSample, request: HttpRequest):
     cpo = audit_sample.cpo.name
     year = audit_sample.created_at.year
 
-    admin_link = f"{CarbureEnv.get_base_url()}/org/9/elec-admin-audit/{year}"
+    admin_link = f"{environ.get('BASE_URL')}/org/9/elec-admin-audit/{year}"
 
     if audit_sample.charge_point_application is not None:
         application_id = audit_sample.charge_point_application.pk

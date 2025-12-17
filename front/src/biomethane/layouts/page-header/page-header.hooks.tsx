@@ -9,6 +9,7 @@ import {
 } from "biomethane/providers/annual-declaration"
 import {
   correctAnnualDeclaration,
+  getAnnualDeclarationYears,
   validateAnnualDeclaration,
 } from "biomethane/api"
 import useEntity from "common/hooks/entity"
@@ -16,6 +17,7 @@ import { HttpError } from "common/services/api-fetch"
 import { MissingFields } from "biomethane/components/missing-fields"
 import { Text } from "common/components/text"
 import { useNavigateToMissingFields } from "biomethane/components/missing-fields"
+import useYears from "common/hooks/years-2"
 
 export const usePageHeaderActions = () => {
   const { t } = useTranslation()
@@ -132,4 +134,37 @@ export const usePageHeaderActions = () => {
     openMissingFieldsDialog,
     correctAnnualDeclarationMutation,
   }
+}
+
+const getAnnualDeclarationYearsList = (
+  years: number[],
+  annualDeclarationYear: number
+) => {
+  return [
+    ...years,
+    ...(years.includes(annualDeclarationYear) ? [] : [annualDeclarationYear]),
+  ]
+}
+
+/**
+ * When the annual declaration is terminated (after 31/03 of the following year),
+ * We want to add the current year to the list of years to allow the user to see the annual declaration for the current year.
+ */
+export const useAnnualDeclarationYears = () => {
+  const entity = useEntity()
+  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  return useYears("biomethane", () =>
+    getAnnualDeclarationYears(entity.id).then((res) => {
+      const years = res.data ?? []
+      const yearsList = getAnnualDeclarationYearsList(
+        years,
+        currentAnnualDeclaration?.year
+      )
+
+      return {
+        ...res,
+        data: yearsList,
+      }
+    })
+  )
 }

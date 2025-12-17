@@ -1,4 +1,5 @@
 from datetime import datetime
+from os import environ
 
 from django.conf import settings
 from drf_spectacular.utils import (
@@ -15,7 +16,6 @@ from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.carburetypes import CarbureSanityCheckErrors
 from core.helpers import send_mail
 from core.models import CarbureLot, Entity, GenericError
-from core.utils import CarbureEnv
 from entity.serializers.depot import CreateDepotSerializer
 from entity.services.geolocation import get_coordinates
 
@@ -110,7 +110,7 @@ def send_email_to_user(entity, depot_name, request):
 def send_email_to_dgec(entity, depot_name, request):
     today = datetime.now().strftime("%d/%m/%Y")
     recipient_list = ["carbure@beta.gouv.fr"]
-    admin_link = f"{CarbureEnv.get_base_url()}/admin/transactions/site/?is_enabled=False"
+    admin_link = f"{environ.get('BASE_URL')}/admin/transactions/site/?is_enabled=False"
     text_message = f"""
     Bonjour,
 

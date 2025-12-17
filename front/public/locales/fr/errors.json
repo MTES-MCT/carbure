@@ -87,5 +87,6 @@
   "DECLARATION_ALREADY_VALIDATED": "La période de ce lot a déjà été déclarée : annulez la déclaration correspondante pour pouvoir le modifier.",
   "DELIVERY_DATE_VALIDITY": "La date de livraison du lot est antérieure à la date de réception su stock dont il est issu.",
   "MISSING_PRODUCTION_INFO": "Les informations de production ne sont pas renseignées",
-  "INVALID_CERTIFICATE": "Le certificat du fournisseur est expiré ou pas encore actif à la date de livraison donnée"
+  "INVALID_CERTIFICATE": "Le certificat du fournisseur est expiré ou pas encore actif à la date de livraison donnée",
+  "MISSING_DELIVERY_TYPE": "Le type de livraison est absent"
 }

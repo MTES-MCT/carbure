@@ -1,3 +1,5 @@
+from os import environ
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.template import loader
@@ -10,7 +12,6 @@ from rest_framework.response import Response
 from auth.serializers import UserResendActivationLinkSerializer
 from auth.tokens import account_activation_token
 from core.helpers import send_mail
-from core.utils import CarbureEnv
 
 
 def email_from(data):
@@ -29,7 +30,7 @@ def send_notification_mail(user, request):
     email_subject = "Carbure - Activation de compte"
     email_context = {
         "user": user,
-        "domain": CarbureEnv.get_base_url(),
+        "domain": environ.get("BASE_URL"),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": account_activation_token.make_token(user),
     }

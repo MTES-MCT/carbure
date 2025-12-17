@@ -43,6 +43,12 @@ env = environ.Env(
     FAKE_PROD=(bool, False),
 )
 
+# ensure a `BASE_URL` env var is present before starting
+if not env("TEST") and not os.environ.get("BASE_URL"):
+    raise LookupError("""\
+Environment variable `BASE_URL` is missing.
+Please add it to the runtime environment and set it to correct value.""")
+
 # False if not in os.environ
 DEBUG = env("DEBUG")
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ

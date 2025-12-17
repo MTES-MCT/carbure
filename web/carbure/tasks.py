@@ -19,7 +19,7 @@ from elec.scripts.create_meter_readings_application_reminder import create_meter
 from ml.scripts.calc_ml_score import calc_ml_score
 from ml.scripts.load_data import load_ml_data
 from saf.models.saf_ticket_source import create_ticket_sources_from_lots
-from tiruert.models.operation import create_tiruert_operations_from_lots
+from tiruert.services.operation import OperationService
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
 
 
@@ -40,7 +40,7 @@ def background_create_ticket_sources_from_lots(lots: QuerySet) -> None:
 
 @db_task()
 def background_create_tiruert_operations_from_lots(lots: QuerySet) -> None:
-    create_tiruert_operations_from_lots(lots)
+    OperationService.create_operations_from_lots(lots)
 
 
 if env.get("IMAGE_TAG") == "prod":

@@ -7,17 +7,18 @@ import {
   EntityDepot,
   OwnershipType,
   EntityPreview,
+  ExternalAdminPages,
 } from "common/types"
 import * as common from "common/api"
 import * as api from "../../api/delivery-sites"
 import { LoaderOverlay } from "common/components/scaffold"
 import { Checkbox, RadioGroup } from "common/components/inputs2"
 import { Button } from "common/components/button2"
-import { Cell, Table } from "common/components/table2"
+import { Cell, Column, Table } from "common/components/table2"
 import { Confirm, Dialog } from "common/components/dialog2"
 import { Autocomplete } from "common/components/autocomplete2"
 import { Form, useForm } from "common/components/form2"
-import useEntity, { useRights } from "common/hooks/entity"
+import useEntity, { hasAdminRight, useRights } from "common/hooks/entity"
 import { normalizeDepot } from "common/utils/normalizers"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
@@ -32,6 +33,7 @@ import { AutoCompleteOperators } from "common/molecules/autocomplete-operators"
 import { EditableCard } from "common/molecules/editable-card"
 import { Notice } from "common/components/notice"
 import Badge from "@codegouvfr/react-dsfr/Badge"
+import { compact } from "common/utils/collection"
 
 interface DeliverySiteSettingsProps {
   readOnly?: boolean
@@ -57,7 +59,8 @@ const DeliverySitesSettings = ({
   const deliverySitesData = deliverySites.result?.data ?? []
   const isEmpty = deliverySitesData.length === 0
 
-  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+  const isDGDDI = hasAdminRight(ExternalAdminPages.DGDDI, entity)
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite) && !isDGDDI
 
   function findDeliverySite() {
     portal((close) => <DeliverySiteFinderDialog onClose={close} />)
@@ -92,8 +95,8 @@ const DeliverySitesSettings = ({
         <Table
           rows={deliverySitesData}
           onAction={showDeliverySite}
-          columns={[
-            {
+          columns={compact<Column<EntityDepot>>([
+            !isDGDDI && {
               key: "status",
               header: t("Statut"),
               cell: (ds) => (
@@ -139,13 +142,13 @@ const DeliverySitesSettings = ({
                 />
               ),
             },
-            {
+            !isDGDDI && {
               header: t("Action"),
               cell: (ds) =>
                 !readOnly &&
                 canModify && <DeleteDeliverySiteButton deliverySite={ds} />,
             },
-          ]}
+          ])}
         />
       )}
 
