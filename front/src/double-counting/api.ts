@@ -91,3 +91,11 @@ export function deleteDoubleCountingApplicationFile(
     }
   )
 }
+
+export function downloadAllDoubleCountingApplicationFiles(
+  entity_id: number,
+  application_id: number
+) {
+  const url = `/api/double-counting/applications/${application_id}/download-all/?entity_id=${entity_id}`
+  return window.open(url)
+}

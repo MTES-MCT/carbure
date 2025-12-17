@@ -158,6 +158,7 @@ const AgreementTabs = ({
 }) => {
   const [focus, setFocus] = useState("production_site")
   const { t } = useTranslation()
+  const entity = useEntity()
   return (
     <>
       <Tabs
@@ -209,7 +210,12 @@ const AgreementTabs = ({
         />
       )}
       {focus === "fichiers" && (
-        <FilesManager readOnly files={agreement.application.documents} />
+        <FilesManager
+          readOnly
+          files={agreement.application.documents}
+          applicationId={agreement.application.id}
+          entityId={entity.id}
+        />
       )}
     </>
   )

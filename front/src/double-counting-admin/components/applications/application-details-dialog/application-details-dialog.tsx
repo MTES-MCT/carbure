@@ -241,6 +241,8 @@ export const ApplicationDetailsDialog = () => {
             quotas={quotas}
             setQuotas={onUpdateQuotas}
             files={application.documents}
+            applicationId={application.id}
+            entityId={entity.id}
           />
         )}
 

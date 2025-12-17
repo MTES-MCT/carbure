@@ -2555,6 +2555,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingApplication"
           description: ""
+  /api/double-counting/applications/{id}/download-all/:
+    get:
+      operationId: double_counting_applications_download_all_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+          description: ""
   /api/double-counting/applications/{id}/export/:
     get:
       operationId: double_counting_applications_export_retrieve

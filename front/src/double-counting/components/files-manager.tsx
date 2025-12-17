@@ -10,12 +10,15 @@ import { Table, Column } from "common/components/table2"
 import { Confirm } from "common/components/dialog2"
 import { Text } from "common/components/text"
 import { FileTypeEnum } from "api-schema"
+import * as api from "double-counting/api"
+import useEntity from "common/hooks/entity"
 
 type FilesManagerProps = {
   readOnly?: boolean
   files?: DoubleCountingFile[]
   onAddFiles?: (files: DoubleCountingFile[]) => void
   onDeleteFile?: (file: DoubleCountingFile) => void
+  applicationId?: number
 }
 
 export const FilesManager = ({
@@ -23,9 +26,11 @@ export const FilesManager = ({
   files = [],
   onAddFiles,
   onDeleteFile,
+  applicationId,
 }: FilesManagerProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const entity = useEntity()
 
   function saveFiles(files: FileList) {
     const dcFiles = Array.from(files).map<DoubleCountingFile>((file) => ({
@@ -53,6 +58,14 @@ export const FilesManager = ({
     },
   ]
 
+  const canDownloadAll = applicationId && entity && files.length > 0
+
+  const handleDownloadAll = () => {
+    if (applicationId && entity) {
+      api.downloadAllDoubleCountingApplicationFiles(entity.id, applicationId)
+    }
+  }
+
   return (
     <Box>
       <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
@@ -60,19 +73,30 @@ export const FilesManager = ({
           {t("Fichiers associés à la demande")}
         </Title>
 
-        {!readOnly && (
-          <Button
-            priority="secondary"
-            iconId="fr-icon-download-fill"
-            onClick={() =>
-              portal((onClose) => (
-                <FileUploadDialog onClose={onClose} onConfirm={saveFiles} />
-              ))
-            }
-          >
-            {t("Charger des fichiers")}
-          </Button>
-        )}
+        <Row style={{ gap: "var(--spacing-xs)" }}>
+          {canDownloadAll && (
+            <Button
+              priority="secondary"
+              iconId="fr-icon-download-fill"
+              onClick={handleDownloadAll}
+            >
+              {t("Tout télécharger")}
+            </Button>
+          )}
+          {!readOnly && (
+            <Button
+              priority="secondary"
+              iconId="fr-icon-download-fill"
+              onClick={() =>
+                portal((onClose) => (
+                  <FileUploadDialog onClose={onClose} onConfirm={saveFiles} />
+                ))
+              }
+            >
+              {t("Charger des fichiers")}
+            </Button>
+          )}
+        </Row>
       </Row>
       <Divider noMargin />
       {files.length === 0 ? (
