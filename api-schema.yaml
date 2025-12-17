@@ -6491,15 +6491,43 @@ paths:
       operationId: resources_airports_list
       parameters:
         - in: query
+          name: origin_depot_id
+          schema:
+            type: integer
+        - in: query
           name: public_only
           schema:
             type: boolean
-          description: Public Only
+            default: false
         - in: query
           name: query
           schema:
             type: string
-          description: Search within the fields `name`, `icao_code` and `city`
+        - in: query
+          name: shipping_method
+          schema:
+            enum:
+              - TRUCK
+              - BARGE
+              - TRAIN
+              - PIPELINE
+              - PIPELINE_DMM
+              - PIPELINE_LHP
+              - PIPELINE_ODC
+              - PIPELINE_SPMR
+              - PIPELINE_SPSE
+            type: string
+            minLength: 1
+          description: |-
+            * `TRUCK` - TRUCK
+            * `BARGE` - BARGE
+            * `TRAIN` - TRAIN
+            * `PIPELINE` - PIPELINE
+            * `PIPELINE_DMM` - PIPELINE_DMM
+            * `PIPELINE_LHP` - PIPELINE_LHP
+            * `PIPELINE_ODC` - PIPELINE_ODC
+            * `PIPELINE_SPMR` - PIPELINE_SPMR
+            * `PIPELINE_SPSE` - PIPELINE_SPSE
       tags:
         - resources
       security:
