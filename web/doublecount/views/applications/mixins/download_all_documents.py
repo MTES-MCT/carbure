@@ -4,9 +4,9 @@ import zipfile
 from django.http import HttpResponse
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 
 from core import private_storage
-from core.common import ErrorResponse
 
 from .response_serializer import ResponseSerializer
 
@@ -30,15 +30,18 @@ class DownloadAllDocumentsMixin:
         documents = application.documents.all()
 
         if not documents.exists():
-            return ErrorResponse(404, "NO_DOCUMENTS", "Aucun document disponible")
+            raise NotFound("Aucun document disponible")
 
         # Create a zip file in memory
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
             for doc in documents:
                 # Download each document from S3 and add it to the zip file
-                file_content = private_storage.open(doc.url).read()
-                zip_file.writestr(doc.file_name, file_content)
+                try:
+                    file_content = private_storage.open(doc.url).read()
+                    zip_file.writestr(doc.file_name, file_content)
+                except FileNotFoundError:
+                    continue
 
         zip_buffer.seek(0)
         response = HttpResponse(zip_buffer, content_type="application/zip")

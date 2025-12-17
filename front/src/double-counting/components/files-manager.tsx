@@ -11,6 +11,7 @@ import { Confirm } from "common/components/dialog2"
 import { Text } from "common/components/text"
 import { FileTypeEnum } from "api-schema"
 import * as api from "double-counting/api"
+import useEntity from "common/hooks/entity"
 
 type FilesManagerProps = {
   readOnly?: boolean
@@ -18,7 +19,6 @@ type FilesManagerProps = {
   onAddFiles?: (files: DoubleCountingFile[]) => void
   onDeleteFile?: (file: DoubleCountingFile) => void
   applicationId?: number
-  entityId?: number
 }
 
 export const FilesManager = ({
@@ -27,10 +27,10 @@ export const FilesManager = ({
   onAddFiles,
   onDeleteFile,
   applicationId,
-  entityId,
 }: FilesManagerProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const entity = useEntity()
 
   function saveFiles(files: FileList) {
     const dcFiles = Array.from(files).map<DoubleCountingFile>((file) => ({
@@ -58,11 +58,11 @@ export const FilesManager = ({
     },
   ]
 
-  const canDownloadAll = applicationId && entityId && files.length > 0
+  const canDownloadAll = applicationId && entity && files.length > 0
 
   const handleDownloadAll = () => {
-    if (applicationId && entityId) {
-      api.downloadAllDoubleCountingApplicationFiles(entityId, applicationId)
+    if (applicationId && entity) {
+      api.downloadAllDoubleCountingApplicationFiles(entity.id, applicationId)
     }
   }
 
