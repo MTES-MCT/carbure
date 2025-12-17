@@ -10360,10 +10360,19 @@ export interface operations {
     resources_airports_list: {
         parameters: {
             query?: {
-                /** @description Public Only */
+                origin_depot_id?: number;
                 public_only?: boolean;
-                /** @description Search within the fields `name`, `icao_code` and `city` */
                 query?: string;
+                /** @description * `TRUCK` - TRUCK
+                 *     * `BARGE` - BARGE
+                 *     * `TRAIN` - TRAIN
+                 *     * `PIPELINE` - PIPELINE
+                 *     * `PIPELINE_DMM` - PIPELINE_DMM
+                 *     * `PIPELINE_LHP` - PIPELINE_LHP
+                 *     * `PIPELINE_ODC` - PIPELINE_ODC
+                 *     * `PIPELINE_SPMR` - PIPELINE_SPMR
+                 *     * `PIPELINE_SPSE` - PIPELINE_SPSE */
+                shipping_method?: PathsApiResourcesAirportsGetParametersQueryShipping_method;
             };
             header?: never;
             path?: never;
@@ -12795,6 +12804,17 @@ export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
     status = "status",
     used_in_tiruert = "used_in_tiruert",
     year = "year"
+}
+export enum PathsApiResourcesAirportsGetParametersQueryShipping_method {
+    TRUCK = "TRUCK",
+    BARGE = "BARGE",
+    TRAIN = "TRAIN",
+    PIPELINE = "PIPELINE",
+    PIPELINE_DMM = "PIPELINE_DMM",
+    PIPELINE_LHP = "PIPELINE_LHP",
+    PIPELINE_ODC = "PIPELINE_ODC",
+    PIPELINE_SPMR = "PIPELINE_SPMR",
+    PIPELINE_SPSE = "PIPELINE_SPSE"
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
     ValueMinusadded_by = "-added_by",
