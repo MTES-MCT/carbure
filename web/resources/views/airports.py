@@ -1,41 +1,50 @@
 from django.db.models import Q
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import extend_schema
+from rest_framework import serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.serializers import AirportSerializer
+from core.utils import extract_enum
+from saf.models.saf_logistics import SafLogistics
 from transactions.models.airport import Airport
 
 
+class AirportQueryParamsSerializer(serializers.Serializer):
+    query = serializers.CharField(required=False, allow_blank=True)
+    public_only = serializers.BooleanField(required=False, default=False)
+    origin_depot_id = serializers.IntegerField(required=False)
+    shipping_method = serializers.ChoiceField(required=False, choices=extract_enum(SafLogistics, "shipping_method"))
+
+
 @extend_schema(
-    parameters=[
-        OpenApiParameter(
-            name="query",
-            description="Search within the fields `name`, `icao_code` and `city`",
-            required=False,
-            type=str,
-        ),
-        OpenApiParameter(
-            name="public_only",
-            description="Public Only",
-            required=False,
-            type=bool,
-        ),
-    ],
+    parameters=[AirportQueryParamsSerializer],
     responses=AirportSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_airports(request, *args, **kwargs):
-    query = request.query_params.get("query")
-    public_only = request.query_params.get("public_only", False)
+    serializer = AirportQueryParamsSerializer(data=request.query_params)
+    serializer.is_valid(raise_exception=True)
+
+    public_only = serializer.validated_data.get("public_only", False)
+    query = serializer.validated_data.get("query", None)
+    origin_depot_id = serializer.validated_data.get("origin_depot_id", None)
+    shipping_method = serializer.validated_data.get("shipping_method", None)
 
     sites = Airport.objects.all().order_by("name").filter(is_enabled=True)
+
     if public_only:
         sites = sites.filter(private=False)
     if query:
         sites = sites.filter(Q(name__icontains=query) | Q(customs_id__icontains=query) | Q(city__icontains=query))
+    if origin_depot_id and shipping_method:
+        if SafLogistics.objects.filter(origin_depot_id=origin_depot_id, shipping_method=shipping_method).exists():
+            sites = sites.filter(
+                airport_from_depot_routes__origin_depot_id=origin_depot_id,
+                airport_from_depot_routes__shipping_method=shipping_method,
+            )
 
     serializer = AirportSerializer(sites, many=True)
 
