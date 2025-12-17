@@ -2,6 +2,8 @@ from math import floor
 
 from django.db import models
 
+from saf.models.saf_logistics import SafLogistics
+
 
 class SafTicket(models.Model):
     class Meta:
@@ -89,17 +91,7 @@ class SafTicket(models.Model):
     )
     consumption_type = models.CharField(max_length=64, choices=CONSUMPTION_TYPES, null=True, blank=True)
 
-    PIPELINE = "PIPELINE"
-    TRUCK = "TRUCK"
-    TRAIN = "TRAIN"
-    BARGE = "BARGE"
-    SHIPPING_METHODS = (
-        (PIPELINE, PIPELINE),
-        (TRUCK, TRUCK),
-        (TRAIN, TRAIN),
-        (BARGE, BARGE),
-    )
-    shipping_method = models.CharField(max_length=64, choices=SHIPPING_METHODS, null=True, blank=True)
+    shipping_method = models.CharField(max_length=64, choices=SafLogistics.SHIPPING_METHODS, null=True, blank=True)
 
     ETS_VALUATION = "ETS_VALUATION"
     OUTSIDE_ETS = "OUTSIDE_ETS"
