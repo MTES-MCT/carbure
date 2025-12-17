@@ -605,7 +605,7 @@ class CarbureNotificationAdmin(admin.ModelAdmin):
 class GenericCertificateResource(resources.ModelResource):
     class Meta:
         model = GenericCertificate
-        import_id_fields = ["certificate_id"]  # unique field in your model
+        import_id_fields = ["certificate_id"]
         skip_unchanged = True
         report_skipped = True
 

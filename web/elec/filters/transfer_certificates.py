@@ -1,4 +1,6 @@
 import django_filters
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 from core.filters import MultipleBooleanFilter
 from elec.models import ElecTransferCertificate
@@ -7,7 +9,7 @@ from elec.models import ElecTransferCertificate
 class TransferCertificateFilter(django_filters.FilterSet):
     status = django_filters.CharFilter(field_name="status")
     year = django_filters.NumberFilter(field_name="transfer_date__year")
-    month = django_filters.AllValuesMultipleFilter(field_name="transfer_date__month")
+    month = extend_schema_field(OpenApiTypes.INT)(django_filters.AllValuesMultipleFilter(field_name="transfer_date__month"))
     cpo = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
     operator = django_filters.AllValuesMultipleFilter(field_name="client__name")
     used_in_tiruert = MultipleBooleanFilter(field_name="used_in_tiruert")
