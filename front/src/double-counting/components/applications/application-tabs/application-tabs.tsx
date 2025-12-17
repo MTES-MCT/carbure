@@ -25,6 +25,8 @@ interface ApplicationDetailsProps {
   files?: DoubleCountingFile[]
   onAddFiles?: (files: DoubleCountingFile[]) => void
   onDeleteFile?: (file: DoubleCountingFile) => void
+  applicationId?: number
+  entityId?: number
 }
 
 const ApplicationTabs = ({
@@ -38,6 +40,8 @@ const ApplicationTabs = ({
   files,
   onAddFiles,
   onDeleteFile,
+  applicationId,
+  entityId,
 }: ApplicationDetailsProps) => {
   const [focus, setFocus] = useState(
     productionSite ? "production_site" : "sourcing_forecast"
@@ -104,6 +108,8 @@ const ApplicationTabs = ({
           files={files}
           onAddFiles={onAddFiles}
           onDeleteFile={onDeleteFile}
+          applicationId={applicationId}
+          entityId={entityId}
         />
       )}
     </>

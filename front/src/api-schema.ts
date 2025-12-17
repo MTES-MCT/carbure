@@ -835,6 +835,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/double-counting/applications/{id}/download-all/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["double_counting_applications_download_all_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/double-counting/applications/{id}/export/": {
         parameters: {
             query?: never;
@@ -2430,7 +2446,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Get agregated objectives for all entities - admin view */
-        get: operations["admin_objectives"];
+        get: operations["tiruert_admin_objectives_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2447,7 +2463,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Get objectives for a specific entity - admin view */
-        get: operations["admin_objectives_entity"];
+        get: operations["tiruert_admin_objectives_entity_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2602,7 +2618,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Get all objectives */
-        get: operations["objectives"];
+        get: operations["tiruert_objectives_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2618,11 +2634,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve a list of operations with optional filtering and pagination. */
-        get: operations["list_operations"];
+        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+         *
+         *     This mixin automatically adds the unit to the request via `initialize_request()`
+         *     and to the serializer context via `get_serializer_context()`.
+         *
+         *     The unit is determined in the following order:
+         *     1. 'unit' parameter from the request (POST or GET)
+         *     2. Entity's preferred unit (entity.preferred_unit)
+         *     3. Default value: 'l' (liters) */
+        get: operations["tiruert_operations_list"];
         put?: never;
-        /** @description Create a new operation. */
-        post: operations["create_operation"];
+        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+         *
+         *     This mixin automatically adds the unit to the request via `initialize_request()`
+         *     and to the serializer context via `get_serializer_context()`.
+         *
+         *     The unit is determined in the following order:
+         *     1. 'unit' parameter from the request (POST or GET)
+         *     2. Entity's preferred unit (entity.preferred_unit)
+         *     3. Default value: 'l' (liters) */
+        post: operations["tiruert_operations_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2636,16 +2668,40 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve one specific operation. */
-        get: operations["get_operation"];
+        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+         *
+         *     This mixin automatically adds the unit to the request via `initialize_request()`
+         *     and to the serializer context via `get_serializer_context()`.
+         *
+         *     The unit is determined in the following order:
+         *     1. 'unit' parameter from the request (POST or GET)
+         *     2. Entity's preferred unit (entity.preferred_unit)
+         *     3. Default value: 'l' (liters) */
+        get: operations["tiruert_operations_retrieve"];
         put?: never;
         post?: never;
-        /** @description Delete an operation. Only allowed for certain types and statuses. */
-        delete: operations["delete_operation"];
+        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+         *
+         *     This mixin automatically adds the unit to the request via `initialize_request()`
+         *     and to the serializer context via `get_serializer_context()`.
+         *
+         *     The unit is determined in the following order:
+         *     1. 'unit' parameter from the request (POST or GET)
+         *     2. Entity's preferred unit (entity.preferred_unit)
+         *     3. Default value: 'l' (liters) */
+        delete: operations["tiruert_operations_destroy"];
         options?: never;
         head?: never;
-        /** @description Update a part of operation. */
-        patch: operations["update_operation"];
+        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+         *
+         *     This mixin automatically adds the unit to the request via `initialize_request()`
+         *     and to the serializer context via `get_serializer_context()`.
+         *
+         *     The unit is determined in the following order:
+         *     1. 'unit' parameter from the request (POST or GET)
+         *     2. Entity's preferred unit (entity.preferred_unit)
+         *     3. Default value: 'l' (liters) */
+        patch: operations["tiruert_operations_partial_update"];
         trace?: never;
     };
     "/api/tiruert/operations/{id}/accept/": {
@@ -2740,6 +2796,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+         *
+         *     This mixin automatically adds the unit to the request via `initialize_request()`
+         *     and to the serializer context via `get_serializer_context()`.
+         *
+         *     The unit is determined in the following order:
+         *     1. 'unit' parameter from the request (POST or GET)
+         *     2. Entity's preferred unit (entity.preferred_unit)
+         *     3. Default value: 'l' (liters) */
         get: operations["tiruert_operations_export_retrieve"];
         put?: never;
         post?: never;
@@ -3636,6 +3701,7 @@ export interface components {
          *     * `ISCC` - ISCC
          *     * `REDCERT` - REDCERT
          *     * `2BS` - 2BS
+         *     * `KZR_INIG` - KZR_INIG
          * @enum {string}
          */
         CertificateTypeEnum: CertificateTypeEnum;
@@ -4720,6 +4786,19 @@ export interface components {
             id: number;
             name: string;
         };
+        OperationInput: {
+            type: components["schemas"]["OperationTypeEnum"];
+            customs_category: components["schemas"]["MPCategoriesEnum"];
+            biofuel: number | null;
+            credited_entity?: number | null;
+            debited_entity: number | null;
+            from_depot?: number | null;
+            to_depot?: number | null;
+            export_country?: string | null;
+            export_recipient?: string;
+            lots: components["schemas"]["OperationLot"][];
+            status?: components["schemas"]["OperationStatusEnum"];
+        };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
             customs_category: components["schemas"]["MPCategoriesEnum"];
@@ -4758,6 +4837,13 @@ export interface components {
             readonly unit: string;
             details?: components["schemas"]["OperationDetail"][];
         };
+        OperationLot: {
+            id: number;
+            /** Format: double */
+            volume: number;
+            /** Format: double */
+            emission_rate_per_mj: number;
+        };
         OperationLotRequest: {
             id: number;
             /** Format: double */
@@ -4791,6 +4877,10 @@ export interface components {
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
+        OperationUpdate: {
+            to_depot?: number | null;
+            status?: components["schemas"]["OperationStatusEnum"];
+        };
         OperationalUnitRequest: {
             code: string;
             /** Format: date */
@@ -7559,6 +7649,31 @@ export interface operations {
             };
         };
     };
+    double_counting_applications_download_all_retrieve: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Dossier Double Compte. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Response"];
+                };
+            };
+        };
+    };
     double_counting_applications_export_retrieve: {
         parameters: {
             query: {
@@ -8006,17 +8121,16 @@ export interface operations {
     elec_provision_certificates_list: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Ordre
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
+                 *     * `energy_amount` - Energy amount
+                 *     * `-energy_amount` - Energy amount (décroissant)
                  *     * `remaining_energy_amount` - Remaining energy amount
                  *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
@@ -8032,11 +8146,16 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `1` - T1
+                 *     * `2` - T2
+                 *     * `3` - T3
+                 *     * `4` - T4 */
                 quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[];
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `MANUAL` - MANUAL
+                 *     * `METER_READINGS` - METER_READINGS
+                 *     * `QUALICHARGE` - QUALICHARGE */
                 source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
                 status?: string;
                 year?: number;
@@ -8300,19 +8419,18 @@ export interface operations {
     elec_provision_certificates_filters_retrieve: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Ordre
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
+                 *     * `energy_amount` - Energy amount
+                 *     * `-energy_amount` - Energy amount (décroissant)
                  *     * `remaining_energy_amount` - Remaining energy amount
                  *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
@@ -8324,11 +8442,16 @@ export interface operations {
                 order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `1` - T1
+                 *     * `2` - T2
+                 *     * `3` - T3
+                 *     * `4` - T4 */
                 quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[];
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                /** @description * `MANUAL` - MANUAL
+                 *     * `METER_READINGS` - METER_READINGS
+                 *     * `QUALICHARGE` - QUALICHARGE */
                 source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
                 status?: string;
                 year?: number;
@@ -8412,16 +8535,10 @@ export interface operations {
     elec_transfer_certificates_list: {
         parameters: {
             query: {
-                certificate_id?: string;
-                client?: number;
-                consumption_date?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
-                month?: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                month?: string[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8449,9 +8566,9 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 status?: string;
-                supplier?: number;
-                transfer_date?: string;
-                used_in_tiruert?: boolean;
+                /** @description * `true` - True
+                 *     * `false` - False */
+                used_in_tiruert?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 year?: number;
             };
             header?: never;
@@ -8604,18 +8721,12 @@ export interface operations {
     elec_transfer_certificates_filters_retrieve: {
         parameters: {
             query: {
-                certificate_id?: string;
-                client?: number;
-                consumption_date?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                energy_amount?: number;
                 /** @description Entity ID */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
-                month?: number;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                month?: string[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8639,9 +8750,9 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 status?: string;
-                supplier?: number;
-                transfer_date?: string;
-                used_in_tiruert?: boolean;
+                /** @description * `true` - True
+                 *     * `false` - False */
+                used_in_tiruert?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 year?: number;
             };
             header?: never;
@@ -11066,7 +11177,7 @@ export interface operations {
             };
         };
     };
-    admin_objectives: {
+    tiruert_admin_objectives_retrieve: {
         parameters: {
             query: {
                 /** @description Date from which to calculate balance for teneur */
@@ -11084,7 +11195,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description All agregated objectives for all liable enttities. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11095,7 +11205,7 @@ export interface operations {
             };
         };
     };
-    admin_objectives_entity: {
+    tiruert_admin_objectives_entity_retrieve: {
         parameters: {
             query: {
                 /** @description Date from which to calculate balance for teneur */
@@ -11115,7 +11225,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description All objectives. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11537,7 +11646,7 @@ export interface operations {
             };
         };
     };
-    objectives: {
+    tiruert_objectives_retrieve: {
         parameters: {
             query: {
                 /** @description Date from which to calculate balance for teneur */
@@ -11555,7 +11664,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description All objectives. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11566,7 +11674,7 @@ export interface operations {
             };
         };
     };
-    list_operations: {
+    tiruert_operations_list: {
         parameters: {
             query: {
                 biofuel?: string[];
@@ -11580,8 +11688,6 @@ export interface operations {
                 date_from?: string;
                 date_to?: string;
                 depot?: string[];
-                /** @description Include detailed information if set to `1`. */
-                details?: boolean;
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 from_to?: string;
@@ -11654,7 +11760,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A list of operations. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11665,7 +11770,7 @@ export interface operations {
             };
         };
     };
-    create_operation: {
+    tiruert_operations_create: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
@@ -11685,25 +11790,17 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The newly created operation. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationList"];
+                    "application/json": components["schemas"]["OperationInput"];
                 };
-            };
-            /** @description Invalid input data. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
-    get_operation: {
+    tiruert_operations_retrieve: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
@@ -11720,7 +11817,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Details of specific operation. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11731,7 +11827,7 @@ export interface operations {
             };
         };
     };
-    delete_operation: {
+    tiruert_operations_destroy: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
@@ -11748,15 +11844,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Operation deleted successfully. */
+            /** @description No response body */
             204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. The operation type or status does not allow deletion. */
-            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11764,7 +11853,7 @@ export interface operations {
             };
         };
     };
-    update_operation: {
+    tiruert_operations_partial_update: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
@@ -11787,21 +11876,13 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The updated operation. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Operation"];
+                    "application/json": components["schemas"]["OperationUpdate"];
                 };
-            };
-            /** @description Invalid input data. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -12500,11 +12581,13 @@ export enum PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by 
 }
 export enum PathsApiElecProvisionCertificatesGetParametersQueryOrder_by {
     ValueMinuscpo = "-cpo",
+    ValueMinusenergy_amount = "-energy_amount",
     ValueMinusoperating_unit = "-operating_unit",
     ValueMinusquarter = "-quarter",
     ValueMinusremaining_energy_amount = "-remaining_energy_amount",
     ValueMinussource = "-source",
     cpo = "cpo",
+    energy_amount = "energy_amount",
     operating_unit = "operating_unit",
     quarter = "quarter",
     remaining_energy_amount = "remaining_energy_amount",
@@ -12537,7 +12620,6 @@ export enum PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQuer
 }
 export enum PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter {
     cpo = "cpo",
-    energy_amount = "energy_amount",
     operating_unit = "operating_unit",
     order_by = "order_by",
     quarter = "quarter",
@@ -12560,18 +12642,16 @@ export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     status = "status",
     transfer_date = "transfer_date"
 }
+export enum PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert {
+    false = "false",
+    true = "true"
+}
 export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
-    certificate_id = "certificate_id",
-    client = "client",
-    consumption_date = "consumption_date",
     cpo = "cpo",
-    energy_amount = "energy_amount",
     month = "month",
     operator = "operator",
     order_by = "order_by",
     status = "status",
-    supplier = "supplier",
-    transfer_date = "transfer_date",
     used_in_tiruert = "used_in_tiruert",
     year = "year"
 }
@@ -12784,7 +12864,8 @@ export enum CertificateTypeEnum {
     SYSTEME_NATIONAL = "SYSTEME_NATIONAL",
     ISCC = "ISCC",
     REDCERT = "REDCERT",
-    Value2BS = "2BS"
+    Value2BS = "2BS",
+    KZR_INIG = "KZR_INIG"
 }
 export enum CompostingLocationsEnum {
     ON_SITE = "ON_SITE",

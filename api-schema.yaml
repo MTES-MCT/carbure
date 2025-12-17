@@ -2555,6 +2555,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingApplication"
           description: ""
+  /api/double-counting/applications/{id}/download-all/:
+    get:
+      operationId: double_counting_applications_download_all_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+          description: ""
   /api/double-counting/applications/{id}/export/:
     get:
       operationId: double_counting_applications_export_retrieve
@@ -3216,14 +3244,8 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -3236,8 +3258,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -3247,11 +3268,13 @@ paths:
               type: string
               enum:
                 - -cpo
+                - -energy_amount
                 - -operating_unit
                 - -quarter
                 - -remaining_energy_amount
                 - -source
                 - cpo
+                - energy_amount
                 - operating_unit
                 - quarter
                 - remaining_energy_amount
@@ -3261,6 +3284,8 @@ paths:
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
             * `remaining_energy_amount` - Remaining energy amount
             * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
@@ -3300,8 +3325,12 @@ paths:
                 - 2
                 - 3
                 - 4
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `1` - T1
+            * `2` - T2
+            * `3` - T3
+            * `4` - T4
+          explode: true
           style: form
         - name: search
           required: false
@@ -3321,8 +3350,11 @@ paths:
                 - METER_READINGS
                 - null
                 - QUALICHARGE
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+          explode: true
           style: form
         - in: query
           name: status
@@ -3753,14 +3785,8 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -3773,7 +3799,6 @@ paths:
             type: string
             enum:
               - cpo
-              - energy_amount
               - operating_unit
               - order_by
               - quarter
@@ -3787,8 +3812,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -3798,11 +3822,13 @@ paths:
               type: string
               enum:
                 - -cpo
+                - -energy_amount
                 - -operating_unit
                 - -quarter
                 - -remaining_energy_amount
                 - -source
                 - cpo
+                - energy_amount
                 - operating_unit
                 - quarter
                 - remaining_energy_amount
@@ -3812,6 +3838,8 @@ paths:
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
             * `remaining_energy_amount` - Remaining energy amount
             * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
@@ -3839,8 +3867,12 @@ paths:
                 - 2
                 - 3
                 - 4
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `1` - T1
+            * `2` - T2
+            * `3` - T3
+            * `4` - T4
+          explode: true
           style: form
         - name: search
           required: false
@@ -3860,8 +3892,11 @@ paths:
                 - METER_READINGS
                 - null
                 - QUALICHARGE
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+          explode: true
           style: form
         - in: query
           name: status
@@ -3888,10 +3923,10 @@ paths:
                 ExampleOfFiltersResponse.:
                   value:
                     - cpo
-                    - energy_amount
                     - operating_unit
                     - order_by
                     - quarter
+                    - source
                   summary: Example of filters response.
           description: ""
   /api/elec/provision-certificates/import/:
@@ -3968,32 +4003,13 @@ paths:
       operationId: elec_transfer_certificates_list
       parameters:
         - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: client
-          schema:
-            type: integer
-        - in: query
-          name: consumption_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: cpo
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -4003,15 +4019,18 @@ paths:
         - in: query
           name: month
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: operator
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4082,18 +4101,19 @@ paths:
           schema:
             type: string
         - in: query
-          name: supplier
-          schema:
-            type: integer
-        - in: query
-          name: transfer_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: used_in_tiruert
           schema:
-            type: boolean
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4263,32 +4283,13 @@ paths:
       operationId: elec_transfer_certificates_filters_retrieve
       parameters:
         - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: client
-          schema:
-            type: integer
-        - in: query
-          name: consumption_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: cpo
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -4300,17 +4301,11 @@ paths:
           schema:
             type: string
             enum:
-              - certificate_id
-              - client
-              - consumption_date
               - cpo
-              - energy_amount
               - month
               - operator
               - order_by
               - status
-              - supplier
-              - transfer_date
               - used_in_tiruert
               - year
           description: Filter string to apply
@@ -4318,15 +4313,18 @@ paths:
         - in: query
           name: month
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: operator
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4385,18 +4383,19 @@ paths:
           schema:
             type: string
         - in: query
-          name: supplier
-          schema:
-            type: integer
-        - in: query
-          name: transfer_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: used_in_tiruert
           schema:
-            type: boolean
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4417,11 +4416,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - certificate_id
-                    - client
-                    - consumption_date
                     - cpo
-                    - energy_amount
+                    - month
+                    - operator
+                    - order_by
+                    - status
                   summary: Example of filters response.
           description: ""
   /api/entities/:
@@ -8101,7 +8100,7 @@ paths:
           description: ""
   /api/tiruert/admin-objectives/:
     get:
-      operationId: admin_objectives
+      operationId: tiruert_admin_objectives_retrieve
       description: Get agregated objectives for all entities - admin view
       parameters:
         - in: query
@@ -8141,10 +8140,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All agregated objectives for all liable enttities.
+          description: ""
   /api/tiruert/admin-objectives-entity/:
     get:
-      operationId: admin_objectives_entity
+      operationId: tiruert_admin_objectives_entity_retrieve
       description: Get objectives for a specific entity - admin view
       parameters:
         - in: query
@@ -8190,7 +8189,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All objectives.
+          description: ""
   /api/tiruert/elec-operations/:
     get:
       operationId: list_elec_operations
@@ -8913,7 +8912,7 @@ paths:
           description: ""
   /api/tiruert/objectives/:
     get:
-      operationId: objectives
+      operationId: tiruert_objectives_retrieve
       description: Get all objectives
       parameters:
         - in: query
@@ -8953,11 +8952,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All objectives.
+          description: ""
   /api/tiruert/operations/:
     get:
-      operationId: list_operations
-      description: Retrieve a list of operations with optional filtering and pagination.
+      operationId: tiruert_operations_list
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: biofuel
@@ -9006,12 +9021,6 @@ paths:
             items:
               type: string
               minLength: 1
-        - in: query
-          name: details
-          schema:
-            type: boolean
-            default: "0"
-          description: Include detailed information if set to `1`.
         - in: query
           name: entity_id
           schema:
@@ -9209,10 +9218,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedOperationListList"
-          description: A list of operations.
+          description: ""
     post:
-      operationId: create_operation
-      description: Create a new operation.
+      operationId: tiruert_operations_create
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9236,23 +9261,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/OperationInputRequest"
-            examples:
-              CreateOperationExample:
-                value:
-                  type: TENEUR
-                  customs_category: CONV
-                  biofuel: 33
-                  credited_entity: ""
-                  debited_entity: 2
-                  depot: ""
-                  lots:
-                    - id: 10
-                      volume: 39462
-                      emission_rate_per_mj: 5.25
-                    - id: 11
-                      volume: 723.2
-                      emission_rate_per_mj: 30.2
-                summary: Create Operation Example
           application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/OperationInputRequest"
@@ -9268,31 +9276,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationList"
-              examples:
-                CreateOperationExample:
-                  value:
-                    type: TENEUR
-                    customs_category: CONV
-                    biofuel: 33
-                    credited_entity: ""
-                    debited_entity: 2
-                    depot: ""
-                    lots:
-                      - id: 10
-                        volume: 39462
-                        emission_rate_per_mj: 5.25
-                      - id: 11
-                        volume: 723.2
-                        emission_rate_per_mj: 30.2
-                  summary: Create Operation Example
-          description: The newly created operation.
-        "400":
-          description: Invalid input data.
+                $ref: "#/components/schemas/OperationInput"
+          description: ""
   /api/tiruert/operations/{id}/:
     get:
-      operationId: get_operation
-      description: Retrieve one specific operation.
+      operationId: tiruert_operations_retrieve
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9326,10 +9331,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Operation"
-          description: Details of specific operation.
+          description: ""
     patch:
-      operationId: update_operation
-      description: Update a part of operation.
+      operationId: tiruert_operations_partial_update
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9359,11 +9380,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PatchedOperationUpdateRequest"
-            examples:
-              UpdateOperationExample:
-                value:
-                  to_depot: 10
-                summary: Update Operation Example
           application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/PatchedOperationUpdateRequest"
@@ -9378,18 +9394,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Operation"
-              examples:
-                UpdateOperationExample:
-                  value:
-                    to_depot: 10
-                  summary: Update Operation Example
-          description: The updated operation.
-        "400":
-          description: Invalid input data.
+                $ref: "#/components/schemas/OperationUpdate"
+          description: ""
     delete:
-      operationId: delete_operation
-      description: Delete an operation. Only allowed for certain types and statuses.
+      operationId: tiruert_operations_destroy
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9419,9 +9444,7 @@ paths:
         - basicAuth: []
       responses:
         "204":
-          description: Operation deleted successfully.
-        "403":
-          description: Forbidden. The operation type or status does not allow deletion.
+          description: No response body
   /api/tiruert/operations/{id}/accept/:
     post:
       operationId: accept_operation
@@ -10105,6 +10128,23 @@ paths:
   /api/tiruert/operations/export/:
     get:
       operationId: tiruert_operations_export_retrieve
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -12547,12 +12587,14 @@ components:
         - ISCC
         - REDCERT
         - 2BS
+        - KZR_INIG
       type: string
       description: |-
         * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
+        * `KZR_INIG` - KZR_INIG
     ChangePasswordError:
       type: object
       properties:
@@ -15219,6 +15261,46 @@ components:
       required:
         - id
         - name
+    OperationInput:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/OperationTypeEnum"
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        biofuel:
+          type: integer
+          nullable: true
+        credited_entity:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        from_depot:
+          type: integer
+          nullable: true
+        to_depot:
+          type: integer
+          nullable: true
+        export_country:
+          type: string
+          nullable: true
+        export_recipient:
+          type: string
+          maxLength: 255
+        lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationLot"
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
+      required:
+        - biofuel
+        - customs_category
+        - debited_entity
+        - lots
+        - type
     OperationInputRequest:
       type: object
       properties:
@@ -15331,6 +15413,21 @@ components:
         - to_depot
         - type
         - unit
+    OperationLot:
+      type: object
+      properties:
+        id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - emission_rate_per_mj
+        - id
+        - volume
     OperationLotRequest:
       type: object
       properties:
@@ -15390,6 +15487,14 @@ components:
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
+    OperationUpdate:
+      type: object
+      properties:
+        to_depot:
+          type: integer
+          nullable: true
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
     OperationalUnitRequest:
       type: object
       properties:
