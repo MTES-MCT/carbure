@@ -20,7 +20,6 @@ class GeneralSanityChecksTest(TestCase):
         "json/feedstock.json",
         "json/countries.json",
         "json/entities.json",
-        "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
         "json/entities_sites.json",
@@ -127,6 +126,8 @@ class GeneralSanityChecksTest(TestCase):
 
         depot = Depot.objects.first()
         other_depot = Depot.objects.last()
+
+        EntitySite.objects.filter(entity=self.producer).delete()
 
         lot = self.create_lot(
             added_by=self.producer,

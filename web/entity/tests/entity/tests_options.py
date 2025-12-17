@@ -12,7 +12,6 @@ class EntityProductionSiteTest(TestCase):
         "json/countries.json",
         "json/depots.json",
         "json/entities.json",
-        "json/productionsites.json",
         "json/entities_sites.json",
     ]
 

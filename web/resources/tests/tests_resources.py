@@ -10,6 +10,7 @@ from transactions.models import Site
 
 class ResourcesTest(TestCase):
     fixtures = [
+        "json/countries.json",
         "json/entities.json",
     ]
 
@@ -95,11 +96,11 @@ class ResourcesTest(TestCase):
         # and returns 4 entries
         assert len(response.json()) >= 4
         # check if querying works
-        response = self.client.get(reverse(url) + "?query=op")
+        response = self.client.get(reverse(url) + "?query=Prod1")
         assert response.status_code == 200
         # and returns filtered data
         data = response.json()
-        assert len(data) == 4
+        assert len(data) == 1
 
     def test_get_producers(self):
         # create entities

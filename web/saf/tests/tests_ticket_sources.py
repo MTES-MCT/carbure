@@ -114,8 +114,8 @@ class SafTicketSourcesTest(TestCase):
                 "is_double_compte": True,
             },
             "biofuel": {
-                "name": "Huile cotraitée - Carburéacteur",
-                "name_en": "Co-processed oil - jet",
+                "name": "Huiles co-traitées - Kérosène",
+                "name_en": "",
                 "code": "HCC",
             },
             "country_of_origin": {
@@ -141,9 +141,9 @@ class SafTicketSourcesTest(TestCase):
             "parent_ticket": None,
             "added_by": {
                 "id": 14,
-                "name": "AOT",
+                "name": "Atlantique Terminals",
                 "entity_type": "Opérateur",
-                "registration_id": "",
+                "registration_id": "822334455",
             },
         }
 

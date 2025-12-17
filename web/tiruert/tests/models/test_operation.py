@@ -286,6 +286,7 @@ class OperationIsCreditMethodTest(TestCase):
 
     fixtures = [
         "json/entities.json",
+        "json/countries.json",
     ]
 
     def setUp(self):
@@ -322,6 +323,7 @@ class OperationIsAcquisitionMethodTest(TestCase):
 
     fixtures = [
         "json/entities.json",
+        "json/countries.json",
     ]
 
     def setUp(self):
