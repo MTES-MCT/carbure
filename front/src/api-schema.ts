@@ -5663,13 +5663,18 @@ export interface components {
             certificate_id: string;
         };
         /**
-         * @description * `PIPELINE` - PIPELINE
-         *     * `TRUCK` - TRUCK
-         *     * `TRAIN` - TRAIN
-         *     * `BARGE` - BARGE
+         * @description * `TRUCK` - Routier
+         *     * `BARGE` - Barge
+         *     * `TRAIN` - Train
+         *     * `PIPELINE` - Oléoduc
+         *     * `PIPELINE_DMM` - Oléoduc DMM
+         *     * `PIPELINE_LHP` - Oléoduc LHP
+         *     * `PIPELINE_ODC` - Oléoduc ODC
+         *     * `PIPELINE_SPMR` - Oléoduc SPMR
+         *     * `PIPELINE_SPSE` - Oléoduc SPSE
          * @enum {string}
          */
-        ShippingMethodEnum: ShippingMethodEnum;
+        ShippingMethodEnum: PathsApiResourcesAirportsGetParametersQueryShipping_method;
         SimulationInputRequest: {
             customs_category: components["schemas"]["MPCategoriesEnum"];
             biofuel: number | null;
@@ -8792,7 +8797,7 @@ export interface operations {
                 cpo?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                month?: string[];
+                month?: number[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8980,7 +8985,7 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
-                month?: string[];
+                month?: number[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -10787,7 +10792,6 @@ export interface operations {
                 added_by?: string[];
                 client?: string[];
                 country_of_origin?: string[];
-                delivery_site?: string[];
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
@@ -10795,8 +10799,8 @@ export interface operations {
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
-                 *     * `period` - Period
-                 *     * `-period` - Period (décroissant)
+                 *     * `delivery` - Delivery
+                 *     * `-delivery` - Delivery (décroissant)
                  *     * `feedstock` - Feedstock
                  *     * `-feedstock` - Feedstock (décroissant)
                  *     * `ghg_reduction` - Ghg reduction
@@ -10806,6 +10810,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -10817,7 +10822,6 @@ export interface operations {
                 /** @description * `HISTORY` - HISTORY
                  *     * `AVAILABLE` - AVAILABLE */
                 status?: PathsApiSafTicketSourcesGetParametersQueryStatus;
-                /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
                 supplier?: string[];
                 year?: number;
             };
@@ -10899,7 +10903,6 @@ export interface operations {
                 added_by?: string[];
                 client?: string[];
                 country_of_origin?: string[];
-                delivery_site?: string[];
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
@@ -10907,8 +10910,8 @@ export interface operations {
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
-                 *     * `period` - Period
-                 *     * `-period` - Period (décroissant)
+                 *     * `delivery` - Delivery
+                 *     * `-delivery` - Delivery (décroissant)
                  *     * `feedstock` - Feedstock
                  *     * `-feedstock` - Feedstock (décroissant)
                  *     * `ghg_reduction` - Ghg reduction
@@ -10918,6 +10921,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 /** @description A search term. */
@@ -10925,7 +10929,6 @@ export interface operations {
                 /** @description * `HISTORY` - HISTORY
                  *     * `AVAILABLE` - AVAILABLE */
                 status?: PathsApiSafTicketSourcesGetParametersQueryStatus;
-                /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
                 supplier?: string[];
                 year?: number;
             };
@@ -10951,18 +10954,17 @@ export interface operations {
                 added_by?: string[];
                 client?: string[];
                 country_of_origin?: string[];
-                delivery_site?: string[];
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
                 /** @description Filter string to apply */
-                filter?: string;
+                filter: PathsApiSafTicketSourcesFiltersGetParametersQueryFilter;
                 /** @description Ordre
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
-                 *     * `period` - Period
-                 *     * `-period` - Period (décroissant)
+                 *     * `delivery` - Delivery
+                 *     * `-delivery` - Delivery (décroissant)
                  *     * `feedstock` - Feedstock
                  *     * `-feedstock` - Feedstock (décroissant)
                  *     * `ghg_reduction` - Ghg reduction
@@ -10972,6 +10974,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 /** @description A search term. */
@@ -10979,7 +10982,6 @@ export interface operations {
                 /** @description * `HISTORY` - HISTORY
                  *     * `AVAILABLE` - AVAILABLE */
                 status?: PathsApiSafTicketSourcesGetParametersQueryStatus;
-                /** @description List of suppliers provided via ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3 */
                 supplier?: string[];
                 year?: number;
             };
@@ -11038,7 +11040,6 @@ export interface operations {
     saf_tickets_list: {
         parameters: {
             query: {
-                biofuel?: string[];
                 client?: string[];
                 /** @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
@@ -11070,6 +11071,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -11272,7 +11274,6 @@ export interface operations {
     saf_tickets_export_retrieve: {
         parameters: {
             query: {
-                biofuel?: string[];
                 client?: string[];
                 /** @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
@@ -11304,6 +11305,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 reception_airport?: string[];
@@ -11335,7 +11337,6 @@ export interface operations {
     saf_tickets_filters_retrieve: {
         parameters: {
             query: {
-                biofuel?: string[];
                 client?: string[];
                 /** @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
@@ -11345,7 +11346,7 @@ export interface operations {
                 entity_id: number;
                 feedstock?: string[];
                 /** @description Filter string to apply */
-                filter?: string;
+                filter: PathsApiSafTicketsFiltersGetParametersQueryFilter;
                 /** @description Ordre
                  *
                  *     * `client` - Client
@@ -11369,6 +11370,7 @@ export interface operations {
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_depot?: string[];
                 period?: number[];
                 production_site?: string[];
                 reception_airport?: string[];
@@ -12927,19 +12929,31 @@ export enum PathsApiResourcesAirportsGetParametersQueryShipping_method {
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryOrder_by {
     ValueMinusadded_by = "-added_by",
+    ValueMinusdelivery = "-delivery",
     ValueMinusfeedstock = "-feedstock",
     ValueMinusghg_reduction = "-ghg_reduction",
-    ValueMinusperiod = "-period",
     ValueMinusvolume = "-volume",
     added_by = "added_by",
+    delivery = "delivery",
     feedstock = "feedstock",
     ghg_reduction = "ghg_reduction",
-    period = "period",
     volume = "volume"
 }
 export enum PathsApiSafTicketSourcesGetParametersQueryStatus {
     AVAILABLE = "AVAILABLE",
     HISTORY = "HISTORY"
+}
+export enum PathsApiSafTicketSourcesFiltersGetParametersQueryFilter {
+    added_by = "added_by",
+    client = "client",
+    country_of_origin = "country_of_origin",
+    feedstock = "feedstock",
+    order_by = "order_by",
+    origin_depot = "origin_depot",
+    period = "period",
+    production_site = "production_site",
+    supplier = "supplier",
+    year = "year"
 }
 export enum PathsApiSafTicketsGetParametersQueryConsumption_type {
     MAC = "MAC",
@@ -12969,6 +12983,20 @@ export enum PathsApiSafTicketsGetParametersQueryStatus {
     ACCEPTED = "ACCEPTED",
     PENDING = "PENDING",
     REJECTED = "REJECTED"
+}
+export enum PathsApiSafTicketsFiltersGetParametersQueryFilter {
+    client = "client",
+    consumption_type = "consumption_type",
+    country_of_origin = "country_of_origin",
+    feedstock = "feedstock",
+    order_by = "order_by",
+    origin_depot = "origin_depot",
+    period = "period",
+    production_site = "production_site",
+    reception_airport = "reception_airport",
+    status = "status",
+    supplier = "supplier",
+    year = "year"
 }
 export enum PathsApiTiruertElecOperationsGetParametersQueryOperation {
     ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
@@ -13331,12 +13359,6 @@ export enum RoleEnum {
     ReadWrite = "RW",
     Admin = "ADMIN",
     Auditor = "AUDITOR"
-}
-export enum ShippingMethodEnum {
-    PIPELINE = "PIPELINE",
-    TRUCK = "TRUCK",
-    TRAIN = "TRAIN",
-    BARGE = "BARGE"
 }
 export enum SiteTypeEnum {
     OTHER = "OTHER",
