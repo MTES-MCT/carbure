@@ -1,4 +1,12 @@
 from django.contrib import admin
+from import_export import fields, resources
+from import_export.widgets import ForeignKeyWidget
+
+from core.import_export_template import ImportExportWithTemplateModelAdmin
+from saf.models.constants import SAF_DEPOT_TYPES
+from saf.models.saf_logistics import SafLogistics
+from transactions.models.airport import Airport
+from transactions.models.depot import Depot
 
 from .models import SafTicket, SafTicketSource
 
@@ -72,4 +80,69 @@ class SafTicketAdmin(admin.ModelAdmin):
         "reception_airport",
         "origin_lot",
         "origin_lot_site",
+    ]
+
+
+class SafLogisticsResource(resources.ModelResource):
+    origin_depot = fields.Field(
+        attribute="origin_depot",
+        widget=ForeignKeyWidget(Depot, field="name"),
+    )
+    destination_airport = fields.Field(
+        attribute="destination_airport",
+        widget=ForeignKeyWidget(Airport, field="name"),
+    )
+
+    class Meta:
+        model = SafLogistics
+        import_id_fields = ["origin_depot", "destination_airport", "shipping_method"]
+        skip_unchanged = True
+        report_skipped = True
+
+
+@admin.register(SafLogistics)
+class SafLogisticsAdmin(ImportExportWithTemplateModelAdmin):
+    resource_classes = [SafLogisticsResource]
+
+    list_display = [
+        "id",
+        "origin_depot__name",
+        "destination_airport__name",
+        "has_intermediary_depot",
+        "shipping_method",
+    ]
+
+    list_filter = [
+        "origin_depot__name",
+        "destination_airport__name",
+        "has_intermediary_depot",
+        "shipping_method",
+    ]
+
+    search_fields = [
+        "origin_depot__name",
+        "destination_airport__name",
+    ]
+
+    import_template_columns = [
+        {
+            "header": "origin_depot",
+            "options": (
+                Depot.objects.filter(is_enabled=True, site_type__in=SAF_DEPOT_TYPES)
+                .order_by("name")
+                .values_list("name", flat=True)
+            ),
+        },
+        {
+            "header": "destination_airport",
+            "options": Airport.objects.filter(is_enabled=True).order_by("name").values_list("name", flat=True),
+        },
+        {
+            "header": "shipping_method",
+            "options": [method for method, _ in SafLogistics.SHIPPING_METHODS],
+        },
+        {
+            "header": "has_intermediary_depot",
+            "options": ["TRUE", "FALSE"],
+        },
     ]
