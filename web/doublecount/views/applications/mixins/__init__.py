@@ -8,7 +8,7 @@ from .lists import ListActionMixin
 from .reject_application import RejectActionMixin
 from .update_quotas import UpdateQuotaActionMixin
 from .filter import FilterActionMixin
-from .download_all import DownloadAllDocumentsMixin
+from .download_all_documents import DownloadAllDocumentsMixin
 
 
 class ActionMixin(
