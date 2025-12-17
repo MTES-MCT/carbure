@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from core.models import CarbureNotification
 from saf.models import SafTicketSource, create_ticket_from_source
 from saf.serializers import SafTicketSourceAssignmentSerializer
+from saf.services.is_shipping_route_available import is_shipping_route_available
 
 from .utils import SafTicketAssignError
 
@@ -66,6 +67,9 @@ class AssignActionMixin:
 
         if pos_number and origin_lot_pos_number and pos_number != origin_lot_pos_number:
             raise ValidationError({"message": SafTicketAssignError.POS_NUMBER_MISMATCH})
+
+        if not is_shipping_route_available(ticket_source.origin_lot_site, reception_airport, shipping_method):
+            raise ValidationError({"message": SafTicketAssignError.SHIPPING_ROUTE_NOT_REGISTERED})
 
         with transaction.atomic():
             ticket = create_ticket_from_source(
