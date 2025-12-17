@@ -6,18 +6,17 @@ import { TextInput } from "common/components/inputs2"
 import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
-import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import { ShippingMethodEnum } from "api-schema"
 import { Autocomplete } from "common/components/autocomplete2"
-import { ConsumptionType } from "saf/types"
+import { ConsumptionType, SafShippingMethod, SafTicketSource } from "saf/types"
 
 export interface AssignmentFormProps {
   grouped?: boolean
   deliveryPeriod?: number
   remainingVolume: number
   posNumber?: string
+  originDepot?: SafTicketSource["origin_lot_site"]
   onSubmit: (form: AssignmentFormData) => void
 }
 
@@ -26,6 +25,7 @@ export const AssignmentForm = ({
   deliveryPeriod,
   remainingVolume,
   posNumber,
+  originDepot,
   onSubmit,
 }: AssignmentFormProps) => {
   const { t } = useTranslation()
@@ -46,7 +46,12 @@ export const AssignmentForm = ({
   }
 
   const findAirports = (query: string) => {
-    return apiResources.findAirports(query)
+    return api.findAirports(
+      query,
+      false,
+      originDepot?.id,
+      value.shipping_method
+    )
   }
 
   const handleSubmit = () => {
@@ -96,6 +101,44 @@ export const AssignmentForm = ({
 
       {(clientIsAirline || clientIsSafTrader) && (
         <>
+          {originDepot && (
+            <TextInput
+              disabled
+              label={t("Dépôt d'origine")}
+              value={originDepot.name}
+            />
+          )}
+          <Autocomplete
+            label={t("Mode d'expédition")}
+            placeholder={t("Sélectionnez un mode")}
+            {...bind("shipping_method")}
+            options={[
+              { value: SafShippingMethod.TRUCK, label: t("Camion") },
+              { value: SafShippingMethod.TRAIN, label: t("Train") },
+              { value: SafShippingMethod.BARGE, label: t("Barge") },
+              {
+                value: SafShippingMethod.PIPELINE_DMM,
+                label: t("Oléoduc DMM"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_LHP,
+                label: t("Oléoduc LHP"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_ODC,
+                label: t("Oléoduc ODC"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_SPMR,
+                label: t("Oléoduc SPMR"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_SPSE,
+                label: t("Oléoduc SPSE"),
+              },
+            ]}
+          />
+
           <Autocomplete
             required
             label={t("Aéroport de réception")}
@@ -103,21 +146,6 @@ export const AssignmentForm = ({
             getOptions={findAirports}
             normalize={norm.normalizeAirport}
             {...bind("reception_airport")}
-          />
-
-          <Autocomplete
-            label={t("Mode d'expédition")}
-            placeholder={t("Sélectionnez un mode")}
-            {...bind("shipping_method")}
-            options={[
-              {
-                value: ShippingMethodEnum.PIPELINE,
-                label: t("Oléoduc"),
-              },
-              { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
-              { value: ShippingMethodEnum.TRAIN, label: t("Train") },
-              { value: ShippingMethodEnum.BARGE, label: t("Barge") },
-            ]}
           />
         </>
       )}
@@ -169,7 +197,7 @@ const defaultAssignment = {
   agreement_reference: "" as string | undefined, //TODO for transfer only
   free_field: "" as string | undefined,
   reception_airport: undefined as Airport | undefined,
-  shipping_method: undefined as ShippingMethodEnum | undefined,
+  shipping_method: undefined as SafShippingMethod | undefined,
   consumption_type: undefined as ConsumptionType | undefined,
   pos_number: undefined as string | undefined,
 }

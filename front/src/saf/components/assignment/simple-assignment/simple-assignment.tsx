@@ -83,6 +83,7 @@ export const TicketAssignment = ({
 
         <AssignmentForm
           posNumber={ticketSource?.origin_lot?.pos_number ?? undefined}
+          originDepot={ticketSource?.origin_lot_site}
           deliveryPeriod={ticketSource.delivery_period}
           remainingVolume={remainingVolume}
           onSubmit={assignTicket}

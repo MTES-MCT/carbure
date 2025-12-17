@@ -1,13 +1,16 @@
 import { api, download } from "common/services/api-fetch"
 import { EntityPreview } from "common/types"
 import {
-  SafFilter,
   SafTicketQuery,
   ConsumptionType,
   SafTicketSourceQuery,
+  SafShippingMethod,
+  SafTicketSourceFilter,
+  SafTicketFilter,
+  SafFilter,
 } from "./types"
 import { QUERY_RESET } from "common/hooks/query-builder-2"
-import { EtsStatusEnum, ShippingMethodEnum } from "api-schema"
+import { EtsStatusEnum } from "api-schema"
 
 export function getYears(entity_id: number) {
   return api.GET("/saf/years/", {
@@ -35,7 +38,7 @@ export function getTicketFilters(field: SafFilter, query: SafTicketQuery) {
     .GET("/saf/tickets/filters/", {
       params: {
         query: {
-          filter: field,
+          filter: field as unknown as SafTicketFilter,
           ...query,
           ...QUERY_RESET,
         },
@@ -119,7 +122,7 @@ export function getTicketSourceFilters(
     .GET("/saf/ticket-sources/filters/", {
       params: {
         query: {
-          filter: field,
+          filter: field as unknown as SafTicketSourceFilter,
           ...query,
           ...QUERY_RESET,
         },
@@ -167,7 +170,7 @@ export function assignSafTicket(
   i?: string,
   free_field?: string,
   reception_airport?: number,
-  shipping_method?: ShippingMethodEnum,
+  shipping_method?: SafShippingMethod,
   consumption_type?: ConsumptionType,
   pos_number?: string
 ) {
@@ -204,7 +207,7 @@ export function groupedAssignSafTicket(
   i: string,
   free_field?: string,
   reception_airport?: number,
-  shipping_method?: ShippingMethodEnum,
+  shipping_method?: SafShippingMethod,
   consumption_type?: ConsumptionType
 ) {
   return api.POST("/saf/ticket-sources/group-assign/", {
@@ -264,4 +267,17 @@ export async function findClients(entity_id: number, query?: string) {
       },
     })
     .then((res) => (res.data ? res.data.results : []))
+}
+
+export async function findAirports(
+  query?: string,
+  public_only?: boolean,
+  origin_depot_id?: number,
+  shipping_method?: SafShippingMethod
+) {
+  const res = await api.GET("/resources/airports", {
+    params: { query: { query, public_only, origin_depot_id, shipping_method } },
+  })
+
+  return res.data ?? []
 }
