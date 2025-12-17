@@ -140,6 +140,8 @@ def create_ticket_sources_from_lots(lots):
                 "ghg_reference": lot.ghg_reference_red_ii,
                 "ghg_reduction": lot.ghg_reduction_red_ii,
                 "parent_lot_id": lot.id,
+                "origin_lot": lot,
+                "origin_lot_site": lot.carbure_delivery_site,
             }
         )
 
@@ -187,6 +189,8 @@ def create_source_from_ticket(ticket, entity_id):
         ghg_reference=ticket.ghg_reference,
         ghg_reduction=ticket.ghg_reduction,
         parent_ticket=ticket,
+        origin_lot=ticket.origin_lot,
+        origin_lot_site=ticket.origin_lot_site,
     )
 
     ticket_source.generate_carbure_id()
