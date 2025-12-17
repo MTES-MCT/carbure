@@ -20,7 +20,7 @@ class DoubleCountingApplicationPermissionTest(TestCase, PermissionTestMixin):
                     [HasProducerWriteRights()],
                 ),
                 (
-                    ["list_admin", "export"],
+                    ["list_admin", "export", "download_all_documents"],
                     [HasDoubleCountingAdminRights()],
                 ),
                 (
