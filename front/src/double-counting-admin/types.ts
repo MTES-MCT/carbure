@@ -17,6 +17,7 @@ export enum AgreementFilter {
   Certificate_id = "certificate_id",
   Producers = "producers",
   ProductionSites = "production_sites",
+  Status = "status_values",
 }
 
 export type ApplicationListQueryBuilder = QueryBuilder<

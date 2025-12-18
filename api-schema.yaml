@@ -2854,7 +2854,14 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - certificate_id
+              - order_by
+              - producers
+              - production_sites
+              - status_values
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -2907,6 +2914,14 @@ paths:
           description: A search term.
           schema:
             type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: status_values
+          schema:
+            type: string
       tags:
         - double-counting
       security:
@@ -2923,28 +2938,13 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - certificate_id
+                    - order_by
+                    - producers
+                    - production_sites
+                    - status_values
                   summary: Example of filters response.
           description: ""
-        "400":
-          content:
-            application/json:
-              schema:
-                message: No filter was specified | NOT_FOUND
-              examples:
-                InvalidFilter:
-                  value:
-                    message: No filter was specified
-                  summary: Invalid filter
-                NotFound:
-                  value:
-                    message: NOT_FOUND
-                  summary: Not found
-          description: Bad request - invalid filter or not found.
   /api/double-counting/applications/generate-decision/:
     get:
       operationId: double_counting_applications_generate_decision_retrieve
@@ -3046,6 +3046,14 @@ paths:
           required: false
           in: query
           description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: status_values
           schema:
             type: string
       tags:
