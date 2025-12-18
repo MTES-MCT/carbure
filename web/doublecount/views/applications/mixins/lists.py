@@ -1,4 +1,3 @@
-from django.db.models.query_utils import Q
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
@@ -33,13 +32,11 @@ class ListActionMixin:
 
         rejected_data = applications.filter(status=DoubleCountingApplication.REJECTED)
 
-        pending_data = applications.filter(
-            ~Q(
-                status__in=[
-                    DoubleCountingApplication.ACCEPTED,
-                    DoubleCountingApplication.REJECTED,
-                ]
-            )
+        pending_data = applications.exclude(
+            status__in=[
+                DoubleCountingApplication.ACCEPTED,
+                DoubleCountingApplication.REJECTED,
+            ]
         )
         rejected = DoubleCountingApplicationPartialSerializer(rejected_data, many=True)
         pending = DoubleCountingApplicationPartialSerializer(pending_data, many=True)
