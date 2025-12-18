@@ -1,6 +1,5 @@
 import os
 import unicodedata
-from os import environ as env
 
 import pandas as pd
 import xlsxwriter
@@ -222,11 +221,6 @@ class Validator(forms.Form):
         cleaned_data = super().clean()
         self.validate(cleaned_data)
         return cleaned_data
-
-
-class CarbureEnv:
-    is_prod = env.get("IMAGE_TAG") == "prod"
-    is_local = env.get("IMAGE_TAG") == "local"
 
 
 # checks if a pandas DataFrame cell contains a truthy value
