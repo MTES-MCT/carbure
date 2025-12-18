@@ -6,6 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ("producers", "0006_alter_productionsiteinput_production_site_and_more"),
+        ("transactions", "0014_delete_contenttoupdate"),
     ]
 
     operations = [
