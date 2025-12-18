@@ -12,6 +12,7 @@ const statusToVariant: Record<DCStatusExt, BadgeProps["severity"]> = {
   [DCStatusExt.REJECTED]: "error",
   [DCStatusExt.EXPIRED]: "new",
   [DCStatusExt.EXPIRES_SOON]: "warning",
+  [DCStatusExt.WAITING_FOR_DECISION]: "info",
 }
 
 const ApplicationStatus = ({
@@ -32,6 +33,7 @@ const ApplicationStatus = ({
     [DCStatusExt.REJECTED]: t("Refusée"),
     [DCStatusExt.EXPIRED]: t("Expirée"),
     [DCStatusExt.EXPIRES_SOON]: t("À renouveler"),
+    [DCStatusExt.WAITING_FOR_DECISION]: t("En attente de décision"),
   }
 
   if (expirationDate && extStatus !== DCStatusExt.REJECTED) {

@@ -6202,26 +6202,19 @@ paths:
   /api/entities/users/update-right-request/:
     post:
       operationId: entities_users_update_right_request_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
       tags:
         - entities
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+              $ref: "#/components/schemas/EntityUserRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+              $ref: "#/components/schemas/EntityUserRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+              $ref: "#/components/schemas/EntityUserRequest"
         required: true
       security:
         - cookieAuth: []
@@ -6231,24 +6224,8 @@ paths:
           content:
             application/json:
               schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
+                $ref: "#/components/schemas/EntityUser"
+          description: ""
   /api/entities/users/update-user-role/:
     post:
       operationId: entities_users_update_user_role_create
@@ -13655,12 +13632,14 @@ components:
         - INPROGRESS
         - REJECTED
         - ACCEPTED
+        - WAITING_FOR_DECISION
       type: string
       description: |-
         * `PENDING` - PENDING
         * `INPROGRESS` - INPROGRESS
         * `REJECTED` - REJECTED
         * `ACCEPTED` - ACCEPTED
+        * `WAITING_FOR_DECISION` - WAITING_FOR_DECISION
     ElecBalance:
       type: object
       properties:
@@ -14527,6 +14506,35 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
+    EntityUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
+        - id
+        - name
+    EntityUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
     ErrorResponse:
       type: object
       properties:
@@ -17122,7 +17130,7 @@ components:
         id:
           type: string
           minLength: 7
-          pattern: ^FR[A-Z]{3}P.*
+          pattern: ^FR[A-Z0-9]{3}P.*
         energy:
           type: number
           format: double
@@ -17321,16 +17329,6 @@ components:
         website:
           type: string
           format: uri
-    UpdateRightsRequestsRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        status:
-          $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
-      required:
-        - id
-        - status
     UpdateUserRoleRequest:
       type: object
       properties:
