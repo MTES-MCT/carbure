@@ -218,6 +218,10 @@ class Entity(models.Model):
         depot_ids = EntityScopeDepot.objects.filter(entity=self).values_list("object_id", flat=True)
         return Depot.objects.filter(id__in=depot_ids)
 
+    def get_admin_users_emails(self):
+        filter_result = UserRights.objects.filter(entity=self, role=UserRights.ADMIN, user__is_active=True)
+        return filter_result.values_list("user__email", flat=True)
+
     class Meta:
         db_table = "entities"
         verbose_name = "Entity"
