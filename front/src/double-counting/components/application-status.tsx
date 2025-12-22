@@ -12,6 +12,23 @@ const statusToVariant: Record<DCStatusExt, BadgeProps["severity"]> = {
   [DCStatusExt.REJECTED]: "error",
   [DCStatusExt.EXPIRED]: "new",
   [DCStatusExt.EXPIRES_SOON]: "warning",
+  [DCStatusExt.WAITING_FOR_DECISION]: "info",
+}
+
+export const getStatusLabel = (
+  status: DCStatusExt,
+  t: (key: string) => string
+) => {
+  const statusLabels = {
+    [DCStatusExt.PENDING]: t("En attente"),
+    [DCStatusExt.INPROGRESS]: t("En cours"),
+    [DCStatusExt.ACCEPTED]: t("Acceptée"),
+    [DCStatusExt.REJECTED]: t("Refusée"),
+    [DCStatusExt.EXPIRED]: t("Expirée"),
+    [DCStatusExt.EXPIRES_SOON]: t("À renouveler"),
+    [DCStatusExt.WAITING_FOR_DECISION]: t("En attente de décision"),
+  }
+  return statusLabels[status]
 }
 
 const ApplicationStatus = ({
@@ -22,17 +39,7 @@ const ApplicationStatus = ({
   expirationDate?: string
 }) => {
   const { t } = useTranslation()
-
   let extStatus = status as unknown as DCStatusExt
-
-  const statusLabels = {
-    [DCStatusExt.PENDING]: t("En attente"),
-    [DCStatusExt.INPROGRESS]: t("En attente"),
-    [DCStatusExt.ACCEPTED]: t("Acceptée"),
-    [DCStatusExt.REJECTED]: t("Refusée"),
-    [DCStatusExt.EXPIRED]: t("Expirée"),
-    [DCStatusExt.EXPIRES_SOON]: t("À renouveler"),
-  }
 
   if (expirationDate && extStatus !== DCStatusExt.REJECTED) {
     const expirationDateFormated = new Date(expirationDate)
@@ -52,7 +59,7 @@ const ApplicationStatus = ({
 
   return (
     <Badge severity={statusToVariant[extStatus]}>
-      {statusLabels[extStatus]}
+      {getStatusLabel(extStatus, t)}
     </Badge>
   )
 }

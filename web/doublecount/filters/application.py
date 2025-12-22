@@ -1,5 +1,4 @@
 import django_filters
-from django.db.models import Q
 
 from doublecount.models import DoubleCountingApplication
 
@@ -14,25 +13,28 @@ class ApplicationFilter(django_filters.FilterSet):
             ("certificate_id", "certificate_id"),
         )
     )
-    certificate_id = django_filters.CharFilter(method="filter_certificate_id")
-    producers = django_filters.CharFilter(method="filter_producers")
-    production_sites = django_filters.CharFilter(method="filter_production_sites")
+    certificate_id = django_filters.CharFilter(field_name="certificate_id", lookup_expr="exact")
+    producers = django_filters.CharFilter(field_name="production_site__created_by__name", lookup_expr="exact")
+    production_sites = django_filters.CharFilter(field_name="production_site__name", lookup_expr="exact")
+    status = django_filters.CharFilter(method="filter_status")
+
+    # Additional filter without method for FiltersActionFactory
+    # allows retrieving the list of available statuses
+    status_values = django_filters.CharFilter(field_name="status", lookup_expr="exact")
 
     class Meta:
         model = DoubleCountingApplication
-        fields = ["order_by"]
+        fields = ["order_by", "certificate_id", "producers", "production_sites", "status_values"]
 
-    def filter_multiple_values(self, queryset, field_name, param_name):
-        values = self.data.getlist(param_name)
-        if values:
-            return queryset.filter(Q(**{f"{field_name}__in": values}))
-        return queryset
-
-    def filter_certificate_id(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "certificate_id", "certificate_id")
-
-    def filter_producers(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "production_site__created_by__name", "producers")
-
-    def filter_production_sites(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "production_site__name", "production_sites")
+    def filter_status(self, queryset, name, value):
+        if value == "rejected":
+            return queryset.filter(status=DoubleCountingApplication.REJECTED)
+        elif value == "pending":
+            return queryset.exclude(
+                status__in=[
+                    DoubleCountingApplication.ACCEPTED,
+                    DoubleCountingApplication.REJECTED,
+                ]
+            )
+        else:
+            return queryset
