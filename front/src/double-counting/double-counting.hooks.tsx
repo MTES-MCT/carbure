@@ -32,7 +32,13 @@ export const useDoubleCounting = () => {
     return Object.groupBy(data, ({ status, period_end }) => {
       if (isAgreementExpired(period_end)) {
         return DoubleCountingTab.EXPIRED
-      } else if (status === DoubleCountingStatus.PENDING) {
+      } else if (
+        [
+          DoubleCountingStatus.PENDING,
+          DoubleCountingStatus.INPROGRESS,
+          DoubleCountingStatus.WAITING_FOR_DECISION,
+        ].includes(status)
+      ) {
         return DoubleCountingTab.PENDING
       } else if (status === DoubleCountingStatus.REJECTED) {
         return DoubleCountingTab.REJECTED
