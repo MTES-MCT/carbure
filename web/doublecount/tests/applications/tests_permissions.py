@@ -24,7 +24,7 @@ class DoubleCountingApplicationPermissionTest(TestCase, PermissionTestMixin):
                     [HasDoubleCountingAdminRights()],
                 ),
                 (
-                    ["approve", "reject", "generate_decision", "update_approved_quotas"],
+                    ["approve", "reject", "generate_decision", "update_approved_quotas", "update", "partial_update"],
                     [HasDoubleCountingAdminWriteRights()],
                 ),
             ],

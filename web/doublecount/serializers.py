@@ -219,20 +219,21 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
 class DoubleCountingApplicationUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating the status of a DoubleCountingApplication."""
 
+    AUTHORIZED_STATUS_VALUES = [
+        DoubleCountingApplication.PENDING,
+        DoubleCountingApplication.INPROGRESS,
+        DoubleCountingApplication.WAITING_FOR_DECISION,
+    ]
+
     class Meta:
         model = DoubleCountingApplication
         fields = ["status"]
 
     def validate_status(self, value):
-        authorized_statuses = [
-            DoubleCountingApplication.PENDING,
-            DoubleCountingApplication.INPROGRESS,
-            DoubleCountingApplication.WAITING_FOR_DECISION,
-        ]
-        if value not in authorized_statuses:
+        if value not in self.AUTHORIZED_STATUS_VALUES:
             raise serializers.ValidationError("Le statut fourni n'est pas autorisé pour la mise à jour.")
 
-        if self.instance.status not in authorized_statuses:
+        if self.instance.status not in self.AUTHORIZED_STATUS_VALUES:
             raise serializers.ValidationError("Le statut actuel de cette demande ne permet pas la mise à jour.")
 
         return value
