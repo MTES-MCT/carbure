@@ -4,15 +4,18 @@ import {
   DoubleCountingStatus as DCStatus,
   DoubleCountingExtendedStatus as DCStatusExt,
 } from "double-counting/types"
+import css from "./application-status.module.css"
 
-const statusToVariant: Record<DCStatusExt, BadgeProps["severity"]> = {
+type CustomSeverity = BadgeProps["severity"] | "info-orange"
+
+const statusToVariant: Record<DCStatusExt, CustomSeverity> = {
   [DCStatusExt.ACCEPTED]: "success",
-  [DCStatusExt.INPROGRESS]: "info",
+  [DCStatusExt.INPROGRESS]: "info-orange",
   [DCStatusExt.PENDING]: "info",
   [DCStatusExt.REJECTED]: "error",
   [DCStatusExt.EXPIRED]: "new",
   [DCStatusExt.EXPIRES_SOON]: "warning",
-  [DCStatusExt.WAITING_FOR_DECISION]: "info",
+  [DCStatusExt.WAITING_FOR_DECISION]: "info-orange",
 }
 
 export const getStatusLabel = (
@@ -21,7 +24,7 @@ export const getStatusLabel = (
 ) => {
   const statusLabels = {
     [DCStatusExt.PENDING]: t("En attente"),
-    [DCStatusExt.INPROGRESS]: t("En cours"),
+    [DCStatusExt.INPROGRESS]: t("En cours de traitement"),
     [DCStatusExt.ACCEPTED]: t("Acceptée"),
     [DCStatusExt.REJECTED]: t("Refusée"),
     [DCStatusExt.EXPIRED]: t("Expirée"),
@@ -57,8 +60,15 @@ const ApplicationStatus = ({
     }
   }
 
+  const variant = statusToVariant[extStatus]
+
   return (
-    <Badge severity={statusToVariant[extStatus]}>
+    <Badge
+      severity={variant === "info-orange" ? "info" : variant}
+      className={
+        variant === "info-orange" ? css["badge-info-orange"] : undefined
+      }
+    >
       {getStatusLabel(extStatus, t)}
     </Badge>
   )
