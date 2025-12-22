@@ -1,5 +1,5 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity
@@ -11,11 +11,25 @@ from doublecount.permissions import (
     HasProducerRights,
     HasProducerWriteRights,
 )
-from doublecount.serializers import DoubleCountingApplicationSerializer
+from doublecount.serializers import (
+    DoubleCountingApplicationSerializer,
+    DoubleCountingApplicationUpdateSerializer,
+)
 from doublecount.views.applications.mixins import ActionMixin
 
 
-class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "entity_id",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Entity ID",
+            required=True,
+        )
+    ],
+)
+class ApplicationViewSet(ActionMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     queryset = DoubleCountingApplication.objects.all()
     serializer_class = DoubleCountingApplicationSerializer
     pagination_class = None
@@ -23,12 +37,17 @@ class ApplicationViewSet(ActionMixin, RetrieveModelMixin, GenericViewSet):
     filterset_class = ApplicationFilter
     permission_classes = [HasProducerRights | HasDoubleCountingAdminRights]
 
+    def get_serializer_class(self):
+        if self.action in ["partial_update"]:
+            return DoubleCountingApplicationUpdateSerializer
+        return super().get_serializer_class()
+
     def get_permissions(self):
         if self.action in ["check_file", "add", "upload_files", "delete_file"]:
             return [HasProducerWriteRights()]
         if self.action in ["list_admin", "export", "download_all_documents"]:
             return [HasDoubleCountingAdminRights()]
-        if self.action in ["approve", "reject", "generate_decision", "update_approved_quotas"]:
+        if self.action in ["approve", "reject", "generate_decision", "update_approved_quotas", "partial_update", "update"]:
             return [HasDoubleCountingAdminWriteRights()]
 
         return super().get_permissions()

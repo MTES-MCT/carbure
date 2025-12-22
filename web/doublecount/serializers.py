@@ -216,6 +216,28 @@ class DoubleCountingApplicationSerializer(serializers.ModelSerializer):
         return obj.has_dechets_industriels()
 
 
+class DoubleCountingApplicationUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating the status of a DoubleCountingApplication."""
+
+    class Meta:
+        model = DoubleCountingApplication
+        fields = ["status"]
+
+    def validate_status(self, value):
+        authorized_statuses = [
+            DoubleCountingApplication.PENDING,
+            DoubleCountingApplication.INPROGRESS,
+            DoubleCountingApplication.WAITING_FOR_DECISION,
+        ]
+        if value not in authorized_statuses:
+            raise serializers.ValidationError("Le statut fourni n'est pas autorisé pour la mise à jour.")
+
+        if self.instance.status not in authorized_statuses:
+            raise serializers.ValidationError("Le statut actuel de cette demande ne permet pas la mise à jour.")
+
+        return value
+
+
 class DoubleCountingApplicationPartialSerializer(serializers.ModelSerializer):
     production_site = DoubleCountingProductionSitePreviewSerializer(read_only=True)
     producer = EntitySummarySerializer(read_only=True)
