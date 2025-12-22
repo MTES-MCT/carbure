@@ -827,12 +827,12 @@ export interface paths {
             cookie?: never;
         };
         get: operations["double_counting_applications_retrieve"];
-        put?: never;
+        put: operations["double_counting_applications_update"];
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["double_counting_applications_partial_update"];
         trace?: never;
     };
     "/api/double-counting/applications/{id}/download-all/": {
@@ -3110,6 +3110,11 @@ export interface components {
             name_en: string;
             code: string;
         };
+        BiofuelRequest: {
+            name: string;
+            name_en: string;
+            code: string;
+        };
         BiomethaneAnnualDeclaration: {
             readonly year: number;
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -3788,6 +3793,12 @@ export interface components {
             code_pays: string;
             is_in_europe?: boolean;
         };
+        CountryRequest: {
+            name: string;
+            name_en: string;
+            code_pays: string;
+            is_in_europe?: boolean;
+        };
         CreateDepotRequest: {
             country_code: string;
             entity_id: number;
@@ -3996,11 +4007,26 @@ export interface components {
              */
             readonly producer_user: string;
         };
+        DoubleCountingApplicationRequest: {
+            /** Format: date */
+            period_start: string;
+            /** Format: date */
+            period_end: string;
+            status?: components["schemas"]["DoubleCountingStatus"];
+        };
+        /** @description Serializer pour la mise à jour partielle du statut uniquement. */
+        DoubleCountingApplicationUpdate: {
+            status?: components["schemas"]["DoubleCountingStatus"];
+        };
         DoubleCountingDocFile: {
             readonly id: number;
             file_name?: string;
             file_type?: components["schemas"]["FileTypeEnum"];
             readonly url: string;
+        };
+        DoubleCountingDocFileRequest: {
+            file_name?: string;
+            file_type?: components["schemas"]["FileTypeEnum"];
         };
         DoubleCountingProduction: {
             readonly id: number;
@@ -4045,6 +4071,22 @@ export interface components {
         DoubleCountingProductionSitePreview: {
             readonly id: number;
             name: string;
+        };
+        DoubleCountingProductionSiteRequest: {
+            name: string;
+            /** Format: date */
+            date_mise_en_service?: string | null;
+            ges_option?: components["schemas"]["GesOptionEnum"];
+            eligible_dc?: boolean;
+            dc_reference?: string;
+            site_siret?: string;
+            address?: string;
+            city?: string;
+            postal_code?: string;
+            gps_coordinates?: string | null;
+            manager_name?: string;
+            manager_phone?: string;
+            manager_email?: string;
         };
         DoubleCountingQuota: {
             approved_quota: number;
@@ -4428,6 +4470,28 @@ export interface components {
             postal_code?: string;
             site_siret?: string;
         };
+        EntityRequest: {
+            name: string;
+            entity_type?: components["schemas"]["EntityTypeEnum"];
+            has_mac?: boolean;
+            has_trading?: boolean;
+            has_direct_deliveries?: boolean;
+            has_stocks?: boolean;
+            preferred_unit?: components["schemas"]["PreferredUnitEnum"];
+            legal_name?: string;
+            registration_id?: string;
+            sustainability_officer_phone_number?: string;
+            sustainability_officer?: string;
+            registered_address?: string;
+            registered_zipcode?: string;
+            registered_city?: string;
+            registered_country?: number | null;
+            activity_description?: string;
+            /** Format: uri */
+            website?: string;
+            vat_number?: string;
+            is_enabled?: boolean;
+        };
         EntitySite: {
             ownership_type?: components["schemas"]["OwnershipTypeEnum"];
             blending_is_outsourced?: boolean;
@@ -4497,6 +4561,13 @@ export interface components {
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
         FeedStock: {
+            name: string;
+            name_en: string;
+            code: string;
+            category?: components["schemas"]["MPCategoriesEnum"];
+            is_double_compte?: boolean;
+        };
+        FeedStockRequest: {
             name: string;
             name_en: string;
             code: string;
@@ -5147,6 +5218,10 @@ export interface components {
             maximum_distance_km?: number | null;
             input_type?: string;
             origin_department?: string | null;
+        };
+        /** @description Serializer pour la mise à jour partielle du statut uniquement. */
+        PatchedDoubleCountingApplicationUpdateRequest: {
+            status?: components["schemas"]["DoubleCountingStatus"];
         };
         PatchedElecOperationUpdateRequest: {
             type?: components["schemas"]["ElecOperationTypeEnum"];
@@ -7662,6 +7737,68 @@ export interface operations {
             };
         };
     };
+    double_counting_applications_update: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Dossier Double Compte. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DoubleCountingApplicationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DoubleCountingApplicationRequest"];
+                "multipart/form-data": components["schemas"]["DoubleCountingApplicationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DoubleCountingApplication"];
+                };
+            };
+        };
+    };
+    double_counting_applications_partial_update: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Dossier Double Compte. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedDoubleCountingApplicationUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedDoubleCountingApplicationUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedDoubleCountingApplicationUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DoubleCountingApplicationUpdate"];
+                };
+            };
+        };
+    };
     double_counting_applications_download_all_retrieve: {
         parameters: {
             query: {
@@ -7890,6 +8027,8 @@ export interface operations {
         parameters: {
             query: {
                 certificate_id?: string;
+                /** @description Entity ID */
+                entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryFilter;
                 /** @description Ordre

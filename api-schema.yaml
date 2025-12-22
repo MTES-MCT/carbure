@@ -2555,6 +2555,83 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingApplication"
           description: ""
+    put:
+      operationId: double_counting_applications_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingApplicationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingApplicationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingApplicationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoubleCountingApplication"
+          description: ""
+    patch:
+      operationId: double_counting_applications_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedDoubleCountingApplicationUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedDoubleCountingApplicationUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedDoubleCountingApplicationUpdateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoubleCountingApplicationUpdate"
+          description: ""
   /api/double-counting/applications/{id}/download-all/:
     get:
       operationId: double_counting_applications_download_all_retrieve
@@ -2850,6 +2927,12 @@ paths:
           name: certificate_id
           schema:
             type: string
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
         - in: query
           name: filter
           schema:
@@ -11036,6 +11119,25 @@ components:
         - code
         - name
         - name_en
+    BiofuelRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        name_en:
+          type: string
+          minLength: 1
+          maxLength: 64
+        code:
+          type: string
+          minLength: 1
+          maxLength: 16
+      required:
+        - code
+        - name
+        - name_en
     BiomethaneAnnualDeclaration:
       type: object
       properties:
@@ -12762,6 +12864,27 @@ components:
         - code_pays
         - name
         - name_en
+    CountryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        name_en:
+          type: string
+          minLength: 1
+          maxLength: 128
+        code_pays:
+          type: string
+          minLength: 1
+          maxLength: 64
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - name
+        - name_en
     CreateDepotRequest:
       type: object
       properties:
@@ -13241,6 +13364,26 @@ components:
         - production_site
         - quotas_progression
         - status
+    DoubleCountingApplicationRequest:
+      type: object
+      properties:
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/DoubleCountingStatus"
+      required:
+        - period_end
+        - period_start
+    DoubleCountingApplicationUpdate:
+      type: object
+      description: Serializer pour la mise à jour partielle du statut uniquement.
+      properties:
+        status:
+          $ref: "#/components/schemas/DoubleCountingStatus"
     DoubleCountingDocFile:
       type: object
       properties:
@@ -13258,6 +13401,15 @@ components:
       required:
         - id
         - url
+    DoubleCountingDocFileRequest:
+      type: object
+      properties:
+        file_name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        file_type:
+          $ref: "#/components/schemas/FileTypeEnum"
     DoubleCountingProduction:
       type: object
       properties:
@@ -13413,6 +13565,51 @@ components:
           maxLength: 128
       required:
         - id
+        - name
+    DoubleCountingProductionSiteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        site_siret:
+          type: string
+          maxLength: 64
+        address:
+          type: string
+          maxLength: 256
+        city:
+          type: string
+          maxLength: 128
+        postal_code:
+          type: string
+          maxLength: 32
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+      required:
         - name
     DoubleCountingQuota:
       type: object
@@ -14431,6 +14628,62 @@ components:
         - inputs
         - name
         - outputs
+    EntityRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        has_mac:
+          type: boolean
+        has_trading:
+          type: boolean
+        has_direct_deliveries:
+          type: boolean
+        has_stocks:
+          type: boolean
+        preferred_unit:
+          $ref: "#/components/schemas/PreferredUnitEnum"
+        legal_name:
+          type: string
+          maxLength: 128
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        registered_address:
+          type: string
+          maxLength: 256
+        registered_zipcode:
+          type: string
+          maxLength: 64
+        registered_city:
+          type: string
+          maxLength: 64
+        registered_country:
+          type: integer
+          nullable: true
+        activity_description:
+          type: string
+        website:
+          type: string
+          format: uri
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 32
+        is_enabled:
+          type: boolean
+      required:
+        - name
     EntitySite:
       type: object
       properties:
@@ -14593,6 +14846,29 @@ components:
           maxLength: 128
         code:
           type: string
+          maxLength: 64
+        category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        is_double_compte:
+          type: boolean
+      required:
+        - code
+        - name
+        - name_en
+    FeedStockRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        name_en:
+          type: string
+          minLength: 1
+          maxLength: 128
+        code:
+          type: string
+          minLength: 1
           maxLength: 64
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
@@ -15924,6 +16200,12 @@ components:
           type: string
           nullable: true
           maxLength: 3
+    PatchedDoubleCountingApplicationUpdateRequest:
+      type: object
+      description: Serializer pour la mise à jour partielle du statut uniquement.
+      properties:
+        status:
+          $ref: "#/components/schemas/DoubleCountingStatus"
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
