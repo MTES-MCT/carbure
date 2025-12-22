@@ -218,7 +218,7 @@ export const ApplicationDetailsDialog = () => {
                 loading={rejectApplication.loading}
                 disabled={applicationResponse.loading}
                 customPriority="warning"
-                iconId="ri-close-line"
+                iconId="ri-loop-right-line"
                 onClick={submitChangeStatus}
               >
                 <Trans>Changer le statut</Trans>
