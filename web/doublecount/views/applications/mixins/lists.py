@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,15 +15,6 @@ class ApplicationListeSerializer(serializers.Serializer):
 class ListActionMixin:
     @extend_schema(
         filters=True,
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         responses=ApplicationListeSerializer,
     )
     @action(methods=["get"], detail=False, url_path="list-admin")

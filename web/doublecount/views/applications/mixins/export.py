@@ -4,7 +4,6 @@ import boto3
 from django.http import HttpResponse
 from drf_spectacular.utils import (
     OpenApiExample,
-    OpenApiParameter,
     OpenApiTypes,
     extend_schema,
 )
@@ -15,15 +14,6 @@ from doublecount.serializers import DoubleCountingApplicationSerializer
 
 class ExportActionMixin:
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         examples=[
             OpenApiExample(
                 "Example of export response.",

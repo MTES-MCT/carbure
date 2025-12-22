@@ -2,7 +2,7 @@ import io
 import zipfile
 
 from django.http import HttpResponse
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 
@@ -13,15 +13,6 @@ from .response_serializer import ResponseSerializer
 
 class DownloadAllDocumentsMixin:
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         responses={200: ResponseSerializer},
     )
     @action(detail=True, methods=["GET"], url_path="download-all")
