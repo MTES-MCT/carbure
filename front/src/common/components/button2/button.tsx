@@ -10,7 +10,7 @@ import { layout, Layout } from "../scaffold"
 export type ButtonProps = ButtonDSFRProps &
   Layout & {
     // For our cases, we want to use the link style with a button
-    customPriority?: "link" | "danger" | "success"
+    customPriority?: "link" | "danger" | "success" | "warning"
     loading?: boolean
     captive?: boolean
   }
@@ -39,10 +39,12 @@ export const Button = forwardRef<
         className={cl(props.className, {
           [css["button-danger"] as string]: customPriority === "danger",
           [css["button-success"] as string]: customPriority === "success",
+          [css["button-warning"] as string]: customPriority === "warning",
           [css["button-as-link-style"] as string]: customPriority === "link",
         })}
         priority={
-          customPriority && ["danger", "success"].includes(customPriority)
+          customPriority &&
+          ["danger", "success", "warning"].includes(customPriority)
             ? "tertiary"
             : props.priority
         }

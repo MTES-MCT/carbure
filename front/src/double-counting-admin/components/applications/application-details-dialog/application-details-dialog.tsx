@@ -217,7 +217,7 @@ export const ApplicationDetailsDialog = () => {
               <Button
                 loading={rejectApplication.loading}
                 disabled={applicationResponse.loading}
-                priority="secondary"
+                customPriority="warning"
                 iconId="ri-close-line"
                 onClick={submitChangeStatus}
               >
