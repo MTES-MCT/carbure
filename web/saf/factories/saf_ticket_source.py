@@ -3,9 +3,10 @@ from datetime import datetime
 
 import factory
 
-from core.models import Biocarburant, Entity, MatierePremiere, Pays
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from saf.models import SafTicketSource
 from transactions.models import ProductionSite
+from transactions.models.depot import Depot
 
 
 class SafTicketSourceFactory(factory.django.DjangoModelFactory):
@@ -29,7 +30,7 @@ class SafTicketSourceFactory(factory.django.DjangoModelFactory):
     carbure_producer = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))
     unknown_producer = factory.Faker("company")
 
-    carbure_production_site = factory.Iterator(ProductionSite.objects.all())
+    carbure_production_site = factory.LazyFunction(lambda: ProductionSite.objects.first())
     unknown_production_site = factory.Faker("company")
     production_country = factory.Iterator(Pays.objects.all())
     production_site_commissioning_date = factory.Faker("date_this_century")
@@ -46,3 +47,6 @@ class SafTicketSourceFactory(factory.django.DjangoModelFactory):
     ghg_total = factory.Faker("random_number", digits=1)
     ghg_reference = 60
     ghg_reduction = factory.Faker("random_number", digits=2)
+
+    origin_lot = factory.LazyFunction(lambda: CarbureLot.objects.order_by("?").first())
+    origin_lot_site = factory.LazyFunction(lambda: Depot.objects.order_by("?").first())

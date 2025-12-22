@@ -18,7 +18,6 @@ class GhgSanityChecksTest(TestCase):
         "json/feedstock.json",
         "json/countries.json",
         "json/entities.json",
-        "json/productionsites.json",
         "json/depots.json",
         "json/ml.json",
         "json/entities_sites.json",

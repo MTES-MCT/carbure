@@ -3,6 +3,7 @@ from datetime import datetime
 
 import factory
 
+from core.factories import RandomInstanceOf
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from transactions.models import Site
 
@@ -31,7 +32,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     # production data
     carbure_producer = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))
     unknown_producer = factory.Faker("company")
-    carbure_production_site = factory.Iterator(Site.objects.all())
+    carbure_production_site = RandomInstanceOf(Site)
     unknown_production_site = factory.Faker("company")
     production_country = factory.Iterator(Pays.objects.all())
     production_site_commissioning_date = factory.Faker("date_this_year")
@@ -58,7 +59,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     dispatch_site_country = None
 
     delivery_date = factory.Faker("date_this_year")
-    carbure_delivery_site = factory.Iterator(Site.objects.all())
+    carbure_delivery_site = RandomInstanceOf(Site)
     unknown_delivery_site = factory.Faker("company")
     delivery_site_country = factory.Iterator(Pays.objects.all())
 

@@ -16,6 +16,7 @@ export enum DoubleCountingExtendedStatus {
   INPROGRESS = DoubleCountingStatus.INPROGRESS,
   PENDING = DoubleCountingStatus.PENDING,
   REJECTED = DoubleCountingStatus.REJECTED,
+  WAITING_FOR_DECISION = DoubleCountingStatus.WAITING_FOR_DECISION,
   EXPIRED = DoubleCountingAgreementStatus.EXPIRED,
   EXPIRES_SOON = DoubleCountingAgreementStatus.EXPIRES_SOON,
 }

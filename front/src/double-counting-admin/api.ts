@@ -4,6 +4,7 @@ import {
   download as downloadFetch,
 } from "common/services/api-fetch"
 import { AgreementListQuery, ApplicationListQuery } from "./types"
+import { DoubleCountingStatus } from "api-schema"
 // GLOBAL
 
 export function getSnapshot(entity_id: number) {
@@ -117,6 +118,20 @@ export function rejectDoubleCountingApplication(
   return apiFetch.POST("/double-counting/applications/reject/", {
     params: { query: { entity_id } },
     body: { dca_id },
+  })
+}
+
+export function updateDoubleCountingApplicationStatus(
+  entity_id: number,
+  dca_id: number,
+  status: DoubleCountingStatus
+) {
+  return apiFetch.PATCH("/double-counting/applications/{id}/", {
+    params: {
+      query: { entity_id },
+      path: { id: dca_id },
+    },
+    body: { status },
   })
 }
 

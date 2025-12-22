@@ -37,13 +37,6 @@ class GenerateDecisionActionMixin:
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            ),
-            OpenApiParameter(
                 "dca_id",
                 OpenApiTypes.INT,
                 OpenApiParameter.QUERY,

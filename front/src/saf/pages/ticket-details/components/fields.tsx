@@ -47,10 +47,10 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={norm.normalizeCountry(ticket.country_of_origin).label}
           readOnly
         />
-        {ticket.pos_poc_number && (
+        {ticket.origin_lot?.pos_number && (
           <TextInput
             label={t("Numéro de POS")}
-            value={ticket.pos_poc_number}
+            value={ticket.origin_lot.pos_number}
             readOnly
           />
         )}

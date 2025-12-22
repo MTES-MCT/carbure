@@ -48,8 +48,7 @@ const TicketsGroupedAssignment = ({
       value.free_field,
       value.reception_airport?.id,
       value.shipping_method,
-      value.consumption_type,
-      value.pos_poc_number
+      value.consumption_type
     )
 
     if (response.data) {
@@ -120,6 +119,7 @@ const TicketsGroupedAssignment = ({
         </Collapse>
 
         <AssignmentForm
+          grouped
           deliveryPeriod={lastDeliveryPeriod}
           remainingVolume={remainingVolume}
           onSubmit={groupedAssignTicket}

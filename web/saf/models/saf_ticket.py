@@ -81,8 +81,6 @@ class SafTicket(models.Model):
         "transactions.Site", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_source_reception_airport"
     )
 
-    pos_poc_number = models.CharField(max_length=32, null=True, blank=True)
-
     MAC = "MAC"
     MAC_DECLASSEMENT = "MAC_DECLASSEMENT"
     CONSUMPTION_TYPES = (
@@ -150,7 +148,6 @@ def create_ticket_from_source(
     reception_airport,
     consumption_type,
     shipping_method,
-    pos_poc_number,
 ):
     year = floor(assignment_period / 100)
 
@@ -190,7 +187,8 @@ def create_ticket_from_source(
         reception_airport=reception_airport,
         consumption_type=consumption_type,
         shipping_method=shipping_method,
-        pos_poc_number=pos_poc_number,
+        origin_lot=ticket_source.origin_lot,
+        origin_lot_site=ticket_source.origin_lot_site,
     )
 
     ticket.generate_carbure_id()

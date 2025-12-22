@@ -2555,6 +2555,111 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingApplication"
           description: ""
+    put:
+      operationId: double_counting_applications_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingApplicationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingApplicationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DoubleCountingApplicationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoubleCountingApplication"
+          description: ""
+    patch:
+      operationId: double_counting_applications_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedDoubleCountingApplicationUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedDoubleCountingApplicationUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedDoubleCountingApplicationUpdateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoubleCountingApplicationUpdate"
+          description: ""
+  /api/double-counting/applications/{id}/download-all/:
+    get:
+      operationId: double_counting_applications_download_all_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Dossier Double Compte.
+          required: true
+      tags:
+        - double-counting
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+          description: ""
   /api/double-counting/applications/{id}/export/:
     get:
       operationId: double_counting_applications_export_retrieve
@@ -2823,10 +2928,23 @@ paths:
           schema:
             type: string
         - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: query
           name: filter
           schema:
             type: string
+            enum:
+              - certificate_id
+              - order_by
+              - producers
+              - production_sites
+              - status_values
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -2879,6 +2997,14 @@ paths:
           description: A search term.
           schema:
             type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: status_values
+          schema:
+            type: string
       tags:
         - double-counting
       security:
@@ -2895,28 +3021,13 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - certificate_id
+                    - order_by
+                    - producers
+                    - production_sites
+                    - status_values
                   summary: Example of filters response.
           description: ""
-        "400":
-          content:
-            application/json:
-              schema:
-                message: No filter was specified | NOT_FOUND
-              examples:
-                InvalidFilter:
-                  value:
-                    message: No filter was specified
-                  summary: Invalid filter
-                NotFound:
-                  value:
-                    message: NOT_FOUND
-                  summary: Not found
-          description: Bad request - invalid filter or not found.
   /api/double-counting/applications/generate-decision/:
     get:
       operationId: double_counting_applications_generate_decision_retrieve
@@ -3018,6 +3129,14 @@ paths:
           required: false
           in: query
           description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: status_values
           schema:
             type: string
       tags:
@@ -3216,14 +3335,8 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -3236,8 +3349,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -3247,11 +3359,13 @@ paths:
               type: string
               enum:
                 - -cpo
+                - -energy_amount
                 - -operating_unit
                 - -quarter
                 - -remaining_energy_amount
                 - -source
                 - cpo
+                - energy_amount
                 - operating_unit
                 - quarter
                 - remaining_energy_amount
@@ -3261,6 +3375,8 @@ paths:
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
             * `remaining_energy_amount` - Remaining energy amount
             * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
@@ -3300,8 +3416,12 @@ paths:
                 - 2
                 - 3
                 - 4
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `1` - T1
+            * `2` - T2
+            * `3` - T3
+            * `4` - T4
+          explode: true
           style: form
         - name: search
           required: false
@@ -3321,8 +3441,11 @@ paths:
                 - METER_READINGS
                 - null
                 - QUALICHARGE
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+          explode: true
           style: form
         - in: query
           name: status
@@ -3753,14 +3876,8 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -3773,7 +3890,6 @@ paths:
             type: string
             enum:
               - cpo
-              - energy_amount
               - operating_unit
               - order_by
               - quarter
@@ -3787,8 +3903,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -3798,11 +3913,13 @@ paths:
               type: string
               enum:
                 - -cpo
+                - -energy_amount
                 - -operating_unit
                 - -quarter
                 - -remaining_energy_amount
                 - -source
                 - cpo
+                - energy_amount
                 - operating_unit
                 - quarter
                 - remaining_energy_amount
@@ -3812,6 +3929,8 @@ paths:
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
+            * `energy_amount` - Energy amount
+            * `-energy_amount` - Energy amount (décroissant)
             * `remaining_energy_amount` - Remaining energy amount
             * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
@@ -3839,8 +3958,12 @@ paths:
                 - 2
                 - 3
                 - 4
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `1` - T1
+            * `2` - T2
+            * `3` - T3
+            * `4` - T4
+          explode: true
           style: form
         - name: search
           required: false
@@ -3860,8 +3983,11 @@ paths:
                 - METER_READINGS
                 - null
                 - QUALICHARGE
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          description: |-
+            * `MANUAL` - MANUAL
+            * `METER_READINGS` - METER_READINGS
+            * `QUALICHARGE` - QUALICHARGE
+          explode: true
           style: form
         - in: query
           name: status
@@ -3888,10 +4014,10 @@ paths:
                 ExampleOfFiltersResponse.:
                   value:
                     - cpo
-                    - energy_amount
                     - operating_unit
                     - order_by
                     - quarter
+                    - source
                   summary: Example of filters response.
           description: ""
   /api/elec/provision-certificates/import/:
@@ -3968,32 +4094,13 @@ paths:
       operationId: elec_transfer_certificates_list
       parameters:
         - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: client
-          schema:
-            type: integer
-        - in: query
-          name: consumption_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: cpo
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -4003,15 +4110,18 @@ paths:
         - in: query
           name: month
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: operator
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4082,18 +4192,19 @@ paths:
           schema:
             type: string
         - in: query
-          name: supplier
-          schema:
-            type: integer
-        - in: query
-          name: transfer_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: used_in_tiruert
           schema:
-            type: boolean
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4263,32 +4374,13 @@ paths:
       operationId: elec_transfer_certificates_filters_retrieve
       parameters:
         - in: query
-          name: certificate_id
-          schema:
-            type: string
-        - in: query
-          name: client
-          schema:
-            type: integer
-        - in: query
-          name: consumption_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: cpo
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
-        - in: query
-          name: energy_amount
-          schema:
-            type: number
-            format: float
         - in: query
           name: entity_id
           schema:
@@ -4300,17 +4392,11 @@ paths:
           schema:
             type: string
             enum:
-              - certificate_id
-              - client
-              - consumption_date
               - cpo
-              - energy_amount
               - month
               - operator
               - order_by
               - status
-              - supplier
-              - transfer_date
               - used_in_tiruert
               - year
           description: Filter string to apply
@@ -4318,15 +4404,18 @@ paths:
         - in: query
           name: month
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: operator
           schema:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: order_by
@@ -4385,18 +4474,19 @@ paths:
           schema:
             type: string
         - in: query
-          name: supplier
-          schema:
-            type: integer
-        - in: query
-          name: transfer_date
-          schema:
-            type: string
-            format: date
-        - in: query
           name: used_in_tiruert
           schema:
-            type: boolean
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -4417,11 +4507,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - certificate_id
-                    - client
-                    - consumption_date
                     - cpo
-                    - energy_amount
+                    - month
+                    - operator
+                    - order_by
+                    - status
                   summary: Example of filters response.
           description: ""
   /api/entities/:
@@ -6203,26 +6293,19 @@ paths:
   /api/entities/users/update-right-request/:
     post:
       operationId: entities_users_update_right_request_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
       tags:
         - entities
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+              $ref: "#/components/schemas/EntityUserRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+              $ref: "#/components/schemas/EntityUserRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
+              $ref: "#/components/schemas/EntityUserRequest"
         required: true
       security:
         - cookieAuth: []
@@ -6232,24 +6315,8 @@ paths:
           content:
             application/json:
               schema:
-                status: success
-              examples:
-                SuccessExample:
-                  value:
-                    status: success
-                  summary: Success example
-          description: Request successful.
-        "400":
-          content:
-            application/json:
-              schema:
-                message: ""
-              examples:
-                BadRequest:
-                  value:
-                    message: ""
-                  summary: Bad request
-          description: Bad request.
+                $ref: "#/components/schemas/EntityUser"
+          description: ""
   /api/entities/users/update-user-role/:
     post:
       operationId: entities_users_update_user_role_create
@@ -8101,7 +8168,7 @@ paths:
           description: ""
   /api/tiruert/admin-objectives/:
     get:
-      operationId: admin_objectives
+      operationId: tiruert_admin_objectives_retrieve
       description: Get agregated objectives for all entities - admin view
       parameters:
         - in: query
@@ -8141,10 +8208,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All agregated objectives for all liable enttities.
+          description: ""
   /api/tiruert/admin-objectives-entity/:
     get:
-      operationId: admin_objectives_entity
+      operationId: tiruert_admin_objectives_entity_retrieve
       description: Get objectives for a specific entity - admin view
       parameters:
         - in: query
@@ -8190,7 +8257,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All objectives.
+          description: ""
   /api/tiruert/elec-operations/:
     get:
       operationId: list_elec_operations
@@ -8913,7 +8980,7 @@ paths:
           description: ""
   /api/tiruert/objectives/:
     get:
-      operationId: objectives
+      operationId: tiruert_objectives_retrieve
       description: Get all objectives
       parameters:
         - in: query
@@ -8953,11 +9020,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
-          description: All objectives.
+          description: ""
   /api/tiruert/operations/:
     get:
-      operationId: list_operations
-      description: Retrieve a list of operations with optional filtering and pagination.
+      operationId: tiruert_operations_list
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: biofuel
@@ -9006,12 +9089,6 @@ paths:
             items:
               type: string
               minLength: 1
-        - in: query
-          name: details
-          schema:
-            type: boolean
-            default: "0"
-          description: Include detailed information if set to `1`.
         - in: query
           name: entity_id
           schema:
@@ -9209,10 +9286,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedOperationListList"
-          description: A list of operations.
+          description: ""
     post:
-      operationId: create_operation
-      description: Create a new operation.
+      operationId: tiruert_operations_create
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9236,23 +9329,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/OperationInputRequest"
-            examples:
-              CreateOperationExample:
-                value:
-                  type: TENEUR
-                  customs_category: CONV
-                  biofuel: 33
-                  credited_entity: ""
-                  debited_entity: 2
-                  depot: ""
-                  lots:
-                    - id: 10
-                      volume: 39462
-                      emission_rate_per_mj: 5.25
-                    - id: 11
-                      volume: 723.2
-                      emission_rate_per_mj: 30.2
-                summary: Create Operation Example
           application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/OperationInputRequest"
@@ -9268,31 +9344,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationList"
-              examples:
-                CreateOperationExample:
-                  value:
-                    type: TENEUR
-                    customs_category: CONV
-                    biofuel: 33
-                    credited_entity: ""
-                    debited_entity: 2
-                    depot: ""
-                    lots:
-                      - id: 10
-                        volume: 39462
-                        emission_rate_per_mj: 5.25
-                      - id: 11
-                        volume: 723.2
-                        emission_rate_per_mj: 30.2
-                  summary: Create Operation Example
-          description: The newly created operation.
-        "400":
-          description: Invalid input data.
+                $ref: "#/components/schemas/OperationInput"
+          description: ""
   /api/tiruert/operations/{id}/:
     get:
-      operationId: get_operation
-      description: Retrieve one specific operation.
+      operationId: tiruert_operations_retrieve
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9326,10 +9399,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Operation"
-          description: Details of specific operation.
+          description: ""
     patch:
-      operationId: update_operation
-      description: Update a part of operation.
+      operationId: tiruert_operations_partial_update
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9359,11 +9448,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PatchedOperationUpdateRequest"
-            examples:
-              UpdateOperationExample:
-                value:
-                  to_depot: 10
-                summary: Update Operation Example
           application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/PatchedOperationUpdateRequest"
@@ -9378,18 +9462,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Operation"
-              examples:
-                UpdateOperationExample:
-                  value:
-                    to_depot: 10
-                  summary: Update Operation Example
-          description: The updated operation.
-        "400":
-          description: Invalid input data.
+                $ref: "#/components/schemas/OperationUpdate"
+          description: ""
     delete:
-      operationId: delete_operation
-      description: Delete an operation. Only allowed for certain types and statuses.
+      operationId: tiruert_operations_destroy
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -9419,9 +9512,7 @@ paths:
         - basicAuth: []
       responses:
         "204":
-          description: Operation deleted successfully.
-        "403":
-          description: Forbidden. The operation type or status does not allow deletion.
+          description: No response body
   /api/tiruert/operations/{id}/accept/:
     post:
       operationId: accept_operation
@@ -10105,6 +10196,23 @@ paths:
   /api/tiruert/operations/export/:
     get:
       operationId: tiruert_operations_export_retrieve
+      description: >-
+        Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+
+        This mixin automatically adds the unit to the request via
+        `initialize_request()`
+
+        and to the serializer context via `get_serializer_context()`.
+
+
+        The unit is determined in the following order:
+
+        1. 'unit' parameter from the request (POST or GET)
+
+        2. Entity's preferred unit (entity.preferred_unit)
+
+        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -11006,6 +11114,25 @@ components:
           maxLength: 64
         code:
           type: string
+          maxLength: 16
+      required:
+        - code
+        - name
+        - name_en
+    BiofuelRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        name_en:
+          type: string
+          minLength: 1
+          maxLength: 64
+        code:
+          type: string
+          minLength: 1
           maxLength: 16
       required:
         - code
@@ -12547,12 +12674,14 @@ components:
         - ISCC
         - REDCERT
         - 2BS
+        - KZR_INIG
       type: string
       description: |-
         * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
         * `ISCC` - ISCC
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
+        * `KZR_INIG` - KZR_INIG
     ChangePasswordError:
       type: object
       properties:
@@ -12728,6 +12857,27 @@ components:
           maxLength: 128
         code_pays:
           type: string
+          maxLength: 64
+        is_in_europe:
+          type: boolean
+      required:
+        - code_pays
+        - name
+        - name_en
+    CountryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        name_en:
+          type: string
+          minLength: 1
+          maxLength: 128
+        code_pays:
+          type: string
+          minLength: 1
           maxLength: 64
         is_in_europe:
           type: boolean
@@ -13214,6 +13364,26 @@ components:
         - production_site
         - quotas_progression
         - status
+    DoubleCountingApplicationRequest:
+      type: object
+      properties:
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/DoubleCountingStatus"
+      required:
+        - period_end
+        - period_start
+    DoubleCountingApplicationUpdate:
+      type: object
+      description: Serializer pour la mise à jour partielle du statut uniquement.
+      properties:
+        status:
+          $ref: "#/components/schemas/DoubleCountingStatus"
     DoubleCountingDocFile:
       type: object
       properties:
@@ -13231,6 +13401,15 @@ components:
       required:
         - id
         - url
+    DoubleCountingDocFileRequest:
+      type: object
+      properties:
+        file_name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        file_type:
+          $ref: "#/components/schemas/FileTypeEnum"
     DoubleCountingProduction:
       type: object
       properties:
@@ -13386,6 +13565,51 @@ components:
           maxLength: 128
       required:
         - id
+        - name
+    DoubleCountingProductionSiteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_reference:
+          type: string
+          maxLength: 64
+        site_siret:
+          type: string
+          maxLength: 64
+        address:
+          type: string
+          maxLength: 256
+        city:
+          type: string
+          maxLength: 128
+        postal_code:
+          type: string
+          maxLength: 32
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+      required:
         - name
     DoubleCountingQuota:
       type: object
@@ -13613,12 +13837,14 @@ components:
         - INPROGRESS
         - REJECTED
         - ACCEPTED
+        - WAITING_FOR_DECISION
       type: string
       description: |-
         * `PENDING` - PENDING
         * `INPROGRESS` - INPROGRESS
         * `REJECTED` - REJECTED
         * `ACCEPTED` - ACCEPTED
+        * `WAITING_FOR_DECISION` - WAITING_FOR_DECISION
     ElecBalance:
       type: object
       properties:
@@ -14402,6 +14628,62 @@ components:
         - inputs
         - name
         - outputs
+    EntityRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        has_mac:
+          type: boolean
+        has_trading:
+          type: boolean
+        has_direct_deliveries:
+          type: boolean
+        has_stocks:
+          type: boolean
+        preferred_unit:
+          $ref: "#/components/schemas/PreferredUnitEnum"
+        legal_name:
+          type: string
+          maxLength: 128
+        registration_id:
+          type: string
+          maxLength: 64
+        sustainability_officer_phone_number:
+          type: string
+          maxLength: 32
+        sustainability_officer:
+          type: string
+          maxLength: 256
+        registered_address:
+          type: string
+          maxLength: 256
+        registered_zipcode:
+          type: string
+          maxLength: 64
+        registered_city:
+          type: string
+          maxLength: 64
+        registered_country:
+          type: integer
+          nullable: true
+        activity_description:
+          type: string
+        website:
+          type: string
+          format: uri
+          maxLength: 200
+        vat_number:
+          type: string
+          maxLength: 32
+        is_enabled:
+          type: boolean
+      required:
+        - name
     EntitySite:
       type: object
       properties:
@@ -14485,6 +14767,35 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
+    EntityUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
+        - id
+        - name
+    EntityUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Adresse électronique
+          maxLength: 255
+      required:
+        - email
     ErrorResponse:
       type: object
       properties:
@@ -14535,6 +14846,29 @@ components:
           maxLength: 128
         code:
           type: string
+          maxLength: 64
+        category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        is_double_compte:
+          type: boolean
+      required:
+        - code
+        - name
+        - name_en
+    FeedStockRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        name_en:
+          type: string
+          minLength: 1
+          maxLength: 128
+        code:
+          type: string
+          minLength: 1
           maxLength: 64
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
@@ -15219,6 +15553,46 @@ components:
       required:
         - id
         - name
+    OperationInput:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/OperationTypeEnum"
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        biofuel:
+          type: integer
+          nullable: true
+        credited_entity:
+          type: integer
+          nullable: true
+        debited_entity:
+          type: integer
+          nullable: true
+        from_depot:
+          type: integer
+          nullable: true
+        to_depot:
+          type: integer
+          nullable: true
+        export_country:
+          type: string
+          nullable: true
+        export_recipient:
+          type: string
+          maxLength: 255
+        lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationLot"
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
+      required:
+        - biofuel
+        - customs_category
+        - debited_entity
+        - lots
+        - type
     OperationInputRequest:
       type: object
       properties:
@@ -15331,6 +15705,21 @@ components:
         - to_depot
         - type
         - unit
+    OperationLot:
+      type: object
+      properties:
+        id:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - emission_rate_per_mj
+        - id
+        - volume
     OperationLotRequest:
       type: object
       properties:
@@ -15390,6 +15779,14 @@ components:
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
+    OperationUpdate:
+      type: object
+      properties:
+        to_depot:
+          type: integer
+          nullable: true
+        status:
+          $ref: "#/components/schemas/OperationStatusEnum"
     OperationalUnitRequest:
       type: object
       properties:
@@ -15803,6 +16200,12 @@ components:
           type: string
           nullable: true
           maxLength: 3
+    PatchedDoubleCountingApplicationUpdateRequest:
+      type: object
+      description: Serializer pour la mise à jour partielle du statut uniquement.
+      properties:
+        status:
+          $ref: "#/components/schemas/DoubleCountingStatus"
     PatchedElecOperationUpdateRequest:
       type: object
       properties:
@@ -16241,6 +16644,10 @@ components:
         carbure_id:
           type: string
           maxLength: 64
+        pos_number:
+          type: string
+          nullable: true
+          maxLength: 64
       required:
         - id
     SafParentTicket:
@@ -16340,10 +16747,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
-        pos_poc_number:
-          type: string
-          nullable: true
-          maxLength: 32
         free_field:
           type: string
           nullable: true
@@ -16502,10 +16905,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/Airport"
           readOnly: true
-        pos_poc_number:
-          type: string
-          nullable: true
-          maxLength: 32
       required:
         - assignment_period
         - biofuel
@@ -16575,6 +16974,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        origin_lot:
+          $ref: "#/components/schemas/SafParentLot"
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -16625,8 +17026,6 @@ components:
         ghg_total:
           type: number
           format: double
-        origin_lot:
-          $ref: "#/components/schemas/SafParentLot"
         origin_lot_site:
           $ref: "#/components/schemas/Site"
       required:
@@ -16669,9 +17068,8 @@ components:
         shipping_method:
           type: string
           nullable: true
-        pos_poc_number:
+        pos_number:
           type: string
-          nullable: true
       required:
         - assignment_period
         - client_id
@@ -16704,9 +17102,9 @@ components:
         shipping_method:
           type: string
           nullable: true
-        pos_poc_number:
+        pos_number:
           type: string
-          nullable: true
+          minLength: 1
       required:
         - assignment_period
         - client_id
@@ -16739,9 +17137,9 @@ components:
         shipping_method:
           type: string
           nullable: true
-        pos_poc_number:
+        pos_number:
           type: string
-          nullable: true
+          minLength: 1
         ticket_sources_ids:
           type: array
           items:
@@ -16810,6 +17208,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        origin_lot:
+          allOf:
+            - $ref: "#/components/schemas/SafParentLot"
+          readOnly: true
       required:
         - added_by
         - assigned_tickets
@@ -16820,6 +17222,7 @@ components:
         - delivery_period
         - feedstock
         - id
+        - origin_lot
         - parent_lot
         - total_volume
         - year
@@ -17017,7 +17420,7 @@ components:
         id:
           type: string
           minLength: 7
-          pattern: ^FR[A-Z]{3}P.*
+          pattern: ^FR[A-Z0-9]{3}P.*
         energy:
           type: number
           format: double
@@ -17216,16 +17619,6 @@ components:
         website:
           type: string
           format: uri
-    UpdateRightsRequestsRequest:
-      type: object
-      properties:
-        id:
-          type: integer
-        status:
-          $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
-      required:
-        - id
-        - status
     UpdateUserRoleRequest:
       type: object
       properties:

@@ -158,6 +158,7 @@ const ApplicationList = ({ snapshot = defaultCount }: ApplicationListProps) => {
 }
 
 const CLIENT_FILTERS = [
+  AgreementFilter.Status,
   AgreementFilter.Certificate_id,
   AgreementFilter.Producers,
   AgreementFilter.ProductionSites,

@@ -19,6 +19,8 @@ class RequesterTest(TestCase):
         self.patched_SubmitMessage = patch("edelivery.soap.requester.SubmitMessage").start()
         self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
 
+        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
+
     def tearDown(self):
         patch.stopall()
 
@@ -26,8 +28,9 @@ class RequesterTest(TestCase):
         commands_called = []
         self.patched_PubSubAdapter.return_value.subscribe = lambda: commands_called.append("subscribe")
         self.patched_SubmitMessage.return_value.perform = lambda: commands_called.append("submit request")
+        self.patched_new_uuid.return_value = "111"
 
-        request = BaseRequest("111", "<request/>")
+        request = BaseRequest("<request/>")
         requester = Requester(request)
         self.assertEqual([], commands_called)
 
@@ -43,8 +46,9 @@ class RequesterTest(TestCase):
 
         self.patched_PubSubAdapter.return_value.next_message = log_next_message_call
         self.patched_PubSubAdapter.return_value.unsubscribe = lambda: commands_called.append("unsubscribe")
+        self.patched_new_uuid.return_value = "111"
 
-        request = BaseRequest("111", "<request/>")
+        request = BaseRequest("<request/>")
         requester = Requester(request)
         self.assertEqual([], commands_called)
 
@@ -53,7 +57,8 @@ class RequesterTest(TestCase):
 
     def test_returns_request_response_received_from_udb(self):
         self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
-        request = BaseRequest("111", "<request/>")
+        self.patched_new_uuid.return_value = "111"
+        request = BaseRequest("<request/>")
         requester = Requester(request)
 
         response = requester.response()
@@ -61,14 +66,15 @@ class RequesterTest(TestCase):
 
     def test_throws_timeout_error_if_not_receiving_any_response_from_udb(self):
         self.patched_PubSubAdapter.return_value.next_message.return_value = None
-        request = BaseRequest("111", "<request/>")
+        request = BaseRequest("<request/>")
         requester = Requester(request, delay_between_retries=0.001, timeout=0.002)
 
         self.assertRaises(TimeoutError, requester.response)
 
     def test_retries_few_times_before_throwing_timeout_error(self):
         self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, self.DEFAULT_RESPONSE_PAYLOAD]
-        request = BaseRequest("111", "<request/>")
+        self.patched_new_uuid.return_value = "111"
+        request = BaseRequest("<request/>")
         requester = Requester(request)
 
         response = requester.response()
@@ -77,7 +83,8 @@ class RequesterTest(TestCase):
     @patch("edelivery.ebms.requests.new_uuid")
     def test_checks_whether_request_ids_correspond(self, patched_new_uuid):
         self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
-        request = BaseRequest("different_request_id", "<request/>")
+        self.patched_new_uuid.return_value = "different_request_id"
+        request = BaseRequest("<request/>")
         requester = Requester(request, delay_between_retries=0.001, timeout=0.002)
 
         self.assertRaises(TimeoutError, requester.response)

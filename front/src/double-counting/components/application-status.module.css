@@ -1,0 +1,6 @@
+.badge-info-orange {
+  --idle: transparent;
+  color: var(--orange-dark);
+  background-color: var(--orange-light);
+  border: none;
+}

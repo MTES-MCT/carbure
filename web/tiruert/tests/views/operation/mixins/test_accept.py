@@ -44,7 +44,6 @@ class AcceptActionMixinTest(TestCase):
         "json/feedstock.json",
         "json/countries.json",
         "json/entities.json",
-        "json/productionsites.json",
         "json/depots.json",
         "json/entities_sites.json",
     ]
@@ -151,7 +150,6 @@ class DeclareTeneurActionMixinTest(TestCase):
         "json/feedstock.json",
         "json/countries.json",
         "json/entities.json",
-        "json/productionsites.json",
         "json/depots.json",
         "json/entities_sites.json",
     ]

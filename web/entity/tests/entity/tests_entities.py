@@ -12,7 +12,6 @@ class AdminEntitiesTest(TestCase):
         "json/countries.json",
         "json/depots.json",
         "json/entities.json",
-        "json/productionsites.json",
         "json/entities_sites.json",
     ]
 
@@ -29,13 +28,13 @@ class AdminEntitiesTest(TestCase):
 
         # check if querying works
         response = self.client.get(
-            reverse("entity-list") + f"?entity_id={self.admin.id}", {"q": "prod", "entity_id": self.admin.id}
+            reverse("entity-list") + f"?entity_id={self.admin.id}", {"q": self.admin.name, "entity_id": self.admin.id}
         )
         # works
         assert response.status_code == 200
-        # and returns at least 2 entities
+        # and returns at least 1 entity
         data = response.json()
-        assert len(data) >= 2
+        assert len(data) == 1
         # check if the content is correct
         random_entity = data[0]["entity"]
         assert "entity_type" in random_entity
@@ -48,7 +47,7 @@ class AdminEntitiesTest(TestCase):
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["name"] == "MTE - DGEC"
+        assert data["name"] == self.admin.name
 
     def test_create_entity_success(self):
         data = {"name": "Test Entity", "entity_type": "Producteur", "has_saf": True, "has_elec": False}

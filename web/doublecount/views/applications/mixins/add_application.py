@@ -3,8 +3,6 @@ from django.db import transaction
 from django.db.models import Q
 from drf_spectacular.utils import (
     OpenApiExample,
-    OpenApiParameter,
-    OpenApiTypes,
     extend_schema,
 )
 from rest_framework import serializers, status
@@ -61,15 +59,6 @@ class DoubleCountingAdminAddSerializer(serializers.Serializer):
 
 class AddActionMixin:
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         request=DoubleCountingAdminAddSerializer,
         responses={200: ResponseSerializer},
         examples=[

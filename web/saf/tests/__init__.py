@@ -4,6 +4,7 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 from saf.factories import SafTicketFactory, SafTicketSourceFactory
 from saf.models import SafTicket, SafTicketSource
+from transactions.factories.carbure_lot import CarbureLotFactory
 
 
 class TestCase(DjangoTestCase):
@@ -12,7 +13,7 @@ class TestCase(DjangoTestCase):
         "json/feedstock.json",
         "json/countries.json",
         "json/entities.json",
-        "json/productionsites.json",
+        
     ]
 
     def setUp(self):
@@ -34,12 +35,21 @@ class TestCase(DjangoTestCase):
         self.client2.has_saf = True
         self.client2.save()
 
+        self.lot = CarbureLotFactory.create(
+            pos_number="ABCDEF", 
+            carbure_supplier=self.entity, 
+            carbure_client=self.entity, 
+            added_by=self.entity,
+        )
+
         SafTicketSource.objects.all().delete()
         self.ticket_source = SafTicketSourceFactory.create(
             added_by_id=self.entity.id,
             delivery_period=202202,
             total_volume=30000,
             assigned_volume=10000,
+            parent_lot=self.lot,
+            origin_lot=self.lot
         )
 
         SafTicket.objects.all().delete()

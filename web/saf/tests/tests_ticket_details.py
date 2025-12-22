@@ -120,8 +120,8 @@ class SafTicketDetailsTest(TestCase):
                 "is_double_compte": True,
             },
             "biofuel": {
-                "name": "Huile cotraitée - Carburéacteur",
-                "name_en": "Co-processed oil - jet",
+                "name": "Huiles co-traitées - Kérosène",
+                "name_en": "",
                 "code": "HCC",
             },
             "country_of_origin": {
@@ -156,10 +156,9 @@ class SafTicketDetailsTest(TestCase):
             "child_ticket_sources": [],
             "origin_lot": None,
             "origin_lot_site": None,
-            "pos_poc_number": None,
         }
 
         data = response.json()
         data.pop("created_at")
 
-        assert data == expected_ticket
+        self.assertEqual(data, expected_ticket)
