@@ -1026,7 +1026,7 @@
   "Agrément double comptage n°{{dcNumber}}": "Double counting approval no. {{dcNumber}}",
   "Pour le site de production <b>{{ productionSite }}</b> de <b><Link>{{ producer }}</Link></b>": "For the <b>{{ productionSite }}</b> production site of <b><Link>{{ producer }}</Link></b>",
   "Générer la décision": "Generating decision",
-  "Aucune demande n'a été associée. Pour afficher les quotas approuvés, ajouter la demande associée à cet agrément dans l'onglet \"demandes en attente\".": "Aucune demande n'a été associée. Pour afficher les quotas approuvés, ajouter la demande associée à cet agrément dans l'onglet \"demandes en attente\".",
+  "Aucune demande n'a été associée. Pour afficher les quotas approuvés, ajouter la demande associée à cet agrément dans l'onglet \"demandes en attente\".": "No application has been associated. To display approved quotas, add the request associated with this approval to the \"pending requests\" tab.",
   "Site de production": "Production site",
   "Quotas": "Quotas",
   "Production": "Production",
