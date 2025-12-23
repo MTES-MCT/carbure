@@ -1,1 +1,255 @@
-[{"model": "core.matierepremiere", "pk": 32, "fields": {"name": "Betterave", "name_en": "Beet", "description": "", "date_added": "2020-03-19", "code": "BETTERAVE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 33, "fields": {"name": "Blé", "name_en": "Wheat", "description": "", "date_added": "2020-03-19", "code": "BLE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 34, "fields": {"name": "Canne à sucre", "name_en": "Sugar cane", "description": "", "date_added": "2020-03-19", "code": "CANNE_A_SUCRE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 35, "fields": {"name": "Colza", "name_en": "Rapeseed", "description": "", "date_added": "2020-03-19", "code": "COLZA", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": false, "is_huile_vegetale": true, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 36, "fields": {"name": "Déchets organiques ménagers", "name_en": "Households biowaste", "description": "", "date_added": "2020-03-19", "code": "DECHETS_ORGANIQUES_MENAGERS", "compatible_alcool": true, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 37, "fields": {"name": "Fumier humide", "name_en": "Manure", "description": "", "date_added": "2020-03-19", "code": "FUMIER_HUMIDE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 38, "fields": {"name": "Fumier sec", "name_en": "Dry manure", "description": "", "date_added": "2020-03-19", "code": "FUMIER_SEC", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 39, "fields": {"name": "Huiles ou graisses animales  (catégorie I et/ou II )", "name_en": "CI/CII Animal fat", "description": "", "date_added": "2020-03-19", "code": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-B", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 40, "fields": {"name": "Huiles ou graisses animales  (catégorie III)", "name_en": "CIII Animal fat", "description": "", "date_added": "2020-03-19", "code": "HUILES_OU_GRAISSES_ANIMALES_CAT3", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "OTHER", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 41, "fields": {"name": "Huile de palme", "name_en": "Palm oil", "description": "", "date_added": "2020-03-19", "code": "HUILE_PALME", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 42, "fields": {"name": "Huile alimentaire usagée", "name_en": "used cooking oil", "description": "", "date_added": "2020-03-19", "code": "HUILE_ALIMENTAIRE_USAGEE", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-B", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 43, "fields": {"name": "Maïs", "name_en": "Corn", "description": "", "date_added": "2020-03-19", "code": "MAIS", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 44, "fields": {"name": "Résidus viniques", "name_en": "Wine sludge", "description": "", "date_added": "2020-03-19", "code": "RESIDUS_VINIQUES", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 45, "fields": {"name": "Soja", "name_en": "Soy", "description": "", "date_added": "2020-03-19", "code": "SOJA", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": false, "is_huile_vegetale": true, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 46, "fields": {"name": "Tournesol", "name_en": "Sunflower", "description": "", "date_added": "2020-03-19", "code": "TOURNESOL", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": false, "is_huile_vegetale": true, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 47, "fields": {"name": "Glycérine brute", "name_en": "Crude glycerine", "description": "", "date_added": "2020-03-19", "code": "GLYCERINE_BRUTE", "compatible_alcool": true, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 48, "fields": {"name": "Déchets de bois", "name_en": "Wood waste", "description": "", "date_added": "2020-03-19", "code": "DECHETS_BOIS", "compatible_alcool": true, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 49, "fields": {"name": "Déchets industriels", "name_en": "Industrial waste", "description": "", "date_added": "2020-03-19", "code": "DECHETS_INDUSTRIELS", "compatible_alcool": true, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 50, "fields": {"name": "Algues", "name_en": "Algae", "description": "", "date_added": "2020-03-19", "code": "ALGUES", "compatible_alcool": true, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 51, "fields": {"name": "Paille", "name_en": "Straw", "description": "", "date_added": "2020-03-19", "code": "PAILLE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 52, "fields": {"name": "Boues d'épuration", "name_en": "Sewage Sludge", "description": "", "date_added": "2020-03-19", "code": "BOUES_EPURATION", "compatible_alcool": true, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 53, "fields": {"name": "Effluents d'huileries de palme et rafles", "name_en": "Palm oil mill efluent", "description": "", "date_added": "2020-03-19", "code": "EFFLUENTS_HUILERIES_PALME_RAFLE", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 54, "fields": {"name": "Brai de tallol", "name_en": "Tall oil pitch", "description": "", "date_added": "2020-03-19", "code": "BRAI_TALLOL", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 55, "fields": {"name": "Bagasse", "name_en": "Bagasse", "description": "", "date_added": "2020-03-19", "code": "BAGASSE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 56, "fields": {"name": "Coques", "name_en": "Nut shells", "description": "", "date_added": "2020-03-19", "code": "COQUES", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 57, "fields": {"name": "Balles (enveloppes)", "name_en": "Husks", "description": "", "date_added": "2020-03-19", "code": "BALLES", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 58, "fields": {"name": "Râpes", "name_en": "Cobs", "description": "", "date_added": "2020-03-19", "code": "RAPES", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 59, "fields": {"name": "Déchets municipaux en mélange (Hors déchets ménagers triés)", "name_en": "Municipal wast", "description": "", "date_added": "2020-03-19", "code": "DECHETS_MUNICIPAUX_MELANGE", "compatible_alcool": true, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 60, "fields": {"name": "Matières cellulosiques d'origine non alimentaire", "name_en": "Non-food cellulosic material", "description": "", "date_added": "2020-03-19", "code": "MAT_CELLULOSIQUE_NON_ALIMENTAIRE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 61, "fields": {"name": "Matières ligno-cellulosiques (Hors grumes de sciage & de placage)", "name_en": "Ligno-cellulosic material", "description": "", "date_added": "2020-03-19", "code": "MAT_LIGNO_CELLULOSIQUE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": false, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 62, "fields": {"name": "Égouts pauvres de 2ème extraction", "name_en": "Molasses", "description": "", "date_added": "2020-05-19", "code": "EP2", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "OTHER", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 63, "fields": {"name": "Amidon résiduel", "name_en": "Starch slury", "description": "", "date_added": "2020-05-19", "code": "AMIDON_RESIDUEL", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "OTHER", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 64, "fields": {"name": "Seigle", "name_en": "Rye", "description": "", "date_added": "2020-09-23", "code": "SEIGLE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 65, "fields": {"name": "Orge", "name_en": "Barley", "description": "", "date_added": "2020-09-23", "code": "ORGE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 66, "fields": {"name": "Triticale", "name_en": "Triticale", "description": "", "date_added": "2020-09-23", "code": "TRITICALE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 67, "fields": {"name": "Résidus de bière", "name_en": "Beer sludge", "description": "", "date_added": "2020-09-23", "code": "RESIDUS_DE_BIERE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "OTHER", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 68, "fields": {"name": "Tallol", "name_en": "Tall oil", "description": "", "date_added": "2020-11-18", "code": "TALLOL", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "TALLOL", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 69, "fields": {"name": "Marc de raisin", "name_en": "Grape marcs", "description": "", "date_added": "2021-02-18", "code": "MARC_DE_RAISIN", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 70, "fields": {"name": "Lies de vin", "name_en": "Wine lies", "description": "", "date_added": "2021-02-18", "code": "LIES_DE_VIN", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 71, "fields": {"name": "PFAD", "name_en": "PFAD", "description": "", "date_added": "2022-03-14", "code": "PFAD", "compatible_alcool": false, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": false, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 72, "fields": {"name": "Déchet de processus sucrier contaminé", "name_en": "Contaminated waste from sugar process", "description": "", "date_added": "2022-03-16", "code": "DPSC", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "OTHER", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 73, "fields": {"name": "Graisses de flottation", "name_en": "Brown Grease", "description": "", "date_added": "2022-03-31", "code": "GRAISSES_FLOTTATION", "compatible_alcool": false, "compatible_graisse": true, "is_double_compte": true, "is_huile_vegetale": false, "is_displayed": true, "category": "ANN-IX-A", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 74, "fields": {"name": "Sorgho", "name_en": "Sorghum", "description": "", "date_added": "2022-06-23", "code": "SORGHO", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}, {"model": "core.matierepremiere", "pk": 75, "fields": {"name": "Mélasse", "name_en": "", "description": "", "date_added": "2022-09-20", "code": "MELASSE", "compatible_alcool": true, "compatible_graisse": false, "is_double_compte": false, "is_huile_vegetale": false, "is_displayed": true, "category": "CONV", "dgddi_category": null}}]
+[
+  {
+    "model": "core.matierepremiere",
+    "pk": 32,
+    "fields": {
+      "name": "Betterave",
+      "name_en": "Beet",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "BETTERAVE",
+      "compatible_alcool": true,
+      "compatible_graisse": false,
+      "is_double_compte": false,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "CONV",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 35,
+    "fields": {
+      "name": "Colza",
+      "name_en": "Rapeseed",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "COLZA",
+      "compatible_alcool": false,
+      "compatible_graisse": true,
+      "is_double_compte": false,
+      "is_huile_vegetale": true,
+      "is_displayed": true,
+      "category": "CONV",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 44,
+    "fields": {
+      "name": "Résidus viniques",
+      "name_en": "Wine sludge",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "RESIDUS_VINIQUES",
+      "compatible_alcool": true,
+      "compatible_graisse": false,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 15,
+    "fields": {
+      "name": "Brai de tallol",
+      "name_en": "Tall oil pitch",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "BRAI_TALLOL",
+      "compatible_alcool": false,
+      "compatible_graisse": true,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 50,
+    "fields": {
+      "name": "Algues",
+      "name_en": "Algae",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "ALGUES",
+      "compatible_alcool": true,
+      "compatible_graisse": true,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 52,
+    "fields": {
+      "name": "Boues d'épuration",
+      "name_en": "Sewage Sludge",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "BOUES_EPURATION",
+      "compatible_alcool": true,
+      "compatible_graisse": true,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+
+  {
+    "model": "core.matierepremiere",
+    "pk": 49,
+    "fields": {
+      "name": "Déchets industriels",
+      "name_en": "Industrial waste",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "DECHETS_INDUSTRIELS",
+      "compatible_alcool": true,
+      "compatible_graisse": true,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 69,
+    "fields": {
+      "name": "Marc de raisin",
+      "name_en": "Grape marcs",
+      "description": "",
+      "date_added": "2021-02-18",
+      "code": "MARC_DE_RAISIN",
+      "compatible_alcool": true,
+      "compatible_graisse": false,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 70,
+    "fields": {
+      "name": "Lies de vin",
+      "name_en": "Wine lies",
+      "description": "",
+      "date_added": "2021-02-18",
+      "code": "LIES_DE_VIN",
+      "compatible_alcool": true,
+      "compatible_graisse": false,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 42,
+    "fields": {
+      "name": "Huile alimentaire usagée",
+      "name_en": "Used cooking oil",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "HUILE_ALIMENTAIRE_USAGEE",
+      "compatible_alcool": false,
+      "compatible_graisse": true,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-B",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 53,
+    "fields": {
+      "name": "Effluents d'huileries de palme et rafles",
+      "name_en": "Palm oil mill efluent",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "EFFLUENTS_HUILERIES_PALME_RAFLE",
+      "compatible_alcool": false,
+      "compatible_graisse": true,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-A",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 33,
+    "fields": {
+      "name": "Blé",
+      "name_en": "Wheat",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "BLE",
+      "compatible_alcool": true,
+      "compatible_graisse": false,
+      "is_double_compte": false,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "CONV",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 39,
+    "fields": {
+      "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
+      "name_en": "CI/CII Animal fat",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
+      "compatible_alcool": false,
+      "compatible_graisse": true,
+      "is_double_compte": true,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "ANN-IX-B",
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.matierepremiere",
+    "pk": 62,
+    "fields": {
+      "name": "Égouts pauvres de 2ème extraction",
+      "name_en": "Molasses",
+      "description": "",
+      "date_added": "2020-05-19",
+      "code": "EP2",
+      "compatible_alcool": true,
+      "compatible_graisse": false,
+      "is_double_compte": false,
+      "is_huile_vegetale": false,
+      "is_displayed": true,
+      "category": "OTHER",
+      "dgddi_category": null
+    }
+  }
+]

@@ -41,6 +41,7 @@ const DoubleCounting = () => {
         DoubleCountingStatus.PENDING,
         DoubleCountingStatus.INPROGRESS,
         DoubleCountingStatus.REJECTED,
+        DoubleCountingStatus.WAITING_FOR_DECISION,
       ].includes(application.status)
     ) {
       navigate({

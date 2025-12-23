@@ -44,7 +44,7 @@ export const TicketAssignment = ({
       value.reception_airport?.id,
       value.shipping_method,
       value.consumption_type,
-      value.pos_poc_number
+      value.pos_number
     )
 
     onTicketAssigned(value.volume!, value.client!.name)
@@ -82,6 +82,7 @@ export const TicketAssignment = ({
         </p>
 
         <AssignmentForm
+          posNumber={ticketSource?.origin_lot?.pos_number ?? undefined}
           deliveryPeriod={ticketSource.delivery_period}
           remainingVolume={remainingVolume}
           onSubmit={assignTicket}

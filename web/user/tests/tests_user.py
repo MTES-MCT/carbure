@@ -13,7 +13,6 @@ class UserTest(TestCase):
         "json/countries.json",
         "json/depots.json",
         "json/entities.json",
-        "json/productionsites.json",
     ]
 
     def setUp(self):

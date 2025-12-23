@@ -14,14 +14,18 @@ import { Autocomplete } from "common/components/autocomplete2"
 import { ConsumptionType } from "saf/types"
 
 export interface AssignmentFormProps {
+  grouped?: boolean
   deliveryPeriod?: number
   remainingVolume: number
+  posNumber?: string
   onSubmit: (form: AssignmentFormData) => void
 }
 
 export const AssignmentForm = ({
+  grouped,
   deliveryPeriod,
   remainingVolume,
+  posNumber,
   onSubmit,
 }: AssignmentFormProps) => {
   const { t } = useTranslation()
@@ -29,6 +33,7 @@ export const AssignmentForm = ({
 
   const { value, bind, setField, setFieldError } = useForm<AssignmentFormData>({
     ...defaultAssignment,
+    pos_number: posNumber,
     assignment_period: deliveryPeriod ?? defaultAssignment.assignment_period,
   })
 
@@ -117,11 +122,12 @@ export const AssignmentForm = ({
         </>
       )}
 
-      {clientIsAirline && (
+      {!grouped && (
         <TextInput
           label={t("Numéro de POS")}
           placeholder="Ex: PC-ISCC-12345678"
-          {...bind("pos_poc_number")}
+          {...bind("pos_number")}
+          disabled={Boolean(posNumber)}
         />
       )}
 
@@ -165,7 +171,7 @@ const defaultAssignment = {
   reception_airport: undefined as Airport | undefined,
   shipping_method: undefined as ShippingMethodEnum | undefined,
   consumption_type: undefined as ConsumptionType | undefined,
-  pos_poc_number: undefined as string | undefined,
+  pos_number: undefined as string | undefined,
 }
 
 export type AssignmentFormData = typeof defaultAssignment

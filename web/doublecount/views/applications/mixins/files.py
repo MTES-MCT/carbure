@@ -24,15 +24,6 @@ class ApplicationFileUploadSerializer(serializers.Serializer):
 
 class ApplicationFilesMixin(RetrieveModelMixin):
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         request=ApplicationFileUploadSerializer,
         responses={200: ResponseSerializer},
     )
@@ -57,13 +48,6 @@ class ApplicationFilesMixin(RetrieveModelMixin):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            ),
             OpenApiParameter(
                 "file_id",
                 OpenApiTypes.INT,

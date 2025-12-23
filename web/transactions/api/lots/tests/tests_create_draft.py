@@ -19,7 +19,7 @@
 #         "json/countries.json",
 #         "json/entities.json",
 #         'json/depots.json',
-#         "json/productionsites.json",
+#
 #     ]
 
 #     def setUp(self):

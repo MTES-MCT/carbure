@@ -12,7 +12,6 @@ from rest_framework.response import Response
 
 from core.helpers import send_mail
 from core.models import UserRights, UserRightsRequests
-from core.utils import CarbureEnv
 
 
 class UpdateRightsRequestsSerializer(serializers.Serializer):
@@ -57,6 +56,25 @@ class UpdateRightsRequestsActionMixin:
             ),
         ],
     )
+    @staticmethod
+    def send_rights_update_notification(request):
+        email_subject = "Carbure - Demande acceptée"
+        message = f"""\
+        Bonjour,
+
+        Votre demande d'accès à la Société {request.entity.name} vient d'être validée par l'administration.
+
+        """
+        recipient_list = ["carbure@beta.gouv.fr"] if settings.WITH_EMAIL_DECORATED_AS_TEST else [request.user.email]
+
+        send_mail(
+            request=request,
+            subject=email_subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=recipient_list,
+        )
+
     @action(detail=False, methods=["post"], url_path="update-right-request")
     def update_right_request(self, request):
         serializer = UpdateRightsRequestsSerializer(data=request.data)
@@ -76,22 +94,7 @@ class UpdateRightsRequestsActionMixin:
                     "expiration_date": right_request.expiration_date,
                 },
             )
-            # send_mail
-            email_subject = "Carbure - Demande acceptée"
-            message = """
-            Bonjour,
-
-            Votre demande d'accès à la Société %s vient d'être validée par l'administration.
-
-            """ % (right_request.entity.name)
-            recipient_list = [right_request.user.email] if CarbureEnv.is_prod else ["carbure@beta.gouv.fr"]
-            send_mail(
-                request=request,
-                subject=email_subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=recipient_list,
-            )
+            self.send_rights_update_notification(right_request)
         else:
             UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()
         return Response({"status": "success"})

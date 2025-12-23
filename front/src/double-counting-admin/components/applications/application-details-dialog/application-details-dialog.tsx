@@ -15,6 +15,7 @@ import { DoubleCountingStatus as DCStatus } from "../../../../double-counting/ty
 import { ApplicationInfo } from "../application-info"
 import ApplicationStatus from "../../../../double-counting/components/application-status"
 import ApplicationDetailsDialogValidateQuotas from "./application-details-dialog-validate-quotas"
+import ApplicationDetailsDialogChangeStatus from "./application-details-dialog-change-status"
 import GenerateDecisionDialog from "double-counting-admin/components/generate-decision-dialog/generate-decision-dialog"
 import ApplicationTabs from "double-counting/components/applications/application-tabs"
 import { Notice } from "common/components/notice"
@@ -134,6 +135,24 @@ export const ApplicationDetailsDialog = () => {
     ))
   }
 
+  async function submitChangeStatus() {
+    if (!application) {
+      return
+    }
+
+    portal((close) => (
+      <ApplicationDetailsDialogChangeStatus
+        application={application}
+        onClose={close}
+        onSuccess={() => {
+          navigate({
+            pathname: location.pathname,
+          })
+        }}
+      />
+    ))
+  }
+
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
@@ -198,6 +217,15 @@ export const ApplicationDetailsDialog = () => {
               <Button
                 loading={rejectApplication.loading}
                 disabled={applicationResponse.loading}
+                customPriority="warning"
+                iconId="ri-loop-right-line"
+                onClick={submitChangeStatus}
+              >
+                <Trans>Changer le statut</Trans>
+              </Button>
+              <Button
+                loading={rejectApplication.loading}
+                disabled={applicationResponse.loading}
                 customPriority="danger"
                 iconId="ri-close-line"
                 onClick={submitReject}
@@ -241,6 +269,7 @@ export const ApplicationDetailsDialog = () => {
             quotas={quotas}
             setQuotas={onUpdateQuotas}
             files={application.documents}
+            applicationId={application.id}
           />
         )}
 

@@ -13,6 +13,7 @@ from tiruert.services.elec_operation import ElecOperationService
 class ElecOperationTest(TestCase):
     fixtures = [
         "json/entities.json",
+        "json/countries.json",
     ]
 
     def setUp(self):

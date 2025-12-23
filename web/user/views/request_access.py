@@ -71,7 +71,7 @@ def request_entity_access(request, *args, **kwargs):
         )
 
         # get all user admins for tthe entity
-        admins = UserRights.objects.filter(entity=entity, role=UserRights.ADMIN).values_list("user__email", flat=True)
+        admins = entity.get_admin_users_emails()
         recipient_list = list(admins)
         recipient_list.append("carbure@beta.gouv.fr")
 
