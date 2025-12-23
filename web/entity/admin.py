@@ -104,7 +104,7 @@ class EntityAdmin(admin.ModelAdmin):
     )
     search_fields = ("entity_type", "name")
     list_filter = ["entity_type"]
-    readonly_fields = ["is_enabled"]
+    readonly_fields = ["is_enabled", "closed_at"]
     inlines = [EntityDepartmentInline, EntityDepotInline]
 
     actions = ["enable_entity", "deactivate_entity"]
