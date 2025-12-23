@@ -14,7 +14,7 @@ from elec.services.export_charge_point_excel import export_charge_points_to_exce
 
 class ApplicationDetailsForm(forms.Form):
     application_id = forms.ModelChoiceField(queryset=ElecChargePointApplication.objects.all())
-    company_id = forms.ModelChoiceField(queryset=Entity.objects.filter(entity_type=Entity.CPO))
+    company_id = forms.ModelChoiceField(queryset=Entity.all_objects.filter(entity_type=Entity.CPO))
 
 
 class ApplicationDetailsError:

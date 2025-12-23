@@ -81,6 +81,7 @@ class EntitySerializer(serializers.ModelSerializer):
             "website",
             "vat_number",
             "is_enabled",
+            "closed_at",
         ]
 
 

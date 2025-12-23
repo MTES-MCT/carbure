@@ -9,7 +9,7 @@ from elec.serializers.elec_charge_point_application import ElecChargePointApplic
 
 
 class ApplicationsForm(forms.Form):
-    company_id = forms.ModelChoiceField(queryset=Entity.objects.filter(entity_type=Entity.CPO))
+    company_id = forms.ModelChoiceField(queryset=Entity.all_objects.filter(entity_type=Entity.CPO))
 
 
 class ApplicationsError:

@@ -12,7 +12,7 @@ from elec.services.export_charge_point_excel import export_charge_points_to_exce
 
 
 class ChargePointsForm(forms.Form):
-    company_id = forms.ModelChoiceField(queryset=Entity.objects.filter(entity_type=Entity.CPO))
+    company_id = forms.ModelChoiceField(queryset=Entity.all_objects.filter(entity_type=Entity.CPO))
 
 
 class ChargePointsError:

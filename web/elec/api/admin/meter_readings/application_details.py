@@ -12,7 +12,7 @@ from elec.services.create_meter_reading_excel import create_meter_readings_excel
 
 class ApplicationDetailsForm(forms.Form):
     application_id = forms.ModelChoiceField(queryset=ElecMeterReadingApplication.objects.all())
-    company_id = forms.ModelChoiceField(queryset=Entity.objects.filter(entity_type=Entity.CPO))
+    company_id = forms.ModelChoiceField(queryset=Entity.all_objects.filter(entity_type=Entity.CPO))
 
 
 class ApplicationDetailsError:

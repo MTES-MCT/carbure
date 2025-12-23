@@ -10,6 +10,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from core.entity_context import get_current_entity
 from transactions.models import Site
 
 usermodel = get_user_model()
@@ -61,8 +62,15 @@ class Department(models.Model):
 
 
 class EntityManager(models.Manager):
+    """Manager that automatically filters based on thread-local requesting entity"""
+
     def get_queryset(self):
-        return super().get_queryset().filter(closed_at__isnull=True)
+        requesting_entity = get_current_entity()
+        print("EntityManager: requesting_entity =", requesting_entity)
+        if requesting_entity and requesting_entity.entity_type in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
+            return super().get_queryset()
+
+        return super().get_queryset().exclude(closed_at__isnull=False)
 
 
 class Entity(models.Model):
@@ -172,6 +180,7 @@ class Entity(models.Model):
             "is_tiruert_liable": self.is_tiruert_liable,
             "is_red_ii": self.is_red_ii,
             "accise_number": self.accise_number,
+            "closed_at": self.closed_at,
         }
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]

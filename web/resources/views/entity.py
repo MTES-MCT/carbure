@@ -52,7 +52,11 @@ def get_entities(request, *args, **kwargs):
     entity_type = request.query_params.getlist("entity_type")
     is_tiruert_liable = request.query_params.get("is_tiruert_liable") == "true"
     allowed_tiruert = request.query_params.get("allowed_tiruert") == "true"
-    entities = Entity.objects.all().order_by("name")
+
+    if request.user.is_superuser:
+        entities = Entity.all_objects.all().order_by("name")
+    else:
+        entities = Entity.objects.all().order_by("name")
 
     if query:
         entities = entities.filter(name__icontains=query)
