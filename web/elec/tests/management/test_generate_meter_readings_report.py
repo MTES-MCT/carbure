@@ -11,6 +11,7 @@ from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
+from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from transactions.models.year_config import YearConfig
 
 ENR_RATIO = 0.25
@@ -27,6 +28,17 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
 
         YearConfig.objects.create(year=2022, renewable_share=ENR_RATIO * 100)
         YearConfig.objects.create(year=2023, renewable_share=ENR_RATIO * 100)
+
+    def create_provision_certificate(self, cpo, amount):
+        return ElecProvisionCertificate.objects.create(
+            cpo=cpo,
+            quarter=1,
+            year=2024,
+            operating_unit="FRBLA",
+            source=ElecProvisionCertificate.METER_READINGS,
+            energy_amount=amount,
+            remaining_energy_amount=amount,
+        )
 
     def create_meter_reading_application(self, cpo, quarter=1, year=2023):
         return ElecMeterReadingApplication.objects.create(
@@ -92,9 +104,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         application,
         meter,
         extracted_energy,
-        energy_used_since_last_reading,
         reading_date,
-        renewable_energy=None,
     ):
         return ElecMeterReading.objects.create(
             extracted_energy=extracted_energy,
@@ -102,9 +112,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             cpo=cpo,
             application=application,
             meter=meter,
-            energy_used_since_last_reading=energy_used_since_last_reading,
-            renewable_energy=renewable_energy or energy_used_since_last_reading * ENR_RATIO,
-            days_since_last_reading=30,
+            enr_ratio=ENR_RATIO,
         )
 
     def run_command(self, year=None):
@@ -131,9 +139,9 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=app_q1,
             meter=meter,
             extracted_energy=150,
-            energy_used_since_last_reading=50,
             reading_date=date(2023, 3, 1),  # end of Q1
         )
+        self.create_provision_certificate(cpo=self.cpo, amount=(150 - 100) * ENR_RATIO / 1000)
 
         # Q2
         app_q2 = self.create_meter_reading_application(
@@ -146,11 +154,11 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=app_q2,
             meter=meter,
             extracted_energy=210,
-            energy_used_since_last_reading=60,
             reading_date=date(2023, 7, 1),  # end of Q2
         )
+        self.create_provision_certificate(cpo=self.cpo, amount=(210 - 150) * ENR_RATIO / 1000)
 
-        self.assertEqual(self.run_command(year=2023), {})
+        self.assertEqual(self.run_command(), {})
 
     def test_report_accumulates_positive_and_negative_deltas(self):
         _, meter = self.create_charge_point_with_meter(
@@ -171,9 +179,12 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             cpo=self.cpo,
             application=app_q1,
             meter=meter,
-            extracted_energy=250,  # should be 50 (250 - 200)
-            energy_used_since_last_reading=90,
+            extracted_energy=250,
             reading_date=date(2023, 3, 1),  # end of Q1
+        )
+        self.create_provision_certificate(
+            cpo=self.cpo,
+            amount=90 * ENR_RATIO / 1000,  # should be 50 (250 - 200)
         )
 
         # Q2
@@ -187,12 +198,15 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=app_q2,
             meter=meter,
             extracted_energy=290,
-            energy_used_since_last_reading=35,  # should be 40 (290 - 250)
             reading_date=date(2023, 7, 1),  # end of Q2
+        )
+        self.create_provision_certificate(
+            cpo=self.cpo,
+            amount=35 * ENR_RATIO / 1000,  # should be 40 (290 - 250)
         )
 
         self.assertEqual(
-            self.run_command(year=2023),
+            self.run_command(),
             {"CPO": 35.0 * ENR_RATIO},
         )
 
@@ -216,8 +230,11 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=app_q1,
             meter=meter_1,
             extracted_energy=360,
-            energy_used_since_last_reading=60,  # correct
             reading_date=date(2023, 3, 1),  # end of Q1
+        )
+        self.create_provision_certificate(
+            cpo=self.cpo,
+            amount=60 * ENR_RATIO / 1000,  # correct
         )
 
         # Q2, change meter, but save correct deltas
@@ -237,8 +254,11 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=app_q2,
             meter=meter_2,
             extracted_energy=1050,
-            energy_used_since_last_reading=50,  # correct
             reading_date=date(2023, 7, 1),  # end of Q2
+        )
+        self.create_provision_certificate(
+            cpo=self.cpo,
+            amount=50 * ENR_RATIO / 1000,  # correct
         )
 
         # Q3, change meter, but save incorrect delta
@@ -258,86 +278,14 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=app_q3,
             meter=meter_3,
             extracted_energy=100,
-            energy_used_since_last_reading=150,  # should be 90
             reading_date=date(2023, 10, 1),  # end of Q3
         )
-
-        self.assertEqual(
-            self.run_command(year=2023),
-            {"CPO": (150 - 90) * ENR_RATIO},
-        )
-
-    def test_report_uses_renewable_energy_when_missing_energy_delta(self):
-        app_q1 = self.create_meter_reading_application(
-            self.cpo,
-            quarter=1,
-            year=2023,
-        )
-        _, meter = self.create_charge_point_with_meter(
+        self.create_provision_certificate(
             cpo=self.cpo,
-            application=self.charge_point_application_a,
-            cp_suffix="004",
-            initial_index=100,
-            initial_index_date=date(2023, 1, 1),
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q1,
-            meter=meter,
-            extracted_energy=150,
-            energy_used_since_last_reading=0,  # we didn't compute energy_used_since_last_reading
-            renewable_energy=10,  # but we did compute renewable energy, so we use it to guess energy_used_since_last_reading
-            reading_date=date(2023, 3, 1),
-        )
-
-        self.assertEqual(
-            self.run_command(year=2023),
-            {"CPO": -2.5},
-        )
-
-    def test_report_without_year_filter_includes_multiple_years(self):
-        _, meter = self.create_charge_point_with_meter(
-            cpo=self.cpo,
-            application=self.charge_point_application_a,
-            cp_suffix="005",
-            initial_index=100,
-            initial_index_date=date(2022, 1, 1),
-        )
-
-        app_2022_q4 = self.create_meter_reading_application(
-            self.cpo,
-            quarter=4,
-            year=2022,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_2022_q4,
-            meter=meter,
-            extracted_energy=150,
-            energy_used_since_last_reading=40,  # should be 50 => -10 delta
-            reading_date=date(2022, 12, 31),
-        )
-
-        app_2023_q1 = self.create_meter_reading_application(
-            self.cpo,
-            quarter=1,
-            year=2023,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_2023_q1,
-            meter=meter,
-            extracted_energy=230,
-            energy_used_since_last_reading=100,  # should be 80 => +20 delta
-            reading_date=date(2023, 3, 31),
+            amount=150 * ENR_RATIO / 1000,  # should be 90
         )
 
         self.assertEqual(
             self.run_command(),
-            {"CPO": 2.5},
-        )
-
-        self.assertEqual(
-            self.run_command(year=2023),
-            {"CPO": 5.0},
+            {"CPO": (150 - 90) * ENR_RATIO},
         )

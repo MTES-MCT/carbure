@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.db import connection
@@ -79,6 +81,7 @@ class Command(BaseCommand):
 
         report = {}
         total_surplus = 0
+
         for cpo in cpo_with_readings:
             real_total_energy_must_be_declared = _get_real_total_energy_declared(cpo["cpo_id"])
             total_renewable_energy_declared = _get_certificates_energy_amount(cpo["cpo_id"])
@@ -120,3 +123,5 @@ class Command(BaseCommand):
                 columns=["Aménageur", "Energie générée par certificats (kWh)", "Énergie déclarée (kWh)", "Surplus (kWh)"],
             )
             df.to_csv("/tmp/readings.csv", index=False)
+
+        return json.dumps({cpo: data["surplus"] for cpo, data in report.items()})
