@@ -3,8 +3,9 @@ import json
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.db.models.aggregates import Sum
 
-from elec.models import ElecMeterReading
+from elec.models import ElecCertificateReadjustment, ElecMeterReading, ElecProvisionCertificate
 
 
 # mettre à jour avec la vue elec_meter_reading_virtual
@@ -83,15 +84,35 @@ class Command(BaseCommand):
         total_surplus = 0
 
         for cpo in cpo_with_readings:
-            real_total_energy_must_be_declared = _get_real_total_energy_declared(cpo["cpo_id"])
-            total_renewable_energy_declared = _get_certificates_energy_amount(cpo["cpo_id"])
-            diff = total_renewable_energy_declared - real_total_energy_must_be_declared
+            total_meter_reading_energy = _get_real_total_energy_declared(cpo["cpo_id"])
+            total_provision_certificate_energy = _get_certificates_energy_amount(cpo["cpo_id"])
+
+            total_admin_error_readjustment_dict = ElecProvisionCertificate.objects.filter(
+                cpo_id=cpo["cpo_id"], source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION
+            ).aggregate(Sum("energy_amount"))
+            total_admin_error_readjustment = (
+                total_admin_error_readjustment_dict.get("energy_amount__sum") or 0
+            ) * 1000  # back to kWh to match meter reading energy values
+
+            total_cpo_readjustment_dict = ElecCertificateReadjustment.objects.filter(
+                cpo_id=cpo["cpo_id"], error_source=ElecCertificateReadjustment.METER_READINGS
+            ).aggregate(Sum("energy_amount"))
+            total_cpo_readjustment = (
+                total_cpo_readjustment_dict.get("energy_amount__sum") or 0
+            ) * 1000  # back to kWh to match meter reading energy values
+
+            diff = (
+                total_provision_certificate_energy
+                - total_meter_reading_energy
+                - total_cpo_readjustment
+                + total_admin_error_readjustment
+            )
 
             if diff > 0.1 or diff < -0.1:
                 total_surplus += diff
                 report[cpo["cpo__name"]] = {
-                    "certificats": total_renewable_energy_declared,
-                    "real_energy_must_be_declared": real_total_energy_must_be_declared,
+                    "certificats": total_provision_certificate_energy,
+                    "real_energy_must_be_declared": total_meter_reading_energy,
                     "surplus": round(diff, 3),
                 }
 
