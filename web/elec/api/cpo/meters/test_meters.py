@@ -74,7 +74,7 @@ class ElecMeterTest(TestCase):
 
         self.meter_reading = ElecMeterReading.objects.create(
             extracted_energy=1000,
-            renewable_energy=1000,
+            enr_ratio=0.25,
             reading_date=datetime.date(2023, 11, 15),
             cpo=self.cpo,
             application=self.reading_application,

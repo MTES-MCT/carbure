@@ -89,7 +89,16 @@ def add_application(request: HttpRequest, entity: Entity):
 
     with transaction.atomic():
         application = ElecMeterReadingApplication(cpo=entity, quarter=quarter, year=year)
-        meter_readings = [ElecMeterReading(**data, application=application, cpo=entity) for data in meter_reading_data]
+        enr_ratio = MeterReadingRepository.get_renewable_share(year)
+        meter_readings = [
+            ElecMeterReading(
+                **data,
+                application=application,
+                cpo=entity,
+                enr_ratio=enr_ratio,
+            )
+            for data in meter_reading_data
+        ]
 
         application.save()
         ElecMeterReading.objects.bulk_create(meter_readings)
