@@ -11,6 +11,14 @@ class SafAssignTicketTest(TestCase):
         super().setUp()
         SafTicket.objects.all().delete()
 
+    def assign_ticket(self, body, ticket_source_id=None):
+        kwargs = {"id": ticket_source_id or self.ticket_source.id}
+        return self.client.post(
+            reverse("saf-ticket-sources-assign", kwargs=kwargs),
+            body,
+            query_params={"entity_id": self.entity.id},
+        )
+
     def test_assign_saf_ticket(self):
         query = {
             "entity_id": self.entity.id,
@@ -20,7 +28,7 @@ class SafAssignTicketTest(TestCase):
             "agreement_reference": "AGREF",
             "agreement_date": "2022-06-01",
             "assignment_period": 202203,
-            "pos_poc_number": "ABCDEFG",
+            "pos_number": "ABCDEF",
         }
 
         datetime.today()
@@ -72,7 +80,6 @@ class SafAssignTicketTest(TestCase):
         assert ticket.ghg_reference == self.ticket_source.ghg_reference
         assert ticket.ghg_reduction == self.ticket_source.ghg_reduction
         assert ticket.parent_ticket_source_id == self.ticket_source.id
-        assert ticket.pos_poc_number == "ABCDEFG"
 
     def test_assign_saf_ticket_fail_if_too_big(self):
         query = {
@@ -83,6 +90,7 @@ class SafAssignTicketTest(TestCase):
             "agreement_reference": "AGREF",
             "agreement_date": "2022-06-01",
             "assignment_period": 202203,
+            "pos_number": "ABCDEF",
         }
 
         query_params = f"?entity_id={self.entity.id}"
@@ -103,6 +111,7 @@ class SafAssignTicketTest(TestCase):
             "agreement_reference": "AGREF",
             "agreement_date": "2022-06-01",
             "assignment_period": 202201,
+            "pos_number": "ABCDEF",
         }
 
         query_params = f"?entity_id={self.entity.id}"
@@ -113,3 +122,41 @@ class SafAssignTicketTest(TestCase):
 
         assert response.status_code == 400
         assert response.json()["message"] == "ASSIGNMENT_BEFORE_DELIVERY"
+
+    def test_assign_saf_ticket_fail_if_mismatch_in_pos_number(self):
+        body = {
+            "entity_id": self.entity.id,
+            "ticket_source_id": self.ticket_source.id,
+            "client_id": self.ticket_client.id,
+            "volume": 1000,
+            "agreement_reference": "AGREF",
+            "agreement_date": "2022-06-01",
+            "assignment_period": 202203,
+            "pos_number": "ZYXWVU",
+        }
+
+        response = self.assign_ticket(body)
+
+        self.assertEqual(response.json()["message"], "POS_NUMBER_MISMATCH")
+
+    def test_assign_saf_ticket_sets_pos_number_on_origin_lot(self):
+        self.lot.pos_number = None
+        self.lot.save()
+
+        body = {
+            "entity_id": self.entity.id,
+            "ticket_source_id": self.ticket_source.id,
+            "client_id": self.ticket_client.id,
+            "volume": 1000,
+            "agreement_reference": "AGREF",
+            "agreement_date": "2022-06-01",
+            "assignment_period": 202203,
+            "pos_number": "ZYXWVU",
+        }
+
+        response = self.assign_ticket(body)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.lot.refresh_from_db()
+        self.assertEqual(self.lot.pos_number, "ZYXWVU")

@@ -1,3 +1,5 @@
+from os import environ
+
 from django.conf import settings
 from django.template import loader
 from django.utils.encoding import force_bytes
@@ -7,14 +9,13 @@ from django_otp.plugins.otp_email.models import EmailDevice
 
 from auth.tokens import account_activation_token
 from core.helpers import send_mail
-from core.utils import CarbureEnv
 
 
 def send_email(user, request, subject, email_type, extra_context):
     email_subject = subject
     email_context = {
         "user": user,
-        "domain": CarbureEnv.get_base_url(),
+        "domain": environ.get("BASE_URL"),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": account_activation_token.make_token(user),
     } | extra_context

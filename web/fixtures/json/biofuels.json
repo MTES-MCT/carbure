@@ -1,1 +1,189 @@
-[{"model": "core.biocarburant", "pk": 12, "fields": {"name": "Biogaz", "name_en": "Biogas", "description": "", "date_added": "2020-03-19", "code": "BG", "pci_kg": 50.0, "pci_litre": 0.0, "masse_volumique": 0.0, "is_alcool": false, "is_graisse": false, "is_displayed": false, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 13, "fields": {"name": "Biogazole de synthèse (Hors HVO)", "name_en": "Synthetic biodiesel (non HVO)", "description": "", "date_added": "2020-03-19", "code": "BGS", "pci_kg": 44.0, "pci_litre": 34.0, "masse_volumique": 0.773, "is_alcool": false, "is_graisse": false, "is_displayed": false, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 14, "fields": {"name": "EMHA", "name_en": "AFME", "description": "", "date_added": "2020-03-19", "code": "EMHA", "pci_kg": 37.0, "pci_litre": 33.0, "masse_volumique": 0.892, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 15, "fields": {"name": "EMHU", "name_en": "UCOME", "description": "", "date_added": "2020-03-19", "code": "EMHU", "pci_kg": 37.0, "pci_litre": 33.0, "masse_volumique": 0.892, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 16, "fields": {"name": "EMHV", "name_en": "VOME", "description": "", "date_added": "2020-03-19", "code": "EMHV", "pci_kg": 37.0, "pci_litre": 33.0, "masse_volumique": 0.892, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 17, "fields": {"name": "ETBE", "name_en": "ETBE", "description": "", "date_added": "2020-03-19", "code": "ETBE", "pci_kg": 36.0, "pci_litre": 27.0, "masse_volumique": 0.75, "is_alcool": true, "is_graisse": false, "is_displayed": true, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 20, "fields": {"name": "MTBE", "name_en": "MTBE", "description": "", "date_added": "2020-03-19", "code": "MTBE", "pci_kg": 35.0, "pci_litre": 26.0, "masse_volumique": 0.743, "is_alcool": true, "is_graisse": false, "is_displayed": true, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 21, "fields": {"name": "TAEE", "name_en": "TAEE", "description": "", "date_added": "2020-03-19", "code": "TAEE", "pci_kg": 38.0, "pci_litre": 29.0, "masse_volumique": 0.763, "is_alcool": false, "is_graisse": false, "is_displayed": true, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 23, "fields": {"name": "Huile végétale pure", "name_en": "Pure vegetable oil", "description": "", "date_added": "2020-03-31", "code": "HVP", "pci_kg": 37.0, "pci_litre": 34.0, "masse_volumique": 0.919, "is_alcool": false, "is_graisse": true, "is_displayed": false, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 24, "fields": {"name": "Huile provenant d'huiles de cuisson usagées", "name_en": "UCO Oil", "description": "", "date_added": "2020-03-31", "code": "HCU", "pci_kg": 0.0, "pci_litre": 0.0, "masse_volumique": 0.0, "is_alcool": false, "is_graisse": true, "is_displayed": false, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 25, "fields": {"name": "Autres Huiles Hydrotraitées - Gazole", "name_en": "Hydrotreated oil - Diesel", "description": "", "date_added": "2020-04-03", "code": "HOG", "pci_kg": 44.0, "pci_litre": 34.0, "masse_volumique": 0.845, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 26, "fields": {"name": "Autres Huiles Hydrotraitées - Essence", "name_en": "Hydrotreated oil - Gasoline", "description": "", "date_added": "2020-04-03", "code": "HOE", "pci_kg": 45.0, "pci_litre": 30.0, "masse_volumique": 0.755, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 27, "fields": {"name": "Huiles Végétales Hydrotraitées - Gazole", "name_en": "Hydrotreated vegetable oil - Diesel", "description": "", "date_added": "2020-04-03", "code": "HVOG", "pci_kg": 44.0, "pci_litre": 34.0, "masse_volumique": 0.845, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 28, "fields": {"name": "Huiles Végétales Hydrotraitées - Essence", "name_en": "Hydrotreated vegetable oil - Gasoline", "description": "", "date_added": "2020-04-03", "code": "HVOE", "pci_kg": 45.0, "pci_litre": 30.0, "masse_volumique": 0.755, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 29, "fields": {"name": "Méthanol", "name_en": "Methanol", "description": "", "date_added": "2020-04-03", "code": "MT", "pci_kg": 20.0, "pci_litre": 16.0, "masse_volumique": 0.8, "is_alcool": true, "is_graisse": false, "is_displayed": false, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 30, "fields": {"name": "Butanol", "name_en": "Butanol", "description": "", "date_added": "2020-06-22", "code": "BT", "pci_kg": 33.0, "pci_litre": 27.0, "masse_volumique": 0.818, "is_alcool": false, "is_graisse": false, "is_displayed": false, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 31, "fields": {"name": "EMAG", "name_en": "FAME", "description": "", "date_added": "2020-07-06", "code": "EMAG", "pci_kg": 37.0, "pci_litre": 33.0, "masse_volumique": 0.892, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 32, "fields": {"name": "Éthanol pour ED95", "name_en": "ED95's ethanol", "description": "", "date_added": "2020-07-08", "code": "ED95", "pci_kg": 27.0, "pci_litre": 21.0, "masse_volumique": 0.778, "is_alcool": true, "is_graisse": false, "is_displayed": true, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 33, "fields": {"name": "Éthanol", "name_en": "Ethanol", "description": "", "date_added": "2020-11-18", "code": "ETH", "pci_kg": 27.0, "pci_litre": 21.0, "masse_volumique": 0.778, "is_alcool": true, "is_graisse": false, "is_displayed": true, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 34, "fields": {"name": "B100", "name_en": "B100", "description": "", "date_added": "2020-12-12", "code": "B100", "pci_kg": 37.0, "pci_litre": 33.0, "masse_volumique": 0.892, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 35, "fields": {"name": "Autres Huiles Hydrotraitées - Kérosène", "name_en": "Hydrotreated oil - Jet", "description": "", "date_added": "2021-05-12", "code": "HOC", "pci_kg": 44.0, "pci_litre": 34.0, "masse_volumique": 0.8, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 36, "fields": {"name": "Huiles Végétales Hydrotraitées - Kérosène", "name_en": "Hydrotreated vegetable oil - Jet", "description": "", "date_added": "2021-05-12", "code": "HVOC", "pci_kg": 44.0, "pci_litre": 34.0, "masse_volumique": 0.8, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 37, "fields": {"name": "Huile cotraitée - Essence", "name_en": "Co-processed oil - Gasoline", "description": "Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles)", "date_added": "2021-10-20", "code": "HCE", "pci_kg": 44.0, "pci_litre": 32.0, "masse_volumique": 0.0, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": true, "compatible_diesel": false, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 43, "fields": {"name": "Huile cotraitée - Gazole", "name_en": "Co-processed oil - Diesel", "description": "Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles)", "date_added": "2021-10-20", "code": "HCG", "pci_kg": 43.0, "pci_litre": 36.0, "masse_volumique": 0.0, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": true, "dgddi_category": null}}, {"model": "core.biocarburant", "pk": 44, "fields": {"name": "Huile cotraitée - Carburéacteur", "name_en": "Co-processed oil - jet", "description": "Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles)", "date_added": "2021-10-20", "code": "HCC", "pci_kg": 43.0, "pci_litre": 33.0, "masse_volumique": 0.0, "is_alcool": false, "is_graisse": true, "is_displayed": true, "compatible_essence": false, "compatible_diesel": false, "dgddi_category": null}}]
+[
+  {
+    "model": "core.biocarburant",
+    "pk": 33,
+    "fields": {
+      "name": "Éthanol",
+      "name_en": "Ethanol",
+      "description": "",
+      "date_added": "2020-11-18",
+      "code": "ETH",
+      "pci_kg": 27.0,
+      "pci_litre": 21.0,
+      "masse_volumique": 0.778,
+      "is_alcool": true,
+      "is_graisse": false,
+      "is_displayed": true,
+      "compatible_essence": true,
+      "compatible_diesel": false,
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 17,
+    "fields": {
+      "name": "ETBE",
+      "name_en": "ETBE",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "ETBE",
+      "pci_kg": 36.0,
+      "pci_litre": 27.0,
+      "masse_volumique": 0.75,
+      "is_alcool": true,
+      "is_graisse": false,
+      "is_displayed": true,
+      "compatible_essence": true,
+      "compatible_diesel": false,
+      "dgddi_category": null
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 12,
+    "fields": {
+      "name": "Biogaz",
+      "name_en": "Biogas",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "BG",
+      "pci_kg": 50.0,
+      "pci_litre": 0.0,
+      "masse_volumique": 0.0,
+      "is_alcool": false,
+      "is_graisse": false,
+      "is_displayed": false,
+      "compatible_essence": false,
+      "compatible_diesel": false,
+      "dgddi_category": null,
+      "renewable_energy_share": 1.0
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 15,
+    "fields": {
+      "name": "EMHU",
+      "name_en": "UCOME",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "EMHU",
+      "pci_kg": 37.0,
+      "pci_litre": 33.0,
+      "masse_volumique": 0.892,
+      "is_alcool": false,
+      "is_graisse": true,
+      "is_displayed": true,
+      "compatible_essence": false,
+      "compatible_diesel": true,
+      "dgddi_category": null,
+      "renewable_energy_share": 1.0
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 16,
+    "fields": {
+      "name": "EMHV",
+      "name_en": "VOME",
+      "description": "",
+      "date_added": "2020-03-19",
+      "code": "EMHV",
+      "pci_kg": 37.0,
+      "pci_litre": 33.0,
+      "masse_volumique": 0.892,
+      "is_alcool": false,
+      "is_graisse": true,
+      "is_displayed": true,
+      "compatible_essence": false,
+      "compatible_diesel": true,
+      "dgddi_category": null,
+      "renewable_energy_share": 1.0
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 31,
+    "fields": {
+      "name": "EMAG",
+      "name_en": "FAME",
+      "description": "",
+      "date_added": "2020-07-06",
+      "code": "EMAG",
+      "pci_kg": 37.0,
+      "pci_litre": 33.0,
+      "masse_volumique": 0.892,
+      "is_alcool": false,
+      "is_graisse": true,
+      "is_displayed": true,
+      "compatible_essence": false,
+      "compatible_diesel": true,
+      "dgddi_category": null,
+      "renewable_energy_share": 1.0
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 35,
+    "fields": {
+      "name": "Autres Huiles Hydrotraitées - Kérosène",
+      "name_en": "Hydrotreated oil - Jet",
+      "description": "",
+      "date_added": "2021-05-12",
+      "code": "HOC",
+      "pci_kg": 44.0,
+      "pci_litre": 34.0,
+      "masse_volumique": 0.8,
+      "is_alcool": false,
+      "is_graisse": true,
+      "is_displayed": true,
+      "compatible_essence": false,
+      "compatible_diesel": false,
+      "dgddi_category": null,
+      "renewable_energy_share": 1.0
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 36,
+    "fields": {
+      "name": "Huiles Végétales Hydrotraitées - Kérosène",
+      "name_en": "Hydrotreated vegetable oil - Jet",
+      "description": "",
+      "date_added": "2021-05-12",
+      "code": "HVOC",
+      "pci_kg": 44.0,
+      "pci_litre": 34.0,
+      "masse_volumique": 0.8,
+      "is_alcool": false,
+      "is_graisse": true,
+      "is_displayed": true,
+      "compatible_essence": false,
+      "compatible_diesel": false,
+      "dgddi_category": null,
+      "renewable_energy_share": 1.0
+    }
+  },
+  {
+    "model": "core.biocarburant",
+    "pk": 44,
+    "fields": {
+      "name": "Huiles co-traitées - Kérosène",
+      "name_en": "",
+      "description": "",
+      "date_added": "2021-10-20",
+      "code": "HCC",
+      "pci_kg": 44.0,
+      "pci_litre": 34.0,
+      "masse_volumique": 0.8,
+      "is_alcool": false,
+      "is_graisse": true,
+      "is_displayed": true,
+      "compatible_essence": false,
+      "compatible_diesel": false,
+      "dgddi_category": null,
+      "renewable_energy_share": 1.0
+    }
+  }
+]

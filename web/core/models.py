@@ -60,6 +60,11 @@ class Department(models.Model):
         ordering = ["code_dept"]
 
 
+class EntityManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(closed_at__isnull=True)
+
+
 class Entity(models.Model):
     PRODUCER = "Producteur"
     OPERATOR = "Opérateur"
@@ -114,6 +119,7 @@ class Entity(models.Model):
     registered_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.CASCADE)
 
     is_enabled = models.BooleanField(default=True)
+    closed_at = models.DateTimeField(null=True, blank=True)
     is_tiruert_liable = models.BooleanField(default=False)
 
     # Biomethane
@@ -212,11 +218,18 @@ class Entity(models.Model):
         depot_ids = EntityScopeDepot.objects.filter(entity=self).values_list("object_id", flat=True)
         return Depot.objects.filter(id__in=depot_ids)
 
+    def get_admin_users_emails(self):
+        filter_result = UserRights.objects.filter(entity=self, role=UserRights.ADMIN, user__is_active=True)
+        return filter_result.values_list("user__email", flat=True)
+
     class Meta:
         db_table = "entities"
         verbose_name = "Entity"
         verbose_name_plural = "Entities"
         ordering = ["name"]
+
+    objects = EntityManager()
+    all_objects = models.Manager()
 
 
 class UserPreferences(models.Model):
@@ -800,6 +813,9 @@ class CarbureLot(models.Model):
 
     # scoring
     data_reliability_score = models.CharField(max_length=1, default="F")
+
+    # saf
+    pos_number = models.CharField(max_length=64, null=True)
 
     class Meta:
         db_table = "carbure_lots"

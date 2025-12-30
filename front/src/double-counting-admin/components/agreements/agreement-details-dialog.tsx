@@ -113,7 +113,7 @@ export const AgreementDetailsDialog = () => {
             <p>
               <Trans>
                 Aucune demande n'a été associée. Pour afficher les quotas
-                approuvés, ajouter le demande associée à cet agrément dans
+                approuvés, ajouter la demande associée à cet agrément dans
                 l'onglet "demandes en attente".
               </Trans>
             </p>
@@ -209,7 +209,11 @@ const AgreementTabs = ({
         />
       )}
       {focus === "fichiers" && (
-        <FilesManager readOnly files={agreement.application.documents} />
+        <FilesManager
+          readOnly
+          files={agreement.application.documents}
+          applicationId={agreement.application.id}
+        />
       )}
     </>
   )

@@ -1,7 +1,5 @@
 from drf_spectacular.utils import (
     OpenApiExample,
-    OpenApiParameter,
-    OpenApiTypes,
     extend_schema,
 )
 from rest_framework import serializers
@@ -28,15 +26,6 @@ class ApproveDoubleCountingSerializer(serializers.Serializer):
 
 class ApproveActionMixin:
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            )
-        ],
         request=ApproveDoubleCountingSerializer,
         responses={200: ResponseSerializer},
         examples=[

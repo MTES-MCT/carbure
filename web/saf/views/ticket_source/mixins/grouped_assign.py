@@ -1,11 +1,8 @@
-import traceback
-
 from django.db import transaction
 from django.db.models.aggregates import Max, Sum
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from core.models import CarbureNotification
@@ -54,7 +51,6 @@ class GroupAssignActionMixin:
         reception_airport = serializer.validated_data.get("reception_airport")
         consumption_type = serializer.validated_data.get("consumption_type")
         shipping_method = serializer.validated_data.get("shipping_method")
-        pos_poc_number = serializer.validated_data.get("pos_poc_number")
 
         ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by(
             "created_at"
@@ -66,72 +62,67 @@ class GroupAssignActionMixin:
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        try:
-            total_volume_in_selection = ticket_sources.aggregate(Sum("total_volume"))["total_volume__sum"]
-            assigned_volume_in_selection = ticket_sources.aggregate(Sum("assigned_volume"))["assigned_volume__sum"]
-            if volume > (total_volume_in_selection - assigned_volume_in_selection):
-                return Response(
-                    {"message": SafTicketAssignError.VOLUME_TOO_BIG},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            # use the most recent period of all the selected ticket sources to decide if the asked period is ok
-            most_recent_period = ticket_sources.aggregate(Max("delivery_period"))["delivery_period__max"]
-            if assignment_period < most_recent_period:
-                return Response(
-                    {"message": SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            with transaction.atomic():
-                assigned_tickets_count = 0
-                remaining_volume_to_assign = volume
-
-                for ticket_source in ticket_sources:
-                    # create a ticket with a volume taking into account:
-                    # - what's left in the ticket source
-                    available_volume_in_source = ticket_source.total_volume - ticket_source.assigned_volume
-                    # - and what's left in the amount asked by the user
-                    ticket_volume = min(remaining_volume_to_assign, available_volume_in_source)
-
-                    # do not
-                    if ticket_volume <= 0:
-                        break
-
-                    ticket = create_ticket_from_source(
-                        ticket_source,
-                        client_id=client_id,
-                        volume=ticket_volume,
-                        agreement_date=agreement_date,
-                        agreement_reference=agreement_reference,
-                        assignment_period=assignment_period,
-                        free_field=free_field,
-                        reception_airport=reception_airport,
-                        consumption_type=consumption_type,
-                        shipping_method=shipping_method,
-                        pos_poc_number=pos_poc_number,
-                    )
-
-                    CarbureNotification.objects.create(
-                        type=CarbureNotification.SAF_TICKET_RECEIVED,
-                        dest_id=client_id,
-                        send_by_email=False,
-                        meta={
-                            "supplier": ticket.supplier.name,
-                            "ticket_id": ticket.id,
-                            "year": ticket.year,
-                        },
-                    )
-
-                    assigned_tickets_count += 1
-                    ticket_source.assigned_volume += ticket.volume
-                    remaining_volume_to_assign -= ticket.volume
-                    ticket_source.save()
-
+        total_volume_in_selection = ticket_sources.aggregate(Sum("total_volume"))["total_volume__sum"]
+        assigned_volume_in_selection = ticket_sources.aggregate(Sum("assigned_volume"))["assigned_volume__sum"]
+        if volume > (total_volume_in_selection - assigned_volume_in_selection):
             return Response(
-                {"assigned_tickets_count": assigned_tickets_count},
-                status=status.HTTP_200_OK,
+                {"message": SafTicketAssignError.VOLUME_TOO_BIG},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        except Exception:
-            traceback.print_exc()
-            raise ValidationError({"message": SafTicketAssignError.TICKET_CREATION_FAILED})
+
+        # use the most recent period of all the selected ticket sources to decide if the asked period is ok
+        most_recent_period = ticket_sources.aggregate(Max("delivery_period"))["delivery_period__max"]
+        if assignment_period < most_recent_period:
+            return Response(
+                {"message": SafTicketAssignError.ASSIGNMENT_BEFORE_DELIVERY},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            assigned_tickets_count = 0
+            remaining_volume_to_assign = volume
+
+            for ticket_source in ticket_sources:
+                # create a ticket with a volume taking into account:
+                # - what's left in the ticket source
+                available_volume_in_source = ticket_source.total_volume - ticket_source.assigned_volume
+                # - and what's left in the amount asked by the user
+                ticket_volume = min(remaining_volume_to_assign, available_volume_in_source)
+
+                # do not
+                if ticket_volume <= 0:
+                    break
+
+                ticket = create_ticket_from_source(
+                    ticket_source,
+                    client_id=client_id,
+                    volume=ticket_volume,
+                    agreement_date=agreement_date,
+                    agreement_reference=agreement_reference,
+                    assignment_period=assignment_period,
+                    free_field=free_field,
+                    reception_airport=reception_airport,
+                    consumption_type=consumption_type,
+                    shipping_method=shipping_method,
+                )
+
+                CarbureNotification.objects.create(
+                    type=CarbureNotification.SAF_TICKET_RECEIVED,
+                    dest_id=client_id,
+                    send_by_email=False,
+                    meta={
+                        "supplier": ticket.supplier.name,
+                        "ticket_id": ticket.id,
+                        "year": ticket.year,
+                    },
+                )
+
+                assigned_tickets_count += 1
+                ticket_source.assigned_volume += ticket.volume
+                remaining_volume_to_assign -= ticket.volume
+                ticket_source.save()
+
+        return Response(
+            {"assigned_tickets_count": assigned_tickets_count},
+            status=status.HTTP_200_OK,
+        )

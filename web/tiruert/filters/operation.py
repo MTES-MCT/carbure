@@ -3,7 +3,14 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.db.models import Q
-from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter, AllValuesMultipleFilter, MultipleChoiceFilter
+from django_filters import (
+    CharFilter,
+    DateFilter,
+    FilterSet,
+    NumberFilter,
+    AllValuesMultipleFilter,
+    MultipleChoiceFilter,
+)
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import CharField, ListField
 
@@ -50,7 +57,11 @@ class BaseFilter(FilterSet):
         entity = getattr(self.request, "entity", None)
 
         # For DGDDI external admins, filter by accessible depots
-        if entity.entity_type == Entity.EXTERNAL_ADMIN and entity.has_external_admin_right(ExternalAdminRights.DGDDI):
+        if (
+            entity
+            and entity.entity_type == Entity.EXTERNAL_ADMIN
+            and entity.has_external_admin_right(ExternalAdminRights.DGDDI)
+        ):
             accessible_depot_ids = entity.get_accessible_depots().values_list("id", flat=True)
             depot_filter = Q(to_depot_id__in=accessible_depot_ids)
             return queryset.filter(depot_filter)

@@ -55,4 +55,6 @@ class ObjectiveInputSerializer(serializers.Serializer):
 
 
 class ObjectiveAdminInputSerializer(ObjectiveInputSerializer):
-    selected_entity_id = serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all(), required=True)
+    selected_entity_id = serializers.PrimaryKeyRelatedField(
+        queryset=Entity.objects.filter(is_tiruert_liable=True), required=True
+    )

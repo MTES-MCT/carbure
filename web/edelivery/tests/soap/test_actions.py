@@ -60,12 +60,12 @@ class RetrieveMessageTest(TestCase):
 @patch.dict("os.environ", {"INITIATOR_ACCESS_POINT_ID": "", "CARBURE_NTR": ""})
 class SubmitMessageTest(TestCase):
     def test_knows_its_action_name(self):
-        request = BaseRequest("12345", "<request/>")
+        request = BaseRequest("<request/>")
         action = SubmitMessage("responder_id", request)
         self.assertEqual("submitMessage", action.name)
 
     def test_knows_its_response_class(self):
-        request = BaseRequest("12345", "<request/>")
+        request = BaseRequest("<request/>")
         action = SubmitMessage("responder_id", request)
         self.assertEqual(SubmitMessageResponse, action.response_class)
 
@@ -131,7 +131,7 @@ class SubmitMessageTest(TestCase):
 
     def test_raises_error_if_message_could_not_submited(self):
         send_callback = MagicMock()
-        request = BaseRequest("12345", "<request/>")
+        request = BaseRequest("<request/>")
         action = SubmitMessage("responder_id", request, send_callback=send_callback)
         action.response_class = MagicMock(**{"return_value.error": True, "return_value.error_message": "oops"})
 

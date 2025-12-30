@@ -38,7 +38,6 @@ from core.serializers import (
     GenericErrorAdminSerializer,
     GenericErrorSerializer,
 )
-from core.utils import CarbureEnv
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 from transactions.models import Depot
 
@@ -929,7 +928,7 @@ def send_email_declaration_invalidated(declaration, request):
 
 
 def send_mail(request, subject, message, from_email, recipient_list, html_message=None, **kwargs):
-    if not CarbureEnv.is_prod and not CarbureEnv.is_local and request is not None:
+    if settings.WITH_EMAIL_DECORATED_AS_TEST and request:
         # Add recipient_list add the end of the message when environment is not prod or local
         message = f"{message} \n\n {recipient_list}"
         if request.user.is_authenticated:

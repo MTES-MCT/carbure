@@ -22,7 +22,6 @@ class AdminDoubleCountAgreementsTest(TestCase):
         "json/countries.json",
         "json/depots.json",
         "json/entities.json",
-        "json/productionsites.json",
         "json/entities_sites.json",
     ]
 
@@ -147,7 +146,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
 
         start_year = agreement.valid_from.year
 
-        _, lot2, prod1_tonnes, prod1_progression, lot3, _ = self.create_lots(
+        lot1, _, prod1_tonnes, prod1_progression, lot3, _ = self.create_lots(
             agreement, production1, production2, production3
         )
 
@@ -164,15 +163,15 @@ class AdminDoubleCountAgreementsTest(TestCase):
         assert application["id"] == app.id
         assert len(quotas) == 2  # production 1 +production 3
 
-        quota_line_1 = quotas[0]
-        assert quota_line_1["year"] == start_year
-        assert quota_line_1["feedstock"]["name"] == lot2.feedstock.name
-        assert quota_line_1["production_tonnes"] == round(prod1_tonnes)
-        assert quota_line_1["lot_count"] == 2  # 2 lots created in create_lots()
-        assert quota_line_1["quotas_progression"] == round(prod1_progression, 2)
+        quota_line_1 = [q for q in quotas if q["feedstock"]["name"] == lot1.feedstock.name][0]
+        self.assertEqual(quota_line_1["year"], start_year)
+        # self.assertEqual(quota_line_1["feedstock"]["name"], lot2.feedstock.name)
+        self.assertEqual(quota_line_1["production_tonnes"], round(prod1_tonnes))
+        self.assertEqual(quota_line_1["lot_count"], 2)  # 2 lots created in create_lots()
+        self.assertEqual(quota_line_1["quotas_progression"], round(prod1_progression, 2))
 
-        quota_line_2 = quotas[1]
-        assert quota_line_2["production_tonnes"] == round(lot3.weight / 1000)
+        quota_line_2 = [q for q in quotas if q["feedstock"]["name"] == lot3.feedstock.name][0]
+        self.assertEqual(quota_line_2["production_tonnes"], round(lot3.weight / 1000))
         # without
         agreement.application = None
         agreement.save()
