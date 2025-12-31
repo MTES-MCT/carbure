@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
 from edelivery.ebms.requests import BaseRequest, EOGetTransactionRequest, GetSourcingContactByIdRequest
 
 
@@ -33,6 +34,10 @@ class BaseRequestTest(TestCase):
 </request>"""
         patched_zip_and_stream_udb_request.assert_called_with(expected_body)
         self.assertEqual("abcdef", encoded_request)
+
+    def test_knows_its_response_class(self):
+        request = BaseRequest("<request/>")
+        self.assertEqual(BaseRequestResponse, request.response_class)
 
 
 class GetSourcingContactByIdRequestTest(TestCase):
@@ -71,6 +76,10 @@ class EOGetTransactionRequestTest(TestCase):
 
     def tearDown(self):
         patch.stopall()
+
+    def test_knows_its_response_class(self):
+        request = EOGetTransactionRequest("99999")
+        self.assertEqual(EOGetTransactionResponse, request.response_class)
 
     def test_injects_transaction_id_in_body(self):
         self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"

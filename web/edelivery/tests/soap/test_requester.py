@@ -1,7 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.ebms.requests import BaseRequest
+from edelivery.ebms.request_responses import EOGetTransactionResponse
+from edelivery.ebms.requests import BaseRequest, EOGetTransactionRequest
 from edelivery.soap.requester import Requester
 
 
@@ -63,6 +64,14 @@ class RequesterTest(TestCase):
 
         response = requester.response()
         self.assertEqual(self.DEFAULT_RESPONSE_PAYLOAD, response.payload)
+
+    def test_returns_response_class_corresponding_to_request_class(self):
+        self.patched_new_uuid.return_value = "111"
+        request = EOGetTransactionRequest("12345")
+        requester = Requester(request)
+
+        response = requester.response()
+        self.assertIsInstance(response, EOGetTransactionResponse)
 
     def test_throws_timeout_error_if_not_receiving_any_response_from_udb(self):
         self.patched_PubSubAdapter.return_value.next_message.return_value = None
