@@ -75,11 +75,12 @@ export function getProvisionCertificateBalance(entity_id: number) {
 export function createTransferCertificate(
   entity_id: number,
   energy_amount: number,
-  client: number
+  client?: number,
+  is_readjustment = false
 ) {
   return api.POST("/elec/provision-certificates/transfer/", {
     params: { query: { entity_id } },
-    body: { energy_amount, client },
+    body: { energy_amount, client, is_readjustment },
   })
 }
 
