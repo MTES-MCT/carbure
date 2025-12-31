@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum
 from drf_spectacular.utils import extend_schema
@@ -11,12 +12,16 @@ from rest_framework.response import Response
 from core.models import Entity
 from core.notifications import notify_elec_transfer_certificate
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
+from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 
 
 class ElecTransferSerializer(serializers.Serializer):
     energy_amount = serializers.FloatField()
-    client = serializers.PrimaryKeyRelatedField(queryset=Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True))
+    client = serializers.PrimaryKeyRelatedField(
+        queryset=Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True), required=False
+    )
+    is_readjustment = serializers.BooleanField(default=False)
 
 
 class TransferActionMixin:
@@ -36,7 +41,24 @@ class TransferActionMixin:
 
         energy_pulled = 0
         energy_required = round(transfer_form.validated_data["energy_amount"], 3)
-        client = transfer_form.validated_data["client"]
+        client = transfer_form.validated_data.get("client")
+        is_readjustment = transfer_form.validated_data.get("is_readjustment", False)
+
+        missing_readjustment = 0
+        if is_readjustment:
+            client = Entity.objects.filter(name=settings.ELEC_READJUSTMENT_ENTITY).first()
+            expected_readjustment_dict = ElecCertificateReadjustment.objects.filter(cpo=entity).aggregate(
+                Sum("energy_amount")
+            )
+            expected_readjustment = expected_readjustment_dict.get("energy_amount__sum") or 0
+            confirmed_readjustment_dict = ElecTransferCertificate.objects.filter(
+                supplier=entity, is_readjustment=True
+            ).aggregate(Sum("energy_amount"))
+            confirmed_readjustment = confirmed_readjustment_dict.get("energy_amount__sum") or 0
+            missing_readjustment = expected_readjustment - confirmed_readjustment
+
+        if not client:
+            raise ParseError("MISSING_CLIENT")
 
         available_provision_certificates = (
             ElecProvisionCertificate.objects.filter(cpo=entity)
@@ -44,9 +66,14 @@ class TransferActionMixin:
             .order_by("year", "quarter")
         )
 
-        available_energy = available_provision_certificates.aggregate(Sum("remaining_energy_amount"))
-        if available_energy["remaining_energy_amount__sum"] < energy_required:
+        available_energy_dict = available_provision_certificates.aggregate(Sum("remaining_energy_amount"))
+        available_energy = available_energy_dict["remaining_energy_amount__sum"] or 0
+
+        if energy_required > available_energy:
             raise ParseError("NOT_ENOUGH_ENERGY")
+
+        if is_readjustment and energy_required > missing_readjustment:
+            raise ParseError("READJUSTING_TOO_MUCH")
 
         available_provision_certificates = list(available_provision_certificates)
 
@@ -68,12 +95,15 @@ class TransferActionMixin:
             available_provision_certificates[current_certificate_idx].save()
             current_certificate_idx += 1
 
+        status = ElecTransferCertificate.ACCEPTED if is_readjustment else ElecTransferCertificate.PENDING
+
         transfer_certificate = ElecTransferCertificate.objects.create(
             energy_amount=energy_required,
             client=client,
             supplier=entity,
             transfer_date=datetime.date.today(),
-            status=ElecTransferCertificate.PENDING,
+            status=status,
+            is_readjustment=is_readjustment,
         )
 
         notify_elec_transfer_certificate(transfer_certificate)
