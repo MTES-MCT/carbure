@@ -14,3 +14,6 @@ python3 ./web/fixtures/load_fossil_fuels.py
 python3 ./web/fixtures/load_departments.py
 python3 ./web/fixtures/load_biomethane_DREAL.py
 python3 ./web/fixtures/load_biomethane_providers.py
+
+# UDB data seed
+python3 ./web/fixtures/load_udb_data.py
