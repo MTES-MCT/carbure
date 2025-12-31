@@ -15,8 +15,8 @@ class BalanceActionMixin:
             200: {
                 "type": "object",
                 "properties": {
-                    "balance": {"type": "float"},
-                    "readjustment_balance": {"type": "float"},
+                    "balance": {"type": "number"},
+                    "readjustment_balance": {"type": "number"},
                 },
             }
         },

@@ -3435,16 +3435,18 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
               enum:
+                - ADMIN_ERROR_COMPENSATION
+                - ENR_RATIO_COMPENSATION
                 - MANUAL
                 - METER_READINGS
-                - null
                 - QUALICHARGE
           description: |-
             * `MANUAL` - MANUAL
             * `METER_READINGS` - METER_READINGS
             * `QUALICHARGE` - QUALICHARGE
+            * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+            * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
         - in: query
@@ -3840,7 +3842,9 @@ paths:
                 type: object
                 properties:
                   balance:
-                    type: integer
+                    type: number
+                  readjustment_balance:
+                    type: number
           description: ""
   /api/elec/provision-certificates/export/:
     get:
@@ -3977,16 +3981,18 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
               enum:
+                - ADMIN_ERROR_COMPENSATION
+                - ENR_RATIO_COMPENSATION
                 - MANUAL
                 - METER_READINGS
-                - null
                 - QUALICHARGE
           description: |-
             * `MANUAL` - MANUAL
             * `METER_READINGS` - METER_READINGS
             * `QUALICHARGE` - QUALICHARGE
+            * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+            * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
         - in: query
@@ -14008,9 +14014,7 @@ components:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
         source:
-          allOf:
-            - $ref: "#/components/schemas/ElecProvisionCertificateSourceEnum"
-          nullable: true
+          $ref: "#/components/schemas/ElecProvisionCertificateSourceEnum"
         quarter:
           allOf:
             - $ref: "#/components/schemas/QuarterEnum"
@@ -14042,6 +14046,7 @@ components:
         - operating_unit
         - quarter
         - remaining_energy_amount
+        - source
         - year
     ElecProvisionCertificateQualicharge:
       type: object
@@ -14100,11 +14105,15 @@ components:
         - MANUAL
         - METER_READINGS
         - QUALICHARGE
+        - ENR_RATIO_COMPENSATION
+        - ADMIN_ERROR_COMPENSATION
       type: string
       description: |-
         * `MANUAL` - MANUAL
         * `METER_READINGS` - METER_READINGS
         * `QUALICHARGE` - QUALICHARGE
+        * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+        * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
     ElecTransferAcceptRequest:
       type: object
       properties:
@@ -14180,8 +14189,10 @@ components:
           format: double
         client:
           type: integer
+        is_readjustment:
+          type: boolean
+          default: false
       required:
-        - client
         - energy_amount
     EmptyResponse:
       type: object

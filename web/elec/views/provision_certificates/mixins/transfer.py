@@ -21,7 +21,7 @@ class ElecTransferSerializer(serializers.Serializer):
     client = serializers.PrimaryKeyRelatedField(
         queryset=Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True), required=False
     )
-    is_readjustment = serializers.BooleanField(default=False)
+    is_readjustment = serializers.BooleanField(default=False, required=False)
 
 
 class TransferActionMixin:
