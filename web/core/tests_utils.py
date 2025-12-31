@@ -35,7 +35,7 @@ def setup_current_user(test, email, name, password, entity_rights=None, is_staff
 
     for entity, role in entity_rights:
         UserRights.objects.update_or_create(entity=entity, user=user, role=role)
-        UserRightsRequests.objects.update_or_create(entity=entity, user=user, role=role)
+        UserRightsRequests.objects.update_or_create(entity=entity, user=user, role=role, status="ACCEPTED")
 
     return user
 
