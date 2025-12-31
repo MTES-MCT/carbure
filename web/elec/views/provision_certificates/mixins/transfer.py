@@ -12,8 +12,8 @@ from rest_framework.response import Response
 from core.models import Entity
 from core.notifications import notify_elec_transfer_certificate
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
-from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
+from elec.services.readjustment_balance import get_readjustment_balance
 
 
 class ElecTransferSerializer(serializers.Serializer):
@@ -47,15 +47,7 @@ class TransferActionMixin:
         missing_readjustment = 0
         if is_readjustment:
             client = Entity.objects.filter(name=settings.ELEC_READJUSTMENT_ENTITY).first()
-            expected_readjustment_dict = ElecCertificateReadjustment.objects.filter(cpo=entity).aggregate(
-                Sum("energy_amount")
-            )
-            expected_readjustment = expected_readjustment_dict.get("energy_amount__sum") or 0
-            confirmed_readjustment_dict = ElecTransferCertificate.objects.filter(
-                supplier=entity, is_readjustment=True
-            ).aggregate(Sum("energy_amount"))
-            confirmed_readjustment = confirmed_readjustment_dict.get("energy_amount__sum") or 0
-            missing_readjustment = expected_readjustment - confirmed_readjustment
+            missing_readjustment = get_readjustment_balance(cpo=entity)
 
         if not client:
             raise ParseError("MISSING_CLIENT")
