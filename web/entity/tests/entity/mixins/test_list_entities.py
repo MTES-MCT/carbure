@@ -4,7 +4,10 @@ from django.urls import reverse
 
 from core.models import Entity, ExternalAdminRights, UserRights, UserRightsRequests
 from core.tests_utils import assert_object_contains_data, setup_current_user
+from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 from entity.factories.entity import EntityFactory
+from transactions.factories.certificate import EntityCertificateFactory, GenericCertificateFactory
 
 
 # Helper function to assert that the expected entities are in the entities_data
@@ -12,6 +15,16 @@ def expect_entities(test, expected_entities, entities_data):
     test.assertEqual(len(expected_entities), len(entities_data))
     for idx, expected_entity in enumerate(expected_entities):
         assert_object_contains_data(test, expected_entity.natural_key(), entities_data[idx]["entity"])
+
+
+# Helper function to get the CPO entity with applications and meter readings
+def add_elec_applications_and_meter_readings_to_entity(entity):
+    ElecChargePointApplication.objects.create(cpo=entity, status=ElecChargePointApplication.ACCEPTED)
+    ElecChargePointApplication.objects.create(cpo=entity, status=ElecChargePointApplication.ACCEPTED)
+    ElecChargePointApplication.objects.create(cpo=entity, status=ElecChargePointApplication.PENDING)
+    ElecMeterReadingApplication.objects.create(cpo=entity, status=ElecMeterReadingApplication.ACCEPTED, quarter=1, year=2024)
+    ElecMeterReadingApplication.objects.create(cpo=entity, status=ElecMeterReadingApplication.PENDING, quarter=2, year=2024)
+    ElecMeterReadingApplication.objects.create(cpo=entity, status=ElecMeterReadingApplication.PENDING, quarter=3, year=2024)
 
 
 class EntityListActionTest(TestCase):
@@ -58,6 +71,9 @@ class EntityListActionTest(TestCase):
         # Create UserRightsRequests with PENDING status to test has_requests filter
         UserRightsRequests.objects.create(entity=self.producer1, user=self.user1, role=UserRights.RO, status="PENDING")
         UserRightsRequests.objects.create(entity=self.producer2, user=self.user2, role=UserRights.RW, status="ACCEPTED")
+
+        # Create ElecChargePointApplications to test elec annotations
+        add_elec_applications_and_meter_readings_to_entity(self.cpo1)
 
     def test_list_as_admin_returns_all_entities(self):
         """Test that admin sees all entities"""
@@ -147,115 +163,52 @@ class EntityListActionTest(TestCase):
         expected_entities = [self.producer1]
         expect_entities(self, expected_entities, entities_data)
 
-    # def test_list_as_admin_includes_elec_annotations(self):
-    #     """Test that admin sees elec annotations (charge_points and meter_readings)"""
-    #     setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)
-    #     response = self.client.get(reverse("entity-list") + f"?entity_id={self.admin.id}")
+    def test_list_as_admin_or_ext_admin_elec_includes_elec_annotations(self):
+        def setup_entity(email, entity):
+            setup_current_user(self, email, "Admin", "test", [(entity, "RW")], True)
+            response = self.client.get(reverse("entity-list") + f"?entity_id={entity.id}&q=CPO 1")
+            entities_data = response.json()
+            entity_data = entities_data[0]
+            self.assertEqual(entity_data["charge_points_accepted"], 2)
+            self.assertEqual(entity_data["charge_points_pending"], 1)
+            self.assertEqual(entity_data["meter_readings_accepted"], 1)
+            self.assertEqual(entity_data["meter_readings_pending"], 2)
 
-    #     self.assertEqual(response.status_code, 200)
-    #     entities_data = response.json()
-    #     # All entities should have elec fields
-    #     for entity_data in entities_data:
-    #         self.assertIn("charge_points_accepted", entity_data)
-    #         self.assertIn("charge_points_pending", entity_data)
-    #         self.assertIn("meter_readings_accepted", entity_data)
-    #         self.assertIn("meter_readings_pending", entity_data)
+        """Test that admin and external admin elec sees elec annotations (charge_points and meter_readings)"""
+        setup_entity("admin@test.com", self.admin)
+        setup_entity("elec_admin@test.com", self.ext_admin_elec)
 
-    # def test_list_as_ext_admin_elec_includes_elec_annotations(self):
-    #     """Test that external ELEC admin sees elec annotations"""
-    #     setup_current_user(self, "elec_admin@test.com", "Elec Admin", "test", [(self.ext_admin_elec, "RW")], True)
-    #     response = self.client.get(reverse("entity-list") + f"?entity_id={self.ext_admin_elec.id}")
+    def test_list_as_not_admin_or_ext_admin_elec_does_not_include_elec_annotations(self):
+        """Test that not admin and not external admin elec does not see elec annotations"""
+        setup_current_user(
+            self, "ext_admin_airline@test.com", "Airline Admin", "test", [(self.ext_admin_airline, "RW")], True
+        )
+        # This case is not possible because an external admin cannot have elec applications and meter readings
+        # But we want to check if the endpoint does not return the data related to elec if we're not an admin
+        # or an external admin elec
+        add_elec_applications_and_meter_readings_to_entity(self.ext_admin_airline)
 
-    #     self.assertEqual(response.status_code, 200)
-    #     entities_data = response.json()
-    #     # All entities should have elec fields
-    #     for entity_data in entities_data:
-    #         self.assertIn("charge_points_accepted", entity_data)
-    #         self.assertIn("charge_points_pending", entity_data)
-    #         self.assertIn("meter_readings_accepted", entity_data)
-    #         self.assertIn("meter_readings_pending", entity_data)
+        response = self.client.get(reverse("entity-list") + f"?entity_id={self.ext_admin_airline.id}&q=Airline 1")
 
-    # def test_list_as_admin_includes_admin_only_annotations(self):
-    #     """Test that only admin sees admin annotations (depots, production_sites, certificates, double_counting)"""
-    #     setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)
-    #     response = self.client.get(reverse("entity-list") + f"?entity_id={self.admin.id}")
+        entities_data = response.json()
+        entity_data = entities_data[0]
+        self.assertEqual(entity_data["charge_points_accepted"], 0)
+        self.assertEqual(entity_data["charge_points_pending"], 0)
+        self.assertEqual(entity_data["meter_readings_accepted"], 0)
+        self.assertEqual(entity_data["meter_readings_pending"], 0)
 
-    #     self.assertEqual(response.status_code, 200)
-    #     entities_data = response.json()
-    #     # All entities should have admin fields
-    #     for entity_data in entities_data:
-    #         self.assertIn("depots", entity_data)
-    #         self.assertIn("production_sites", entity_data)
-    #         self.assertIn("certificates", entity_data)
-    #         self.assertIn("certificates_pending", entity_data)
-    #         self.assertIn("double_counting", entity_data)
-    #         self.assertIn("double_counting_requests", entity_data)
+    def test_list_as_admin_includes_admin_only_annotations(self):
+        """Test that only admin sees admin annotations (depots, production_sites, certificates, double_counting)"""
+        setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)
+        cert = GenericCertificateFactory.create(certificate_id="FR_123")
+        EntityCertificateFactory.create(entity=self.admin, certificate=cert, checked_by_admin=False, rejected_by_admin=False)
+        EntityCertificateFactory.create(entity=self.admin, certificate=cert, checked_by_admin=True, rejected_by_admin=False)
+        EntityCertificateFactory.create(entity=self.admin, certificate=cert, checked_by_admin=False, rejected_by_admin=True)
+        EntityCertificateFactory.create(entity=self.admin, certificate=cert, checked_by_admin=True, rejected_by_admin=True)
 
-    # def test_list_as_ext_admin_does_not_include_admin_only_annotations(self):
-    #     """Test that external admin does not see admin annotations"""
-    #     setup_current_user(self, "airline_admin@test.com", "Airline Admin", "test", [(self.ext_admin_airline, "RW")], True)
-    #     response = self.client.get(reverse("entity-list") + f"?entity_id={self.ext_admin_airline.id}")
+        response = self.client.get(reverse("entity-list") + f"?entity_id={self.admin.id}&q=Admin Entity")
 
-    #     self.assertEqual(response.status_code, 200)
-    #     entities_data = response.json()
-    #     # Entities should not have admin fields (should be 0)
-    #     for entity_data in entities_data:
-    #         self.assertEqual(entity_data["depots"], 0)
-    #         self.assertEqual(entity_data["production_sites"], 0)
-    #         self.assertEqual(entity_data["certificates"], 0)
-    #         self.assertEqual(entity_data["certificates_pending"], 0)
-    #         self.assertEqual(entity_data["double_counting"], 0)
-    #         self.assertEqual(entity_data["double_counting_requests"], 0)
-
-    # def test_list_entities_sorted_by_name(self):
-    #     """Test that entities are sorted by name"""
-    #     setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)
-    #     response = self.client.get(reverse("entity-list") + f"?entity_id={self.admin.id}")
-
-    #     self.assertEqual(response.status_code, 200)
-    #     entities_data = response.json()
-    #     # Verify that entities are sorted by name
-    #     names = [e["entity"]["name"] for e in entities_data]
-    #     self.assertEqual(names, sorted(names))
-
-    # def test_list_returns_all_required_fields(self):
-    #     """Test that response contains all required fields"""
-    #     setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)
-    #     response = self.client.get(reverse("entity-list") + f"?entity_id={self.admin.id}")
-
-    #     self.assertEqual(response.status_code, 200)
-    #     entities_data = response.json()
-    #     self.assertGreater(len(entities_data), 0)
-
-    #     required_fields = [
-    #         "entity",
-    #         "users",
-    #         "requests",
-    #         "depots",
-    #         "production_sites",
-    #         "certificates",
-    #         "double_counting",
-    #         "double_counting_requests",
-    #         "certificates_pending",
-    #         "charge_points_accepted",
-    #         "charge_points_pending",
-    #         "meter_readings_accepted",
-    #         "meter_readings_pending",
-    #     ]
-
-    #     for entity_data in entities_data:
-    #         for field in required_fields:
-    #             self.assertIn(field, entity_data, f"Field {field} is missing in response")
-
-    # def test_list_with_multiple_filters_combined(self):
-    #     """Test combination of multiple filters"""
-    #     setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)
-    #     # Filter by name and has_requests
-    #     response = self.client.get(reverse("entity-list") + f"?entity_id={self.admin.id}&q=Producer&has_requests=true")
-
-    #     self.assertEqual(response.status_code, 200)
-    #     entities_data = response.json()
-    #     # Should return only producers with pending requests
-    #     for entity_data in entities_data:
-    #         self.assertIn("Producer", entity_data["entity"]["name"])
-    #         self.assertGreater(entity_data["requests"], 0)
+        entities_data = response.json()
+        admin_entity_data = entities_data[0]
+        self.assertEqual(admin_entity_data["certificates"], 4)
+        self.assertEqual(admin_entity_data["certificates_pending"], 1)
