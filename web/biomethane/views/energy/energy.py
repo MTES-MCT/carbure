@@ -50,7 +50,8 @@ class BiomethaneEnergyViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMix
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
-        setattr(request, "year", BiomethaneAnnualDeclarationService.get_declaration_period())
+        entity = getattr(self.request, "entity", None)
+        setattr(request, "year", BiomethaneAnnualDeclarationService.get_declaration_period(entity))
         return request
 
     def get_serializer_context(self):

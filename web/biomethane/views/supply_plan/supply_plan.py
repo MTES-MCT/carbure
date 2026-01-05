@@ -39,7 +39,8 @@ class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin, ExcelImportA
 
     def get_queryset(self):
         if self.action == "import_supply_plan_from_excel":
-            year = BiomethaneAnnualDeclarationService.get_declaration_period()
+            entity = getattr(self.request, "entity", None)
+            year = BiomethaneAnnualDeclarationService.get_declaration_period(entity)
             try:
                 return super().get_queryset().get(producer=self.request.entity, year=year)
             except BiomethaneSupplyPlan.DoesNotExist:

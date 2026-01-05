@@ -11,18 +11,25 @@ from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDecl
 
 class BiomethaneAnnualDeclarationService:
     @staticmethod
-    def get_declaration_period():
+    def get_declaration_period(entity=None):
         """
-        Determines the current declaration interval based on the current date.
+        Determines the current declaration year for a producer.
 
-        The declaration period extends from April 1st to March 31st of the following year.
-        The year to declare depends on the current month:
+        If the producer has a previous declaration that is not yet DECLARED,
+        returns the year of that declaration (to allow completion).
+        Otherwise, computes the declaration year based on the current date:
         - If the current month is January-March: declare for the previous year
         - If the current month is April-December: declare for the current year
 
         Returns:
-            int: The year corresponding to the current declaration period.
+            int: The year corresponding to the current declaration period or the unfinished declaration.
         """
+
+        if entity:
+            last_declaration = BiomethaneAnnualDeclaration.objects.filter(producer=entity.id).order_by("-year").first()
+            if last_declaration and not last_declaration.status == BiomethaneAnnualDeclaration.DECLARED:
+                return last_declaration.year
+
         current_date = date.today()
         current_year = current_date.year
         current_month = current_date.month
@@ -197,12 +204,10 @@ class BiomethaneAnnualDeclarationService:
 
         Args:
             producer: The Entity instance representing the producer
-            year: The year of the declaration to reset
-
         """
         try:
             declaration = BiomethaneAnnualDeclaration.objects.get(
-                producer=producer, year=BiomethaneAnnualDeclarationService.get_declaration_period()
+                producer=producer, year=BiomethaneAnnualDeclarationService.get_declaration_period(producer)
             )
             if declaration.status != BiomethaneAnnualDeclaration.IN_PROGRESS:
                 declaration.status = BiomethaneAnnualDeclaration.IN_PROGRESS
