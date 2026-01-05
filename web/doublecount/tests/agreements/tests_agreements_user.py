@@ -49,7 +49,7 @@ class DoubleCountAgreementsTest(TestCase):
         self.production_site2.entitysite_set.update(entity=self.producer)
         self.production_site2.save()
 
-        self.requested_start_year = 2023
+        self.requested_start_year = date.today().year
 
     def create_application(self, id, start_year, production_site, status=DoubleCountingApplication.ACCEPTED):
         return DoubleCountingApplicationFactory.create(
