@@ -7,6 +7,7 @@ Service to reduce the number of carbure lots.
 import time
 
 from core.models import CarbureLot
+from saf.models import SafTicketSource
 
 from ..utils import delete_queryset_in_batches
 
@@ -158,10 +159,16 @@ class CarbureLotDeleter:
             if self.dry_run:
                 return self.limit, to_delete
             else:
-                all_lots = CarbureLot.objects.filter(year=year).order_by("id")
-                last_lot = CarbureLot.objects.filter(year=year).order_by("id")[self.limit - 1 : self.limit].first()
+                # Exclude lots that are linked to a SAF ticket source
+                saf_ticket_sources_lots_ids = SafTicketSource.objects.filter(year=year).values_list(
+                    "parent_lot_id", flat=True
+                )
+
+                queryset = CarbureLot.objects.filter(year=year).exclude(id__in=saf_ticket_sources_lots_ids)
+                all_lots = queryset.order_by("id")
+                last_lot = queryset.order_by("id")[self.limit - 1 : self.limit].first()
                 if last_lot:
-                    lots_to_delete = CarbureLot.objects.filter(year=year, id__gt=last_lot.id).order_by("id")
+                    lots_to_delete = queryset.filter(id__gt=last_lot.id).order_by("id")
                 else:
                     lots_to_delete = all_lots
                 deleted = self._delete_in_batches(lots_to_delete)
