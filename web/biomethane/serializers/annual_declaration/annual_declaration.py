@@ -8,6 +8,7 @@ from biomethane.services import BiomethaneAnnualDeclarationService
 class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
     missing_fields = serializers.SerializerMethodField()
     is_complete = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = BiomethaneAnnualDeclaration
@@ -15,6 +16,9 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         read_only_fields = ["year", "missing_fields", "is_complete"]
         writeable_fields = ["status"]
         required_fields = writeable_fields
+
+    def get_status(self, instance):
+        return BiomethaneAnnualDeclarationService.get_declaration_status(instance)
 
     @extend_schema_field(
         {

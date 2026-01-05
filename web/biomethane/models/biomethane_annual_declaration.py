@@ -6,6 +6,7 @@ from core.models import Entity
 class BiomethaneAnnualDeclaration(models.Model):
     IN_PROGRESS = "IN_PROGRESS"
     DECLARED = "DECLARED"
+    OVERDUE = "OVERDUE"  # Virtual status
     DECLARATION_STATUS = [(IN_PROGRESS, IN_PROGRESS), (DECLARED, DECLARED)]
 
     # Propriétaire de la déclaration annuelle
