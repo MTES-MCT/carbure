@@ -31,10 +31,9 @@ export const Field = ({
   return (
     <div
       className={cl(
-        fr.cx("fr-select-group"),
+        fr.cx("fr-input-group"),
         className,
-        disabled && "fr-select-group--disabled",
-        state !== "default" && `fr-select-group--${state}`,
+        disabled && "fr-input-group--disabled",
         !marginBottom && css["no-margin-bottom"]
       )}
     >
