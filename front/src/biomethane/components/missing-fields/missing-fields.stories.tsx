@@ -28,6 +28,7 @@ const meta: Meta<typeof MissingFields> = {
   component: MissingFields,
   ...AnnualDeclarationStoryUtils,
   parameters: {
+    mockingDate: new Date(2025, 11, 1),
     msw: {
       handlers: MOCKS,
     },
