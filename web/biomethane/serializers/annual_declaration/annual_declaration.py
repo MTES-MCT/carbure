@@ -8,7 +8,6 @@ from biomethane.services import BiomethaneAnnualDeclarationService
 class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
     missing_fields = serializers.SerializerMethodField()
     is_complete = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
 
     class Meta:
         model = BiomethaneAnnualDeclaration
@@ -17,8 +16,11 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         writeable_fields = ["status"]
         required_fields = writeable_fields
 
-    def get_status(self, instance):
-        return BiomethaneAnnualDeclarationService.get_declaration_status(instance)
+    def to_representation(self, instance):
+        # Override status in representation to use computed value
+        representation = super().to_representation(instance)
+        representation["status"] = BiomethaneAnnualDeclarationService.get_declaration_status(instance)
+        return representation
 
     @extend_schema_field(
         {

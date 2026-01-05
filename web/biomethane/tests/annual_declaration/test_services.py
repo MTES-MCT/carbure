@@ -144,7 +144,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
     def test_get_required_fields_with_valid_model(self):
         """Test get_required_fields returns all field names for a model"""
         # Test with BiomethaneDigestate model
-        fields = BiomethaneAnnualDeclarationService.get_required_fields(BiomethaneDigestate)
+        fields = BiomethaneAnnualDeclarationService.get_all_fields(BiomethaneDigestate)
 
         # Assert we get a list of field names
         self.assertIsInstance(fields, list)
@@ -160,6 +160,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         missing_fields = {
             "digestate_missing_fields": ["xxx"],
             "energy_missing_fields": ["yyy"],
+            "supply_plan_missing_fields": ["zzz"],
         }
 
         # Create declaration
@@ -174,7 +175,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertFalse(is_complete)
 
     def test_is_declaration_complete_with_no_data(self):
-        """Test is_declaration_complete returns False when no digestate/energy exist"""
+        """Test is_declaration_complete returns False when no digestate/energy/supply plan exist"""
         # Create declaration without digestate and energy
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -191,6 +192,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         missing_fields = {
             "digestate_missing_fields": [],
             "energy_missing_fields": [],
+            "supply_plan_missing_fields": [],
         }
 
         # Create declaration

@@ -7,6 +7,7 @@ from biomethane.models import (
     BiomethaneProductionUnit,
 )
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
+from biomethane.models.biomethane_supply_plan import BiomethaneSupplyPlan
 
 
 class BiomethaneAnnualDeclarationService:
@@ -96,17 +97,18 @@ class BiomethaneAnnualDeclarationService:
     @staticmethod
     def get_missing_fields(declaration):
         """
-        Get the missing required fields for digestate and energy declarations.
+        Get the missing required fields for digestate, energy and supply plan declarations.
 
         Args:
             declaration: A BiomethaneAnnualDeclaration instance
 
         Returns:
-            dict: Dictionary with 'digestate_missing_fields' and 'energy_missing_fields' keys.
+            dict: Dictionary with 'digestate_missing_fields', 'energy_missing_fields', 'supply_plan_missing_fields' keys.
                   Values are lists of missing field names or None if the model doesn't exist.
         """
         digestate_missing_fields = None
         energy_missing_fields = None
+        supply_plan_missing_fields = None
 
         try:
             digestate = BiomethaneDigestate.objects.get(producer=declaration.producer, year=declaration.year)
@@ -118,6 +120,11 @@ class BiomethaneAnnualDeclarationService:
         except BiomethaneEnergy.DoesNotExist:
             energy = None
 
+        try:
+            supply_plan = BiomethaneSupplyPlan.objects.get(producer=declaration.producer, year=declaration.year)
+        except BiomethaneSupplyPlan.DoesNotExist:
+            supply_plan = None
+
         if digestate is not None:
             digestate_missing_fields = []
             digestate_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(digestate)
@@ -126,9 +133,15 @@ class BiomethaneAnnualDeclarationService:
             energy_missing_fields = []
             energy_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(energy)
 
+        if supply_plan is not None:
+            supply_plan_missing_fields = []
+            if supply_plan.supply_inputs.count() == 0:
+                supply_plan_missing_fields = ["supply_inputs"]
+
         return {
             "digestate_missing_fields": digestate_missing_fields,
             "energy_missing_fields": energy_missing_fields,
+            "supply_plan_missing_fields": supply_plan_missing_fields,
         }
 
     @staticmethod
@@ -137,7 +150,7 @@ class BiomethaneAnnualDeclarationService:
         Return all missing fields for an instance.
         Takes into account optional fields defined by business rules.
         """
-        all_fields = BiomethaneAnnualDeclarationService.get_required_fields(model=type(instance))
+        all_fields = BiomethaneAnnualDeclarationService.get_all_fields(model=type(instance))
 
         optional_fields = instance.optional_fields if hasattr(instance, "optional_fields") else []
         required_fields = list(set(all_fields) - set(optional_fields))
@@ -152,7 +165,7 @@ class BiomethaneAnnualDeclarationService:
         return missing_fields
 
     @staticmethod
-    def get_required_fields(model):
+    def get_all_fields(model):
         """
         Return all field names for a given model.
         """
@@ -178,10 +191,18 @@ class BiomethaneAnnualDeclarationService:
         if missing_fields is None:
             missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
 
-        if missing_fields["digestate_missing_fields"] is None or missing_fields["energy_missing_fields"] is None:
+        if (
+            missing_fields["digestate_missing_fields"] is None
+            or missing_fields["energy_missing_fields"] is None
+            or missing_fields["supply_plan_missing_fields"] is None
+        ):
             return False
 
-        return len(missing_fields["digestate_missing_fields"]) == 0 and len(missing_fields["energy_missing_fields"]) == 0
+        return (
+            len(missing_fields["digestate_missing_fields"]) == 0
+            and len(missing_fields["energy_missing_fields"]) == 0
+            and len(missing_fields["supply_plan_missing_fields"]) == 0
+        )
 
     @staticmethod
     def is_declaration_editable(producer, year):
