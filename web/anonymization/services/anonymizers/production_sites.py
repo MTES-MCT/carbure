@@ -1,6 +1,6 @@
 from faker import Faker
 
-from producers.models import ProductionSite
+from transactions.models import ProductionSite
 
 from ..utils import anonymize_fields_and_collect_modifications, get_french_coordinates
 from .base import Anonymizer
