@@ -19,6 +19,7 @@ from .anonymizers.certificates import CertificateAnonymizer
 from .anonymizers.depots import DepotAnonymizer
 from .anonymizers.double_counting.applications import DoubleCountingApplicationAnonymizer
 from .anonymizers.double_counting.doc_files import DoubleCountingDocFileAnonymizer
+from .anonymizers.double_counting.registrations import DoubleCountingRegistrationAnonymizer
 from .anonymizers.double_counting.sourcing_history import DoubleCountingSourcingHistoryAnonymizer
 from .anonymizers.elec.charge_points import ElecChargePointAnonymizer
 from .anonymizers.elec.meters import ElecMeterAnonymizer
@@ -149,28 +150,29 @@ class DataAnonymizationService:
         print("=" * 60)
 
         anonymizers_config = [
-            UserAnonymizer(),
-            EntityAnonymizer(self.fake),
+            # UserAnonymizer(),
+            # EntityAnonymizer(self.fake),
             SiteAnonymizer(self.fake),
-            DepotAnonymizer(self.fake),
-            ProductionSiteAnonymizer(self.fake),
-            BiomethaneContractAnonymizer(self.fake),
-            BiomethaneContractAmendmentAnonymizer(self.fake),
-            BiomethaneInjectionSiteAnonymizer(self.fake),
-            BiomethaneProductionUnitAnonymizer(self.fake),
-            DoubleCountingApplicationAnonymizer(self.fake),
-            DoubleCountingDocFileAnonymizer(self.fake),
-            DoubleCountingSourcingHistoryAnonymizer(self.fake),
-            ElecChargePointAnonymizer(self.fake),
-            ElecMeterAnonymizer(self.fake),
-            ElecTransferCertificateAnonymizer(self.fake),
-            ElecProvisionCertificateAnonymizer(self.fake),
-            ElecProvisionCertificateQualichargeAnonymizer(self.fake),
-            SafTicketAnonymizer(self.fake),
-            SafTicketSourceAnonymizer(self.fake),
+            # DepotAnonymizer(self.fake),
+            # ProductionSiteAnonymizer(self.fake),
+            # BiomethaneContractAnonymizer(self.fake),
+            # BiomethaneContractAmendmentAnonymizer(self.fake),
+            # BiomethaneInjectionSiteAnonymizer(self.fake),
+            # BiomethaneProductionUnitAnonymizer(self.fake),
+            # DoubleCountingApplicationAnonymizer(self.fake),
+            # DoubleCountingDocFileAnonymizer(self.fake),
+            # DoubleCountingSourcingHistoryAnonymizer(self.fake),
+            # ElecChargePointAnonymizer(self.fake),
+            # ElecMeterAnonymizer(self.fake),
+            # ElecTransferCertificateAnonymizer(self.fake),
+            # ElecProvisionCertificateAnonymizer(self.fake),
+            # ElecProvisionCertificateQualichargeAnonymizer(self.fake),
+            # SafTicketAnonymizer(self.fake),
+            # SafTicketSourceAnonymizer(self.fake),
             CarbureLotAnonymizer(self.fake),
-            CertificateAnonymizer(self.fake),
-            CarbureLotCommentAnonymizer(self.fake),
+            DoubleCountingRegistrationAnonymizer(self.fake),
+            # CertificateAnonymizer(self.fake),
+            # CarbureLotCommentAnonymizer(self.fake),
         ]
 
         anonymizer_stats = []
