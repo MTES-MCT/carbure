@@ -1,4 +1,3 @@
-import Badge from "@codegouvfr/react-dsfr/Badge"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
 import { Content, Main, Row } from "common/components/scaffold"
@@ -12,8 +11,9 @@ import {
 } from "./page-header.hooks"
 import useEntity from "common/hooks/entity"
 import { PropsWithChildren } from "react"
+import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 
-// Digestate and Energy pages share the same page header and the same declaration validation logic
+// Digestate / Energy / Supply Plan pages share the same page header and the same declaration validation logic
 export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -43,35 +43,45 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
           value={selectedYear}
           onChange={years.setYear}
         />
-        <Badge
-          severity={
-            status === AnnualDeclarationStatus.DECLARED ? "success" : "info"
-          }
-        >
-          {status === AnnualDeclarationStatus.DECLARED
-            ? t("Déclaration transmise")
-            : t("Déclaration en cours")}
-        </Badge>
+        {isInDeclarationPeriod && (
+          <AnnualDeclarationStatusBadge status={status} />
+        )}
       </Row>
       {isInDeclarationPeriod && entity.canWrite() && (
-        <Notice variant="info" icon="ri-time-line">
-          {t("A déclarer et mettre à jour une fois par an, avant le {{date}}", {
-            date: `31/03/${selectedYear + 1}`,
-          })}
-          {status === AnnualDeclarationStatus.IN_PROGRESS && (
-            <Button
-              onClick={
-                currentAnnualDeclaration?.is_complete
-                  ? openValidateDeclarationDialog
-                  : openMissingFieldsDialog
-              }
-              iconId="ri-file-text-line"
-              asideX
-              disabled={hasAnnualDeclarationMissingObjects}
-            >
-              {t("Transmettre mes informations annuelles")}
-            </Button>
-          )}
+        <Notice
+          variant={
+            status === AnnualDeclarationStatus.OVERDUE ? "warning" : "info"
+          }
+          icon="ri-time-line"
+        >
+          {status === AnnualDeclarationStatus.OVERDUE
+            ? t(
+                "Vous avez dépassé les délais de déclaration pour {{year}}, l'administration se réserve le droit de la refuser.",
+                {
+                  year: selectedYear,
+                }
+              )
+            : t(
+                "A déclarer et mettre à jour une fois par an, avant le {{date}}",
+                {
+                  date: `31/03/${selectedYear + 1}`,
+                }
+              )}
+          {status === AnnualDeclarationStatus.IN_PROGRESS ||
+            (status === AnnualDeclarationStatus.OVERDUE && (
+              <Button
+                onClick={
+                  currentAnnualDeclaration?.is_complete
+                    ? openValidateDeclarationDialog
+                    : openMissingFieldsDialog
+                }
+                iconId="ri-file-text-line"
+                asideX
+                disabled={hasAnnualDeclarationMissingObjects}
+              >
+                {t("Transmettre mes informations annuelles")}
+              </Button>
+            ))}
           {status === AnnualDeclarationStatus.DECLARED && (
             <Button
               onClick={() => correctAnnualDeclarationMutation.execute()}

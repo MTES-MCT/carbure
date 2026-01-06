@@ -3130,6 +3130,7 @@ export interface components {
         /**
          * @description * `IN_PROGRESS` - IN_PROGRESS
          *     * `DECLARED` - DECLARED
+         *     * `OVERDUE` - OVERDUE
          * @enum {string}
          */
         BiomethaneAnnualDeclarationStatusEnum: BiomethaneAnnualDeclarationStatusEnum;
@@ -3141,7 +3142,7 @@ export interface components {
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
-            cmax_annualized?: boolean;
+            cmax_annualized?: boolean | null;
             /** Format: double */
             cmax_annualized_value?: number | null;
             /** Format: double */
@@ -4014,7 +4015,7 @@ export interface components {
             period_end: string;
             status?: components["schemas"]["DoubleCountingStatus"];
         };
-        /** @description Serializer pour la mise à jour partielle du statut uniquement. */
+        /** @description Serializer for updating the status of a DoubleCountingApplication. */
         DoubleCountingApplicationUpdate: {
             status?: components["schemas"]["DoubleCountingStatus"];
         };
@@ -5219,7 +5220,7 @@ export interface components {
             input_type?: string;
             origin_department?: string | null;
         };
-        /** @description Serializer pour la mise à jour partielle du statut uniquement. */
+        /** @description Serializer for updating the status of a DoubleCountingApplication. */
         PatchedDoubleCountingApplicationUpdateRequest: {
             status?: components["schemas"]["DoubleCountingStatus"];
         };
@@ -12979,7 +12980,8 @@ export enum AmendmentObjectEnum {
 }
 export enum BiomethaneAnnualDeclarationStatusEnum {
     IN_PROGRESS = "IN_PROGRESS",
-    DECLARED = "DECLARED"
+    DECLARED = "DECLARED",
+    OVERDUE = "OVERDUE"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

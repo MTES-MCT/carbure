@@ -19,13 +19,12 @@ const BiomethaneProductionPage = lazy(
   () => import("biomethane/pages/production")
 )
 
-const currentYear = new Date().getFullYear()
-
+type REDIRECTED_ROUTES = "digestate" | "energy" | "supply-plan"
 /**
  * Composant de redirection qui utilise l'année de déclaration courante
  * récupérée depuis le backend via AnnualDeclarationProvider
  */
-const RedirectToCurrentYear = ({ path }: { path: "digestate" | "energy" }) => {
+const RedirectToCurrentYear = ({ path }: { path: REDIRECTED_ROUTES }) => {
   const biomethaneRoutes = useRoutes().BIOMETHANE()
   const { currentAnnualDeclaration } = useAnnualDeclaration()
   const year = currentAnnualDeclaration?.year
@@ -34,6 +33,12 @@ const RedirectToCurrentYear = ({ path }: { path: "digestate" | "energy" }) => {
 
   return <Navigate to={`${biomethaneRoutes.ROOT}/${year}/${path}`} />
 }
+
+const RedirectToCurrentYearRoute = ({ path }: { path: REDIRECTED_ROUTES }) => (
+  <AnnualDeclarationProvider>
+    <RedirectToCurrentYear path={path} />
+  </AnnualDeclarationProvider>
+)
 
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer } = useEntity()
@@ -45,19 +50,15 @@ export const BiomethaneRoutes = () => {
       {/* Routes sans année qui redirigent vers l'année de déclaration courante */}
       <Route
         path="digestate"
-        element={
-          <AnnualDeclarationProvider>
-            <RedirectToCurrentYear path="digestate" />
-          </AnnualDeclarationProvider>
-        }
+        element={<RedirectToCurrentYearRoute path="digestate" />}
       />
       <Route
         path="energy"
-        element={
-          <AnnualDeclarationProvider>
-            <RedirectToCurrentYear path="energy" />
-          </AnnualDeclarationProvider>
-        }
+        element={<RedirectToCurrentYearRoute path="energy" />}
+      />
+      <Route
+        path="supply-plan"
+        element={<RedirectToCurrentYearRoute path="supply-plan" />}
       />
 
       <Route
@@ -71,12 +72,8 @@ export const BiomethaneRoutes = () => {
         <Route index element={<Navigate replace to="digestate" />} />
         <Route path="digestate" element={<Digestate />} />
         <Route path="energy" element={<Energy />} />
+        <Route path="supply-plan" element={<SupplyPlan />} />
       </Route>
-      <Route path="supply-plan/:year" element={<SupplyPlan />} />
-      <Route
-        path="supply-plan"
-        element={<Navigate replace to={`supply-plan/${currentYear}`} />}
-      />
 
       <Route
         path=""

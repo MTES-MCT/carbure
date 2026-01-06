@@ -33,27 +33,25 @@ export const useMissingFieldsMessages = ({
       message: string
     ) => {
       return (
-        <span>
-          <Trans
-            defaults={message}
-            values={{ count, page }}
-            components={{
-              strong: <strong />,
-              CustomLink: (
-                // @ts-ignore children is propagated to the button by i18next
-                <Button
-                  customPriority="link"
-                  linkProps={{
-                    to: `${url}#${MISSING_FIELDS_HASH}`,
-                    onClick: () => onPageClick?.(page),
-                  }}
-                />
-              ),
-            }}
-            key={page}
-            t={t}
-          />
-        </span>
+        <Trans
+          defaults={message}
+          values={{ count, page }}
+          components={{
+            strong: <strong />,
+            CustomLink: (
+              // @ts-ignore children is propagated to the button by i18next
+              <Button
+                customPriority="link"
+                linkProps={{
+                  to: `${url}#${MISSING_FIELDS_HASH}`,
+                  onClick: () => onPageClick?.(page),
+                }}
+              />
+            ),
+          }}
+          key={page}
+          t={t}
+        />
       )
     }
 
@@ -147,7 +145,7 @@ export const useMissingFieldsMessages = ({
     // Filter out null values (when supplyPlanErrorMessage is null)
     const messages = [
       supplyPlanErrorMessage,
-      ...digestateEnergyErrorMessage,
+      <span>{...digestateEnergyErrorMessage}</span>,
     ].filter((msg) => msg !== null)
     return messages
   }, [digestateEnergyErrorMessage, supplyPlanErrorMessage])
