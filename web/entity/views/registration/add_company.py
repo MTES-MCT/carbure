@@ -1,12 +1,7 @@
 from datetime import datetime
-from os import environ
 
 from django.conf import settings
-from drf_spectacular.utils import (
-    OpenApiExample,
-    OpenApiResponse,
-    extend_schema,
-)
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -16,8 +11,10 @@ from core.helpers import send_mail
 from core.models import (
     Entity,
     EntityCertificate,
+    ExternalAdminRights,
     GenericCertificate,
     Pays,
+    UserRights,
     UserRightsRequests,
 )
 from core.serializers import check_fields_required
@@ -143,7 +140,7 @@ def add_company_view(request):
 
     # Notifications par email
     send_email_to_user(entity, request)
-    send_email_to_dgec(entity, request)
+    send_email_to_admin(entity, request)
 
     return Response({"status": "success"})
 
@@ -177,24 +174,27 @@ def send_email_to_user(entity, request):
     )
 
 
-def send_email_to_dgec(entity, request):
+def send_email_to_admin(entity, request, extra_recipients=None):
     today = datetime.now().strftime("%d/%m/%Y")
     subject = "Demande d'inscription de la société " + entity.name
     if settings.WITH_EMAIL_DECORATED_AS_TEST:
         subject = f"TEST {subject}"
 
     recipient_list = ["carbure@beta.gouv.fr"]
-    admin_link = f"{environ.get('BASE_URL')}/admin/core/entity/?is_enabled=False"
+
+    if entity.entity_type == Entity.AIRLINE:
+        recipient_list += list_dgac_emails()
+
     text_message = f"""
     Bonjour,
 
-    Une demande d'inscription de société {entity.name} a été déposé le {today} par l'utilisateur {request.user.email}.
+    Une demande d'inscription de société {entity.name} a été déposée le {today} par l'utilisateur {request.user.email}.
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :
 
-    1 - Visualisez la liste des sociétés à valider sur ce lien : {admin_link}.
+    1 - Allez sur la page 'Sociétés'.
     2 - Selectionnez la société {entity.name}.
-    3 - Selectionnez l'action "Activer les sociétés sélectionnées".
-    4 - Cliquez sur "Envoyer".
+    3 - Vérifiez que les informations renseignées sont cohérentes.
+    4 - Cliquez sur le bouton "Autoriser la société".
 
     Bonne journée
     """
@@ -205,3 +205,10 @@ def send_email_to_dgec(entity, request):
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipient_list,
     )
+
+
+def list_dgac_emails():
+    dgac = ExternalAdminRights.objects.filter(right=ExternalAdminRights.AIRLINE).select_related("entity").first()
+    if dgac is None:
+        return []
+    return dgac.entity.get_users_emails(user__is_staff=False, user__is_superuser=False, role=UserRights.ADMIN)
