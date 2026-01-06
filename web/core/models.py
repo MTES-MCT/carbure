@@ -1370,6 +1370,26 @@ class GenericCertificate(models.Model):
     input = models.JSONField(null=True)  # TODO check if we need this
     output = models.JSONField(null=True)
 
+    VALID = "VALID"  # certificat valide.
+    SUSPENDED = "SUSPENDED"  # certificat temporairement invalidé (non‑conformités ou à la demande de l’opérateur).
+    WITHDRAWN = "WITHDRAWN"  # certificat annulé de façon permanente par le schéma.
+    TERMINATED = "TERMINATED"  # certification volontairement arrêtée alors qu’elle était encore valide.
+    EXPIRED = "EXPIRED"  # certificat arrivé à échéance, donc inutilisable.
+
+    last_status_update = models.DateField(null=True)
+
+    status = models.CharField(
+        null=True,
+        max_length=16,
+        choices=[
+            (VALID, "Valide"),
+            (SUSPENDED, "Suspendu"),
+            (WITHDRAWN, "Retiré"),
+            (TERMINATED, "Interrompu"),
+            (EXPIRED, "Expiré"),
+        ],
+    )
+
     class Meta:
         db_table = "carbure_certificates"
         indexes = [
