@@ -18,12 +18,12 @@ export const useMissingFieldsMessages = ({
 } = {}) => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { selectedYear } = useAnnualDeclaration()
+  const { selectedYear, hasAtLeastOneSupplyInput } = useAnnualDeclaration()
   const { digestateCount, energyCount } = useMissingFieldCounts()
 
   const biomethaneRoutes = routes.BIOMETHANE(selectedYear)
 
-  const errorMessage = useMemo(() => {
+  const digestateEnergyErrorMessage = useMemo(() => {
     const pages: { page: string; count: number; url: string }[] = []
 
     const generateTranslatedMessage = (
@@ -33,25 +33,27 @@ export const useMissingFieldsMessages = ({
       message: string
     ) => {
       return (
-        <Trans
-          defaults={message}
-          values={{ count, page }}
-          components={{
-            strong: <strong />,
-            CustomLink: (
-              // @ts-ignore children is propagé au bouton par i18next
-              <Button
-                customPriority="link"
-                linkProps={{
-                  to: `${url}#${MISSING_FIELDS_HASH}`,
-                  onClick: () => onPageClick?.(page),
-                }}
-              />
-            ),
-          }}
-          key={page}
-          t={t}
-        />
+        <span>
+          <Trans
+            defaults={message}
+            values={{ count, page }}
+            components={{
+              strong: <strong />,
+              CustomLink: (
+                // @ts-ignore children is propagated to the button by i18next
+                <Button
+                  customPriority="link"
+                  linkProps={{
+                    to: `${url}#${MISSING_FIELDS_HASH}`,
+                    onClick: () => onPageClick?.(page),
+                  }}
+                />
+              ),
+            }}
+            key={page}
+            t={t}
+          />
+        </span>
       )
     }
 
@@ -112,5 +114,43 @@ export const useMissingFieldsMessages = ({
     onPageClick,
   ])
 
-  return { errorMessage, digestateCount, energyCount }
+  const supplyPlanErrorMessage = useMemo(() => {
+    // Only show the error if there is no supply input filled
+    if (hasAtLeastOneSupplyInput) {
+      return null
+    }
+
+    return (
+      <span>
+        <Trans
+          defaults="<CustomLink>Plan d'approvisionnement</CustomLink> : veuillez renseigner au moins un intrant pour valider votre déclaration annuelle"
+          components={{
+            CustomLink: (
+              // @ts-ignore children is propagated to the button by i18next
+              <Button
+                customPriority="link"
+                linkProps={{
+                  to: biomethaneRoutes.SUPPLY_PLAN,
+                  onClick: () => onPageClick?.(biomethaneRoutes.SUPPLY_PLAN),
+                }}
+              />
+            ),
+          }}
+          t={t}
+        />
+        <br />
+      </span>
+    )
+  }, [t, hasAtLeastOneSupplyInput, biomethaneRoutes.SUPPLY_PLAN, onPageClick])
+
+  const errorMessage = useMemo(() => {
+    // Filter out null values (when supplyPlanErrorMessage is null)
+    const messages = [
+      supplyPlanErrorMessage,
+      ...digestateEnergyErrorMessage,
+    ].filter((msg) => msg !== null)
+    return messages
+  }, [digestateEnergyErrorMessage, supplyPlanErrorMessage])
+
+  return { errorMessage, digestateCount, energyCount, hasAtLeastOneSupplyInput }
 }

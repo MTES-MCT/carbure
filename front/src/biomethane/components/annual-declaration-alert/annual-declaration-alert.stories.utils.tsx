@@ -30,6 +30,7 @@ export const generateAnnualDeclarationContextProvider = (
     isDeclarationValidated: false,
     canEditDeclaration: false,
     hasAnnualDeclarationMissingObjects: false,
+    hasAtLeastOneSupplyInput: false,
   }
   const mergedProps = { ...defaultProps, ...props }
   console.log(mergedProps)

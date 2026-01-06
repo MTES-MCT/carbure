@@ -20,6 +20,9 @@ export interface AnnualDeclarationContextValue {
 
   /** Whether the annual declaration has missing objects (digestate or energy) */
   hasAnnualDeclarationMissingObjects: boolean
+
+  /** Whether at least one supply plan input (intrant) has been filled */
+  hasAtLeastOneSupplyInput: boolean
 }
 
 export const AnnualDeclarationContext =
@@ -73,6 +76,12 @@ export function AnnualDeclarationProvider({
       null ||
     currentAnnualDeclaration?.missing_fields?.energy_missing_fields === null
 
+  // Check if at least one supply plan input has been filled
+  // This will be provided by the API in currentAnnualDeclaration
+  // For now, we check if the field exists, otherwise default to false
+  const hasAtLeastOneSupplyInput =
+    (currentAnnualDeclaration as any)?.has_supply_plan_inputs ?? false
+
   const value: AnnualDeclarationContextValue = {
     selectedYear: year,
     currentAnnualDeclaration,
@@ -80,6 +89,7 @@ export function AnnualDeclarationProvider({
     isDeclarationValidated,
     canEditDeclaration,
     hasAnnualDeclarationMissingObjects,
+    hasAtLeastOneSupplyInput,
   }
 
   return (
