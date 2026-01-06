@@ -25,11 +25,12 @@ class BiomethaneAnnualDeclarationService:
         Returns:
             int: The year corresponding to the current declaration period or the unfinished declaration.
         """
-
         if entity:
-            declaration_year = BiomethaneAnnualDeclarationService._get_year_of_latest_declaration(entity)
-            if declaration_year is not None:
-                return declaration_year
+            latest_declaration = BiomethaneAnnualDeclarationService._get_latest_declaration(entity)
+            if latest_declaration:
+                status = BiomethaneAnnualDeclarationService.get_declaration_status(latest_declaration)
+                if status == BiomethaneAnnualDeclaration.OVERDUE:
+                    return latest_declaration.year
 
         return BiomethaneAnnualDeclarationService._get_current_declaration_year()
 
@@ -44,16 +45,11 @@ class BiomethaneAnnualDeclarationService:
         Returns:
             int: The year corresponding to the current declaration period.
         """
-        current_date = date.today()
-        current_year = current_date.year
-        current_month = current_date.month
-
-        declaration_year = current_year - 1 if current_month < 4 else current_year
-
-        return declaration_year
+        today = date.today()
+        return today.year - 1 if today.month < 4 else today.year
 
     @staticmethod
-    def _get_year_of_latest_declaration(entity):
+    def _get_latest_declaration(entity):
         """
         Retrieve the latest NOT DECLARED declaration for a given entity.
 
@@ -63,15 +59,12 @@ class BiomethaneAnnualDeclarationService:
         Returns:
             BiomethaneAnnualDeclaration instance or None if not found
         """
-        declaration = (
+        return (
             BiomethaneAnnualDeclaration.objects.filter(producer=entity)
             .exclude(status=BiomethaneAnnualDeclaration.DECLARED)
             .order_by("-year")
             .first()
         )
-        if declaration:
-            return declaration.year
-        return None
 
     @staticmethod
     def get_declaration_status(declaration):
@@ -91,8 +84,8 @@ class BiomethaneAnnualDeclarationService:
 
         if declaration.year < current_declaration_period and declaration.status != BiomethaneAnnualDeclaration.DECLARED:
             return BiomethaneAnnualDeclaration.OVERDUE
-        else:
-            return declaration.status
+
+        return declaration.status
 
     @staticmethod
     def get_missing_fields(declaration):

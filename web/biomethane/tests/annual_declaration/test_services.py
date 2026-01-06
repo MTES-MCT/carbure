@@ -48,7 +48,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             self.assertEqual(result, 2026)
 
     def test_get_declaration_period_with_entity_and_undeclared_declaration(self):
-        """Test get_declaration_period returns year of unfinished declaration"""
+        """Test get_declaration_period returns year of OVERDUE declaration"""
         # Create an IN_PROGRESS declaration for 2025
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -56,7 +56,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        # Even if current date would suggest 2026, should return 2025 (unfinished)
+        # In May 2026, declaration for 2025 is OVERDUE, so should return 2025
         with patch("biomethane.services.annual_declaration.date") as mock_date:
             mock_date.today.return_value = date(2026, 5, 15)
             result = BiomethaneAnnualDeclarationService.get_declaration_period(entity=self.producer_entity)
@@ -78,7 +78,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             self.assertEqual(result, 2026)
 
     def test_get_declaration_period_with_multiple_declarations(self):
-        """Test get_declaration_period returns most recent undeclared declaration"""
+        """Test get_declaration_period returns most recent OVERDUE declaration"""
         # Create multiple declarations
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -96,11 +96,26 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        # Should return 2024 (most recent non-DECLARED)
+        # In May 2026, 2025 is OVERDUE (most recent), should return 2025
         with patch("biomethane.services.annual_declaration.date") as mock_date:
             mock_date.today.return_value = date(2026, 5, 15)
             result = BiomethaneAnnualDeclarationService.get_declaration_period(entity=self.producer_entity)
             self.assertEqual(result, 2025)
+
+    def test_get_declaration_period_with_in_progress_current_year(self):
+        """Test get_declaration_period with IN_PROGRESS declaration for current year (not OVERDUE)"""
+        # Create an IN_PROGRESS declaration for 2026
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=2026,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        # In May 2026, declaration for 2026 is NOT OVERDUE, so should return current year (2026)
+        with patch("biomethane.services.annual_declaration.date") as mock_date:
+            mock_date.today.return_value = date(2026, 5, 15)
+            result = BiomethaneAnnualDeclarationService.get_declaration_period(entity=self.producer_entity)
+            self.assertEqual(result, 2026)
 
     def test_get_missing_fields_both_models_exist(self):
         """Test get_missing_fields structure when both digestate and energy exist"""
