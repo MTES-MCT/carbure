@@ -44,6 +44,11 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
                     "nullable": True,
                     "description": "List of missing fields for energy",
                 },
+                "supply_plan_valid": {
+                    "type": "boolean",
+                    "nullable": False,
+                    "description": "Whether the supply plan is valid",
+                },
             },
             "description": "Missing fields grouped by type",
         }

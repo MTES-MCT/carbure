@@ -3124,6 +3124,8 @@ export interface components {
                 digestate_missing_fields?: string[] | null;
                 /** @description List of missing fields for energy */
                 energy_missing_fields?: string[] | null;
+                /** @description Whether the supply plan is valid */
+                supply_plan_valid?: boolean;
             };
             readonly is_complete: boolean;
         };
