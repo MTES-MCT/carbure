@@ -67,7 +67,7 @@ if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
-        environment=f"{image_tag}",
+        environment=f"carbure-{image_tag}",
     )
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
