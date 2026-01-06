@@ -96,45 +96,19 @@ class BiomethaneAnnualDeclarationService:
             declaration: A BiomethaneAnnualDeclaration instance
 
         Returns:
-            dict: Dictionary with 'digestate_missing_fields', 'energy_missing_fields', 'supply_plan_missing_fields' keys.
+            dict: Dictionary with 'digestate_missing_fields', 'energy_missing_fields', 'supply_plan_valid' keys.
                   Values are lists of missing field names or None if the model doesn't exist.
         """
-        digestate_missing_fields = None
-        energy_missing_fields = None
-        supply_plan_missing_fields = None
-
-        try:
-            digestate = BiomethaneDigestate.objects.get(producer=declaration.producer, year=declaration.year)
-        except BiomethaneDigestate.DoesNotExist:
-            digestate = None
-
-        try:
-            energy = BiomethaneEnergy.objects.get(producer=declaration.producer, year=declaration.year)
-        except BiomethaneEnergy.DoesNotExist:
-            energy = None
-
-        try:
-            supply_plan = BiomethaneSupplyPlan.objects.get(producer=declaration.producer, year=declaration.year)
-        except BiomethaneSupplyPlan.DoesNotExist:
-            supply_plan = None
-
-        if digestate is not None:
-            digestate_missing_fields = []
-            digestate_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(digestate)
-
-        if energy is not None:
-            energy_missing_fields = []
-            energy_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(energy)
-
-        if supply_plan is not None:
-            supply_plan_missing_fields = []
-            if supply_plan.supply_inputs.count() == 0:
-                supply_plan_missing_fields = ["supply_inputs"]
+        digestate = BiomethaneDigestate.objects.filter(producer=declaration.producer, year=declaration.year).first()
+        energy = BiomethaneEnergy.objects.filter(producer=declaration.producer, year=declaration.year).first()
+        supply_plan = BiomethaneSupplyPlan.objects.filter(producer=declaration.producer, year=declaration.year).first()
 
         return {
-            "digestate_missing_fields": digestate_missing_fields,
-            "energy_missing_fields": energy_missing_fields,
-            "supply_plan_missing_fields": supply_plan_missing_fields,
+            "digestate_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(digestate)
+            if digestate
+            else None,
+            "energy_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(energy) if energy else None,
+            "supply_plan_valid": supply_plan and supply_plan.supply_inputs.exists(),
         }
 
     @staticmethod
@@ -179,22 +153,17 @@ class BiomethaneAnnualDeclarationService:
             missing_fields: Optional dict of missing fields (will be computed if not provided)
 
         Returns:
-            bool: True if both digestate and energy declarations exist and have no missing fields
+            bool: True if digestate, energy and supply_plan are valid with no missing fields
         """
         if missing_fields is None:
             missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
 
-        if (
-            missing_fields["digestate_missing_fields"] is None
-            or missing_fields["energy_missing_fields"] is None
-            or missing_fields["supply_plan_missing_fields"] is None
-        ):
-            return False
-
         return (
-            len(missing_fields["digestate_missing_fields"]) == 0
+            missing_fields.get("digestate_missing_fields") is not None
+            and len(missing_fields["digestate_missing_fields"]) == 0
+            and missing_fields.get("energy_missing_fields") is not None
             and len(missing_fields["energy_missing_fields"]) == 0
-            and len(missing_fields["supply_plan_missing_fields"]) == 0
+            and missing_fields.get("supply_plan_valid") is True
         )
 
     @staticmethod

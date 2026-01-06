@@ -6,12 +6,15 @@ from django.test import TestCase
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.energy import BiomethaneEnergyFactory
+from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 
 
 class BiomethaneAnnualDeclarationServiceTests(TestCase):
+    fixtures = ["json/countries.json"]
+
     def setUp(self):
         self.producer_entity = Entity.objects.create(
             name="Test Producer",
@@ -118,7 +121,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             self.assertEqual(result, 2026)
 
     def test_get_missing_fields_both_models_exist(self):
-        """Test get_missing_fields structure when both digestate and energy exist"""
+        """Test get_missing_fields structure when digestate, energy and supply_plan exist"""
         BiomethaneDigestateFactory.create(
             producer=self.producer_entity,
             year=self.current_year,
@@ -128,6 +131,12 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             producer=self.producer_entity,
             year=self.current_year,
         )
+
+        supply_plan = BiomethaneSupplyPlanFactory.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+        )
+        BiomethaneSupplyInputFactory.create(supply_plan=supply_plan)
 
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -140,11 +149,13 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIsInstance(missing_fields, dict)
         self.assertIn("digestate_missing_fields", missing_fields)
         self.assertIn("energy_missing_fields", missing_fields)
+        self.assertIn("supply_plan_valid", missing_fields)
         self.assertIsInstance(missing_fields["digestate_missing_fields"], list)
         self.assertIsInstance(missing_fields["energy_missing_fields"], list)
+        self.assertTrue(missing_fields["supply_plan_valid"])
 
     def test_get_missing_fields_both_not_exist(self):
-        """Test get_missing_fields when neither digestate nor energy exist"""
+        """Test get_missing_fields when neither digestate, energy nor supply_plan exist"""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
@@ -155,6 +166,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         self.assertIsNone(missing_fields["digestate_missing_fields"])
         self.assertIsNone(missing_fields["energy_missing_fields"])
+        self.assertFalse(missing_fields["supply_plan_valid"])
 
     def test_get_required_fields_with_valid_model(self):
         """Test get_required_fields returns all field names for a model"""
@@ -170,12 +182,29 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIn("year", fields)
         self.assertIn("raw_digestate_tonnage_produced", fields)
 
+    def test_get_missing_fields_supply_plan_without_inputs(self):
+        """Test get_missing_fields when supply_plan exists but has no inputs"""
+        BiomethaneSupplyPlanFactory.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+        )
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+
+        self.assertFalse(missing_fields["supply_plan_valid"])
+
     def test_is_declaration_complete_with_incomplete_data(self):
         """Test is_declaration_complete returns False when required fields are missing"""
         missing_fields = {
             "digestate_missing_fields": ["xxx"],
             "energy_missing_fields": ["yyy"],
-            "supply_plan_missing_fields": ["zzz"],
+            "supply_plan_valid": False,
         }
 
         # Create declaration
@@ -207,7 +236,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         missing_fields = {
             "digestate_missing_fields": [],
             "energy_missing_fields": [],
-            "supply_plan_missing_fields": [],
+            "supply_plan_valid": True,
         }
 
         # Create declaration
