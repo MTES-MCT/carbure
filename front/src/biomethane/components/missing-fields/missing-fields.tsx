@@ -10,13 +10,22 @@ export const MissingFields = ({ onPageClick }: MissingFieldsProps) => {
   const { errorMessage } = useMissingFieldsMessages({
     onPageClick,
   })
-  const { canEditDeclaration, currentAnnualDeclaration } =
-    useAnnualDeclaration()
+  const {
+    canEditDeclaration,
+    currentAnnualDeclaration,
+    hasAnnualDeclarationMissingObjects,
+  } = useAnnualDeclaration()
 
   // Don't show if:
   // - User can't edit the declaration
   // - All fields are complete (no missing fields AND at least one supply input)
-  if (currentAnnualDeclaration.is_complete || !canEditDeclaration) return null
+  // - There are missing objects (digestate or energy)
+  if (
+    currentAnnualDeclaration.is_complete ||
+    !canEditDeclaration ||
+    hasAnnualDeclarationMissingObjects
+  )
+    return null
 
   return (
     <Notice

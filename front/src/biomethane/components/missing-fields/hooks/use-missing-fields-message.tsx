@@ -119,7 +119,7 @@ export const useMissingFieldsMessages = ({
     }
 
     return (
-      <span>
+      <span key="supplyPlanErrorMessage">
         <Trans
           defaults="<CustomLink>Plan d'approvisionnement</CustomLink> : veuillez renseigner au moins un intrant pour valider votre déclaration annuelle"
           components={{
@@ -145,7 +145,9 @@ export const useMissingFieldsMessages = ({
     // Filter out null values (when supplyPlanErrorMessage is null)
     const messages = [
       supplyPlanErrorMessage,
-      <span>{...digestateEnergyErrorMessage}</span>,
+      <span key="digestateEnergyErrorMessage">
+        {...digestateEnergyErrorMessage}
+      </span>,
     ].filter((msg) => msg !== null)
     return messages
   }, [digestateEnergyErrorMessage, supplyPlanErrorMessage])

@@ -67,21 +67,21 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
                   date: `31/03/${selectedYear + 1}`,
                 }
               )}
-          {status === AnnualDeclarationStatus.IN_PROGRESS ||
-            (status === AnnualDeclarationStatus.OVERDUE && (
-              <Button
-                onClick={
-                  currentAnnualDeclaration?.is_complete
-                    ? openValidateDeclarationDialog
-                    : openMissingFieldsDialog
-                }
-                iconId="ri-file-text-line"
-                asideX
-                disabled={hasAnnualDeclarationMissingObjects}
-              >
-                {t("Transmettre mes informations annuelles")}
-              </Button>
-            ))}
+          {(status === AnnualDeclarationStatus.IN_PROGRESS ||
+            status === AnnualDeclarationStatus.OVERDUE) && (
+            <Button
+              onClick={
+                currentAnnualDeclaration?.is_complete
+                  ? openValidateDeclarationDialog
+                  : openMissingFieldsDialog
+              }
+              iconId="ri-file-text-line"
+              asideX
+              disabled={hasAnnualDeclarationMissingObjects}
+            >
+              {t("Transmettre mes informations annuelles")}
+            </Button>
+          )}
           {status === AnnualDeclarationStatus.DECLARED && (
             <Button
               onClick={() => correctAnnualDeclarationMutation.execute()}

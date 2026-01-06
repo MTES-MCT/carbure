@@ -33,7 +33,7 @@ export const generateAnnualDeclarationContextProvider = (
     hasAtLeastOneSupplyInput: false,
   }
   const mergedProps = { ...defaultProps, ...props }
-  console.log(mergedProps)
+
   return (Story: StoryFn) => (
     <AnnualDeclarationContext.Provider value={mergedProps}>
       <Story />

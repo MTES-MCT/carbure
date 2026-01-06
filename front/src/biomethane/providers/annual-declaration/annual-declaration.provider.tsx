@@ -80,7 +80,7 @@ export function AnnualDeclarationProvider({
   // This will be provided by the API in currentAnnualDeclaration
   // For now, we check if the field exists, otherwise default to false
   const hasAtLeastOneSupplyInput =
-    (currentAnnualDeclaration as any)?.has_supply_plan_inputs ?? false
+    currentAnnualDeclaration?.missing_fields?.supply_plan_valid ?? false
 
   const value: AnnualDeclarationContextValue = {
     selectedYear: year,

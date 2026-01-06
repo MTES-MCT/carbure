@@ -1,22 +1,14 @@
 import { Button } from "common/components/button2"
 import { SearchInput } from "common/components/inputs2"
 import { ActionBar, Row } from "common/components/scaffold"
-import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import {
-  getSupplyPlanInputs,
-  getSupplyPlanYears,
-  downloadSupplyPlan,
-} from "./api"
-import useEntity from "common/hooks/entity"
+import { getSupplyPlanInputs, downloadSupplyPlan } from "./api"
 import { useGetFilterOptions, useSupplyPlanColumns } from "./supply-plan.hooks"
 import { useQuery } from "common/hooks/async"
 import { Table } from "common/components/table2"
 import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
-import { Notice } from "common/components/notice"
-import { declarationInterval } from "biomethane/utils"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneSupplyInputQueryBuilder } from "./types"
@@ -29,21 +21,19 @@ import {
 import { ExportButton } from "common/components/export"
 import { ExcelImportDialog } from "./supply-excel-import-dialog"
 import { usePortal } from "common/components/portal"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
   const portal = usePortal()
   usePrivateNavigation(t("Mes plans d'approvisionnement"))
-  const entity = useEntity()
-  const years = useYears("biomethane/supply-plan", () =>
-    getSupplyPlanYears(entity.id)
-  )
+  const { selectedYear, canEditDeclaration } = useAnnualDeclaration()
   const columns = useSupplyPlanColumns()
 
   const { state, actions, query } = useQueryBuilder<
     BiomethaneSupplyInputQueryBuilder["config"]
   >({
-    year: years.selected,
+    year: selectedYear,
   })
   const { getFilterOptions, filterLabels, normalizers } =
     useGetFilterOptions(query)
@@ -52,8 +42,6 @@ export const SupplyPlan = () => {
     key: `supply-plan-inputs`,
     params: [query],
   })
-  const selectedYearIsInCurrentInterval =
-    years.selected === declarationInterval.year
 
   const openCreateSupplyInputDialog = () => {
     portal((close) => <CreateSupplyInputDialog onClose={close} />)
@@ -69,7 +57,7 @@ export const SupplyPlan = () => {
         <Button
           onClick={openExcelImportDialog}
           iconId="ri-upload-line"
-          disabled={!selectedYearIsInCurrentInterval}
+          disabled={!canEditDeclaration}
           asideX
         >
           {t("Charger un plan d'approvisionnement")}
@@ -85,7 +73,7 @@ export const SupplyPlan = () => {
           iconId="ri-add-line"
           asideX
           priority="secondary"
-          disabled={!selectedYearIsInCurrentInterval}
+          disabled={!canEditDeclaration}
         >
           {t("Ajouter un intrant")}
         </Button>
@@ -98,13 +86,6 @@ export const SupplyPlan = () => {
         getFilterOptions={getFilterOptions}
         normalizers={normalizers}
       />
-      {selectedYearIsInCurrentInterval && (
-        <Notice variant="info" icon="ri-time-line" isClosable>
-          {t("A déclarer et mettre à jour une fois par an, avant le {{date}}", {
-            date: `31/03/${years.selected + 1}`,
-          })}
-        </Notice>
-      )}
       {!loading && (!supplyInputs || supplyInputs?.count === 0) && <NoResult />}
       {supplyInputs && supplyInputs.count > 0 && (
         <>

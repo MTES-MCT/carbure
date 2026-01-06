@@ -25,6 +25,7 @@ class BiomethaneAnnualDeclarationService:
         Returns:
             int: The year corresponding to the current declaration period or the unfinished declaration.
         """
+
         if entity:
             latest_declaration = BiomethaneAnnualDeclarationService._get_latest_declaration(entity)
             if latest_declaration:

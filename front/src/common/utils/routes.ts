@@ -57,7 +57,7 @@ export const ROUTE_URLS = {
     }
   },
 
-  BIOMETHANE: (entity_id: number, year: number) => {
+  BIOMETHANE: (entity_id: number, year?: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/biomethane`)
 
     return {
