@@ -59,8 +59,12 @@ class EOGetTransactionResponse(BaseRequestResponse):
             feedstock=feedstock,
             period=self.period(),
             lot_status=self.status(),
+            udb_transaction_id=self.udb_transaction_id(),
             year=self.year(),
         )
+
+    def udb_transaction_id(self):
+        return self.transaction_XML_element.find("./TRANSACTION_ID").text
 
     def year(self):
         return self.delivery_date().year

@@ -38,6 +38,7 @@ class EOGetTransactionResponseTest(TestCase):
         feedstock=None,
         status="ACCEPTED",
         supplier_id="FR_SIREN_CD111111111",
+        udb_transaction_id="TRN-0000000159437-1766484490",
     ):
         if feedstock is None:
             feedstock = {"code": "URWS023", "name": "Sugar beet"}
@@ -61,7 +62,7 @@ class EOGetTransactionResponseTest(TestCase):
       <MATERIAL_CODE>SFC0015</MATERIAL_CODE>
       <STATUS>{status}</STATUS>
       <POS_ID>POS-0000000219349-1766484490</POS_ID>
-      <TRANSACTION_ID>TRN-0000000159437-1766484490</TRANSACTION_ID>
+      <TRANSACTION_ID>{udb_transaction_id}</TRANSACTION_ID>
       <NON_RECOGNISED_VS>false</NON_RECOGNISED_VS>
       <MATERIAL_NAME>Biogas</MATERIAL_NAME>
       <EO_TRANS_DETAIL_MATERIALS>
@@ -113,6 +114,13 @@ class EOGetTransactionResponseTest(TestCase):
         response = EOGetTransactionResponse(self.payload())
         carbure_lot = response.to_lot()
         self.assertIsInstance(carbure_lot, CarbureLot)
+
+    def test_knows_its_udb_transaction_id(self):
+        response = EOGetTransactionResponse(self.payload(udb_transaction_id="TRN-0000000000001-1234567890"))
+        self.assertEqual("TRN-0000000000001-1234567890", response.udb_transaction_id())
+
+        carbure_lot = response.to_lot()
+        self.assertEqual("TRN-0000000000001-1234567890", carbure_lot.udb_transaction_id)
 
     def test_knows_its_delivery_date_in_ISO_format(self):
         response = EOGetTransactionResponse(self.payload(delivery_date="2025-12-22T00:00:00.000Z"))
