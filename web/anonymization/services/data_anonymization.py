@@ -9,6 +9,8 @@ import time
 
 from faker import Faker
 
+from anonymization.services.update_certificate_id import update_certificate_ids
+
 from .anonymizers.biomethane.contract_amendments import BiomethaneContractAmendmentAnonymizer
 from .anonymizers.biomethane.contracts import BiomethaneContractAnonymizer
 from .anonymizers.biomethane.injection_sites import BiomethaneInjectionSiteAnonymizer
@@ -29,7 +31,6 @@ from .anonymizers.elec.provision_certificates_qualicharge import (
 )
 from .anonymizers.elec.transfer_certificates import ElecTransferCertificateAnonymizer
 from .anonymizers.entities import EntityAnonymizer
-from .anonymizers.production_sites import ProductionSiteAnonymizer
 from .anonymizers.saf.ticket_sources import SafTicketSourceAnonymizer
 from .anonymizers.saf.tickets import SafTicketAnonymizer
 from .anonymizers.sites import SiteAnonymizer
@@ -93,7 +94,7 @@ class DataAnonymizationService:
 
     def _delete_data(self):
         print("=" * 60)
-        print("ÉTAPE 1: Suppression des données")
+        print("ÉTAPE 2: Suppression des données")
         print("=" * 60)
 
         print("Suppression des lots...")
@@ -108,7 +109,7 @@ class DataAnonymizationService:
         operation_deleter = EmptyOperationDeleter(dry_run=self.dry_run)
         deleted_operations, operations_elapsed_time = operation_deleter.delete_empty_operations()
 
-        print("Étape 1 terminée\n")
+        print("Étape 2 terminée\n")
 
         return [
             {
@@ -133,7 +134,7 @@ class DataAnonymizationService:
 
     def _truncate_tables(self):
         print("=" * 60)
-        print("ÉTAPE 2: Vidage des tables")
+        print("ÉTAPE 1: Vidage des tables")
         print("=" * 60)
         if not self.dry_run:
             print("Truncate des tables...")
@@ -141,7 +142,7 @@ class DataAnonymizationService:
             print("Tables tronquées avec succès")
         else:
             print("[DRY-RUN] Truncate des tables (simulation)")
-        print("Étape 2 terminée\n")
+        print("Étape 1 terminée\n")
         return []
 
     def _anonymize_data(self):
@@ -150,29 +151,28 @@ class DataAnonymizationService:
         print("=" * 60)
 
         anonymizers_config = [
-            # UserAnonymizer(),
-            # EntityAnonymizer(self.fake),
+            UserAnonymizer(),
+            EntityAnonymizer(self.fake),
             SiteAnonymizer(self.fake),
-            # DepotAnonymizer(self.fake),
-            # ProductionSiteAnonymizer(self.fake),
-            # BiomethaneContractAnonymizer(self.fake),
-            # BiomethaneContractAmendmentAnonymizer(self.fake),
-            # BiomethaneInjectionSiteAnonymizer(self.fake),
-            # BiomethaneProductionUnitAnonymizer(self.fake),
-            # DoubleCountingApplicationAnonymizer(self.fake),
-            # DoubleCountingDocFileAnonymizer(self.fake),
-            # DoubleCountingSourcingHistoryAnonymizer(self.fake),
-            # ElecChargePointAnonymizer(self.fake),
-            # ElecMeterAnonymizer(self.fake),
-            # ElecTransferCertificateAnonymizer(self.fake),
-            # ElecProvisionCertificateAnonymizer(self.fake),
-            # ElecProvisionCertificateQualichargeAnonymizer(self.fake),
-            # SafTicketAnonymizer(self.fake),
-            # SafTicketSourceAnonymizer(self.fake),
+            DepotAnonymizer(self.fake),
+            BiomethaneContractAnonymizer(self.fake),
+            BiomethaneContractAmendmentAnonymizer(self.fake),
+            BiomethaneInjectionSiteAnonymizer(self.fake),
+            BiomethaneProductionUnitAnonymizer(self.fake),
+            DoubleCountingApplicationAnonymizer(self.fake),
+            DoubleCountingDocFileAnonymizer(self.fake),
+            DoubleCountingSourcingHistoryAnonymizer(self.fake),
+            ElecChargePointAnonymizer(self.fake),
+            ElecMeterAnonymizer(self.fake),
+            ElecTransferCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateAnonymizer(self.fake),
+            ElecProvisionCertificateQualichargeAnonymizer(self.fake),
+            SafTicketAnonymizer(self.fake),
+            SafTicketSourceAnonymizer(self.fake),
             CarbureLotAnonymizer(self.fake),
             DoubleCountingRegistrationAnonymizer(self.fake),
-            # CertificateAnonymizer(self.fake),
-            # CarbureLotCommentAnonymizer(self.fake),
+            CertificateAnonymizer(self.fake),
+            CarbureLotCommentAnonymizer(self.fake),
         ]
 
         anonymizer_stats = []
@@ -206,9 +206,10 @@ class DataAnonymizationService:
         self._truncate_tables()
         deletion_stats = self._delete_data()
         anonymizer_stats = self._anonymize_data()
+        rows_updated = update_certificate_ids(dry_run=self.dry_run)
 
         total_elapsed_time = time.perf_counter() - total_start_time
         all_stats = deletion_stats + anonymizer_stats
-        total_all_processed = sum(stat["processed"] for stat in all_stats)
+        total_all_processed = sum(stat["processed"] for stat in all_stats) + rows_updated
 
         display_anonymization_summary(all_stats, total_all_processed, total_elapsed_time)

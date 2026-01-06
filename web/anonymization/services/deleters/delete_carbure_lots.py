@@ -26,6 +26,12 @@ class CarbureLotDeleter:
         self.limit = limit
         self.dry_run = dry_run
 
+        # Exclude lots that are linked to a SAF ticket source
+        saf_ticket_sources_lots_ids = SafTicketSource.objects.values_list("parent_lot_id", flat=True).exclude(
+            parent_lot_id__isnull=True
+        )
+        self.base_queryset = CarbureLot.objects.all().exclude(id__in=saf_ticket_sources_lots_ids)
+
     def execute(self):
         start_time = time.perf_counter()
 
@@ -54,7 +60,7 @@ class CarbureLotDeleter:
 
     def _get_years_to_process(self):
         """Get the list of years to process."""
-        return CarbureLot.objects.values_list("year", flat=True).distinct().order_by("year")
+        return self.base_queryset.values_list("year", flat=True).distinct().order_by("year")
 
     def _calculate_statistics_by_year(self, years):
         """
@@ -68,7 +74,7 @@ class CarbureLotDeleter:
         total_to_delete = 0
 
         for year in years:
-            count = CarbureLot.objects.filter(year=year).count()
+            count = self.base_queryset.filter(year=year).count()
 
             if count < self.MIN_LOTS_THRESHOLD:
                 to_keep = 0
@@ -159,12 +165,7 @@ class CarbureLotDeleter:
             if self.dry_run:
                 return self.limit, to_delete
             else:
-                # Exclude lots that are linked to a SAF ticket source
-                saf_ticket_sources_lots_ids = SafTicketSource.objects.filter(year=year).values_list(
-                    "parent_lot_id", flat=True
-                )
-
-                queryset = CarbureLot.objects.filter(year=year).exclude(id__in=saf_ticket_sources_lots_ids)
+                queryset = self.base_queryset.filter(year=year)
                 all_lots = queryset.order_by("id")
                 last_lot = queryset.order_by("id")[self.limit - 1 : self.limit].first()
                 if last_lot:
