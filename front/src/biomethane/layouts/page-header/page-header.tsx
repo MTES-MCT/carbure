@@ -88,7 +88,6 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
               iconId="ri-edit-line"
               asideX
               loading={correctAnnualDeclarationMutation.loading}
-              disabled={hasAnnualDeclarationMissingObjects}
             >
               {t("Corriger mes informations annuelles")}
             </Button>
