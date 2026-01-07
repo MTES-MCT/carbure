@@ -1,4 +1,5 @@
 import argparse
+from collections import defaultdict
 import datetime
 import os
 from typing import List, Tuple, cast
@@ -17,8 +18,7 @@ from pandas._typing import Scalar
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import GenericCertificate  # noqa: E402
-from core.utils import bulk_update_or_create  # noqa: E402
+from core.models import GenericCertificate
 
 today = datetime.date.today()
 REDCERT_CERT_PAGE = "https://redcert.eu/ZertifikateDatenAnzeige.aspx"
@@ -26,6 +26,13 @@ REDCERT_EXPORT_URL = "https://redcert.eu/ExportZertifikate.aspx"
 DESTINATION_FOLDER = "/tmp/"
 REDCERT_ENGLISH_PARAMS = {"__EVENTTARGET": "ctl00$languageEnglishLinkButton"}
 
+REDCERT_STATUS = {
+    'valid certificate': GenericCertificate.VALID,
+    'suspended certificate': GenericCertificate.SUSPENDED,
+    'withdrawn certificate': GenericCertificate.WITHDRAWN,
+    'terminated certificate': GenericCertificate.TERMINATED,
+    'expired certificate': GenericCertificate.EXPIRED
+}
 
 def update_redcert_certificates(email: bool = False, test: bool = False) -> None:
     download_redcert_certificates()
@@ -45,21 +52,16 @@ def download_redcert_certificates() -> None:
     open(filename, "wb").write(res.content)
     print("File was created successfully.")
 
-
 def save_redcert_certificates() -> Tuple[int, list, list]:
-    certificates = []
+    certificates_by_status = defaultdict(list)
     invalidated = []
-    existing = {c.certificate_id: c for c in GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)}
+
+    existing = GenericCertificate.objects.filter(certificate_type=GenericCertificate.REDCERT)
+    existing_by_id = {c.certificate_id: c for c in existing}
 
     filename = "%s/REDcert-certificates.xlsx" % (DESTINATION_FOLDER)
-    wb = openpyxl.load_workbook(filename, data_only=True)
-    sheet = wb.worksheets[0]
-    data = get_sheet_data(sheet, convert_float=True)
-    column_names = data[0]
-    data = data[1:]
-    df = pd.DataFrame(data, columns=column_names)
+    df = pd.read_excel(filename)
     df.fillna("", inplace=True)
-    status = GenericCertificate.VALID
     i = 0
     for row in df.iterrows():
         i += 1
@@ -74,21 +76,20 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
         # Certified as                                        801,901
         # Certification body                       TÜV NORD CERT GmbH
         # Type                              Certificate REDcert² Chem
-        # State                                                 Valid
+        # State                                     valid certificate
         # Type of biomass
+
+        certificate_id = cert["Identifier"]
+        existing_cert = existing_by_id.get(certificate_id)
+        status = REDCERT_STATUS.get(cert["State"])
         valid_from = datetime.datetime.strptime(cert["Valid from"], "%d.%m.%Y").date()
         valid_until = datetime.datetime.strptime(cert["Valid until"], "%d.%m.%Y").date()
-        if cert.Identifier in existing:
-            # existing certificate, check if valid_until has changed
-            existingcert = existing[cert.Identifier]
-            if valid_until < existingcert.valid_until:
-                print("Certificate %s %s invalidated" % (existingcert.certificate_id, existingcert.certificate_holder))
-                print(valid_until, existingcert.valid_until)
-                invalidated.append((cert, existingcert, existingcert.valid_until, valid_until))
+       
+        if existing_cert.status == GenericCertificate.VALID and status != GenericCertificate.VALID:
+            invalidated.append(existing_cert)
 
-        certificates.append(
-            {
-                "certificate_id": cert["Identifier"],
+        certificates_by_status[status].append({
+                "certificate_id": certificate_id,
                 "certificate_type": GenericCertificate.REDCERT,
                 "certificate_holder": cert["Name of the certificate holder"],
                 "certificate_issuer": cert["Certification body"],
@@ -99,10 +100,15 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
                 "input": {"Type of biomass": cert["Type of biomass"]},
                 "output": None,
                 "status": status
-            }
-        )
-        
-    existing, new = GenericCertificate.bulk_create_or_update(certificates, status)
+            })
+    
+    existing = []
+    new = []
+
+    for status, certificates in certificates_by_status.items():
+        existing_for_status, new_for_status = GenericCertificate.bulk_create_or_update(certificates, status)
+        existing += existing_for_status
+        new += new_for_status
 
     print("[REDcert Certificates] %d updated, %d created" % (len(existing), len(new)))
     return i, new, invalidated
@@ -121,24 +127,20 @@ def send_email_summary(
     if len(new_certificates):
         mail_content += "%d nouveaux certificats enregistrés :<br />\n" % len(new_certificates)
         for nc in new_certificates:
-            mail_content += "%s - %s" % (nc.certificate_type, nc.certificate_holder)
+            mail_content += "%s - %s" % (nc.certificate_id, nc.certificate_holder)
             mail_content += "<br />"
 
-    fraud = False
     if len(newly_invalidated_certificates):
-        for _, previous, prev_valid_date, new_valid_date in newly_invalidated_certificates:
-            fraud = True
-            mail_content += "**** Certificat expiré *****<br />"
-            mail_content += "%s - %s" % (previous.certificate_id, previous.certificate_holder)
+        for cert in newly_invalidated_certificates:
+            mail_content += "**** Certificat %s *****<br />" % (cert.status)
+            mail_content += "%s - %s" % (cert.certificate_id, cert.certificate_holder)
             mail_content += "<br />"
-            mail_content += "Date de validité précédente: %s<br />" % (prev_valid_date)
-            mail_content += "Nouvelle Date de validité: %s<br />" % (new_valid_date)
-            mail_content += "<br />"
+            mail_content += "Date de fin: %s<br />" % (cert.valid_until)
 
     try:
         connection = get_connection()
         connection.open()
-        if email and fraud:
+        if email:
             send_mail(
                 "Certificats REDcert",
                 mail_content,
@@ -154,35 +156,6 @@ def send_email_summary(
         print("Error: Could not open connection to email backend")
         return
 
-
-def get_sheet_data(sheet: Worksheet, convert_float: bool) -> List[List[Scalar]]:
-    data: List[List[Scalar]] = []
-    for row in sheet.rows:
-        data.append([convert_cell(cell, convert_float) for cell in row])
-    return data
-
-
-def convert_cell(cell: Cell, convert_float: bool) -> Scalar:
-    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC  # noqa: E402
-
-    if cell.is_date:
-        return cell.value
-    elif cell.data_type == TYPE_ERROR:
-        return np.nan
-    elif cell.data_type == TYPE_BOOL:
-        return bool(cell.value)
-    elif cell.value is None:
-        return ""  # compat with xlrd
-    elif cell.data_type == TYPE_NUMERIC:
-        # GH5394
-        if convert_float:
-            val = int(cast(float, cell.value))
-            if val == cell.value:
-                return val
-        else:
-            return float(cast(float, cell.value))
-
-    return cell.value
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load REDCert certificates in database")
