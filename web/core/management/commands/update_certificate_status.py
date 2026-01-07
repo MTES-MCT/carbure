@@ -14,8 +14,8 @@ class Command(BaseCommand):
         today = timezone.localdate()
 
         status_case = Case(
-            When(valid_from__gt=today, then=Value("PENDING")),
-            When(valid_until__lt=today, then=Value("EXPIRED")),
+            When(valid_from__gt=today, then=Value(GenericCertificate.PENDING)),
+            When(valid_until__lt=today, then=Value(GenericCertificate.EXPIRED)),
             default=Value("VALID"),
             output_field=CharField(),
         )
