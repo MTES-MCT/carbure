@@ -10,23 +10,22 @@ from django.utils import timezone
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-import argparse  # noqa: E402
-import json  # noqa: E402
-import re  # noqa: E402
-import shutil  # noqa: E402
-from datetime import date, datetime  # Pour le nom du fichier sauvegardé  # noqa: E402
-from os import listdir  # noqa: E402
-from os.path import isfile  # noqa: E402
-from typing import Tuple, cast  # noqa: E402
+import argparse
+import json
+import re
+import shutil
+from datetime import date, datetime  # Pour le nom du fichier sauvegardé
+from os import listdir
+from os.path import isfile
+from typing import Tuple, cast
 
-import pandas as pd  # noqa: E402
-import requests  # noqa: E402
-from bs4 import BeautifulSoup  # noqa: E402
-from django.conf import settings  # noqa: E402
-from django.core.mail import get_connection, send_mail  # noqa: E402
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from django.conf import settings
+from django.core.mail import get_connection, send_mail
 
-from core.models import GenericCertificate  # noqa: E402
-from core.utils import bulk_update_or_create  # noqa: E402
+from core.models import GenericCertificate
 
 ISCC_DATA_URL = "https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=2"
 ISCC_CERT_PAGE = "https://www.iscc-system.org/certificates/all-certificates/"
@@ -46,16 +45,16 @@ ISCC_STATUS = [
 
 
 def get_params(
-    start: int = 0, 
-    length: int = PAGELENGTH, 
-    wdtNonce: str = None, 
+    start: int = 0,
+    length: int = PAGELENGTH,
+    wdtNonce: str = None,
     status: str = GenericCertificate.VALID
 ):
     return {
-        "start": start, 
+        "start": start,
         "length": length,
 
-        "draw": 1, 
+        "draw": 1,
         "wdtNonce": wdtNonce,
 
         # filter by status
@@ -64,7 +63,7 @@ def get_params(
 
         # sort by most recent valid_from column
         "columns[8][orderable]": "true",
-        "order[0][column]":	"8", 
+        "order[0][column]":	"8",
         "order[0][dir]": "desc",
     }
 
@@ -104,7 +103,7 @@ def download_iscc_certificates(test: bool, latest: bool, status: str) -> None:
     # Sauvegarde
     filename = "%s/Certificates_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), str(date.today()))
     pd.DataFrame.to_csv(cleaned_data, filename, index=False)
-    
+
     ## Comparaison pour extraire les doublons
     # 1) Création d'un historique
     files = [f for f in listdir(DESTINATION_FOLDER) if isfile("%s/%s" % (DESTINATION_FOLDER, f))]
@@ -310,7 +309,7 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
 
     # extraction de la balise HTML
     allData["certificate_holder"] = allData["certificate_holder"].str.replace('.*title="(.*)">.*', "\\1", regex=True)
-    
+
     scope_definitions = get_scope_abbreviations(soup)
     # Replace None/NaN with empty string before processing
     allData["scope"] = allData["scope"].fillna("")
@@ -342,20 +341,20 @@ def get_full_scope_definitions(abbreviations: str, scope_definitions: dict) -> s
 
 def get_scope_abbreviations(soup: BeautifulSoup) -> dict:
     content = soup.find(class_="wp-block-group__inner-container")
-    
+
     if not content:
         print("Warning: Could not find wp-block-group__inner-container")
         return {}
-    
+
     # Le nouveau format utilise <strong>ABBR</strong> = Definition<br/>
     # Ou parfois <strong>ABBR =</strong> Definition<br/>
     dic = {}
-    
+
     # On parcourt tous les <strong> tags
     for strong_tag in content.find_all("strong"):
         # Récupérer le contenu du <strong>
         strong_text = strong_tag.get_text(strip=True)
-        
+
         # Cas 1: Le "=" est dans le <strong> tag (ex: "FSA =")
         if "=" in strong_text:
             abbr = strong_text.replace("=", "").strip()
@@ -375,7 +374,7 @@ def get_scope_abbreviations(soup: BeautifulSoup) -> dict:
                 if len(parts) == 2:
                     definition = parts[1].strip()
                     dic[abbr] = definition
-    
+
     return dic
 
 
