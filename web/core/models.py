@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 from calendar import monthrange
+from typing import Tuple
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -1390,6 +1391,23 @@ class GenericCertificate(models.Model):
             (EXPIRED, "Expiré"),
         ],
     )
+
+    @staticmethod
+    def bulk_create_or_update(certificates: list[dict], status: str) -> Tuple[list, list]:
+        from core.utils import bulk_update_or_create  # this is imported here to avoid circular dependencies
+
+        current_date = timezone.localdate()
+
+        # udpate the `last_status_update` field only for certificates that actually changed status
+        existing_certs = GenericCertificate.objects.filter(certificate_id__in=[x["certificate_id"] for x in certificates])
+        existing_certs.exclude(status=status).update(last_status_update=current_date)
+
+        return bulk_update_or_create(
+            GenericCertificate,
+            "certificate_id",
+            certificates,
+            defaults={"last_status_update": current_date},  # only set the `last_status_update` column on new rows
+        )
 
     class Meta:
         db_table = "carbure_certificates"

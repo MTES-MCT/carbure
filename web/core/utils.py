@@ -30,7 +30,7 @@ def normalize_string(input_str: str):
 @transaction.atomic
 def bulk_update_or_create(Model, id_field, rows, batch=1000, defaults=None):
     if len(rows) == 0:
-        return
+        return [], []
 
     paginator = Paginator(rows, batch)
 
