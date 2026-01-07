@@ -29,7 +29,7 @@ def normalize_string(input_str: str):
 
 
 @transaction.atomic
-def bulk_update_or_create(Model, id_field, rows, batch=1000):
+def bulk_update_or_create(Model, id_field, rows, batch=1000, defaults=None):
     if len(rows) == 0:
         return
 
@@ -64,7 +64,8 @@ def bulk_update_or_create(Model, id_field, rows, batch=1000):
                 existing_objects.append(existing)
             else:
                 # create a new model instance and save it to bulk_create later
-                new = Model(**row)
+                props = {**(defaults or {}), **row}
+                new = Model(**props)
                 new_objects.append(new)
 
         Model.objects.bulk_update(existing_objects, update_keys)
