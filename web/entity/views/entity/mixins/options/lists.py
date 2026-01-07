@@ -38,10 +38,10 @@ class EntityListActionMixin:
     )
     def list(self, request):
         entity_id = self.request.query_params.get("entity_id")
-        entity = Entity.objects.get(id=entity_id)
+        entity = Entity.objects.prefetch_related("externaladminrights_set").get(id=entity_id)
         q = request.query_params.get("q", None)
         has_requests = request.query_params.get("has_requests", None)
-        entities = Entity.objects.all().order_by("name")
+        entities = Entity.objects.all().order_by("name").prefetch_related("registered_country", "externaladminrights_set")
 
         filter_condition = Q()
 
@@ -129,7 +129,7 @@ class EntityListActionMixin:
                 certificates=Count("entitycertificate", distinct=True),
                 certificates_pending=Count(
                     "entitycertificate",
-                    filter=Q(entitycertificate__checked_by_admin=False),
+                    filter=Q(entitycertificate__checked_by_admin=False, entitycertificate__rejected_by_admin=False),
                     distinct=True,
                 ),
                 double_counting=Count(
