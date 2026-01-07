@@ -306,7 +306,6 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
         "certificate_report",
         "audit_report",
         "_",
-        "__",
     ]
 
     # extraction de la balise HTML
