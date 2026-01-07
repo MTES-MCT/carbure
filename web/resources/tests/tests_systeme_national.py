@@ -6,7 +6,7 @@ from matplotlib.dates import relativedelta
 
 from core.models import Entity, GenericCertificate
 from core.tests_utils import setup_current_user
-from resources.factories.generic_certificate import GenericCertificateFactory
+from transactions.factories.certificate import GenericCertificateFactory
 
 
 class SystemeNationalTest(TestCase):

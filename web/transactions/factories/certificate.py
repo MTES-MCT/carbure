@@ -1,4 +1,5 @@
 import factory
+from django.utils import timezone
 from factory import fuzzy
 from matplotlib.dates import relativedelta
 
@@ -21,6 +22,8 @@ class GenericCertificateFactory(factory.django.DjangoModelFactory):
     scope = '"SCOPE_TEST"'
     input = None
     output = None
+    last_status_update = timezone.localdate()
+    status = GenericCertificate.VALID
 
 
 class EntityCertificateFactory(factory.django.DjangoModelFactory):
