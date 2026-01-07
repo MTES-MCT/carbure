@@ -24,6 +24,7 @@ from core.utils import bulk_update_or_create  # noqa: E402
 
 DESTINATION_FOLDER = "/tmp"
 
+DBS_URL = "https://www.2bsvs.org/fr/certificats-bloc-parent"
 DBS_VALID_URL = "https://www.2bsvs.org/fr/certificats-bloc-parent/certificats-valides/"
 DBS_INVALID_URL = "https://www.2bsvs.org/fr/certificats-bloc-parent/certificats-retires/"
 
@@ -33,42 +34,53 @@ DBS_ADDRESS_KEY = "Adresse"
 DBS_COUNTRY_KEY = "Pays"
 DBS_VALID_FROM_KEY = "Date de début de validité du certificat"
 DBS_VALID_UNTIL_KEY = "Date de fin de validité du certificat"
+DBS_WITHDRAWAL_DATE_KEY = "Date de retrait du certificat"
+DBS_SUSPENSION_DATE_KEY = "Date de suspension du certificat"
 DBS_TYPE_KEY = "Type d'activité"
 
+DBS_STATUS = {
+    GenericCertificate.VALID: f"{DBS_URL}/certificats-valides/",
+    GenericCertificate.WITHDRAWN: f"{DBS_URL}/certificats-retires/",
+    GenericCertificate.SUSPENDED: f"{DBS_URL}/certificats-suspendus/",
+    GenericCertificate.TERMINATED: f"{DBS_URL}/certificats-resilies/",
+}
+
 def update_2bs_certificates(email: bool = False) -> None:
-    # download certificates from 2bs website
-    download_certificates(DBS_VALID_URL)
-    download_certificates(DBS_INVALID_URL, valid=False)
-    # save certificates to database
-    nb_valid_certificates, new_valids = save_2bs_certificates(valid=True)
-    nb_invalid_certificates, new_invalids = save_2bs_certificates(valid=False)
+    nb_valid_certificates = 0
+    nb_invalid_certificates = 0
+    new_valids = []
+    new_invalids = []
+
+    for status, url in DBS_STATUS.items():
+        download_certificates(url, status)
+        count, new = save_2bs_certificates(status)
+        if status == GenericCertificate.VALID:
+            nb_valid_certificates += count
+            new_valids += new
+        else:
+            nb_invalid_certificates += count
+            new_invalids += new
+
     # send email summary
     send_email_summary(nb_valid_certificates, nb_invalid_certificates, new_valids, new_invalids, email)
 
 
-def download_certificates(url: str, valid: bool = True) -> None:
+def download_certificates(url: str, status: str) -> None:
     html_content = requests.get(url).text.replace("<br/>", " ").replace("<br />", " ")
     soup = BeautifulSoup(html_content, "lxml")
     table = soup.find_all("table")
     html_io = StringIO(str(table))
     df = pd.read_html(html_io)[0]
     df = df[~df[DBS_NUMBER_KEY].isnull()]  # Pour une raison inconnue, la ligne de coordonnées est dupliquée
-    if valid:
-        pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
-    else:
-        pd.DataFrame.to_csv(df, "%s/Certificates2BS_invalid_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
+    pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), str(date.today())), index=False)
 
 
-def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
+def save_2bs_certificates(status: str) -> Tuple[int, list]:
     today = date.today()
     certificates = []
-    if valid:
-        filename = "%s/Certificates2BS_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
-    else:
-        filename = "%s/Certificates2BS_invalid_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
+    filename = "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status, today.strftime("%Y-%m-%d"))
     csvfile = open(filename, "r")
     reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
-    status = GenericCertificate.VALID if valid else GenericCertificate.WITHDRAWN
     i = 0
     for row in reader:
         i += 1
@@ -81,10 +93,19 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
             valid_from = date(year=1970, month=1, day=1)
 
         try:
-            vu = row[DBS_VALID_UNTIL_KEY].split("/")
-            valid_until = date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
+            if status in [GenericCertificate.VALID, GenericCertificate.TERMINATED]:
+                vu = row[DBS_VALID_UNTIL_KEY].split("/")
+                valid_until = date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
+            elif status == GenericCertificate.WITHDRAWN:
+                vu = row[DBS_WITHDRAWAL_DATE_KEY].split("/")
+                valid_until = date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
+            elif status == GenericCertificate.SUSPENDED:
+                vu = row[DBS_SUSPENSION_DATE_KEY].split("/")
+                valid_until = date(year=int(vu[2]), month=int(vu[1]), day=int(vu[0]))
         except Exception:
             valid_until = date(year=1970, month=1, day=1)
+
+        
 
         certificates.append(
             {
