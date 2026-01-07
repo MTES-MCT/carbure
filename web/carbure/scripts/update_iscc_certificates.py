@@ -5,6 +5,7 @@
 import os
 
 import django
+from django.utils import timezone
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -36,30 +37,72 @@ HEADERS = {
 PAGELENGTH = 3000
 
 
+ISCC_STATUS = [
+    GenericCertificate.VALID,
+    GenericCertificate.SUSPENDED,
+    GenericCertificate.WITHDRAWN,
+    GenericCertificate.TERMINATED
+]
+
+
+def get_params(
+    start: int = 0, 
+    length: int = PAGELENGTH, 
+    wdtNonce: str = None, 
+    status: str = GenericCertificate.VALID
+):
+    return {
+        "start": start, 
+        "length": length,
+
+        "draw": 1, 
+        "wdtNonce": wdtNonce,
+
+        # filter by status
+        "columns[0][searchable]": "true",
+        "columns[0][search][value]": status.lower(),
+
+        # sort by most recent valid_from column
+        "columns[8][orderable]": "true",
+        "order[0][column]":	"8", 
+        "order[0][dir]": "desc",
+    }
+
+
 # Download ISCC certificates and save them to the database
 def update_iscc_certificates(email: bool = False, test: bool = False, latest: bool = False, batch: int = 1000) -> None:
-    download_iscc_certificates(test, latest)
-    i, new = save_iscc_certificates(email, batch)
+    i = 0
+    new = []
+
+    for status in ISCC_STATUS:
+        print(f">>> Checking certificates with status {status}")
+        download_iscc_certificates(test, latest, status)
+        status_i, status_new = save_iscc_certificates(email, batch, status)
+        i += status_i
+        new += status_new
+        print()
+
     send_email_summary(i, new, email)
 
 
-def download_iscc_certificates(test: bool, latest: bool) -> None:
+def download_iscc_certificates(test: bool, latest: bool, status: str) -> None:
     # On récupère le wdtNonce du jour
     nonce, soup = get_wdtNonce()
 
     # Nombre de requêtes
-    r = requests.post(ISCC_DATA_URL, data={"length": 1, "start": 0, "draw": 1, "wdtNonce": nonce}, headers=HEADERS)
-    recordsTotal = 3 if test else int(json.loads(r.content.decode("utf-8"))["recordsTotal"])
+    params = get_params(length=1, wdtNonce=nonce, status=status)
+    r = requests.post(ISCC_DATA_URL, data=params, headers=HEADERS)
+    recordsTotal = 3 if test else int(json.loads(r.content.decode("utf-8"))["recordsFiltered"])
     print(f"> Found {recordsTotal} ISCC certificates")
 
     # Récupération du contenu
-    data = fetch_certificate_data(nonce, recordsTotal, test, latest)
+    data = fetch_certificate_data(nonce, recordsTotal, test, latest, status)
 
     # On retire les balises html pour ne garder que le contenu
     cleaned_data = clean_certificate_data(data, soup)
 
     # Sauvegarde
-    filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, str(date.today()))
+    filename = "%s/Certificates_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), str(date.today()))
     pd.DataFrame.to_csv(cleaned_data, filename, index=False)
     
     ## Comparaison pour extraire les doublons
@@ -97,10 +140,10 @@ def download_iscc_certificates(test: bool, latest: bool) -> None:
     pd.DataFrame.to_csv(dup, "%s/Duplicates_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
 
 
-def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
+def save_iscc_certificates(email: bool, batch: int, status: str) -> Tuple[int, list]:
     today = date.today()
     certificates = []
-    filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
+    filename = "%s/Certificates_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), today.strftime("%Y-%m-%d"))
     df = pd.read_csv(filename, sep=",", quotechar='"', lineterminator="\n")
 
     df.fillna("", inplace=True)
@@ -112,8 +155,8 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
             elif "-" in row["valid_from"]:
                 valid_from = datetime.strptime(row["valid_from"], "%Y-%m-%d").date()
             else:
-                print("* Unrecognized date format [%s]" % (row["valid_from"]))
-                print(row)
+                # print("* Unrecognized date format [%s]" % (row["valid_from"]))
+                # print(row)
                 valid_from = date(year=1970, month=1, day=1)
         except Exception:
             valid_from = date(year=1970, month=1, day=1)
@@ -125,8 +168,8 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
             elif "-" in row["valid_until"]:
                 valid_until = datetime.strptime(row["valid_until"], "%Y-%m-%d").date()
             else:
-                print("* Unrecognized date format [%s]" % (row["valid_until"]))
-                print(row)
+                # print("* Unrecognized date format [%s]" % (row["valid_until"]))
+                # print(row)
                 valid_until = date(year=1970, month=1, day=1)
         except Exception:
             valid_until = date(year=1970, month=1, day=1)
@@ -149,10 +192,23 @@ def save_iscc_certificates(email: bool, batch: int) -> Tuple[int, list]:
                 "download_link": row["certificate_report"],
                 "input": {"raw_material": row["raw_material"]},
                 "output": "",
+                "status": status
             }
         )
 
-    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates, batch)
+    current_date = timezone.localdate()
+
+    # udpate the `last_status_update` field for certificates that actually changed status
+    existing_certs = GenericCertificate.objects.filter(certificate_id__in=[x["certificate_id"] for x in certificates])
+    existing_certs.exclude(status=status).update(last_status_update=current_date)
+
+    existing, new = bulk_update_or_create(
+        GenericCertificate, 
+        "certificate_id", 
+        certificates, 
+        batch,
+        defaults={"last_status_update": current_date} # only set the `last_status_update` column on new rows
+    )
 
     print("[ISCC Certificates] %d updated, %d created" % (len(existing), len(new)))
     return len(certificates), new
@@ -200,13 +256,13 @@ def get_wdtNonce() -> str:
     return wdtNonce, soup
 
 
-def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bool) -> list:
+def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bool, status: str) -> list:
     # On parcourt le tableau de résultats, en incrémentant de 1000 à chaque fois.
     # On stocke le tableau dans une liste de tableau
     allData: list = []
     start = 0
     if latest:
-        start = recordsTotal - PAGELENGTH
+        start = max(0, recordsTotal - PAGELENGTH)
     if test:
         recordsTotal = PAGELENGTH
     page = 1
@@ -214,8 +270,8 @@ def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bo
     print(f"> Loading {pages_total} pages of {PAGELENGTH} items")
     while start < recordsTotal:
         print(f"> From page {page} at index {start}")
-        data = {"length": PAGELENGTH, "start": start, "draw": 1, "wdtNonce": nonce}
-        r = requests.post(ISCC_DATA_URL, data=data, headers=HEADERS)
+        params = get_params(start=start, length=PAGELENGTH, wdtNonce=nonce, status=status)
+        r = requests.post(ISCC_DATA_URL, data=params, headers=HEADERS)
         certificates: dict = json.loads(r.content.decode("utf-8"))
         dataframe = pd.DataFrame.from_dict(certificates["data"])
         allData.append(dataframe)
@@ -260,7 +316,8 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
         "map",
         "certificate_report",
         "audit_report",
-        "unknown_column",
+        "_",
+        "__",
     ]
 
     # extraction de la balise HTML
