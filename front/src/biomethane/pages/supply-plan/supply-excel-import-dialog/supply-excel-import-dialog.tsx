@@ -122,6 +122,10 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
             }
             value={value.supplyPlanFile || undefined}
             onChange={handleFileChange}
+            state="info"
+            stateRelatedMessage={t(
+              "Les intrants déjà importés seront écrasés."
+            )}
           />
 
           {importErrors && importErrors.validation_errors.length > 0 && (
