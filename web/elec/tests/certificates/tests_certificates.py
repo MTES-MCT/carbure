@@ -40,6 +40,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             operating_unit="XYZ",
             energy_amount=4000,
             remaining_energy_amount=0,
+            source=ElecProvisionCertificate.METER_READINGS,
         )
         self.prov2 = ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
@@ -48,6 +49,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             operating_unit="ABCD",
             energy_amount=1000,
             remaining_energy_amount=500,
+            source=ElecProvisionCertificate.METER_READINGS,
         )
         self.prov3 = ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
@@ -56,6 +58,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             operating_unit="DCBA",
             energy_amount=2000,
             remaining_energy_amount=2000,
+            source=ElecProvisionCertificate.METER_READINGS,
         )
 
     def test_transfer_provision_certificate_pile_poil(self):
@@ -174,7 +177,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
                 "cpo": [self.cpo.name],
                 "operating_unit": ["ABCD", "DCBA", "XYZ"],
                 "quarter": [1, 2, 4],
-                "source": [],
+                "source": [ElecProvisionCertificate.METER_READINGS],
                 "year": [2022, 2023],
             },
             entity=self.cpo,

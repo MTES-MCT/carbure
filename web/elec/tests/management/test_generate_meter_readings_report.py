@@ -41,7 +41,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         )
         self.meter = ElecMeter.objects.create(
             mid_certificate=f"MID-{self.cpo.id}-001",
-            initial_index=100,
+            initial_index=1000,
             initial_index_date=date(2023, 1, 1),
             charge_point=self.charge_point,
         )
@@ -98,8 +98,8 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         charge_point.save(update_fields=["current_meter"])
         return meter
 
-    def run_command(self, year=None):
-        report = call_command("generate_meter_readings_report", year=year, stdout=StringIO())
+    def run_command(self, year=None, apply_readjustments=False):
+        report = call_command("generate_meter_readings_report", year=year, apply=apply_readjustments, stdout=StringIO())
         return json.loads(report)
 
     def test_report_returns_zero_delta_when_values_are_correct(self):
@@ -107,18 +107,18 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         self.setup_meter_reading(
             quarter=1,
             year=2023,
-            reading_energy=150,
+            reading_energy=1500,
             reading_date=date(2023, 3, 1),
-            certificate_energy=(150 - 100) * ENR_RATIO / 1000,
+            certificate_energy=(1500 - 1000) * ENR_RATIO / 1000,
         )
 
         # Q2
         self.setup_meter_reading(
             quarter=2,
             year=2023,
-            reading_energy=210,
+            reading_energy=2100,
             reading_date=date(2023, 7, 1),
-            certificate_energy=(210 - 150) * ENR_RATIO / 1000,
+            certificate_energy=(2100 - 1500) * ENR_RATIO / 1000,
         )
 
         self.assertEqual(self.run_command(), {})
@@ -128,69 +128,68 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         self.setup_meter_reading(
             quarter=1,
             year=2023,
-            reading_energy=160,
+            reading_energy=1600,
             reading_date=date(2023, 3, 1),
-            certificate_energy=60 * ENR_RATIO / 1000,
+            certificate_energy=600 * ENR_RATIO / 1000,
         )
 
         # Q2, change meter, but save correct deltas
         meter_2 = self.create_new_meter_for_charge_point(
             charge_point=self.charge_point,
             meter_suffix="replacement-1",
-            initial_index=1000,
+            initial_index=2000,
             initial_index_date=date(2023, 6, 1),
         )
         self.setup_meter_reading(
             meter=meter_2,
             quarter=2,
             year=2023,
-            reading_energy=1050,
+            reading_energy=2500,
             reading_date=date(2023, 7, 1),
-            certificate_energy=50 * ENR_RATIO / 1000,
+            certificate_energy=500 * ENR_RATIO / 1000,
         )
 
         # Q3, change meter, but save incorrect delta
         meter_3 = self.create_new_meter_for_charge_point(
             charge_point=self.charge_point,
             meter_suffix="replacement-1",
-            initial_index=10,
+            initial_index=100,
             initial_index_date=date(2023, 9, 1),
         )
         self.setup_meter_reading(
             meter=meter_3,
             quarter=3,
             year=2023,
-            reading_energy=100,
+            reading_energy=1000,
             reading_date=date(2023, 10, 1),
-            certificate_energy=150 * ENR_RATIO / 1000,
+            certificate_energy=1500 * ENR_RATIO / 1000,
         )
 
+        expected_readjustment_energy = (1500 - 900) * ENR_RATIO
+
         self.assertEqual(
-            self.run_command(),
-            {"CPO": (150 - 90) * ENR_RATIO},
+            self.run_command(apply_readjustments=True),
+            {"CPO": expected_readjustment_energy},
         )
+        # Check that readjustments where created in database
+        readjustment = ElecCertificateReadjustment.objects.filter(
+            cpo=self.cpo, error_source=ElecCertificateReadjustment.METER_READINGS
+        ).get()
+
+        self.assertEqual(readjustment.energy_amount, expected_readjustment_energy / 1000)
 
     def test_report_takes_already_defined_readjustments_into_account(self):
         self.setup_meter_reading(
             quarter=1,
             year=2023,
-            reading_energy=150,
+            reading_energy=1500,
             reading_date=date(2023, 3, 1),
-            certificate_energy=90 * ENR_RATIO / 1000,  # should be 50 (150 - 100)
+            certificate_energy=900 * ENR_RATIO / 1000,  # should be 500 (1500 - 1000)
         )
 
         self.assertEqual(
-            self.run_command(),
-            {"CPO": 40 * ENR_RATIO},
-        )
-
-        ElecCertificateReadjustment.objects.create(
-            cpo=self.cpo, energy_amount=40 * ENR_RATIO / 1000, error_source=ElecCertificateReadjustment.METER_READINGS
-        )
-        ElecCertificateReadjustment.objects.create(
-            cpo=self.cpo,
-            energy_amount=1000,
-            error_source=ElecCertificateReadjustment.QUALICHARGE,  # this should be ignored
+            self.run_command(apply_readjustments=True),
+            {"CPO": 400 * ENR_RATIO},
         )
 
         self.assertEqual(
@@ -202,22 +201,22 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         self.setup_meter_reading(
             quarter=1,
             year=2023,
-            reading_energy=150,
+            reading_energy=15000,
             reading_date=date(2023, 3, 1),
-            certificate_energy=40 * ENR_RATIO / 1000,  # should be 50 (150 - 100)
+            certificate_energy=4000 * ENR_RATIO / 1000,  # should be 14000 (15000 - 1000)
         )
 
         self.assertEqual(
             self.run_command(),
-            {"CPO": -10 * ENR_RATIO},
+            {"CPO": -10000 * ENR_RATIO},
         )
 
         ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
             quarter=1,
             year=2023,
-            energy_amount=10 * ENR_RATIO / 1000,
-            remaining_energy_amount=10 * ENR_RATIO / 1000,
+            energy_amount=10000 * ENR_RATIO / 1000,
+            remaining_energy_amount=10000 * ENR_RATIO / 1000,
             source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION,
         )
 

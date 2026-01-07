@@ -110,6 +110,8 @@ export const SendReadjustmentCertificatesDialog = ({
           required
           label={t("Quantité d'énergie (MWh)")}
           max={max}
+          min={0.01}
+          step={0.01}
           addon={
             <Button onClick={() => form.setField("energy_amount", max)}>
               {t("Max")}

@@ -14,10 +14,11 @@ from core.notifications import notify_elec_transfer_certificate
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
 from elec.services.readjustment_balance import get_readjustment_balance
+from tiruert.serializers.fields import RoundedFloatField
 
 
 class ElecTransferSerializer(serializers.Serializer):
-    energy_amount = serializers.FloatField()
+    energy_amount = RoundedFloatField(min_value=0.01, decimal_places=2)
     client = serializers.PrimaryKeyRelatedField(
         queryset=Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True), required=False
     )
@@ -40,7 +41,7 @@ class TransferActionMixin:
         # Parcourir les certificat de provision et vider au fur et à mesure tant que on a pas atteint la somme
 
         energy_pulled = 0
-        energy_required = round(transfer_form.validated_data["energy_amount"], 3)
+        energy_required = transfer_form.validated_data["energy_amount"]
         client = transfer_form.validated_data.get("client")
         is_readjustment = transfer_form.validated_data.get("is_readjustment", False)
 
@@ -58,8 +59,15 @@ class TransferActionMixin:
             .order_by("year", "quarter")
         )
 
-        available_energy_dict = available_provision_certificates.aggregate(Sum("remaining_energy_amount"))
-        available_energy = available_energy_dict["remaining_energy_amount__sum"] or 0
+        total_provision = (
+            ElecProvisionCertificate.objects.filter(cpo=entity).aggregate(Sum("energy_amount")).get("energy_amount__sum")
+            or 0
+        )
+        total_transfer = (
+            ElecTransferCertificate.objects.filter(supplier=entity).aggregate(Sum("energy_amount")).get("energy_amount__sum")
+            or 0
+        )
+        available_energy = round(total_provision - total_transfer, 2)
 
         if energy_required > available_energy:
             raise ParseError("NOT_ENOUGH_ENERGY")
