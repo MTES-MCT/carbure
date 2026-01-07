@@ -59,6 +59,7 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
     data = data[1:]
     df = pd.DataFrame(data, columns=column_names)
     df.fillna("", inplace=True)
+    status = GenericCertificate.VALID
     i = 0
     for row in df.iterrows():
         i += 1
@@ -97,10 +98,12 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
                 "scope": "%s" % (cert["Type"]),
                 "input": {"Type of biomass": cert["Type of biomass"]},
                 "output": None,
+                "status": status
             }
         )
         
-    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
+    existing, new = GenericCertificate.bulk_create_or_update(certificates, status)
+
     print("[REDcert Certificates] %d updated, %d created" % (len(existing), len(new)))
     return i, new, invalidated
 

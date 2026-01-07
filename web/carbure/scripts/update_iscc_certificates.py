@@ -155,8 +155,8 @@ def save_iscc_certificates(email: bool, batch: int, status: str) -> Tuple[int, l
             elif "-" in row["valid_from"]:
                 valid_from = datetime.strptime(row["valid_from"], "%Y-%m-%d").date()
             else:
-                # print("* Unrecognized date format [%s]" % (row["valid_from"]))
-                # print(row)
+                print("* Unrecognized date format [%s]" % (row["valid_from"]))
+                print(row)
                 valid_from = date(year=1970, month=1, day=1)
         except Exception:
             valid_from = date(year=1970, month=1, day=1)
@@ -168,8 +168,8 @@ def save_iscc_certificates(email: bool, batch: int, status: str) -> Tuple[int, l
             elif "-" in row["valid_until"]:
                 valid_until = datetime.strptime(row["valid_until"], "%Y-%m-%d").date()
             else:
-                # print("* Unrecognized date format [%s]" % (row["valid_until"]))
-                # print(row)
+                print("* Unrecognized date format [%s]" % (row["valid_until"]))
+                print(row)
                 valid_until = date(year=1970, month=1, day=1)
         except Exception:
             valid_until = date(year=1970, month=1, day=1)
@@ -196,19 +196,7 @@ def save_iscc_certificates(email: bool, batch: int, status: str) -> Tuple[int, l
             }
         )
 
-    current_date = timezone.localdate()
-
-    # udpate the `last_status_update` field for certificates that actually changed status
-    existing_certs = GenericCertificate.objects.filter(certificate_id__in=[x["certificate_id"] for x in certificates])
-    existing_certs.exclude(status=status).update(last_status_update=current_date)
-
-    existing, new = bulk_update_or_create(
-        GenericCertificate, 
-        "certificate_id", 
-        certificates, 
-        batch,
-        defaults={"last_status_update": current_date} # only set the `last_status_update` column on new rows
-    )
+    existing, new = GenericCertificate.bulk_create_or_update(certificates, status)
 
     print("[ISCC Certificates] %d updated, %d created" % (len(existing), len(new)))
     return len(certificates), new
