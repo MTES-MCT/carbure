@@ -1325,6 +1325,7 @@ class GenericCertificate(models.Model):
     status = models.CharField(
         max_length=16,
         choices=[
+            (PENDING, "En attente"),
             (VALID, "Valide"),
             (SUSPENDED, "Suspendu"),
             (WITHDRAWN, "Retiré"),
