@@ -68,6 +68,7 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
         filename = "%s/Certificates2BS_invalid_%s.csv" % (DESTINATION_FOLDER, today.strftime("%Y-%m-%d"))
     csvfile = open(filename, "r")
     reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
+    status = GenericCertificate.VALID if valid else GenericCertificate.WITHDRAWN
     i = 0
     for row in reader:
         i += 1
@@ -99,9 +100,12 @@ def save_2bs_certificates(valid: bool = True) -> Tuple[int, list]:
                 "scope": "%s" % (row[DBS_TYPE_KEY]),
                 "input": None,
                 "output": None,
+                "status": status
             }
         )
-    existing, new = bulk_update_or_create(GenericCertificate, "certificate_id", certificates)
+
+    existing, new = GenericCertificate.bulk_create_or_update(certificates, status)
+    
     print("[2BS Certificates] %d updated, %d created" % (len(existing), len(new)))
     csvfile.close()
     return i, new
