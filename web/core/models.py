@@ -1371,12 +1371,12 @@ class GenericCertificate(models.Model):
     input = models.JSONField(null=True)  # TODO check if we need this
     output = models.JSONField(null=True)
 
-    PENDING = "PENDING"  # certificat pas encore valide.
-    VALID = "VALID"  # certificat valide.
-    SUSPENDED = "SUSPENDED"  # certificat temporairement invalidé (non‑conformités ou à la demande de l’opérateur).
-    WITHDRAWN = "WITHDRAWN"  # certificat annulé de façon permanente par le schéma.
-    TERMINATED = "TERMINATED"  # certification volontairement arrêtée alors qu’elle était encore valide.
-    EXPIRED = "EXPIRED"  # certificat arrivé à échéance, donc inutilisable.
+    PENDING = "PENDING"  # certificat pas encore valide
+    VALID = "VALID"  # certificat valide
+    SUSPENDED = "SUSPENDED"  # certificat temporairement invalidé
+    WITHDRAWN = "WITHDRAWN"  # certificat annulé de façon permanente par le schéma volontaire
+    TERMINATED = "TERMINATED"  # certificat volontairement arrêté par l'opérateur économique
+    EXPIRED = "EXPIRED"  # certificat arrivé à échéance
 
     last_status_update = models.DateField()
 
