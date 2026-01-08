@@ -4325,8 +4325,6 @@ export interface components {
             operating_unit: string;
             /** Format: double */
             energy_amount: number;
-            /** Format: double */
-            remaining_energy_amount: number;
             /** Format: date-time */
             readonly created_at: string | null;
         };
@@ -5212,7 +5210,6 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["ElecProvisionCertificate"][];
-            available_energy?: number;
         };
         PaginatedElecProvisionCertificateQualichargeResponseList: {
             /** @example 123 */
@@ -8574,8 +8571,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        provision_certificates_available: number;
-                        provision_certificates_history: number;
+                        provision_certificates: number;
                         transfer_certificates_pending: number;
                         transfer_certificates_accepted: number;
                         transfer_certificates_rejected: number;
@@ -8619,8 +8615,6 @@ export interface operations {
                  *     * `-quarter` - Quarter (décroissant)
                  *     * `energy_amount` - Energy amount
                  *     * `-energy_amount` - Energy amount (décroissant)
-                 *     * `remaining_energy_amount` - Remaining energy amount
-                 *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
                  *     * `-cpo` - Cpo (décroissant)
                  *     * `operating_unit` - Operating unit
@@ -8647,7 +8641,6 @@ export interface operations {
                  *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
                  *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
                 source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
-                status?: string;
                 year?: number;
             };
             header?: never;
@@ -8920,8 +8913,6 @@ export interface operations {
                  *     * `-quarter` - Quarter (décroissant)
                  *     * `energy_amount` - Energy amount
                  *     * `-energy_amount` - Energy amount (décroissant)
-                 *     * `remaining_energy_amount` - Remaining energy amount
-                 *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
                  *     * `-cpo` - Cpo (décroissant)
                  *     * `operating_unit` - Operating unit
@@ -8944,7 +8935,6 @@ export interface operations {
                  *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
                  *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
                 source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
-                status?: string;
                 year?: number;
             };
             header?: never;
@@ -13150,13 +13140,11 @@ export enum PathsApiElecProvisionCertificatesGetParametersQueryOrder_by {
     ValueMinusenergy_amount = "-energy_amount",
     ValueMinusoperating_unit = "-operating_unit",
     ValueMinusquarter = "-quarter",
-    ValueMinusremaining_energy_amount = "-remaining_energy_amount",
     ValueMinussource = "-source",
     cpo = "cpo",
     energy_amount = "energy_amount",
     operating_unit = "operating_unit",
     quarter = "quarter",
-    remaining_energy_amount = "remaining_energy_amount",
     source = "source"
 }
 export enum PathsApiElecProvisionCertificatesGetParametersQueryQuarter {

@@ -3733,9 +3733,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  provision_certificates_available:
-                    type: integer
-                  provision_certificates_history:
+                  provision_certificates:
                     type: integer
                   transfer_certificates_pending:
                     type: integer
@@ -3744,8 +3742,7 @@ paths:
                   transfer_certificates_rejected:
                     type: integer
                 required:
-                  - provision_certificates_available
-                  - provision_certificates_history
+                  - provision_certificates
                   - transfer_certificates_pending
                   - transfer_certificates_accepted
                   - transfer_certificates_rejected
@@ -3827,13 +3824,11 @@ paths:
                 - -energy_amount
                 - -operating_unit
                 - -quarter
-                - -remaining_energy_amount
                 - -source
                 - cpo
                 - energy_amount
                 - operating_unit
                 - quarter
-                - remaining_energy_amount
                 - source
           description: |-
             Ordre
@@ -3842,8 +3837,6 @@ paths:
             * `-quarter` - Quarter (décroissant)
             * `energy_amount` - Energy amount
             * `-energy_amount` - Energy amount (décroissant)
-            * `remaining_energy_amount` - Remaining energy amount
-            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
             * `-cpo` - Cpo (décroissant)
             * `operating_unit` - Operating unit
@@ -3914,10 +3907,6 @@ paths:
             * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
-        - in: query
-          name: status
-          schema:
-            type: string
         - in: query
           name: year
           schema:
@@ -4410,13 +4399,11 @@ paths:
                 - -energy_amount
                 - -operating_unit
                 - -quarter
-                - -remaining_energy_amount
                 - -source
                 - cpo
                 - energy_amount
                 - operating_unit
                 - quarter
-                - remaining_energy_amount
                 - source
           description: |-
             Ordre
@@ -4425,8 +4412,6 @@ paths:
             * `-quarter` - Quarter (décroissant)
             * `energy_amount` - Energy amount
             * `-energy_amount` - Energy amount (décroissant)
-            * `remaining_energy_amount` - Remaining energy amount
-            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
             * `-cpo` - Cpo (décroissant)
             * `operating_unit` - Operating unit
@@ -4485,10 +4470,6 @@ paths:
             * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
-        - in: query
-          name: status
-          schema:
-            type: string
         - in: query
           name: year
           schema:
@@ -14821,9 +14802,6 @@ components:
         energy_amount:
           type: number
           format: double
-        remaining_energy_amount:
-          type: number
-          format: double
         created_at:
           type: string
           format: date-time
@@ -14836,7 +14814,6 @@ components:
         - id
         - operating_unit
         - quarter
-        - remaining_energy_amount
         - source
         - year
     ElecProvisionCertificateQualicharge:
@@ -16878,8 +16855,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ElecProvisionCertificate"
-        available_energy:
-          type: number
     PaginatedElecProvisionCertificateQualichargeResponseList:
       type: object
       required:
