@@ -76,14 +76,6 @@ export const ProvisionCertificateDetails = () => {
               ExtendedUnit.MWh
             )}
           />
-          <TextInput
-            readOnly
-            label={t("Énergie disponible pour cession")}
-            value={formatUnit(
-              provisionCert?.remaining_energy_amount ?? 0,
-              ExtendedUnit.MWh
-            )}
-          />
         </Box>
 
         {provisionResponse.loading && <LoaderOverlay />}

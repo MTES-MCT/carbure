@@ -17,8 +17,7 @@ export {
 }
 
 export type ElecCertificateSnapshot = {
-  provision_certificates_available: number
-  provision_certificates_history: number
+  provision_certificates: number
   transfer_certificates_pending: number
   transfer_certificates_accepted: number
   transfer_certificates_rejected: number
