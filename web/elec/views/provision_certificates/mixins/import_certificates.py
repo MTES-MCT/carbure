@@ -48,7 +48,6 @@ class ImportActionMixin:
                 operating_unit=record["operating_unit"],
                 energy_amount=record["energy_amount"],
                 source=ElecProvisionCertificate.MANUAL,
-                remaining_energy_amount=record["energy_amount"],
             )
             certificate_model_instances.append(certif)
 

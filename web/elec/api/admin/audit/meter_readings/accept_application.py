@@ -73,7 +73,6 @@ def accept_application(request: HttpRequest):
             operating_unit=group["operating_unit"],
             energy_amount=group["renewable_energy"] / 1000,
             source=ElecProvisionCertificate.METER_READINGS,
-            remaining_energy_amount=group["renewable_energy"] / 1000,
         )
         certificate_model_instances.append(certif)
     ElecProvisionCertificate.objects.bulk_create(certificate_model_instances)

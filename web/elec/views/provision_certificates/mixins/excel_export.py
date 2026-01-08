@@ -34,7 +34,6 @@ class ExcelExportActionMixin:
                         {"label": "operating_unit", "value": "operating_unit"},
                         {"label": "source", "value": "source"},
                         {"label": "energy_amount", "value": "energy_amount"},
-                        {"label": "remaining_energy_amount", "value": "remaining_energy_amount"},
                     ],
                 }
             ],

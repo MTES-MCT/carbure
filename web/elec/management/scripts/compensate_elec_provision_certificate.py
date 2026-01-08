@@ -32,7 +32,6 @@ def generate_compensate_elec_provision_certificate(last_year, percent):
                     year=last_year,
                     operating_unit="-",
                     energy_amount=delta,
-                    remaining_energy_amount=delta,
                     compensation=True,
                 )
             )

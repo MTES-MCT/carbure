@@ -23,7 +23,6 @@ class ElecProvisionCertificateAdmin(admin.ModelAdmin):
         "year",
         "operating_unit",
         "energy_amount",
-        "remaining_energy_amount",
     ]
     list_filter = [
         "cpo",
