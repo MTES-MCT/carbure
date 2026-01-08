@@ -6,7 +6,8 @@ from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransacti
 
 
 class BaseRequestResponseTest(TestCase):
-    def payload(_, request_id):
+    @staticmethod
+    def payload(request_id):
         return f"""\
 <?xml version="1.0" encoding="UTF-8"?>
 <udb:GetSourcingContactByIDResponse
