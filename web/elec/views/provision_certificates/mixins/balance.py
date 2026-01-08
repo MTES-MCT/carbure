@@ -27,12 +27,16 @@ class BalanceActionMixin:
         provisions = ElecProvisionCertificate.objects.all()
         transfers = ElecTransferCertificate.objects.all()
 
+        total_balance = 0
+        missing_readjustment = 0
+
         if entity.entity_type == Entity.CPO:
             provisions = provisions.filter(cpo=entity)
             transfers = transfers.filter(supplier=entity)
-
-        total_balance = get_certificate_balance(cpo=entity)
-        missing_readjustment = get_readjustment_balance(cpo=entity)
+            total_balance = get_certificate_balance(cpo=entity)
+            missing_readjustment = get_readjustment_balance(cpo=entity)
+        else:
+            total_balance = get_certificate_balance()
 
         return Response(
             {
