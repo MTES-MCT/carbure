@@ -46,7 +46,6 @@ class FiltersActionFactoryTest(TestCase):
             operating_unit="OU-1",
             source=ElecProvisionCertificate.MANUAL,
             energy_amount=100.0,
-            remaining_energy_amount=50.0,
         )
         ElecProvisionCertificate.objects.create(
             cpo=cls.cpo,
@@ -55,7 +54,6 @@ class FiltersActionFactoryTest(TestCase):
             operating_unit="OU-2",
             source=ElecProvisionCertificate.MANUAL,
             energy_amount=200.0,
-            remaining_energy_amount=150.0,
         )
         ElecProvisionCertificate.objects.create(
             cpo=cls.other_cpo,
@@ -64,7 +62,6 @@ class FiltersActionFactoryTest(TestCase):
             operating_unit="OU-3",
             source=ElecProvisionCertificate.METER_READINGS,
             energy_amount=300.0,
-            remaining_energy_amount=250.0,
         )
 
     def setUp(self):

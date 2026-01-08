@@ -39,7 +39,6 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             year=2022,
             operating_unit="XYZ",
             energy_amount=4000,
-            remaining_energy_amount=0,
             source=ElecProvisionCertificate.METER_READINGS,
         )
         self.prov2 = ElecProvisionCertificate.objects.create(
@@ -48,7 +47,6 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             year=2023,
             operating_unit="ABCD",
             energy_amount=1000,
-            remaining_energy_amount=500,
             source=ElecProvisionCertificate.METER_READINGS,
         )
         self.prov3 = ElecProvisionCertificate.objects.create(
@@ -57,7 +55,6 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             year=2023,
             operating_unit="DCBA",
             energy_amount=2000,
-            remaining_energy_amount=2000,
             source=ElecProvisionCertificate.METER_READINGS,
         )
 
@@ -71,13 +68,9 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             },
         )
 
-        prov1 = ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
-
-        assert prov1.remaining_energy_amount == 0
-        assert prov2.remaining_energy_amount == 0
-        assert prov3.remaining_energy_amount == 2000
+        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
         transfer_cert = ElecTransferCertificate.objects.all().first()
         assert transfer_cert.energy_amount == 500
@@ -94,13 +87,9 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             },
         )
 
-        prov1 = ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
-
-        assert prov1.remaining_energy_amount == 0
-        assert prov2.remaining_energy_amount == 0
-        assert prov3.remaining_energy_amount == 1000
+        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
         transfer_cert = ElecTransferCertificate.objects.all().first()
         assert transfer_cert.energy_amount == 1500
@@ -120,13 +109,9 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
         assert response.status_code == 400
         assert response.json()["detail"] == "NOT_ENOUGH_ENERGY"
 
-        prov1 = ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
-
-        assert prov1.remaining_energy_amount == 0
-        assert prov2.remaining_energy_amount == 500
-        assert prov3.remaining_energy_amount == 2000
+        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
         transfer_cert_count = ElecTransferCertificate.objects.count()
         assert transfer_cert_count == 0
@@ -151,13 +136,9 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
 
         assert response.status_code == 200
 
-        prov1 = ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        prov2 = ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        prov3 = ElecProvisionCertificate.objects.get(pk=self.prov3.id)
-
-        assert prov1.remaining_energy_amount == 0
-        assert prov2.remaining_energy_amount == 500
-        assert prov3.remaining_energy_amount == 2000
+        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
+        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
 
     def test_certificate_years(self):
         response = self.client.get(
@@ -316,10 +297,6 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
         self.prov1.refresh_from_db()
         self.prov2.refresh_from_db()
         self.prov3.refresh_from_db()
-
-        assert self.prov1.remaining_energy_amount == 0
-        assert self.prov2.remaining_energy_amount == 0
-        assert self.prov3.remaining_energy_amount == 2000
 
         transfer_cert = ElecTransferCertificate.objects.all().first()
         assert transfer_cert.status == ElecTransferCertificate.ACCEPTED
