@@ -74,6 +74,8 @@ export const ROUTE_URLS = {
       ADMIN: {
         SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
         DECLARATIONS: `${baseUrl}/admin/declarations`,
+        DECLARATION_DETAIL: (producer_id: number) =>
+          `${baseUrl}/admin/declarations/${producer_id}`,
         EXPORTS: `${baseUrl}/admin/exports`,
       },
     }

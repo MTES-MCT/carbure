@@ -9,6 +9,7 @@ import {
 } from "./providers/annual-declaration"
 import { useRoutes } from "common/hooks/routes"
 import { ExternalAdminPages } from "common/types"
+import { BiomethaneAdminDeclarationsPage } from "./pages/admin/declarations"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -115,7 +116,14 @@ export const BiomethaneAdminRoutes = () => {
     <Routes>
       <Route path="admin" element={<Outlet />}>
         <Route index element={<Navigate replace to="declarations" />} />
-        <Route path="declarations" element={<div>Declarations</div>} />
+        <Route
+          path="declarations"
+          element={<BiomethaneAdminDeclarationsPage />}
+        />
+        <Route
+          path="declarations/:producer_id"
+          element={<div>Declaration detail</div>}
+        />
       </Route>
     </Routes>
   )
