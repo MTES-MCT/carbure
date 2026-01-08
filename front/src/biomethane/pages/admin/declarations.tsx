@@ -7,12 +7,14 @@ import { getBiomethaneProducers } from "./api"
 import useEntity from "common/hooks/entity"
 import { useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
+import { usePrivateNavigation } from "common/layouts/navigation"
 
-export const BiomethaneAdminDeclarationsPage = () => {
+const BiomethaneAdminDeclarationsPage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
   const routes = useRoutes()
+  usePrivateNavigation(t("Déclarations par établissement"))
 
   const { result: producers } = useQuery(
     () =>
@@ -30,7 +32,9 @@ export const BiomethaneAdminDeclarationsPage = () => {
 
   const onSelectProducer = (producerId?: string) => {
     if (producerId) {
-      navigate(routes.BIOMETHANE().ADMIN.DECLARATION_DETAIL(Number(producerId)))
+      navigate(
+        routes.BIOMETHANE().ADMIN.DECLARATION_DETAIL(Number(producerId)).ROOT
+      )
     }
   }
 
@@ -51,3 +55,5 @@ export const BiomethaneAdminDeclarationsPage = () => {
     </Main>
   )
 }
+
+export default BiomethaneAdminDeclarationsPage

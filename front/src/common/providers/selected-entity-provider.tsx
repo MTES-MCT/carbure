@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext } from "react"
 
 /**
  * This provider is used to propagate the selected entity in the tree of components
@@ -7,7 +7,6 @@ import { createContext, useContext, useState } from "react"
  */
 interface SelectedEntityContextType {
   selectedEntityId: number | undefined
-  setSelectedEntityId: (entityId: number | undefined) => void
   hasSelectedEntity: boolean
 }
 
@@ -17,18 +16,15 @@ const SelectedEntityContext = createContext<
 
 export const SelectedEntityProvider = ({
   children,
+  selectedEntityId,
 }: {
   children: React.ReactNode
+  selectedEntityId: number | undefined
 }) => {
-  const [selectedEntityId, setSelectedEntityId] = useState<number | undefined>(
-    undefined
-  )
-
   return (
     <SelectedEntityContext.Provider
       value={{
         selectedEntityId,
-        setSelectedEntityId,
         hasSelectedEntity: selectedEntityId !== undefined,
       }}
     >
