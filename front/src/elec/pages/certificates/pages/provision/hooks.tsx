@@ -28,7 +28,7 @@ export function useTabs(
       label: t("Historique"),
       icon: "fr-icon-time-line",
       iconActive: "fr-icon-time-fill",
-      path: "../provision/available",
+      path: "../provision/history",
       count: snapshot?.provision_certificates,
     },
   ]
