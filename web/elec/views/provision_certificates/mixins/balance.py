@@ -1,10 +1,10 @@
-from django.db.models import Sum
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from core.models import Entity
 from elec.models import ElecProvisionCertificate, ElecTransferCertificate
+from elec.services.certificate_balance import get_certificate_balance
 from elec.services.readjustment_balance import get_readjustment_balance
 
 
@@ -31,13 +31,12 @@ class BalanceActionMixin:
             provisions = provisions.filter(cpo=entity)
             transfers = transfers.filter(supplier=entity)
 
-        total_provision = provisions.aggregate(Sum("energy_amount")).get("energy_amount__sum") or 0
-        total_transfer = transfers.aggregate(Sum("energy_amount")).get("energy_amount__sum") or 0
+        total_balance = get_certificate_balance(cpo=entity)
         missing_readjustment = get_readjustment_balance(cpo=entity)
 
         return Response(
             {
-                "balance": round(total_provision - total_transfer, 2) or 0,
+                "balance": total_balance,
                 "readjustment_balance": missing_readjustment,
             }
         )
