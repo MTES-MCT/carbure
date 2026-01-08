@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from edelivery.ebms.request_responses import BaseRequestResponse
 from edelivery.ebms.requests import BaseRequest
 from edelivery.soap.requester import Requester
 
@@ -20,6 +21,9 @@ class RequesterTest(TestCase):
         self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
 
         self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
+
+        self.patched_ResponseFactory = patch("edelivery.soap.requester.ResponseFactory").start()
+        self.patched_ResponseFactory.return_value.response.return_value = BaseRequestResponse(self.DEFAULT_RESPONSE_PAYLOAD)
 
     def tearDown(self):
         patch.stopall()
@@ -56,17 +60,16 @@ class RequesterTest(TestCase):
         self.assertEqual(["fetch message", "unsubscribe"], commands_called)
 
     def test_returns_result_of_action_triggered_upon_receiving_response_from_udb(self):
-        patched_BaseRequestResponse = MagicMock()
-        patched_BaseRequestResponse.return_value.request_id.return_value = "111"
-        patched_BaseRequestResponse.return_value.post_retrieval_action_result.return_value = "Some result"
-        self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
+        patched_response = MagicMock()
+        patched_response.request_id.return_value = "111"
+        patched_response.post_retrieval_action_result.return_value = "Some result"
+        self.patched_ResponseFactory.return_value.response.return_value = patched_response
+        self.patched_PubSubAdapter.return_value.next_message.side_effect = self.DEFAULT_RESPONSE_PAYLOAD
         self.patched_new_uuid.return_value = "111"
-        request = BaseRequest("<request/>")
-        request.response_class = patched_BaseRequestResponse
-        requester = Requester(request)
 
+        request = BaseRequest("<request/>")
+        requester = Requester(request)
         result = requester.do_request()
-        patched_BaseRequestResponse.assert_called_with(self.DEFAULT_RESPONSE_PAYLOAD)
         self.assertEqual("Some result", result)
 
     def test_throws_timeout_error_if_not_receiving_any_response_from_udb(self):
@@ -77,16 +80,15 @@ class RequesterTest(TestCase):
         self.assertRaises(TimeoutError, requester.do_request)
 
     def test_retries_few_times_before_throwing_timeout_error(self):
-        patched_BaseRequestResponse = MagicMock()
-        patched_BaseRequestResponse.return_value.request_id.return_value = "111"
-        patched_BaseRequestResponse.return_value.post_retrieval_action_result.return_value = "Some result"
-        patched_BaseRequestResponse.return_value.post_retrieval_action_result.return_value = "Some result"
+        patched_response = MagicMock()
+        patched_response.request_id.return_value = "111"
+        patched_response.post_retrieval_action_result.return_value = "Some result"
+        self.patched_ResponseFactory.return_value.response.return_value = patched_response
         self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, self.DEFAULT_RESPONSE_PAYLOAD]
         self.patched_new_uuid.return_value = "111"
-        request = BaseRequest("<request/>")
-        request.response_class = patched_BaseRequestResponse
-        requester = Requester(request)
 
+        request = BaseRequest("<request/>")
+        requester = Requester(request)
         result = requester.do_request()
         self.assertEqual("Some result", result)
 

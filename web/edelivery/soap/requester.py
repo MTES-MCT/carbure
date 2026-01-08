@@ -2,6 +2,7 @@ from os import environ
 from time import sleep
 
 from edelivery.adapters.pub_sub_adapter import PubSubAdapter
+from edelivery.ebms.request_responses import ResponseFactory
 from edelivery.soap.actions import SubmitMessage
 
 
@@ -20,7 +21,8 @@ class Requester:
                 tried += 1
                 message = self.pub_sub_adapter.next_message()
                 if message is not None:
-                    candidate = self.request.response_class(message)
+                    factory = ResponseFactory(self.request.response_class, message)
+                    candidate = factory.response()
                     if candidate.request_id() == self.request.id:
                         return candidate
                 sleep(self.delay_between_retries)
