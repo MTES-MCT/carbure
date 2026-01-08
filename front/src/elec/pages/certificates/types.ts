@@ -23,7 +23,7 @@ export type ElecCertificateSnapshot = {
   transfer_certificates_rejected: number
 }
 
-export type ProvisionCertificateStatus = "available" | "history"
+export type ProvisionCertificateStatus = "history"
 
 export type ProvisionCertificateOrder =
   PathsApiElecProvisionCertificatesGetParametersQueryOrder_by
