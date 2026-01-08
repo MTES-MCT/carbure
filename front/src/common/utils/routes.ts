@@ -74,8 +74,17 @@ export const ROUTE_URLS = {
       ADMIN: {
         SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
         DECLARATIONS: `${baseUrl}/admin/declarations`,
-        DECLARATION_DETAIL: (producer_id: number) =>
-          `${baseUrl}/admin/declarations/${producer_id}`,
+        DECLARATION_DETAIL: (producer_id: number) => {
+          const declarationDetailUrl = `${baseUrl}/admin/declarations/${producer_id}`
+          return {
+            ROOT: declarationDetailUrl,
+            DIGESTATE: `${declarationDetailUrl}/digestate`,
+            ENERGY: `${declarationDetailUrl}/energy`,
+            SUPPLY_PLAN: `${declarationDetailUrl}/supply-plan`,
+            CONTRACT: `${declarationDetailUrl}/contract`,
+            CONTACTS: `${declarationDetailUrl}/contacts`,
+          }
+        },
         EXPORTS: `${baseUrl}/admin/exports`,
       },
     }
