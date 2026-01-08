@@ -2,7 +2,6 @@ import datetime
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Sum
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
@@ -11,8 +10,9 @@ from rest_framework.response import Response
 
 from core.models import Entity
 from core.notifications import notify_elec_transfer_certificate
-from elec.models import ElecProvisionCertificate, ElecTransferCertificate
+from elec.models import ElecTransferCertificate
 from elec.serializers.elec_transfer_certificate import ElecTransferCertificateSerializer
+from elec.services.certificate_balance import get_certificate_balance
 from elec.services.readjustment_balance import get_readjustment_balance
 from tiruert.serializers.fields import RoundedFloatField
 
@@ -38,10 +38,7 @@ class TransferActionMixin:
         transfer_form = ElecTransferSerializer(data=request.POST)
         transfer_form.is_valid(raise_exception=True)
 
-        # Parcourir les certificat de provision et vider au fur et à mesure tant que on a pas atteint la somme
-
-        energy_pulled = 0
-        energy_required = transfer_form.validated_data["energy_amount"]
+        energy_amount = transfer_form.validated_data["energy_amount"]
         client = transfer_form.validated_data.get("client")
         is_readjustment = transfer_form.validated_data.get("is_readjustment", False)
 
@@ -53,52 +50,18 @@ class TransferActionMixin:
         if not client:
             raise ParseError("MISSING_CLIENT")
 
-        available_provision_certificates = (
-            ElecProvisionCertificate.objects.filter(cpo=entity)
-            .exclude(remaining_energy_amount=0)
-            .order_by("year", "quarter")
-        )
-
-        total_provision = (
-            ElecProvisionCertificate.objects.filter(cpo=entity).aggregate(Sum("energy_amount")).get("energy_amount__sum")
-            or 0
-        )
-        total_transfer = (
-            ElecTransferCertificate.objects.filter(supplier=entity).aggregate(Sum("energy_amount")).get("energy_amount__sum")
-            or 0
-        )
-        available_energy = round(total_provision - total_transfer, 2)
-
-        if energy_required > available_energy:
+        if energy_amount > get_certificate_balance(cpo=entity):
             raise ParseError("NOT_ENOUGH_ENERGY")
 
-        if is_readjustment and energy_required > missing_readjustment:
+        if is_readjustment and energy_amount > missing_readjustment:
             raise ParseError("READJUSTING_TOO_MUCH")
 
-        available_provision_certificates = list(available_provision_certificates)
-
-        total_certificates = len(available_provision_certificates)
-        current_certificate_idx = 0
-        while (energy_pulled < energy_required) and (current_certificate_idx < total_certificates):
-            curr_certif_energy = available_provision_certificates[current_certificate_idx].remaining_energy_amount
-
-            # Le certificat n'a pas assez d'énergie
-            missing_energy = energy_required - energy_pulled
-            if curr_certif_energy <= missing_energy:
-                available_provision_certificates[current_certificate_idx].remaining_energy_amount = 0
-                energy_pulled += curr_certif_energy
-            # Le certificat a assez d'énergie
-            else:
-                remaining_energy_amount = round(curr_certif_energy - missing_energy, 3)
-                available_provision_certificates[current_certificate_idx].remaining_energy_amount = remaining_energy_amount
-                energy_pulled = energy_required
-            available_provision_certificates[current_certificate_idx].save()
-            current_certificate_idx += 1
-
-        status = ElecTransferCertificate.ACCEPTED if is_readjustment else ElecTransferCertificate.PENDING
+        status = ElecTransferCertificate.PENDING
+        if is_readjustment:
+            status = ElecTransferCertificate.ACCEPTED
 
         transfer_certificate = ElecTransferCertificate.objects.create(
-            energy_amount=energy_required,
+            energy_amount=energy_amount,
             client=client,
             supplier=entity,
             transfer_date=datetime.date.today(),
