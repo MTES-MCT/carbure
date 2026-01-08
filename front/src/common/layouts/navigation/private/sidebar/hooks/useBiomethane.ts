@@ -2,30 +2,31 @@ import { useRoutes } from "common/hooks/routes"
 import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
 import useEntity from "common/hooks/entity"
+import { ExternalAdminPages } from "common/types"
 
 export const useBiomethane = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
-  const { isBiomethaneProducer } = useEntity()
+  const { isBiomethaneProducer, hasAdminRight } = useEntity()
 
-  const biomethane: MenuSection = {
+  const biomethaneProducerMenu: MenuSection = {
     title: t("Déclarations"),
     condition: isBiomethaneProducer,
     children: [
       {
-        path: routes.BIOMETHANE().SUPPLY_PLAN,
+        path: routes.BIOMETHANE().PRODUCER.SUPPLY_PLAN,
         title: t("Approvisionnement"),
         icon: "ri-home-4-line",
         iconActive: "ri-home-4-fill",
       },
       {
-        path: routes.BIOMETHANE().DIGESTATE,
+        path: routes.BIOMETHANE().PRODUCER.DIGESTATE,
         title: t("Digestat"),
         icon: "ri-contrast-drop-line",
         iconActive: "ri-contrast-drop-fill",
       },
       {
-        path: routes.BIOMETHANE().ENERGY,
+        path: routes.BIOMETHANE().PRODUCER.ENERGY,
         title: t("Énergie"),
         icon: "ri-flashlight-line",
         iconActive: "ri-flashlight-fill",
@@ -33,5 +34,30 @@ export const useBiomethane = () => {
     ],
   }
 
-  return biomethane
+  const biomethaneAdminMenu: MenuSection = {
+    title: t("Biométhane"),
+    condition: hasAdminRight(ExternalAdminPages.DREAL),
+    children: [
+      // {
+      //   path: routes.BIOMETHANE().ADMIN.SUPPLY_INPUTS,
+      //   title: t("Intrants"),
+      //   icon: "ri-leaf-line",
+      //   iconActive: "ri-leaf-fill",
+      // },
+      {
+        path: routes.BIOMETHANE().ADMIN.DECLARATIONS,
+        title: t("Déclarations"),
+        icon: "ri-file-text-line",
+        iconActive: "ri-file-text-fill",
+      },
+      // {
+      //   path: routes.BIOMETHANE().ADMIN.EXPORTS,
+      //   title: t("Exportats"),
+      //   icon: "ri-file-download-line",
+      //   iconActive: "ri-file-download-fill",
+      // },
+    ],
+  }
+
+  return [biomethaneProducerMenu, biomethaneAdminMenu]
 }

@@ -9,6 +9,7 @@ import { YearsProvider } from "common/providers/years-provider"
 import { lazy, Suspense } from "react"
 import { BiomethaneRoutes } from "biomethane/routes"
 import { useCacheBuster } from "./hooks/cache-buster"
+import { ExternalAdminPages } from "./types"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -130,14 +131,20 @@ const Org = () => {
     has_saf,
     accise_number,
   } = entity
-  const isAdminDC = isExternal && entity.hasAdminRight("DCA")
-  const isSafAdmin = isExternal && entity.hasAdminRight("AIRLINE")
-  const isElecAdmin = isExternal && entity.hasAdminRight("ELEC")
+  const isAdminDC = isExternal && entity.hasAdminRight(ExternalAdminPages.DCA)
+  const isSafAdmin =
+    isExternal && entity.hasAdminRight(ExternalAdminPages.AIRLINE)
+  const isElecAdmin =
+    isExternal && entity.hasAdminRight(ExternalAdminPages.ELEC)
   const isElecOperator = isOperator && entity.has_elec
-  const isTiruertAdmin = isExternal && entity.hasAdminRight("TIRIB")
+  const isTiruertAdmin =
+    isExternal && entity.hasAdminRight(ExternalAdminPages.TIRIB)
   const isTransferElecAdmin =
-    isExternal && entity.hasAdminRight("TRANSFERRED_ELEC")
-  const isBiofuelAdmin = isExternal && entity.hasAdminRight("BIOFUEL")
+    isExternal && entity.hasAdminRight(ExternalAdminPages.TRANSFERRED_ELEC)
+  const isBiofuelAdmin =
+    isExternal && entity.hasAdminRight(ExternalAdminPages.BIOFUEL)
+  const isDrealAdmin =
+    isExternal && entity.hasAdminRight(ExternalAdminPages.DREAL)
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
   )
@@ -260,7 +267,7 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="entities" />} />
       )}
 
-      {isBiomethaneProducer && (
+      {(isBiomethaneProducer || isDrealAdmin) && (
         <>
           <Route path="biomethane/*" element={<BiomethaneRoutes />} />
           <Route path="*" element={<Navigate replace to="biomethane" />} />

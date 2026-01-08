@@ -9,7 +9,7 @@ export const MISSING_FIELDS_HASH = "missing-fields"
 
 export const pageToMissingFieldKey: Record<
   Page,
-  keyof AnnualDeclaration["missing_fields"]
+  Exclude<keyof AnnualDeclaration["missing_fields"], "supply_plan_valid">
 > = {
   [Page.DIGESTATE]: "digestate_missing_fields",
   [Page.ENERGY]: "energy_missing_fields",

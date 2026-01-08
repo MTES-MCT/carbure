@@ -62,11 +62,20 @@ export const ROUTE_URLS = {
 
     return {
       ROOT: `${baseUrl}`,
-      SUPPLY_PLAN: year
-        ? `${baseUrl}/${year}/supply-plan`
-        : `${baseUrl}/supply-plan`,
-      DIGESTATE: year ? `${baseUrl}/${year}/digestate` : `${baseUrl}/digestate`,
-      ENERGY: year ? `${baseUrl}/${year}/energy` : `${baseUrl}/energy`,
+      PRODUCER: {
+        SUPPLY_PLAN: year
+          ? `${baseUrl}/${year}/supply-plan`
+          : `${baseUrl}/supply-plan`,
+        DIGESTATE: year
+          ? `${baseUrl}/${year}/digestate`
+          : `${baseUrl}/digestate`,
+        ENERGY: year ? `${baseUrl}/${year}/energy` : `${baseUrl}/energy`,
+      },
+      ADMIN: {
+        SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
+        DECLARATIONS: `${baseUrl}/admin/declarations`,
+        EXPORTS: `${baseUrl}/admin/exports`,
+      },
     }
   },
 
