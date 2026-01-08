@@ -617,11 +617,12 @@ class GenericCertificateAdmin(ImportExportModelAdmin):
     list_display = [
         "certificate_id",
         "certificate_type",
+        "status",
         "certificate_holder",
         "valid_from",
         "valid_until",
     ]
-    list_filter = ["certificate_type"]
+    list_filter = ["certificate_type", "status"]
     search_fields = ("certificate_holder", "certificate_id")
 
 
