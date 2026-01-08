@@ -25,8 +25,6 @@ from core.utils import bulk_update_or_create  # noqa: E402
 DESTINATION_FOLDER = "/tmp"
 
 DBS_URL = "https://www.2bsvs.org/fr/certificats-bloc-parent"
-DBS_VALID_URL = "https://www.2bsvs.org/fr/certificats-bloc-parent/certificats-valides/"
-DBS_INVALID_URL = "https://www.2bsvs.org/fr/certificats-bloc-parent/certificats-retires/"
 
 DBS_NUMBER_KEY = "Numéro de Certificat 2BS"
 DBS_COMPANY_NAME_KEY = "Nom de l’opérateur économique"
