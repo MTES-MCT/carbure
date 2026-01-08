@@ -22,9 +22,11 @@ type SupplyInputFormValue = Partial<BiomethaneSupplyInput>
 export const SupplyInputForm = ({
   supplyInput,
   onSubmit,
+  readOnly = false,
 }: {
   supplyInput?: BiomethaneSupplyInput
   onSubmit: (value?: BiomethaneSupplyInput) => void
+  readOnly?: boolean
 }) => {
   const { t } = useTranslation()
   const sourceOptions = getSupplyPlanInputSourceOptions()
@@ -49,6 +51,7 @@ export const SupplyInputForm = ({
             required
             orientation="horizontal"
             {...bind("source")}
+            readOnly={readOnly}
           />
           <RadioGroup
             options={cropTypeOptions}
@@ -56,17 +59,20 @@ export const SupplyInputForm = ({
             required
             orientation="horizontal"
             {...bind("crop_type")}
+            readOnly={readOnly}
           />
           <SelectDsfr
             options={categoryOptions}
             label={t("Catégorie intrants")}
             required
             {...bind("input_category")}
+            readOnly={readOnly}
           />
           <TextInput
             label={t("Intrants")} //
             required
             {...bind("input_type")}
+            readOnly={readOnly}
           />
           <RadioGroup
             options={materialUnitOptions}
@@ -74,6 +80,7 @@ export const SupplyInputForm = ({
             required
             orientation="horizontal"
             {...bind("material_unit")}
+            readOnly={readOnly}
           />
           {value?.material_unit === BiomethaneSupplyInputMaterialUnit.DRY && (
             <>
@@ -83,11 +90,13 @@ export const SupplyInputForm = ({
                 max={100}
                 required
                 {...bind("dry_matter_ratio_percent")}
+                readOnly={readOnly}
               />
               <NumberInput
                 label={t("Tonnage (tMS)")}
                 required
                 {...bind("volume")}
+                readOnly={readOnly}
               />
             </>
           )}
@@ -96,6 +105,7 @@ export const SupplyInputForm = ({
               label={t("Tonnage (tMB)")}
               required
               {...bind("volume")}
+              readOnly={readOnly}
             />
           )}
         </Dialog.Section>
@@ -104,21 +114,25 @@ export const SupplyInputForm = ({
             label={t("Pays d'origine")}
             required
             {...bind("origin_country")}
+            readOnly={readOnly}
           />
           {value.origin_country?.code_pays == "FR" && (
             <AutoCompleteDepartments
               label={t("Département d'origine")}
               required
               {...bind("origin_department")}
+              readOnly={readOnly}
             />
           )}
           <NumberInput
             label={t("Distance moyenne pondérée d'approvisionnement (Km)")}
             {...bind("average_weighted_distance_km")}
+            readOnly={readOnly}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
             {...bind("maximum_distance_km")}
+            readOnly={readOnly}
           />
         </Dialog.Section>
       </Grid>

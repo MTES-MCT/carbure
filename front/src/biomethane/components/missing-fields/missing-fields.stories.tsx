@@ -68,7 +68,9 @@ export const DisplayOnlyDigestateMissingFields: Story = {
           missing_fields: {
             digestate_missing_fields: ["digestate_field_1"],
             energy_missing_fields: [],
+            supply_plan_valid: true,
           },
+          is_complete: false,
         }),
         ...MOCKS,
       ],
@@ -90,7 +92,9 @@ export const DisplayOnlyEnergyMissingFields: Story = {
           missing_fields: {
             digestate_missing_fields: [],
             energy_missing_fields: ["energy_field_1"],
+            supply_plan_valid: true,
           },
+          is_complete: false,
         }),
         ...MOCKS,
       ],
@@ -113,6 +117,7 @@ export const DisplayBothEnergyAndDigestateMissingFields: Story = {
             digestate_missing_fields: ["digestate_field_1"],
             energy_missing_fields: ["energy_field_1"],
           },
+          is_complete: false,
         }),
         ...MOCKS,
       ],
@@ -127,6 +132,30 @@ export const DisplayNothingWhenTheDeclarationIsNotEditable: Story = {
       description: "Displays nothing when the declaration is not editable.",
     },
     chromatic: { disableSnapshot: true },
+  },
+  play: NoMissingFields.play,
+}
+
+export const DisplayNothingWhenTheDeclarationIsComplete: Story = {
+  parameters: {
+    mockingDate: new Date(2026, 3, 1),
+    docs: {
+      description: "Displays nothing when the declaration is complete.",
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: [
+        buildCurrentAnnualDeclarationHandler({
+          missing_fields: {
+            digestate_missing_fields: [],
+            energy_missing_fields: [],
+            supply_plan_valid: true,
+          },
+          is_complete: true,
+        }),
+        ...MOCKS,
+      ],
+    },
   },
   play: NoMissingFields.play,
 }

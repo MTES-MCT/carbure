@@ -2,6 +2,6 @@
   margin-top: var(--spacing-1w);
 }
 
-.no-margin-bottom:global(.fr-select-group) {
+.no-margin-bottom:global(.fr-input-group) {
   margin-bottom: 0;
 }

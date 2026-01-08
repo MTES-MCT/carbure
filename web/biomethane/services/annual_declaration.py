@@ -7,66 +7,109 @@ from biomethane.models import (
     BiomethaneProductionUnit,
 )
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
+from biomethane.models.biomethane_supply_plan import BiomethaneSupplyPlan
 
 
 class BiomethaneAnnualDeclarationService:
     @staticmethod
-    def get_declaration_period():
+    def get_declaration_period(entity=None):
         """
-        Determines the current declaration interval based on the current date.
+        Determines the current declaration year for a producer.
 
-        The declaration period extends from April 1st to March 31st of the following year.
-        The year to declare depends on the current month:
+        If the producer has a previous declaration that is not yet DECLARED,
+        returns the year of that declaration (to allow completion).
+        Otherwise, computes the declaration year based on the current date:
+        - If the current month is January-March: declare for the previous year
+        - If the current month is April-December: declare for the current year
+
+        Returns:
+            int: The year corresponding to the current declaration period or the unfinished declaration.
+        """
+
+        if entity:
+            latest_declaration = BiomethaneAnnualDeclarationService._get_latest_declaration(entity)
+            if latest_declaration:
+                status = BiomethaneAnnualDeclarationService.get_declaration_status(latest_declaration)
+                if status == BiomethaneAnnualDeclaration.OVERDUE:
+                    return latest_declaration.year
+
+        return BiomethaneAnnualDeclarationService._get_current_declaration_year()
+
+    @staticmethod
+    def _get_current_declaration_year():
+        """
+        Determines the current declaration year based on the current date.
+
         - If the current month is January-March: declare for the previous year
         - If the current month is April-December: declare for the current year
 
         Returns:
             int: The year corresponding to the current declaration period.
         """
-        current_date = date.today()
-        current_year = current_date.year
-        current_month = current_date.month
+        today = date.today()
+        return today.year - 1 if today.month < 4 else today.year
 
-        declaration_year = current_year - 1 if current_month < 4 else current_year
+    @staticmethod
+    def _get_latest_declaration(entity):
+        """
+        Retrieve the latest NOT DECLARED declaration for a given entity.
 
-        return declaration_year
+        Args:
+            entity: The Entity instance representing the producer
+
+        Returns:
+            BiomethaneAnnualDeclaration instance or None if not found
+        """
+        return (
+            BiomethaneAnnualDeclaration.objects.filter(producer=entity)
+            .exclude(status=BiomethaneAnnualDeclaration.DECLARED)
+            .order_by("-year")
+            .first()
+        )
+
+    @staticmethod
+    def get_declaration_status(declaration):
+        """
+        Returns the status of a biomethane annual declaration.
+
+        If the declaration's year is earlier than the current declaration period and its status is not 'DECLARED',
+        the method returns 'OVERDUE'. Otherwise, it returns the current status of the declaration.
+
+        Args:
+            declaration: An object representing the biomethane annual declaration.
+
+        Returns:
+            str: The status of the declaration, either 'OVERDUE' or its current status.
+        """
+        current_declaration_period = BiomethaneAnnualDeclarationService._get_current_declaration_year()
+
+        if declaration.year < current_declaration_period and declaration.status != BiomethaneAnnualDeclaration.DECLARED:
+            return BiomethaneAnnualDeclaration.OVERDUE
+
+        return declaration.status
 
     @staticmethod
     def get_missing_fields(declaration):
         """
-        Get the missing required fields for digestate and energy declarations.
+        Get the missing required fields for digestate, energy and supply plan declarations.
 
         Args:
             declaration: A BiomethaneAnnualDeclaration instance
 
         Returns:
-            dict: Dictionary with 'digestate_missing_fields' and 'energy_missing_fields' keys.
+            dict: Dictionary with 'digestate_missing_fields', 'energy_missing_fields', 'supply_plan_valid' keys.
                   Values are lists of missing field names or None if the model doesn't exist.
         """
-        digestate_missing_fields = None
-        energy_missing_fields = None
-
-        try:
-            digestate = BiomethaneDigestate.objects.get(producer=declaration.producer, year=declaration.year)
-        except BiomethaneDigestate.DoesNotExist:
-            digestate = None
-
-        try:
-            energy = BiomethaneEnergy.objects.get(producer=declaration.producer, year=declaration.year)
-        except BiomethaneEnergy.DoesNotExist:
-            energy = None
-
-        if digestate is not None:
-            digestate_missing_fields = []
-            digestate_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(digestate)
-
-        if energy is not None:
-            energy_missing_fields = []
-            energy_missing_fields = BiomethaneAnnualDeclarationService._get_missing_fields(energy)
+        digestate = BiomethaneDigestate.objects.filter(producer=declaration.producer, year=declaration.year).first()
+        energy = BiomethaneEnergy.objects.filter(producer=declaration.producer, year=declaration.year).first()
+        supply_plan = BiomethaneSupplyPlan.objects.filter(producer=declaration.producer, year=declaration.year).first()
 
         return {
-            "digestate_missing_fields": digestate_missing_fields,
-            "energy_missing_fields": energy_missing_fields,
+            "digestate_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(digestate)
+            if digestate
+            else None,
+            "energy_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(energy) if energy else None,
+            "supply_plan_valid": supply_plan and supply_plan.supply_inputs.exists(),
         }
 
     @staticmethod
@@ -75,7 +118,7 @@ class BiomethaneAnnualDeclarationService:
         Return all missing fields for an instance.
         Takes into account optional fields defined by business rules.
         """
-        all_fields = BiomethaneAnnualDeclarationService.get_required_fields(model=type(instance))
+        all_fields = BiomethaneAnnualDeclarationService.get_all_fields(model=type(instance))
 
         optional_fields = instance.optional_fields if hasattr(instance, "optional_fields") else []
         required_fields = list(set(all_fields) - set(optional_fields))
@@ -90,7 +133,7 @@ class BiomethaneAnnualDeclarationService:
         return missing_fields
 
     @staticmethod
-    def get_required_fields(model):
+    def get_all_fields(model):
         """
         Return all field names for a given model.
         """
@@ -111,15 +154,18 @@ class BiomethaneAnnualDeclarationService:
             missing_fields: Optional dict of missing fields (will be computed if not provided)
 
         Returns:
-            bool: True if both digestate and energy declarations exist and have no missing fields
+            bool: True if digestate, energy and supply_plan are valid with no missing fields
         """
         if missing_fields is None:
             missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
 
-        if missing_fields["digestate_missing_fields"] is None or missing_fields["energy_missing_fields"] is None:
-            return False
-
-        return len(missing_fields["digestate_missing_fields"]) == 0 and len(missing_fields["energy_missing_fields"]) == 0
+        return (
+            missing_fields.get("digestate_missing_fields") is not None
+            and len(missing_fields["digestate_missing_fields"]) == 0
+            and missing_fields.get("energy_missing_fields") is not None
+            and len(missing_fields["energy_missing_fields"]) == 0
+            and missing_fields.get("supply_plan_valid") is True
+        )
 
     @staticmethod
     def is_declaration_editable(producer, year):
@@ -197,12 +243,10 @@ class BiomethaneAnnualDeclarationService:
 
         Args:
             producer: The Entity instance representing the producer
-            year: The year of the declaration to reset
-
         """
         try:
             declaration = BiomethaneAnnualDeclaration.objects.get(
-                producer=producer, year=BiomethaneAnnualDeclarationService.get_declaration_period()
+                producer=producer, year=BiomethaneAnnualDeclarationService.get_declaration_period(producer)
             )
             if declaration.status != BiomethaneAnnualDeclaration.IN_PROGRESS:
                 declaration.status = BiomethaneAnnualDeclaration.IN_PROGRESS

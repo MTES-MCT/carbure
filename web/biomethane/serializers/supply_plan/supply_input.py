@@ -56,7 +56,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         entity = self.context.get("entity")
-        year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        year = BiomethaneAnnualDeclarationService.get_declaration_period(entity)
 
         # Get or create the supply plan for the entity and year
         supply_plan, created = BiomethaneSupplyPlan.objects.get_or_create(

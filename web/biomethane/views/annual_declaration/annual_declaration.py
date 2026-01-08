@@ -43,7 +43,8 @@ class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, Ye
         if self.action == "get_years":
             return super().get_queryset()
 
-        year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        entity = getattr(self.request, "entity", None)
+        year = BiomethaneAnnualDeclarationService.get_declaration_period(entity)
         return self.queryset.filter(year=year)
 
     @extend_schema(

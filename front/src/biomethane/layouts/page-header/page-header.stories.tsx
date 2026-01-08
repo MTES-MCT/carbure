@@ -126,3 +126,16 @@ export const DisplayMissingFieldsDialogIfTheDeclarationIsNotComplete: Story = {
   },
   play: DisplayValidateDeclarationDialogIfTheDeclarationIsComplete.play,
 }
+
+export const DisplayOverdueDeclarationNoticeIfTheDeclarationIsOverdue: Story = {
+  parameters: {
+    msw: {
+      handlers: [
+        buildCurrentAnnualDeclarationHandler({
+          status: AnnualDeclarationStatus.OVERDUE,
+        }),
+        ...MOCKS,
+      ],
+    },
+  },
+}

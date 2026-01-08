@@ -11161,6 +11161,10 @@ components:
                 type: string
               nullable: true
               description: List of missing fields for energy
+            supply_plan_valid:
+              type: boolean
+              nullable: false
+              description: Whether the supply plan is valid
           description: Missing fields grouped by type
           readOnly: true
         is_complete:
@@ -11174,10 +11178,12 @@ components:
       enum:
         - IN_PROGRESS
         - DECLARED
+        - OVERDUE
       type: string
       description: |-
         * `IN_PROGRESS` - IN_PROGRESS
         * `DECLARED` - DECLARED
+        * `OVERDUE` - OVERDUE
     BiomethaneContract:
       type: object
       properties:
@@ -11208,6 +11214,7 @@ components:
           nullable: true
         cmax_annualized:
           type: boolean
+          nullable: true
         cmax_annualized_value:
           type: number
           format: double
@@ -13380,7 +13387,7 @@ components:
         - period_start
     DoubleCountingApplicationUpdate:
       type: object
-      description: Serializer pour la mise à jour partielle du statut uniquement.
+      description: Serializer for updating the status of a DoubleCountingApplication.
       properties:
         status:
           $ref: "#/components/schemas/DoubleCountingStatus"
@@ -16202,7 +16209,7 @@ components:
           maxLength: 3
     PatchedDoubleCountingApplicationUpdateRequest:
       type: object
-      description: Serializer pour la mise à jour partielle du statut uniquement.
+      description: Serializer for updating the status of a DoubleCountingApplication.
       properties:
         status:
           $ref: "#/components/schemas/DoubleCountingStatus"

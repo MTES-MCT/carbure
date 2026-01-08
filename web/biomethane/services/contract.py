@@ -313,7 +313,7 @@ def _build_required_field_rules() -> list[RequiredFieldRule]:
         RequiredFieldRule(
             name="cmax_annualized_requires_value",
             fields=["cmax_annualized_value"],
-            condition=lambda ctx: ctx.cmax_annualized is True,
+            condition=lambda ctx: ctx.cmax_annualized is True and ctx.tariff_reference in BiomethaneContract.TARIFF_RULE_1,
         ),
         # When any contract document field is provided: require all document fields
         RequiredFieldRule(

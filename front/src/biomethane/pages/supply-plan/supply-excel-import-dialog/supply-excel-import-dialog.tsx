@@ -41,7 +41,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   })
 
   const { execute: executeImport, loading } = useMutation(importSupplyPlan, {
-    invalidates: ["supply-plan-inputs"],
+    invalidates: ["supply-plan-inputs", "current-annual-declaration"],
     onSuccess: () => {
       notify(t("Fichier importé avec succès"), { variant: "success" })
       onClose()
@@ -122,6 +122,10 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
             }
             value={value.supplyPlanFile || undefined}
             onChange={handleFileChange}
+            state="info"
+            stateRelatedMessage={t(
+              "Les intrants déjà importés seront écrasés."
+            )}
           />
 
           {importErrors && importErrors.validation_errors.length > 0 && (

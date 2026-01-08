@@ -8,13 +8,25 @@ from biomethane.services import BiomethaneAnnualDeclarationService
 class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
     missing_fields = serializers.SerializerMethodField()
     is_complete = serializers.SerializerMethodField()
+    status = serializers.ChoiceField(
+        choices=[
+            (BiomethaneAnnualDeclaration.IN_PROGRESS, BiomethaneAnnualDeclaration.IN_PROGRESS),
+            (BiomethaneAnnualDeclaration.DECLARED, BiomethaneAnnualDeclaration.DECLARED),
+            (BiomethaneAnnualDeclaration.OVERDUE, BiomethaneAnnualDeclaration.OVERDUE),
+        ],
+        required=False,
+    )
 
     class Meta:
         model = BiomethaneAnnualDeclaration
         fields = ["year", "status", "missing_fields", "is_complete"]
         read_only_fields = ["year", "missing_fields", "is_complete"]
-        writeable_fields = ["status"]
-        required_fields = writeable_fields
+
+    def to_representation(self, instance):
+        # Override status in representation to use computed value
+        representation = super().to_representation(instance)
+        representation["status"] = BiomethaneAnnualDeclarationService.get_declaration_status(instance)
+        return representation
 
     @extend_schema_field(
         {
@@ -31,6 +43,11 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
                     "items": {"type": "string"},
                     "nullable": True,
                     "description": "List of missing fields for energy",
+                },
+                "supply_plan_valid": {
+                    "type": "boolean",
+                    "nullable": False,
+                    "description": "Whether the supply plan is valid",
                 },
             },
             "description": "Missing fields grouped by type",

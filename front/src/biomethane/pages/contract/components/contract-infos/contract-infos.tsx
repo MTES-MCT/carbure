@@ -150,7 +150,6 @@ export const ContractInfos = ({
                 orientation="horizontal"
                 required
                 {...bind("cmax_annualized")}
-                value={value.cmax_annualized ?? false}
                 readOnly={!isEditing}
               />
             </Grid>

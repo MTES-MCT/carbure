@@ -61,7 +61,7 @@ export const Malfunction = () => {
       {
         value: MalfunctionTypes.INJECTION_POST,
         label: t(
-          "Poste d'injection (autre que problématiques de saturation des réseaux)"
+          "Site d'injection (autre que problématiques de saturation des réseaux)"
         ),
       },
       { value: MalfunctionTypes.INPUTS, label: t("Intrants") },

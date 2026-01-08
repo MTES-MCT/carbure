@@ -22,7 +22,7 @@ export const AnnualDeclarationAlert = () => {
       data-testid="annual-declaration-alert"
     >
       {t(
-        "En cas de modification de champs sur cette page, votre déclaration annuelle (digestat et énergie) devra être soumise à nouveau."
+        "En cas de modification de champs sur cette page, votre déclaration annuelle devra être soumise à nouveau."
       )}
     </Notice>
   )
