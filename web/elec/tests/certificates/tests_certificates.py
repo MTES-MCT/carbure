@@ -8,6 +8,7 @@ from core.tests_utils import FiltersActionTestMixin, setup_current_user
 from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
+from elec.services.certificate_balance import get_certificate_balance
 from elec.views import ProvisionCertificateViewSet, TransferCertificateViewSet
 
 
@@ -39,7 +40,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             year=2022,
             operating_unit="XYZ",
             energy_amount=4000,
-            source=ElecProvisionCertificate.METER_READINGS,
+            source=ElecProvisionCertificate.MANUAL,
         )
         self.prov2 = ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
@@ -47,7 +48,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             year=2023,
             operating_unit="ABCD",
             energy_amount=1000,
-            source=ElecProvisionCertificate.METER_READINGS,
+            source=ElecProvisionCertificate.MANUAL,
         )
         self.prov3 = ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
@@ -59,6 +60,8 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
         )
 
     def test_transfer_provision_certificate_pile_poil(self):
+        self.assertEqual(get_certificate_balance(self.cpo), 7000)
+
         self.client.post(
             reverse("provision-certificates-transfer"),
             {
@@ -68,33 +71,12 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             },
         )
 
-        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
-
         transfer_cert = ElecTransferCertificate.objects.all().first()
-        assert transfer_cert.energy_amount == 500
-        assert transfer_cert.supplier_id == self.cpo.id
-        assert transfer_cert.client_id == self.operator.id
+        self.assertEqual(transfer_cert.energy_amount, 500)
+        self.assertEqual(transfer_cert.supplier_id, self.cpo.id)
+        self.assertEqual(transfer_cert.client_id, self.operator.id)
 
-    def test_transfer_provision_certificate_multiple(self):
-        self.client.post(
-            reverse("provision-certificates-transfer"),
-            {
-                "entity_id": self.cpo.id,
-                "energy_amount": 1500,
-                "client": self.operator.id,
-            },
-        )
-
-        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
-
-        transfer_cert = ElecTransferCertificate.objects.all().first()
-        assert transfer_cert.energy_amount == 1500
-        assert transfer_cert.supplier_id == self.cpo.id
-        assert transfer_cert.client_id == self.operator.id
+        self.assertEqual(get_certificate_balance(self.cpo), 6500)
 
     def test_transfer_provision_certificate_too_much(self):
         response = self.client.post(
@@ -109,14 +91,12 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
         assert response.status_code == 400
         assert response.json()["detail"] == "NOT_ENOUGH_ENERGY"
 
-        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
-
         transfer_cert_count = ElecTransferCertificate.objects.count()
         assert transfer_cert_count == 0
 
     def test_cancel_transfer_certificate(self):
+        self.assertEqual(get_certificate_balance(self.cpo), 7000)
+
         self.client.post(
             reverse("provision-certificates-transfer"),
             {
@@ -126,19 +106,17 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             },
         )
 
-        transfer = ElecTransferCertificate.objects.last()
-        assert transfer.energy_amount == 1500
+        self.assertEqual(get_certificate_balance(self.cpo), 5500)
 
-        response = self.client.post(
+        transfer = ElecTransferCertificate.objects.last()
+        self.assertEqual(transfer.energy_amount, 1500)
+
+        self.client.post(
             reverse("transfer-certificates-cancel", kwargs={"id": transfer.id}),
             {"entity_id": self.cpo.id},
         )
 
-        assert response.status_code == 200
-
-        ElecProvisionCertificate.objects.get(pk=self.prov1.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov2.id)
-        ElecProvisionCertificate.objects.get(pk=self.prov3.id)
+        self.assertEqual(get_certificate_balance(self.cpo), 7000)
 
     def test_certificate_years(self):
         response = self.client.get(
@@ -158,7 +136,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
                 "cpo": [self.cpo.name],
                 "operating_unit": ["ABCD", "DCBA", "XYZ"],
                 "quarter": [1, 2, 4],
-                "source": [ElecProvisionCertificate.METER_READINGS],
+                "source": [ElecProvisionCertificate.MANUAL, ElecProvisionCertificate.METER_READINGS],
                 "year": [2022, 2023],
             },
             entity=self.cpo,
