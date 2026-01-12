@@ -474,6 +474,7 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+<<<<<<< HEAD
         - name: page
           required: false
           in: query
@@ -486,6 +487,8 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+=======
+>>>>>>> 85b9f184d (feat: connect get biomethane producers to the front)
         - name: search
           required: false
           in: query
@@ -502,7 +505,13 @@ paths:
           content:
             application/json:
               schema:
+<<<<<<< HEAD
                 $ref: "#/components/schemas/PaginatedBiomethaneProducerList"
+=======
+                type: array
+                items:
+                  $ref: "#/components/schemas/BiomethaneProducer"
+>>>>>>> 85b9f184d (feat: connect get biomethane producers to the front)
           description: ""
   /api/biomethane/annual-declaration/:
     get:

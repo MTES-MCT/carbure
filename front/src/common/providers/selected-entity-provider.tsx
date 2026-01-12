@@ -39,7 +39,6 @@ export const useSelectedEntity = () => {
     // If the context is not found, return a default value to avoid pass provider when the hooks is used
     return {
       selectedEntityId: undefined,
-      setSelectedEntityId: () => {},
       hasSelectedEntity: false,
     }
   }
