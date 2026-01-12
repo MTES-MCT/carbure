@@ -2,11 +2,44 @@ from unittest import TestCase
 from unittest.mock import ANY, patch
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
-from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
+from edelivery.ebms.request_responses import (
+    BaseRequestResponse,
+    EOGetTransactionResponse,
+    NotFoundErrorResponse,
+    ResponseFactory,
+)
+
+
+class ResponseFactoryTest(TestCase):
+    @staticmethod
+    def payload(status="FOUND"):
+        return f"""\
+<udb:EOGetTransactionResponse
+  xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <RESPONSE_HEADER REQUEST_ID="123"
+                   STATUS="{status}" />
+  <!-- … -->
+</udb:EOGetTransactionResponse>"""
+
+    def test_knows_UDB_response_status(self):
+        factory = ResponseFactory(BaseRequestResponse, self.payload(status="SOME_STATUS"))
+        self.assertEqual("SOME_STATUS", factory.udb_response_status())
+
+    def test_returns_a_request_response_with_found_data_on_UDB_response_status_found(self):
+        factory = ResponseFactory(BaseRequestResponse, self.payload())
+        response = factory.response()
+        self.assertIsInstance(response, BaseRequestResponse)
+        self.assertEqual(self.payload(), response.payload)
+
+    def test_returns_an_error_response_on_UDB_response_status_not_found(self):
+        factory = ResponseFactory(BaseRequestResponse, self.payload(status="NOT_FOUND"))
+        response = factory.response()
+        self.assertIsInstance(response, NotFoundErrorResponse)
 
 
 class BaseRequestResponseTest(TestCase):
-    def payload(_, request_id):
+    @staticmethod
+    def payload(request_id):
         return f"""\
 <?xml version="1.0" encoding="UTF-8"?>
 <udb:GetSourcingContactByIDResponse
@@ -18,6 +51,32 @@ class BaseRequestResponseTest(TestCase):
     def test_extract_request_id(self):
         response = BaseRequestResponse(self.payload("12345"))
         self.assertEqual("12345", response.request_id())
+
+
+class NotFoundErrorResponseTest(TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    @staticmethod
+    def payload():
+        return """\
+<udb:EOGetTransactionResponse
+  xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <RESPONSE_HEADER REQUEST_ID="123" STATUS="NOT_FOUND" />
+  <!-- … -->
+</udb:EOGetTransactionResponse>"""
+
+    @patch("edelivery.ebms.request_responses.log_error")
+    def test_sends_sentry_alert_as_post_retrieval_action(self, patched_log_error):
+        response = NotFoundErrorResponse(self.payload())
+        patched_log_error.assert_not_called()
+
+        result = response.post_retrieval_action_result()
+        patched_log_error.assert_called_with("Search returned no result")
+        self.assertEqual({"error": "Not found"}, result)
 
 
 class EOGetTransactionResponseTest(TestCase):
