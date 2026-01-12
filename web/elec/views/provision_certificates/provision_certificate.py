@@ -1,15 +1,23 @@
+from django.db.models import Sum
+from django.db.models.functions import Round
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity
-from core.utils import CustomPageNumberPagination
+from core.pagination import MetadataPageNumberPagination
 from elec.filters.provision_certificates import ProvisionCertificateFilter
 from elec.models import ElecProvisionCertificate
 from elec.permissions import HasCpoRights, HasCpoWriteRights, HasElecAdminRights
 from elec.serializers.elec_provision_certificate import ElecProvisionCertificateSerializer
 
 from .mixins import ActionMixin
+
+
+class ProvisionCertificatePagination(MetadataPageNumberPagination):
+    aggregate_fields = {
+        "provisioned_energy": Round(Sum("energy_amount"), 2),
+    }
 
 
 @extend_schema(
@@ -27,7 +35,7 @@ class ProvisionCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixi
     queryset = ElecProvisionCertificate.objects.all()
     serializer_class = ElecProvisionCertificateSerializer
     filterset_class = ProvisionCertificateFilter
-    pagination_class = CustomPageNumberPagination
+    pagination_class = ProvisionCertificatePagination
     permission_classes = [HasCpoRights | HasElecAdminRights]
     lookup_field = "id"
     search_fields = ["cpo__name", "operating_unit"]
