@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from biomethane.models import BiomethaneAnnualDeclaration
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 
 
 class Command(BaseCommand):
@@ -24,7 +25,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         is_open = options["open"] == "true"
 
-        updated_count = BiomethaneAnnualDeclaration.objects.update(is_open=is_open)
+        year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        updated_count = BiomethaneAnnualDeclaration.objects.filter(year=year).update(is_open=is_open)
 
         status = "open" if is_open else "closed"
         self.stdout.write(
