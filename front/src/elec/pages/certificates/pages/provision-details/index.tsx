@@ -70,7 +70,7 @@ export const ProvisionCertificateDetails = () => {
           />
           <TextInput
             readOnly
-            label={t("Énergie fournie initialement")}
+            label={t("Quantité initiale")}
             value={formatUnit(
               provisionCert?.energy_amount ?? 0,
               ExtendedUnit.MWh

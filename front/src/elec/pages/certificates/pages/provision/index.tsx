@@ -26,6 +26,8 @@ import { useColumns, useFilters, useStatus, useTabs } from "./hooks"
 import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { formatUnit } from "common/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 export interface ProvisionCertificatesProps {
   year: number
@@ -64,6 +66,7 @@ export const ProvisionCertificates = ({
   const loading = provisionCerts.loading
   const data = provisionCerts.result?.data
   const isEmpty = !data?.results.length
+  const total = data?.provisioned_energy ?? 0
 
   const showProvisionCertificateDetail = (p: ProvisionCertificate) => {
     return {
@@ -118,10 +121,11 @@ export const ProvisionCertificates = ({
             <RecapQuantity
               text={
                 <Trans
-                  defaults="{{count}} certificats, <b>solde disponible pour cession: {{available}}</b>"
+                  defaults="{{count}} certificats de fourniture pour <b>un total de {{total}}</b>, et <b>{{available}} disponibles pour cession</b>"
                   components={{ b: <b /> }}
                   values={{
                     count: data.count,
+                    total: formatUnit(total, ExtendedUnit.MWh),
                     available: formattedBalance,
                   }}
                 />
