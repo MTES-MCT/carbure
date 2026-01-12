@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from core.models import CarbureLot, Entity, MatierePremiere
 from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
@@ -38,6 +38,7 @@ class EOGetTransactionResponseTest(TestCase):
         feedstock=None,
         status="ACCEPTED",
         supplier_id="FR_SIREN_CD111111111",
+        udb_transaction_id="TRN-0000000159437-1766484490",
     ):
         if feedstock is None:
             feedstock = {"code": "URWS023", "name": "Sugar beet"}
@@ -61,7 +62,7 @@ class EOGetTransactionResponseTest(TestCase):
       <MATERIAL_CODE>SFC0015</MATERIAL_CODE>
       <STATUS>{status}</STATUS>
       <POS_ID>POS-0000000219349-1766484490</POS_ID>
-      <TRANSACTION_ID>TRN-0000000159437-1766484490</TRANSACTION_ID>
+      <TRANSACTION_ID>{udb_transaction_id}</TRANSACTION_ID>
       <NON_RECOGNISED_VS>false</NON_RECOGNISED_VS>
       <MATERIAL_NAME>Biogas</MATERIAL_NAME>
       <EO_TRANS_DETAIL_MATERIALS>
@@ -109,31 +110,41 @@ class EOGetTransactionResponseTest(TestCase):
   </EO_TRANS_HEADER>
 </udb:EOGetTransactionResponse>"""
 
-    def test_converts_into_carbure_lot(self):
-        response = EOGetTransactionResponse(self.payload())
-        carbure_lot = response.to_lot()
-        self.assertIsInstance(carbure_lot, CarbureLot)
+    def test_knows_its_udb_transaction_id(self):
+        response = EOGetTransactionResponse(self.payload(udb_transaction_id="TRN-0000000000001-1234567890"))
+        self.assertEqual("TRN-0000000000001-1234567890", response.udb_transaction_id())
+
+    @patch("edelivery.ebms.request_responses.CarbureLot")
+    def test_creates_or_updates_lot_after_response_retrieval(self, patched_CarbureLot):
+        patched_update_or_create = patched_CarbureLot.objects.update_or_create
+        patched_update_or_create.return_value = (CarbureLot(id="12345"), True)
+        response = EOGetTransactionResponse(self.payload(udb_transaction_id="TRN-0000000000001-1234567890"))
+        patched_update_or_create.assert_not_called()
+
+        result = response.post_retrieval_action_result()
+        patched_update_or_create.assert_called_with(udb_transaction_id="TRN-0000000000001-1234567890", defaults=ANY)
+        self.assertEqual({"newLotCreated": True, "id": "12345"}, result)
 
     def test_knows_its_delivery_date_in_ISO_format(self):
         response = EOGetTransactionResponse(self.payload(delivery_date="2025-12-22T00:00:00.000Z"))
         self.assertEqual("2025-12-22", response.iso_format_delivery_date())
 
-        carbure_lot = response.to_lot()
-        self.assertEqual("2025-12-22", carbure_lot.delivery_date)
+        lot_attributes = response.to_lot_attributes()
+        self.assertEqual("2025-12-22", lot_attributes["delivery_date"])
 
     def test_knows_its_delivery_month_period(self):
         response = EOGetTransactionResponse(self.payload(delivery_date="2025-12-22T00:00:00.000Z"))
         self.assertEqual(202512, response.period())
 
-        carbure_lot = response.to_lot()
-        self.assertEqual(202512, carbure_lot.period)
+        lot_attributes = response.to_lot_attributes()
+        self.assertEqual(202512, lot_attributes["period"])
 
     def test_knows_its_year(self):
         response = EOGetTransactionResponse(self.payload(delivery_date="2025-12-22T00:00:00.000Z"))
         self.assertEqual(2025, response.year())
 
-        carbure_lot = response.to_lot()
-        self.assertEqual(2025, carbure_lot.year)
+        lot_attributes = response.to_lot_attributes()
+        self.assertEqual(2025, lot_attributes["year"])
 
     def test_knows_its_supplier(self):
         entity = Entity(name="Some Entity")
@@ -144,9 +155,9 @@ class EOGetTransactionResponseTest(TestCase):
         self.assertEqual("123456789", response.supplier_id())
         entity_get.assert_not_called()
 
-        lot_carbure = response.to_lot()
+        lot_attributes = response.to_lot_attributes()
         entity_get.assert_any_call(registration_id="123456789")
-        self.assertEqual("Some Entity", lot_carbure.carbure_supplier.name)
+        self.assertEqual("Some Entity", lot_attributes["carbure_supplier"].name)
 
     def test_knows_its_client_id(self):
         entity = Entity(name="Some Entity")
@@ -157,16 +168,16 @@ class EOGetTransactionResponseTest(TestCase):
         self.assertEqual("123456780", response.client_id())
         entity_get.assert_not_called()
 
-        lot_carbure = response.to_lot()
+        lot_attributes = response.to_lot_attributes()
         entity_get.assert_any_call(registration_id="123456780")
-        self.assertEqual("Some Entity", lot_carbure.carbure_client.name)
+        self.assertEqual("Some Entity", lot_attributes["carbure_client"].name)
 
     def test_knows_its_status(self):
         response = EOGetTransactionResponse(self.payload(status="PENDING"))
         self.assertEqual("PENDING", response.status())
 
-        carbure_lot = response.to_lot()
-        self.assertEqual("PENDING", carbure_lot.lot_status)
+        lot_attributes = response.to_lot_attributes()
+        self.assertEqual("PENDING", lot_attributes["lot_status"])
 
     def test_knows_its_feedstock_code(self):
         self.patched_from_UDB_feedstock_code.return_value = MatierePremiere(name="Betterave")
@@ -175,6 +186,6 @@ class EOGetTransactionResponseTest(TestCase):
         self.assertEqual("URWS023", response.feedstock_code())
         self.patched_from_UDB_feedstock_code.assert_not_called()
 
-        carbure_lot = response.to_lot()
+        lot_attributes = response.to_lot_attributes()
         self.patched_from_UDB_feedstock_code.assert_called_with("URWS023")
-        self.assertEqual("Betterave", carbure_lot.feedstock.name)
+        self.assertEqual("Betterave", lot_attributes["feedstock"].name)

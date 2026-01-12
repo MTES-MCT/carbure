@@ -12,7 +12,7 @@ class Requester:
         self.timeout = timeout
         self.pub_sub_adapter = PubSubAdapter()
 
-    def response(self):
+    def do_request(self):
         def wait_for_udb_response():
             tried = 0
 
@@ -31,7 +31,8 @@ class Requester:
             self.pub_sub_adapter.subscribe()
             SubmitMessage(environ["UDB_ACCESS_POINT_ID"], self.request).perform()
 
-            return wait_for_udb_response()
+            response = wait_for_udb_response()
+            return response.post_retrieval_action_result()
 
         finally:
             self.pub_sub_adapter.unsubscribe()

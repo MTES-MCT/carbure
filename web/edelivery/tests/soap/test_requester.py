@@ -1,8 +1,7 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from edelivery.ebms.request_responses import EOGetTransactionResponse
-from edelivery.ebms.requests import BaseRequest, EOGetTransactionRequest
+from edelivery.ebms.requests import BaseRequest
 from edelivery.soap.requester import Requester
 
 
@@ -35,7 +34,7 @@ class RequesterTest(TestCase):
         requester = Requester(request)
         self.assertEqual([], commands_called)
 
-        requester.response()
+        requester.do_request()
         self.assertEqual(["subscribe", "submit request"], commands_called)
 
     def test_unsubscribes_to_message_queue_after_fetching_message(self):
@@ -53,41 +52,43 @@ class RequesterTest(TestCase):
         requester = Requester(request)
         self.assertEqual([], commands_called)
 
-        requester.response()
+        requester.do_request()
         self.assertEqual(["fetch message", "unsubscribe"], commands_called)
 
-    def test_returns_request_response_received_from_udb(self):
+    def test_returns_result_of_action_triggered_upon_receiving_response_from_udb(self):
+        patched_BaseRequestResponse = MagicMock()
+        patched_BaseRequestResponse.return_value.request_id.return_value = "111"
+        patched_BaseRequestResponse.return_value.post_retrieval_action_result.return_value = "Some result"
         self.patched_PubSubAdapter.return_value.next_message.return_value = self.DEFAULT_RESPONSE_PAYLOAD
         self.patched_new_uuid.return_value = "111"
         request = BaseRequest("<request/>")
+        request.response_class = patched_BaseRequestResponse
         requester = Requester(request)
 
-        response = requester.response()
-        self.assertEqual(self.DEFAULT_RESPONSE_PAYLOAD, response.payload)
-
-    def test_returns_response_class_corresponding_to_request_class(self):
-        self.patched_new_uuid.return_value = "111"
-        request = EOGetTransactionRequest("12345")
-        requester = Requester(request)
-
-        response = requester.response()
-        self.assertIsInstance(response, EOGetTransactionResponse)
+        result = requester.do_request()
+        patched_BaseRequestResponse.assert_called_with(self.DEFAULT_RESPONSE_PAYLOAD)
+        self.assertEqual("Some result", result)
 
     def test_throws_timeout_error_if_not_receiving_any_response_from_udb(self):
         self.patched_PubSubAdapter.return_value.next_message.return_value = None
         request = BaseRequest("<request/>")
         requester = Requester(request, delay_between_retries=0.001, timeout=0.002)
 
-        self.assertRaises(TimeoutError, requester.response)
+        self.assertRaises(TimeoutError, requester.do_request)
 
     def test_retries_few_times_before_throwing_timeout_error(self):
+        patched_BaseRequestResponse = MagicMock()
+        patched_BaseRequestResponse.return_value.request_id.return_value = "111"
+        patched_BaseRequestResponse.return_value.post_retrieval_action_result.return_value = "Some result"
+        patched_BaseRequestResponse.return_value.post_retrieval_action_result.return_value = "Some result"
         self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, self.DEFAULT_RESPONSE_PAYLOAD]
         self.patched_new_uuid.return_value = "111"
         request = BaseRequest("<request/>")
+        request.response_class = patched_BaseRequestResponse
         requester = Requester(request)
 
-        response = requester.response()
-        self.assertEqual(self.DEFAULT_RESPONSE_PAYLOAD, response.payload)
+        result = requester.do_request()
+        self.assertEqual("Some result", result)
 
     @patch("edelivery.ebms.requests.new_uuid")
     def test_checks_whether_request_ids_correspond(self, patched_new_uuid):
@@ -96,4 +97,4 @@ class RequesterTest(TestCase):
         request = BaseRequest("<request/>")
         requester = Requester(request, delay_between_retries=0.001, timeout=0.002)
 
-        self.assertRaises(TimeoutError, requester.response)
+        self.assertRaises(TimeoutError, requester.do_request)

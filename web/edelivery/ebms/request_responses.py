@@ -15,6 +15,9 @@ class BaseRequestResponse:
         response_header_element = self.parsed_XML.find("./RESPONSE_HEADER")
         return response_header_element.attrib["REQUEST_ID"]
 
+    def post_retrieval_action_result(self):
+        pass
+
 
 class EOGetTransactionResponse(BaseRequestResponse):
     def __init__(self, payload):
@@ -47,20 +50,32 @@ class EOGetTransactionResponse(BaseRequestResponse):
         ntr = self.transaction_XML_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
         return from_national_trade_register(ntr)
 
-    def to_lot(self):
+    def to_lot_attributes(self):
         client = Entity.objects.get(registration_id=self.client_id())
         supplier = Entity.objects.get(registration_id=self.supplier_id())
         feedstock = from_UDB_feedstock_code(self.feedstock_code())
 
-        return CarbureLot(
-            carbure_client=client,
-            carbure_supplier=supplier,
-            delivery_date=self.iso_format_delivery_date(),
-            feedstock=feedstock,
-            period=self.period(),
-            lot_status=self.status(),
-            year=self.year(),
+        return {
+            "carbure_client": client,
+            "carbure_supplier": supplier,
+            "delivery_date": self.iso_format_delivery_date(),
+            "feedstock": feedstock,
+            "period": self.period(),
+            "lot_status": self.status(),
+            "year": self.year(),
+        }
+
+    def post_retrieval_action_result(self):
+        lot_attributes = self.to_lot_attributes()
+        lot, created = CarbureLot.objects.update_or_create(
+            udb_transaction_id=self.udb_transaction_id(),
+            defaults=lot_attributes,
         )
+
+        return {"newLotCreated": created, "id": lot.id}
+
+    def udb_transaction_id(self):
+        return self.transaction_XML_element.find("./TRANSACTION_ID").text
 
     def year(self):
         return self.delivery_date().year
