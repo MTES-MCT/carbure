@@ -17,6 +17,9 @@ class BiomethaneAnnualDeclaration(models.Model):
 
     status = models.CharField(choices=DECLARATION_STATUS, max_length=20, default=IN_PROGRESS)
 
+    # Indique si la déclaration est modifiable ou non
+    is_open = models.BooleanField(default=True)
+
     class Meta:
         db_table = "biomethane_annual_declaration"
         unique_together = ["producer", "year"]
