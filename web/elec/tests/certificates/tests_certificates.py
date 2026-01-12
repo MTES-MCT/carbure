@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from core.models import Entity
 from core.tests_utils import FiltersActionTestMixin, setup_current_user
+from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
 from elec.views import ProvisionCertificateViewSet, TransferCertificateViewSet
@@ -39,6 +40,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             operating_unit="XYZ",
             energy_amount=4000,
             remaining_energy_amount=0,
+            source=ElecProvisionCertificate.METER_READINGS,
         )
         self.prov2 = ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
@@ -47,6 +49,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             operating_unit="ABCD",
             energy_amount=1000,
             remaining_energy_amount=500,
+            source=ElecProvisionCertificate.METER_READINGS,
         )
         self.prov3 = ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
@@ -55,6 +58,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             operating_unit="DCBA",
             energy_amount=2000,
             remaining_energy_amount=2000,
+            source=ElecProvisionCertificate.METER_READINGS,
         )
 
     def test_transfer_provision_certificate_pile_poil(self):
@@ -173,7 +177,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
                 "cpo": [self.cpo.name],
                 "operating_unit": ["ABCD", "DCBA", "XYZ"],
                 "quarter": [1, 2, 4],
-                "source": [],
+                "source": [ElecProvisionCertificate.METER_READINGS],
                 "year": [2022, 2023],
             },
             entity=self.cpo,
@@ -260,3 +264,66 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
 
         assert json["count"] == 1
         assert json["results"][0]["supplier"]["name"] == self.cpo.name
+
+    def test_transfer_provision_certificate_readjustement_flag(self):
+        ElecCertificateReadjustment.objects.create(
+            cpo=self.cpo,
+            energy_amount=500,  # MWh
+            error_source=ElecCertificateReadjustment.METER_READINGS,
+        )
+
+        readjustment_entity = Entity.objects.create(
+            name="READJUSTMENT",
+            entity_type=Entity.EXTERNAL_ADMIN,
+        )
+
+        with self.settings(ELEC_READJUSTMENT_ENTITY=readjustment_entity.name):
+            response = self.client.post(
+                reverse("provision-certificates-transfer"),
+                {
+                    "entity_id": self.cpo.id,
+                    "energy_amount": 1000,
+                    "is_readjustment": True,
+                },
+            )
+
+            # not working because too much energy compared to what's asked
+            assert response.status_code == 400
+
+            response = self.client.post(
+                reverse("provision-certificates-transfer"),
+                {
+                    "entity_id": self.cpo.id,
+                    "energy_amount": 500,
+                    "is_readjustment": True,
+                },
+            )
+
+            assert response.status_code == 200
+
+            response = self.client.post(
+                reverse("provision-certificates-transfer"),
+                {
+                    "entity_id": self.cpo.id,
+                    "energy_amount": 1,
+                    "is_readjustment": True,
+                },
+            )
+
+            # not working because it was already readjusted
+            assert response.status_code == 400
+
+        self.prov1.refresh_from_db()
+        self.prov2.refresh_from_db()
+        self.prov3.refresh_from_db()
+
+        assert self.prov1.remaining_energy_amount == 0
+        assert self.prov2.remaining_energy_amount == 0
+        assert self.prov3.remaining_energy_amount == 2000
+
+        transfer_cert = ElecTransferCertificate.objects.all().first()
+        assert transfer_cert.status == ElecTransferCertificate.ACCEPTED
+        assert transfer_cert.energy_amount == 500
+        assert transfer_cert.supplier_id == self.cpo.id
+        assert transfer_cert.client_id == readjustment_entity.id
+        assert transfer_cert.is_readjustment is True

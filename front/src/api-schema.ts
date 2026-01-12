@@ -4239,7 +4239,7 @@ export interface components {
         ElecProvisionCertificate: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
-            source?: components["schemas"]["ElecProvisionCertificateSourceEnum"] | null;
+            source: components["schemas"]["ElecProvisionCertificateSourceEnum"];
             quarter: components["schemas"]["QuarterEnum"];
             year: number;
             operating_unit: string;
@@ -4272,6 +4272,8 @@ export interface components {
          * @description * `MANUAL` - MANUAL
          *     * `METER_READINGS` - METER_READINGS
          *     * `QUALICHARGE` - QUALICHARGE
+         *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+         *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
          * @enum {string}
          */
         ElecProvisionCertificateSourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
@@ -4307,7 +4309,9 @@ export interface components {
         ElecTransferRequest: {
             /** Format: double */
             energy_amount: number;
-            client: number;
+            client?: number;
+            /** @default false */
+            is_readjustment: boolean;
         };
         EmptyResponse: {
             empty?: string;
@@ -8305,8 +8309,10 @@ export interface operations {
                 search?: string;
                 /** @description * `MANUAL` - MANUAL
                  *     * `METER_READINGS` - METER_READINGS
-                 *     * `QUALICHARGE` - QUALICHARGE */
-                source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
+                 *     * `QUALICHARGE` - QUALICHARGE
+                 *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
+                source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
                 status?: string;
                 year?: number;
             };
@@ -8539,6 +8545,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         balance?: number;
+                        readjustment_balance?: number;
                     };
                 };
             };
@@ -8601,8 +8608,10 @@ export interface operations {
                 search?: string;
                 /** @description * `MANUAL` - MANUAL
                  *     * `METER_READINGS` - METER_READINGS
-                 *     * `QUALICHARGE` - QUALICHARGE */
-                source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
+                 *     * `QUALICHARGE` - QUALICHARGE
+                 *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
+                source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
                 status?: string;
                 year?: number;
             };
@@ -12744,6 +12753,8 @@ export enum PathsApiElecProvisionCertificatesGetParametersQueryQuarter {
     Value4 = 4
 }
 export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
+    ADMIN_ERROR_COMPENSATION = "ADMIN_ERROR_COMPENSATION",
+    ENR_RATIO_COMPENSATION = "ENR_RATIO_COMPENSATION",
     MANUAL = "MANUAL",
     METER_READINGS = "METER_READINGS",
     QUALICHARGE = "QUALICHARGE"
