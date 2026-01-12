@@ -5,12 +5,11 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react"
 
 interface PrivateNavigationContext {
-  title?: ReactElement | string
+  title?: ReactElement | string | undefined
   setTitle: (title: ReactElement | string) => void
 }
 export const PrivateNavigationContext = createContext<PrivateNavigationContext>(
@@ -20,19 +19,28 @@ export const PrivateNavigationContext = createContext<PrivateNavigationContext>(
   }
 )
 
-export const usePrivateNavigation = (newTitle: ReactElement | string) => {
+export const usePrivateNavigation = (
+  newTitle?: ReactElement | string,
+  key?: string
+) => {
   const { setTitle } = useContext(PrivateNavigationContext)
-  const ref = useRef(newTitle)
+  const _key = typeof newTitle !== "string" ? key : newTitle
+  console.log("newTitle", typeof newTitle)
+  if (newTitle && typeof newTitle !== "string" && !key) {
+    throw new Error("Key is required when newTitle is not a string")
+  }
 
-  // Title need to be updated only when the ref changes (to prevent infinite re-renders with a react element)
+  // Title need to be updated only when the key changes (to prevent infinite re-renders with a react element)
   useEffect(() => {
-    setTitle(ref.current)
-  }, [ref])
+    setTitle(newTitle ?? "")
+  }, [_key])
+
+  return { setTitle }
 }
 
 export const PrivateNavigationProvider = ({ children }: PropsWithChildren) => {
   const [title, setTitle] = useState<ReactElement | string | undefined>("")
-
+  console.log("title", title)
   const value = useMemo(
     () => ({
       title,

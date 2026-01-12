@@ -44,7 +44,7 @@ const Teneur = () => {
   const readOnly = isAdminOrExternal
   const { t } = useTranslation()
   const portal = usePortal()
-  usePrivateNavigation(<BetaPage title={t("Objectifs annuels")} />)
+  usePrivateNavigation(<BetaPage title={t("Objectifs annuels")} />, "teneur")
 
   const { selectedEntityId } = useOutletContext<TeneurOutletContext>()
 

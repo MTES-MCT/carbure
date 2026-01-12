@@ -10,11 +10,25 @@ import { DeclarationDetailTabs } from "./components/declaration-detail-tabs"
 
 export const BiomethaneAdminDeclarationDetailPage = () => {
   const { t } = useTranslation()
-  usePrivateNavigation(t("Déclarations par établissement - détail"))
+
   const { selectedEntityId } = useParams<{ selectedEntityId: string }>()
   const routes = useRoutes()
+  const { setTitle } = usePrivateNavigation()
   const { isEntityMatchWithProducers, loading, producers } =
-    useBiomethaneProducers()
+    useBiomethaneProducers({
+      onSuccess: (data) => {
+        if (selectedEntityId) {
+          const selectedEntityName = data?.find(
+            (producer) => producer.id === Number(selectedEntityId)
+          )?.name
+          setTitle(
+            t("Déclaration - {{entityName}}", {
+              entityName: selectedEntityName,
+            })
+          )
+        }
+      },
+    })
 
   if (!selectedEntityId) {
     return null
