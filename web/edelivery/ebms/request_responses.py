@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 from core.models import CarbureLot, Entity
-from edelivery.ebms.feedstocks import from_UDB_feedstock_code
+from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
 from edelivery.ebms.ntr import from_national_trade_register
 
 
@@ -23,6 +23,9 @@ class EOGetTransactionResponse(BaseRequestResponse):
     def __init__(self, payload):
         super().__init__(payload)
         self.transaction_XML_element = self.parsed_XML.find("./EO_TRANS_HEADER/EO_TRANSACTION")
+
+    def biofuel_code(self):
+        return self.transaction_XML_element.find("./MATERIAL_CODE").text
 
     def client_id(self):
         ntr = self.transaction_XML_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text
@@ -51,17 +54,21 @@ class EOGetTransactionResponse(BaseRequestResponse):
         return from_national_trade_register(ntr)
 
     def to_lot_attributes(self):
+        biofuel = from_UDB_biofuel_code(self.biofuel_code())
         client = Entity.objects.get(registration_id=self.client_id())
-        supplier = Entity.objects.get(registration_id=self.supplier_id())
         feedstock = from_UDB_feedstock_code(self.feedstock_code())
+        lhv_amount = self.quantity() * 3600
+        supplier = Entity.objects.get(registration_id=self.supplier_id())
 
         return {
+            "biofuel": biofuel,
             "carbure_client": client,
             "carbure_supplier": supplier,
             "delivery_date": self.iso_format_delivery_date(),
             "feedstock": feedstock,
             "period": self.period(),
             "lot_status": self.status(),
+            "lhv_amount": lhv_amount,
             "year": self.year(),
         }
 
@@ -73,6 +80,10 @@ class EOGetTransactionResponse(BaseRequestResponse):
         )
 
         return {"newLotCreated": created, "id": lot.id}
+
+    def quantity(self):
+        quantity = self.transaction_XML_element.find("./EO_TRANS_DETAIL_MATERIALS/QUANTITY").text
+        return int(quantity)
 
     def udb_transaction_id(self):
         return self.transaction_XML_element.find("./TRANSACTION_ID").text
