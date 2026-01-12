@@ -16855,6 +16855,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ElecProvisionCertificate"
+        provisioned_energy:
+          type: number
     PaginatedElecProvisionCertificateQualichargeResponseList:
       type: object
       required:

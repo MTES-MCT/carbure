@@ -5210,6 +5210,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["ElecProvisionCertificate"][];
+            provisioned_energy?: number;
         };
         PaginatedElecProvisionCertificateQualichargeResponseList: {
             /** @example 123 */
