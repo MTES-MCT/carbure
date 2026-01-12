@@ -19,8 +19,8 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneAnnualDeclaration
-        fields = ["year", "status", "missing_fields", "is_complete"]
-        read_only_fields = ["year", "missing_fields", "is_complete"]
+        fields = ["producer", "year", "status", "missing_fields", "is_complete"]
+        read_only_fields = ["missing_fields", "is_complete"]
 
     def to_representation(self, instance):
         # Override status in representation to use computed value
@@ -62,11 +62,6 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
     def get_is_complete(self, instance):
         missing_fields = self.get_missing_fields(instance)
         return BiomethaneAnnualDeclarationService.is_declaration_complete(instance, missing_fields)
-
-    def create(self, validated_data):
-        validated_data["producer"] = self.context["entity"]
-        validated_data["year"] = BiomethaneAnnualDeclarationService.get_declaration_period()
-        return super().create(validated_data)
 
     def update(self, instance, validated_data):
         # Allow partial update of the declaration, only for status field to IN_PROGRESS
