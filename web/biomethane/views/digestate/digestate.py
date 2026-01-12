@@ -1,10 +1,10 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, extend_schema_view
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters.mixins import EntityProducerFilter, EntityProducerYearFilter
+from biomethane.filters.mixins import EntityProducerYearFilter
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.digestate import (
@@ -25,25 +25,19 @@ from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.QUERY,
+            description="Year of the energy declaration.",
+            required=True,
+        ),
     ]
-)
-@extend_schema_view(
-    retrieve=extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="year",
-                type=OpenApiTypes.INT,
-                location=OpenApiParameter.QUERY,
-                description="Year of the energy declaration.",
-                required=True,
-            ),
-        ],
-    )
 )
 class BiomethaneDigestateViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMixin, GenericViewSet):
     queryset = BiomethaneDigestate.objects.all()
     serializer_class = BiomethaneDigestateSerializer
-    filterset_class = EntityProducerFilter
+    filterset_class = EntityProducerYearFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -51,8 +45,7 @@ class BiomethaneDigestateViewSet(OptionalFieldsActionMixin, RetrieveSingleObject
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
-        entity = getattr(self.request, "entity", None)
-        setattr(request, "year", BiomethaneAnnualDeclarationService.get_declaration_period(entity))
+        setattr(request, "year", request.query_params.get("year"))
         return request
 
     def get_serializer_context(self):
@@ -65,20 +58,6 @@ class BiomethaneDigestateViewSet(OptionalFieldsActionMixin, RetrieveSingleObject
         if self.action == "upsert":
             return BiomethaneDigestateInputSerializer
         return super().get_serializer_class()
-
-    def get_filterset_class(self):
-        if self.action == "retrieve":
-            return EntityProducerYearFilter
-        elif self.action in ["upsert", "get_optional_fields"]:
-            return EntityProducerFilter
-        return None
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.action in ["upsert", "get_optional_fields"]:
-            # force filtering by current declaration year
-            queryset = queryset.filter(year=self.request.year)
-        return queryset
 
     @extend_schema(
         responses={
