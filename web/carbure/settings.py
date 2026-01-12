@@ -120,6 +120,7 @@ INSTALLED_APPS = [
     "user",
     "biomethane",
     "edelivery",
+    "anonymization",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
