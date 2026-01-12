@@ -96,7 +96,7 @@ export const TransferCertificateDetails = () => {
           )}
           <TextInput
             readOnly
-            label={t("Énergie transférée")}
+            label={t("Quantité")}
             value={formatUnit(
               transferCert?.energy_amount ?? 0,
               ExtendedUnit.MWh
