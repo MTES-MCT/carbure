@@ -191,6 +191,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/admin/producers/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List biomethane producers visible by the current DREAL entity.
+         *
+         *     Returns producers that have production units in departments
+         *     accessible by the DREAL. */
+        get: operations["biomethane_admin_producers_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/annual-declaration/": {
         parameters: {
             query?: never;
@@ -3448,6 +3468,10 @@ export interface components {
             network_type: components["schemas"]["NetworkTypeEnum"] | null;
             network_manager_name: string | null;
         };
+        BiomethaneProducer: {
+            readonly id: number;
+            name: string;
+        };
         BiomethaneProductionUnit: {
             readonly id: number;
             installed_meters?: components["schemas"]["InstalledMetersEnum"][];
@@ -6276,6 +6300,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserCreation"];
+                };
+            };
+        };
+    };
+    biomethane_admin_producers_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiomethaneProducer"][];
                 };
             };
         };

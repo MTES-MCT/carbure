@@ -453,6 +453,47 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/biomethane/admin/producers/:
+    get:
+      operationId: biomethane_admin_producers_list
+      description: |-
+        List biomethane producers visible by the current DREAL entity.
+
+        Returns producers that have production units in departments
+        accessible by the DREAL.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BiomethaneProducer"
+          description: ""
   /api/biomethane/annual-declaration/:
     get:
       operationId: biomethane_annual_declaration_retrieve
@@ -11977,6 +12018,18 @@ components:
         - network_manager_name
         - network_type
         - unique_identification_number
+    BiomethaneProducer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+      required:
+        - id
+        - name
     BiomethaneProductionUnit:
       type: object
       properties:

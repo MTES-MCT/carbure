@@ -2,14 +2,14 @@ import { Row } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { useRoutes } from "common/hooks/routes"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
-import { EntityPreview } from "common/types"
 import { useNavigate } from "react-router-dom"
+import { BiomethaneProducer } from "../../types"
 
 interface DeclarationDetailHeaderProps {
-  producers: EntityPreview[]
+  producers: BiomethaneProducer[]
 }
 
-const normalizeProducer = (producer: EntityPreview) => {
+const normalizeProducer = (producer: BiomethaneProducer) => {
   return {
     label: producer.name,
     value: producer.id,
