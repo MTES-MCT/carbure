@@ -81,14 +81,16 @@ class NotFoundErrorResponseTest(TestCase):
 
 class EOGetTransactionResponseTest(TestCase):
     def setUp(self):
-        self.patched_entity = patch("edelivery.ebms.request_responses.Entity").start()
-        self.patched_entity.objects.get.return_value = Entity()
-
         self.patched_from_UDB_feedstock_code = patch("edelivery.ebms.request_responses.from_UDB_feedstock_code").start()
         self.patched_from_UDB_feedstock_code.return_value = MatierePremiere()
 
         self.patched_from_UDB_biofuel_code = patch("edelivery.ebms.request_responses.from_UDB_biofuel_code").start()
         self.patched_from_UDB_biofuel_code.return_value = Biocarburant()
+
+        self.patched_from_national_trade_register = patch(
+            "edelivery.ebms.request_responses.from_national_trade_register",
+        ).start()
+        self.patched_from_national_trade_register.return_value = Entity()
 
     def tearDown(self):
         patch.stopall()
@@ -216,28 +218,26 @@ class EOGetTransactionResponseTest(TestCase):
 
     def test_knows_its_supplier(self):
         entity = Entity(name="Some Entity")
-        entity_get = self.patched_entity.objects.get
-        entity_get.return_value = entity
+        self.patched_from_national_trade_register.return_value = entity
 
         response = EOGetTransactionResponse(self.payload(supplier_id="FR_SIREN_CD123456789"))
-        self.assertEqual("123456789", response.supplier_id())
-        entity_get.assert_not_called()
+        self.assertEqual("FR_SIREN_CD123456789", response.supplier_id())
+        self.patched_from_national_trade_register.assert_not_called()
 
         lot_attributes = response.to_lot_attributes()
-        entity_get.assert_any_call(registration_id="123456789")
+        self.patched_from_national_trade_register.assert_any_call("FR_SIREN_CD123456789")
         self.assertEqual("Some Entity", lot_attributes["carbure_supplier"].name)
 
-    def test_knows_its_client_id(self):
+    def test_knows_its_client(self):
         entity = Entity(name="Some Entity")
-        entity_get = self.patched_entity.objects.get
-        entity_get.return_value = entity
+        self.patched_from_national_trade_register.return_value = entity
 
-        response = EOGetTransactionResponse(self.payload(client_id="FR_SIREN_CD123456780"))
-        self.assertEqual("123456780", response.client_id())
-        entity_get.assert_not_called()
+        response = EOGetTransactionResponse(self.payload(client_id="FR_SIREN_CD123123123"))
+        self.assertEqual("FR_SIREN_CD123123123", response.client_id())
+        self.patched_from_national_trade_register.assert_not_called()
 
         lot_attributes = response.to_lot_attributes()
-        entity_get.assert_any_call(registration_id="123456780")
+        self.patched_from_national_trade_register.assert_any_call("FR_SIREN_CD123123123")
         self.assertEqual("Some Entity", lot_attributes["carbure_client"].name)
 
     def test_knows_its_status(self):
