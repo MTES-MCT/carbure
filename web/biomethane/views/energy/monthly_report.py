@@ -5,7 +5,6 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters import BiomethaneEnergyMonthlyReportFilter
 from biomethane.filters.energy_monthly_report import BiomethaneEnergyMonthlyReportYearFilter
 from biomethane.models import BiomethaneEnergyMonthlyReport
 from biomethane.permissions import get_biomethane_permissions
@@ -25,10 +24,18 @@ from biomethane.views.mixins import ListWithObjectPermissionsMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.QUERY,
+            description="Year of the energy declaration.",
+            required=True,
+        ),
     ]
 )
 class BiomethaneEnergyMonthlyReportViewSet(ListWithObjectPermissionsMixin, GenericViewSet, ListModelMixin):
     queryset = BiomethaneEnergyMonthlyReport.objects.all()
+    filterset_class = BiomethaneEnergyMonthlyReportYearFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -38,20 +45,16 @@ class BiomethaneEnergyMonthlyReportViewSet(ListWithObjectPermissionsMixin, Gener
         """Check permissions on the energy of the monthly reports."""
         return first_obj.energy if first_obj else None
 
-    def get_filterset_class(self):
-        if self.action == "list":
-            return BiomethaneEnergyMonthlyReportYearFilter
-        return BiomethaneEnergyMonthlyReportFilter
-
     def get_serializer_class(self):
         if self.action == "upsert":
             return BiomethaneEnergyMonthlyReportInputSerializer
         return BiomethaneEnergyMonthlyReportSerializer
 
-    def get_queryset(self):
-        if self.action == "upsert":
-            return self.queryset.filter(energy__year=self.request.year)
-        return super().get_queryset()
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["energy_instance"] = self.queryset.first().energy if self.queryset.exists() else None
+        print("context:", context["energy_instance"])
+        return context
 
     @extend_schema(
         responses={

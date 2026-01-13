@@ -2,7 +2,6 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneEnergyMonthlyReport
-from biomethane.models.biomethane_energy import BiomethaneEnergy
 
 
 class BiomethaneEnergyMonthlyReportSerializer(serializers.ModelSerializer):
@@ -20,14 +19,13 @@ class MonthlyReportDataSerializer(serializers.Serializer):
 
 class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
     child = MonthlyReportDataSerializer()
-    year = serializers.IntegerField(write_only=True, required=True)
 
     def validate(self, attrs):
         months = [item["month"] for item in attrs]
         if len(months) != len(set(months)):
             raise serializers.ValidationError(_("Chaque mois ne peut apparaître qu'une seule fois"))
 
-        energy_instance = self.context.get("energy")
+        energy_instance = self.context.get("energy_instance")
         if not energy_instance:
             raise serializers.ValidationError(
                 {"energy": [_("Cette entité n'a pas de déclaration énergétique pour cette année.")]}
@@ -35,10 +33,7 @@ class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
         return attrs
 
     def create(self, validated_data):
-        entity = self.context.get("request").entity
-        year = validated_data.pop("year")
-
-        energy_instance = BiomethaneEnergy.objects.filter(producer=entity, year=year).first()
+        energy_instance = self.context.get("energy_instance")
 
         created_reports = []
 
