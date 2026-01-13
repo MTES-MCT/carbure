@@ -19,8 +19,8 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneAnnualDeclaration
-        fields = ["producer", "year", "status", "missing_fields", "is_complete"]
-        read_only_fields = ["missing_fields", "is_complete"]
+        fields = ["producer", "year", "status", "missing_fields", "is_complete", "is_open"]
+        read_only_fields = ["missing_fields", "is_complete", "is_open"]
 
     def to_representation(self, instance):
         # Override status in representation to use computed value
