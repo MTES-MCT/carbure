@@ -10,12 +10,16 @@ export const getAnnualDeclarationYears = (entity_id: number) =>
     },
   })
 
-export const getCurrentAnnualDeclaration = (entity_id: number) =>
+export const getCurrentAnnualDeclaration = (
+  entity_id: number,
+  year: number | undefined
+) =>
   api
     .GET("/biomethane/annual-declaration/", {
       params: {
         query: {
           entity_id,
+          year,
         },
       },
     })

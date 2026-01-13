@@ -46,6 +46,10 @@ interface AnnualDeclarationProviderProps {
 export function AnnualDeclarationProvider({
   children,
 }: AnnualDeclarationProviderProps) {
+  const { year: _year } = useParams<{ year: string }>()
+  const parsedYear = _year ? parseInt(_year) : undefined
+  const key =
+    "current-annual-declaration" + (parsedYear ? `-${parsedYear}` : "")
   // We need to use the current year inside the provider to mock the date when the provider is mounted
   const currentYear = new Date().getFullYear()
   const entity = useEntity()
@@ -53,10 +57,9 @@ export function AnnualDeclarationProvider({
     result: currentAnnualDeclaration,
     loading: loadingCurrentAnnualDeclaration,
   } = useQuery(getCurrentAnnualDeclaration, {
-    key: "current-annual-declaration",
-    params: [entity.id],
+    key,
+    params: [entity.id, parsedYear],
   })
-  const { year: _year } = useParams<{ year: string }>()
 
   if (loadingCurrentAnnualDeclaration && !currentAnnualDeclaration)
     return <LoaderOverlay />
@@ -64,7 +67,7 @@ export function AnnualDeclarationProvider({
   if (!currentAnnualDeclaration) return null
 
   // Use year from url if provided, otherwise selected year is current year
-  const year = _year ? parseInt(_year) : currentYear
+  const year = parsedYear ?? currentYear
 
   const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
   const isDeclarationValidated =
