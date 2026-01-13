@@ -47,7 +47,7 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
-        entity = self.context.get("entity")
+        entity = self.context.get("request").entity
         validated_data["producer"] = entity
         BiomethaneContractService.handle_is_red_ii(validated_data, entity)
         return super().create(validated_data)

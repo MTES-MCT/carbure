@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneEnergyMonthlyReport
+from biomethane.models.biomethane_energy import BiomethaneEnergy
 
 
 class BiomethaneEnergyMonthlyReportSerializer(serializers.ModelSerializer):
@@ -19,6 +20,7 @@ class MonthlyReportDataSerializer(serializers.Serializer):
 
 class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
     child = MonthlyReportDataSerializer()
+    year = serializers.IntegerField(write_only=True, required=True)
 
     def validate(self, attrs):
         months = [item["month"] for item in attrs]
@@ -33,7 +35,11 @@ class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
         return attrs
 
     def create(self, validated_data):
-        energy_instance = self.context.get("energy")
+        entity = self.context.get("request").entity
+        year = validated_data.pop("year")
+
+        energy_instance = BiomethaneEnergy.objects.filter(producer=entity, year=year).first()
+
         created_reports = []
 
         # Upsert all monthly reports

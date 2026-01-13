@@ -35,11 +35,6 @@ class BiomethaneContractViewSet(RetrieveSingleObjectMixin, WatchedFieldsActionMi
     def get_permissions(self):
         return get_biomethane_permissions(["upsert"], self.action)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["entity"] = getattr(self.request, "entity", None)
-        return context
-
     def get_serializer_class(self):
         if self.action == "upsert":
             return BiomethaneContractInputSerializer

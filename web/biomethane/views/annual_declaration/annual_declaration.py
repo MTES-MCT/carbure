@@ -46,11 +46,6 @@ class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, Ye
 
         return request
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["entity"] = getattr(self.request, "entity", None)
-        return context
-
     def get_queryset(self):
         if self.action == "get_years":
             return super().get_queryset()
