@@ -23,6 +23,13 @@ from .mixins import ValidateActionMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=int,
+            required=False,
+            location=OpenApiParameter.QUERY,
+            description="Year of the annual declaration",
+        ),
     ]
 )
 class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, YearsActionMixin, GenericViewSet):
@@ -86,6 +93,7 @@ class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, Ye
         return Response(data, status=status_code)
 
     def partial_update(self, request, *args, **kwargs):
+        """Partial update of the declaration for a producer and year (only status field to IN_PROGRESS is allowed)."""
         try:
             declaration = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(declaration, data=request.data, partial=True)
