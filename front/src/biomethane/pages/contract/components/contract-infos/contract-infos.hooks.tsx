@@ -67,7 +67,8 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
   const entity = useEntity()
   const portal = usePortal()
   const { hasWatchedFieldsChanged } = useWatchedFields<BiomethaneContract>()
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const { currentAnnualDeclaration, currentAnnualDeclarationKey } =
+    useAnnualDeclaration()
 
   const mutation = useMutation(
     (data) =>
@@ -86,7 +87,7 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
       invalidates: [
         "contract-infos",
         "user-settings",
-        "current-annual-declaration",
+        currentAnnualDeclarationKey,
       ],
       onSuccess: () => {
         notify(t("Le contrat a bien été mis à jour."), { variant: "success" })

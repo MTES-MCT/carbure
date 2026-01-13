@@ -23,13 +23,16 @@ type AddSpreadingDepartmentForm =
 export const AddSpreadingDepartment = ({
   onClose,
   spreadings,
+  year,
 }: {
   onClose: () => void
   spreadings: BiomethaneDigestateSpreading[]
+  year: number
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { bind, value } = useForm<AddSpreadingDepartmentForm>({})
+
   const mutate = useMutation(addSpreadingDepartment, {
     invalidates: ["digestate"],
     onSuccess: () => {
@@ -42,6 +45,7 @@ export const AddSpreadingDepartment = ({
       spreading_department: value.spreading_department!,
       spread_quantity: value.spread_quantity!,
       spread_parcels_area: value.spread_parcels_area!,
+      year,
     })
   }
 

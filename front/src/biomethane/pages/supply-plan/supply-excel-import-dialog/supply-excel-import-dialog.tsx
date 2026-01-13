@@ -11,6 +11,7 @@ import { importSupplyPlan } from "../api"
 import { Notice } from "common/components/notice"
 import { Box } from "common/components/scaffold"
 import { ExcelImportErrors } from "./excel-import-errors"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 interface ImportFormData {
   supplyPlanFile: File | null
@@ -32,6 +33,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const { currentAnnualDeclarationKey } = useAnnualDeclaration()
   const [importErrors, setImportErrors] = useState<ImportErrorResponse | null>(
     null
   )
@@ -41,7 +43,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   })
 
   const { execute: executeImport, loading } = useMutation(importSupplyPlan, {
-    invalidates: ["supply-plan-inputs", "current-annual-declaration"],
+    invalidates: ["supply-plan-inputs", currentAnnualDeclarationKey],
     onSuccess: () => {
       notify(t("Fichier importé avec succès"), { variant: "success" })
       onClose()

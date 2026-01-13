@@ -36,7 +36,8 @@ export const useSaveProductionUnit = (
   const portal = usePortal()
   const { hasWatchedFieldsChanged } =
     useWatchedFields<BiomethaneProductionUnit>()
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const { currentAnnualDeclaration, currentAnnualDeclarationKey } =
+    useAnnualDeclaration()
 
   const mutation = useMutation(
     (data) =>
@@ -52,7 +53,7 @@ export const useSaveProductionUnit = (
         }
       }),
     {
-      invalidates: ["production-unit", "current-annual-declaration"],
+      invalidates: ["production-unit", currentAnnualDeclarationKey],
       onSuccess: () => {
         notify(t("L'unité de production a bien été sauvegardée."), {
           variant: "success",

@@ -23,6 +23,9 @@ export interface AnnualDeclarationContextValue {
 
   /** Whether at least one supply plan input (intrant) has been filled */
   hasAtLeastOneSupplyInput: boolean
+
+  /** Key for the current annual declaration */
+  currentAnnualDeclarationKey: string
 }
 
 export const AnnualDeclarationContext =
@@ -93,6 +96,7 @@ export function AnnualDeclarationProvider({
     canEditDeclaration,
     hasAnnualDeclarationMissingObjects,
     hasAtLeastOneSupplyInput,
+    currentAnnualDeclarationKey: key,
   }
 
   return (

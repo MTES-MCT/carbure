@@ -4,17 +4,20 @@ import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import { saveDigestate } from "./api"
 import { BiomethaneDigestateInputRequest } from "./types"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useSaveDigestate = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const { selectedYear, currentAnnualDeclarationKey } = useAnnualDeclaration()
 
   const saveDigestateMutation = useMutation(
-    (data: BiomethaneDigestateInputRequest) => saveDigestate(entity.id, data),
+    (data: BiomethaneDigestateInputRequest) =>
+      saveDigestate(entity.id, selectedYear, data),
     {
-      invalidates: ["digestate", "current-annual-declaration"],
+      invalidates: ["digestate", currentAnnualDeclarationKey],
       onSuccess: () => {
         notify(t("Le digestat a bien été mis à jour."), { variant: "success" })
       },

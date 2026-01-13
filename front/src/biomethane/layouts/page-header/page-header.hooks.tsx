@@ -26,10 +26,13 @@ export const usePageHeaderActions = () => {
   const annualDeclarationData = useAnnualDeclaration()
   const { navigateToMissingFields } = useNavigateToMissingFields()
 
+  const { currentAnnualDeclaration, currentAnnualDeclarationKey } =
+    annualDeclarationData
+
   const validateAnnualDeclarationMutation = useMutation(
     () => validateAnnualDeclaration(entity.id),
     {
-      invalidates: ["current-annual-declaration"],
+      invalidates: [currentAnnualDeclarationKey],
       onSuccess: () => {
         notify(t("Votre déclaration a bien été transmise."), {
           variant: "success",
@@ -51,7 +54,7 @@ export const usePageHeaderActions = () => {
   const correctAnnualDeclarationMutation = useMutation(
     () => correctAnnualDeclaration(entity.id),
     {
-      invalidates: ["current-annual-declaration"],
+      invalidates: [currentAnnualDeclarationKey],
       onSuccess: () => {
         notify(
           t(
@@ -74,8 +77,6 @@ export const usePageHeaderActions = () => {
       },
     }
   )
-
-  const { currentAnnualDeclaration } = annualDeclarationData
 
   const openValidateDeclarationDialog = () => {
     portal((close) => (

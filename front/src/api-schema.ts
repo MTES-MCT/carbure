@@ -191,6 +191,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/admin/producers/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List biomethane producers visible by the current DREAL entity.
+         *
+         *     Returns producers that have production units in departments
+         *     accessible by the DREAL. */
+        get: operations["biomethane_admin_producers_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/annual-declaration/": {
         parameters: {
             query?: never;
@@ -3116,7 +3136,8 @@ export interface components {
             code: string;
         };
         BiomethaneAnnualDeclaration: {
-            readonly year: number;
+            producer: number;
+            year: number;
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             /** @description Missing fields grouped by type */
             readonly missing_fields: {
@@ -3293,6 +3314,7 @@ export interface components {
             spread_parcels_area: number;
         };
         BiomethaneDigestateSpreadingAddRequest: {
+            year: number;
             spreading_department: string;
             /** Format: double */
             spread_quantity: number;
@@ -3447,6 +3469,10 @@ export interface components {
             postal_code?: string | null;
             network_type: components["schemas"]["NetworkTypeEnum"] | null;
             network_manager_name: string | null;
+        };
+        BiomethaneProducer: {
+            readonly id: number;
+            name: string;
         };
         BiomethaneProductionUnit: {
             readonly id: number;
@@ -5021,6 +5047,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["BiomethaneContractAmendment"][];
         };
+        PaginatedBiomethaneProducerList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["BiomethaneProducer"][];
+        };
         PaginatedBiomethaneSupplyInputList: {
             /** @example 123 */
             count: number;
@@ -5196,6 +5237,8 @@ export interface components {
             total_available_volume?: number;
         };
         PatchedBiomethaneAnnualDeclarationRequest: {
+            producer?: number;
+            year?: number;
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
         };
         PatchedBiomethaneDigestateStorageInputRequest: {
@@ -6280,6 +6323,36 @@ export interface operations {
             };
         };
     };
+    biomethane_admin_producers_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedBiomethaneProducerList"];
+                };
+            };
+        };
+    };
     biomethane_annual_declaration_retrieve: {
         parameters: {
             query: {
@@ -6583,6 +6656,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6787,6 +6862,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6892,6 +6969,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6992,6 +7071,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;

@@ -9,6 +9,7 @@ export const currentAnnualDeclaration = {
     supply_plan_valid: true,
   },
   is_complete: true,
+  producer: 1,
 }
 
 export const currentAnnualDeclarationMissingFields = {
