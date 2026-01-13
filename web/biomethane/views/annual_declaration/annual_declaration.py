@@ -1,11 +1,12 @@
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneAnnualDeclaration
-from biomethane.permissions import get_biomethane_permissions
+from biomethane.permissions import HasDrealRights, get_biomethane_permissions
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import YearsActionMixin
@@ -32,13 +33,21 @@ from .mixins import ValidateActionMixin
         ),
     ]
 )
-class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, YearsActionMixin, GenericViewSet):
+class BiomethaneAnnualDeclarationViewSet(
+    GetObjectMixin,
+    ValidateActionMixin,
+    YearsActionMixin,
+    CreateModelMixin,
+    GenericViewSet,
+):
     queryset = BiomethaneAnnualDeclaration.objects.all()
     serializer_class = BiomethaneAnnualDeclarationSerializer
     filterset_class = EntityProducerFilter
     pagination_class = None
 
     def get_permissions(self):
+        if self.action in ["create"]:
+            return [HasDrealRights()]
         return get_biomethane_permissions(["partial_update", "validate_annual_declaration"], self.action)
 
     def initialize_request(self, request, *args, **kwargs):
