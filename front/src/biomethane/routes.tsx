@@ -9,6 +9,7 @@ import {
   useAnnualDeclarationYear,
 } from "./providers/annual-declaration"
 import { useRoutes } from "common/hooks/routes"
+import { ClosedDeclaration } from "biomethane/components/closed-declaration"
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -84,10 +85,7 @@ export const BiomethaneRoutes = () => {
         <Route path="supply-plan" element={<SupplyPlan />} />
       </Route>
 
-      <Route
-        path="closed-declaration"
-        element={<div>Closed declaration</div>}
-      />
+      <Route path="closed-declaration" element={<ClosedDeclaration />} />
 
       <Route
         path=""

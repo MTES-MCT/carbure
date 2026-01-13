@@ -5,13 +5,11 @@ import { Select } from "common/components/selects2"
 import { useTranslation } from "react-i18next"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationStatus } from "biomethane/types"
-import {
-  useAnnualDeclarationYears,
-  usePageHeaderActions,
-} from "./page-header.hooks"
+import { usePageHeaderActions } from "./page-header.hooks"
 import useEntity from "common/hooks/entity"
 import { PropsWithChildren } from "react"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
+import { useAnnualDeclarationYears } from "biomethane/hooks/use-annual-declaration-years"
 
 // Digestate / Energy / Supply Plan pages share the same page header and the same declaration validation logic
 export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {

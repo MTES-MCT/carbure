@@ -66,21 +66,9 @@ export function AnnualDeclarationProvider({
     key,
     params: [entity.id, parsedYear],
   })
-  const {
-    result: annualDeclarationYears,
-    loading: loadingAnnualDeclarationYears,
-  } = useQuery(getAnnualDeclarationYears, {
-    key: "annual-declaration-years",
-    params: [entity.id],
-  })
 
-  if (
-    (loadingCurrentAnnualDeclaration && !currentAnnualDeclaration) ||
-    (loadingAnnualDeclarationYears && !annualDeclarationYears)
-  )
+  if (loadingCurrentAnnualDeclaration && !currentAnnualDeclaration)
     return <LoaderOverlay />
-
-  // if (!currentAnnualDeclaration) return undefined
 
   // Use year from url if provided, otherwise selected year is current year
   const year = parsedYear ?? currentYear
