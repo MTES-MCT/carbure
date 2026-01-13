@@ -82,7 +82,7 @@ class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, Ye
                 request.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
                 and BiomethaneAnnualDeclarationService.is_declaration_period_open()
             ):
-                serializer = self.get_serializer(data={"producer": request.entity, "year": request.year})
+                serializer = self.get_serializer(data={"producer": request.entity.id, "year": request.year})
                 serializer.is_valid(raise_exception=True)
                 declaration = serializer.save()
                 status_code = status.HTTP_201_CREATED
