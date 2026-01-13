@@ -61,7 +61,7 @@ export const ROUTE_URLS = {
     const baseUrl = urlWithOrgId(entity_id, `/biomethane`)
     const baseUrlWithYear = year ? `${baseUrl}/${year}` : baseUrl
     return {
-      ROOT: `${baseUrlWithYear}`,
+      ROOT: `${baseUrl}`,
       SUPPLY_PLAN: `${baseUrlWithYear}/supply-plan`,
       SUPPLY_PLAN_IMPORT: `${baseUrlWithYear}/supply-plan#import`,
       SUPPLY_PLAN_ADD_INPUT: `${baseUrlWithYear}/supply-plan#create`,
