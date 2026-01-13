@@ -2,16 +2,14 @@ import {
   AnnualDeclarationProvider,
   useAnnualDeclaration,
 } from "biomethane/providers/annual-declaration"
-import { Navigate, Outlet } from "react-router-dom"
+import { Outlet } from "react-router-dom"
 import { BiomethanePageHeader } from "./page-header"
-import { useRoutes } from "common/hooks/routes"
+import { DeclarationNotFound } from "biomethane/components/declaration-not-found"
 
 export const AnnualDeclarationLayoutComponent = () => {
   const { currentAnnualDeclaration } = useAnnualDeclaration()
-  const biomethaneRoutes = useRoutes().BIOMETHANE()
 
-  if (currentAnnualDeclaration === undefined)
-    return <Navigate to={`${biomethaneRoutes.ROOT}/declaration-not-found`} />
+  if (currentAnnualDeclaration === undefined) return <DeclarationNotFound />
 
   return (
     <BiomethanePageHeader>

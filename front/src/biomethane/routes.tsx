@@ -90,11 +90,6 @@ export const BiomethaneRoutes = () => {
       />
 
       <Route
-        path="declaration-not-found"
-        element={<div>Declaration not found</div>}
-      />
-
-      <Route
         path=""
         element={
           <AnnualDeclarationProvider>
