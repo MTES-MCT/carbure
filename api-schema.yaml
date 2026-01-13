@@ -515,6 +515,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -535,16 +540,8 @@ paths:
           description: Declaration created for the entity
     patch:
       operationId: biomethane_annual_declaration_partial_update
-      description: >-
-        Mixin that provides get_object() method with filterset and permission
-        checks.
-
-
-        The ViewSet must have:
-
-        - filterset_class configured
-
-        - queryset defined
+      description: Partial update of the declaration for a producer and year (only
+        status field to IN_PROGRESS is allowed).
       parameters:
         - in: query
           name: entity_id
@@ -552,6 +549,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       requestBody:
@@ -595,6 +597,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -618,6 +625,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:

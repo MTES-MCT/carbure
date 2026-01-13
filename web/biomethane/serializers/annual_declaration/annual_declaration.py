@@ -64,6 +64,11 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         return BiomethaneAnnualDeclarationService.is_declaration_complete(instance, missing_fields)
 
     def update(self, instance, validated_data):
+        if not instance.is_open:
+            raise serializers.ValidationError(
+                {"status": "La déclaration annuelle n'est pas modifiable dans son état actuel."}
+            )
+
         # Allow partial update of the declaration, only for status field to IN_PROGRESS
         status = validated_data.get("status")
         if status is not None:

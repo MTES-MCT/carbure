@@ -225,11 +225,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** @description Mixin that provides get_object() method with filterset and permission checks.
-         *
-         *     The ViewSet must have:
-         *     - filterset_class configured
-         *     - queryset defined */
+        /** @description Partial update of the declaration for a producer and year (only status field to IN_PROGRESS is allowed). */
         patch: operations["biomethane_annual_declaration_partial_update"];
         trace?: never;
     };
@@ -6358,6 +6354,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -6390,6 +6388,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -6418,6 +6418,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -6453,6 +6455,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;

@@ -26,11 +26,14 @@ export const usePageHeaderActions = () => {
   const annualDeclarationData = useAnnualDeclaration()
   const { navigateToMissingFields } = useNavigateToMissingFields()
 
-  const { currentAnnualDeclaration, currentAnnualDeclarationKey } =
-    annualDeclarationData
+  const {
+    currentAnnualDeclaration,
+    currentAnnualDeclarationKey,
+    selectedYear,
+  } = annualDeclarationData
 
   const validateAnnualDeclarationMutation = useMutation(
-    () => validateAnnualDeclaration(entity.id),
+    () => validateAnnualDeclaration(entity.id, selectedYear),
     {
       invalidates: [currentAnnualDeclarationKey],
       onSuccess: () => {
@@ -52,7 +55,7 @@ export const usePageHeaderActions = () => {
     }
   )
   const correctAnnualDeclarationMutation = useMutation(
-    () => correctAnnualDeclaration(entity.id),
+    () => correctAnnualDeclaration(entity.id, selectedYear),
     {
       invalidates: [currentAnnualDeclarationKey],
       onSuccess: () => {
