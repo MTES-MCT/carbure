@@ -3145,6 +3145,7 @@ export interface components {
                 supply_plan_valid?: boolean;
             };
             readonly is_complete: boolean;
+            readonly is_open: boolean;
         };
         /**
          * @description * `IN_PROGRESS` - IN_PROGRESS

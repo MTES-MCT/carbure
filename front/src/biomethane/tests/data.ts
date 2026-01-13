@@ -10,6 +10,7 @@ export const currentAnnualDeclaration = {
   },
   is_complete: true,
   producer: 1,
+  is_open: true,
 }
 
 export const currentAnnualDeclarationMissingFields = {

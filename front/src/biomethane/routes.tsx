@@ -6,6 +6,7 @@ import { ContractProductionUnitProvider } from "./providers/contract-production-
 import {
   AnnualDeclarationProvider,
   useAnnualDeclaration,
+  useAnnualDeclarationYear,
 } from "./providers/annual-declaration"
 import { useRoutes } from "common/hooks/routes"
 
@@ -20,6 +21,7 @@ const BiomethaneProductionPage = lazy(
 )
 
 type REDIRECTED_ROUTES = "digestate" | "energy" | "supply-plan"
+
 /**
  * Composant de redirection qui utilise l'année de déclaration courante
  * récupérée depuis le backend via AnnualDeclarationProvider
@@ -27,11 +29,18 @@ type REDIRECTED_ROUTES = "digestate" | "energy" | "supply-plan"
 const RedirectToCurrentYear = ({ path }: { path: REDIRECTED_ROUTES }) => {
   const biomethaneRoutes = useRoutes().BIOMETHANE()
   const { currentAnnualDeclaration } = useAnnualDeclaration()
-  const year = currentAnnualDeclaration?.year
+  const yearParam = useAnnualDeclarationYear()
 
-  if (!year) return null
+  // If there is no current annual declaration and no year param,
+  // we are in the closed declaration period, so we redirect to the closed declaration page
+  if (currentAnnualDeclaration === undefined && yearParam === undefined)
+    return <Navigate to={`${biomethaneRoutes.ROOT}/closed-declaration`} />
 
-  return <Navigate to={`${biomethaneRoutes.ROOT}/${year}/${path}`} />
+  return (
+    <Navigate
+      to={`${biomethaneRoutes.ROOT}/${currentAnnualDeclaration?.year}/${path}`}
+    />
+  )
 }
 
 const RedirectToCurrentYearRoute = ({ path }: { path: REDIRECTED_ROUTES }) => (
@@ -74,6 +83,16 @@ export const BiomethaneRoutes = () => {
         <Route path="energy" element={<Energy />} />
         <Route path="supply-plan" element={<SupplyPlan />} />
       </Route>
+
+      <Route
+        path="closed-declaration"
+        element={<div>Closed declaration</div>}
+      />
+
+      <Route
+        path="declaration-not-found"
+        element={<div>Declaration not found</div>}
+      />
 
       <Route
         path=""

@@ -11260,8 +11260,12 @@ components:
         is_complete:
           type: boolean
           readOnly: true
+        is_open:
+          type: boolean
+          readOnly: true
       required:
         - is_complete
+        - is_open
         - missing_fields
         - producer
         - year

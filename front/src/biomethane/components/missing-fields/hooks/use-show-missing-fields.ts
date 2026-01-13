@@ -32,7 +32,7 @@ export const useShowMissingFields = <FormType extends object | undefined>(
     }
 
     const missingFields =
-      currentAnnualDeclaration.missing_fields?.[
+      currentAnnualDeclaration?.missing_fields?.[
         pageToMissingFieldKey[currentPage]
       ] ?? []
 
@@ -51,7 +51,7 @@ export const useShowMissingFields = <FormType extends object | undefined>(
     }
   }, [
     currentPage,
-    currentAnnualDeclaration.missing_fields,
+    currentAnnualDeclaration?.missing_fields,
     sectionsManager,
     form,
     t,

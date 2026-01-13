@@ -14,10 +14,10 @@ export const useMissingFieldCounts = () => {
   const { currentAnnualDeclaration } = useAnnualDeclaration()
 
   const digestateCount =
-    currentAnnualDeclaration.missing_fields?.digestate_missing_fields?.length ??
-    0
+    currentAnnualDeclaration?.missing_fields?.digestate_missing_fields
+      ?.length ?? 0
   const energyCount =
-    currentAnnualDeclaration.missing_fields?.energy_missing_fields?.length ?? 0
+    currentAnnualDeclaration?.missing_fields?.energy_missing_fields?.length ?? 0
 
   return { digestateCount, energyCount }
 }

@@ -21,7 +21,7 @@ export const MissingFields = ({ onPageClick }: MissingFieldsProps) => {
   // - All fields are complete (no missing fields AND at least one supply input)
   // - There are missing objects (digestate or energy)
   if (
-    currentAnnualDeclaration.is_complete ||
+    currentAnnualDeclaration?.is_complete ||
     !canEditDeclaration ||
     hasAnnualDeclarationMissingObjects
   )
