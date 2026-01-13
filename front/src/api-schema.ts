@@ -7019,6 +7019,7 @@ export interface operations {
                 producer_id?: string;
                 /** @description A search term. */
                 search?: string;
+                /** @description Year of the energy declaration. */
                 year: number;
             };
             header?: never;
@@ -7042,6 +7043,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;

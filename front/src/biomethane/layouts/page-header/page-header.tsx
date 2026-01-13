@@ -45,7 +45,7 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
           <AnnualDeclarationStatusBadge status={status} />
         )}
       </Row>
-      {isInDeclarationPeriod && entity.canWrite() && (
+      {currentAnnualDeclaration?.is_open && entity.canWrite() && (
         <Notice
           variant={
             status === AnnualDeclarationStatus.OVERDUE ? "warning" : "info"

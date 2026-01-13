@@ -1,8 +1,5 @@
 import { createContext, ReactNode, useContext } from "react"
-import {
-  getAnnualDeclarationYears,
-  getCurrentAnnualDeclaration,
-} from "biomethane/api"
+import { getCurrentAnnualDeclaration } from "biomethane/api"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -77,7 +74,9 @@ export function AnnualDeclarationProvider({
   const isDeclarationValidated =
     currentAnnualDeclaration?.status === AnnualDeclarationStatus.DECLARED
   const canEditDeclaration =
-    !isDeclarationValidated && isInDeclarationPeriod && entity.canWrite()
+    !isDeclarationValidated &&
+    Boolean(currentAnnualDeclaration?.is_open) &&
+    entity.canWrite()
   const hasAnnualDeclarationMissingObjects =
     currentAnnualDeclaration?.missing_fields?.digestate_missing_fields ===
       null ||

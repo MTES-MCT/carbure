@@ -16,6 +16,7 @@ import { HttpError } from "common/services/api-fetch"
 import { MissingFields } from "biomethane/components/missing-fields"
 import { Text } from "common/components/text"
 import { useNavigateToMissingFields } from "biomethane/components/missing-fields"
+import { AnnualDeclarationStatus } from "biomethane/types"
 
 export const usePageHeaderActions = () => {
   const { t } = useTranslation()
@@ -90,13 +91,23 @@ export const usePageHeaderActions = () => {
         description={
           <>
             {t(
-              "Votre déclaration (digestat et énergie) est complète, voulez-vous la transmettre à l'administration DGEC ?"
+              "Votre déclaration est complète, voulez-vous la transmettre à l'administration DGEC ?"
             )}
             <br />
-            {currentAnnualDeclaration?.year &&
-              t("Vous pourrez la corriger jusqu'au {{date}}", {
-                date: `31/03/${currentAnnualDeclaration.year + 1}`,
-              })}
+            {currentAnnualDeclaration?.status ===
+              AnnualDeclarationStatus.IN_PROGRESS && (
+              <>
+                {currentAnnualDeclaration?.year &&
+                  t("Vous pourrez la corriger jusqu'au {{date}}", {
+                    date: `31/03/${currentAnnualDeclaration.year + 1}`,
+                  })}
+              </>
+            )}
+            {currentAnnualDeclaration?.status ===
+              AnnualDeclarationStatus.OVERDUE &&
+              t(
+                "Attention, vous ne pourrez pas corriger votre déclaration une fois celle-ci transmise."
+              )}
           </>
         }
       />
