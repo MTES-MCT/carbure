@@ -11308,6 +11308,10 @@ components:
           items:
             $ref: "#/components/schemas/TrackedAmendmentTypesEnum"
           readOnly: true
+        complementary_aid_organisms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
@@ -11347,6 +11351,13 @@ components:
           type: string
           format: uri
           nullable: true
+        has_complementary_investment_aid:
+          type: boolean
+          nullable: true
+        complementary_aid_other_organism_name:
+          type: string
+          nullable: true
+          maxLength: 255
         buyer:
           type: integer
           nullable: true
@@ -11354,6 +11365,7 @@ components:
           type: integer
       required:
         - amendments
+        - complementary_aid_organisms
         - id
         - producer
         - tracked_amendment_types
@@ -11448,6 +11460,10 @@ components:
           nullable: true
         is_red_ii:
           type: boolean
+        complementary_aid_organisms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
@@ -11485,6 +11501,13 @@ components:
           format: binary
           nullable: true
         tracked_amendment_types: {}
+        has_complementary_investment_aid:
+          type: boolean
+          nullable: true
+        complementary_aid_other_organism_name:
+          type: string
+          nullable: true
+          maxLength: 255
         buyer:
           type: integer
           nullable: true
@@ -12919,6 +12942,16 @@ components:
         - registered_country
         - registered_zipcode
         - registration_id
+    ComplementaryAidOrganismsEnum:
+      enum:
+        - ADEME
+        - REGION
+        - OTHER
+      type: string
+      description: |-
+        * `ADEME` - Ademe
+        * `REGION` - Région
+        * `OTHER` - Autre
     CompostingLocationsEnum:
       enum:
         - ON_SITE
@@ -14305,6 +14338,7 @@ components:
         energy_amount:
           type: number
           format: double
+          minimum: 0.01
         client:
           type: integer
         is_readjustment:

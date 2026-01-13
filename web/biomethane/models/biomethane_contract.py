@@ -67,6 +67,26 @@ class BiomethaneContract(models.Model):
     # (if cmax or pap is updated, we need to save CMAX_PAP_UPDATE to force the user to add an amendment)
     tracked_amendment_types = models.JSONField(default=list)
 
+    # Aide complémentaire à l'investissement
+    COMPLEMENTARY_AID_ORGANISM_ADEME = "ADEME"
+    COMPLEMENTARY_AID_ORGANISM_REGION = "REGION"
+    COMPLEMENTARY_AID_ORGANISM_OTHER = "OTHER"
+
+    COMPLEMENTARY_AID_ORGANISMS_CHOICES = [
+        (COMPLEMENTARY_AID_ORGANISM_ADEME, "Ademe"),
+        (COMPLEMENTARY_AID_ORGANISM_REGION, "Région"),
+        (COMPLEMENTARY_AID_ORGANISM_OTHER, "Autre"),
+    ]
+
+    # Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement?
+    has_complementary_investment_aid = models.BooleanField(default=False, null=True, blank=True)
+
+    # Préciser l'organisme qui a attribué l'aide complémentaire (Ademe, Région, Autre)
+    complementary_aid_organisms = models.JSONField(null=True, blank=True, default=list)
+
+    # Précisez le nom du ou des organismes publics ayant octroyé l'aide (si "Autre" est sélectionné)
+    complementary_aid_other_organism_name = models.CharField(max_length=255, null=True, blank=True)
+
     class Meta:
         db_table = "biomethane_contract"
         verbose_name = "Contrat d'achat"

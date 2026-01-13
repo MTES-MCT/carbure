@@ -3158,6 +3158,7 @@ export interface components {
             readonly id: number;
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
             readonly tracked_amendment_types: components["schemas"]["TrackedAmendmentTypesEnum"][];
+            complementary_aid_organisms: components["schemas"]["ComplementaryAidOrganismsEnum"][];
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
@@ -3175,6 +3176,8 @@ export interface components {
             general_conditions_file?: string | null;
             /** Format: uri */
             specific_conditions_file?: string | null;
+            has_complementary_investment_aid?: boolean | null;
+            complementary_aid_other_organism_name?: string | null;
             buyer?: number | null;
             producer: number;
         };
@@ -3214,6 +3217,7 @@ export interface components {
         BiomethaneContractInputRequest: {
             cmax_annualized?: boolean | null;
             is_red_ii?: boolean;
+            complementary_aid_organisms?: components["schemas"]["ComplementaryAidOrganismsEnum"][];
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
@@ -3231,6 +3235,8 @@ export interface components {
             /** Format: binary */
             specific_conditions_file?: File | null;
             tracked_amendment_types?: unknown;
+            has_complementary_investment_aid?: boolean | null;
+            complementary_aid_other_organism_name?: string | null;
             buyer?: number | null;
         };
         BiomethaneDigestate: {
@@ -3777,6 +3783,13 @@ export interface components {
             registered_country: components["schemas"]["RegistrationCountry"];
             department_code: string;
         };
+        /**
+         * @description * `ADEME` - Ademe
+         *     * `REGION` - Région
+         *     * `OTHER` - Autre
+         * @enum {string}
+         */
+        ComplementaryAidOrganismsEnum: ComplementaryAidOrganismsEnum;
         /**
          * @description * `ON_SITE` - Sur site
          *     * `EXTERNAL_PLATFORM` - Plateforme externe
@@ -13111,6 +13124,11 @@ export enum CertificateTypeEnum {
     REDCERT = "REDCERT",
     Value2BS = "2BS",
     KZR_INIG = "KZR_INIG"
+}
+export enum ComplementaryAidOrganismsEnum {
+    ADEME = "ADEME",
+    REGION = "REGION",
+    OTHER = "OTHER"
 }
 export enum CompostingLocationsEnum {
     ON_SITE = "ON_SITE",
