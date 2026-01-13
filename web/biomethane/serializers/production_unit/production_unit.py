@@ -43,5 +43,5 @@ class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSeria
     def update(self, instance, validated_data):
         # Check if annual declaration needs to be reset
         if BiomethaneAnnualDeclarationService.has_watched_field_changed(instance, validated_data.keys()):
-            BiomethaneAnnualDeclarationService.reset_annual_declaration_status(instance.producer, validated_data["year"])
+            BiomethaneAnnualDeclarationService.reset_annual_declaration_status(instance.producer)
         return super().update(instance, validated_data)
