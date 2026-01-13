@@ -102,10 +102,18 @@ class BiomethaneAnnualDeclarationViewSet(
         return Response(data, status=status_code)
 
     def partial_update(self, request, *args, **kwargs):
-        """Partial update of the declaration for a producer and year (only status field to IN_PROGRESS is allowed)."""
+        """Partial update of the declaration for a producer and year"""
+        permission = HasDrealRights()
+        is_dreal = permission.has_permission(request, self)
+
         try:
             declaration = self.filter_queryset(self.get_queryset()).get()
-            serializer = self.get_serializer(declaration, data=request.data, partial=True)
+            serializer = self.get_serializer(
+                declaration,
+                data=request.data,
+                partial=True,
+                context={"is_dreal": is_dreal},
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
