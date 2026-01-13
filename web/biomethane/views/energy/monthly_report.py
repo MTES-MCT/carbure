@@ -7,13 +7,12 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import BiomethaneEnergyMonthlyReportFilter
 from biomethane.filters.energy_monthly_report import BiomethaneEnergyMonthlyReportYearFilter
-from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
+from biomethane.models import BiomethaneEnergyMonthlyReport
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.energy import (
     BiomethaneEnergyMonthlyReportInputSerializer,
     BiomethaneEnergyMonthlyReportSerializer,
 )
-from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import ListWithObjectPermissionsMixin
 
 
@@ -38,27 +37,6 @@ class BiomethaneEnergyMonthlyReportViewSet(ListWithObjectPermissionsMixin, Gener
     def get_permission_object(self, first_obj):
         """Check permissions on the energy of the monthly reports."""
         return first_obj.energy if first_obj else None
-
-    def initialize_request(self, request, *args, **kwargs):
-        request = super().initialize_request(request, *args, **kwargs)
-        entity = getattr(self.request, "entity", None)
-        setattr(request, "year", BiomethaneAnnualDeclarationService.get_declaration_period(entity))
-        return request
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-
-        entity = getattr(self.request, "entity", None)
-        year = getattr(self.request, "year", None)
-
-        if entity and year:
-            try:
-                energy = BiomethaneEnergy.objects.get(producer=entity, year=year)
-                context["energy"] = energy
-            except BiomethaneEnergy.DoesNotExist:
-                context["energy"] = None
-
-        return context
 
     def get_filterset_class(self):
         if self.action == "list":
