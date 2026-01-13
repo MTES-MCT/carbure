@@ -9,7 +9,6 @@ import {
 } from "biomethane/providers/annual-declaration"
 import {
   correctAnnualDeclaration,
-  getAnnualDeclarationYears,
   validateAnnualDeclaration,
 } from "biomethane/api"
 import useEntity from "common/hooks/entity"
@@ -136,35 +135,22 @@ export const usePageHeaderActions = () => {
   }
 }
 
-const getAnnualDeclarationYearsList = (
-  years: number[],
-  annualDeclarationYear: number
-) => {
-  return [
-    ...years,
-    ...(years.includes(annualDeclarationYear) ? [] : [annualDeclarationYear]),
-  ]
-}
-
-/**
- * When the annual declaration is terminated (after 31/03 of the following year),
- * We want to add the current year to the list of years to allow the user to see the annual declaration for the current year.
- */
-export const useAnnualDeclarationYears = () => {
-  const entity = useEntity()
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
-  return useYears("biomethane", () =>
-    getAnnualDeclarationYears(entity.id).then((res) => {
-      const years = res.data ?? []
-      const yearsList = getAnnualDeclarationYearsList(
-        years,
-        currentAnnualDeclaration?.year
-      )
-
-      return {
-        ...res,
-        data: yearsList,
-      }
-    })
+const getYears = () => {
+  const currentYear = new Date().getFullYear()
+  const startYear = 2025
+  const endYear = currentYear > startYear ? currentYear - 1 : startYear
+  return Array.from(
+    { length: endYear - startYear + 1 },
+    (_, i) => startYear + i
   )
 }
+/**
+ * Get years from 2025 (the first year of the biomethane module), to N-1 (the current year - 1)
+ */
+export const useAnnualDeclarationYears = () =>
+  useYears("biomethane", () =>
+    Promise.resolve({
+      data: getYears(),
+      response: new Response(),
+    })
+  )

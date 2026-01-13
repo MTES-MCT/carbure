@@ -1,10 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react"
 import { BiomethanePageHeader } from "./page-header"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
-import {
-  buildCurrentAnnualDeclarationHandler,
-  getAnnualDeclarationYearsOk,
-} from "biomethane/tests/api"
+import { buildCurrentAnnualDeclarationHandler } from "biomethane/tests/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType, UserRole } from "common/types"
@@ -14,7 +11,6 @@ import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const MOCKS = [
   GLOBAL_MOCKS,
-  getAnnualDeclarationYearsOk,
   ...AnnualDeclarationStoryUtils.parameters.msw.handlers,
 ]
 const meta: Meta<typeof BiomethanePageHeader> = {
@@ -78,13 +74,21 @@ export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
 
 export const LayoutForThePreviousYear: Story = {
   parameters: {
+    msw: {
+      handlers: [
+        buildCurrentAnnualDeclarationHandler({
+          year: 2026,
+        }),
+        ...MOCKS,
+      ],
+    },
     docs: {
       description:
-        "If the selected year is 2024, and the current annual declaration year is 2025, the user can't validate the declaration",
+        "If the selected year is 2025, and the current annual declaration year is 2026, the user can't validate the declaration",
     },
     reactRouter: reactRouterParameters({
       location: {
-        pathParams: { year: "2024" },
+        pathParams: { year: "2025" },
         path: "/:year",
       },
       routing: {

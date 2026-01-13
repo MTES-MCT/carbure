@@ -25,8 +25,3 @@ export const buildCurrentAnnualDeclarationHandler = (
       ...declaration,
     })
   )
-
-export const getAnnualDeclarationYearsOk = http.get(
-  "/biomethane/annual-declaration/years/",
-  () => HttpResponse.json([2024, 2025])
-)
