@@ -7,6 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.energy_monthly_report import BiomethaneEnergyMonthlyReportYearFilter
 from biomethane.models import BiomethaneEnergyMonthlyReport
+from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.energy import (
     BiomethaneEnergyMonthlyReportInputSerializer,
@@ -52,8 +53,9 @@ class BiomethaneEnergyMonthlyReportViewSet(ListWithObjectPermissionsMixin, Gener
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["energy_instance"] = self.queryset.first().energy if self.queryset.exists() else None
-        print("context:", context["energy_instance"])
+        context["energy_instance"] = BiomethaneEnergy.objects.filter(
+            producer=self.request.entity, year=self.request.query_params.get("year")
+        ).first()
         return context
 
     @extend_schema(
