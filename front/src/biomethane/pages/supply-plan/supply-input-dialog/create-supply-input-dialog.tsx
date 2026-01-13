@@ -17,7 +17,7 @@ export const CreateSupplyInputDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { currentAnnualDeclarationKey } = useAnnualDeclaration()
+  const { currentAnnualDeclarationKey, selectedYear } = useAnnualDeclaration()
 
   const createSupplyInputMutation = useMutation(createSupplyInput, {
     invalidates: ["supply-plan-inputs", currentAnnualDeclarationKey],
@@ -49,7 +49,9 @@ export const CreateSupplyInputDialog = ({
       <SupplyInputForm
         onSubmit={(form) =>
           form &&
-          createSupplyInputMutation.execute(entity.id, form).then(onClose)
+          createSupplyInputMutation
+            .execute(entity.id, selectedYear, form)
+            .then(onClose)
         }
       />
     </Dialog>

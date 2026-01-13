@@ -33,7 +33,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { currentAnnualDeclarationKey } = useAnnualDeclaration()
+  const { currentAnnualDeclarationKey, selectedYear } = useAnnualDeclaration()
   const [importErrors, setImportErrors] = useState<ImportErrorResponse | null>(
     null
   )
@@ -66,7 +66,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
     }
 
     setImportErrors(null)
-    executeImport(entity.id, value.supplyPlanFile)
+    executeImport(entity.id, selectedYear, value.supplyPlanFile)
   }
 
   const handleFileChange = (file: File | undefined) => {
