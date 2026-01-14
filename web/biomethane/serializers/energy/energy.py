@@ -4,6 +4,10 @@ from biomethane.models.biomethane_energy import BiomethaneEnergy
 
 
 class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
+    energy_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneEnergy.ENERGY_TYPES),
+        required=False,
+    )
     malfunction_types = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneEnergy.MALFUNCTION_TYPES),
         required=False,
@@ -20,6 +24,11 @@ class BiomethaneEnergySerializer(BaseBiomethaneEnergySerializer):
 
 
 class BiomethaneEnergyInputSerializer(BaseBiomethaneEnergySerializer):
+    energy_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneEnergy.ENERGY_TYPES),
+        required=False,
+    )
+
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")

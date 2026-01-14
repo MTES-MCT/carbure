@@ -32,21 +32,21 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
     flaring_operating_hours = factory.Faker("pyfloat", min_value=0, max_value=8760, right_digits=1)
 
     # Nature de l'énergie utilisée
-    attest_no_fossil_for_digester_heating_and_purification = factory.Faker("boolean")
-    energy_used_for_digester_heating = factory.Faker(
-        "random_element", elements=["Électricité", "Biogaz", "Biomasse", "Énergie solaire", "Autre"]
-    )
-    fossil_details_for_digester_heating = factory.LazyAttribute(
-        lambda obj: faker.text(max_nb_chars=200) if not obj.attest_no_fossil_for_digester_heating_and_purification else None
-    )
+    # attest_no_fossil_for_digester_heating_and_purification = factory.Faker("boolean")
+    # energy_used_for_digester_heating = factory.Faker(
+    #     "random_element", elements=["Électricité", "Biogaz", "Biomasse", "Énergie solaire", "Autre"]
+    # )
+    # fossil_details_for_digester_heating = factory.LazyAttribute(
+    #     lambda obj: faker.text(max_nb_chars=200) if not obj.attest_no_fossil_for_digester_heating_and_purification else None
+    # )
 
-    attest_no_fossil_for_installation_needs = factory.Faker("boolean")
-    energy_used_for_installation_needs = factory.Faker(
-        "random_element", elements=["Électricité", "Biogaz", "Biomasse", "Énergie solaire", "Autre"]
-    )
-    fossil_details_for_installation_needs = factory.LazyAttribute(
-        lambda obj: faker.text(max_nb_chars=200) if not obj.attest_no_fossil_for_installation_needs else None
-    )
+    # attest_no_fossil_for_installation_needs = factory.Faker("boolean")
+    # energy_used_for_installation_needs = factory.Faker(
+    #     "random_element", elements=["Électricité", "Biogaz", "Biomasse", "Énergie solaire", "Autre"]
+    # )
+    # fossil_details_for_installation_needs = factory.LazyAttribute(
+    #     lambda obj: faker.text(max_nb_chars=200) if not obj.attest_no_fossil_for_installation_needs else None
+    # )
 
     # Efficacité énergétique
     purified_biogas_quantity_nm3 = factory.Faker("pyfloat", min_value=0, max_value=100000, right_digits=2)

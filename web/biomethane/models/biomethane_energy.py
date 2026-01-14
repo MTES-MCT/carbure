@@ -45,25 +45,68 @@ class BiomethaneEnergy(models.Model):
     # Besoins en énergie liés au chauffage du digesteur pour une installation de méthanisation
     # ainsi qu’à l’épuration du biogaz et à l’oxydation des évents
     # J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d’origine fossile.
-    attest_no_fossil_for_digester_heating_and_purification = models.BooleanField(default=False)
+    # attest_no_fossil_for_digester_heating_and_purification = models.BooleanField(default=False)
 
-    # Type d'énergie utilisée pour le chauffage du digesteur
-    energy_used_for_digester_heating = models.CharField(max_length=255, null=True, blank=True)
+    # # Type d'énergie utilisée pour le chauffage du digesteur
+    # energy_used_for_digester_heating = models.CharField(max_length=255, null=True, blank=True)
 
-    # Précisions (si utilisation d’énergie d’origine fossile)
-    fossil_details_for_digester_heating = models.TextField(null=True, blank=True)
+    # # Précisions (si utilisation d’énergie d’origine fossile)
+    # fossil_details_for_digester_heating = models.TextField(null=True, blank=True)
 
-    # Besoins en énergie de l’installation de production de biométhane (notamment liés à la pasteurisation, l’hygiénisation
-    # et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz)
-    # J'atteste que les besoins en énergie cités ci-dessus ont pas satisfaits par une énergie d’origine fossile.
-    attest_no_fossil_for_installation_needs = models.BooleanField(default=False)
+    # # Besoins en énergie de l’installation de production de biométhane (notamment liés à la pasteurisation, l’hygiénisation
+    # # et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz)
+    # # J'atteste que les besoins en énergie cités ci-dessus ont pas satisfaits par une énergie d’origine fossile.
+    # attest_no_fossil_for_installation_needs = models.BooleanField(default=False)
 
-    # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
-    # le chauffage du digesteur et l’épuration du biogaz
-    energy_used_for_installation_needs = models.CharField(max_length=255, null=True, blank=True)
+    # # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
+    # # le chauffage du digesteur et l’épuration du biogaz
+    # energy_used_for_installation_needs = models.CharField(max_length=255, null=True, blank=True)
 
-    # Précisions (si utilisation d’énergie d’origine fossile)
-    fossil_details_for_installation_needs = models.TextField(null=True, blank=True)
+    # # Précisions (si utilisation d’énergie d’origine fossile)
+    # fossil_details_for_installation_needs = models.TextField(null=True, blank=True)
+    MALFUNCTION_TYPE_CONCEPTION = "CONCEPTION"
+
+    MALFUNCTION_TYPES = [
+        (MALFUNCTION_TYPE_CONCEPTION, "Conception"),
+    ]
+
+    ## Types d'énergie possibles
+    ENERGY_TYPE_PRODUCED_BIOGAS = "PRODUCED_BIOGAS"
+    ENERGY_TYPE_PRODUCED_BIOMETHANE = "PRODUCED_BIOMETHANE"
+    ENERGY_TYPE_WASTE_HEAT_PREEXISTING = "WASTE_HEAT_PREEXISTING"
+    ENERGY_TYPE_WASTE_HEAT_PURIFICATION = "WASTE_HEAT_PURIFICATION"
+    ENERGY_TYPE_WASTE_HEAT_ON_SITE = "WASTE_HEAT_ON_SITE"
+    ENERGY_TYPE_BIOMASS_BOILER = "BIOMASS_BOILER"
+    ENERGY_TYPE_SOLAR_THERMAL = "SOLAR_THERMAL"
+    ENERGY_TYPE_OTHER_RENEWABLE = "OTHER_RENEWABLE"
+    ENERGY_TYPE_FOSSIL = "FOSSIL"
+    ENERGY_TYPE_OTHER = "OTHER"
+
+    ENERGY_TYPES = [
+        (ENERGY_TYPE_PRODUCED_BIOGAS, "Biogaz produit par l'installation"),
+        (ENERGY_TYPE_PRODUCED_BIOMETHANE, "Biométhane produit par l'installation"),
+        (
+            ENERGY_TYPE_WASTE_HEAT_PREEXISTING,
+            "Chaleur fatale [Energie thermique résiduelle] (issue d'un équipement préexistant installé sur site ou sur un site situé à proximité)",
+        ),
+        (
+            ENERGY_TYPE_WASTE_HEAT_PURIFICATION,
+            "Chaleur fatale (issue du système d'épuration ou de compression de l'installation)",
+        ),
+        (
+            ENERGY_TYPE_WASTE_HEAT_ON_SITE,
+            "Chaleur fatale (issue d'un équipement installé sur site)",
+        ),
+        (ENERGY_TYPE_BIOMASS_BOILER, "Chaudière biomasse"),
+        (ENERGY_TYPE_SOLAR_THERMAL, "Solaire thermique"),
+        (ENERGY_TYPE_OTHER_RENEWABLE, "Autre énergie renouvelable"),
+        (ENERGY_TYPE_FOSSIL, "Energie fossile"),
+        (ENERGY_TYPE_OTHER, "Autre"),
+    ]
+
+    attest_no_fossil_for_energy = models.BooleanField(default=False)
+    energy_types = models.JSONField(null=True, blank=True, default=list)
+    energy_details = models.TextField(null=True, blank=True)
 
     ## Efficacité énergétique
 

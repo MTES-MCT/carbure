@@ -11792,6 +11792,10 @@ components:
         id:
           type: integer
           readOnly: true
+        energy_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnergyTypesEnum"
         malfunction_types:
           type: array
           items:
@@ -11832,22 +11836,9 @@ components:
           type: number
           format: double
           nullable: true
-        attest_no_fossil_for_digester_heating_and_purification:
+        attest_no_fossil_for_energy:
           type: boolean
-        energy_used_for_digester_heating:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_digester_heating:
-          type: string
-          nullable: true
-        attest_no_fossil_for_installation_needs:
-          type: boolean
-        energy_used_for_installation_needs:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_installation_needs:
+        energy_details:
           type: string
           nullable: true
         purified_biogas_quantity_nm3:
@@ -11907,6 +11898,10 @@ components:
     BiomethaneEnergyInputRequest:
       type: object
       properties:
+        energy_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnergyTypesEnum"
         malfunction_types:
           type: array
           items:
@@ -11943,22 +11938,9 @@ components:
           type: number
           format: double
           nullable: true
-        attest_no_fossil_for_digester_heating_and_purification:
+        attest_no_fossil_for_energy:
           type: boolean
-        energy_used_for_digester_heating:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_digester_heating:
-          type: string
-          nullable: true
-        attest_no_fossil_for_installation_needs:
-          type: boolean
-        energy_used_for_installation_needs:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_installation_needs:
+        energy_details:
           type: string
           nullable: true
         purified_biogas_quantity_nm3:
@@ -14354,6 +14336,43 @@ components:
         empty:
           type: string
           minLength: 1
+    EnergyTypesEnum:
+      enum:
+        - PRODUCED_BIOGAS
+        - PRODUCED_BIOMETHANE
+        - WASTE_HEAT_PREEXISTING
+        - WASTE_HEAT_PURIFICATION
+        - WASTE_HEAT_ON_SITE
+        - BIOMASS_BOILER
+        - SOLAR_THERMAL
+        - OTHER_RENEWABLE
+        - FOSSIL
+        - OTHER
+      type: string
+      description: >-
+        * `PRODUCED_BIOGAS` - Biogaz produit par l'installation
+
+        * `PRODUCED_BIOMETHANE` - Biométhane produit par l'installation
+
+        * `WASTE_HEAT_PREEXISTING` - Chaleur fatale [Energie thermique
+        résiduelle] (issue d'un équipement préexistant installé sur site ou sur
+        un site situé à proximité)
+
+        * `WASTE_HEAT_PURIFICATION` - Chaleur fatale (issue du système
+        d'épuration ou de compression de l'installation)
+
+        * `WASTE_HEAT_ON_SITE` - Chaleur fatale (issue d'un équipement installé
+        sur site)
+
+        * `BIOMASS_BOILER` - Chaudière biomasse
+
+        * `SOLAR_THERMAL` - Solaire thermique
+
+        * `OTHER_RENEWABLE` - Autre énergie renouvelable
+
+        * `FOSSIL` - Energie fossile
+
+        * `OTHER` - Autre
     Entity:
       type: object
       properties:

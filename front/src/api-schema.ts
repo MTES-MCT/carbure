@@ -3350,6 +3350,7 @@ export interface components {
         };
         BiomethaneEnergy: {
             readonly id: number;
+            energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             year: number;
             /** Format: double */
@@ -3368,12 +3369,8 @@ export interface components {
             flared_biogas_nm3_per_year?: number | null;
             /** Format: double */
             flaring_operating_hours?: number | null;
-            attest_no_fossil_for_digester_heating_and_purification?: boolean;
-            energy_used_for_digester_heating?: string | null;
-            fossil_details_for_digester_heating?: string | null;
-            attest_no_fossil_for_installation_needs?: boolean;
-            energy_used_for_installation_needs?: string | null;
-            fossil_details_for_installation_needs?: string | null;
+            attest_no_fossil_for_energy?: boolean;
+            energy_details?: string | null;
             /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
             /** Format: double */
@@ -3396,6 +3393,7 @@ export interface components {
             producer: number;
         };
         BiomethaneEnergyInputRequest: {
+            energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
@@ -3413,12 +3411,8 @@ export interface components {
             flared_biogas_nm3_per_year?: number | null;
             /** Format: double */
             flaring_operating_hours?: number | null;
-            attest_no_fossil_for_digester_heating_and_purification?: boolean;
-            energy_used_for_digester_heating?: string | null;
-            fossil_details_for_digester_heating?: string | null;
-            attest_no_fossil_for_installation_needs?: boolean;
-            energy_used_for_installation_needs?: string | null;
-            fossil_details_for_installation_needs?: string | null;
+            attest_no_fossil_for_energy?: boolean;
+            energy_details?: string | null;
             /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
             /** Format: double */
@@ -4353,6 +4347,20 @@ export interface components {
         EmptyResponseRequest: {
             empty?: string;
         };
+        /**
+         * @description * `PRODUCED_BIOGAS` - Biogaz produit par l'installation
+         *     * `PRODUCED_BIOMETHANE` - Biométhane produit par l'installation
+         *     * `WASTE_HEAT_PREEXISTING` - Chaleur fatale [Energie thermique résiduelle] (issue d'un équipement préexistant installé sur site ou sur un site situé à proximité)
+         *     * `WASTE_HEAT_PURIFICATION` - Chaleur fatale (issue du système d'épuration ou de compression de l'installation)
+         *     * `WASTE_HEAT_ON_SITE` - Chaleur fatale (issue d'un équipement installé sur site)
+         *     * `BIOMASS_BOILER` - Chaudière biomasse
+         *     * `SOLAR_THERMAL` - Solaire thermique
+         *     * `OTHER_RENEWABLE` - Autre énergie renouvelable
+         *     * `FOSSIL` - Energie fossile
+         *     * `OTHER` - Autre
+         * @enum {string}
+         */
+        EnergyTypesEnum: EnergyTypesEnum;
         Entity: {
             readonly id: number;
             name: string;
@@ -13181,6 +13189,18 @@ export enum ElecOperationTypeEnum {
     ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
     CESSION = "CESSION",
     TENEUR = "TENEUR"
+}
+export enum EnergyTypesEnum {
+    PRODUCED_BIOGAS = "PRODUCED_BIOGAS",
+    PRODUCED_BIOMETHANE = "PRODUCED_BIOMETHANE",
+    WASTE_HEAT_PREEXISTING = "WASTE_HEAT_PREEXISTING",
+    WASTE_HEAT_PURIFICATION = "WASTE_HEAT_PURIFICATION",
+    WASTE_HEAT_ON_SITE = "WASTE_HEAT_ON_SITE",
+    BIOMASS_BOILER = "BIOMASS_BOILER",
+    SOLAR_THERMAL = "SOLAR_THERMAL",
+    OTHER_RENEWABLE = "OTHER_RENEWABLE",
+    FOSSIL = "FOSSIL",
+    OTHER = "OTHER"
 }
 export enum EntityTypeEnum {
     Producer = "Producteur",

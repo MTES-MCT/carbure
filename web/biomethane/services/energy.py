@@ -25,13 +25,13 @@ class EnergyContext:
     def has_injection_difficulties(self) -> bool:
         return getattr(self.instance, "has_injection_difficulties_due_to_network_saturation", False)
 
-    @property
-    def attest_no_fossil_for_digester_heating_and_purification(self) -> bool:
-        return getattr(self.instance, "attest_no_fossil_for_digester_heating_and_purification", False)
+    # @property
+    # def attest_no_fossil_for_digester_heating_and_purification(self) -> bool:
+    #     return getattr(self.instance, "attest_no_fossil_for_digester_heating_and_purification", False)
 
-    @property
-    def attest_no_fossil_for_installation_needs(self) -> bool:
-        return getattr(self.instance, "attest_no_fossil_for_installation_needs", False)
+    # @property
+    # def attest_no_fossil_for_installation_needs(self) -> bool:
+    #     return getattr(self.instance, "attest_no_fossil_for_installation_needs", False)
 
     @property
     def tariff_reference(self) -> Optional[str]:
@@ -49,16 +49,12 @@ class BiomethaneEnergyService:
 
     # Fields for tariff reference 2011, 2020, 2021
     OLD_TARIFF_FIELDS = [
-        "energy_used_for_digester_heating",
-        "fossil_details_for_digester_heating",
         "purified_biogas_quantity_nm3",
         "purification_electric_consumption_kwe",
     ]
 
     # Fields for tariff reference 2023
     NEW_TARIFF_FIELDS = [
-        "energy_used_for_installation_needs",
-        "fossil_details_for_installation_needs",
         "self_consumed_biogas_nm3",
         "total_unit_electric_consumption_kwe",
     ]
@@ -194,14 +190,14 @@ def _build_energy_rules() -> list[FieldClearingRule]:
             condition=lambda ctx: not ctx.has_injection_difficulties,
         ),
         # Installation energy needs rules
-        FieldClearingRule(
-            name="no_fossil_for_digester_heating",
-            fields=["fossil_details_for_digester_heating"],
-            condition=lambda ctx: ctx.attest_no_fossil_for_digester_heating_and_purification,
-        ),
-        FieldClearingRule(
-            name="no_fossil_for_installation_needs",
-            fields=["fossil_details_for_installation_needs"],
-            condition=lambda ctx: ctx.attest_no_fossil_for_installation_needs,
-        ),
+        # FieldClearingRule(
+        #     name="no_fossil_for_digester_heating",
+        #     fields=["fossil_details_for_digester_heating"],
+        #     condition=lambda ctx: ctx.attest_no_fossil_for_digester_heating_and_purification,
+        # ),
+        # FieldClearingRule(
+        #     name="no_fossil_for_installation_needs",
+        #     fields=["fossil_details_for_installation_needs"],
+        #     condition=lambda ctx: ctx.attest_no_fossil_for_installation_needs,
+        # ),
     ]
