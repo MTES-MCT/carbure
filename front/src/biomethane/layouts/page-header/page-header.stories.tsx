@@ -1,7 +1,10 @@
 import { Meta, StoryObj } from "@storybook/react"
 import { BiomethanePageHeader } from "./page-header"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
-import { buildCurrentAnnualDeclarationHandler } from "biomethane/tests/api"
+import {
+  buildCurrentAnnualDeclarationHandler,
+  getAnnualDeclarationYearsOk,
+} from "biomethane/tests/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType, UserRole } from "common/types"
@@ -11,6 +14,7 @@ import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const MOCKS = [
   GLOBAL_MOCKS,
+  getAnnualDeclarationYearsOk,
   ...AnnualDeclarationStoryUtils.parameters.msw.handlers,
 ]
 const meta: Meta<typeof BiomethanePageHeader> = {
@@ -61,6 +65,10 @@ export const DefaultLayoutForTheCurrentYearWithReadOnlyPermissions: Story = {
 
 export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
   parameters: {
+    docs: {
+      description:
+        "If the selected year is 2025 and the declaration is validated, a notice with a button to correct the declaration should be displayed",
+    },
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
@@ -72,23 +80,50 @@ export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
   },
 }
 
-export const LayoutForThePreviousYear: Story = {
+export const ValidateThePreviousYearDeclaration: Story = {
   parameters: {
     msw: {
       handlers: [
         buildCurrentAnnualDeclarationHandler({
-          year: 2026,
+          year: 2024,
         }),
         ...MOCKS,
       ],
     },
     docs: {
       description:
-        "If the selected year is 2025, and the current annual declaration year is 2026, the user can't validate the declaration",
+        "If the selected year is 2024 (but not the current year) and the declaration is open, the user is authorized to validated a previous declaration",
     },
     reactRouter: reactRouterParameters({
       location: {
-        pathParams: { year: "2025" },
+        pathParams: { year: "2024" },
+        path: "/:year",
+      },
+      routing: {
+        path: "/:year",
+      },
+    }),
+  },
+}
+
+export const CouldNotValidateThePreviousYearDeclaration: Story = {
+  parameters: {
+    msw: {
+      handlers: [
+        buildCurrentAnnualDeclarationHandler({
+          year: 2024,
+          is_open: false,
+        }),
+        ...MOCKS,
+      ],
+    },
+    docs: {
+      description:
+        "If the selected year is 2024 and the declaration is not open and the current declaration is 2026, the user just can see the declaration as read only",
+    },
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { year: "2024" },
         path: "/:year",
       },
       routing: {
@@ -108,6 +143,35 @@ export const DisplayValidateDeclarationDialogIfTheDeclarationIsComplete: Story =
 
       await userEvent.click(button)
     },
+  }
+
+export const DisplayValidateDeclarationDialogIfTheDeclarationIsCompleteWhenSelectedYearIsNotTheCurrentYear: Story =
+  {
+    parameters: {
+      msw: {
+        handlers: [
+          buildCurrentAnnualDeclarationHandler({
+            year: 2024,
+            status: AnnualDeclarationStatus.OVERDUE,
+          }),
+          ...MOCKS,
+        ],
+      },
+      docs: {
+        description:
+          "If the selected year is 2024 (but not the current year) and the declaration is overdue, the user is authorized to validated a previous declaration with a specific message",
+      },
+      reactRouter: reactRouterParameters({
+        location: {
+          pathParams: { year: "2024" },
+          path: "/:year",
+        },
+        routing: {
+          path: "/:year",
+        },
+      }),
+    },
+    play: DisplayValidateDeclarationDialogIfTheDeclarationIsComplete.play,
   }
 
 export const DisplayMissingFieldsDialogIfTheDeclarationIsNotComplete: Story = {

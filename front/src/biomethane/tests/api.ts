@@ -6,6 +6,11 @@ import {
 import { http } from "common/__test__/http"
 import { AnnualDeclaration } from "biomethane/types"
 
+export const getAnnualDeclarationYearsOk = http.get(
+  "/biomethane/annual-declaration/years/",
+  () => HttpResponse.json([2024, 2025])
+)
+
 export const getCurrentAnnualDeclarationOk = http.get(
   "/biomethane/annual-declaration/",
   () => HttpResponse.json(currentAnnualDeclaration)

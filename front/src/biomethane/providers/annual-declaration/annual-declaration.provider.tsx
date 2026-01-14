@@ -73,10 +73,12 @@ export function AnnualDeclarationProvider({
   const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
   const isDeclarationValidated =
     currentAnnualDeclaration?.status === AnnualDeclarationStatus.DECLARED
+
   const canEditDeclaration =
     !isDeclarationValidated &&
     Boolean(currentAnnualDeclaration?.is_open) &&
     entity.canWrite()
+
   const hasAnnualDeclarationMissingObjects =
     currentAnnualDeclaration?.missing_fields?.digestate_missing_fields ===
       null ||
