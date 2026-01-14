@@ -19,9 +19,9 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
 
   const {
     selectedYear,
-    currentAnnualDeclaration,
-    isInDeclarationPeriod,
+    annualDeclaration,
     hasAnnualDeclarationMissingObjects,
+    isDeclarationInCurrentPeriod,
   } = useAnnualDeclaration()
 
   const {
@@ -31,7 +31,7 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   } = usePageHeaderActions()
 
   const status =
-    currentAnnualDeclaration?.status ?? AnnualDeclarationStatus.IN_PROGRESS
+    annualDeclaration?.status ?? AnnualDeclarationStatus.IN_PROGRESS
 
   return (
     <Main>
@@ -41,11 +41,10 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
           value={selectedYear}
           onChange={years.setYear}
         />
-        {isInDeclarationPeriod && (
-          <AnnualDeclarationStatusBadge status={status} />
-        )}
+
+        <AnnualDeclarationStatusBadge status={status} />
       </Row>
-      {currentAnnualDeclaration?.is_open && entity.canWrite() && (
+      {annualDeclaration?.is_open && entity.canWrite() && (
         <Notice
           variant={
             status === AnnualDeclarationStatus.OVERDUE ? "warning" : "info"
@@ -69,7 +68,7 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
             status === AnnualDeclarationStatus.OVERDUE) && (
             <Button
               onClick={
-                currentAnnualDeclaration?.is_complete
+                annualDeclaration?.is_complete
                   ? openValidateDeclarationDialog
                   : openMissingFieldsDialog
               }
@@ -80,16 +79,17 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
               {t("Transmettre mes informations annuelles")}
             </Button>
           )}
-          {status === AnnualDeclarationStatus.DECLARED && (
-            <Button
-              onClick={() => correctAnnualDeclarationMutation.execute()}
-              iconId="ri-edit-line"
-              asideX
-              loading={correctAnnualDeclarationMutation.loading}
-            >
-              {t("Corriger mes informations annuelles")}
-            </Button>
-          )}
+          {status === AnnualDeclarationStatus.DECLARED &&
+            isDeclarationInCurrentPeriod && (
+              <Button
+                onClick={() => correctAnnualDeclarationMutation.execute()}
+                iconId="ri-edit-line"
+                asideX
+                loading={correctAnnualDeclarationMutation.loading}
+              >
+                {t("Corriger mes informations annuelles")}
+              </Button>
+            )}
         </Notice>
       )}
       <Content marginTop>{children}</Content>

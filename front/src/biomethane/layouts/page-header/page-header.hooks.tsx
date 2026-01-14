@@ -26,16 +26,13 @@ export const usePageHeaderActions = () => {
   const annualDeclarationData = useAnnualDeclaration()
   const { navigateToMissingFields } = useNavigateToMissingFields()
 
-  const {
-    currentAnnualDeclaration,
-    currentAnnualDeclarationKey,
-    selectedYear,
-  } = annualDeclarationData
+  const { annualDeclaration, annualDeclarationKey, selectedYear } =
+    annualDeclarationData
 
   const validateAnnualDeclarationMutation = useMutation(
     () => validateAnnualDeclaration(entity.id, selectedYear),
     {
-      invalidates: [currentAnnualDeclarationKey],
+      invalidates: [annualDeclarationKey],
       onSuccess: () => {
         notify(t("Votre déclaration a bien été transmise."), {
           variant: "success",
@@ -57,7 +54,7 @@ export const usePageHeaderActions = () => {
   const correctAnnualDeclarationMutation = useMutation(
     () => correctAnnualDeclaration(entity.id, selectedYear),
     {
-      invalidates: [currentAnnualDeclarationKey],
+      invalidates: [annualDeclarationKey],
       onSuccess: () => {
         notify(
           t(
@@ -94,17 +91,16 @@ export const usePageHeaderActions = () => {
               "Votre déclaration est complète, voulez-vous la transmettre à l'administration DGEC ?"
             )}
             <br />
-            {currentAnnualDeclaration?.status ===
+            {annualDeclaration?.status ===
               AnnualDeclarationStatus.IN_PROGRESS && (
               <>
-                {currentAnnualDeclaration?.year &&
+                {annualDeclaration?.year &&
                   t("Vous pourrez la corriger jusqu'au {{date}}", {
-                    date: `31/03/${currentAnnualDeclaration.year + 1}`,
+                    date: `31/03/${annualDeclaration.year + 1}`,
                   })}
               </>
             )}
-            {currentAnnualDeclaration?.status ===
-              AnnualDeclarationStatus.OVERDUE &&
+            {annualDeclaration?.status === AnnualDeclarationStatus.OVERDUE &&
               t(
                 "Attention, vous ne pourrez pas corriger votre déclaration une fois celle-ci transmise."
               )}

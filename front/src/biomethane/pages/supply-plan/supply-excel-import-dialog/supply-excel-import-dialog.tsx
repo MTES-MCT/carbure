@@ -33,7 +33,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { currentAnnualDeclarationKey, selectedYear } = useAnnualDeclaration()
+  const { annualDeclarationKey, selectedYear } = useAnnualDeclaration()
   const [importErrors, setImportErrors] = useState<ImportErrorResponse | null>(
     null
   )
@@ -43,7 +43,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   })
 
   const { execute: executeImport, loading } = useMutation(importSupplyPlan, {
-    invalidates: ["supply-plan-inputs", currentAnnualDeclarationKey],
+    invalidates: ["supply-plan-inputs", annualDeclarationKey],
     onSuccess: () => {
       notify(t("Fichier importé avec succès"), { variant: "success" })
       onClose()

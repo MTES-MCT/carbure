@@ -17,10 +17,10 @@ export const CreateSupplyInputDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { currentAnnualDeclarationKey, selectedYear } = useAnnualDeclaration()
+  const { annualDeclarationKey, selectedYear } = useAnnualDeclaration()
 
   const createSupplyInputMutation = useMutation(createSupplyInput, {
-    invalidates: ["supply-plan-inputs", currentAnnualDeclarationKey],
+    invalidates: ["supply-plan-inputs", annualDeclarationKey],
     onSuccess: () => {
       notify(t("L'intrant a bien été créé."), {
         variant: "success",

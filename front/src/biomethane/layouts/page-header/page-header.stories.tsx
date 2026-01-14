@@ -2,7 +2,7 @@ import { Meta, StoryObj } from "@storybook/react"
 import { BiomethanePageHeader } from "./page-header"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import {
-  buildCurrentAnnualDeclarationHandler,
+  buildAnnualDeclarationHandler,
   getAnnualDeclarationYearsOk,
 } from "biomethane/tests/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
@@ -71,7 +71,7 @@ export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
     },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           status: AnnualDeclarationStatus.DECLARED,
         }),
         ...MOCKS,
@@ -84,7 +84,7 @@ export const ValidateThePreviousYearDeclaration: Story = {
   parameters: {
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           year: 2024,
         }),
         ...MOCKS,
@@ -110,7 +110,7 @@ export const CouldNotValidateThePreviousYearDeclaration: Story = {
   parameters: {
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           year: 2024,
           is_open: false,
         }),
@@ -150,7 +150,7 @@ export const DisplayValidateDeclarationDialogIfTheDeclarationIsCompleteWhenSelec
     parameters: {
       msw: {
         handlers: [
-          buildCurrentAnnualDeclarationHandler({
+          buildAnnualDeclarationHandler({
             year: 2024,
             status: AnnualDeclarationStatus.OVERDUE,
           }),
@@ -178,7 +178,7 @@ export const DisplayMissingFieldsDialogIfTheDeclarationIsNotComplete: Story = {
   parameters: {
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           is_complete: false,
           missing_fields: {
             digestate_missing_fields: ["digestate_missing_field_1"],
@@ -199,7 +199,7 @@ export const DisplayOverdueDeclarationNoticeIfTheDeclarationIsOverdue: Story = {
   parameters: {
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           status: AnnualDeclarationStatus.OVERDUE,
         }),
         ...MOCKS,

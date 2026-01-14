@@ -11,13 +11,13 @@ export const useSaveDigestate = () => {
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { selectedYear, currentAnnualDeclarationKey } = useAnnualDeclaration()
+  const { selectedYear, annualDeclarationKey } = useAnnualDeclaration()
 
   const saveDigestateMutation = useMutation(
     (data: BiomethaneDigestateInputRequest) =>
       saveDigestate(entity.id, selectedYear, data),
     {
-      invalidates: ["digestate", currentAnnualDeclarationKey],
+      invalidates: ["digestate", annualDeclarationKey],
       onSuccess: () => {
         notify(t("Le digestat a bien été mis à jour."), { variant: "success" })
       },

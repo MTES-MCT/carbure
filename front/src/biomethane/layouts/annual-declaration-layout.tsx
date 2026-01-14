@@ -7,9 +7,9 @@ import { BiomethanePageHeader } from "./page-header"
 import { DeclarationNotFound } from "biomethane/components/declaration-not-found"
 
 export const AnnualDeclarationLayoutComponent = () => {
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const { annualDeclaration } = useAnnualDeclaration()
 
-  if (currentAnnualDeclaration === undefined) return <DeclarationNotFound />
+  if (annualDeclaration === undefined) return <DeclarationNotFound />
 
   return (
     <BiomethanePageHeader>

@@ -11,13 +11,13 @@ export const useSaveEnergy = () => {
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { currentAnnualDeclarationKey, selectedYear } = useAnnualDeclaration()
+  const { annualDeclarationKey, selectedYear } = useAnnualDeclaration()
 
   const saveEnergyMutation = useMutation(
     (data: BiomethaneEnergyInputRequest) =>
       saveEnergy(entity.id, selectedYear, data),
     {
-      invalidates: ["energy", currentAnnualDeclarationKey],
+      invalidates: ["energy", annualDeclarationKey],
       onSuccess: () => {
         notify(t("Les données ont bien été mises à jour."), {
           variant: "success",

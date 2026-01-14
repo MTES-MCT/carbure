@@ -10,7 +10,7 @@ export const getAnnualDeclarationYears = (entity_id: number) =>
     },
   })
 
-export const getCurrentAnnualDeclaration = (
+export const getAnnualDeclaration = (
   entity_id: number,
   year: number | undefined
 ) =>

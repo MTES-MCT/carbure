@@ -1,8 +1,5 @@
 import { HttpResponse } from "msw"
-import {
-  currentAnnualDeclaration,
-  currentAnnualDeclarationMissingFields,
-} from "./data"
+import { annualDeclaration, annualDeclarationMissingFields } from "./data"
 import { http } from "common/__test__/http"
 import { AnnualDeclaration } from "biomethane/types"
 
@@ -11,22 +8,22 @@ export const getAnnualDeclarationYearsOk = http.get(
   () => HttpResponse.json([2024, 2025])
 )
 
-export const getCurrentAnnualDeclarationOk = http.get(
+export const getAnnualDeclarationOk = http.get(
   "/biomethane/annual-declaration/",
-  () => HttpResponse.json(currentAnnualDeclaration)
+  () => HttpResponse.json(annualDeclaration)
 )
 
-export const getCurrentAnnualDeclarationMissingFields = http.get(
+export const getAnnualDeclarationMissingFields = http.get(
   "/biomethane/annual-declaration/",
-  () => HttpResponse.json(currentAnnualDeclarationMissingFields)
+  () => HttpResponse.json(annualDeclarationMissingFields)
 )
 
-export const buildCurrentAnnualDeclarationHandler = (
+export const buildAnnualDeclarationHandler = (
   declaration: Partial<AnnualDeclaration>
 ) =>
   http.get("/biomethane/annual-declaration/", () =>
     HttpResponse.json<AnnualDeclaration>({
-      ...currentAnnualDeclaration,
+      ...annualDeclaration,
       ...declaration,
     })
   )

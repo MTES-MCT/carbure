@@ -29,17 +29,17 @@ type REDIRECTED_ROUTES = "digestate" | "energy" | "supply-plan"
  */
 const RedirectToCurrentYear = ({ path }: { path: REDIRECTED_ROUTES }) => {
   const biomethaneRoutes = useRoutes().BIOMETHANE()
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const { annualDeclaration } = useAnnualDeclaration()
   const yearParam = useAnnualDeclarationYear()
 
   // If there is no current annual declaration and no year param,
   // we are in the closed declaration period, so we redirect to the closed declaration page
-  if (currentAnnualDeclaration === undefined && yearParam === undefined)
+  if (annualDeclaration === undefined && yearParam === undefined)
     return <Navigate to={`${biomethaneRoutes.ROOT}/closed-declaration`} />
 
   return (
     <Navigate
-      to={`${biomethaneRoutes.ROOT}/${currentAnnualDeclaration?.year}/${path}`}
+      to={`${biomethaneRoutes.ROOT}/${annualDeclaration?.year}/${path}`}
     />
   )
 }
