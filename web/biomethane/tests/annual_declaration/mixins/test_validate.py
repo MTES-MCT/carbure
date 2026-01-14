@@ -37,7 +37,7 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         """Test successful validation via API endpoint."""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=BiomethaneAnnualDeclarationService.get_declaration_period(),
+            year=BiomethaneAnnualDeclarationService.get_current_declaration_year(),
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
@@ -59,7 +59,7 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         """Test validation when declaration is incomplete."""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=BiomethaneAnnualDeclarationService.get_declaration_period(),
+            year=BiomethaneAnnualDeclarationService.get_current_declaration_year(),
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
