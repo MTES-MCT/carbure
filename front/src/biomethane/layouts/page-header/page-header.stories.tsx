@@ -65,6 +65,8 @@ export const DefaultLayoutForTheCurrentYearWithReadOnlyPermissions: Story = {
 
 export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
   parameters: {
+    // We need to set the mocking date to 2026 to ensure that the user is correcting the declaration inside the current declaration period (01/01/2026 to 31/03/2026)
+    mockingDate: new Date(2026, 2, 1),
     docs: {
       description:
         "If the selected year is 2025 and the declaration is validated, a notice with a button to correct the declaration should be displayed",
