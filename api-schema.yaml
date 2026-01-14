@@ -12022,9 +12022,6 @@ components:
         average_monthly_flow_nm3_per_hour:
           type: number
           format: double
-        injection_hours:
-          type: number
-          format: double
         energy:
           type: integer
       required:
@@ -15447,13 +15444,9 @@ components:
         average_monthly_flow_nm3_per_hour:
           type: number
           format: double
-        injection_hours:
-          type: number
-          format: double
       required:
         - average_monthly_flow_nm3_per_hour
         - injected_volume_nm3
-        - injection_hours
         - month
     NavStats:
       type: object

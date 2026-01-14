@@ -90,7 +90,6 @@ class BiomethaneEnergyMonthlyReportFactory(factory.django.DjangoModelFactory):
     month = faker.random_int(1, 12)
     injected_volume_nm3 = factory.Faker("pyfloat", min_value=0, max_value=50000, right_digits=2)
     average_monthly_flow_nm3_per_hour = factory.Faker("pyfloat", min_value=0, max_value=1000, right_digits=2)
-    injection_hours = factory.Faker("pyfloat", min_value=0, max_value=744, right_digits=1)
 
 
 def create_monthly_reports_for_energy(energy):

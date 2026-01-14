@@ -3445,8 +3445,6 @@ export interface components {
             injected_volume_nm3?: number;
             /** Format: double */
             average_monthly_flow_nm3_per_hour?: number;
-            /** Format: double */
-            injection_hours?: number;
             energy: number;
         };
         BiomethaneInjectionSite: {
@@ -4800,8 +4798,6 @@ export interface components {
             injected_volume_nm3: number;
             /** Format: double */
             average_monthly_flow_nm3_per_hour: number;
-            /** Format: double */
-            injection_hours: number;
         };
         NavStats: {
             total_pending_action_for_admin?: number;
