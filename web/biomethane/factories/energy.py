@@ -56,7 +56,7 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
     butane_or_propane_addition = factory.Faker("pyfloat", min_value=0, max_value=100, right_digits=2)
     fossil_fuel_consumed_kwh = factory.Faker("pyfloat", min_value=0, max_value=50000, right_digits=2)
 
-    # Acceptabilité
+    # Questions diverses
     has_opposition_or_complaints_acceptability = factory.Faker("boolean")
     estimated_work_days_acceptability = factory.Faker("random_int", min=0, max=365)
 

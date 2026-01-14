@@ -86,7 +86,7 @@ class BiomethaneEnergy(models.Model):
     # Quantité de combustible fossile consommé (kWh)
     fossil_fuel_consumed_kwh = models.FloatField(null=True, blank=True)
 
-    ## Acceptabilité
+    ## Questions diverses
 
     # L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement
     # d'une opposition ou de plaintes de voisinage ?

@@ -147,7 +147,7 @@ export function EnergyEfficiency({
               readOnly={!isEditing}
               disabled
               value={energyEfficiencyCoefficient.label}
-              state={energyEfficiencyCoefficient.error ? "error" : "default"}
+              state={energyEfficiencyCoefficient.error ? "info" : "default"}
               stateRelatedMessage={energyEfficiencyCoefficient.error}
               hasTooltip
               title={energyEfficiencyCoefficient.tooltip}
