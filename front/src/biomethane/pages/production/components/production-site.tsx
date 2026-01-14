@@ -71,26 +71,32 @@ export function ProductionSite({
   const installedMetersOptions = [
     {
       value: InstalledMeters.BIOGAS_PRODUCTION_FLOWMETER,
-      label: t("Débitmètre dédié à la production de biogaz"),
+      label: t(
+        "Débitmètre dédié à la production de biogaz ou méthode de comptage dédiée"
+      ),
     },
     {
       value: InstalledMeters.PURIFICATION_FLOWMETER,
-      label: t("Débitmètre dédié au volume de biogaz traité en épuration"),
+      label: t(
+        "Débitmètre dédié au volume de biogaz traité en épuration ou méthode de comptage dédiée"
+      ),
     },
     {
       value: InstalledMeters.FLARING_FLOWMETER,
-      label: t("Débitmètre dédié au volume de biogaz torché"),
+      label: t(
+        "Débitmètre dédié au volume de biogaz torché ou méthode de comptage dédiée"
+      ),
     },
     {
       value: InstalledMeters.HEATING_FLOWMETER,
       label: t(
-        "Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur"
+        "Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur ou méthode de comptage dédiée"
       ),
     },
     {
       value: InstalledMeters.PURIFICATION_ELECTRICAL_METER,
       label: t(
-        "Compteur dédié à la consommation électrique au système d'épuration et traitement des évents"
+        "Compteur dédié à la consommation électrique au système d'épuration et traitement des évents ou méthode de comptage dédiée"
       ),
     },
     {

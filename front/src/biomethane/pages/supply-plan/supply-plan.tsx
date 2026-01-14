@@ -23,6 +23,7 @@ import { ExcelImportDialog } from "./supply-excel-import-dialog"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
+import { MissingFields } from "biomethane/components/missing-fields"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
@@ -52,6 +53,7 @@ export const SupplyPlan = () => {
 
   return (
     <>
+      <MissingFields />
       <Row>
         <Button
           onClick={() =>
