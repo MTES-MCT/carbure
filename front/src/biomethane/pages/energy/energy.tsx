@@ -8,7 +8,6 @@ import { InjectedBiomethane } from "./components/injected-biomethane"
 import { BiogasProduction } from "./components/biogas-production"
 import { useProductionUnit } from "../production/production.hooks"
 import { EnergyEfficiency } from "./components/energy-efficiency"
-import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 import { MonthlyBiomethaneInjection } from "./components/monthy-biomethane-injection/monthly-biomethane-injection"
 import { isTariffReference2011Or2020 } from "../contract"
 import { VariousQuestions } from "./components/various-questions"
@@ -22,6 +21,7 @@ import {
   useMissingFields,
 } from "biomethane/components/missing-fields"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
+import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 
 const EnergyPage = () => {
   const { t } = useTranslation()

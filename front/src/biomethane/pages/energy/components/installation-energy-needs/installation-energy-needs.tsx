@@ -3,40 +3,23 @@ import { Checkbox, TextInput } from "common/components/inputs2"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
-import { DeepPartial } from "common/types"
-import { BiomethaneEnergyInputRequest } from "../types"
-import { useSaveEnergy } from "../energy.hooks"
-import {
-  BiomethaneContract,
-  TariffReference,
-} from "biomethane/pages/contract/types"
+import { BiomethaneEnergyInputRequest, EnergyType } from "../../types"
+import { useSaveEnergy } from "../../energy.hooks"
+import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useAttestNoFossilForEnergy } from "./installation-energy-needs.hooks"
+import { EnergyTypes } from "./energy-types"
 
-type InstallationEnergyNeedsForm = DeepPartial<
-  Pick<
-    BiomethaneEnergyInputRequest,
-    | "attest_no_fossil_for_digester_heating_and_purification"
-    | "energy_used_for_digester_heating"
-    | "fossil_details_for_digester_heating"
-    | "attest_no_fossil_for_installation_needs"
-    | "energy_used_for_installation_needs"
-    | "fossil_details_for_installation_needs"
-  >
+type InstallationEnergyNeedsForm = Pick<
+  BiomethaneEnergyInputRequest,
+  "attest_no_fossil_for_energy" | "energy_types" | "energy_details"
 >
 
 const extractValues = (energy?: InstallationEnergyNeedsForm) => {
   return {
-    attest_no_fossil_for_digester_heating_and_purification:
-      energy?.attest_no_fossil_for_digester_heating_and_purification,
-    energy_used_for_digester_heating: energy?.energy_used_for_digester_heating,
-    fossil_details_for_digester_heating:
-      energy?.fossil_details_for_digester_heating,
-    attest_no_fossil_for_installation_needs:
-      energy?.attest_no_fossil_for_installation_needs,
-    energy_used_for_installation_needs:
-      energy?.energy_used_for_installation_needs,
-    fossil_details_for_installation_needs:
-      energy?.fossil_details_for_installation_needs,
+    attest_no_fossil_for_energy: energy?.attest_no_fossil_for_energy,
+    energy_types: energy?.energy_types ?? [],
+    energy_details: energy?.energy_details,
   }
 }
 export function InstallationEnergyNeeds({
@@ -46,15 +29,21 @@ export function InstallationEnergyNeeds({
 }) {
   const { t } = useTranslation()
 
-  const { bind, value } = useFormContext<InstallationEnergyNeedsForm>()
+  const form = useFormContext<InstallationEnergyNeedsForm>()
+  const { bind, value } = form
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
+  const attestNoFossilForEnergyTexts = useAttestNoFossilForEnergy(
+    contract?.tariff_reference
+  )
 
   const handleSubmit = async () => saveEnergy.execute(extractValues(value))
 
-  const isTariffReference2023 =
-    contract?.tariff_reference === TariffReference.Value2023
-
+  const displayDetailsField = value.energy_types?.some((type) =>
+    [EnergyType.FOSSIL, EnergyType.OTHER_RENEWABLE, EnergyType.OTHER].includes(
+      type
+    )
+  )
   return (
     <ManagedEditableCard
       sectionId="installation-energy-needs"
@@ -64,8 +53,22 @@ export function InstallationEnergyNeeds({
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
-        <ManagedEditableCard.Form onSubmit={handleSubmit}>
-          {!isTariffReference2023 && (
+        <ManagedEditableCard.Form onSubmit={handleSubmit} form={form}>
+          <Checkbox
+            readOnly={!isEditing}
+            {...attestNoFossilForEnergyTexts}
+            {...bind("attest_no_fossil_for_energy")}
+          />
+          <EnergyTypes contract={contract} isReadOnly={!isEditing} />
+          {displayDetailsField && (
+            <TextInput
+              readOnly={!isEditing}
+              label={t("Précisions")}
+              {...bind("energy_details")}
+              required
+            />
+          )}
+          {/* {!isTariffReference2023 && (
             <>
               <Checkbox
                 readOnly={!isEditing}
@@ -134,7 +137,7 @@ export function InstallationEnergyNeeds({
                 />
               )}
             </>
-          )}
+          )} */}
 
           {isEditing && (
             <Button

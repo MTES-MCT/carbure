@@ -24,11 +24,6 @@ class BiomethaneEnergySerializer(BaseBiomethaneEnergySerializer):
 
 
 class BiomethaneEnergyInputSerializer(BaseBiomethaneEnergySerializer):
-    energy_types = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneEnergy.ENERGY_TYPES),
-        required=False,
-    )
-
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")
