@@ -124,9 +124,7 @@ export function ProductionSite({
             readOnly={!isEditing}
             min={0}
             max={100}
-            label={t(
-              "Rendement de l'installation de production de biométhane (%)"
-            )}
+            label={t("Rendement moyen de l'épurateur de l'installation (%)")}
             hintText={t(
               "Rendement global de l'installation (comprenant notamment le rendement de l'épurateur)"
             )}

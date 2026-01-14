@@ -113,7 +113,7 @@ class BiomethaneProductionUnit(models.Model):
         blank=True,
     )
 
-    # Rendement de l'installation de production de biométhane %
+    # Rendement moyen de l'épurateur de l'installation %
     production_efficiency = models.FloatField(null=True, blank=True)
 
     # Équipements installés (débitmètres et compteurs)
