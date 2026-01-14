@@ -9,10 +9,15 @@ import {
   BiomethaneSupplyInputSource,
 } from "./types"
 import Tag from "@codegouvfr/react-dsfr/Tag"
-import { getSupplyPlanInputCategory, getSupplyPlanInputSource } from "./utils"
+import {
+  convertSupplyPlanInputVolume,
+  getSupplyPlanInputCategory,
+  getSupplyPlanInputSource,
+} from "./utils"
 import { getDepartmentName } from "common/utils/geography"
 import { getSupplyPlanInputFilters } from "./api"
 import { defaultNormalizer } from "common/utils/normalize"
+import { formatNumber } from "common/utils/formatters"
 
 export const useSupplyPlanColumns = () => {
   const { t } = useTranslation()
@@ -38,12 +43,18 @@ export const useSupplyPlanColumns = () => {
         ),
     },
     {
-      header: t("Tonnage"),
-      cell: (input) => (
-        <Cell
-          text={`${input.volume} ${input.material_unit === BiomethaneSupplyInputMaterialUnit.DRY ? "tMS" : "tMB"}`}
-        />
-      ),
+      header: t("Tonnage (tMB)"),
+      cell: (input) => {
+        const volume =
+          input.material_unit === BiomethaneSupplyInputMaterialUnit.DRY
+            ? convertSupplyPlanInputVolume(
+                input.volume,
+                input.volume,
+                input.dry_matter_ratio_percent ?? 0
+              )
+            : input.volume
+        return <Cell text={`${formatNumber(volume)} tMB`} />
+      },
     },
   ]
 
