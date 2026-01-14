@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -11,6 +11,15 @@ class ExcelImportActionMixin:
     @extend_schema(
         operation_id="import_supply_plan_from_excel",
         description=("Upload and process an Excel file to create supply plan entries. "),
+        parameters=[
+            OpenApiParameter(
+                name="year",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Year of the supply plan.",
+                required=True,
+            ),
+        ],
         request=BiomethaneUploadExcelSerializer,
         responses={201: {"type": "object"}, 400: {"type": "object"}},
         examples=[

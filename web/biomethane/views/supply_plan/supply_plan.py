@@ -2,7 +2,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters.mixins import EntityProducerFilter
+from biomethane.filters.mixins import EntityProducerFilter, EntityProducerYearFilter
 from biomethane.models import BiomethaneSupplyPlan
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers import BiomethaneSupplyPlanSerializer
@@ -25,11 +25,22 @@ from .mixins import ExcelImportActionMixin
 class BiomethaneSupplyPlanViewSet(GenericViewSet, YearsActionMixin, ExcelImportActionMixin):
     queryset = BiomethaneSupplyPlan.objects.all()
     serializer_class = BiomethaneSupplyPlanSerializer
-    filterset_class = EntityProducerFilter
+
     pagination_class = None
 
     def get_permissions(self):
         return get_biomethane_permissions(["import_supply_plan_from_excel"], self.action)
+
+    def get_filterset_class(self):
+        if self.action == "get_years":
+            return EntityProducerFilter
+        return EntityProducerYearFilter
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["entity"] = getattr(self.request, "entity", None)
+        context["year"] = self.request.query_params.get("year")
+        return context
 
     def get_queryset(self):
         if self.action == "import_supply_plan_from_excel":
