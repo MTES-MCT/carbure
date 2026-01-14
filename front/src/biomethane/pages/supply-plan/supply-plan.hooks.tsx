@@ -49,7 +49,6 @@ export const useSupplyPlanColumns = () => {
           input.material_unit === BiomethaneSupplyInputMaterialUnit.DRY
             ? convertSupplyPlanInputVolume(
                 input.volume,
-                input.volume,
                 input.dry_matter_ratio_percent ?? 0
               )
             : input.volume
