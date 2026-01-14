@@ -1,7 +1,9 @@
+from datetime import date
+
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 
-from biomethane.models import BiomethaneAnnualDeclaration
+from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDeclarationPeriod
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 
@@ -17,6 +19,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+
+        # Check if today is the first day of the declaration period
+        if current_declaration_period := BiomethaneDeclarationPeriod.objects.filter(year=current_year).first():
+            start_date = current_declaration_period.start_date
+
+            if date.today() != start_date:
+                self.stdout.write(self.style.ERROR("Not today. Nothing to do."))
+                return
+        else:
+            self.stdout.write(self.style.ERROR(f"Declaration period for year {current_year} does not exist"))
+            return
 
         # Get all biomethane producers
         producers = Entity.objects.filter(entity_type=Entity.BIOMETHANE_PRODUCER)

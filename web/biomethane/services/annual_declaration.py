@@ -1,13 +1,14 @@
 from datetime import date
 
 from biomethane.models import (
+    BiomethaneAnnualDeclaration,
     BiomethaneContract,
+    BiomethaneDeclarationPeriod,
     BiomethaneDigestate,
     BiomethaneEnergy,
     BiomethaneProductionUnit,
+    BiomethaneSupplyPlan,
 )
-from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
-from biomethane.models.biomethane_supply_plan import BiomethaneSupplyPlan
 
 
 class BiomethaneAnnualDeclarationService:
@@ -26,15 +27,18 @@ class BiomethaneAnnualDeclarationService:
     @staticmethod
     def is_declaration_period_open():
         """
-        Check if we are currently in the declaration period (from Jan 1st to Mar 31st).
+        Check if we are currently in the declaration period.
 
         Returns:
             bool: True if current date is within the declaration period, False otherwise.
         """
-        today = date.today()
-        start_period = date(today.year, 1, 1)
-        end_period = date(today.year, 3, 31)
-        return start_period <= today <= end_period
+        try:
+            declaration_period = BiomethaneDeclarationPeriod.objects.get(
+                year=BiomethaneAnnualDeclarationService.get_current_declaration_year()
+            )
+            return declaration_period.is_open
+        except BiomethaneDeclarationPeriod.DoesNotExist:
+            return False
 
     @staticmethod
     def get_declaration_status(declaration):
