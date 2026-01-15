@@ -85,6 +85,16 @@ export function Production({
                   {...bind("liquid_digestate_quantity")}
                   required
                 />
+                <NumberInput
+                  readOnly={!isEditing}
+                  label={t("Tonnage de digestat brut (t)")}
+                  hintText={t(
+                    "Quantité éventuelle de digestat brut n'ayant pas subi de séparation de phase"
+                  )}
+                  type="number"
+                  {...bind("solid_digestate_tonnage")}
+                  required
+                />
               </>
             )}
           </Grid>

@@ -232,10 +232,7 @@ def clear_production_unit_fields_on_save(sender, instance, **kwargs):
         fields_to_clear.append("hygienization_exemption_type")
 
     # Clear digestate treatment steps based on phase separation setting
-    if instance.has_digestate_phase_separation:
-        # If phase separation is enabled, clear raw digestate treatment steps
-        fields_to_clear.append("raw_digestate_treatment_steps")
-    else:
+    if not instance.has_digestate_phase_separation:
         # If phase separation is disabled, clear liquid and solid phase treatment steps
         fields_to_clear.extend(["liquid_phase_treatment_steps", "solid_phase_treatment_steps"])
 
