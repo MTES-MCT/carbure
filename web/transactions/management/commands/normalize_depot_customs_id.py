@@ -8,6 +8,14 @@ from transactions.models.site import Site
 
 
 class Command(BaseCommand):
+    """
+    Management command to normalize depot customs IDs from DGDDI Excel file.
+
+    python web/manage.py normalize_depot_customs_id --dry-run=true
+    python web/manage.py normalize_depot_customs_id --dry-run=false
+
+    """
+
     help = "Normalize depot customs IDs from DGDDI Excel file"
 
     DGDDI_DEPOTS_FILENAME = "Recensement_des_entrepots_suspensifs_PE__METRO+DOM__v2.xlsx"
