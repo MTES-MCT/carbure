@@ -32,10 +32,17 @@ class EnergyContext:
     # @property
     # def attest_no_fossil_for_installation_needs(self) -> bool:
     #     return getattr(self.instance, "attest_no_fossil_for_installation_needs", False)
+    @property
+    def energy_types(self) -> Optional[list]:
+        return getattr(self.instance, "energy_types", None) or []
 
     @property
     def tariff_reference(self) -> Optional[str]:
         return getattr(self.contract, "tariff_reference", None) if self.contract else None
+
+    @property
+    def installation_category(self) -> Optional[str]:
+        return getattr(self.contract, "installation_category", None) if self.contract else None
 
 
 class BiomethaneEnergyService:
@@ -190,14 +197,22 @@ def _build_energy_rules() -> list[FieldClearingRule]:
             condition=lambda ctx: not ctx.has_injection_difficulties,
         ),
         # Installation energy needs rules
+        FieldClearingRule(
+            name="no_fossil_for_energy",
+            fields=["energy_details"],
+            condition=lambda ctx: not any(
+                energy_type
+                in [
+                    BiomethaneEnergy.ENERGY_TYPE_FOSSIL,
+                    BiomethaneEnergy.ENERGY_TYPE_OTHER_RENEWABLE,
+                    BiomethaneEnergy.ENERGY_TYPE_OTHER,
+                ]
+                for energy_type in ctx.energy_types
+            ),
+        ),
         # FieldClearingRule(
-        #     name="no_fossil_for_digester_heating",
-        #     fields=["fossil_details_for_digester_heating"],
-        #     condition=lambda ctx: ctx.attest_no_fossil_for_digester_heating_and_purification,
-        # ),
-        # FieldClearingRule(
-        #     name="no_fossil_for_installation_needs",
-        #     fields=["fossil_details_for_installation_needs"],
-        #     condition=lambda ctx: ctx.attest_no_fossil_for_installation_needs,
+        #     name="clear_energy_types_when_installation_category_is_2",
+        #     fields=["energy_types"],
+        #     condition=lambda ctx: ctx.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_2,
         # ),
     ]

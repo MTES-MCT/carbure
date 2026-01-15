@@ -59,12 +59,9 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     "flaring_operating_hours",
   ],
   "installation-energy-needs": [
-    "attest_no_fossil_for_digester_heating_and_purification",
-    "energy_used_for_digester_heating",
-    "fossil_details_for_digester_heating",
-    "attest_no_fossil_for_installation_needs",
-    "energy_used_for_installation_needs",
-    "fossil_details_for_installation_needs",
+    "attest_no_fossil_for_energy",
+    "energy_types",
+    "energy_details",
   ],
   "energy-efficiency": [
     "purified_biogas_quantity_nm3",

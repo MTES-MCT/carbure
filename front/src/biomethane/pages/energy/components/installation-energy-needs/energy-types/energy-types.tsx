@@ -24,6 +24,7 @@ export const EnergyTypes = ({ contract, isReadOnly }: EnergyTypesProps) => {
       label={energyTypeLabel}
       options={energyTypeOptions}
       readOnly={isReadOnly}
+      required
     />
   )
 }

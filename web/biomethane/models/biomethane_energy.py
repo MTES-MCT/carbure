@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
@@ -40,37 +40,15 @@ class BiomethaneEnergy(models.Model):
     # Nombre d'heures de fonctionnement de la torchère (h)
     flaring_operating_hours = models.FloatField(null=True, blank=True)
 
-    ## Nature de l'énergie utilisée pour les besoins de l'installation
-
-    # Besoins en énergie liés au chauffage du digesteur pour une installation de méthanisation
-    # ainsi qu’à l’épuration du biogaz et à l’oxydation des évents
-    # J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d’origine fossile.
-    # attest_no_fossil_for_digester_heating_and_purification = models.BooleanField(default=False)
-
-    # # Type d'énergie utilisée pour le chauffage du digesteur
-    # energy_used_for_digester_heating = models.CharField(max_length=255, null=True, blank=True)
-
-    # # Précisions (si utilisation d’énergie d’origine fossile)
-    # fossil_details_for_digester_heating = models.TextField(null=True, blank=True)
-
-    # # Besoins en énergie de l’installation de production de biométhane (notamment liés à la pasteurisation, l’hygiénisation
-    # # et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz)
-    # # J'atteste que les besoins en énergie cités ci-dessus ont pas satisfaits par une énergie d’origine fossile.
-    # attest_no_fossil_for_installation_needs = models.BooleanField(default=False)
-
-    # # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
-    # # le chauffage du digesteur et l’épuration du biogaz
-    # energy_used_for_installation_needs = models.CharField(max_length=255, null=True, blank=True)
-
-    # # Précisions (si utilisation d’énergie d’origine fossile)
-    # fossil_details_for_installation_needs = models.TextField(null=True, blank=True)
     MALFUNCTION_TYPE_CONCEPTION = "CONCEPTION"
 
     MALFUNCTION_TYPES = [
         (MALFUNCTION_TYPE_CONCEPTION, "Conception"),
     ]
 
-    ## Types d'énergie possibles
+    ## Nature de l'énergie utilisée pour les besoins de l'installation
+
+    # Types d'énergie possibles
     ENERGY_TYPE_PRODUCED_BIOGAS = "PRODUCED_BIOGAS"
     ENERGY_TYPE_PRODUCED_BIOMETHANE = "PRODUCED_BIOMETHANE"
     ENERGY_TYPE_WASTE_HEAT_PREEXISTING = "WASTE_HEAT_PREEXISTING"
@@ -87,7 +65,8 @@ class BiomethaneEnergy(models.Model):
         (ENERGY_TYPE_PRODUCED_BIOMETHANE, "Biométhane produit par l'installation"),
         (
             ENERGY_TYPE_WASTE_HEAT_PREEXISTING,
-            "Chaleur fatale [Energie thermique résiduelle] (issue d'un équipement préexistant installé sur site ou sur un site situé à proximité)",
+            "Chaleur fatale [Energie thermique résiduelle] (issue d'un équipement préexistant installé sur site "
+            + "ou sur un site situé à proximité)",
         ),
         (
             ENERGY_TYPE_WASTE_HEAT_PURIFICATION,
@@ -104,8 +83,15 @@ class BiomethaneEnergy(models.Model):
         (ENERGY_TYPE_OTHER, "Autre"),
     ]
 
+    # Besoins en énergie de l'installation de production de biométhane / au chauffage du digesteur
     attest_no_fossil_for_energy = models.BooleanField(default=False)
+
+    # Type d'énergie utilisée pour le chauffage du digesteur
+    # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
+    # le chauffage du digesteur et l’épuration du biogaz
     energy_types = models.JSONField(null=True, blank=True, default=list)
+
+    # Précisions
     energy_details = models.TextField(null=True, blank=True)
 
     ## Efficacité énergétique
@@ -227,3 +213,19 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
         update_data = {field: None for field in fields_to_clear}
 
         BiomethaneEnergy.objects.filter(pk=energy_instance.pk).update(**update_data)
+
+
+@receiver(pre_save, sender=BiomethaneContract)
+def update_energy_fields_on_contract_save(sender, instance, **kwargs):
+    old_contract = sender.objects.get(pk=instance.pk)
+
+    if (
+        old_contract.tariff_reference != instance.tariff_reference
+        or old_contract.installation_category != instance.installation_category
+    ):
+        producer = instance.producer
+        energy_instance = producer.biomethane_energies.order_by("-year").first()
+        if energy_instance:
+            fields_to_clear = ["energy_types"]
+            update_data = {field: None for field in fields_to_clear}
+            BiomethaneEnergy.objects.filter(pk=energy_instance.pk).update(**update_data)

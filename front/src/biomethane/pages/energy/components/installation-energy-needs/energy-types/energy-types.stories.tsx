@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { EnergyTypes } from "./energy-types"
 import { contractData } from "biomethane/pages/contract/tests/contract.data"
-import { TariffReference } from "biomethane/pages/contract/types"
+import {
+  InstallationCategory,
+  TariffReference,
+} from "biomethane/pages/contract/types"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneEnergyInputRequest } from "biomethane/pages/energy/types"
 
@@ -45,6 +48,19 @@ export const Contrat2020: Story = {
     contract: {
       ...contractData,
       tariff_reference: TariffReference.Value2020,
+    },
+  },
+}
+
+export const Contract2020WithInstallationCategory2: Story = {
+  parameters: {
+    docs: "Options displayed for tariff reference 2020 with installation category 2",
+  },
+  args: {
+    contract: {
+      ...contractData,
+      tariff_reference: TariffReference.Value2020,
+      installation_category: InstallationCategory.INSTALLATION_CATEGORY_2,
     },
   },
 }
