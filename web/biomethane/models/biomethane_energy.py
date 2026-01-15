@@ -217,9 +217,9 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=BiomethaneContract)
 def update_energy_fields_on_contract_save(sender, instance, **kwargs):
-    old_contract = sender.objects.get(pk=instance.pk)
+    old_contract = sender.objects.filter(pk=instance.pk).first()
 
-    if (
+    if old_contract and (
         old_contract.tariff_reference != instance.tariff_reference
         or old_contract.installation_category != instance.installation_category
     ):

@@ -25,13 +25,6 @@ class EnergyContext:
     def has_injection_difficulties(self) -> bool:
         return getattr(self.instance, "has_injection_difficulties_due_to_network_saturation", False)
 
-    # @property
-    # def attest_no_fossil_for_digester_heating_and_purification(self) -> bool:
-    #     return getattr(self.instance, "attest_no_fossil_for_digester_heating_and_purification", False)
-
-    # @property
-    # def attest_no_fossil_for_installation_needs(self) -> bool:
-    #     return getattr(self.instance, "attest_no_fossil_for_installation_needs", False)
     @property
     def energy_types(self) -> Optional[list]:
         return getattr(self.instance, "energy_types", None) or []
@@ -196,7 +189,7 @@ def _build_energy_rules() -> list[FieldClearingRule]:
             fields=BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS,
             condition=lambda ctx: not ctx.has_injection_difficulties,
         ),
-        # Installation energy needs rules
+        # Energy details rules
         FieldClearingRule(
             name="no_fossil_for_energy",
             fields=["energy_details"],
@@ -210,9 +203,4 @@ def _build_energy_rules() -> list[FieldClearingRule]:
                 for energy_type in ctx.energy_types
             ),
         ),
-        # FieldClearingRule(
-        #     name="clear_energy_types_when_installation_category_is_2",
-        #     fields=["energy_types"],
-        #     condition=lambda ctx: ctx.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_2,
-        # ),
     ]
