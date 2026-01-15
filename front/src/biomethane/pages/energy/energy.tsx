@@ -49,7 +49,7 @@ const EnergyPage = () => {
   return (
     <FormContext.Provider value={form}>
       <MissingFields />
-      <InjectedBiomethane contract={contract} />
+      <InjectedBiomethane energy={energy} contract={contract} />
       <BiogasProduction />
       <InstallationEnergyNeeds contract={contract} />
       <EnergyEfficiency energy={energy} contract={contract} />

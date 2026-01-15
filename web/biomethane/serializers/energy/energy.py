@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
+from biomethane.serializers.energy.monthly_report import BiomethaneEnergyMonthlyReportSerializer
 
 
 class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
@@ -19,6 +20,8 @@ class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
 
 
 class BiomethaneEnergySerializer(BaseBiomethaneEnergySerializer):
+    monthly_reports = BiomethaneEnergyMonthlyReportSerializer(many=True, read_only=True)
+
     class Meta(BaseBiomethaneEnergySerializer.Meta):
         exclude = []
 

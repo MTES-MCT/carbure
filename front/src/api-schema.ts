@@ -3352,6 +3352,7 @@ export interface components {
             readonly id: number;
             energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
+            readonly monthly_reports: components["schemas"]["BiomethaneEnergyMonthlyReport"][];
             year: number;
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
@@ -7534,6 +7535,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
