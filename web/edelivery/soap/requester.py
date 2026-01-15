@@ -2,7 +2,7 @@ from os import environ
 from time import sleep
 
 from edelivery.adapters.pub_sub_adapter import PubSubAdapter
-from edelivery.ebms.request_responses import BaseRequestResponse
+from edelivery.ebms.request_responses import ResponseFactory
 from edelivery.soap.actions import SubmitMessage
 
 
@@ -13,7 +13,7 @@ class Requester:
         self.timeout = timeout
         self.pub_sub_adapter = PubSubAdapter()
 
-    def response(self):
+    def do_request(self):
         def wait_for_udb_response():
             tried = 0
 
@@ -21,7 +21,8 @@ class Requester:
                 tried += 1
                 message = self.pub_sub_adapter.next_message()
                 if message is not None:
-                    candidate = BaseRequestResponse(message)
+                    factory = ResponseFactory(self.request.response_class, message)
+                    candidate = factory.response()
                     if candidate.request_id() == self.request.id:
                         return candidate
                 sleep(self.delay_between_retries)
@@ -32,7 +33,8 @@ class Requester:
             self.pub_sub_adapter.subscribe()
             SubmitMessage(environ["UDB_ACCESS_POINT_ID"], self.request).perform()
 
-            return wait_for_udb_response()
+            response = wait_for_udb_response()
+            return response.post_retrieval_action_result()
 
         finally:
             self.pub_sub_adapter.unsubscribe()

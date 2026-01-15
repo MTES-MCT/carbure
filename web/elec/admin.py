@@ -12,6 +12,7 @@ from elec.models import (
     ElecProvisionCertificateQualicharge,
     ElecTransferCertificate,
 )
+from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 
 
 @admin.register(ElecProvisionCertificate)
@@ -206,4 +207,24 @@ class ElecProvisionCertificateQualichargeAdmin(admin.ModelAdmin):
         "cpo__name",
         "station_id",
         "operating_unit",
+    ]
+
+
+@admin.register(ElecCertificateReadjustment)
+class ElecCertificateReadjustmentAdmin(admin.ModelAdmin):
+    list_display = [
+        "cpo",
+        "created_at",
+        "energy_amount",
+        "error_source",
+        "reason",
+    ]
+    list_filter = [
+        "cpo",
+        "error_source",
+    ]
+    search_fields = [
+        "cpo__name",
+        "error_source",
+        "reason",
     ]

@@ -1,11 +1,13 @@
+import json
+
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.db.models.aggregates import Sum
 
-from elec.models import ElecMeterReading
+from elec.models import ElecCertificateReadjustment, ElecMeterReading, ElecProvisionCertificate
 
 
-# mettre à jour avec la vue elec_meter_reading_virtual
 def _get_real_total_energy_declared(cpo_id):
     with connection.cursor() as cursor:
         cursor.execute(
@@ -64,11 +66,18 @@ class Command(BaseCommand):
             default=None,
             help="Cpo to filter readings",
         )
+        parser.add_argument(
+            "--apply",
+            default=False,
+            action="store_true",
+            help="Create readjustments in the table elec_certificate_readjustment for each cpo",
+        )
 
     def handle(self, *args, **options):
         log = options.get("log")
         csv = options.get("csv")
         cpo = options.get("cpo")
+        apply_readjustments = options.get("apply")
 
         cpo_with_readings = ElecMeterReading.objects.select_related("cpo").values("cpo_id", "cpo__name")
 
@@ -79,18 +88,50 @@ class Command(BaseCommand):
 
         report = {}
         total_surplus = 0
-        for cpo in cpo_with_readings:
-            real_total_energy_must_be_declared = _get_real_total_energy_declared(cpo["cpo_id"])
-            total_renewable_energy_declared = _get_certificates_energy_amount(cpo["cpo_id"])
-            diff = total_renewable_energy_declared - real_total_energy_must_be_declared
 
-            if diff > 0.1 or diff < -0.1:
+        for cpo in cpo_with_readings:
+            total_meter_reading_energy = _get_real_total_energy_declared(cpo["cpo_id"])
+            total_provision_certificate_energy = _get_certificates_energy_amount(cpo["cpo_id"])
+
+            total_admin_error_readjustment_dict = ElecProvisionCertificate.objects.filter(
+                cpo_id=cpo["cpo_id"], source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION
+            ).aggregate(Sum("energy_amount"))
+            total_admin_error_readjustment = (
+                total_admin_error_readjustment_dict.get("energy_amount__sum") or 0
+            ) * 1000  # back to kWh to match meter reading energy values
+
+            total_cpo_readjustment_dict = ElecCertificateReadjustment.objects.filter(
+                cpo_id=cpo["cpo_id"], error_source=ElecCertificateReadjustment.METER_READINGS
+            ).aggregate(Sum("energy_amount"))
+            total_cpo_readjustment = (
+                total_cpo_readjustment_dict.get("energy_amount__sum") or 0
+            ) * 1000  # back to kWh to match meter reading energy values
+
+            diff = (
+                total_provision_certificate_energy
+                - total_meter_reading_energy
+                - total_cpo_readjustment
+                + total_admin_error_readjustment
+            )
+
+            # if diff is more than 100 kWh, it's a significant difference
+            if abs(diff) >= 100:
                 total_surplus += diff
                 report[cpo["cpo__name"]] = {
-                    "certificats": total_renewable_energy_declared,
-                    "real_energy_must_be_declared": real_total_energy_must_be_declared,
+                    "certificats": total_provision_certificate_energy,
+                    "real_energy_must_be_declared": total_meter_reading_energy,
                     "surplus": round(diff, 3),
                 }
+
+                # create a readjustment only if the cpo has a positive surplus
+                if apply_readjustments and diff > 0:
+                    ElecCertificateReadjustment.objects.create(
+                        cpo_id=cpo["cpo_id"],
+                        error_source=ElecCertificateReadjustment.METER_READINGS,
+                        # back to MWh to match the energy_amount field
+                        energy_amount=round(diff / 1000, 2),
+                        reason="Différence entre l'énergie générée par certificats et l'énergie déclarée dans les relevés",
+                    )
 
         if log:
             items = []
@@ -120,3 +161,5 @@ class Command(BaseCommand):
                 columns=["Aménageur", "Energie générée par certificats (kWh)", "Énergie déclarée (kWh)", "Surplus (kWh)"],
             )
             df.to_csv("/tmp/readings.csv", index=False)
+
+        return json.dumps({cpo: data["surplus"] for cpo, data in report.items()})

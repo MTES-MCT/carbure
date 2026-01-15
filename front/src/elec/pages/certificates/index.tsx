@@ -14,6 +14,7 @@ import { ImportProvisionCertificates } from "./components/import-provision-certi
 import { SendTransferCertificates } from "./components/send-transfer-certificates"
 import { useQuery } from "common/hooks/async"
 import { useProvisionCertificatesBalance } from "./hooks/provision-certificates.hooks"
+import { ReadjustmentNotice } from "./components/readjustment-notice"
 
 export const ElecCertificates = () => {
   const { t } = useTranslation()
@@ -26,7 +27,12 @@ export const ElecCertificates = () => {
     params: [entity.id, years.selected],
   })
 
-  const { balance, formattedBalance } = useProvisionCertificatesBalance()
+  const {
+    balance,
+    formattedBalance,
+    readjustmentBalance,
+    formattedReadjustmentBalance,
+  } = useProvisionCertificatesBalance()
 
   const canWriteCPO = entity.isCPO && entity.canWrite()
   const canWriteAdmin =
@@ -53,6 +59,14 @@ export const ElecCertificates = () => {
           )}
           {canWriteAdmin && <ImportProvisionCertificates />}
         </section>
+        {readjustmentBalance > 0 && (
+          <ReadjustmentNotice
+            balance={balance}
+            formattedBalance={formattedBalance}
+            readjustmentBalance={readjustmentBalance}
+            formattedReadjustmentBalance={formattedReadjustmentBalance}
+          />
+        )}
       </header>
 
       <Routes>
