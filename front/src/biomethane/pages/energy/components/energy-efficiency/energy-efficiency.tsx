@@ -5,13 +5,20 @@ import { ManagedEditableCard } from "common/molecules/editable-card/managed-edit
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../../types"
+import {
+  BiomethaneEnergy,
+  BiomethaneEnergyInputRequest,
+  EnergyType,
+} from "../../types"
 import { useSaveEnergy } from "../../energy.hooks"
 import {
   BiomethaneContract,
   TariffReference,
 } from "biomethane/pages/contract/types"
-import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
+import {
+  useBiogazOrBiomethaneAutoconsumptionLabel,
+  useEnergyEfficiencyCoefficient,
+} from "./energy-efficiency.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type EnergyEfficiencyForm = DeepPartial<
@@ -66,6 +73,9 @@ export function EnergyEfficiency({
       energy?.injected_biomethane_gwh_pcs_per_year ?? 0,
   })
 
+  const biogazOrBiomethaneAutoconsumptionLabel =
+    useBiogazOrBiomethaneAutoconsumptionLabel(contract?.tariff_reference)
+
   return (
     <ManagedEditableCard
       sectionId="energy-efficiency"
@@ -78,6 +88,14 @@ export function EnergyEfficiency({
       {({ isEditing }) => (
         <ManagedEditableCard.Form onSubmit={handleSubmit}>
           <Grid cols={1} gap="lg">
+            {energyTypesIncludesBiogazOrBiomethane(energy?.energy_types) && (
+              <NumberInput
+                readOnly={!isEditing}
+                label={biogazOrBiomethaneAutoconsumptionLabel}
+                required
+                step={0.01}
+              />
+            )}
             {!isTariffReference2023 && (
               <>
                 <NumberInput
@@ -169,3 +187,7 @@ export function EnergyEfficiency({
     </ManagedEditableCard>
   )
 }
+
+const energyTypesIncludesBiogazOrBiomethane = (energyTypes?: EnergyType[]) =>
+  energyTypes?.includes(EnergyType.PRODUCED_BIOGAS) ||
+  energyTypes?.includes(EnergyType.PRODUCED_BIOMETHANE)
