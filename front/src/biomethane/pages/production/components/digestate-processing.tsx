@@ -110,7 +110,6 @@ export function DigestateProcessing({
             />
             {!value.has_digestate_phase_separation && (
               <TextInput
-                required
                 readOnly={!isEditing}
                 label={t(
                   "Étapes complémentaires de traitement du digestat brut"

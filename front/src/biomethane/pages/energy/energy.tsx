@@ -6,7 +6,6 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { LoaderOverlay } from "common/components/scaffold"
 import { InjectedBiomethane } from "./components/injected-biomethane"
 import { BiogasProduction } from "./components/biogas-production"
-import { useProductionUnit } from "../production/production.hooks"
 import { EnergyEfficiency } from "./components/energy-efficiency"
 import { MonthlyBiomethaneInjection } from "./components/monthy-biomethane-injection/monthly-biomethane-injection"
 import { isTariffReference2011Or2020 } from "../contract"
@@ -29,7 +28,7 @@ const EnergyPage = () => {
   const form = useForm<BiomethaneEnergy | undefined | object>(undefined)
   const { selectedYear } = useAnnualDeclaration()
   const { contractInfos: contract } = useContractProductionUnit()
-  const { result: productionUnit } = useProductionUnit()
+
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "energy",
     params: [entity.id, selectedYear],
@@ -51,7 +50,7 @@ const EnergyPage = () => {
     <FormContext.Provider value={form}>
       <MissingFields />
       <InjectedBiomethane contract={contract} />
-      <BiogasProduction productionUnit={productionUnit} />
+      <BiogasProduction />
       <InstallationEnergyNeeds contract={contract} />
       <EnergyEfficiency energy={energy} contract={contract} />
       {isTariffReference2011Or2020(contract?.tariff_reference) && (

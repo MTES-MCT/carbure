@@ -4,7 +4,6 @@ from django.test import TestCase
 
 from biomethane.factories import BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
-from biomethane.models import BiomethaneProductionUnit
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.services.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 from core.models import Entity
@@ -115,7 +114,6 @@ class EnergyRulesConfigurationTests(TestCase):
     def test_all_expected_rules_are_configured(self):
         """Test that all expected rules are present in the configuration."""
         expected_rule_names = [
-            "flaring_not_installed",
             "not_old_tariff",
             "not_new_tariff",
             "not_2011_2020_tariff",
@@ -127,21 +125,6 @@ class EnergyRulesConfigurationTests(TestCase):
 
         actual_rule_names = [rule.name for rule in self.rules]
         self.assertEqual(expected_rule_names, actual_rule_names)
-
-    def test_flaring_rule_fields_and_condition(self):
-        """Test flaring rule has correct fields and condition logic."""
-        flaring_rule = next(r for r in self.rules if r.name == "flaring_not_installed")
-        self.assertEqual(flaring_rule.fields, BiomethaneEnergyService.FLARING_FIELDS)
-
-        # Test condition: should trigger when FLARING_FLOWMETER not in installed_meters
-        mock_ctx = Mock()
-        mock_ctx.production_unit = Mock()
-        mock_ctx.production_unit.installed_meters = [BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER]
-        self.assertTrue(flaring_rule.condition(mock_ctx))
-
-        # Should not trigger when FLARING_FLOWMETER is present
-        mock_ctx.production_unit.installed_meters = [BiomethaneProductionUnit.FLARING_FLOWMETER]
-        self.assertFalse(flaring_rule.condition(mock_ctx))
 
     def test_old_tariff_rule_fields_and_condition(self):
         """Test old tariff rule has correct fields and condition logic."""
@@ -304,22 +287,6 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
         energy.save()
         fields = BiomethaneEnergyService.get_fields_to_clear(energy)
         self.assertIn("energy_details", fields)
-
-    def test_full_integration_flaring_rules(self):
-        """Smoke test: verify flaring rules work end-to-end."""
-        energy = BiomethaneEnergyFactory.create(producer=self.producer_entity)
-
-        # No flaring meter - fields cleared
-        self.production_unit.installed_meters = []
-        self.production_unit.save()
-        fields = BiomethaneEnergyService.get_fields_to_clear(energy)
-        self.assertIn("flaring_operating_hours", fields)
-
-        # Flaring meter installed - fields not cleared
-        self.production_unit.installed_meters = [BiomethaneProductionUnit.FLARING_FLOWMETER]
-        self.production_unit.save()
-        fields = BiomethaneEnergyService.get_fields_to_clear(energy)
-        self.assertNotIn("flaring_operating_hours", fields)
 
     def test_fields_to_clear_returns_deduplicated_list(self):
         """Test that the returned list has no duplicates."""

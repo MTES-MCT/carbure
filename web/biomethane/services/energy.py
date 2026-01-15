@@ -44,9 +44,6 @@ class BiomethaneEnergyService:
     All validation rules and conditional field logic are defined here.
     """
 
-    # Field groups definition
-    FLARING_FIELDS = ["flaring_operating_hours"]
-
     # Fields for tariff reference 2011, 2020, 2021
     OLD_TARIFF_FIELDS = [
         "purified_biogas_quantity_nm3",
@@ -138,16 +135,8 @@ def _build_energy_rules() -> list[FieldClearingRule]:
     """
     Build the list of field clearing rules for energy instances.
     """
-    from biomethane.models import BiomethaneProductionUnit
 
     return [
-        # Flaring rules
-        RuleBuilder.required_value_not_in_list(
-            lambda ctx: ctx.production_unit.installed_meters if ctx.production_unit else [],
-            BiomethaneProductionUnit.FLARING_FLOWMETER,
-            BiomethaneEnergyService.FLARING_FIELDS,
-            "flaring_not_installed",
-        ),
         # Tariff rules - Old tariff fields (2011, 2020, 2021)
         RuleBuilder.value_not_in_list(
             lambda ctx: ctx.tariff_reference,
