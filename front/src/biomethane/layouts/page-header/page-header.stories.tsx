@@ -79,6 +79,15 @@ export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
         ...MOCKS,
       ],
     },
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { year: "2025" },
+        path: "/:year",
+      },
+      routing: {
+        path: "/:year",
+      },
+    }),
   },
 }
 

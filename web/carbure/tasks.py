@@ -109,11 +109,11 @@ if env.get("IMAGE_TAG") == "prod":
         call_command("anonymize_inactive_users")
 
     # Biomethane declaration status update
-    @periodic_task(month=1, day=1, hour=0, minute=1)
+    @periodic_task(crontab(hour=0, minute=1))
     def create_new_biomethane_declaration() -> None:
         call_command("create_biomethane_annual_declarations")
 
-    @periodic_task(month=4, day=1, hour=0, minute=0)
+    @periodic_task(crontab(hour=0, minute=1))
     def close_biomethane_declaration_status() -> None:
         call_command("set_biomethane_declarations_open", "--open=false")
 

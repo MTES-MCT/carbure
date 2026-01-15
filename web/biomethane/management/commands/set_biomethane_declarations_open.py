@@ -8,7 +8,7 @@ from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationSe
 
 class Command(BaseCommand):
     help = """
-    Update is_open status for all biomethane annual declarations.
+    Update is_open status for all biomethane annual declarations of current year.
 
     Usage:
         python web/manage.py set_biomethane_declarations_open --open=true

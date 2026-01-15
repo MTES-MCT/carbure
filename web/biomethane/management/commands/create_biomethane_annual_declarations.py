@@ -11,7 +11,7 @@ from core.models import Entity
 class Command(BaseCommand):
     help = """
     Create new annual declarations for all biomethane producers for the current declaration year.
-    This command should be run on January 1st of each year.
+    This command should be run every day.
 
     Usage:
         python web/manage.py create_biomethane_annual_declarations
