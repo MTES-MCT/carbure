@@ -14,13 +14,15 @@ if settings.WITH_UDB_ACCEPTANCE_DATA:
     france = Pays.objects.get(code_pays="FR")
 
     carbure, _ = Entity.objects.update_or_create(
-        name="CARBURE",
-        defaults={"entity_type": Entity.PRODUCER, "registration_id": "123456789", "registered_country": france},
+        registered_country=france,
+        registration_id="123456789",
+        defaults={"entity_type": Entity.PRODUCER, "name": "CARBURE"},
     )
 
     Entity.objects.update_or_create(
-        name="CARBURE1",
-        defaults={"entity_type": Entity.OPERATOR, "registration_id": "123456780", "registered_country": france},
+        registered_country=france,
+        registration_id="123456780",
+        defaults={"entity_type": Entity.OPERATOR, "name": "CARBURE1"},
     )
 
     certificate, _ = GenericCertificate.objects.update_or_create(

@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from core.models import CarbureLot, Entity
+from core.models import CarbureLot
 from edelivery.adapters.logger import log_error
 from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
 from edelivery.ebms.ntr import from_national_trade_register
@@ -51,8 +51,7 @@ class EOGetTransactionResponse(BaseRequestResponse):
         return self.transaction_XML_element.find("./MATERIAL_CODE").text
 
     def client_id(self):
-        ntr = self.transaction_XML_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text
-        return from_national_trade_register(ntr)
+        return self.transaction_XML_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text
 
     def delivery_date(self):
         delivery_date_text = self.transaction_XML_element.find("./DELIVERY_DATE").text
@@ -73,15 +72,14 @@ class EOGetTransactionResponse(BaseRequestResponse):
         return self.transaction_XML_element.find("./STATUS").text
 
     def supplier_id(self):
-        ntr = self.transaction_XML_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
-        return from_national_trade_register(ntr)
+        return self.transaction_XML_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
 
     def to_lot_attributes(self):
         biofuel = from_UDB_biofuel_code(self.biofuel_code())
-        client = Entity.objects.get(registration_id=self.client_id())
+        client = from_national_trade_register(self.client_id())
         feedstock = from_UDB_feedstock_code(self.feedstock_code())
         lhv_amount = self.quantity() * 3600
-        supplier = Entity.objects.get(registration_id=self.supplier_id())
+        supplier = from_national_trade_register(self.supplier_id())
 
         return {
             "biofuel": biofuel,
