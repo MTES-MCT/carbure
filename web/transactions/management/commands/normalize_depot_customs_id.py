@@ -4,6 +4,9 @@ import pandas as pd
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from core.models import Entity
+from entity.models import EntityScope
+from transactions.models.depot import Depot
 from transactions.models.site import Site
 
 
@@ -51,12 +54,16 @@ class Command(BaseCommand):
 
         depots = Site.objects.filter(site_type__in=[Site.EFS, Site.EFPE, Site.EFCA])
 
-        stats = {"processed": 0, "updated": 0, "skipped": 0}
+        stats = {"processed": 0, "updated": 0, "skipped": 0, "bureau_not_found": 0}
 
         with transaction.atomic():
             for depot in depots:
                 stats["processed"] += 1
                 customs_id = depot.customs_id
+
+                # Very specific case
+                if customs_id == "FR000000521":
+                    customs_id = "FR00000000521"
 
                 if not customs_id:
                     self.stdout.write(f"Depot ID {depot.id}: no customs_id, skipping")
@@ -120,15 +127,59 @@ class Command(BaseCommand):
                     changed = True
                     self.stdout.write(self.style.SUCCESS(f" - Updated (accise: {accise or 'N/A'})"))
 
+                # Search for "bureau de rattachement du dépot"
+                found_office = df_dgddi.loc[
+                    df_dgddi["NUMERO DU DEPOT"] == customs_id,
+                    ["BUREAU DE RATTACHEMENT DU DEPOT"],
+                ].values
+
+                if len(found_office) > 0:
+                    office_name = found_office[0][0]
+                    self.stdout.write(self.style.SUCCESS(f" - Found (bureau de rattachement: {office_name})"))
+                else:
+                    office_name = None
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f" - No matching 'bureau de rattachement du dépot' found in DGDDI file "
+                            f"for customs ID '{customs_id}'"
+                        )
+                    )
+                    stats["bureau_not_found"] += 1
+
                 if changed:
                     if not dry_run:
                         depot.save()
                     stats["updated"] += 1
+
+                # Link depot to DGGDI entity (external admin) using EntityScope
+                if office_name:
+                    if not dry_run:
+                        self.link_depot_to_dgddi_entity(depot, office_name)
+                    self.stdout.write(self.style.SUCCESS(f" - Linked to DGDDI entity {self.rename_entity(office_name)}"))
 
         # Print summary
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write(self.style.SUCCESS(f"Processed: {stats['processed']} depots"))
         self.stdout.write(self.style.SUCCESS(f"Updated: {stats['updated']} depots"))
         self.stdout.write(self.style.WARNING(f"Skipped: {stats['skipped']} depots"))
+        self.stdout.write(self.style.WARNING(f"Bureau not found: {stats['bureau_not_found']} depots"))
         if dry_run:
             self.stdout.write(self.style.NOTICE("DRY RUN - No changes saved to database"))
+
+    def rename_entity(self, name):
+        if "bureau" in name.strip():
+            name = name.replace("bureau", "").strip()
+        return f"Bureau DGDDI - {name}"
+
+    def link_depot_to_dgddi_entity(self, depot, office_name):
+        from django.contrib.contenttypes.models import ContentType
+
+        depot_ct = ContentType.objects.get_for_model(Depot)
+        bureau_dgddi_name = self.rename_entity(office_name)
+        dgddi_entity = Entity.objects.filter(name=bureau_dgddi_name, entity_type=Entity.EXTERNAL_ADMIN).first()
+
+        scope, created = EntityScope.objects.get_or_create(
+            entity=dgddi_entity,
+            content_type=depot_ct,
+            object_id=depot.id,
+        )
