@@ -28,7 +28,14 @@ class AirportTest(TestCase):
             site_type=Site.AIRPORT,
         )
 
-    def get_airports(self, query=None, public_only=None, origin_depot=None, shipping_method=None):
+    def get_airports(
+        self,
+        query=None,
+        public_only=None,
+        origin_depot=None,
+        shipping_method=None,
+        has_intermediary_depot=None,
+    ):
         query_params = {}
         if query:
             query_params["query"] = query
@@ -38,6 +45,8 @@ class AirportTest(TestCase):
             query_params["origin_depot_id"] = origin_depot.id
         if shipping_method:
             query_params["shipping_method"] = shipping_method
+        if has_intermediary_depot is not None:
+            query_params["has_intermediary_depot"] = has_intermediary_depot
 
         response = self.client.get(reverse("resources-airports"), query_params=query_params)
         data = response.json()
@@ -60,6 +69,13 @@ class AirportTest(TestCase):
             origin_depot=self.depot_a,
             destination_airport=self.airport_a,
             shipping_method=SafLogistics.TRAIN,
+            has_intermediary_depot=False,
+        )
+        SafLogisticsFactory.create(
+            origin_depot=self.depot_a,
+            destination_airport=self.airport_a,
+            shipping_method=SafLogistics.BARGE,
+            has_intermediary_depot=True,
         )
 
         # incomplete queries get ignored
@@ -67,6 +83,10 @@ class AirportTest(TestCase):
         self.assertCountEqual(data, ["Aéroport Paris", "Aéroport Marseille"])
         data = self.get_airports(shipping_method=SafLogistics.TRUCK)
         self.assertCountEqual(data, ["Aéroport Paris", "Aéroport Marseille"])
+        data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.TRAIN, has_intermediary_depot=True)
+        self.assertCountEqual(data, ["Aéroport Paris", "Aéroport Marseille"])
 
-        data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.TRAIN)
+        data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.TRAIN, has_intermediary_depot=False)
+        self.assertCountEqual(data, ["Aéroport Paris"])
+        data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.BARGE, has_intermediary_depot=True)
         self.assertCountEqual(data, ["Aéroport Paris"])

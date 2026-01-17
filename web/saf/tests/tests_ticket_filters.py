@@ -48,6 +48,7 @@ class SafTicketFiltersTest(TestCase, FiltersActionTestMixin):
                 "year": [2022],
                 "supplier": [self.entity.name],
                 "client": [self.client1.name, self.client2.name],
+                "client_type": [self.client1.entity_type],
                 "feedstock": [self.hau.code, self.hga.code],
                 "period": [202201, 202202],
                 "country_of_origin": [self.fr.code_pays],
