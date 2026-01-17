@@ -119,7 +119,7 @@ const TicketsGroupedAssignment = ({
         </Collapse>
 
         <AssignmentForm
-          grouped
+          groupSize={ticketSources.length}
           deliveryPeriod={lastDeliveryPeriod}
           remainingVolume={remainingVolume}
           onSubmit={groupedAssignTicket}

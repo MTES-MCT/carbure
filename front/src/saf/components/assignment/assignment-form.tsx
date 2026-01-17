@@ -12,7 +12,7 @@ import { Autocomplete } from "common/components/autocomplete2"
 import { ConsumptionType, SafShippingMethod, SafTicketSource } from "saf/types"
 
 export interface AssignmentFormProps {
-  grouped?: boolean
+  groupSize?: number
   deliveryPeriod?: number
   remainingVolume: number
   posNumber?: string
@@ -21,7 +21,7 @@ export interface AssignmentFormProps {
 }
 
 export const AssignmentForm = ({
-  grouped,
+  groupSize = 1,
   deliveryPeriod,
   remainingVolume,
   posNumber,
@@ -150,7 +150,7 @@ export const AssignmentForm = ({
         </>
       )}
 
-      {!grouped && (
+      {groupSize === 1 && (
         <TextInput
           label={t("Numéro de POS")}
           placeholder="Ex: PC-ISCC-12345678"
