@@ -6510,6 +6510,7 @@ paths:
               - TRUCK
               - BARGE
               - TRAIN
+              - SHIP
               - PIPELINE
               - PIPELINE_DMM
               - PIPELINE_LHP
@@ -6522,6 +6523,7 @@ paths:
             * `TRUCK` - TRUCK
             * `BARGE` - BARGE
             * `TRAIN` - TRAIN
+            * `SHIP` - SHIP
             * `PIPELINE` - PIPELINE
             * `PIPELINE_DMM` - PIPELINE_DMM
             * `PIPELINE_LHP` - PIPELINE_LHP
@@ -17504,6 +17506,7 @@ components:
         - TRUCK
         - BARGE
         - TRAIN
+        - SHIP
         - PIPELINE
         - PIPELINE_DMM
         - PIPELINE_LHP
@@ -17515,6 +17518,7 @@ components:
         * `TRUCK` - Routier
         * `BARGE` - Barge
         * `TRAIN` - Train
+        * `SHIP` - Bateau
         * `PIPELINE` - Oléoduc
         * `PIPELINE_DMM` - Oléoduc DMM
         * `PIPELINE_LHP` - Oléoduc LHP

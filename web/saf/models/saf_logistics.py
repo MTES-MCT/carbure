@@ -37,6 +37,7 @@ class SafLogistics(models.Model):
     TRUCK = "TRUCK"
     BARGE = "BARGE"
     TRAIN = "TRAIN"
+    SHIP = "SHIP"
     PIPELINE = "PIPELINE"
     PIPELINE_DMM = "PIPELINE_DMM"
     PIPELINE_LHP = "PIPELINE_LHP"
@@ -48,6 +49,7 @@ class SafLogistics(models.Model):
         (TRUCK, "Routier"),
         (BARGE, "Barge"),
         (TRAIN, "Train"),
+        (SHIP, "Bateau"),
         (PIPELINE, "Oléoduc"),
         (PIPELINE_DMM, "Oléoduc DMM"),
         (PIPELINE_LHP, "Oléoduc LHP"),

@@ -99,15 +99,16 @@ export const AssignmentForm = ({
         />
       )}
 
+      {originDepot && (
+        <TextInput
+          disabled
+          label={t("Dépôt d'incorporation")}
+          value={originDepot.name}
+        />
+      )}
+
       {(clientIsAirline || clientIsSafTrader) && (
         <>
-          {originDepot && (
-            <TextInput
-              disabled
-              label={t("Dépôt d'origine")}
-              value={originDepot.name}
-            />
-          )}
           <Autocomplete
             label={t("Mode d'expédition")}
             placeholder={t("Sélectionnez un mode")}
@@ -116,6 +117,7 @@ export const AssignmentForm = ({
               { value: SafShippingMethod.TRUCK, label: t("Camion") },
               { value: SafShippingMethod.TRAIN, label: t("Train") },
               { value: SafShippingMethod.BARGE, label: t("Barge") },
+              { value: SafShippingMethod.SHIP, label: t("Bateau") },
               {
                 value: SafShippingMethod.PIPELINE_DMM,
                 label: t("Oléoduc DMM"),
