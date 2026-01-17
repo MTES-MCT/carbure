@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
 import { SafTicketSourcePreview } from "saf/types"
 import { AssignmentForm, AssignmentFormData } from "./assignment-form"
+import { useNotifyError } from "common/components/notifications"
 
 export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSourcePreview[]
@@ -28,6 +29,7 @@ const TicketsGroupedAssignment = ({
 }: TicketsGroupedAssignmentProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const notifyError = useNotifyError()
 
   const lastDeliveryPeriod = ticketSources.sort(
     (a, b) => b.delivery_period - a.delivery_period
@@ -35,6 +37,14 @@ const TicketsGroupedAssignment = ({
 
   const groupedAssignSafTicket = useMutation(api.groupedAssignSafTicket, {
     invalidates: ["ticket-sources", "operator-snapshot"],
+
+    onError: (e) => {
+      notifyError(e, undefined, {
+        SHIPPING_ROUTE_NOT_REGISTERED: t(
+          "Aucune route n'a été trouvée entre le dépôt d'incorporation et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
+        ),
+      })
+    },
   })
 
   const groupedAssignTicket = async (value: AssignmentFormData) => {

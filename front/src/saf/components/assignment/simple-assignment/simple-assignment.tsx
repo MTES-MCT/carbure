@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
 import { SafTicketSourceDetails } from "saf/types"
 import { AssignmentForm, AssignmentFormData } from "../assignment-form"
+import { useNotifyError } from "common/components/notifications"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails
@@ -21,6 +22,8 @@ export const TicketAssignment = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
+  const notifyError = useNotifyError()
+
   const remainingVolume =
     ticketSource.total_volume - ticketSource.assigned_volume
 
@@ -30,6 +33,14 @@ export const TicketAssignment = ({
       "ticket-sources",
       "operator-snapshot",
     ],
+
+    onError: (e) => {
+      notifyError(e, undefined, {
+        SHIPPING_ROUTE_NOT_REGISTERED: t(
+          "Aucune route n'a été trouvée entre le dépôt d'incorporation et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
+        ),
+      })
+    },
   })
 
   const assignTicket = async (value: AssignmentFormData) => {
