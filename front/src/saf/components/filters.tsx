@@ -31,6 +31,7 @@ export function SafFilters({
     [SafFilter.origin_depot]: t("Dépôt d'incorporation"),
     [SafFilter.consumption_type]: t("Types de consommation"),
     [SafFilter.reception_airport]: t("Aéroport"),
+    [SafFilter.client_type]: t("Type de client"),
   }
 
   const computedFilters = filters.reduce(
@@ -65,6 +66,7 @@ const filterNormalizers: FilterNormalizers = {
   [SafFilter.origin_depot]: norm.normalizeUnknownFilter,
   [SafFilter.consumption_type]: normalizeConsumptionType,
   [SafFilter.reception_airport]: norm.normalizeUnknownFilter,
+  [SafFilter.client_type]: norm.normalizeEntityType,
 }
 
 export default SafFilters

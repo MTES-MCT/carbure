@@ -11044,6 +11044,20 @@ export interface operations {
         parameters: {
             query: {
                 client?: string[];
+                /** @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane */
+                client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
                 /** @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
                 consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[];
@@ -11278,6 +11292,20 @@ export interface operations {
         parameters: {
             query: {
                 client?: string[];
+                /** @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane */
+                client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
                 /** @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
                 consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[];
@@ -11341,6 +11369,20 @@ export interface operations {
         parameters: {
             query: {
                 client?: string[];
+                /** @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane */
+                client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
                 /** @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
                 consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[];
@@ -12959,6 +13001,21 @@ export enum PathsApiSafTicketSourcesFiltersGetParametersQueryFilter {
     supplier = "supplier",
     year = "year"
 }
+export enum PathsApiSafTicketsGetParametersQueryClient_type {
+    Administration = "Administration",
+    Administration_Externe = "Administration Externe",
+    Auditor = "Auditor",
+    Charge_Point_Operator = "Charge Point Operator",
+    Compagnie_a_rienne = "Compagnie a\u00E9rienne",
+    Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane",
+    Op_rateur = "Op\u00E9rateur",
+    Power_or_Heat_Producer = "Power or Heat Producer",
+    Producteur = "Producteur",
+    Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
+    SAF_Trader = "SAF Trader",
+    Trader = "Trader",
+    Unknown = "Unknown"
+}
 export enum PathsApiSafTicketsGetParametersQueryConsumption_type {
     MAC = "MAC",
     MAC_DECLASSEMENT = "MAC_DECLASSEMENT"
@@ -12990,6 +13047,7 @@ export enum PathsApiSafTicketsGetParametersQueryStatus {
 }
 export enum PathsApiSafTicketsFiltersGetParametersQueryFilter {
     client = "client",
+    client_type = "client_type",
     consumption_type = "consumption_type",
     country_of_origin = "country_of_origin",
     feedstock = "feedstock",

@@ -10,6 +10,7 @@ class TicketFilter(django_filters.FilterSet):
 
     supplier = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
     client = django_filters.AllValuesMultipleFilter(field_name="client__name")
+    client_type = django_filters.AllValuesMultipleFilter(field_name="client__entity_type")
     period = django_filters.AllValuesMultipleFilter(field_name="assignment_period")
     feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
     country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
@@ -51,6 +52,7 @@ class TicketFilter(django_filters.FilterSet):
             "year",
             "supplier",
             "client",
+            "client_type",
             "period",
             "feedstock",
             "country_of_origin",

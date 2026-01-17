@@ -7517,6 +7517,42 @@ paths:
           explode: true
           style: form
         - in: query
+          name: client_type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
+          explode: true
+          style: form
+        - in: query
           name: consumption_type
           schema:
             type: array
@@ -7902,6 +7938,42 @@ paths:
           explode: true
           style: form
         - in: query
+          name: client_type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
+          explode: true
+          style: form
+        - in: query
           name: consumption_type
           schema:
             type: array
@@ -8085,6 +8157,42 @@ paths:
           explode: true
           style: form
         - in: query
+          name: client_type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
+          explode: true
+          style: form
+        - in: query
           name: consumption_type
           schema:
             type: array
@@ -8127,6 +8235,7 @@ paths:
             type: string
             enum:
               - client
+              - client_type
               - consumption_type
               - country_of_origin
               - feedstock
@@ -8275,10 +8384,10 @@ paths:
                 ExampleOfFiltersResponse.:
                   value:
                     - client
+                    - client_type
                     - consumption_type
                     - country_of_origin
                     - feedstock
-                    - order_by
                   summary: Example of filters response.
           description: ""
   /api/saf/years/:

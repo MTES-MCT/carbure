@@ -165,7 +165,13 @@ const RECEIVED_FILTERS = [
 
 const ASSIGNED_FILTERS = [
   SafFilter.client, //
+  SafFilter.client_type,
   ...TICKET_FILTERS,
 ]
 
-const ADMIN_FILTERS = [SafFilter.supplier, SafFilter.client, ...TICKET_FILTERS]
+const ADMIN_FILTERS = [
+  SafFilter.supplier,
+  SafFilter.client,
+  SafFilter.client_type,
+  ...TICKET_FILTERS,
+]
