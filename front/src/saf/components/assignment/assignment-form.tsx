@@ -2,7 +2,7 @@ import useEntity from "common/hooks/entity"
 import { EntityPreview, EntityType, Airport } from "common/types"
 import * as norm from "common/utils/normalizers"
 import Form, { useForm } from "common/components/form"
-import { TextInput } from "common/components/inputs2"
+import { RadioGroup, TextInput } from "common/components/inputs2"
 import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
@@ -50,7 +50,8 @@ export const AssignmentForm = ({
       query,
       false,
       originDepot?.id,
-      value.shipping_method
+      value.shipping_method,
+      value.has_intermediary_depot
     )
   }
 
@@ -112,6 +113,10 @@ export const AssignmentForm = ({
           <Autocomplete
             label={t("Mode d'expédition")}
             placeholder={t("Sélectionnez un mode")}
+            hasTooltip
+            title={t(
+              "En choisissant un mode d'expédition, la liste des aéroports accessibles s'adaptera en fonction du dépôt d'incorporation."
+            )}
             {...bind("shipping_method")}
             options={[
               { value: SafShippingMethod.TRUCK, label: t("Camion") },
@@ -141,12 +146,26 @@ export const AssignmentForm = ({
             ]}
           />
 
+          <RadioGroup
+            label={t("Dépôt intermédiaire ?")}
+            hasTooltip
+            title={t(
+              "Ce champ permet d'indiquer la présence d'un dépôt de stockage intermédiaire avant la livraison finale à l'aéroport."
+            )}
+            options={norm.getYesNoOptions()}
+            {...bind("has_intermediary_depot")}
+          />
+
           <Autocomplete
             required
             label={t("Aéroport de réception")}
             placeholder={t("Sélectionnez un aéroport")}
             getOptions={findAirports}
             normalize={norm.normalizeAirport}
+            hasTooltip
+            title={t(
+              "Si vous ne retrouvez pas l'aéroport désiré dans la liste, merci de contacter la DGEC en indiquant le dépôt d'incorporation et la méthode de livraison."
+            )}
             {...bind("reception_airport")}
           />
         </>
@@ -202,6 +221,7 @@ const defaultAssignment = {
   shipping_method: undefined as SafShippingMethod | undefined,
   consumption_type: undefined as ConsumptionType | undefined,
   pos_number: undefined as string | undefined,
+  has_intermediary_depot: false,
 }
 
 export type AssignmentFormData = typeof defaultAssignment

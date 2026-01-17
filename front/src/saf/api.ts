@@ -273,10 +273,19 @@ export async function findAirports(
   query?: string,
   public_only?: boolean,
   origin_depot_id?: number,
-  shipping_method?: SafShippingMethod
+  shipping_method?: SafShippingMethod,
+  has_intermediary_depot?: boolean
 ) {
   const res = await api.GET("/resources/airports", {
-    params: { query: { query, public_only, origin_depot_id, shipping_method } },
+    params: {
+      query: {
+        query,
+        public_only,
+        origin_depot_id,
+        shipping_method,
+        has_intermediary_depot,
+      },
+    },
   })
 
   return res.data ?? []

@@ -10473,6 +10473,7 @@ export interface operations {
     resources_airports_list: {
         parameters: {
             query?: {
+                has_intermediary_depot?: boolean;
                 origin_depot_id?: number;
                 public_only?: boolean;
                 query?: string;

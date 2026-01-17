@@ -6491,6 +6491,11 @@ paths:
       operationId: resources_airports_list
       parameters:
         - in: query
+          name: has_intermediary_depot
+          schema:
+            type: boolean
+            default: false
+        - in: query
           name: origin_depot_id
           schema:
             type: integer
