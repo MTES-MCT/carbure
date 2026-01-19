@@ -12,7 +12,7 @@ class ListenerTest(TestCase):
         self.patched_PubSubAdapter.return_value.next_message.return_value = None
         self.patched_RetrieveMessage = patch("edelivery.soap.listener.RetrieveMessage").start()
         self.patched_sleep = patch("edelivery.soap.listener.sleep").start()
-        self.patched_sentry_sdk = patch("edelivery.soap.listener.sentry_sdk").start()
+        self.patched_log_exception = patch("edelivery.soap.listener.log_exception").start()
 
     def tearDown(self):
         patch.stopall()
@@ -73,7 +73,6 @@ class ListenerTest(TestCase):
             self.assertEqual(["list", "list", "list"], commands_called)
 
     def test_logs_errors_and_proceeds(self):
-        capture_exception = self.patched_sentry_sdk.capture_exception
         error = RuntimeError("oops")
 
         def log_list_pending_messages_call():
@@ -84,13 +83,13 @@ class ListenerTest(TestCase):
 
         try:
             listener = Listener()
-            capture_exception.assert_not_called()
+            self.patched_log_exception.assert_not_called()
             listener.start()
 
             self.fail("sleep() should have been called")
         except Warning:
             self.patched_sleep.assert_called_with(1)
-            capture_exception.assert_called_with(error)
+            self.patched_log_exception.assert_called_with(error)
 
     @patch.dict("os.environ", {"WITH_EDELIVERY": "False"})
     def test_does_not_poll_if_feature_flag_not_set(self):

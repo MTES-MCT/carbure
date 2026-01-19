@@ -1,8 +1,7 @@
 from os import environ
 from time import sleep
 
-import sentry_sdk
-
+from edelivery.adapters.logger import log_exception
 from edelivery.adapters.pub_sub_adapter import PubSubAdapter
 from edelivery.soap.actions import ListPendingMessages, RetrieveMessage
 
@@ -52,7 +51,7 @@ class Listener:
                     self.poll_once()
 
             except Exception as e:
-                sentry_sdk.capture_exception(e)
+                log_exception(e)
 
             finally:
                 sleep(1)
