@@ -1,4 +1,3 @@
-import sentry_sdk
 from django.db import transaction
 from django.db.models import Q
 from drf_spectacular.utils import (
@@ -236,9 +235,6 @@ class AddActionMixin:
         self.upload_file_to_s3(s3_path, file, dca, extra_files)
 
         # 4 - send emails
-        try:
-            send_dca_confirmation_email(dca, request)
-        except Exception as e:
-            sentry_sdk.capture_exception(e)
+        send_dca_confirmation_email(dca, request)
 
         return Response({"status": "success"})
