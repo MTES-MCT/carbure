@@ -1,7 +1,7 @@
 from os import environ
 from time import sleep
 
-from edelivery.adapters.logger import log_exception
+from adapters.logger import log_exception
 from edelivery.adapters.pub_sub_adapter import PubSubAdapter
 from edelivery.soap.actions import ListPendingMessages, RetrieveMessage
 
