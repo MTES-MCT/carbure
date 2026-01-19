@@ -46,7 +46,7 @@ export const ClosedDeclaration = () => {
           options={years}
           placeholder={t("Consulter mes précédentes déclarations")}
           onChange={(year?: number) => {
-            if (year) navigate(routes.BIOMETHANE(year).DIGESTATE)
+            if (year) navigate(routes.BIOMETHANE(year).PRODUCER.DIGESTATE)
           }}
         />
       ) : (

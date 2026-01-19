@@ -64,6 +64,8 @@ export const ROUTE_URLS = {
       ROOT: `${baseUrl}`,
       PRODUCER: {
         SUPPLY_PLAN: `${baseUrlWithYear}/supply-plan`,
+        SUPPLY_PLAN_IMPORT: `${baseUrlWithYear}/supply-plan#import`,
+        SUPPLY_PLAN_ADD_INPUT: `${baseUrlWithYear}/supply-plan#create`,
         DIGESTATE: `${baseUrlWithYear}/digestate`,
         ENERGY: `${baseUrlWithYear}/energy`,
       },
