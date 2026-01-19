@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from adapters.logger import log_exception
 from certificates.models import DoubleCountingRegistration
 from core import private_storage
 from core.carburetypes import CarbureError
@@ -74,6 +75,21 @@ class AddActionMixin:
     @transaction.atomic
     def add(self, request, *args, **kwargs):
         return self.add_application_by_type(request, Entity.ADMIN)
+
+    @staticmethod
+    def upload_file_to_s3(s3_path, file, dca, extra_files):
+        try:
+            private_storage.save(s3_path, file)
+            DoubleCountingDocFile.objects.create(url=s3_path, file_name=file.name, file_type="EXCEL", dca=dca)
+            dc_files = []
+            for extra_file in extra_files:
+                extra_s3_path = f"doublecounting/{dca.id}_file_{extra_file.name}"
+                dc_file = DoubleCountingDocFile(url=extra_s3_path, file_name=extra_file.name, dca=dca)
+                dc_files.append(dc_file)
+                private_storage.save(extra_s3_path, extra_file)
+            DoubleCountingDocFile.objects.bulk_create(dc_files)
+        except Exception as e:
+            log_exception(e)
 
     def add_application_by_type(self, request, entity_type):
         serializer = DoubleCountingAdminAddSerializer(data=request.data)
@@ -217,18 +233,7 @@ class AddActionMixin:
             production_history.save()
 
         # 3 - Upload file to S3
-        try:
-            private_storage.save(s3_path, file)
-            DoubleCountingDocFile.objects.create(url=s3_path, file_name=file.name, file_type="EXCEL", dca=dca)
-            dc_files = []
-            for extra_file in extra_files:
-                extra_s3_path = f"doublecounting/{dca.id}_file_{extra_file.name}"
-                dc_file = DoubleCountingDocFile(url=extra_s3_path, file_name=extra_file.name, dca=dca)
-                dc_files.append(dc_file)
-                private_storage.save(extra_s3_path, extra_file)
-            DoubleCountingDocFile.objects.bulk_create(dc_files)
-        except Exception as e:
-            sentry_sdk.capture_exception(e)
+        self.upload_file_to_s3(s3_path, file, dca, extra_files)
 
         # 4 - send emails
         try:
