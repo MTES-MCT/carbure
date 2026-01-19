@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { MissingFields, MissingFieldsProps } from "./missing-fields"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import {
-  buildCurrentAnnualDeclarationHandler,
-  getCurrentAnnualDeclarationOk,
+  buildAnnualDeclarationHandler,
+  getAnnualDeclarationOk,
 } from "biomethane/tests/api"
 import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 import GLOBAL_MOCKS from "@storybook/mocks"
 
-const MOCKS = [...GLOBAL_MOCKS, getCurrentAnnualDeclarationOk]
+const MOCKS = [...GLOBAL_MOCKS, getAnnualDeclarationOk]
 const clickOnLink = async (
   canvasElement: HTMLElement,
   linkName: string,
@@ -64,7 +64,7 @@ export const DisplayOnlyDigestateMissingFields: Story = {
     },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           missing_fields: {
             digestate_missing_fields: ["digestate_field_1"],
             energy_missing_fields: [],
@@ -88,7 +88,7 @@ export const DisplayOnlyEnergyMissingFields: Story = {
     },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           missing_fields: {
             digestate_missing_fields: [],
             energy_missing_fields: ["energy_field_1"],
@@ -112,7 +112,7 @@ export const DisplayBothEnergyAndDigestateMissingFields: Story = {
     },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           missing_fields: {
             digestate_missing_fields: ["digestate_field_1"],
             energy_missing_fields: ["energy_field_1"],
@@ -145,7 +145,7 @@ export const DisplayNothingWhenTheDeclarationIsComplete: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           missing_fields: {
             digestate_missing_fields: [],
             energy_missing_fields: [],

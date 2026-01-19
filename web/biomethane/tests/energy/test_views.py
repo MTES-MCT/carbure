@@ -46,9 +46,9 @@ class BiomethaneEnergyViewSetTests(TestCase):
             tariff_reference="2011",  # Use 2011 to support injected_biomethane_nm3_per_year
         )
 
-        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.energy_url = reverse("biomethane-energy")
-        self.base_params = {"entity_id": self.producer_entity.id}
+        self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
 
         # Test data for creating/updating an energy declaration
         self.valid_energy_data = {
@@ -138,7 +138,7 @@ class BiomethaneEnergyViewSetTests(TestCase):
             query_params=self.base_params,
         )
 
-        mock_is_editable.assert_called_once_with(self.producer_entity, self.current_year)
+        mock_is_editable.assert_called_once_with(self.producer_entity, str(self.current_year))
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn("error", response.data)

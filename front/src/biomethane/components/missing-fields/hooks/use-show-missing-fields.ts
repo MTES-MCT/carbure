@@ -18,7 +18,7 @@ import type { FormManager } from "common/components/form2"
 export const useShowMissingFields = <FormType extends object | undefined>(
   form: FormManager<FormType>
 ) => {
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const { annualDeclaration } = useAnnualDeclaration()
   const sectionsManager = useSectionsManager()
   const { currentPage } = usePageDetection()
   const { t } = useTranslation()
@@ -32,9 +32,8 @@ export const useShowMissingFields = <FormType extends object | undefined>(
     }
 
     const missingFields =
-      currentAnnualDeclaration.missing_fields?.[
-        pageToMissingFieldKey[currentPage]
-      ] ?? []
+      annualDeclaration?.missing_fields?.[pageToMissingFieldKey[currentPage]] ??
+      []
 
     const sectionIds = getMissingFieldsSectionIds(missingFields)
     sectionIds.forEach((sectionId) => {
@@ -49,13 +48,7 @@ export const useShowMissingFields = <FormType extends object | undefined>(
     if (missingFields.length > 0) {
       focusFirstMissingField(missingFields)
     }
-  }, [
-    currentPage,
-    currentAnnualDeclaration.missing_fields,
-    sectionsManager,
-    form,
-    t,
-  ])
+  }, [currentPage, annualDeclaration?.missing_fields, sectionsManager, form, t])
 
   return { showMissingFields }
 }

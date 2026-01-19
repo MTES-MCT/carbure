@@ -453,6 +453,57 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/biomethane/admin/producers/:
+    get:
+      operationId: biomethane_admin_producers_list
+      description: |-
+        List biomethane producers visible by the current DREAL entity.
+
+        Returns producers that have production units in departments
+        accessible by the DREAL.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedBiomethaneProducerList"
+          description: ""
   /api/biomethane/annual-declaration/:
     get:
       operationId: biomethane_annual_declaration_retrieve
@@ -464,6 +515,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -484,16 +540,8 @@ paths:
           description: Declaration created for the entity
     patch:
       operationId: biomethane_annual_declaration_partial_update
-      description: >-
-        Mixin that provides get_object() method with filterset and permission
-        checks.
-
-
-        The ViewSet must have:
-
-        - filterset_class configured
-
-        - queryset defined
+      description: Partial update of the declaration for a producer and year (only
+        status field to IN_PROGRESS is allowed).
       parameters:
         - in: query
           name: entity_id
@@ -501,6 +549,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       requestBody:
@@ -544,6 +597,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -567,6 +625,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -845,6 +908,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1133,6 +1202,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
+          required: true
       tags:
         - biomethane
       security:
@@ -1249,6 +1324,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -1309,6 +1390,7 @@ paths:
           name: year
           schema:
             type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1333,6 +1415,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1372,6 +1460,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -11147,9 +11241,12 @@ components:
     BiomethaneAnnualDeclaration:
       type: object
       properties:
+        producer:
+          type: integer
         year:
           type: integer
-          readOnly: true
+          maximum: 2147483647
+          minimum: -2147483648
         status:
           $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         missing_fields:
@@ -11176,9 +11273,14 @@ components:
         is_complete:
           type: boolean
           readOnly: true
+        is_open:
+          type: boolean
+          readOnly: true
       required:
         - is_complete
+        - is_open
         - missing_fields
+        - producer
         - year
     BiomethaneAnnualDeclarationStatusEnum:
       enum:
@@ -11583,6 +11685,9 @@ components:
     BiomethaneDigestateSpreadingAddRequest:
       type: object
       properties:
+        year:
+          type: integer
+          writeOnly: true
         spreading_department:
           type: string
           minLength: 1
@@ -11597,6 +11702,7 @@ components:
         - spread_parcels_area
         - spread_quantity
         - spreading_department
+        - year
     BiomethaneDigestateStorage:
       type: object
       properties:
@@ -11983,6 +12089,18 @@ components:
         - network_manager_name
         - network_type
         - unique_identification_number
+    BiomethaneProducer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+      required:
+        - id
+        - name
     BiomethaneProductionUnit:
       type: object
       properties:
@@ -15891,6 +16009,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BiomethaneContractAmendment"
+    PaginatedBiomethaneProducerList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneProducer"
     PaginatedBiomethaneSupplyInputList:
       type: object
       required:
@@ -16165,6 +16306,12 @@ components:
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
+        producer:
+          type: integer
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
         status:
           $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
     PatchedBiomethaneDigestateStorageInputRequest:

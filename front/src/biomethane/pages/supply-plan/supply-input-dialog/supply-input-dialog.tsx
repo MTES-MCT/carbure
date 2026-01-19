@@ -21,7 +21,7 @@ export const SupplyInputDialog = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { canEditDeclaration } = useAnnualDeclaration()
+  const { canEditDeclaration, selectedYear } = useAnnualDeclaration()
   const supplyInputId = Number(match?.params.id)
 
   const { result: supplyInput, loading } = useQuery(getSupplyInput, {
@@ -80,7 +80,7 @@ export const SupplyInputDialog = () => {
           onSubmit={(form) =>
             form &&
             saveSupplyInputMutation
-              .execute(entity.id, supplyInputId, form)
+              .execute(entity.id, selectedYear, supplyInputId, form)
               .then(onClose)
           }
           readOnly={!canEditDeclaration}

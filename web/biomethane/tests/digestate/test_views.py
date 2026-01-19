@@ -34,7 +34,7 @@ class BiomethaneDigestateViewsTests(TestCase):
             has_digestate_phase_separation=False,
         )
 
-        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.digestate_url = reverse("biomethane-digestate")
         self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
 

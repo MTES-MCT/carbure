@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 from core.tests_utils import setup_current_user
 
@@ -26,6 +27,7 @@ class ExcelImportActionMixinTests(APITestCase):
             [(self.producer_entity, "RW")],
         )
 
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.url = reverse("biomethane-supply-plan-import-excel")
 
     def create_test_excel_file(self, data=None):
@@ -49,7 +51,9 @@ class ExcelImportActionMixinTests(APITestCase):
     def test_api_file_validation_integration(self):
         """Test API-level file validation"""
         # Test missing file
-        response = self.client.post(self.url, {"entity_id": self.producer_entity.id}, format="multipart")
+        response = self.client.post(
+            self.url, {}, query_params={"entity_id": self.producer_entity.id, "year": self.current_year}, format="multipart"
+        )
         self.assertEqual(response.status_code, 400)
         self.assertIn("file", response.data)
 
@@ -57,7 +61,8 @@ class ExcelImportActionMixinTests(APITestCase):
         invalid_file = SimpleUploadedFile("test.txt", b"This is not an Excel file", content_type="text/plain")
         response = self.client.post(
             self.url,
-            {"entity_id": self.producer_entity.id, "file": invalid_file},
+            {"file": invalid_file},
+            query_params={"entity_id": self.producer_entity.id, "year": self.current_year},
             format="multipart",
         )
         self.assertEqual(response.status_code, 400)
@@ -96,7 +101,8 @@ class ExcelImportActionMixinTests(APITestCase):
 
         response = self.client.post(
             self.url,
-            {"entity_id": self.producer_entity.id, "file": excel_file},
+            {"file": excel_file},
+            query_params={"entity_id": self.producer_entity.id, "year": self.current_year},
             format="multipart",
         )
 

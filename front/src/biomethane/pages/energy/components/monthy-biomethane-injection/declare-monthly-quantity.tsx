@@ -73,7 +73,7 @@ export const DeclareMonthlyQuantity = ({
         item.average_monthly_flow_nm3_per_hour ?? 0,
       injection_hours: item.injection_hours ?? 0,
     }))
-    saveMonthlyReportsMutation(entity.id, data)
+    saveMonthlyReportsMutation(entity.id, selectedYear, data)
   }
 
   // État pour stocker toutes les valeurs du tableau

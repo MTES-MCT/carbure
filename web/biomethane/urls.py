@@ -11,6 +11,7 @@ from .views import (
     BiomethaneEnergyMonthlyReportViewSet,
     BiomethaneEnergyViewSet,
     BiomethaneInjectionSiteViewSet,
+    BiomethaneProducersViewSet,
     BiomethaneProductionUnitViewSet,
     BiomethaneSupplyInputViewSet,
     BiomethaneSupplyPlanViewSet,
@@ -37,6 +38,11 @@ router.register(
     "supply-input",
     BiomethaneSupplyInputViewSet,
     basename="biomethane-supply-input",
+)
+router.register(
+    "admin/producers",
+    BiomethaneProducersViewSet,
+    basename="biomethane-admin-producers",
 )
 
 contract_viewset = BiomethaneContractViewSet.as_view(

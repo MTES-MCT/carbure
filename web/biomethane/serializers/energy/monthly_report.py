@@ -25,7 +25,7 @@ class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
         if len(months) != len(set(months)):
             raise serializers.ValidationError(_("Chaque mois ne peut apparaître qu'une seule fois"))
 
-        energy_instance = self.context.get("energy")
+        energy_instance = self.context.get("energy_instance")
         if not energy_instance:
             raise serializers.ValidationError(
                 {"energy": [_("Cette entité n'a pas de déclaration énergétique pour cette année.")]}
@@ -33,7 +33,8 @@ class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
         return attrs
 
     def create(self, validated_data):
-        energy_instance = self.context.get("energy")
+        energy_instance = self.context.get("energy_instance")
+
         created_reports = []
 
         # Upsert all monthly reports

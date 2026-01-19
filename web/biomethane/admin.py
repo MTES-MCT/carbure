@@ -4,6 +4,7 @@ from biomethane.models import (
     BiomethaneAnnualDeclaration,
     BiomethaneContract,
     BiomethaneContractAmendment,
+    BiomethaneDeclarationPeriod,
     BiomethaneDigestate,
     BiomethaneDigestateSpreading,
     BiomethaneDigestateStorage,
@@ -97,3 +98,9 @@ class BiomethaneAnnualDeclarationAdmin(admin.ModelAdmin):
     list_display = ("id", "producer", "year", "status")
     list_filter = ("status", "year")
     search_fields = ("producer__name", "producer__pk")
+
+
+@admin.register(BiomethaneDeclarationPeriod)
+class BiomethaneDeclarationPeriodAdmin(admin.ModelAdmin):
+    list_display = ("year", "start_date", "end_date")
+    search_fields = ("year",)
