@@ -1378,8 +1378,6 @@ class GenericCertificate(models.Model):
     TERMINATED = "TERMINATED"  # certificat volontairement arrêté par l'opérateur économique
     EXPIRED = "EXPIRED"  # certificat arrivé à échéance
 
-    last_status_update = models.DateField()
-
     status = models.CharField(
         max_length=16,
         choices=[
@@ -1391,6 +1389,9 @@ class GenericCertificate(models.Model):
             (EXPIRED, "Expiré"),
         ],
     )
+
+    last_status_update = models.DateField()
+    suspended_dates = models.JSONField(null=True)
 
     @staticmethod
     def bulk_create_or_update(certificates: list[dict], status: str) -> Tuple[list, list]:

@@ -5,7 +5,6 @@
 import os
 
 import django
-from django.utils import timezone
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -88,6 +87,8 @@ def download_iscc_certificates(test: bool, latest: bool, status: str) -> None:
     # On récupère le wdtNonce du jour
     nonce, soup = get_wdtNonce()
 
+    status_lower = status.lower()
+
     # Nombre de requêtes
     params = get_params(length=1, wdtNonce=nonce, status=status)
     r = requests.post(ISCC_DATA_URL, data=params, headers=HEADERS)
@@ -101,15 +102,19 @@ def download_iscc_certificates(test: bool, latest: bool, status: str) -> None:
     cleaned_data = clean_certificate_data(data, soup)
 
     # Sauvegarde
-    filename = "%s/Certificates_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), str(date.today()))
+    filename = "%s/Certificates_%s_%s.csv" % (DESTINATION_FOLDER, status_lower, str(date.today()))
     pd.DataFrame.to_csv(cleaned_data, filename, index=False)
+
+    # Préparation des regex pour les noms de fichier
+    cert_re = rf"^Certificates_{status_lower}_(\d{{4}}-\d{{2}}-\d{{2}})\.csv$"
+    history_re = rf"^History_{status_lower}_(\d{{4}}-\d{{2}}-\d{{2}})\.csv$"
 
     ## Comparaison pour extraire les doublons
     # 1) Création d'un historique
     files = [f for f in listdir(DESTINATION_FOLDER) if isfile("%s/%s" % (DESTINATION_FOLDER, f))]
     files.sort()
-    certificatesFiles = [f for f in files if re.match("Certificates_[0-9]{4}-[0-9]{2}-[0-9]{2}.csv", f)]
-    histoFiles = [f for f in files if re.match("History_[0-9]{4}-[0-9]{2}-[0-9]{2}.csv", f)]
+    certificatesFiles = [f for f in files if re.match(cert_re, f)]
+    histoFiles = [f for f in files if re.match(history_re, f)]
 
     # Il n'y a pas d'historique --> le fichier crée est celui du jour. Il y a maintenant un historique
     if len(histoFiles) == 0:
@@ -119,24 +124,26 @@ def download_iscc_certificates(test: bool, latest: bool, status: str) -> None:
     # 2) Ouverture et concaténation
     files = [f for f in listdir(DESTINATION_FOLDER) if isfile("%s/%s" % (DESTINATION_FOLDER, f))]
     files.sort()
-    histoFiles = [f for f in files if re.match("History_[0-9]{4}-[0-9]{2}-[0-9]{2}.csv", f)]
+    histoFiles = [f for f in files if re.match(history_re, f)]
+
+
     histo = pd.read_csv(f"{DESTINATION_FOLDER}/{histoFiles[-1]}", sep=",", quotechar='"', lineterminator="\n")
-    histo["date"] = str(re.sub("History_([0-9]{4}-[0-9]{2}-[0-9]{2}).csv", "\\1", histoFiles[-1]))
+    histo["date"] = str(re.sub(history_re, "\\1", histoFiles[-1]))
 
     certificates = pd.read_csv(f"{DESTINATION_FOLDER}/{certificatesFiles[-1]}", sep=",", quotechar='"', lineterminator="\n")
-    certificates["date"] = str(re.sub("Certificates_([0-9]{4}-[0-9]{2}-[0-9]{2}).csv", "\\1", certificatesFiles[-1]))
+    certificates["date"] = str(re.sub(cert_re, "\\1", certificatesFiles[-1]))
 
     # On concatène l'historique et les certificats du jour
     # On regarde les certificats qui ont plusieurs dates de fin.
     histo_and_new = pd.concat([certificates, histo])
     histo_and_new = histo_and_new.drop_duplicates(subset=histo_and_new.columns.difference(["date", "index"]))
-    pd.DataFrame.to_csv(histo_and_new, "%s/History_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
+    pd.DataFrame.to_csv(histo_and_new, "%s/History_%s_%s.csv" % (DESTINATION_FOLDER, status_lower, str(date.today())), index=False)
 
     # On sauve dans un fichier les potentiels doublons.
     dup = histo_and_new.drop_duplicates(["certificate", "valid_until"])
     boolean = dup.duplicated(["certificate"])
     dup = dup[boolean]
-    pd.DataFrame.to_csv(dup, "%s/Duplicates_%s.csv" % (DESTINATION_FOLDER, str(date.today())), index=False)
+    pd.DataFrame.to_csv(dup, "%s/Duplicates_%s_%s.csv" % (DESTINATION_FOLDER, status_lower, str(date.today())), index=False)
 
 
 def save_iscc_certificates(email: bool, batch: int, status: str) -> Tuple[int, list]:
@@ -191,6 +198,7 @@ def save_iscc_certificates(email: bool, batch: int, status: str) -> Tuple[int, l
                 "download_link": row["certificate_report"],
                 "input": {"raw_material": row["raw_material"]},
                 "output": "",
+                "suspended_dates": row["suspended"] or None,
                 "status": status
             }
         )
@@ -325,6 +333,7 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
     allData["map"] = allData["map"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
     allData["certificate_report"] = allData["certificate_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
     allData["audit_report"] = allData["audit_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
+    allData["suspended"] = allData["suspended"].apply(parse_suspended_dates)
 
     return cast(pd.DataFrame, allData)
 
@@ -377,6 +386,25 @@ def get_scope_abbreviations(soup: BeautifulSoup) -> dict:
 
     return dic
 
+def parse_suspended_dates(suspended_html: str):
+    if not isinstance(suspended_html, str) or not suspended_html.strip():
+        return None
+    
+    soup = BeautifulSoup(suspended_html, "html.parser")
+
+    from_dates = [s.get_text(strip=True) for s in soup.select(".cert_suspended_from")]
+    until_dates = [
+        s.get_text(strip=True).replace("until", "").strip()
+        for s in soup.select(".cert_suspended_until")
+    ]
+
+    if len(from_dates) == 0:
+        return None
+
+    return [
+        {"from": f, "until": u}
+        for f, u in zip(from_dates, until_dates)
+    ]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load ISCC certificates in database")
