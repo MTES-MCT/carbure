@@ -43,7 +43,7 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
     purification_electric_consumption_kwe = factory.Faker("pyfloat", min_value=0, max_value=1000, right_digits=2)
     self_consumed_biogas_nm3 = factory.Faker("pyfloat", min_value=0, max_value=20000, right_digits=2)
     total_unit_electric_consumption_kwe = factory.Faker("pyfloat", min_value=0, max_value=2000, right_digits=2)
-    butane_or_propane_addition = factory.Faker("pyfloat", min_value=0, max_value=100, right_digits=2)
+    butane_or_propane_addition = factory.Faker("boolean")
     fossil_fuel_consumed_kwh = factory.Faker("pyfloat", min_value=0, max_value=50000, right_digits=2)
 
     # Questions diverses

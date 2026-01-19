@@ -1,5 +1,5 @@
 import { Button } from "common/components/button2"
-import { NumberInput, TextInput } from "common/components/inputs2"
+import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
@@ -20,6 +20,7 @@ import {
   useEnergyEfficiencyCoefficient,
 } from "./energy-efficiency.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { getYesNoOptions } from "common/utils/normalizers"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -144,13 +145,15 @@ export function EnergyEfficiency({
             )}
 
             <Grid cols={2} gap="lg">
-              <NumberInput
+              <RadioGroup
                 readOnly={!isEditing}
                 label={t(
                   "Addition de butane ou propane lors de l'injection du biométhane dans le réseau"
                 )}
                 {...bind("butane_or_propane_addition")}
                 required
+                options={getYesNoOptions()}
+                orientation="horizontal"
               />
               <NumberInput
                 readOnly={!isEditing}

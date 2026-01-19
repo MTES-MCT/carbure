@@ -3380,8 +3380,7 @@ export interface components {
             self_consumed_biogas_nm3?: number | null;
             /** Format: double */
             total_unit_electric_consumption_kwe?: number | null;
-            /** Format: double */
-            butane_or_propane_addition?: number | null;
+            butane_or_propane_addition?: boolean;
             /** Format: double */
             fossil_fuel_consumed_kwh?: number | null;
             has_opposition_or_complaints_acceptability?: boolean;
@@ -3422,8 +3421,7 @@ export interface components {
             self_consumed_biogas_nm3?: number | null;
             /** Format: double */
             total_unit_electric_consumption_kwe?: number | null;
-            /** Format: double */
-            butane_or_propane_addition?: number | null;
+            butane_or_propane_addition?: boolean;
             /** Format: double */
             fossil_fuel_consumed_kwh?: number | null;
             has_opposition_or_complaints_acceptability?: boolean;
@@ -3481,6 +3479,7 @@ export interface components {
             company_address?: string | null;
             postal_code?: string | null;
             city?: string | null;
+            insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3511,6 +3510,7 @@ export interface components {
             company_address?: string | null;
             postal_code?: string | null;
             city?: string | null;
+            insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
             sanitary_approval_number?: string | null;
@@ -3775,6 +3775,7 @@ export interface components {
             registered_zipcode: string;
             registered_country: components["schemas"]["RegistrationCountry"];
             department_code: string;
+            insee_code: string;
         };
         /**
          * @description * `ADEME` - Ademe

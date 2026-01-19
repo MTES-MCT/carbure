@@ -110,7 +110,7 @@ class BiomethaneEnergy(models.Model):
     total_unit_electric_consumption_kwe = models.FloatField(null=True, blank=True)
 
     # Addition de butane ou propane lors de l'injection du biométhane dans le réseau
-    butane_or_propane_addition = models.FloatField(null=True, blank=True)
+    butane_or_propane_addition = models.BooleanField(default=False)
 
     # Quantité de combustible fossile consommé (kWh)
     fossil_fuel_consumed_kwh = models.FloatField(null=True, blank=True)

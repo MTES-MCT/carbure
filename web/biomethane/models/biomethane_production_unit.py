@@ -20,6 +20,7 @@ class BiomethaneProductionUnit(models.Model):
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     city = models.CharField(max_length=128, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    insee_code = models.CharField(max_length=5, null=True, blank=True)
 
     # légende
     AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS"

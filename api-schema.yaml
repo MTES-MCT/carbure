@@ -11869,9 +11869,7 @@ components:
           format: double
           nullable: true
         butane_or_propane_addition:
-          type: number
-          format: double
-          nullable: true
+          type: boolean
         fossil_fuel_consumed_kwh:
           type: number
           format: double
@@ -11972,9 +11970,7 @@ components:
           format: double
           nullable: true
         butane_or_propane_addition:
-          type: number
-          format: double
-          nullable: true
+          type: boolean
         fossil_fuel_consumed_kwh:
           type: number
           format: double
@@ -12155,6 +12151,10 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        insee_code:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -12256,6 +12256,10 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        insee_code:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -12924,8 +12928,12 @@ components:
         department_code:
           type: string
           maxLength: 5
+        insee_code:
+          type: string
+          maxLength: 5
       required:
         - department_code
+        - insee_code
         - legal_name
         - name
         - registered_address
