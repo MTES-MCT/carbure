@@ -57,7 +57,9 @@ export const SupplyPlan = () => {
       <Row>
         <Button
           onClick={() =>
-            navigate(routes.BIOMETHANE(selectedYear).SUPPLY_PLAN_IMPORT)
+            navigate(
+              routes.BIOMETHANE(selectedYear).PRODUCER.SUPPLY_PLAN_IMPORT
+            )
           }
           iconId="ri-upload-line"
           disabled={!canEditDeclaration}
@@ -73,7 +75,9 @@ export const SupplyPlan = () => {
         </ActionBar.Grow>
         <Button
           onClick={() =>
-            navigate(routes.BIOMETHANE(selectedYear).SUPPLY_PLAN_ADD_INPUT)
+            navigate(
+              routes.BIOMETHANE(selectedYear).PRODUCER.SUPPLY_PLAN_ADD_INPUT
+            )
           }
           iconId="ri-add-line"
           asideX

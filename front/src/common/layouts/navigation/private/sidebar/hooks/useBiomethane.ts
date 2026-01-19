@@ -21,7 +21,7 @@ export const useBiomethane = () => {
   // When we are not in the declaration pages, we don't need to pass the year to the routes
   const year = !currentRouteIsDeclaration ? undefined : currentYear - 1
 
-  const biomethane: MenuSection = {
+  const biomethaneProducerMenu: MenuSection = {
     title: t("Déclarations"),
     condition: isBiomethaneProducer,
     children: [
