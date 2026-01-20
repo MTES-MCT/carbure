@@ -2,9 +2,9 @@ import os
 import time
 import warnings
 
-import sentry_sdk
 from django.core.management.base import BaseCommand
 
+from adapters.logger import log_exception
 from core import private_storage
 from doublecount.helpers import load_dc_production_history_data, load_dc_sourcing_history_data
 from doublecount.models import DoubleCountingApplication
@@ -144,7 +144,7 @@ class Command(BaseCommand):
         try:
             private_storage.save(s3_path, file)
         except Exception as e:
-            sentry_sdk.capture_exception(e)
+            log_exception(e)
             self.stdout.write(self.style.ERROR(f"Error uploading file to S3: {s3_path}"))
 
     def create_tmp_folder(self):
