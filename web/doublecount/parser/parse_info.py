@@ -1,5 +1,6 @@
-import sentry_sdk
 from openpyxl import Workbook
+
+from adapters.logger import log_exception
 
 
 def parse_info(excel_file: Workbook):
@@ -26,5 +27,5 @@ def parse_info(excel_file: Workbook):
             "start_year": start_year,
         }
     except Exception as e:
-        sentry_sdk.capture_exception(e)
+        log_exception(e)
         return {"production_site": None, "producer_email": None, "start_year": 0}
