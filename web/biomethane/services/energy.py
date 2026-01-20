@@ -68,6 +68,11 @@ class BiomethaneEnergyService:
 
     INJECTION_DIFFICULTY_FIELDS = ["injection_impossibility_hours"]
 
+    # Fields conditional on energy types (PRODUCED_BIOGAS or PRODUCED_BIOMETHANE)
+    ENERGY_TYPE_CONDITIONAL_FIELDS = [
+        "self_consumed_biogas_or_biomethane_kwh",
+    ]
+
     @staticmethod
     def _extract_data(instance) -> EnergyContext:
         """Extract data from an energy instance and return structured context."""
@@ -188,6 +193,19 @@ def _build_energy_rules() -> list[FieldClearingRule]:
                     BiomethaneEnergy.ENERGY_TYPE_FOSSIL,
                     BiomethaneEnergy.ENERGY_TYPE_OTHER_RENEWABLE,
                     BiomethaneEnergy.ENERGY_TYPE_OTHER,
+                ]
+                for energy_type in ctx.energy_types
+            ),
+        ),
+        # Energy type conditional fields - only visible if PRODUCED_BIOGAS or PRODUCED_BIOMETHANE
+        FieldClearingRule(
+            name="no_biogas_or_biomethane_energy_type",
+            fields=BiomethaneEnergyService.ENERGY_TYPE_CONDITIONAL_FIELDS,
+            condition=lambda ctx: not any(
+                energy_type
+                in [
+                    BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOGAS,
+                    BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOMETHANE,
                 ]
                 for energy_type in ctx.energy_types
             ),

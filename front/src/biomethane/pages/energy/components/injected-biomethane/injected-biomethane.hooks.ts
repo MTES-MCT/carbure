@@ -84,9 +84,7 @@ export const useInjectedBiomethane = (
 
   // Set the operating hours in the form when it is calculated
   useEffect(() => {
-    if (operatingHours) {
-      setField("operating_hours", operatingHours)
-    }
+    setField("operating_hours", operatingHours ?? 0)
   }, [operatingHours, setField])
 
   return {

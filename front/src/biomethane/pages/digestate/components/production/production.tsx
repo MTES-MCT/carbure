@@ -92,7 +92,7 @@ export function Production({
                     "Quantité éventuelle de digestat brut n'ayant pas subi de séparation de phase"
                   )}
                   type="number"
-                  {...bind("solid_digestate_tonnage")}
+                  {...bind("raw_digestate_tonnage_produced")}
                   required
                 />
               </>

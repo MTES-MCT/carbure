@@ -61,15 +61,15 @@ export const useEnergyTypeOptions = (contract?: BiomethaneContract) => {
     const wasteHeatPurificationOption =
       contract?.installation_category ===
       InstallationCategory.INSTALLATION_CATEGORY_2
-        ? [EnergyType.WASTE_HEAT_PURIFICATION]
+        ? [EnergyType.WASTE_HEAT_ON_SITE]
         : []
 
     switch (contract?.tariff_reference) {
       case TariffReference.Value2023:
         return [
           ...commonOptions,
+          EnergyType.WASTE_HEAT_PURIFICATION,
           ...wasteHeatPurificationOption,
-          EnergyType.WASTE_HEAT_ON_SITE,
           EnergyType.BIOMASS_BOILER,
           EnergyType.SOLAR_THERMAL,
           EnergyType.OTHER_RENEWABLE,
@@ -84,8 +84,8 @@ export const useEnergyTypeOptions = (contract?: BiomethaneContract) => {
       default:
         return [
           ...commonOptions,
+          EnergyType.WASTE_HEAT_PURIFICATION,
           ...wasteHeatPurificationOption,
-          EnergyType.WASTE_HEAT_ON_SITE,
           EnergyType.OTHER,
         ]
     }

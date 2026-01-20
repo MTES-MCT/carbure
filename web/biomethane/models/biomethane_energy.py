@@ -103,8 +103,13 @@ class BiomethaneEnergy(models.Model):
     purification_electric_consumption_kwe = models.FloatField(null=True, blank=True)
 
     # Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants,
-    # le chauffage du digesteur et l’épuration du biogaz  (Nm3)
+    # le chauffage du digesteur et l'épuration du biogaz  (Nm3)
     self_consumed_biogas_nm3 = models.FloatField(null=True, blank=True)
+
+    # Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh)
+    # ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
+    # le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+    self_consumed_biogas_or_biomethane_kwh = models.FloatField(null=True, blank=True)
 
     # Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
     total_unit_electric_consumption_kwe = models.FloatField(null=True, blank=True)

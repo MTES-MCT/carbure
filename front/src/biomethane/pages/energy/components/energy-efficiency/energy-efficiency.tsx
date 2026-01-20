@@ -28,6 +28,7 @@ type EnergyEfficiencyForm = DeepPartial<
     | "purified_biogas_quantity_nm3"
     | "purification_electric_consumption_kwe"
     | "self_consumed_biogas_nm3"
+    | "self_consumed_biogas_or_biomethane_kwh"
     | "total_unit_electric_consumption_kwe"
     | "butane_or_propane_addition"
     | "fossil_fuel_consumed_kwh"
@@ -41,6 +42,8 @@ const extractValues = (energy?: EnergyEfficiencyForm) => {
     total_unit_electric_consumption_kwe:
       energy?.total_unit_electric_consumption_kwe,
     self_consumed_biogas_nm3: energy?.self_consumed_biogas_nm3,
+    self_consumed_biogas_or_biomethane_kwh:
+      energy?.self_consumed_biogas_or_biomethane_kwh,
     butane_or_propane_addition: energy?.butane_or_propane_addition,
     fossil_fuel_consumed_kwh: energy?.fossil_fuel_consumed_kwh,
   }
@@ -93,6 +96,7 @@ export function EnergyEfficiency({
               <NumberInput
                 readOnly={!isEditing}
                 label={biogazOrBiomethaneAutoconsumptionLabel}
+                {...bind("self_consumed_biogas_or_biomethane_kwh")}
                 required
                 step={0.01}
               />

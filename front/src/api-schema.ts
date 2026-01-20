@@ -3379,6 +3379,8 @@ export interface components {
             /** Format: double */
             self_consumed_biogas_nm3?: number | null;
             /** Format: double */
+            self_consumed_biogas_or_biomethane_kwh?: number | null;
+            /** Format: double */
             total_unit_electric_consumption_kwe?: number | null;
             butane_or_propane_addition?: boolean;
             /** Format: double */
@@ -3419,6 +3421,8 @@ export interface components {
             purification_electric_consumption_kwe?: number | null;
             /** Format: double */
             self_consumed_biogas_nm3?: number | null;
+            /** Format: double */
+            self_consumed_biogas_or_biomethane_kwh?: number | null;
             /** Format: double */
             total_unit_electric_consumption_kwe?: number | null;
             butane_or_propane_addition?: boolean;

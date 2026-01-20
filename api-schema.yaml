@@ -11864,6 +11864,10 @@ components:
           type: number
           format: double
           nullable: true
+        self_consumed_biogas_or_biomethane_kwh:
+          type: number
+          format: double
+          nullable: true
         total_unit_electric_consumption_kwe:
           type: number
           format: double
@@ -11962,6 +11966,10 @@ components:
           format: double
           nullable: true
         self_consumed_biogas_nm3:
+          type: number
+          format: double
+          nullable: true
+        self_consumed_biogas_or_biomethane_kwh:
           type: number
           format: double
           nullable: true

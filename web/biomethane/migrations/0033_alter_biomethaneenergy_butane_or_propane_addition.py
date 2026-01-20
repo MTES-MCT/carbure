@@ -3,6 +3,12 @@
 from django.db import migrations, models
 
 
+def clear_field_values(apps, schema_editor):
+    """Reset the butane_or_propane_addition field to False"""
+    BiomethaneEnergy = apps.get_model("biomethane", "BiomethaneEnergy")
+    BiomethaneEnergy.objects.all().update(butane_or_propane_addition=False)
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("biomethane", "0032_merge_20260115_1352"),
@@ -14,4 +20,5 @@ class Migration(migrations.Migration):
             name="butane_or_propane_addition",
             field=models.BooleanField(default=False),
         ),
+        migrations.RunPython(clear_field_values, migrations.RunPython.noop),
     ]

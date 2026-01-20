@@ -121,6 +121,7 @@ class EnergyRulesConfigurationTests(TestCase):
             "malfunction_no_other_type",
             "no_injection_difficulties",
             "no_fossil_for_energy",
+            "no_biogas_or_biomethane_energy_type",
         ]
 
         actual_rule_names = [rule.name for rule in self.rules]

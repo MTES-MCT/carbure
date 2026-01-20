@@ -67,6 +67,7 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     "purified_biogas_quantity_nm3",
     "purification_electric_consumption_kwe",
     "self_consumed_biogas_nm3",
+    "self_consumed_biogas_or_biomethane_kwh",
     "total_unit_electric_consumption_kwe",
     "butane_or_propane_addition",
     "fossil_fuel_consumed_kwh",
