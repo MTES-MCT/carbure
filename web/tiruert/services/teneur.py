@@ -325,7 +325,7 @@ class TeneurService:
         if len(volumes) > 0:
             negative_volumes = volumes[volumes < 0]
             if len(negative_volumes) > 0:
-                TeneurService._send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes)
+                TeneurService.log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes)
                 # Fix negative volumes by setting them to 0
                 volumes = np.maximum(volumes, 0)
 
@@ -346,7 +346,7 @@ class TeneurService:
             return quantity
 
     @staticmethod
-    def _send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes):
+    def log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes):
         # Get the lot_ids corresponding to negative volumes
         negative_indices = np.where(volumes < 0)[0]
         negative_lot_ids = lot_ids[negative_indices].tolist()
