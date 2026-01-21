@@ -5,7 +5,6 @@ import unicodedata
 from typing import List
 
 import pandas as pd
-import sentry_sdk
 from django.conf import settings
 from django.db import transaction
 from django.db.models.aggregates import Count, Sum
@@ -458,7 +457,7 @@ def check_dc_file(file):
             excel_error = error(DoubleCountingError.BAD_WORKSHEET_NAME, is_blocking=True, meta=e.meta)
 
     except Exception as e:
-        sentry_sdk.capture_exception(e)
+        log_exception(e)
 
         # bad tab name
         sheetNameRegexp = r"'Worksheet (.*) does not exist.'"
