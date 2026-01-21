@@ -1,12 +1,12 @@
 from unittest.mock import Mock, patch
 
 import numpy as np
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from tiruert.services.teneur import TeneurService, TeneurServiceErrors
 
 
-class TeneurServiceOptimizeBiofuelBlendingTest(TestCase):
+class TeneurServiceOptimizeBiofuelBlendingTest(SimpleTestCase):
     """Test TeneurService.optimize_biofuel_blending() method"""
 
     def test_optimize_biofuel_blending_successful_optimization(self):
@@ -116,7 +116,7 @@ class TeneurServiceOptimizeBiofuelBlendingTest(TestCase):
             self.assertEqual(volume, round(volume, 2))
 
 
-class TeneurServiceEmissionBoundsTest(TestCase):
+class TeneurServiceEmissionBoundsTest(SimpleTestCase):
     """Test TeneurService.emission_bounds() method"""
 
     def test_emission_bounds_returns_min_and_max(self):
@@ -172,7 +172,7 @@ class TeneurServiceEmissionBoundsTest(TestCase):
         self.assertEqual(str(context.exception), TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
 
-class TeneurServiceConvertInLitersTest(TestCase):
+class TeneurServiceConvertInLitersTest(SimpleTestCase):
     """Test TeneurService._convert_in_liters() method"""
 
     def test_convert_in_liters_returns_same_for_liter_unit(self):
@@ -205,7 +205,7 @@ class TeneurServiceConvertInLitersTest(TestCase):
         self.assertEqual(result, 100.0)  # 85 / 0.85 = 100
 
 
-class TeneurServiceConvertEmissionsTest(TestCase):
+class TeneurServiceConvertEmissionsTest(SimpleTestCase):
     """Test TeneurService.convert_producted_emissions_to_avoided_emissions() method"""
 
     def test_convert_producted_emissions_to_avoided_emissions(self):
@@ -234,7 +234,7 @@ class TeneurServiceConvertEmissionsTest(TestCase):
         self.assertLess(result, 0)
 
 
-class TeneurServicePrepareDataAndOptimizeTest(TestCase):
+class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
     """Test TeneurService.prepare_data_and_optimize() method"""
 
     @patch("tiruert.services.teneur.TeneurService.prepare_data")
@@ -296,7 +296,7 @@ class TeneurServicePrepareDataAndOptimizeTest(TestCase):
         self.assertEqual(call_args[2], target_volume)
 
 
-class TeneurServiceGetMinAndMaxEmissionsTest(TestCase):
+class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):
     """Test TeneurService.get_min_and_max_emissions() method"""
 
     @patch("tiruert.services.teneur.TeneurService.prepare_data")
