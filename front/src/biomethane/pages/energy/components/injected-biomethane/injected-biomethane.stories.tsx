@@ -76,7 +76,7 @@ export const WithContract2011: Story = {
   },
 }
 
-// Calculation = 36000 / (12 * 300) = 7.5
+// Calculation = 36000 / (12 * 300) = 10
 export const WithContract2020: Story = {
   args: {
     contract: {
