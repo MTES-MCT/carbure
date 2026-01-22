@@ -30,7 +30,6 @@ const DEFAULT_DATA: BiomethaneEnergyMonthlyReportForm[] = Array.from(
     month: index + 1, // Numéro du mois (1 à 12)
     injected_volume_nm3: 0,
     average_monthly_flow_nm3_per_hour: 0,
-    injection_hours: 0,
   })
 )
 
@@ -71,9 +70,8 @@ export const DeclareMonthlyQuantity = ({
       injected_volume_nm3: item.injected_volume_nm3 ?? 0,
       average_monthly_flow_nm3_per_hour:
         item.average_monthly_flow_nm3_per_hour ?? 0,
-      injection_hours: item.injection_hours ?? 0,
     }))
-    saveMonthlyReportsMutation(entity.id, data)
+    saveMonthlyReportsMutation(entity.id, selectedYear, data)
   }
 
   // État pour stocker toutes les valeurs du tableau

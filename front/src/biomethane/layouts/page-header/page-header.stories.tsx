@@ -2,7 +2,7 @@ import { Meta, StoryObj } from "@storybook/react"
 import { BiomethanePageHeader } from "./page-header"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import {
-  buildCurrentAnnualDeclarationHandler,
+  buildAnnualDeclarationHandler,
   getAnnualDeclarationYearsOk,
 } from "biomethane/tests/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
@@ -65,22 +65,72 @@ export const DefaultLayoutForTheCurrentYearWithReadOnlyPermissions: Story = {
 
 export const LayoutForTheCurrentYearWhenTheDeclarationIsValidated: Story = {
   parameters: {
+    // We need to set the mocking date to 2026 to ensure that the user is correcting the declaration inside the current declaration period (01/01/2026 to 31/03/2026)
+    mockingDate: new Date(2026, 2, 1),
+    docs: {
+      description:
+        "If the selected year is 2025 and the declaration is validated, a notice with a button to correct the declaration should be displayed",
+    },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           status: AnnualDeclarationStatus.DECLARED,
         }),
         ...MOCKS,
       ],
     },
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { year: "2025" },
+        path: "/:year",
+      },
+      routing: {
+        path: "/:year",
+      },
+    }),
   },
 }
 
-export const LayoutForThePreviousYear: Story = {
+export const ValidateThePreviousYearDeclaration: Story = {
   parameters: {
+    msw: {
+      handlers: [
+        buildAnnualDeclarationHandler({
+          year: 2024,
+        }),
+        ...MOCKS,
+      ],
+    },
     docs: {
       description:
-        "If the selected year is 2024, and the current annual declaration year is 2025, the user can't validate the declaration",
+        "If the selected year is 2024 (but not the current year) and the declaration is open, the user is authorized to validated a previous declaration",
+    },
+    reactRouter: reactRouterParameters({
+      location: {
+        pathParams: { year: "2024" },
+        path: "/:year",
+      },
+      routing: {
+        path: "/:year",
+      },
+    }),
+  },
+}
+
+export const CouldNotValidateThePreviousYearDeclaration: Story = {
+  parameters: {
+    msw: {
+      handlers: [
+        buildAnnualDeclarationHandler({
+          year: 2024,
+          is_open: false,
+        }),
+        ...MOCKS,
+      ],
+    },
+    docs: {
+      description:
+        "If the selected year is 2024 and the declaration is not open and the current declaration is 2026, the user just can see the declaration as read only",
     },
     reactRouter: reactRouterParameters({
       location: {
@@ -106,11 +156,40 @@ export const DisplayValidateDeclarationDialogIfTheDeclarationIsComplete: Story =
     },
   }
 
+export const DisplayValidateDeclarationDialogIfTheDeclarationIsCompleteWhenSelectedYearIsNotTheCurrentYear: Story =
+  {
+    parameters: {
+      msw: {
+        handlers: [
+          buildAnnualDeclarationHandler({
+            year: 2024,
+            status: AnnualDeclarationStatus.OVERDUE,
+          }),
+          ...MOCKS,
+        ],
+      },
+      docs: {
+        description:
+          "If the selected year is 2024 (but not the current year) and the declaration is overdue, the user is authorized to validated a previous declaration with a specific message",
+      },
+      reactRouter: reactRouterParameters({
+        location: {
+          pathParams: { year: "2024" },
+          path: "/:year",
+        },
+        routing: {
+          path: "/:year",
+        },
+      }),
+    },
+    play: DisplayValidateDeclarationDialogIfTheDeclarationIsComplete.play,
+  }
+
 export const DisplayMissingFieldsDialogIfTheDeclarationIsNotComplete: Story = {
   parameters: {
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           is_complete: false,
           missing_fields: {
             digestate_missing_fields: ["digestate_missing_field_1"],
@@ -131,7 +210,7 @@ export const DisplayOverdueDeclarationNoticeIfTheDeclarationIsOverdue: Story = {
   parameters: {
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           status: AnnualDeclarationStatus.OVERDUE,
         }),
         ...MOCKS,

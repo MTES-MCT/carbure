@@ -5,13 +5,11 @@ import { Select } from "common/components/selects2"
 import { useTranslation } from "react-i18next"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationStatus } from "biomethane/types"
-import {
-  useAnnualDeclarationYears,
-  usePageHeaderActions,
-} from "./page-header.hooks"
+import { usePageHeaderActions } from "./page-header.hooks"
 import useEntity from "common/hooks/entity"
 import { PropsWithChildren } from "react"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
+import { useAnnualDeclarationYears } from "biomethane/hooks/use-annual-declaration-years"
 
 // Digestate / Energy / Supply Plan pages share the same page header and the same declaration validation logic
 export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
@@ -21,9 +19,9 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
 
   const {
     selectedYear,
-    currentAnnualDeclaration,
-    isInDeclarationPeriod,
+    annualDeclaration,
     hasAnnualDeclarationMissingObjects,
+    isDeclarationInCurrentPeriod,
   } = useAnnualDeclaration()
 
   const {
@@ -33,7 +31,7 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   } = usePageHeaderActions()
 
   const status =
-    currentAnnualDeclaration?.status ?? AnnualDeclarationStatus.IN_PROGRESS
+    annualDeclaration?.status ?? AnnualDeclarationStatus.IN_PROGRESS
 
   return (
     <Main>
@@ -43,11 +41,10 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
           value={selectedYear}
           onChange={years.setYear}
         />
-        {isInDeclarationPeriod && (
-          <AnnualDeclarationStatusBadge status={status} />
-        )}
+
+        <AnnualDeclarationStatusBadge status={status} />
       </Row>
-      {isInDeclarationPeriod && entity.canWrite() && (
+      {annualDeclaration?.is_open && entity.canWrite() && (
         <Notice
           variant={
             status === AnnualDeclarationStatus.OVERDUE ? "warning" : "info"
@@ -71,7 +68,7 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
             status === AnnualDeclarationStatus.OVERDUE) && (
             <Button
               onClick={
-                currentAnnualDeclaration?.is_complete
+                annualDeclaration?.is_complete
                   ? openValidateDeclarationDialog
                   : openMissingFieldsDialog
               }
@@ -82,16 +79,17 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
               {t("Transmettre mes informations annuelles")}
             </Button>
           )}
-          {status === AnnualDeclarationStatus.DECLARED && (
-            <Button
-              onClick={() => correctAnnualDeclarationMutation.execute()}
-              iconId="ri-edit-line"
-              asideX
-              loading={correctAnnualDeclarationMutation.loading}
-            >
-              {t("Corriger mes informations annuelles")}
-            </Button>
-          )}
+          {status === AnnualDeclarationStatus.DECLARED &&
+            isDeclarationInCurrentPeriod && (
+              <Button
+                onClick={() => correctAnnualDeclarationMutation.execute()}
+                iconId="ri-edit-line"
+                asideX
+                loading={correctAnnualDeclarationMutation.loading}
+              >
+                {t("Corriger mes informations annuelles")}
+              </Button>
+            )}
         </Notice>
       )}
       <Content marginTop>{children}</Content>

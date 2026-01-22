@@ -14,7 +14,7 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.energy = BiomethaneEnergy.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
@@ -24,13 +24,11 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
                 "month": 1,
                 "injected_volume_nm3": 1000.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
-                "injection_hours": 20.0,
             },
             {
                 "month": 2,
                 "injected_volume_nm3": 1200.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
-                "injection_hours": 20.0,
             },
         ]
 
@@ -41,13 +39,11 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
                 "month": 1,
                 "injected_volume_nm3": 1000.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
-                "injection_hours": 20.0,
             },
             {
                 "month": 1,
                 "injected_volume_nm3": 2000.0,
                 "average_monthly_flow_nm3_per_hour": 60.0,
-                "injection_hours": 20.0,
             },
         ]
         serializer = BiomethaneEnergyMonthlyReportInputSerializer(data=invalid_monthly_reports_data)
@@ -55,13 +51,13 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
 
     def test_energy_not_found(self):
         # Tests that the serializer rejects data when no energy declaration is found
-        serializer = BiomethaneEnergyMonthlyReportInputSerializer(data=self.valid_monthly_reports_data)
+        serializer = BiomethaneEnergyMonthlyReportInputSerializer(data=self.valid_monthly_reports_data, context={})
         self.assertFalse(serializer.is_valid())
         self.assertIn("energy", serializer.errors)
 
     def test_create_monthly_reports(self):
         # Tests the creation of new monthly reports with valid data
-        serializer = BiomethaneEnergyMonthlyReportInputSerializer(context={"energy": self.energy})
+        serializer = BiomethaneEnergyMonthlyReportInputSerializer(context={"energy_instance": self.energy})
 
         validated_data = serializer.create(self.valid_monthly_reports_data)
 
@@ -78,19 +74,17 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
         # Tests the update of existing monthly reports with new data
         for report in self.valid_monthly_reports_data:
             BiomethaneEnergyMonthlyReport.objects.create(energy=self.energy, **report)
-        serializer = BiomethaneEnergyMonthlyReportInputSerializer(context={"energy": self.energy})
+        serializer = BiomethaneEnergyMonthlyReportInputSerializer(context={"energy_instance": self.energy})
         updated_monthly_reports_data = [
             {
                 "month": 1,
                 "injected_volume_nm3": 10,
                 "average_monthly_flow_nm3_per_hour": 5.0,
-                "injection_hours": 2.0,
             },
             {
                 "month": 2,
                 "injected_volume_nm3": 120.0,
                 "average_monthly_flow_nm3_per_hour": 5.0,
-                "injection_hours": 2.0,
             },
         ]
 

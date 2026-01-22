@@ -9,7 +9,6 @@ import {
 } from "biomethane/providers/annual-declaration"
 import {
   correctAnnualDeclaration,
-  getAnnualDeclarationYears,
   validateAnnualDeclaration,
 } from "biomethane/api"
 import useEntity from "common/hooks/entity"
@@ -17,7 +16,7 @@ import { HttpError } from "common/services/api-fetch"
 import { MissingFields } from "biomethane/components/missing-fields"
 import { Text } from "common/components/text"
 import { useNavigateToMissingFields } from "biomethane/components/missing-fields"
-import useYears from "common/hooks/years-2"
+import { AnnualDeclarationStatus } from "biomethane/types"
 
 export const usePageHeaderActions = () => {
   const { t } = useTranslation()
@@ -27,10 +26,13 @@ export const usePageHeaderActions = () => {
   const annualDeclarationData = useAnnualDeclaration()
   const { navigateToMissingFields } = useNavigateToMissingFields()
 
+  const { annualDeclaration, annualDeclarationKey, selectedYear } =
+    annualDeclarationData
+
   const validateAnnualDeclarationMutation = useMutation(
-    () => validateAnnualDeclaration(entity.id),
+    () => validateAnnualDeclaration(entity.id, selectedYear),
     {
-      invalidates: ["current-annual-declaration"],
+      invalidates: [annualDeclarationKey],
       onSuccess: () => {
         notify(t("Votre déclaration a bien été transmise."), {
           variant: "success",
@@ -50,9 +52,9 @@ export const usePageHeaderActions = () => {
     }
   )
   const correctAnnualDeclarationMutation = useMutation(
-    () => correctAnnualDeclaration(entity.id),
+    () => correctAnnualDeclaration(entity.id, selectedYear),
     {
-      invalidates: ["current-annual-declaration"],
+      invalidates: [annualDeclarationKey],
       onSuccess: () => {
         notify(
           t(
@@ -76,8 +78,6 @@ export const usePageHeaderActions = () => {
     }
   )
 
-  const { currentAnnualDeclaration } = annualDeclarationData
-
   const openValidateDeclarationDialog = () => {
     portal((close) => (
       <Confirm
@@ -88,13 +88,22 @@ export const usePageHeaderActions = () => {
         description={
           <>
             {t(
-              "Votre déclaration (digestat et énergie) est complète, voulez-vous la transmettre à l'administration DGEC ?"
+              "Votre déclaration est complète, voulez-vous la transmettre à l'administration DGEC ?"
             )}
             <br />
-            {currentAnnualDeclaration?.year &&
-              t("Vous pourrez la corriger jusqu'au {{date}}", {
-                date: `31/03/${currentAnnualDeclaration.year + 1}`,
-              })}
+            {annualDeclaration?.status ===
+              AnnualDeclarationStatus.IN_PROGRESS && (
+              <>
+                {annualDeclaration?.year &&
+                  t("Vous pourrez la corriger jusqu'au {{date}}", {
+                    date: `31/03/${annualDeclaration.year + 1}`,
+                  })}
+              </>
+            )}
+            {annualDeclaration?.status === AnnualDeclarationStatus.OVERDUE &&
+              t(
+                "Attention, vous ne pourrez pas corriger votre déclaration une fois celle-ci transmise."
+              )}
           </>
         }
       />
@@ -134,37 +143,4 @@ export const usePageHeaderActions = () => {
     openMissingFieldsDialog,
     correctAnnualDeclarationMutation,
   }
-}
-
-const getAnnualDeclarationYearsList = (
-  years: number[],
-  annualDeclarationYear: number
-) => {
-  return [
-    ...years,
-    ...(years.includes(annualDeclarationYear) ? [] : [annualDeclarationYear]),
-  ]
-}
-
-/**
- * When the annual declaration is terminated (after 31/03 of the following year),
- * We want to add the current year to the list of years to allow the user to see the annual declaration for the current year.
- */
-export const useAnnualDeclarationYears = () => {
-  const entity = useEntity()
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
-  return useYears("biomethane", () =>
-    getAnnualDeclarationYears(entity.id).then((res) => {
-      const years = res.data ?? []
-      const yearsList = getAnnualDeclarationYearsList(
-        years,
-        currentAnnualDeclaration?.year
-      )
-
-      return {
-        ...res,
-        data: yearsList,
-      }
-    })
-  )
 }

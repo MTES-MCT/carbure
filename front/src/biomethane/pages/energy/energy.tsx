@@ -6,12 +6,10 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { LoaderOverlay } from "common/components/scaffold"
 import { InjectedBiomethane } from "./components/injected-biomethane"
 import { BiogasProduction } from "./components/biogas-production"
-import { useProductionUnit } from "../production/production.hooks"
 import { EnergyEfficiency } from "./components/energy-efficiency"
-import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 import { MonthlyBiomethaneInjection } from "./components/monthy-biomethane-injection/monthly-biomethane-injection"
 import { isTariffReference2011Or2020 } from "../contract"
-import { Acceptability } from "./components/acceptability"
+import { VariousQuestions } from "./components/various-questions"
 import { Malfunction } from "./components/malfunction"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
@@ -22,6 +20,7 @@ import {
   useMissingFields,
 } from "biomethane/components/missing-fields"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
+import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
@@ -29,7 +28,7 @@ const EnergyPage = () => {
   const form = useForm<BiomethaneEnergy | undefined | object>(undefined)
   const { selectedYear } = useAnnualDeclaration()
   const { contractInfos: contract } = useContractProductionUnit()
-  const { result: productionUnit } = useProductionUnit()
+
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "energy",
     params: [entity.id, selectedYear],
@@ -50,15 +49,15 @@ const EnergyPage = () => {
   return (
     <FormContext.Provider value={form}>
       <MissingFields />
-      <InjectedBiomethane contract={contract} />
-      <BiogasProduction productionUnit={productionUnit} />
+      <InjectedBiomethane energy={energy} contract={contract} />
+      <BiogasProduction />
       <InstallationEnergyNeeds contract={contract} />
       <EnergyEfficiency energy={energy} contract={contract} />
       {isTariffReference2011Or2020(contract?.tariff_reference) && (
         <MonthlyBiomethaneInjection energy={energy} />
       )}
-      <Acceptability />
       <Malfunction />
+      <VariousQuestions />
     </FormContext.Provider>
   )
 }

@@ -10,3 +10,4 @@ from .biomethane_energy_monthly_report import BiomethaneEnergyMonthlyReport
 from .biomethane_supply_plan import BiomethaneSupplyPlan
 from .biomethane_supply_input import BiomethaneSupplyInput
 from .biomethane_annual_declaration import BiomethaneAnnualDeclaration
+from .biomethane_declaration_period import BiomethaneDeclarationPeriod

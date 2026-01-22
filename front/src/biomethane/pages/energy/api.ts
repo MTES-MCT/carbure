@@ -18,12 +18,14 @@ export const getEnergy = (entity_id: number, year: number) =>
 
 export const saveEnergy = (
   entity_id: number,
+  year: number,
   body: BiomethaneEnergyInputRequest
 ) =>
   api.PUT("/biomethane/energy/", {
     params: {
       query: {
         entity_id,
+        year,
       },
     },
     body,
@@ -43,12 +45,14 @@ export const getMonthlyReports = (entity_id: number, year: number) =>
 
 export const saveMonthlyReports = (
   entity_id: number,
+  year: number,
   body: BiomethaneEnergyMonthlyReportDataRequest[]
 ) =>
   api.PUT("/biomethane/energy/monthly-reports/", {
     params: {
       query: {
         entity_id,
+        year,
       },
     },
     body,

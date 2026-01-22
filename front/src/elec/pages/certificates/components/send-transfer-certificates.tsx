@@ -68,6 +68,7 @@ const SendTransferCertificatesDialog = ({
       "elec-provision-certificates",
       "elec-transfer-certificates",
       "elec-certificates-snapshot",
+      "elec-provision-certificate-balance",
       "years",
     ],
 
@@ -134,6 +135,8 @@ const SendTransferCertificatesDialog = ({
           required
           label={t("Quantité d'énergie (MWh)")}
           max={balance}
+          min={0.01}
+          step={0.01}
           addon={
             <Button onClick={() => form.setField("energy_amount", balance)}>
               {t("Max")}

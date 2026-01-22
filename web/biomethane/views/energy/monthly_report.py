@@ -5,15 +5,14 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters import BiomethaneEnergyMonthlyReportFilter
 from biomethane.filters.energy_monthly_report import BiomethaneEnergyMonthlyReportYearFilter
-from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
+from biomethane.models import BiomethaneEnergyMonthlyReport
+from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.energy import (
     BiomethaneEnergyMonthlyReportInputSerializer,
     BiomethaneEnergyMonthlyReportSerializer,
 )
-from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import ListWithObjectPermissionsMixin
 
 
@@ -26,10 +25,18 @@ from biomethane.views.mixins import ListWithObjectPermissionsMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.QUERY,
+            description="Year of the energy declaration.",
+            required=True,
+        ),
     ]
 )
 class BiomethaneEnergyMonthlyReportViewSet(ListWithObjectPermissionsMixin, GenericViewSet, ListModelMixin):
     queryset = BiomethaneEnergyMonthlyReport.objects.all()
+    filterset_class = BiomethaneEnergyMonthlyReportYearFilter
     pagination_class = None
 
     def get_permissions(self):
@@ -39,41 +46,17 @@ class BiomethaneEnergyMonthlyReportViewSet(ListWithObjectPermissionsMixin, Gener
         """Check permissions on the energy of the monthly reports."""
         return first_obj.energy if first_obj else None
 
-    def initialize_request(self, request, *args, **kwargs):
-        request = super().initialize_request(request, *args, **kwargs)
-        entity = getattr(self.request, "entity", None)
-        setattr(request, "year", BiomethaneAnnualDeclarationService.get_declaration_period(entity))
-        return request
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-
-        entity = getattr(self.request, "entity", None)
-        year = getattr(self.request, "year", None)
-
-        if entity and year:
-            try:
-                energy = BiomethaneEnergy.objects.get(producer=entity, year=year)
-                context["energy"] = energy
-            except BiomethaneEnergy.DoesNotExist:
-                context["energy"] = None
-
-        return context
-
-    def get_filterset_class(self):
-        if self.action == "list":
-            return BiomethaneEnergyMonthlyReportYearFilter
-        return BiomethaneEnergyMonthlyReportFilter
-
     def get_serializer_class(self):
         if self.action == "upsert":
             return BiomethaneEnergyMonthlyReportInputSerializer
         return BiomethaneEnergyMonthlyReportSerializer
 
-    def get_queryset(self):
-        if self.action == "upsert":
-            return self.queryset.filter(energy__year=self.request.year)
-        return super().get_queryset()
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["energy_instance"] = BiomethaneEnergy.objects.filter(
+            producer=self.request.entity, year=self.request.query_params.get("year")
+        ).first()
+        return context
 
     @extend_schema(
         responses={

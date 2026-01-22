@@ -6,6 +6,7 @@ import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { createSupplyInput } from "../api"
 import { useNotify, useNotifyError } from "common/components/notifications"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const CreateSupplyInputDialog = ({
   onClose,
@@ -16,9 +17,10 @@ export const CreateSupplyInputDialog = ({
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const { annualDeclarationKey, selectedYear } = useAnnualDeclaration()
 
   const createSupplyInputMutation = useMutation(createSupplyInput, {
-    invalidates: ["supply-plan-inputs", "current-annual-declaration"],
+    invalidates: ["supply-plan-inputs", annualDeclarationKey],
     onSuccess: () => {
       notify(t("L'intrant a bien été créé."), {
         variant: "success",
@@ -47,7 +49,9 @@ export const CreateSupplyInputDialog = ({
       <SupplyInputForm
         onSubmit={(form) =>
           form &&
-          createSupplyInputMutation.execute(entity.id, form).then(onClose)
+          createSupplyInputMutation
+            .execute(entity.id, selectedYear, form)
+            .then(onClose)
         }
       />
     </Dialog>

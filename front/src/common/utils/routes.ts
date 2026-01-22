@@ -59,17 +59,15 @@ export const ROUTE_URLS = {
 
   BIOMETHANE: (entity_id: number, year?: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/biomethane`)
-
+    const baseUrlWithYear = year ? `${baseUrl}/${year}` : baseUrl
     return {
       ROOT: `${baseUrl}`,
       PRODUCER: {
-        SUPPLY_PLAN: year
-          ? `${baseUrl}/${year}/supply-plan`
-          : `${baseUrl}/supply-plan`,
-        DIGESTATE: year
-          ? `${baseUrl}/${year}/digestate`
-          : `${baseUrl}/digestate`,
-        ENERGY: year ? `${baseUrl}/${year}/energy` : `${baseUrl}/energy`,
+        SUPPLY_PLAN: `${baseUrlWithYear}/supply-plan`,
+        SUPPLY_PLAN_IMPORT: `${baseUrlWithYear}/supply-plan#import`,
+        SUPPLY_PLAN_ADD_INPUT: `${baseUrlWithYear}/supply-plan#create`,
+        DIGESTATE: `${baseUrlWithYear}/digestate`,
+        ENERGY: `${baseUrlWithYear}/energy`,
       },
       ADMIN: {
         SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,

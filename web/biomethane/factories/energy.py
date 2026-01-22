@@ -32,31 +32,22 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
     flaring_operating_hours = factory.Faker("pyfloat", min_value=0, max_value=8760, right_digits=1)
 
     # Nature de l'énergie utilisée
-    attest_no_fossil_for_digester_heating_and_purification = factory.Faker("boolean")
-    energy_used_for_digester_heating = factory.Faker(
-        "random_element", elements=["Électricité", "Biogaz", "Biomasse", "Énergie solaire", "Autre"]
+    attest_no_fossil_for_energy = factory.Faker("boolean")
+    energy_types = factory.LazyAttribute(
+        lambda obj: random.sample([choice[0] for choice in BiomethaneEnergy.ENERGY_TYPES], k=random.randint(1, 3))
     )
-    fossil_details_for_digester_heating = factory.LazyAttribute(
-        lambda obj: faker.text(max_nb_chars=200) if not obj.attest_no_fossil_for_digester_heating_and_purification else None
-    )
-
-    attest_no_fossil_for_installation_needs = factory.Faker("boolean")
-    energy_used_for_installation_needs = factory.Faker(
-        "random_element", elements=["Électricité", "Biogaz", "Biomasse", "Énergie solaire", "Autre"]
-    )
-    fossil_details_for_installation_needs = factory.LazyAttribute(
-        lambda obj: faker.text(max_nb_chars=200) if not obj.attest_no_fossil_for_installation_needs else None
-    )
+    energy_details = factory.LazyAttribute(lambda obj: faker.text(max_nb_chars=500) if obj.energy_types else None)
 
     # Efficacité énergétique
     purified_biogas_quantity_nm3 = factory.Faker("pyfloat", min_value=0, max_value=100000, right_digits=2)
     purification_electric_consumption_kwe = factory.Faker("pyfloat", min_value=0, max_value=1000, right_digits=2)
     self_consumed_biogas_nm3 = factory.Faker("pyfloat", min_value=0, max_value=20000, right_digits=2)
+    self_consumed_biogas_or_biomethane_kwh = factory.Faker("pyfloat", min_value=0, max_value=50000, right_digits=2)
     total_unit_electric_consumption_kwe = factory.Faker("pyfloat", min_value=0, max_value=2000, right_digits=2)
-    butane_or_propane_addition = factory.Faker("pyfloat", min_value=0, max_value=100, right_digits=2)
+    butane_or_propane_addition = factory.Faker("boolean")
     fossil_fuel_consumed_kwh = factory.Faker("pyfloat", min_value=0, max_value=50000, right_digits=2)
 
-    # Acceptabilité
+    # Questions diverses
     has_opposition_or_complaints_acceptability = factory.Faker("boolean")
     estimated_work_days_acceptability = factory.Faker("random_int", min=0, max=365)
 
@@ -90,7 +81,6 @@ class BiomethaneEnergyMonthlyReportFactory(factory.django.DjangoModelFactory):
     month = faker.random_int(1, 12)
     injected_volume_nm3 = factory.Faker("pyfloat", min_value=0, max_value=50000, right_digits=2)
     average_monthly_flow_nm3_per_hour = factory.Faker("pyfloat", min_value=0, max_value=1000, right_digits=2)
-    injection_hours = factory.Faker("pyfloat", min_value=0, max_value=744, right_digits=1)
 
 
 def create_monthly_reports_for_energy(energy):
@@ -107,7 +97,7 @@ def create_monthly_reports_for_energy(energy):
 def create_biomethane_energy(producer=None, **kwargs):
     if producer is None:
         producer = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER)
-    year = BiomethaneAnnualDeclarationService.get_declaration_period()
+    year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
     previous_year = year - 1
 
     # Create energy declaration for the current year and the previous year

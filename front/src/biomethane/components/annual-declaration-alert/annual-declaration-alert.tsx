@@ -5,12 +5,12 @@ import { useTranslation } from "react-i18next"
 
 export const AnnualDeclarationAlert = () => {
   const { t } = useTranslation()
-  const { currentAnnualDeclaration, isInDeclarationPeriod } =
+  const { annualDeclaration, isDeclarationInCurrentPeriod } =
     useAnnualDeclaration()
 
   if (
-    !isInDeclarationPeriod ||
-    currentAnnualDeclaration?.status === AnnualDeclarationStatus.IN_PROGRESS
+    !isDeclarationInCurrentPeriod ||
+    annualDeclaration?.status === AnnualDeclarationStatus.IN_PROGRESS
   )
     return null
 

@@ -1,8 +1,12 @@
+from datetime import date
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
+from biomethane.models.biomethane_declaration_period import BiomethaneDeclarationPeriod
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 from core.tests_utils import setup_current_user
@@ -24,25 +28,42 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
             [(self.producer_entity, "RW")],
         )
 
-        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.annual_declaration_url = reverse("biomethane-annual-declaration")
         self.base_params = {"entity_id": self.producer_entity.id}
 
+        # Create an open declaration period for the current year
+        BiomethaneDeclarationPeriod.objects.create(
+            year=self.current_year,
+            start_date="2026-01-01",
+            end_date="2026-03-31",
+        )
+
     def test_retrieve_creates_declaration_if_not_exists(self):
         """Test that retrieve creates a new declaration if it doesn't exist"""
-        response = self.client.get(self.annual_declaration_url, self.base_params)
+        # Mock date to ensure we're within the declaration period
+        with (
+            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("biomethane.models.biomethane_declaration_period.date") as mock_date_model,
+        ):
+            mock_date_service.today.return_value = date(2026, 2, 15)
+            mock_date_model.today.return_value = date(2026, 2, 15)
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["year"], self.current_year)
-        self.assertEqual(response.data["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
-        self.assertIn("missing_fields", response.data)
-        self.assertIn("digestate_missing_fields", response.data["missing_fields"])
-        self.assertIn("energy_missing_fields", response.data["missing_fields"])
-        self.assertIn("is_complete", response.data)
+            response = self.client.get(self.annual_declaration_url, self.base_params)
 
-        # Verify that the declaration was created in the database
-        declaration = BiomethaneAnnualDeclaration.objects.get(producer=self.producer_entity, year=self.current_year)
-        self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(response.data["year"], self.current_year)
+            self.assertEqual(response.data["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
+            self.assertTrue(response.data["is_open"])
+            self.assertIn("missing_fields", response.data)
+            self.assertIn("digestate_missing_fields", response.data["missing_fields"])
+            self.assertIn("energy_missing_fields", response.data["missing_fields"])
+            self.assertIn("is_complete", response.data)
+
+            # Verify that the declaration was created in the database
+            declaration = BiomethaneAnnualDeclaration.objects.get(producer=self.producer_entity, year=self.current_year)
+            self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
+            self.assertTrue(declaration.is_open)
 
     def test_retrieve_returns_existing_declaration(self):
         """Test successful retrieval of an existing declaration"""
@@ -162,3 +183,22 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["year"], self.current_year)
         self.assertNotEqual(response.data["year"], self.current_year - 1)
+
+    def test_retrieve_closed_declaration_period_returns_404(self):
+        """Test that retrieve returns 404 when declaration period is closed"""
+        # Remove the open declaration period
+        BiomethaneDeclarationPeriod.objects.filter(year=self.current_year).delete()
+
+        response = self.client.get(self.annual_declaration_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_declaration_is_open_field_default_value(self):
+        """Test that is_open field has default value of True when creating a declaration"""
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        self.assertTrue(declaration.is_open)

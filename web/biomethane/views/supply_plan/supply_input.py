@@ -59,6 +59,7 @@ class BiomethaneSupplyInputViewSet(
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
+        context["year"] = self.request.query_params.get("year")
         return context
 
     def get_filterset_class(self):

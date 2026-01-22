@@ -187,3 +187,17 @@ export const Ellipsis = ({
   const Tag = is
   return <Tag {...props} className={css.ellipsis} style={{ maxWidth }} />
 }
+
+export const ContainerFluid = ({
+  center = true,
+  children,
+  ...props
+}: JSX.IntrinsicElements["div"] & { center?: boolean }) => (
+  <div {...props} className={cl(css["container-fluid"], props.className)}>
+    {center ? (
+      <div className={css["container-fluid--center"]}>{children}</div>
+    ) : (
+      children
+    )}
+  </div>
+)

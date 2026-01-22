@@ -4,6 +4,7 @@ from biomethane.models import (
     BiomethaneAnnualDeclaration,
     BiomethaneContract,
     BiomethaneContractAmendment,
+    BiomethaneDeclarationPeriod,
     BiomethaneDigestate,
     BiomethaneDigestateSpreading,
     BiomethaneDigestateStorage,
@@ -73,7 +74,7 @@ class BiomethaneEnergyAdmin(admin.ModelAdmin):
 
 @admin.register(BiomethaneEnergyMonthlyReport)
 class BiomethaneEnergyMonthlyReportAdmin(admin.ModelAdmin):
-    list_display = ("id", "energy__producer__name", "energy__year", "month", "injected_volume_nm3", "injection_hours")
+    list_display = ("id", "energy__producer__name", "energy__year", "month", "injected_volume_nm3")
     list_filter = ("energy__year",)
     search_fields = ("energy__producer__name", "energy__producer__pk")
 
@@ -97,3 +98,9 @@ class BiomethaneAnnualDeclarationAdmin(admin.ModelAdmin):
     list_display = ("id", "producer", "year", "status")
     list_filter = ("status", "year")
     search_fields = ("producer__name", "producer__pk")
+
+
+@admin.register(BiomethaneDeclarationPeriod)
+class BiomethaneDeclarationPeriodAdmin(admin.ModelAdmin):
+    list_display = ("year", "start_date", "end_date")
+    search_fields = ("year",)

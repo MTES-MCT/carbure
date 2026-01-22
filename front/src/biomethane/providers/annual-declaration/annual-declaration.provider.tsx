@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext } from "react"
-import { getCurrentAnnualDeclaration } from "biomethane/api"
+import { getAnnualDeclaration } from "biomethane/api"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
@@ -9,12 +9,16 @@ import { useParams } from "react-router-dom"
 export interface AnnualDeclarationContextValue {
   /** Selected year for the annual declaration */
   selectedYear: number
+
   /** Current annual declaration data for the entity */
-  currentAnnualDeclaration: AnnualDeclaration
-  /** Whether we are in the declaration period */
-  isInDeclarationPeriod: boolean
+  annualDeclaration?: AnnualDeclaration
+
+  /** Whether the selected year is in the currentdeclaration period */
+  isDeclarationInCurrentPeriod: boolean
+
   /** Whether the annual declaration has been validated/declared */
   isDeclarationValidated: boolean
+
   /** Whether the annual declaration can be edited */
   canEditDeclaration: boolean
 
@@ -23,6 +27,9 @@ export interface AnnualDeclarationContextValue {
 
   /** Whether at least one supply plan input (intrant) has been filled */
   hasAtLeastOneSupplyInput: boolean
+
+  /** Key for the current annual declaration */
+  annualDeclarationKey: string
 }
 
 export const AnnualDeclarationContext =
@@ -46,50 +53,53 @@ interface AnnualDeclarationProviderProps {
 export function AnnualDeclarationProvider({
   children,
 }: AnnualDeclarationProviderProps) {
+  const parsedYear = useAnnualDeclarationYear()
+
+  const key =
+    "current-annual-declaration" + (parsedYear ? `-${parsedYear}` : "")
   // We need to use the current year inside the provider to mock the date when the provider is mounted
   const currentYear = new Date().getFullYear()
   const entity = useEntity()
-  const {
-    result: currentAnnualDeclaration,
-    loading: loadingCurrentAnnualDeclaration,
-  } = useQuery(getCurrentAnnualDeclaration, {
-    key: "current-annual-declaration",
-    params: [entity.id],
-  })
-  const { year: _year } = useParams<{ year: string }>()
+  const { result: annualDeclaration, loading: loadingAnnualDeclaration } =
+    useQuery(getAnnualDeclaration, {
+      key,
+      params: [entity.id, parsedYear],
+    })
 
-  if (loadingCurrentAnnualDeclaration && !currentAnnualDeclaration)
-    return <LoaderOverlay />
-
-  if (!currentAnnualDeclaration) return null
+  if (loadingAnnualDeclaration && !annualDeclaration) return <LoaderOverlay />
 
   // Use year from url if provided, otherwise selected year is current year
-  const year = _year ? parseInt(_year) : currentYear
+  const year = parsedYear ?? currentYear
 
-  const isInDeclarationPeriod = year === currentAnnualDeclaration?.year
+  const isDeclarationInCurrentPeriod = annualDeclaration?.year
+    ? new Date().getFullYear() === annualDeclaration?.year + 1
+    : false
+
   const isDeclarationValidated =
-    currentAnnualDeclaration?.status === AnnualDeclarationStatus.DECLARED
+    annualDeclaration?.status === AnnualDeclarationStatus.DECLARED
+
   const canEditDeclaration =
-    !isDeclarationValidated && isInDeclarationPeriod && entity.canWrite()
+    !isDeclarationValidated &&
+    Boolean(annualDeclaration?.is_open) &&
+    entity.canWrite()
+
   const hasAnnualDeclarationMissingObjects =
-    currentAnnualDeclaration?.missing_fields?.digestate_missing_fields ===
-      null ||
-    currentAnnualDeclaration?.missing_fields?.energy_missing_fields === null
+    annualDeclaration?.missing_fields?.digestate_missing_fields === null ||
+    annualDeclaration?.missing_fields?.energy_missing_fields === null
 
   // Check if at least one supply plan input has been filled
-  // This will be provided by the API in currentAnnualDeclaration
-  // For now, we check if the field exists, otherwise default to false
   const hasAtLeastOneSupplyInput =
-    currentAnnualDeclaration?.missing_fields?.supply_plan_valid ?? false
+    annualDeclaration?.missing_fields?.supply_plan_valid ?? false
 
   const value: AnnualDeclarationContextValue = {
     selectedYear: year,
-    currentAnnualDeclaration,
-    isInDeclarationPeriod,
+    annualDeclaration,
+    isDeclarationInCurrentPeriod,
     isDeclarationValidated,
     canEditDeclaration,
     hasAnnualDeclarationMissingObjects,
     hasAtLeastOneSupplyInput,
+    annualDeclarationKey: key,
   }
 
   return (
@@ -107,4 +117,10 @@ export function useAnnualDeclaration(): AnnualDeclarationContextValue {
     )
   }
   return ctx
+}
+
+export function useAnnualDeclarationYear(): number | undefined {
+  const { year: _year } = useParams<{ year: string }>()
+  const parsedYear = _year ? parseInt(_year) : undefined
+  return parsedYear
 }

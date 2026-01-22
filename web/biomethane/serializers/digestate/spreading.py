@@ -17,9 +17,11 @@ class BiomethaneDigestateSpreadingSerializer(BaseBiomethaneDigestateSpreadingSer
 
 
 class BiomethaneDigestateSpreadingAddSerializer(BaseBiomethaneDigestateSpreadingSerializer):
+    year = serializers.IntegerField(write_only=True, required=True)
+
     def create(self, validated_data):
-        entity = self.context.get("entity")
-        year = self.context.get("year")
+        entity = self.context.get("request").entity
+        year = validated_data.pop("year")
 
         digestate = BiomethaneDigestate.objects.filter(producer=entity, year=year).first()
 

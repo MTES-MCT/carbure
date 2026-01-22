@@ -20,12 +20,16 @@ import {
 } from "./supply-input-dialog"
 import { ExportButton } from "common/components/export"
 import { ExcelImportDialog } from "./supply-excel-import-dialog"
-import { usePortal } from "common/components/portal"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useRoutes } from "common/hooks/routes"
+import { MissingFields } from "biomethane/components/missing-fields"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
-  const portal = usePortal()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const routes = useRoutes()
   usePrivateNavigation(t("Mes plans d'approvisionnement"))
   const { selectedYear, canEditDeclaration } = useAnnualDeclaration()
   const columns = useSupplyPlanColumns()
@@ -43,19 +47,20 @@ export const SupplyPlan = () => {
     params: [query],
   })
 
-  const openCreateSupplyInputDialog = () => {
-    portal((close) => <CreateSupplyInputDialog onClose={close} />)
-  }
-
-  const openExcelImportDialog = () => {
-    portal((close) => <ExcelImportDialog onClose={close} />)
+  const onClose = () => {
+    navigate({ search: location.search, hash: "#" })
   }
 
   return (
     <>
+      <MissingFields />
       <Row>
         <Button
-          onClick={openExcelImportDialog}
+          onClick={() =>
+            navigate(
+              routes.BIOMETHANE(selectedYear).PRODUCER.SUPPLY_PLAN_IMPORT
+            )
+          }
           iconId="ri-upload-line"
           disabled={!canEditDeclaration}
           asideX
@@ -69,7 +74,11 @@ export const SupplyPlan = () => {
           <SearchInput value={state.search} onChange={actions.setSearch} />
         </ActionBar.Grow>
         <Button
-          onClick={openCreateSupplyInputDialog}
+          onClick={() =>
+            navigate(
+              routes.BIOMETHANE(selectedYear).PRODUCER.SUPPLY_PLAN_ADD_INPUT
+            )
+          }
           iconId="ri-add-line"
           asideX
           priority="secondary"
@@ -117,6 +126,14 @@ export const SupplyPlan = () => {
         />
       )}
       <HashRoute path="/supply-input/:id" element={<SupplyInputDialog />} />
+      <HashRoute
+        path="/import"
+        element={<ExcelImportDialog onClose={onClose} />}
+      />
+      <HashRoute
+        path="/create"
+        element={<CreateSupplyInputDialog onClose={onClose} />}
+      />
     </>
   )
 }

@@ -117,3 +117,22 @@ export const useEnergyEfficiencyCoefficient = ({
 
   return energyEfficiencyCoefficient
 }
+
+export const useBiogazOrBiomethaneAutoconsumptionLabel = (
+  tariffReference?: TariffReference | null
+) => {
+  const { t } = useTranslation()
+
+  const label = useMemo(() => {
+    if (tariffReference !== TariffReference.Value2023) {
+      return t(
+        "Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh)"
+      )
+    }
+    return t(
+      "Quantité de biogaz/biométhane autoconsommée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l’épuration (kWh)"
+    )
+  }, [tariffReference, t])
+
+  return label
+}

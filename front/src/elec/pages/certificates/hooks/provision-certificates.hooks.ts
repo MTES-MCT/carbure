@@ -13,9 +13,16 @@ export const useProvisionCertificatesBalance = () => {
   })
 
   const balance = balanceResponse.result?.data?.balance ?? 0
+  const readjustmentBalance =
+    balanceResponse.result?.data?.readjustment_balance ?? 0
 
   return {
     balance,
     formattedBalance: formatUnit(balance, ExtendedUnit.MWh),
+    readjustmentBalance,
+    formattedReadjustmentBalance: formatUnit(
+      readjustmentBalance,
+      ExtendedUnit.MWh
+    ),
   }
 }

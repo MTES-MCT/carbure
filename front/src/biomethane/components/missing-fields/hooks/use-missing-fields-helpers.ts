@@ -11,13 +11,12 @@ import { useNavigate } from "react-router-dom"
 import { MISSING_FIELDS_HASH } from "../missing-fields.constants"
 
 export const useMissingFieldCounts = () => {
-  const { currentAnnualDeclaration } = useAnnualDeclaration()
+  const { annualDeclaration } = useAnnualDeclaration()
 
   const digestateCount =
-    currentAnnualDeclaration.missing_fields?.digestate_missing_fields?.length ??
-    0
+    annualDeclaration?.missing_fields?.digestate_missing_fields?.length ?? 0
   const energyCount =
-    currentAnnualDeclaration.missing_fields?.energy_missing_fields?.length ?? 0
+    annualDeclaration?.missing_fields?.energy_missing_fields?.length ?? 0
 
   return { digestateCount, energyCount }
 }

@@ -1,71 +1,44 @@
 from datetime import date
 
 from biomethane.models import (
+    BiomethaneAnnualDeclaration,
     BiomethaneContract,
+    BiomethaneDeclarationPeriod,
     BiomethaneDigestate,
     BiomethaneEnergy,
     BiomethaneProductionUnit,
+    BiomethaneSupplyPlan,
 )
-from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
-from biomethane.models.biomethane_supply_plan import BiomethaneSupplyPlan
 
 
 class BiomethaneAnnualDeclarationService:
     @staticmethod
-    def get_declaration_period(entity=None):
-        """
-        Determines the current declaration year for a producer.
-
-        If the producer has a previous declaration that is not yet DECLARED,
-        returns the year of that declaration (to allow completion).
-        Otherwise, computes the declaration year based on the current date:
-        - If the current month is January-March: declare for the previous year
-        - If the current month is April-December: declare for the current year
-
-        Returns:
-            int: The year corresponding to the current declaration period or the unfinished declaration.
-        """
-
-        if entity:
-            latest_declaration = BiomethaneAnnualDeclarationService._get_latest_declaration(entity)
-            if latest_declaration:
-                status = BiomethaneAnnualDeclarationService.get_declaration_status(latest_declaration)
-                if status == BiomethaneAnnualDeclaration.OVERDUE:
-                    return latest_declaration.year
-
-        return BiomethaneAnnualDeclarationService._get_current_declaration_year()
-
-    @staticmethod
-    def _get_current_declaration_year():
+    def get_current_declaration_year():
         """
         Determines the current declaration year based on the current date.
-
-        - If the current month is January-March: declare for the previous year
-        - If the current month is April-December: declare for the current year
+        Always returns last year
 
         Returns:
             int: The year corresponding to the current declaration period.
         """
         today = date.today()
-        return today.year - 1 if today.month < 4 else today.year
+        return today.year - 1
 
     @staticmethod
-    def _get_latest_declaration(entity):
+    def is_declaration_period_open():
         """
-        Retrieve the latest NOT DECLARED declaration for a given entity.
-
-        Args:
-            entity: The Entity instance representing the producer
+        Check if we are currently in the declaration period.
 
         Returns:
-            BiomethaneAnnualDeclaration instance or None if not found
+            bool: True if current date is within the declaration period, False otherwise.
         """
-        return (
-            BiomethaneAnnualDeclaration.objects.filter(producer=entity)
-            .exclude(status=BiomethaneAnnualDeclaration.DECLARED)
-            .order_by("-year")
-            .first()
-        )
+        try:
+            declaration_period = BiomethaneDeclarationPeriod.objects.get(
+                year=BiomethaneAnnualDeclarationService.get_current_declaration_year()
+            )
+            return declaration_period.is_open
+        except BiomethaneDeclarationPeriod.DoesNotExist:
+            return False
 
     @staticmethod
     def get_declaration_status(declaration):
@@ -81,7 +54,7 @@ class BiomethaneAnnualDeclarationService:
         Returns:
             str: The status of the declaration, either 'OVERDUE' or its current status.
         """
-        current_declaration_period = BiomethaneAnnualDeclarationService._get_current_declaration_year()
+        current_declaration_period = BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
         if declaration.year < current_declaration_period and declaration.status != BiomethaneAnnualDeclaration.DECLARED:
             return BiomethaneAnnualDeclaration.OVERDUE
@@ -198,7 +171,6 @@ class BiomethaneAnnualDeclarationService:
             }
         """
         PRODUCTION_UNIT_WATCHED_FIELDS = [
-            "installed_meters",  # Impacts FLARING_FIELDS
             "has_digestate_phase_separation",  # Impacts RAW_DIGESTATE_FIELDS vs SEPARATED_DIGESTATE_FIELDS
             "digestate_valorization_methods",  # Impacts SPREADING, INCINERATION, COMPOSTING fields
             "spreading_management_methods",  # Impacts SALE_FIELDS
@@ -239,14 +211,14 @@ class BiomethaneAnnualDeclarationService:
     @staticmethod
     def reset_annual_declaration_status(producer):
         """
-        Reset the annual declaration status to IN_PROGRESS for a given producer and year.
+        Reset the current annual declaration status to IN_PROGRESS for a given producer.
 
         Args:
             producer: The Entity instance representing the producer
         """
         try:
             declaration = BiomethaneAnnualDeclaration.objects.get(
-                producer=producer, year=BiomethaneAnnualDeclarationService.get_declaration_period(producer)
+                producer=producer, year=BiomethaneAnnualDeclarationService.get_current_declaration_year()
             )
             if declaration.status != BiomethaneAnnualDeclaration.IN_PROGRESS:
                 declaration.status = BiomethaneAnnualDeclaration.IN_PROGRESS

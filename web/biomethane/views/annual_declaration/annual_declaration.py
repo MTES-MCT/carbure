@@ -23,6 +23,13 @@ from .mixins import ValidateActionMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=int,
+            required=False,
+            location=OpenApiParameter.QUERY,
+            description="Year of the annual declaration",
+        ),
     ]
 )
 class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, YearsActionMixin, GenericViewSet):
@@ -34,18 +41,23 @@ class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, Ye
     def get_permissions(self):
         return get_biomethane_permissions(["partial_update", "validate_annual_declaration"], self.action)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["entity"] = getattr(self.request, "entity", None)
-        return context
+    def initialize_request(self, request, *args, **kwargs):
+        request = super().initialize_request(request, *args, **kwargs)
+
+        year = (
+            BiomethaneAnnualDeclarationService.get_current_declaration_year()
+            if request.query_params.get("year") is None
+            else request.query_params.get("year")
+        )
+        setattr(request, "year", year)
+
+        return request
 
     def get_queryset(self):
         if self.action == "get_years":
             return super().get_queryset()
 
-        entity = getattr(self.request, "entity", None)
-        year = BiomethaneAnnualDeclarationService.get_declaration_period(entity)
-        return self.queryset.filter(year=year)
+        return self.queryset.filter(year=self.request.year)
 
     @extend_schema(
         responses={
@@ -61,20 +73,27 @@ class BiomethaneAnnualDeclarationViewSet(GetObjectMixin, ValidateActionMixin, Ye
         description="Retrieve the declaration. Returns a single declaration object.",
     )
     def retrieve(self, request, *args, **kwargs):
-        """Retrieve the declaration for the current entity and current period or create it if it does not exist."""
+        """Retrieve the declaration for the current entity and year or create it if it does not exist."""
         try:
             declaration = self.get_object()
             status_code = status.HTTP_200_OK
         except BiomethaneAnnualDeclaration.DoesNotExist:
-            serializer = self.get_serializer(data={})
-            serializer.is_valid(raise_exception=True)
-            declaration = serializer.save()
-            status_code = status.HTTP_201_CREATED
+            if (
+                request.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
+                and BiomethaneAnnualDeclarationService.is_declaration_period_open()
+            ):
+                serializer = self.get_serializer(data={"producer": request.entity.id, "year": request.year})
+                serializer.is_valid(raise_exception=True)
+                declaration = serializer.save()
+                status_code = status.HTTP_201_CREATED
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         data = self.get_serializer(declaration, many=False).data
         return Response(data, status=status_code)
 
     def partial_update(self, request, *args, **kwargs):
+        """Partial update of the declaration for a producer and year (only status field to IN_PROGRESS is allowed)."""
         try:
             declaration = self.filter_queryset(self.get_queryset()).get()
             serializer = self.get_serializer(declaration, data=request.data, partial=True)
