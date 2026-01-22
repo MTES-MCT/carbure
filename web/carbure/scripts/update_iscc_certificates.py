@@ -250,6 +250,7 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
         "certificate",
         "certificate_holder",
         "scope",
+        "processing_unit_type",        
         "raw_material",
         "addons",
         "products",
