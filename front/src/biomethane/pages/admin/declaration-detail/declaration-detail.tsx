@@ -7,6 +7,8 @@ import { Content, LoaderOverlay, Main } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { DeclarationDetailTabs } from "./components/declaration-detail-tabs"
+import { AnnualDeclarationProvider } from "biomethane/providers/annual-declaration"
+import { ContractProductionUnitProvider } from "biomethane/providers/contract-production-unit"
 
 export const BiomethaneAdminDeclarationDetailPage = () => {
   const { t } = useTranslation()
@@ -44,13 +46,17 @@ export const BiomethaneAdminDeclarationDetailPage = () => {
 
   return (
     <SelectedEntityProvider selectedEntityId={Number(selectedEntityId)}>
-      <Main>
-        <DeclarationDetailHeader producers={producers ?? []} />
-        <DeclarationDetailTabs />
-        <Content>
-          <Outlet />
-        </Content>
-      </Main>
+      <AnnualDeclarationProvider>
+        <ContractProductionUnitProvider allowEmpty>
+          <Main>
+            <DeclarationDetailHeader producers={producers ?? []} />
+            <DeclarationDetailTabs />
+            <Content>
+              <Outlet />
+            </Content>
+          </Main>
+        </ContractProductionUnitProvider>
+      </AnnualDeclarationProvider>
     </SelectedEntityProvider>
   )
 }

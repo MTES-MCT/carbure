@@ -25,7 +25,7 @@ export const usePrivateNavigation = (
 ) => {
   const { setTitle } = useContext(PrivateNavigationContext)
   const _key = typeof newTitle !== "string" ? key : newTitle
-  console.log("newTitle", typeof newTitle)
+
   if (newTitle && typeof newTitle !== "string" && !key) {
     throw new Error("Key is required when newTitle is not a string")
   }
