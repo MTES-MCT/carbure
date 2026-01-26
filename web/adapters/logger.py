@@ -9,3 +9,8 @@ def log_error(error_message, additional_infos=None):
 
 def log_exception(e):
     capture_exception(e)
+
+
+def log_warning(message, additional_infos=None):
+    additional_infos = additional_infos or {}
+    logger.warning(message, attributes=additional_infos)

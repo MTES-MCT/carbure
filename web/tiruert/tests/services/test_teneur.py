@@ -295,6 +295,28 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         np.testing.assert_array_equal(call_args[1], emissions)
         self.assertEqual(call_args[2], target_volume)
 
+    @patch("tiruert.services.teneur.log_warning")
+    def test_logs_negative_volumes(self, patched_log_warning):
+        data = {"biofuel": "Biofuel infos", "customs_category": "Some category", "other_key": "Other value"}
+        debited_entity = "Some entity"
+        volumes = np.array([10, -20, 50, -30, 40])
+        lot_ids = np.array([1, 2, 5, 3, 4])
+        negative_volumes = np.array([-20, -30])
+        patched_log_warning.assert_not_called()
+
+        TeneurService.log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes)
+        expected_logged_message = (
+            "Negative volumes detected in balance calculation: "
+            "2 lots with volumes ranging from -30.00L to -20.00L. "
+            "Lot IDs: [2, 3]"
+        )
+        expected_additional_informations = {
+            "biofuel": "Biofuel infos",
+            "customs_category": "Some category",
+            "debited_entity": "Some entity",
+        }
+        patched_log_warning.assert_called_with(expected_logged_message, expected_additional_informations)
+
 
 class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):
     """Test TeneurService.get_min_and_max_emissions() method"""
