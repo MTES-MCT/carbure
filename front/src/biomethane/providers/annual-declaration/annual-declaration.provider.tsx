@@ -78,10 +78,21 @@ export function AnnualDeclarationProvider({
   const isDeclarationValidated =
     annualDeclaration?.status === AnnualDeclarationStatus.DECLARED
 
-  const canEditDeclaration =
+  // For biomethane producers, the declaration can be edited if :
+  // - it is not validated
+  // - the declaration is open
+  // - the entity has write rights
+  const canEditDeclarationBiomethaneProducer =
     !isDeclarationValidated &&
     Boolean(annualDeclaration?.is_open) &&
     entity.canWrite()
+
+  // For dreals, the declaration can't be edited
+  const canEditDeclarationAdmin = false
+
+  const canEditDeclaration = entity.isBiomethaneProducer
+    ? canEditDeclarationBiomethaneProducer
+    : canEditDeclarationAdmin
 
   const hasAnnualDeclarationMissingObjects =
     annualDeclaration?.missing_fields?.digestate_missing_fields === null ||

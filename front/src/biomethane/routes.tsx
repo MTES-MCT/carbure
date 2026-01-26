@@ -145,7 +145,7 @@ export const BiomethaneAdminRoutes = () => {
         >
           <Route index element={<Navigate replace to="digestate" />} />
           <Route path="digestate" element={<Digestate />} />
-          <Route path="energy" element={<div>energy</div>} />
+          <Route path="energy" element={<Energy />} />
         </Route>
         <Route
           path="declarations/:selectedEntityId"

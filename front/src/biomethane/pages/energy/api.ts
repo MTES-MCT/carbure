@@ -4,13 +4,18 @@ import {
   BiomethaneEnergyMonthlyReportDataRequest,
 } from "./types"
 
-export const getEnergy = (entity_id: number, year: number) =>
+export const getEnergy = (
+  entity_id: number,
+  year: number,
+  selected_entity_id?: number
+) =>
   api
     .GET("/biomethane/energy/", {
       params: {
         query: {
           entity_id,
           year,
+          producer_id: selected_entity_id,
         },
       },
     })

@@ -50,7 +50,7 @@ const DigestatePage = () => {
   useMissingFields(form)
 
   if (loading && !digestate) return <LoaderOverlay />
-  console.log("AAAAAAAAAAAAAAAAA", selectedEntityId)
+
   return (
     <FormContext.Provider value={form}>
       <MissingFields />

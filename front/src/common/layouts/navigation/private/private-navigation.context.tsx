@@ -40,7 +40,7 @@ export const usePrivateNavigation = (
 
 export const PrivateNavigationProvider = ({ children }: PropsWithChildren) => {
   const [title, setTitle] = useState<ReactElement | string | undefined>("")
-  console.log("title", title)
+
   const value = useMemo(
     () => ({
       title,
