@@ -12,8 +12,6 @@ class BiomethaneEnergyMonthlyReport(models.Model):
     injected_volume_nm3 = models.FloatField(default=0)
     # Débit moyen mensuel (Nm3/h)
     average_monthly_flow_nm3_per_hour = models.FloatField(default=0)
-    # Heures d'injection (h)
-    injection_hours = models.FloatField(default=0)
 
     class Meta:
         db_table = "biomethane_energy_monthly_report"

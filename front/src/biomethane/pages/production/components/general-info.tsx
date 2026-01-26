@@ -24,6 +24,7 @@ type GeneralInfoForm = DeepPartial<
     | "postal_code"
     | "city"
     | "department"
+    | "insee_code"
   >
 >
 
@@ -90,6 +91,7 @@ export function GeneralInfo({
                   setField("postal_code", company?.registered_zipcode)
                   setField("city", company?.registered_city)
                   setField("department", company?.department_code)
+                  setField("insee_code", company?.insee_code)
                 }
               }}
               readOnly={!isEditing}
@@ -123,6 +125,12 @@ export function GeneralInfo({
               label={t("Commune")}
               required
               {...bind("city")}
+            />
+            <TextInput
+              readOnly={!isEditing}
+              label={t("Code INSEE")}
+              required
+              {...bind("insee_code")}
             />
           </Grid>
           <RadioGroup

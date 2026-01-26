@@ -5,13 +5,14 @@ import { ManagedEditableCard } from "common/molecules/editable-card/managed-edit
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergyInputRequest } from "../types"
-import { useSaveEnergy } from "../energy.hooks"
+import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../../types"
+import { useSaveEnergy } from "../../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { isTariffReference2011Or2020 } from "biomethane/pages/contract"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useInjectedBiomethane } from "./injected-biomethane.hooks"
 
-type InjectedBiomethaneForm = DeepPartial<
+export type InjectedBiomethaneForm = DeepPartial<
   Pick<
     BiomethaneEnergyInputRequest,
     | "injected_biomethane_gwh_pcs_per_year"
@@ -35,13 +36,19 @@ const extractValues = (energy?: InjectedBiomethaneForm) => {
 }
 export function InjectedBiomethane({
   contract,
+  energy,
 }: {
   contract?: BiomethaneContract
+  energy?: BiomethaneEnergy
 }) {
   const { t } = useTranslation()
   const { bind, value } = useFormContext<InjectedBiomethaneForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
+  const { rule } = useInjectedBiomethane(
+    energy?.monthly_reports ?? [],
+    contract
+  )
 
   const handleSave = async () => saveEnergy.execute(extractValues(value))
 
@@ -93,14 +100,16 @@ export function InjectedBiomethane({
               required
             />
             <NumberInput
-              readOnly={!isEditing}
               label={t("Nombre d'heures de fonctionnement (h)")}
               hintText={t(
                 "Fonctionnement à plein régime (à la capacité maximale inscrite dans le contrat)"
               )}
-              type="number"
               {...bind("operating_hours")}
+              disabled
               required
+              readOnly={!isEditing}
+              hasTooltip
+              title={rule}
             />
           </Grid>
           {isEditing && (

@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next"
 import { Column } from "common/components/table2"
 import { BiomethaneEnergyMonthlyReportDataRequest } from "../../types"
-import { formatMonth } from "common/utils/formatters"
-import { NumberInput } from "common/components/inputs2"
+import { formatMonth, formatNumber } from "common/utils/formatters"
+import { NumberInput, TextInput } from "common/components/inputs2"
 
 export type BiomethaneEnergyMonthlyReportForm = Partial<
   Exclude<BiomethaneEnergyMonthlyReportDataRequest, "month">
@@ -63,16 +63,13 @@ export const useDeclareMonthlyQuantityColumns = ({
     },
     {
       header: t("Heures d'injection (h)"),
-      cell: (item) => (
-        <NumberInput
-          value={item.injection_hours}
-          onChange={(value) =>
-            updateCellValue(item.month, "injection_hours", value)
-          }
-          readOnly={isReadOnly}
-          required
-        />
-      ),
+      cell: (item) => {
+        const injectionHours =
+          !item.injected_volume_nm3 || !item.average_monthly_flow_nm3_per_hour
+            ? 0
+            : item.injected_volume_nm3 / item.average_monthly_flow_nm3_per_hour
+        return <TextInput value={formatNumber(injectionHours)} disabled />
+      },
     },
   ]
 

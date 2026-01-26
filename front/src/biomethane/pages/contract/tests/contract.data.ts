@@ -12,4 +12,6 @@ export const contractData: BiomethaneContract = {
   producer: 1,
   amendments: [],
   tracked_amendment_types: [],
+  complementary_aid_organisms: [],
+  has_complementary_investment_aid: false,
 }
