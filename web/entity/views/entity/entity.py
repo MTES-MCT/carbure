@@ -31,6 +31,7 @@ class EntityViewSet(ViewSet, EntityActionMixin):
                         ExternalAdminRights.ELEC,
                         ExternalAdminRights.DOUBLE_COUNTING,
                         ExternalAdminRights.TRANSFERRED_ELEC,
+                        ExternalAdminRights.DREAL,
                     ]
                 )
             ]
