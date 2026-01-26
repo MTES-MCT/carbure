@@ -44,6 +44,7 @@ env = environ.Env(
     WITH_EMAIL_DECORATED_AS_TEST=(bool, False),
     WITH_UDB_ACCEPTANCE_DATA=(bool, False),
     ELEC_READJUSTMENT_ENTITY=(str, ""),
+    WITH_ANONYMIZATION=(bool, False),
 )
 
 # ensure a `BASE_URL` env var is present before starting
@@ -486,5 +487,7 @@ if env("TEST"):
 # Feature flags
 WITH_EMAIL_DECORATED_AS_TEST = env("WITH_EMAIL_DECORATED_AS_TEST")
 WITH_UDB_ACCEPTANCE_DATA = env("WITH_UDB_ACCEPTANCE_DATA")
+WITH_ANONYMIZATION = env("WITH_ANONYMIZATION")
+
 # this env var will hold the name of the entity CPOs will send their readjustement certificates to
 ELEC_READJUSTMENT_ENTITY = env("ELEC_READJUSTMENT_ENTITY")

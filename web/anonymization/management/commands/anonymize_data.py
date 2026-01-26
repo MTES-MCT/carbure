@@ -3,8 +3,7 @@ Command to anonymize sensitive data in the database for development environments
 
 """
 
-import os
-
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from anonymization.services import BATCH_SIZE, DataAnonymizationService
@@ -46,9 +45,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        env = os.environ["IMAGE_TAG"]
+        allow_anonymization = settings.WITH_ANONYMIZATION
 
-        if env not in ["dev", "local"]:
+        if not allow_anonymization:
             self.stdout.write(
                 self.style.ERROR("⚠️  ATTENTION: Cette commande ne doit être exécutée qu'en environnement de développement!")
             )
