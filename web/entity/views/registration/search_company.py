@@ -39,6 +39,7 @@ def search_company_view(request):
     company_zipcode = company_siege["code_postal"]
     company_address = company_siege["adresse"]
     company_department = company_siege["departement"]
+    company_insee_code = company_siege["commune"]
     string_to_remove = f"{company_zipcode} {company_city}"
     company_address = company_address.replace(string_to_remove, "")
 
@@ -57,6 +58,7 @@ def search_company_view(request):
         "registered_zipcode": company_siege["code_postal"],
         "registered_country": france,
         "department_code": company_department,
+        "insee_code": company_insee_code,
     }
 
     response_data = {"company_preview": company_preview}

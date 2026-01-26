@@ -16,6 +16,8 @@ class ContractValidationContext:
     tariff_reference: str | None
     cmax_annualized: bool | None
     has_contract_document: bool
+    has_complementary_investment_aid: bool | None
+    complementary_aid_organisms: list[str] | None
 
     @classmethod
     def from_contract_and_data(cls, contract, validated_data):
@@ -33,6 +35,8 @@ class ContractValidationContext:
             is_creation=contract is None,
             tariff_reference=validated_data.get("tariff_reference"),
             cmax_annualized=validated_data.get("cmax_annualized"),
+            has_complementary_investment_aid=validated_data.get("has_complementary_investment_aid"),
+            complementary_aid_organisms=validated_data.get("complementary_aid_organisms"),
             has_contract_document=any(
                 field in validated_data for field in BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS
             ),
@@ -128,7 +132,6 @@ class BiomethaneContractService:
         required_fields = []
 
         tariff_reference = validated_data.get("tariff_reference")
-
         # Get required fields using rule engine
         required_fields.extend(BiomethaneContractService.get_required_fields(contract, validated_data))
 
@@ -282,6 +285,19 @@ def _build_contract_clearing_rules() -> list[FieldClearingRule]:
             fields=["cmax_annualized_value"],
             condition=lambda contract: contract.cmax_annualized is False,
         ),
+        FieldClearingRule(
+            name="complementary_aid_organisms_disabled",
+            fields=["complementary_aid_organisms", "complementary_aid_other_organism_name"],
+            condition=lambda contract: contract.has_complementary_investment_aid is False,
+        ),
+        FieldClearingRule(
+            name="complementary_aid_other_organism_name_not_selected",
+            fields=["complementary_aid_other_organism_name"],
+            condition=lambda contract: (
+                contract.complementary_aid_organisms
+                and BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_OTHER not in contract.complementary_aid_organisms
+            ),
+        ),
     ]
 
 
@@ -320,5 +336,18 @@ def _build_required_field_rules() -> list[RequiredFieldRule]:
             name="contract_document_all_or_nothing",
             fields=BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS,
             condition=lambda ctx: ctx.has_contract_document,
+        ),
+        # When has_complementary_investment_aid is True: require complementary_aid_organisms
+        RequiredFieldRule(
+            name="complementary_aid_organisms_required",
+            fields=["complementary_aid_organisms"],
+            condition=lambda ctx: ctx.has_complementary_investment_aid is True,
+        ),
+        # When has_complementary_investment_aid is True: require complementary_aid_other_organism_name
+        RequiredFieldRule(
+            name="complementary_aid_other_organism_name_required",
+            fields=["complementary_aid_other_organism_name"],
+            condition=lambda ctx: ctx.has_complementary_investment_aid is True
+            and BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_OTHER in ctx.complementary_aid_organisms,
         ),
     ]
