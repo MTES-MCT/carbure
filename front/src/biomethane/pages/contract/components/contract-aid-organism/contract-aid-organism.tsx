@@ -11,6 +11,7 @@ import { useForm } from "common/components/form2"
 import { useContractAidOrganismOptions } from "./contract-aid-organism.hooks"
 import { Button } from "common/components/button2"
 import { useMutateContractInfos } from "../contract-infos/contract-infos.hooks"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 type ContractAidOrganismForm = Pick<
   BiomethaneContractPatchRequest,
@@ -35,6 +36,8 @@ export const ContractAidOrganism = ({
   contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
+  const { hasSelectedEntity } = useSelectedEntity()
+
   const { bind, value } = useForm<ContractAidOrganismForm>(
     extractValues(contract)
   )
@@ -44,7 +47,10 @@ export const ContractAidOrganism = ({
   const complementaryAidOrganismOptions = useContractAidOrganismOptions()
 
   return (
-    <EditableCard title={t("Aide complémentaire à l'investissement")}>
+    <EditableCard
+      title={t("Aide complémentaire à l'investissement")}
+      readOnly={hasSelectedEntity}
+    >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => updateContractAidOrganism(value)}>
           <RadioGroup

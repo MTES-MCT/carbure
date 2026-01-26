@@ -7,6 +7,7 @@ import {
 } from "react"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export interface WatchedFieldsContextValue<T extends object> {
   /** List of watched fields */
@@ -21,7 +22,10 @@ const WatchedFieldsContext =
 interface WatchedFieldsProviderProps {
   children: ReactNode
   /** API function that returns an array of fields */
-  apiFunction: (entity_id: number) => Promise<string[]>
+  apiFunction: (
+    entity_id: number,
+    selectedEntityId?: number
+  ) => Promise<string[]>
   /** Unique key for query cache */
   queryKey: string
 }
@@ -41,9 +45,10 @@ export function WatchedFieldsProvider<T extends object>({
   queryKey,
 }: WatchedFieldsProviderProps) {
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
   const { result: watchedFields = [] } = useQuery(apiFunction, {
     key: queryKey,
-    params: [entity.id],
+    params: [entity.id, selectedEntityId],
   })
 
   const hasWatchedFieldsChanged = useCallback(

@@ -8,6 +8,7 @@ import { DateInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { usePortal } from "common/components/portal"
 import { AddContract } from "./add-contract"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 type ContractFile = {
   name: string
@@ -21,6 +22,7 @@ export const ContractFiles = ({
 }) => {
   const { t } = useTranslation()
   const portal = usePortal()
+  const { hasSelectedEntity } = useSelectedEntity()
 
   const files: ContractFile[] = [
     {
@@ -63,13 +65,15 @@ export const ContractFiles = ({
     <EditableCard
       title={t("Conditions générales et particulières")}
       headerActions={
-        <Button
-          iconId="ri-add-line"
-          disabled={!contract || Boolean(contract.general_conditions_file)}
-          onClick={openAddContractDialog}
-        >
-          {t("Charger un contrat")}
-        </Button>
+        !hasSelectedEntity && (
+          <Button
+            iconId="ri-add-line"
+            disabled={!contract || Boolean(contract.general_conditions_file)}
+            onClick={openAddContractDialog}
+          >
+            {t("Charger un contrat")}
+          </Button>
+        )
       }
     >
       {files.length === 0 ? (

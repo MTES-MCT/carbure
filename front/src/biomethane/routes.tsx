@@ -149,6 +149,7 @@ export const BiomethaneAdminRoutes = () => {
           <Route path="digestate" element={<Digestate />} />
           <Route path="energy" element={<Energy />} />
           <Route path="supply-plan" element={<SupplyPlan />} />
+          <Route path="contract" element={<BiomethaneContractPage />} />
         </Route>
         <Route
           path="declarations/:selectedEntityId"
