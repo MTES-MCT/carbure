@@ -5,10 +5,15 @@ import {
   BiomethaneSupplyInputQuery,
 } from "./types"
 
-export const getSupplyPlanInputs = async (query: BiomethaneSupplyInputQuery) =>
+export const getSupplyPlanInputs = async (
+  query: BiomethaneSupplyInputQuery,
+  selectedEntityId?: number
+) =>
   api
     .GET("/biomethane/supply-input/", {
-      params: { query },
+      params: {
+        query: { ...query, producer_id: selectedEntityId?.toString() },
+      },
     })
     .then((res) => res.data)
 
