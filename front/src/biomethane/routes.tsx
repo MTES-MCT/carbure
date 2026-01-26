@@ -11,6 +11,7 @@ import {
 import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
 import { ExternalAdminPages } from "common/types"
+import { Contact } from "./pages/admin/declaration-detail/pages/contact"
 
 const currentYear = new Date().getFullYear()
 
@@ -150,6 +151,7 @@ export const BiomethaneAdminRoutes = () => {
           <Route path="energy" element={<Energy />} />
           <Route path="supply-plan" element={<SupplyPlan />} />
           <Route path="contract" element={<BiomethaneContractPage />} />
+          <Route path="contacts" element={<Contact />} />
         </Route>
         <Route
           path="declarations/:selectedEntityId"

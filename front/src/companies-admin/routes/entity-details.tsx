@@ -22,6 +22,7 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExtAdminPagesEnum } from "api-schema"
 import { ApplicationDetailsDialog } from "double-counting-admin/components/applications/application-details-dialog"
 import { AgreementDetailsDialog } from "double-counting-admin/components/agreements/agreement-details-dialog"
+import { getCompanyDetails } from "common/api"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -31,7 +32,7 @@ const EntityDetails = () => {
   const { t } = useTranslation()
   usePrivateNavigation(t("Sociétés"))
 
-  const company = useQuery(api.getCompanyDetails, {
+  const company = useQuery(getCompanyDetails, {
     key: "entity-details",
     params: [entity.id, companyId],
   })
