@@ -12,15 +12,6 @@ from biomethane.services.contract import (
 )
 from core.models import Entity
 
-contract_context_data = {
-    "is_creation": False,
-    "tariff_reference": "2011",
-    "cmax_annualized": None,
-    "has_contract_document": False,
-    "has_complementary_investment_aid": False,
-    "complementary_aid_organisms": [],
-}
-
 
 class ContractRulesConfigurationTests(TestCase):
     """Test the _build_contract_clearing_rules function configuration."""
@@ -34,8 +25,6 @@ class ContractRulesConfigurationTests(TestCase):
             "tariff_rule_1_clear_pap",
             "tariff_rule_2_clear_cmax",
             "cmax_not_annualized",
-            "complementary_aid_organisms_disabled",
-            "complementary_aid_other_organism_name_not_selected",
         ]
 
         actual_rule_names = [rule.name for rule in self.rules]
@@ -105,21 +94,17 @@ class ContractValidationContextTests(TestCase):
 
     def test_context_creation_with_all_fields(self):
         """Test that context can be created with all fields."""
-        data = {
-            **contract_context_data,
-            "is_creation": True,
-            "tariff_reference": "2011",
-            "cmax_annualized": True,
-            "complementary_aid_organisms": [BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME],
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=True,
+            tariff_reference="2011",
+            cmax_annualized=True,
+            has_contract_document=False,
+        )
 
         self.assertTrue(context.is_creation)
         self.assertEqual(context.tariff_reference, "2011")
         self.assertTrue(context.cmax_annualized)
         self.assertFalse(context.has_contract_document)
-        self.assertFalse(context.has_complementary_investment_aid)
-        self.assertEqual(context.complementary_aid_organisms, [BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME])
 
     def test_factory_method_for_creation(self):
         """Test factory method when creating a new contract (contract=None)."""
@@ -191,8 +176,6 @@ class RequiredFieldRulesConfigurationTests(TestCase):
             "tariff_rule_2_required",
             "cmax_annualized_requires_value",
             "contract_document_all_or_nothing",
-            "complementary_aid_organisms_required",
-            "complementary_aid_other_organism_name_required",
         ]
 
         actual_rule_names = [rule.name for rule in self.rules]
@@ -204,21 +187,15 @@ class RequiredFieldRulesConfigurationTests(TestCase):
         self.assertEqual(rule.fields, ["tariff_reference"])
 
         # Should require tariff_reference when creating (is_creation=True)
-        data = {
-            **contract_context_data,
-            "is_creation": True,
-            "tariff_reference": None,
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=True, tariff_reference=None, cmax_annualized=None, has_contract_document=False
+        )
         self.assertTrue(rule.condition(context))
 
         # Should not require when updating (is_creation=False)
-        data = {
-            **contract_context_data,
-            "is_creation": False,
-            "tariff_reference": None,
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=False, tariff_reference=None, cmax_annualized=None, has_contract_document=False
+        )
         self.assertFalse(rule.condition(context))
 
     def test_tariff_rule_1_required_fields_and_condition(self):
@@ -228,23 +205,15 @@ class RequiredFieldRulesConfigurationTests(TestCase):
 
         # Should require fields when tariff is in TARIFF_RULE_1 (2011, 2020)
         for tariff in ["2011", "2020"]:
-            data = {
-                **contract_context_data,
-                "is_creation": True,
-                "tariff_reference": tariff,
-            }
-            context = ContractValidationContext(**data)
+            context = ContractValidationContext(
+                is_creation=True, tariff_reference=tariff, cmax_annualized=None, has_contract_document=False
+            )
             self.assertTrue(rule.condition(context), f"Should require fields for tariff {tariff}")
 
         # Should not require when tariff is in TARIFF_RULE_2
         for tariff in ["2021", "2023"]:
-            data = {
-                **contract_context_data,
-                "is_creation": True,
-                "tariff_reference": tariff,
-            }
             context = ContractValidationContext(
-                **data,
+                is_creation=True, tariff_reference=tariff, cmax_annualized=None, has_contract_document=False
             )
             self.assertFalse(rule.condition(context), f"Should not require fields for tariff {tariff}")
 
@@ -255,22 +224,16 @@ class RequiredFieldRulesConfigurationTests(TestCase):
 
         # Should require fields when tariff is in TARIFF_RULE_2 (2021, 2023)
         for tariff in ["2021", "2023"]:
-            data = {
-                **contract_context_data,
-                "is_creation": True,
-                "tariff_reference": tariff,
-            }
-            context = ContractValidationContext(**data)
+            context = ContractValidationContext(
+                is_creation=True, tariff_reference=tariff, cmax_annualized=None, has_contract_document=False
+            )
             self.assertTrue(rule.condition(context), f"Should require fields for tariff {tariff}")
 
         # Should not require when tariff is in TARIFF_RULE_1
         for tariff in ["2011", "2020"]:
-            data = {
-                **contract_context_data,
-                "is_creation": True,
-                "tariff_reference": tariff,
-            }
-            context = ContractValidationContext(**data)
+            context = ContractValidationContext(
+                is_creation=True, tariff_reference=tariff, cmax_annualized=None, has_contract_document=False
+            )
             self.assertFalse(rule.condition(context), f"Should not require fields for tariff {tariff}")
 
     def test_cmax_annualized_requires_value_fields_and_condition(self):
@@ -279,30 +242,21 @@ class RequiredFieldRulesConfigurationTests(TestCase):
         self.assertEqual(rule.fields, ["cmax_annualized_value"])
 
         # Should require cmax_annualized_value when cmax_annualized is True
-        data = {
-            **contract_context_data,
-            "is_creation": True,
-            "tariff_reference": "2011",
-            "cmax_annualized": True,
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=True, tariff_reference="2011", cmax_annualized=True, has_contract_document=False
+        )
         self.assertTrue(rule.condition(context))
 
         # Should not require when cmax_annualized is False
-        data = {
-            **contract_context_data,
-            "is_creation": True,
-            "cmax_annualized": False,
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=True, tariff_reference="2011", cmax_annualized=False, has_contract_document=False
+        )
         self.assertFalse(rule.condition(context))
 
         # Should not require when cmax_annualized is None
-        data = {
-            **contract_context_data,
-            "is_creation": True,
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=True, tariff_reference="2011", cmax_annualized=None, has_contract_document=False
+        )
         self.assertFalse(rule.condition(context))
 
     def test_contract_document_all_or_nothing_fields_and_condition(self):
@@ -311,21 +265,15 @@ class RequiredFieldRulesConfigurationTests(TestCase):
         self.assertEqual(rule.fields, BiomethaneContractService.CONTRACT_DOCUMENT_FIELDS)
 
         # Should require all document fields when has_contract_document is True
-        data = {
-            **contract_context_data,
-            "is_creation": True,
-            "has_contract_document": True,
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=True, tariff_reference="2011", cmax_annualized=None, has_contract_document=True
+        )
         self.assertTrue(rule.condition(context))
 
         # Should not require when has_contract_document is False
-        data = {
-            **contract_context_data,
-            "is_creation": True,
-            "has_contract_document": False,
-        }
-        context = ContractValidationContext(**data)
+        context = ContractValidationContext(
+            is_creation=True, tariff_reference="2011", cmax_annualized=None, has_contract_document=False
+        )
         self.assertFalse(rule.condition(context))
 
 

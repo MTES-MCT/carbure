@@ -1,10 +1,7 @@
 import { apiTypes } from "common/services/api-fetch.types"
-import {
-  MalfunctionTypesEnum as MalfunctionTypes,
-  EnergyTypesEnum as EnergyType,
-} from "api-schema"
+import { MalfunctionTypesEnum as MalfunctionTypes } from "api-schema"
 
-export { MalfunctionTypes, EnergyType }
+export { MalfunctionTypes }
 
 export type BiomethaneEnergy = apiTypes["BiomethaneEnergy"]
 export type BiomethaneEnergyInputRequest =

@@ -74,7 +74,7 @@ class BiomethaneEnergyAdmin(admin.ModelAdmin):
 
 @admin.register(BiomethaneEnergyMonthlyReport)
 class BiomethaneEnergyMonthlyReportAdmin(admin.ModelAdmin):
-    list_display = ("id", "energy__producer__name", "energy__year", "month", "injected_volume_nm3")
+    list_display = ("id", "energy__producer__name", "energy__year", "month", "injected_volume_nm3", "injection_hours")
     list_filter = ("energy__year",)
     search_fields = ("energy__producer__name", "energy__producer__pk")
 

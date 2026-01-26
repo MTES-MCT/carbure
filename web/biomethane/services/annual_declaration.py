@@ -171,6 +171,7 @@ class BiomethaneAnnualDeclarationService:
             }
         """
         PRODUCTION_UNIT_WATCHED_FIELDS = [
+            "installed_meters",  # Impacts FLARING_FIELDS
             "has_digestate_phase_separation",  # Impacts RAW_DIGESTATE_FIELDS vs SEPARATED_DIGESTATE_FIELDS
             "digestate_valorization_methods",  # Impacts SPREADING, INCINERATION, COMPOSTING fields
             "spreading_management_methods",  # Impacts SALE_FIELDS

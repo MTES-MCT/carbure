@@ -1,26 +1,18 @@
 import { Button } from "common/components/button2"
-import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
+import { NumberInput, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
-import {
-  BiomethaneEnergy,
-  BiomethaneEnergyInputRequest,
-  EnergyType,
-} from "../../types"
+import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../../types"
 import { useSaveEnergy } from "../../energy.hooks"
 import {
   BiomethaneContract,
   TariffReference,
 } from "biomethane/pages/contract/types"
-import {
-  useBiogazOrBiomethaneAutoconsumptionLabel,
-  useEnergyEfficiencyCoefficient,
-} from "./energy-efficiency.hooks"
+import { useEnergyEfficiencyCoefficient } from "./energy-efficiency.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { getYesNoOptions } from "common/utils/normalizers"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -28,7 +20,6 @@ type EnergyEfficiencyForm = DeepPartial<
     | "purified_biogas_quantity_nm3"
     | "purification_electric_consumption_kwe"
     | "self_consumed_biogas_nm3"
-    | "self_consumed_biogas_or_biomethane_kwh"
     | "total_unit_electric_consumption_kwe"
     | "butane_or_propane_addition"
     | "fossil_fuel_consumed_kwh"
@@ -42,8 +33,6 @@ const extractValues = (energy?: EnergyEfficiencyForm) => {
     total_unit_electric_consumption_kwe:
       energy?.total_unit_electric_consumption_kwe,
     self_consumed_biogas_nm3: energy?.self_consumed_biogas_nm3,
-    self_consumed_biogas_or_biomethane_kwh:
-      energy?.self_consumed_biogas_or_biomethane_kwh,
     butane_or_propane_addition: energy?.butane_or_propane_addition,
     fossil_fuel_consumed_kwh: energy?.fossil_fuel_consumed_kwh,
   }
@@ -77,9 +66,6 @@ export function EnergyEfficiency({
       energy?.injected_biomethane_gwh_pcs_per_year ?? 0,
   })
 
-  const biogazOrBiomethaneAutoconsumptionLabel =
-    useBiogazOrBiomethaneAutoconsumptionLabel(contract?.tariff_reference)
-
   return (
     <ManagedEditableCard
       sectionId="energy-efficiency"
@@ -92,15 +78,6 @@ export function EnergyEfficiency({
       {({ isEditing }) => (
         <ManagedEditableCard.Form onSubmit={handleSubmit}>
           <Grid cols={1} gap="lg">
-            {energyTypesIncludesBiogazOrBiomethane(energy?.energy_types) && (
-              <NumberInput
-                readOnly={!isEditing}
-                label={biogazOrBiomethaneAutoconsumptionLabel}
-                {...bind("self_consumed_biogas_or_biomethane_kwh")}
-                required
-                step={0.01}
-              />
-            )}
             {!isTariffReference2023 && (
               <>
                 <NumberInput
@@ -149,15 +126,13 @@ export function EnergyEfficiency({
             )}
 
             <Grid cols={2} gap="lg">
-              <RadioGroup
+              <NumberInput
                 readOnly={!isEditing}
                 label={t(
                   "Addition de butane ou propane lors de l'injection du biométhane dans le réseau"
                 )}
                 {...bind("butane_or_propane_addition")}
                 required
-                options={getYesNoOptions()}
-                orientation="horizontal"
               />
               <NumberInput
                 readOnly={!isEditing}
@@ -172,7 +147,7 @@ export function EnergyEfficiency({
               readOnly={!isEditing}
               disabled
               value={energyEfficiencyCoefficient.label}
-              state={energyEfficiencyCoefficient.error ? "info" : "default"}
+              state={energyEfficiencyCoefficient.error ? "error" : "default"}
               stateRelatedMessage={energyEfficiencyCoefficient.error}
               hasTooltip
               title={energyEfficiencyCoefficient.tooltip}
@@ -194,7 +169,3 @@ export function EnergyEfficiency({
     </ManagedEditableCard>
   )
 }
-
-const energyTypesIncludesBiogazOrBiomethane = (energyTypes?: EnergyType[]) =>
-  energyTypes?.includes(EnergyType.PRODUCED_BIOGAS) ||
-  energyTypes?.includes(EnergyType.PRODUCED_BIOMETHANE)

@@ -7,6 +7,10 @@ import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import { BiomethaneEnergyInputRequest } from "../types"
 import { useSaveEnergy } from "../energy.hooks"
+import {
+  BiomethaneProductionUnit,
+  InstalledMeters,
+} from "biomethane/pages/production/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type BiogasProductionForm = DeepPartial<
@@ -25,7 +29,11 @@ const extractValues = (energy?: BiogasProductionForm) => {
     flaring_operating_hours: energy?.flaring_operating_hours,
   }
 }
-export function BiogasProduction() {
+export function BiogasProduction({
+  productionUnit,
+}: {
+  productionUnit?: BiomethaneProductionUnit
+}) {
   const { t } = useTranslation()
   const { bind, value } = useFormContext<BiogasProductionForm>()
   const saveEnergy = useSaveEnergy()
@@ -60,14 +68,17 @@ export function BiogasProduction() {
               required
             />
           </Grid>
-
-          <NumberInput
-            readOnly={!isEditing}
-            label={t("Nombre d'heures de fonctionnement de la torchère (h)")}
-            type="number"
-            {...bind("flaring_operating_hours")}
-            required
-          />
+          {productionUnit?.installed_meters?.includes(
+            InstalledMeters.FLARING_FLOWMETER
+          ) && (
+            <NumberInput
+              readOnly={!isEditing}
+              label={t("Nombre d'heures de fonctionnement de la torchère (h)")}
+              type="number"
+              {...bind("flaring_operating_hours")}
+              required
+            />
+          )}
 
           {isEditing && (
             <Button

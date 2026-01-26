@@ -2093,12 +2093,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Year of the supply plan.
-          required: true
       tags:
         - biomethane
       requestBody:
@@ -11314,10 +11308,6 @@ components:
           items:
             $ref: "#/components/schemas/TrackedAmendmentTypesEnum"
           readOnly: true
-        complementary_aid_organisms:
-          type: array
-          items:
-            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
@@ -11357,13 +11347,6 @@ components:
           type: string
           format: uri
           nullable: true
-        has_complementary_investment_aid:
-          type: boolean
-          nullable: true
-        complementary_aid_other_organism_name:
-          type: string
-          nullable: true
-          maxLength: 255
         buyer:
           type: integer
           nullable: true
@@ -11371,7 +11354,6 @@ components:
           type: integer
       required:
         - amendments
-        - complementary_aid_organisms
         - id
         - producer
         - tracked_amendment_types
@@ -11466,10 +11448,6 @@ components:
           nullable: true
         is_red_ii:
           type: boolean
-        complementary_aid_organisms:
-          type: array
-          items:
-            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
@@ -11507,13 +11485,6 @@ components:
           format: binary
           nullable: true
         tracked_amendment_types: {}
-        has_complementary_investment_aid:
-          type: boolean
-          nullable: true
-        complementary_aid_other_organism_name:
-          type: string
-          nullable: true
-          maxLength: 255
         buyer:
           type: integer
           nullable: true
@@ -11798,19 +11769,10 @@ components:
         id:
           type: integer
           readOnly: true
-        energy_types:
-          type: array
-          items:
-            $ref: "#/components/schemas/EnergyTypesEnum"
         malfunction_types:
           type: array
           items:
             $ref: "#/components/schemas/MalfunctionTypesEnum"
-        monthly_reports:
-          type: array
-          items:
-            $ref: "#/components/schemas/BiomethaneEnergyMonthlyReport"
-          readOnly: true
         year:
           type: integer
           maximum: 2147483647
@@ -11847,9 +11809,22 @@ components:
           type: number
           format: double
           nullable: true
-        attest_no_fossil_for_energy:
+        attest_no_fossil_for_digester_heating_and_purification:
           type: boolean
-        energy_details:
+        energy_used_for_digester_heating:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_digester_heating:
+          type: string
+          nullable: true
+        attest_no_fossil_for_installation_needs:
+          type: boolean
+        energy_used_for_installation_needs:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_installation_needs:
           type: string
           nullable: true
         purified_biogas_quantity_nm3:
@@ -11864,16 +11839,14 @@ components:
           type: number
           format: double
           nullable: true
-        self_consumed_biogas_or_biomethane_kwh:
-          type: number
-          format: double
-          nullable: true
         total_unit_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
         butane_or_propane_addition:
-          type: boolean
+          type: number
+          format: double
+          nullable: true
         fossil_fuel_consumed_kwh:
           type: number
           format: double
@@ -11906,16 +11879,11 @@ components:
           type: integer
       required:
         - id
-        - monthly_reports
         - producer
         - year
     BiomethaneEnergyInputRequest:
       type: object
       properties:
-        energy_types:
-          type: array
-          items:
-            $ref: "#/components/schemas/EnergyTypesEnum"
         malfunction_types:
           type: array
           items:
@@ -11952,9 +11920,22 @@ components:
           type: number
           format: double
           nullable: true
-        attest_no_fossil_for_energy:
+        attest_no_fossil_for_digester_heating_and_purification:
           type: boolean
-        energy_details:
+        energy_used_for_digester_heating:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_digester_heating:
+          type: string
+          nullable: true
+        attest_no_fossil_for_installation_needs:
+          type: boolean
+        energy_used_for_installation_needs:
+          type: string
+          nullable: true
+          maxLength: 255
+        fossil_details_for_installation_needs:
           type: string
           nullable: true
         purified_biogas_quantity_nm3:
@@ -11969,16 +11950,14 @@ components:
           type: number
           format: double
           nullable: true
-        self_consumed_biogas_or_biomethane_kwh:
-          type: number
-          format: double
-          nullable: true
         total_unit_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
         butane_or_propane_addition:
-          type: boolean
+          type: number
+          format: double
+          nullable: true
         fossil_fuel_consumed_kwh:
           type: number
           format: double
@@ -12018,6 +11997,9 @@ components:
           type: number
           format: double
         average_monthly_flow_nm3_per_hour:
+          type: number
+          format: double
+        injection_hours:
           type: number
           format: double
         energy:
@@ -12159,10 +12141,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        insee_code:
-          type: string
-          nullable: true
-          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -12264,10 +12242,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        insee_code:
-          type: string
-          nullable: true
-          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -12936,12 +12910,8 @@ components:
         department_code:
           type: string
           maxLength: 5
-        insee_code:
-          type: string
-          maxLength: 5
       required:
         - department_code
-        - insee_code
         - legal_name
         - name
         - registered_address
@@ -12949,16 +12919,6 @@ components:
         - registered_country
         - registered_zipcode
         - registration_id
-    ComplementaryAidOrganismsEnum:
-      enum:
-        - ADEME
-        - REGION
-        - OTHER
-      type: string
-      description: |-
-        * `ADEME` - Ademe
-        * `REGION` - Région
-        * `OTHER` - Autre
     CompostingLocationsEnum:
       enum:
         - ON_SITE
@@ -14345,7 +14305,6 @@ components:
         energy_amount:
           type: number
           format: double
-          minimum: 0.01
         client:
           type: integer
         is_readjustment:
@@ -14364,43 +14323,6 @@ components:
         empty:
           type: string
           minLength: 1
-    EnergyTypesEnum:
-      enum:
-        - PRODUCED_BIOGAS
-        - PRODUCED_BIOMETHANE
-        - WASTE_HEAT_PREEXISTING
-        - WASTE_HEAT_PURIFICATION
-        - WASTE_HEAT_ON_SITE
-        - BIOMASS_BOILER
-        - SOLAR_THERMAL
-        - OTHER_RENEWABLE
-        - FOSSIL
-        - OTHER
-      type: string
-      description: >-
-        * `PRODUCED_BIOGAS` - Biogaz produit par l'installation
-
-        * `PRODUCED_BIOMETHANE` - Biométhane produit par l'installation
-
-        * `WASTE_HEAT_PREEXISTING` - Chaleur fatale [Energie thermique
-        résiduelle] (issue d'un équipement préexistant installé sur site ou sur
-        un site situé à proximité)
-
-        * `WASTE_HEAT_PURIFICATION` - Chaleur fatale (issue du système
-        d'épuration ou de compression de l'installation)
-
-        * `WASTE_HEAT_ON_SITE` - Chaleur fatale (issue d'un équipement installé
-        sur site)
-
-        * `BIOMASS_BOILER` - Chaudière biomasse
-
-        * `SOLAR_THERMAL` - Solaire thermique
-
-        * `OTHER_RENEWABLE` - Autre énergie renouvelable
-
-        * `FOSSIL` - Energie fossile
-
-        * `OTHER` - Autre
     Entity:
       type: object
       properties:
@@ -15491,9 +15413,13 @@ components:
         average_monthly_flow_nm3_per_hour:
           type: number
           format: double
+        injection_hours:
+          type: number
+          format: double
       required:
         - average_monthly_flow_nm3_per_hour
         - injected_volume_nm3
+        - injection_hours
         - month
     NavStats:
       type: object

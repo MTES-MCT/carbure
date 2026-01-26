@@ -88,12 +88,3 @@ export const getSupplyPlanInputMaterialUnitOptions = () => {
     { value: BiomethaneSupplyInputMaterialUnit.WET, label: i18next.t("Brute") },
   ]
 }
-
-export const convertSupplyPlanInputVolume = (
-  volumeTonsMS: number,
-  ratioTonsMS: number
-) => {
-  const ratioTonsMB = 100 - ratioTonsMS
-
-  return volumeTonsMS / ratioTonsMS / ratioTonsMB
-}
