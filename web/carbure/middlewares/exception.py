@@ -16,7 +16,7 @@ class ExceptionMiddleware:
     def __call__(self, request):
         return self.get_response(request)
 
-    def process_exception(self, request, exception):
+    def process_exception(self, _, exception):
         if not os.getenv("TEST") and os.getenv("IMAGE_TAG") in ("dev", "staging", "prod"):
             sentry_sdk.capture_exception(exception)
 
