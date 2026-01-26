@@ -24,13 +24,11 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
                 "month": 1,
                 "injected_volume_nm3": 1000.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
-                "injection_hours": 20.0,
             },
             {
                 "month": 2,
                 "injected_volume_nm3": 1200.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
-                "injection_hours": 20.0,
             },
         ]
 
@@ -41,13 +39,11 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
                 "month": 1,
                 "injected_volume_nm3": 1000.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
-                "injection_hours": 20.0,
             },
             {
                 "month": 1,
                 "injected_volume_nm3": 2000.0,
                 "average_monthly_flow_nm3_per_hour": 60.0,
-                "injection_hours": 20.0,
             },
         ]
         serializer = BiomethaneEnergyMonthlyReportInputSerializer(data=invalid_monthly_reports_data)
@@ -84,13 +80,11 @@ class BiomethaneEnergyMonthlyReportInputSerializerTests(TestCase):
                 "month": 1,
                 "injected_volume_nm3": 10,
                 "average_monthly_flow_nm3_per_hour": 5.0,
-                "injection_hours": 2.0,
             },
             {
                 "month": 2,
                 "injected_volume_nm3": 120.0,
                 "average_monthly_flow_nm3_per_hour": 5.0,
-                "injection_hours": 2.0,
             },
         ]
 

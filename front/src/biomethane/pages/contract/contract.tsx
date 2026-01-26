@@ -7,6 +7,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
 import { getContractWatchedFields } from "./api"
 import { WatchedFieldsProvider } from "biomethane/providers/watched-fields"
+import { ContractAidOrganism } from "./components/contract-aid-organism"
 
 export const BiomethaneContractPage = () => {
   const { result: contractInfos, loading } = useGetContractInfos()
@@ -34,6 +35,7 @@ export const BiomethaneContractPage = () => {
       )}
       <ContractFiles contract={contractInfos} />
       <ContractAmendments contract={contractInfos} />
+      <ContractAidOrganism contract={contractInfos} />
     </WatchedFieldsProvider>
   )
 }

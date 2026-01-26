@@ -14,7 +14,6 @@ class MonthlyReportDataSerializer(serializers.Serializer):
     month = serializers.IntegerField(min_value=1, max_value=12)
     injected_volume_nm3 = serializers.FloatField()
     average_monthly_flow_nm3_per_hour = serializers.FloatField()
-    injection_hours = serializers.FloatField()
 
 
 class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
@@ -42,7 +41,6 @@ class BiomethaneEnergyMonthlyReportInputSerializer(serializers.ListSerializer):
             report_data = {
                 "injected_volume_nm3": month_data["injected_volume_nm3"],
                 "average_monthly_flow_nm3_per_hour": month_data["average_monthly_flow_nm3_per_hour"],
-                "injection_hours": month_data["injection_hours"],
             }
 
             report, created = BiomethaneEnergyMonthlyReport.objects.update_or_create(
