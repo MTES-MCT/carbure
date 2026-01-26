@@ -9,7 +9,7 @@ from core.common import ErrorResponse
 
 
 # general middleware that will catch any uncaught error in endpoints, and return a clean error response
-class ExceptionMiddleware(object):
+class ExceptionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
