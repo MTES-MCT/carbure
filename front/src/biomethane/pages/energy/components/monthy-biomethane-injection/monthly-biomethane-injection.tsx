@@ -45,12 +45,7 @@ export const MonthlyBiomethaneInjection = ({
       </ManagedEditableCard>
       <HashRoute
         path="monthly-reports"
-        element={
-          <DeclareMonthlyQuantity
-            isReadOnly={!canEditDeclaration}
-            monthlyReports={energy?.monthly_reports ?? []}
-          />
-        }
+        element={<DeclareMonthlyQuantity isReadOnly={!canEditDeclaration} />}
       />
     </>
   )

@@ -35,7 +35,7 @@ from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
     ]
 )
 class BiomethaneEnergyViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMixin, GenericViewSet):
-    queryset = BiomethaneEnergy.objects.prefetch_related("monthly_reports")
+    queryset = BiomethaneEnergy.objects.all()
     serializer_class = BiomethaneEnergySerializer
     filterset_class = EntityProducerYearFilter
     pagination_class = None

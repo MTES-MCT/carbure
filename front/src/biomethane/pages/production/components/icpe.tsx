@@ -53,9 +53,7 @@ export function ICPE({
             label={t("N° ICPE")}
             state="info"
             pattern="\d{10}"
-            hintText={t(
-              "Code à 10 chiffres correspondant au code unique AIOT utilisé sur les applications GUN et GEREP"
-            )}
+            hintText={t("Code à 10 chiffres")}
             {...bind("icpe_number")}
           />
           <RadioGroup
@@ -64,9 +62,6 @@ export function ICPE({
             label={t("Régime ICPE")}
             orientation="horizontal"
             options={icpeRegimeOptions}
-            hintText={t(
-              "Précisez le régime ICPE de l'installation de méthanisation associée à la rubrique 2781 ou 3532"
-            )}
             {...bind("icpe_regime")}
           />
           {isEditing && (

@@ -242,6 +242,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIsInstance(watched_fields["contract"], list)
 
         # Verify some known watched fields
+        self.assertIn("installed_meters", watched_fields["production_unit"])
         self.assertIn("tariff_reference", watched_fields["contract"])
 
     def test_has_watched_field_changed_production_unit(self):
@@ -249,7 +250,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
 
         # Test with watched field
-        changed_fields = ["has_digestate_phase_separation"]
+        changed_fields = ["installed_meters", "name"]
         result = BiomethaneAnnualDeclarationService.has_watched_field_changed(production_unit, changed_fields)
         self.assertTrue(result)
 

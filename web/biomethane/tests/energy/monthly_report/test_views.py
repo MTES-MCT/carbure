@@ -43,11 +43,13 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
                 "month": 1,
                 "injected_volume_nm3": 1000.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
+                "injection_hours": 20.0,
             },
             {
                 "month": 2,
                 "injected_volume_nm3": 1200.0,
                 "average_monthly_flow_nm3_per_hour": 60.0,
+                "injection_hours": 20.0,
             },
         ]
 
@@ -95,6 +97,7 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
                 "month": 1,
                 "injected_volume_nm3": 100.0,
                 "average_monthly_flow_nm3_per_hour": 50.0,
+                "injection_hours": 20.0,
             },
         ]
 

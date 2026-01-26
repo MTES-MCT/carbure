@@ -71,32 +71,26 @@ export function ProductionSite({
   const installedMetersOptions = [
     {
       value: InstalledMeters.BIOGAS_PRODUCTION_FLOWMETER,
-      label: t(
-        "Débitmètre dédié à la production de biogaz ou méthode de comptage dédiée"
-      ),
+      label: t("Débitmètre dédié à la production de biogaz"),
     },
     {
       value: InstalledMeters.PURIFICATION_FLOWMETER,
-      label: t(
-        "Débitmètre dédié au volume de biogaz traité en épuration ou méthode de comptage dédiée"
-      ),
+      label: t("Débitmètre dédié au volume de biogaz traité en épuration"),
     },
     {
       value: InstalledMeters.FLARING_FLOWMETER,
-      label: t(
-        "Débitmètre dédié au volume de biogaz torché ou méthode de comptage dédiée"
-      ),
+      label: t("Débitmètre dédié au volume de biogaz torché"),
     },
     {
       value: InstalledMeters.HEATING_FLOWMETER,
       label: t(
-        "Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur ou méthode de comptage dédiée"
+        "Débitmètre dédié au volume de biogaz ou biométhane utilisé pour le chauffage du digesteur"
       ),
     },
     {
       value: InstalledMeters.PURIFICATION_ELECTRICAL_METER,
       label: t(
-        "Compteur dédié à la consommation électrique au système d'épuration et traitement des évents ou méthode de comptage dédiée"
+        "Compteur dédié à la consommation électrique au système d'épuration et traitement des évents"
       ),
     },
     {
@@ -130,7 +124,9 @@ export function ProductionSite({
             readOnly={!isEditing}
             min={0}
             max={100}
-            label={t("Rendement moyen de l'épurateur de l'installation (%)")}
+            label={t(
+              "Rendement de l'installation de production de biométhane (%)"
+            )}
             hintText={t(
               "Rendement global de l'installation (comprenant notamment le rendement de l'épurateur)"
             )}

@@ -2,16 +2,10 @@ import {
   TariffReferenceEnum as TariffReference,
   InstallationCategoryEnum as InstallationCategory,
   TrackedAmendmentTypesEnum as TrackedAmendmentTypes,
-  ComplementaryAidOrganismsEnum as ComplementaryAidOrganisms,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
-export {
-  TariffReference,
-  InstallationCategory,
-  TrackedAmendmentTypes,
-  ComplementaryAidOrganisms,
-}
+export { TariffReference, InstallationCategory, TrackedAmendmentTypes }
 
 // Contracts
 export type BiomethaneContract = apiTypes["BiomethaneContract"]

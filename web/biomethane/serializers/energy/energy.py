@@ -1,14 +1,9 @@
 from rest_framework import serializers
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
-from biomethane.serializers.energy.monthly_report import BiomethaneEnergyMonthlyReportSerializer
 
 
 class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
-    energy_types = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneEnergy.ENERGY_TYPES),
-        required=False,
-    )
     malfunction_types = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneEnergy.MALFUNCTION_TYPES),
         required=False,
@@ -20,8 +15,6 @@ class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
 
 
 class BiomethaneEnergySerializer(BaseBiomethaneEnergySerializer):
-    monthly_reports = BiomethaneEnergyMonthlyReportSerializer(many=True, read_only=True)
-
     class Meta(BaseBiomethaneEnergySerializer.Meta):
         exclude = []
 

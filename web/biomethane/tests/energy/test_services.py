@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from biomethane.factories import BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
+from biomethane.models import BiomethaneProductionUnit
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.services.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 from core.models import Entity
@@ -73,7 +74,8 @@ class EnergyContextExtractionTests(TestCase):
             has_malfunctions=True,
             malfunction_types=["TECHNICAL"],
             has_injection_difficulties_due_to_network_saturation=True,
-            energy_types=[BiomethaneEnergy.ENERGY_TYPE_FOSSIL],
+            attest_no_fossil_for_digester_heating_and_purification=True,
+            attest_no_fossil_for_installation_needs=False,
         )
 
         context = BiomethaneEnergyService._extract_data(energy)
@@ -81,7 +83,8 @@ class EnergyContextExtractionTests(TestCase):
         self.assertTrue(context.has_malfunctions)
         self.assertEqual(context.malfunction_types, ["TECHNICAL"])
         self.assertTrue(context.has_injection_difficulties)
-        self.assertEqual(context.energy_types, [BiomethaneEnergy.ENERGY_TYPE_FOSSIL])
+        self.assertTrue(context.attest_no_fossil_for_digester_heating_and_purification)
+        self.assertFalse(context.attest_no_fossil_for_installation_needs)
 
     def test_context_tariff_reference_with_contract(self):
         """Test that tariff_reference property accesses contract correctly."""
@@ -114,18 +117,34 @@ class EnergyRulesConfigurationTests(TestCase):
     def test_all_expected_rules_are_configured(self):
         """Test that all expected rules are present in the configuration."""
         expected_rule_names = [
+            "flaring_not_installed",
             "not_old_tariff",
             "not_new_tariff",
             "not_2011_2020_tariff",
             "no_malfunctions",
             "malfunction_no_other_type",
             "no_injection_difficulties",
-            "no_fossil_for_energy",
-            "no_biogas_or_biomethane_energy_type",
+            "no_fossil_for_digester_heating",
+            "no_fossil_for_installation_needs",
         ]
 
         actual_rule_names = [rule.name for rule in self.rules]
         self.assertEqual(expected_rule_names, actual_rule_names)
+
+    def test_flaring_rule_fields_and_condition(self):
+        """Test flaring rule has correct fields and condition logic."""
+        flaring_rule = next(r for r in self.rules if r.name == "flaring_not_installed")
+        self.assertEqual(flaring_rule.fields, BiomethaneEnergyService.FLARING_FIELDS)
+
+        # Test condition: should trigger when FLARING_FLOWMETER not in installed_meters
+        mock_ctx = Mock()
+        mock_ctx.production_unit = Mock()
+        mock_ctx.production_unit.installed_meters = [BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER]
+        self.assertTrue(flaring_rule.condition(mock_ctx))
+
+        # Should not trigger when FLARING_FLOWMETER is present
+        mock_ctx.production_unit.installed_meters = [BiomethaneProductionUnit.FLARING_FLOWMETER]
+        self.assertFalse(flaring_rule.condition(mock_ctx))
 
     def test_old_tariff_rule_fields_and_condition(self):
         """Test old tariff rule has correct fields and condition logic."""
@@ -201,39 +220,29 @@ class EnergyRulesConfigurationTests(TestCase):
         self.assertFalse(injection_rule.condition(mock_ctx))
 
     def test_fossil_attestation_rules_conditions(self):
-        """Test fossil energy rules condition logic."""
-        from biomethane.models.biomethane_energy import BiomethaneEnergy
+        """Test fossil attestation rules condition logic."""
+        digester_heating_rule = next(r for r in self.rules if r.name == "no_fossil_for_digester_heating")
+        installation_needs_rule = next(r for r in self.rules if r.name == "no_fossil_for_installation_needs")
 
-        no_fossil_rule = next(r for r in self.rules if r.name == "no_fossil_for_energy")
-        self.assertEqual(no_fossil_rule.fields, ["energy_details"])
-
-        # Test: should trigger when no problematic energy types are present
+        # Test digester heating attestation: should trigger when attesting NO fossil (True)
         mock_ctx = Mock()
-        mock_ctx.energy_types = [BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOGAS]
-        self.assertTrue(no_fossil_rule.condition(mock_ctx))
+        mock_ctx.attest_no_fossil_for_digester_heating_and_purification = True
+        self.assertTrue(digester_heating_rule.condition(mock_ctx))
 
-        # Should trigger when energy_types is empty
-        mock_ctx.energy_types = []
-        self.assertTrue(no_fossil_rule.condition(mock_ctx))
+        # Should not trigger when NOT attesting (False) - details field needed
+        mock_ctx.attest_no_fossil_for_digester_heating_and_purification = False
+        self.assertFalse(digester_heating_rule.condition(mock_ctx))
 
-        # Should not trigger when FOSSIL type is present
-        mock_ctx.energy_types = [BiomethaneEnergy.ENERGY_TYPE_FOSSIL]
-        self.assertFalse(no_fossil_rule.condition(mock_ctx))
+        # Test installation needs attestation: should trigger when attesting NO fossil (True)
+        mock_ctx.attest_no_fossil_for_installation_needs = True
+        self.assertTrue(installation_needs_rule.condition(mock_ctx))
 
-        # Should not trigger when OTHER_RENEWABLE type is present
-        mock_ctx.energy_types = [BiomethaneEnergy.ENERGY_TYPE_OTHER_RENEWABLE]
-        self.assertFalse(no_fossil_rule.condition(mock_ctx))
+        # Should not trigger when NOT attesting (False) - details field needed
+        mock_ctx.attest_no_fossil_for_installation_needs = False
+        self.assertFalse(installation_needs_rule.condition(mock_ctx))
 
-        # Should not trigger when OTHER type is present
-        mock_ctx.energy_types = [BiomethaneEnergy.ENERGY_TYPE_OTHER]
-        self.assertFalse(no_fossil_rule.condition(mock_ctx))
-
-        # Should not trigger when multiple types including problematic one
-        mock_ctx.energy_types = [
-            BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOGAS,
-            BiomethaneEnergy.ENERGY_TYPE_FOSSIL,
-        ]
-        self.assertFalse(no_fossil_rule.condition(mock_ctx))
+        malfunction_no_other_rule = next(r for r in self.rules if r.name == "malfunction_no_other_type")
+        self.assertEqual(malfunction_no_other_rule.fields, BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD)
 
 
 class BiomethaneEnergyServiceIntegrationTests(TestCase):
@@ -274,20 +283,37 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
 
     def test_full_integration_tariff_rules(self):
         """Smoke test: verify tariff rules work end-to-end."""
-        energy = BiomethaneEnergyFactory.create(
-            producer=self.producer_entity,
-            energy_types=[BiomethaneEnergy.ENERGY_TYPE_FOSSIL],
-            energy_details="test",
-        )
+        energy = BiomethaneEnergyFactory.create(producer=self.producer_entity)
 
+        # Tariff 2023 - old fields cleared
+        self.contract.tariff_reference = "2023"
+        self.contract.save()
         fields = BiomethaneEnergyService.get_fields_to_clear(energy)
+        self.assertIn("energy_used_for_digester_heating", fields)
+        self.assertNotIn("energy_used_for_installation_needs", fields)
 
-        self.assertNotIn("energy_details", fields)
-
-        energy.energy_types = [BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOGAS]
-        energy.save()
+        # Tariff 2020 - new fields cleared
+        self.contract.tariff_reference = "2020"
+        self.contract.save()
         fields = BiomethaneEnergyService.get_fields_to_clear(energy)
-        self.assertIn("energy_details", fields)
+        self.assertNotIn("energy_used_for_digester_heating", fields)
+        self.assertIn("energy_used_for_installation_needs", fields)
+
+    def test_full_integration_flaring_rules(self):
+        """Smoke test: verify flaring rules work end-to-end."""
+        energy = BiomethaneEnergyFactory.create(producer=self.producer_entity)
+
+        # No flaring meter - fields cleared
+        self.production_unit.installed_meters = []
+        self.production_unit.save()
+        fields = BiomethaneEnergyService.get_fields_to_clear(energy)
+        self.assertIn("flaring_operating_hours", fields)
+
+        # Flaring meter installed - fields not cleared
+        self.production_unit.installed_meters = [BiomethaneProductionUnit.FLARING_FLOWMETER]
+        self.production_unit.save()
+        fields = BiomethaneEnergyService.get_fields_to_clear(energy)
+        self.assertNotIn("flaring_operating_hours", fields)
 
     def test_fields_to_clear_returns_deduplicated_list(self):
         """Test that the returned list has no duplicates."""

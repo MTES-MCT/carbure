@@ -13,9 +13,6 @@ class BiomethaneContractSerializer(serializers.ModelSerializer):
     tracked_amendment_types = serializers.ListField(
         child=serializers.ChoiceField(choices=BiomethaneContractAmendment.TRACKED_AMENDMENT_TYPES), read_only=True
     )
-    complementary_aid_organisms = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneContract.COMPLEMENTARY_AID_ORGANISMS_CHOICES)
-    )
 
     class Meta:
         model = BiomethaneContract
@@ -29,10 +26,6 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
     # Allow the biomethane producer to set/unset the RED II status if the cmax or pap_contracted
     # is lower than the threshold (see biomethane contract model)
     is_red_ii = serializers.BooleanField(required=False)
-
-    complementary_aid_organisms = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneContract.COMPLEMENTARY_AID_ORGANISMS_CHOICES), required=False
-    )
 
     class Meta:
         model = BiomethaneContract

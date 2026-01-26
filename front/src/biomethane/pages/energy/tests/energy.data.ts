@@ -10,5 +10,4 @@ export const energyData: BiomethaneEnergy = {
   operating_hours: 100,
   produced_biogas_nm3_per_year: 100,
   producer: 1,
-  monthly_reports: [],
 }

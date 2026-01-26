@@ -19,7 +19,6 @@ MOCK_API_RESPONSE = {
                 "code_postal": "92400",
                 "libelle_commune": "COURBEVOIE",
                 "departement": "92",
-                "commune": "92001",
             },
         }
     ]
@@ -64,7 +63,6 @@ class EntityRegistrationSearchCompanyTest(TestCase):
         assert company_preview["registered_city"] == "COURBEVOIE"
         assert company_preview["registered_zipcode"] == "92400"
         assert company_preview["registered_address"] == "2 PL JEAN MILLIER"
-        assert company_preview["insee_code"] == "92001"
 
     def test_search_company_already_exists(self):
         self.mock_api.return_value.json.return_value = MOCK_API_RESPONSE
