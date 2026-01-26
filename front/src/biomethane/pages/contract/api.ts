@@ -13,11 +13,15 @@ export const findBuyerBiomethaneEntities = async (query: string) =>
     entity_type: [EntityType.Fournisseur_de_biom_thane],
   })
 
-export const getContract = async (entity_id: number) => {
+export const getContract = async (
+  entity_id: number,
+  selected_entity_id?: number
+) => {
   const response = await api.GET("/biomethane/contract/", {
     params: {
       query: {
         entity_id,
+        producer_id: selected_entity_id,
       },
     },
   })

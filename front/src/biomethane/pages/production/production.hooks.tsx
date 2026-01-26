@@ -15,12 +15,14 @@ import { useWatchedFields } from "biomethane/providers/watched-fields"
 import { BiomethaneProductionUnit } from "./types"
 import { AnnualDeclarationResetDialog } from "biomethane/components/annual-declaration-reset-dialog"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const useProductionUnit = () => {
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
   const query = useQuery(getProductionUnit, {
     key: "production-unit",
-    params: [entity.id],
+    params: [entity.id, selectedEntityId],
   })
 
   return query
