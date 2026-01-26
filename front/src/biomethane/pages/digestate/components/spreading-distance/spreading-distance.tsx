@@ -34,7 +34,7 @@ export function SpreadingDistance() {
     <ManagedEditableCard
       sectionId="spreading-distance"
       title={t("Distance d'épandage")}
-      description={t("Donnée du plan d'épandage mis en oeuvre")}
+      description={t("Données du plan d'épandage mis en oeuvre")}
       readOnly={!canEditDeclaration}
     >
       {({ isEditing }) => (
