@@ -30,6 +30,8 @@ class ElecTransferCertificate(models.Model):
     used_in_tiruert = models.BooleanField(default=False)
     consumption_date = models.DateField(null=True, blank=True)
 
+    is_readjustment = models.BooleanField(default=False)
+
     def generate_certificate_id(self):
         self.certificate_id = f"E{self.transfer_date.year}{self.transfer_date.month}-FR-{self.id}"
 

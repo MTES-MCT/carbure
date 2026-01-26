@@ -13,7 +13,7 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
     def setUp(self):
         """Initial setup for tests"""
         self.viewset = BiomethaneEnergyMonthlyReportViewSet()
-        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
         self.producer_entity = Entity.objects.create(
             name="Test Producer",
@@ -35,7 +35,7 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
         )
 
         self.monthly_report_url = reverse("biomethane-energy-monthly-report")
-        self.base_params = {"entity_id": self.producer_entity.id}
+        self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
 
         # Test data for creating monthly reports
         self.valid_monthly_reports_data = [

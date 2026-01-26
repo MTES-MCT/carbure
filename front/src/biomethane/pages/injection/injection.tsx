@@ -38,7 +38,7 @@ export const BiomethaneInjectionPage = () => {
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => updateInjectionSite(value)}>
           <TextInput
-            label={t("Numéro d'identifiant unique du poste d'injection")}
+            label={t("Numéro d'identifiant unique du site d'injection")}
             {...bind("unique_identification_number")}
             required
             readOnly={!isEditing}
@@ -47,14 +47,14 @@ export const BiomethaneInjectionPage = () => {
           <RadioGroup
             options={yesNoOptions}
             {...bind("is_shared_injection_site")}
-            label={t("Raccordement à un poste d'injection mutualisé")}
+            label={t("Raccordement à un site d'injection mutualisé")}
             required
             readOnly={!isEditing}
             orientation="horizontal"
           />
           {value.is_shared_injection_site && (
             <TextInput
-              label={t("N° de compteur associé au poste d'injection")}
+              label={t("N° de compteur associé au site d'injection")}
               {...bind("meter_number")}
               required
               readOnly={!isEditing}
@@ -63,9 +63,7 @@ export const BiomethaneInjectionPage = () => {
           <RadioGroup
             options={yesNoOptions}
             {...bind("is_different_from_production_site")}
-            label={t(
-              "Le poste d'injection est différent du poste de production"
-            )}
+            label={t("Le site d'injection est différent du site de production")}
             required
             readOnly={!isEditing}
             orientation="horizontal"

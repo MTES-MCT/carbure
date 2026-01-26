@@ -6,11 +6,13 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from core.models import Entity
+from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_charge_point_application import ElecChargePointApplication
 from elec.models.elec_meter import ElecMeter
 from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
+from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from transactions.models.year_config import YearConfig
 
 ENR_RATIO = 0.25
@@ -20,52 +22,63 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
     def setUp(self):
         self.cpo = Entity.objects.create(name="CPO", entity_type=Entity.CPO, has_elec=True)
 
-        self.charge_point_application_a = ElecChargePointApplication.objects.create(
+        self.charge_point_application = ElecChargePointApplication.objects.create(
             status=ElecChargePointApplication.ACCEPTED,
             cpo=self.cpo,
         )
 
+        self.charge_point = ElecChargePoint.objects.create(
+            application=self.charge_point_application,
+            cpo=self.cpo,
+            charge_point_id=f"{self.cpo.name}-CP-001",
+            current_type=ElecChargePoint.AC,
+            installation_date=date(2023, 1, 1),
+            is_article_2=False,
+            measure_reference_point_id="MRP-001",
+            station_name=f"{self.cpo.name} Station 001",
+            station_id=f"STAT-{self.cpo.id}-001",
+            nominal_power=50,
+        )
+        self.meter = ElecMeter.objects.create(
+            mid_certificate=f"MID-{self.cpo.id}-001",
+            initial_index=1000,
+            initial_index_date=date(2023, 1, 1),
+            charge_point=self.charge_point,
+        )
+        self.charge_point.current_meter = self.meter
+        self.charge_point.save(update_fields=["current_meter"])
+
         YearConfig.objects.create(year=2022, renewable_share=ENR_RATIO * 100)
         YearConfig.objects.create(year=2023, renewable_share=ENR_RATIO * 100)
 
-    def create_meter_reading_application(self, cpo, quarter=1, year=2023):
-        return ElecMeterReadingApplication.objects.create(
+    def setup_meter_reading(self, quarter, year, reading_energy, reading_date, certificate_energy, meter=None):
+        application = ElecMeterReadingApplication.objects.create(
             status=ElecMeterReadingApplication.ACCEPTED,
             quarter=quarter,
             year=year,
-            cpo=cpo,
+            cpo=self.cpo,
         )
 
-    def create_charge_point_with_meter(
-        self,
-        *,
-        cpo,
-        application,
-        cp_suffix,
-        initial_index,
-        initial_index_date,
-    ):
-        charge_point = ElecChargePoint.objects.create(
+        meter_reading = ElecMeterReading.objects.create(
+            extracted_energy=reading_energy,
+            reading_date=reading_date,
+            cpo=self.cpo,
             application=application,
-            cpo=cpo,
-            charge_point_id=f"{cpo.name}-CP-{cp_suffix}",
-            current_type=ElecChargePoint.AC,
-            installation_date=initial_index_date,
-            is_article_2=False,
-            measure_reference_point_id=f"MRP-{cp_suffix}",
-            station_name=f"{cpo.name} Station {cp_suffix}",
-            station_id=f"STAT-{cpo.id}-{cp_suffix}",
-            nominal_power=50,
+            meter=meter or self.meter,
+            enr_ratio=ENR_RATIO,
         )
-        meter = ElecMeter.objects.create(
-            mid_certificate=f"MID-{cpo.id}-{cp_suffix}",
-            initial_index=initial_index,
-            initial_index_date=initial_index_date,
-            charge_point=charge_point,
+
+        ElecProvisionCertificate.objects.create(
+            cpo=self.cpo,
+            quarter=1,
+            year=2024,
+            operating_unit="FRBLA",
+            source=ElecProvisionCertificate.METER_READINGS,
+            energy_amount=certificate_energy,
+            remaining_energy_amount=certificate_energy,
         )
-        charge_point.current_meter = meter
-        charge_point.save(update_fields=["current_meter"])
-        return charge_point, meter
+
+        return meter_reading
 
     def create_new_meter_for_charge_point(
         self,
@@ -85,259 +98,129 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         charge_point.save(update_fields=["current_meter"])
         return meter
 
-    def create_meter_reading(
-        self,
-        *,
-        cpo,
-        application,
-        meter,
-        extracted_energy,
-        energy_used_since_last_reading,
-        reading_date,
-        renewable_energy=None,
-    ):
-        return ElecMeterReading.objects.create(
-            extracted_energy=extracted_energy,
-            reading_date=reading_date,
-            cpo=cpo,
-            application=application,
-            meter=meter,
-            energy_used_since_last_reading=energy_used_since_last_reading,
-            renewable_energy=renewable_energy or energy_used_since_last_reading * ENR_RATIO,
-            days_since_last_reading=30,
-        )
-
-    def run_command(self, year=None):
-        report = call_command("generate_meter_readings_report", year=year, stdout=StringIO())
+    def run_command(self, year=None, apply_readjustments=False):
+        report = call_command("generate_meter_readings_report", year=year, apply=apply_readjustments, stdout=StringIO())
         return json.loads(report)
 
     def test_report_returns_zero_delta_when_values_are_correct(self):
-        _, meter = self.create_charge_point_with_meter(
-            cpo=self.cpo,
-            application=self.charge_point_application_a,
-            cp_suffix="001",
-            initial_index=100,
-            initial_index_date=date(2023, 1, 1),
-        )
-
         # Q1
-        app_q1 = self.create_meter_reading_application(
-            self.cpo,
+        self.setup_meter_reading(
             quarter=1,
             year=2023,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q1,
-            meter=meter,
-            extracted_energy=150,
-            energy_used_since_last_reading=50,
-            reading_date=date(2023, 3, 1),  # end of Q1
+            reading_energy=1500,
+            reading_date=date(2023, 3, 1),
+            certificate_energy=(1500 - 1000) * ENR_RATIO / 1000,
         )
 
         # Q2
-        app_q2 = self.create_meter_reading_application(
-            self.cpo,
+        self.setup_meter_reading(
             quarter=2,
             year=2023,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q2,
-            meter=meter,
-            extracted_energy=210,
-            energy_used_since_last_reading=60,
-            reading_date=date(2023, 7, 1),  # end of Q2
+            reading_energy=2100,
+            reading_date=date(2023, 7, 1),
+            certificate_energy=(2100 - 1500) * ENR_RATIO / 1000,
         )
 
-        self.assertEqual(self.run_command(year=2023), {})
-
-    def test_report_accumulates_positive_and_negative_deltas(self):
-        _, meter = self.create_charge_point_with_meter(
-            cpo=self.cpo,
-            application=self.charge_point_application_a,
-            cp_suffix="002",
-            initial_index=200,
-            initial_index_date=date(2023, 1, 1),
-        )
-
-        # Q1
-        app_q1 = self.create_meter_reading_application(
-            self.cpo,
-            quarter=1,
-            year=2023,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q1,
-            meter=meter,
-            extracted_energy=250,  # should be 50 (250 - 200)
-            energy_used_since_last_reading=90,
-            reading_date=date(2023, 3, 1),  # end of Q1
-        )
-
-        # Q2
-        app_q2 = self.create_meter_reading_application(
-            self.cpo,
-            quarter=2,
-            year=2023,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q2,
-            meter=meter,
-            extracted_energy=290,
-            energy_used_since_last_reading=35,  # should be 40 (290 - 250)
-            reading_date=date(2023, 7, 1),  # end of Q2
-        )
-
-        self.assertEqual(
-            self.run_command(year=2023),
-            {"CPO": 35.0 * ENR_RATIO},
-        )
+        self.assertEqual(self.run_command(), {})
 
     def test_report_handles_meter_change_between_applications(self):
-        charge_point, meter_1 = self.create_charge_point_with_meter(
-            cpo=self.cpo,
-            application=self.charge_point_application_a,
-            cp_suffix="003",
-            initial_index=300,
-            initial_index_date=date(2023, 1, 1),
-        )
-
         # Q1
-        app_q1 = self.create_meter_reading_application(
-            self.cpo,
+        self.setup_meter_reading(
             quarter=1,
             year=2023,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q1,
-            meter=meter_1,
-            extracted_energy=360,
-            energy_used_since_last_reading=60,  # correct
-            reading_date=date(2023, 3, 1),  # end of Q1
+            reading_energy=1600,
+            reading_date=date(2023, 3, 1),
+            certificate_energy=600 * ENR_RATIO / 1000,
         )
 
         # Q2, change meter, but save correct deltas
-        app_q2 = self.create_meter_reading_application(
-            self.cpo,
+        meter_2 = self.create_new_meter_for_charge_point(
+            charge_point=self.charge_point,
+            meter_suffix="replacement-1",
+            initial_index=2000,
+            initial_index_date=date(2023, 6, 1),
+        )
+        self.setup_meter_reading(
+            meter=meter_2,
             quarter=2,
             year=2023,
-        )
-        meter_2 = self.create_new_meter_for_charge_point(
-            charge_point=charge_point,
-            meter_suffix="replacement-1",
-            initial_index=1000,
-            initial_index_date=date(2023, 6, 1),  # during Q2
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q2,
-            meter=meter_2,
-            extracted_energy=1050,
-            energy_used_since_last_reading=50,  # correct
-            reading_date=date(2023, 7, 1),  # end of Q2
+            reading_energy=2500,
+            reading_date=date(2023, 7, 1),
+            certificate_energy=500 * ENR_RATIO / 1000,
         )
 
         # Q3, change meter, but save incorrect delta
-        app_q3 = self.create_meter_reading_application(
-            self.cpo,
+        meter_3 = self.create_new_meter_for_charge_point(
+            charge_point=self.charge_point,
+            meter_suffix="replacement-1",
+            initial_index=100,
+            initial_index_date=date(2023, 9, 1),
+        )
+        self.setup_meter_reading(
+            meter=meter_3,
             quarter=3,
             year=2023,
+            reading_energy=1000,
+            reading_date=date(2023, 10, 1),
+            certificate_energy=1500 * ENR_RATIO / 1000,
         )
-        meter_3 = self.create_new_meter_for_charge_point(
-            charge_point=charge_point,
-            meter_suffix="replacement-2",
-            initial_index=10,
-            initial_index_date=date(2023, 9, 1),  # during Q3
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q3,
-            meter=meter_3,
-            extracted_energy=100,
-            energy_used_since_last_reading=150,  # should be 90
-            reading_date=date(2023, 10, 1),  # end of Q3
-        )
+
+        expected_readjustment_energy = (1500 - 900) * ENR_RATIO
 
         self.assertEqual(
-            self.run_command(year=2023),
-            {"CPO": (150 - 90) * ENR_RATIO},
+            self.run_command(apply_readjustments=True),
+            {"CPO": expected_readjustment_energy},
         )
+        # Check that readjustments where created in database
+        readjustment = ElecCertificateReadjustment.objects.filter(
+            cpo=self.cpo, error_source=ElecCertificateReadjustment.METER_READINGS
+        ).get()
 
-    def test_report_uses_renewable_energy_when_missing_energy_delta(self):
-        app_q1 = self.create_meter_reading_application(
-            self.cpo,
+        self.assertEqual(readjustment.energy_amount, expected_readjustment_energy / 1000)
+
+    def test_report_takes_already_defined_readjustments_into_account(self):
+        self.setup_meter_reading(
             quarter=1,
             year=2023,
-        )
-        _, meter = self.create_charge_point_with_meter(
-            cpo=self.cpo,
-            application=self.charge_point_application_a,
-            cp_suffix="004",
-            initial_index=100,
-            initial_index_date=date(2023, 1, 1),
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_q1,
-            meter=meter,
-            extracted_energy=150,
-            energy_used_since_last_reading=0,  # we didn't compute energy_used_since_last_reading
-            renewable_energy=10,  # but we did compute renewable energy, so we use it to guess energy_used_since_last_reading
+            reading_energy=1500,
             reading_date=date(2023, 3, 1),
+            certificate_energy=900 * ENR_RATIO / 1000,  # should be 500 (1500 - 1000)
         )
 
         self.assertEqual(
-            self.run_command(year=2023),
-            {"CPO": -2.5},
-        )
-
-    def test_report_without_year_filter_includes_multiple_years(self):
-        _, meter = self.create_charge_point_with_meter(
-            cpo=self.cpo,
-            application=self.charge_point_application_a,
-            cp_suffix="005",
-            initial_index=100,
-            initial_index_date=date(2022, 1, 1),
-        )
-
-        app_2022_q4 = self.create_meter_reading_application(
-            self.cpo,
-            quarter=4,
-            year=2022,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_2022_q4,
-            meter=meter,
-            extracted_energy=150,
-            energy_used_since_last_reading=40,  # should be 50 => -10 delta
-            reading_date=date(2022, 12, 31),
-        )
-
-        app_2023_q1 = self.create_meter_reading_application(
-            self.cpo,
-            quarter=1,
-            year=2023,
-        )
-        self.create_meter_reading(
-            cpo=self.cpo,
-            application=app_2023_q1,
-            meter=meter,
-            extracted_energy=230,
-            energy_used_since_last_reading=100,  # should be 80 => +20 delta
-            reading_date=date(2023, 3, 31),
+            self.run_command(apply_readjustments=True),
+            {"CPO": 400 * ENR_RATIO},
         )
 
         self.assertEqual(
             self.run_command(),
-            {"CPO": 2.5},
+            {},
+        )
+
+    def test_report_takes_admin_error_readjustments_into_account(self):
+        self.setup_meter_reading(
+            quarter=1,
+            year=2023,
+            reading_energy=15000,
+            reading_date=date(2023, 3, 1),
+            certificate_energy=4000 * ENR_RATIO / 1000,  # should be 14000 (15000 - 1000)
         )
 
         self.assertEqual(
-            self.run_command(year=2023),
-            {"CPO": 5.0},
+            self.run_command(),
+            {"CPO": -10000 * ENR_RATIO},
+        )
+
+        ElecProvisionCertificate.objects.create(
+            cpo=self.cpo,
+            quarter=1,
+            year=2023,
+            energy_amount=10000 * ENR_RATIO / 1000,
+            remaining_energy_amount=10000 * ENR_RATIO / 1000,
+            source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION,
+        )
+
+        self.assertEqual(
+            self.run_command(),
+            {},
         )

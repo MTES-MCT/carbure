@@ -1,11 +1,11 @@
-import { getCurrentAnnualDeclarationOk } from "biomethane/tests/api"
+import { getAnnualDeclarationOk } from "biomethane/tests/api"
 import { AnnualDeclarationProvider } from "./annual-declaration.provider"
 import { StoryFn } from "@storybook/react"
 
 export const AnnualDeclarationStoryUtils = {
   parameters: {
     msw: {
-      handlers: [getCurrentAnnualDeclarationOk],
+      handlers: [getAnnualDeclarationOk],
     },
     mockingDate: new Date(2025, 2, 1),
   },

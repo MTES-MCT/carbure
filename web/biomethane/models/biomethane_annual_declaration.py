@@ -6,6 +6,7 @@ from core.models import Entity
 class BiomethaneAnnualDeclaration(models.Model):
     IN_PROGRESS = "IN_PROGRESS"
     DECLARED = "DECLARED"
+    OVERDUE = "OVERDUE"  # Virtual status
     DECLARATION_STATUS = [(IN_PROGRESS, IN_PROGRESS), (DECLARED, DECLARED)]
 
     # Propriétaire de la déclaration annuelle
@@ -15,6 +16,9 @@ class BiomethaneAnnualDeclaration(models.Model):
     year = models.IntegerField()
 
     status = models.CharField(choices=DECLARATION_STATUS, max_length=20, default=IN_PROGRESS)
+
+    # Indique si la déclaration est modifiable ou non
+    is_open = models.BooleanField(default=True)
 
     class Meta:
         db_table = "biomethane_annual_declaration"

@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 
 from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.adapters.zip_utils import zip_and_stream_udb_request
+from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
 
 
 class BaseRequest:
@@ -14,9 +15,10 @@ class BaseRequest:
         ET.indent(xml)
         return ET.tostring(xml, encoding="utf-8").decode("utf-8")
 
-    def __init__(self, body):
+    def __init__(self, body, response_class=BaseRequestResponse):
         self.id = new_uuid()
         self.body = self.with_request_id_inserted(self.id, body)
+        self.response_class = response_class
 
     def zipped_encoded(self):
         return zip_and_stream_udb_request(self.body)
@@ -37,12 +39,13 @@ class GetSourcingContactByIdRequest(BaseRequest):
 class EOGetTransactionRequest(BaseRequest):
     def __init__(self, *args):
         xml_fragment = "".join([f"<TRANSACTION_ID>{transaction_id}</TRANSACTION_ID>" for transaction_id in args])
-
-        super().__init__(f"""\
+        body = f"""\
 <udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
   <EO_GET_TRANS_HEADER>
     <EO_TRANSACTION>
       {xml_fragment}
     </EO_TRANSACTION>
   </EO_GET_TRANS_HEADER>
-</udb:EOGetTransactionRequest>""")
+</udb:EOGetTransactionRequest>"""
+
+        super().__init__(body, EOGetTransactionResponse)

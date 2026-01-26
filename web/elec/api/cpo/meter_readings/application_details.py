@@ -32,17 +32,16 @@ def get_application_details(request, entity: Entity):
     if application.cpo != entity:
         return ErrorResponse(400, ApplicationDetailsError.WRONG_ENTITY)
 
-    charge_points = MeterReadingRepository.get_application_charge_points(entity, application)
-    charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points, application.id)
+    meter_readings = MeterReadingRepository.get_application_meter_readings(entity, application)
 
     meter_reading_data = []
-    for charge_point in charge_points:
+    for meter_reading in meter_readings:
         meter_reading_data.append(
             {
-                "charge_point_id": charge_point.charge_point_id,
-                "previous_reading": charge_point.second_latest_reading_index,
-                "current_reading": charge_point.latest_reading_index,
-                "reading_date": charge_point.latest_reading_date,
+                "charge_point_id": meter_reading.charge_point.charge_point_id,
+                "previous_reading": meter_reading.prev_index,
+                "current_reading": meter_reading.current_index,
+                "reading_date": meter_reading.current_index_date,
             }
         )
 

@@ -40,7 +40,7 @@ class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
     volume = factory.Faker("random_int", min=100, max=10000)
 
     # Section Réception
-    origin_country = factory.Iterator(Pays.objects.all())
+    origin_country = factory.LazyFunction(lambda: Pays.objects.order_by("?").first())
     origin_department = factory.Faker("random_int", min=10, max=95)
     average_weighted_distance_km = factory.Faker("random_int", min=10, max=500)
     maximum_distance_km = factory.Faker("random_int", min=50, max=1000)

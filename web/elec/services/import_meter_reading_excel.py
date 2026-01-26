@@ -61,7 +61,7 @@ class ExcelMeterReadings:
         beginning_of_quarter: date = None,
         end_of_quarter: date = None,
     ):
-        charge_points = MeterReadingRepository.annotate_charge_points_with_latest_readings(charge_points)
+        charge_points = MeterReadingRepository.annotate_charge_points_with_latest_index(charge_points)
         charge_point_by_id = {cp.charge_point_id: cp for cp in charge_points}
 
         lines_by_charge_point = defaultdict(list)
@@ -83,42 +83,45 @@ class ExcelMeterReadingValidator(Validator):
     meter = forms.ModelChoiceField(queryset=ElecMeter.objects.all(), required=False)
     extracted_energy = forms.FloatField(min_value=0)
     reading_date = forms.DateField(input_formats=Validator.DATE_FORMATS)
-    energy_used_since_last_reading = forms.FloatField()
-    renewable_energy = forms.FloatField()
+    # energy_used_since_last_reading = forms.FloatField()
+    # renewable_energy = forms.FloatField()
     charge_point_id = forms.CharField()
 
     def extend(self, meter_reading):
         meter_reading["meter"] = None
-        meter_reading["energy_used_since_last_reading"] = 0
-        meter_reading["days_since_last_reading"] = 0
-        meter_reading["facteur_de_charge"] = 0
-        meter_reading["renewable_energy"] = 0
+        meter_reading["operating_unit"] = None
         return meter_reading
 
     def validate(self, meter_reading):
         charge_point_id = meter_reading.get("charge_point_id")
 
-        renewable_share = self.context.get("renewable_share")
         charge_point = self.context.get("charge_point_by_id").get(charge_point_id)
+
         lines = self.context.get("lines_by_charge_point").get(charge_point_id)
 
         meter = charge_point.current_meter if charge_point else None
         charge_point_power = charge_point.nominal_power if charge_point else 0
 
         previous_extracted_energy = 0
-        if charge_point:
-            previous_extracted_energy = round(charge_point.latest_reading_index, 3)
+        if charge_point and charge_point.latest_reading_index is not None:
+            previous_extracted_energy = charge_point.latest_reading_index
         elif meter:
-            previous_extracted_energy = round(meter.initial_index, 3)
+            previous_extracted_energy = meter.initial_index or 0
 
+        previous_extracted_energy = round(previous_extracted_energy, 3)
         new_extracted_energy = round(meter_reading.get("extracted_energy", 0), 3)
         energy_used_since_last_reading = round(new_extracted_energy - previous_extracted_energy, 3)
 
         previous_reading_date = date.min
-        if charge_point:
+        operating_unit = None
+        if charge_point and charge_point.latest_reading_date is not None:
             previous_reading_date = charge_point.latest_reading_date
+            operating_unit = charge_point.charge_point_id[:5]
         elif meter:
-            previous_reading_date = meter.initial_index_date
+            previous_reading_date = meter.initial_index_date or date.min
+            operating_unit = meter.charge_point.charge_point_id[:5] if meter.charge_point else None
+
+        meter_reading["operating_unit"] = operating_unit
 
         new_reading_date = meter_reading["reading_date"]
         days_since_last_reading = (new_reading_date - previous_reading_date).days
@@ -128,10 +131,6 @@ class ExcelMeterReadingValidator(Validator):
             facteur_de_charge = energy_used_since_last_reading / (charge_point_power * days_since_last_reading * 24)
 
         meter_reading["meter"] = meter
-        meter_reading["energy_used_since_last_reading"] = energy_used_since_last_reading
-        meter_reading["days_since_last_reading"] = days_since_last_reading
-        meter_reading["facteur_de_charge"] = facteur_de_charge
-        meter_reading["renewable_energy"] = energy_used_since_last_reading * renewable_share
 
         reading_date = meter_reading.get("reading_date")
 

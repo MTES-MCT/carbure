@@ -11,6 +11,7 @@ import { Notice } from "common/components/notice"
 import { SupplyInputForm } from "./supply-input-form"
 import { Button } from "common/components/button2"
 import { useNotify, useNotifyError } from "common/components/notifications"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const SupplyInputDialog = () => {
   const navigate = useNavigate()
@@ -20,7 +21,7 @@ export const SupplyInputDialog = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const notifyError = useNotifyError()
-
+  const { canEditDeclaration, selectedYear } = useAnnualDeclaration()
   const supplyInputId = Number(match?.params.id)
 
   const { result: supplyInput, loading } = useQuery(getSupplyInput, {
@@ -56,13 +57,15 @@ export const SupplyInputDialog = () => {
         </Dialog.Title>
       }
       footer={
-        <Button
-          type="submit"
-          loading={saveSupplyInputMutation.loading}
-          nativeButtonProps={{ form: "supply-input-form" }}
-        >
-          {t("Valider l'intrant")}
-        </Button>
+        canEditDeclaration && (
+          <Button
+            type="submit"
+            loading={saveSupplyInputMutation.loading}
+            nativeButtonProps={{ form: "supply-input-form" }}
+          >
+            {t("Valider l'intrant")}
+          </Button>
+        )
       }
       onClose={onClose}
       size="large"
@@ -77,9 +80,10 @@ export const SupplyInputDialog = () => {
           onSubmit={(form) =>
             form &&
             saveSupplyInputMutation
-              .execute(entity.id, supplyInputId, form)
+              .execute(entity.id, selectedYear, supplyInputId, form)
               .then(onClose)
           }
+          readOnly={!canEditDeclaration}
         />
       )}
     </Dialog>

@@ -107,7 +107,7 @@ def create_monthly_reports_for_energy(energy):
 def create_biomethane_energy(producer=None, **kwargs):
     if producer is None:
         producer = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER)
-    year = BiomethaneAnnualDeclarationService.get_declaration_period()
+    year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
     previous_year = year - 1
 
     # Create energy declaration for the current year and the previous year

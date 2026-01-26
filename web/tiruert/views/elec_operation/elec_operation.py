@@ -46,7 +46,7 @@ class ElecOperationPagination(MetadataPageNumberPagination):
     ]
 )
 class ElecOperationViewSet(ModelViewSet, ActionMixin):
-    queryset = ElecOperation.objects.all()
+    queryset = ElecOperation.objects.all().order_by("pk")
     serializer_class = ElecOperationListSerializer
     permission_classes = (
         IsAuthenticated,

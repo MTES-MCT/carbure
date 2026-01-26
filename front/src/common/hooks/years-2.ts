@@ -19,7 +19,10 @@ function useYears(
   options: {
     // If true, the years will be fetched, but if the selected year is not in the list of years, it will not be changed
     readOnly?: boolean
-  } = {}
+
+    // If true, the current year will be added to the list of years if the backend doesn't return any years
+    withCurrentYearIfEmpty?: boolean
+  } = { withCurrentYearIfEmpty: true }
 ) {
   const location = useLocation()
   const params = useParams<"year">()
@@ -64,18 +67,23 @@ function useYears(
 
   return {
     loading: years.loading,
-    options: listYears(years.result?.data).map((year) => ({
-      label: `${t("Année")} ${year}`,
-      value: year,
-    })),
+    options: listYears(years.result?.data, options.withCurrentYearIfEmpty).map(
+      (year) => ({
+        label: `${t("Année")} ${year}`,
+        value: year,
+      })
+    ),
     selected,
     setYear,
   }
 }
 
-function listYears(years: number[] | undefined) {
+function listYears(
+  years: number[] | undefined,
+  withCurrentYearIfEmpty: boolean = true
+) {
   if (years?.length) return years
-  else return [currentYear]
+  else return withCurrentYearIfEmpty ? [currentYear] : []
 }
 
 export default useYears

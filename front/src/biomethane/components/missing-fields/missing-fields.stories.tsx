@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { MissingFields, MissingFieldsProps } from "./missing-fields"
 import { AnnualDeclarationStoryUtils } from "biomethane/providers/annual-declaration/annual-declaration.stories.utils"
 import {
-  buildCurrentAnnualDeclarationHandler,
-  getCurrentAnnualDeclarationOk,
+  buildAnnualDeclarationHandler,
+  getAnnualDeclarationOk,
 } from "biomethane/tests/api"
 import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 import GLOBAL_MOCKS from "@storybook/mocks"
 
-const MOCKS = [...GLOBAL_MOCKS, getCurrentAnnualDeclarationOk]
+const MOCKS = [...GLOBAL_MOCKS, getAnnualDeclarationOk]
 const clickOnLink = async (
   canvasElement: HTMLElement,
   linkName: string,
@@ -28,6 +28,7 @@ const meta: Meta<typeof MissingFields> = {
   component: MissingFields,
   ...AnnualDeclarationStoryUtils,
   parameters: {
+    mockingDate: new Date(2025, 11, 1),
     msw: {
       handlers: MOCKS,
     },
@@ -63,11 +64,13 @@ export const DisplayOnlyDigestateMissingFields: Story = {
     },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           missing_fields: {
             digestate_missing_fields: ["digestate_field_1"],
             energy_missing_fields: [],
+            supply_plan_valid: true,
           },
+          is_complete: false,
         }),
         ...MOCKS,
       ],
@@ -85,11 +88,13 @@ export const DisplayOnlyEnergyMissingFields: Story = {
     },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           missing_fields: {
             digestate_missing_fields: [],
             energy_missing_fields: ["energy_field_1"],
+            supply_plan_valid: true,
           },
+          is_complete: false,
         }),
         ...MOCKS,
       ],
@@ -107,11 +112,12 @@ export const DisplayBothEnergyAndDigestateMissingFields: Story = {
     },
     msw: {
       handlers: [
-        buildCurrentAnnualDeclarationHandler({
+        buildAnnualDeclarationHandler({
           missing_fields: {
             digestate_missing_fields: ["digestate_field_1"],
             energy_missing_fields: ["energy_field_1"],
           },
+          is_complete: false,
         }),
         ...MOCKS,
       ],
@@ -126,6 +132,30 @@ export const DisplayNothingWhenTheDeclarationIsNotEditable: Story = {
       description: "Displays nothing when the declaration is not editable.",
     },
     chromatic: { disableSnapshot: true },
+  },
+  play: NoMissingFields.play,
+}
+
+export const DisplayNothingWhenTheDeclarationIsComplete: Story = {
+  parameters: {
+    mockingDate: new Date(2026, 3, 1),
+    docs: {
+      description: "Displays nothing when the declaration is complete.",
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: [
+        buildAnnualDeclarationHandler({
+          missing_fields: {
+            digestate_missing_fields: [],
+            energy_missing_fields: [],
+            supply_plan_valid: true,
+          },
+          is_complete: true,
+        }),
+        ...MOCKS,
+      ],
+    },
   },
   play: NoMissingFields.play,
 }
