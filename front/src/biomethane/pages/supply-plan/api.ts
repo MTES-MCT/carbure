@@ -19,7 +19,8 @@ export const getSupplyPlanInputs = async (
 
 export const getSupplyPlanInputFilters = async (
   query: BiomethaneSupplyInputQuery,
-  filter: BiomethaneSupplyInputFilter
+  filter: BiomethaneSupplyInputFilter,
+  selected_entity_id?: number
 ) =>
   api
     .GET("/biomethane/supply-input/filters/", {
@@ -27,6 +28,7 @@ export const getSupplyPlanInputFilters = async (
         query: {
           ...query,
           filter,
+          producer_id: selected_entity_id?.toString(),
         },
       },
     })
@@ -34,7 +36,8 @@ export const getSupplyPlanInputFilters = async (
 
 export const getSupplyInput = async (
   entity_id: number,
-  supply_input_id: number
+  supply_input_id: number,
+  selected_entity_id?: number
 ) =>
   api
     .GET("/biomethane/supply-input/{id}/", {
@@ -42,7 +45,7 @@ export const getSupplyInput = async (
         path: {
           id: supply_input_id,
         },
-        query: { entity_id },
+        query: { entity_id, producer_id: selected_entity_id },
       },
     })
     .then((res) => res.data)

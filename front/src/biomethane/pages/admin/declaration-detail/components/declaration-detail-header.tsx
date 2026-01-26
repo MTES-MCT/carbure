@@ -5,6 +5,9 @@ import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { useNavigate } from "react-router-dom"
 import { BiomethaneProducer } from "../../types"
 import { useAnnualDeclarationYearsAdmin } from "../hooks/use-annual-declaration-years-admin"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { AnnualDeclarationIsOpenBadge } from "./annual-declaration-is-open-badge"
+import { ToggleDeclarationButton } from "./toggle-declaration-button"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -22,6 +25,7 @@ export const DeclarationDetailHeader = ({
 }: DeclarationDetailHeaderProps) => {
   const { selectedEntityId } = useSelectedEntity()
   const years = useAnnualDeclarationYearsAdmin()
+  const { annualDeclaration } = useAnnualDeclaration()
   const navigate = useNavigate()
   const routes = useRoutes()
 
@@ -42,6 +46,10 @@ export const DeclarationDetailHeader = ({
         value={years.selected}
         onChange={years.setYear}
       />
+      <AnnualDeclarationIsOpenBadge
+        isDeclarationOpen={annualDeclaration?.is_open ?? false}
+      />
+      <ToggleDeclarationButton />
     </Row>
   )
 }

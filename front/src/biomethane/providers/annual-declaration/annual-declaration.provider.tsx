@@ -5,6 +5,7 @@ import useEntity from "common/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
 import { AnnualDeclaration, AnnualDeclarationStatus } from "biomethane/types"
 import { useParams } from "react-router-dom"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export interface AnnualDeclarationContextValue {
   /** Selected year for the annual declaration */
@@ -60,10 +61,12 @@ export function AnnualDeclarationProvider({
   // We need to use the current year inside the provider to mock the date when the provider is mounted
   const currentYear = new Date().getFullYear()
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
+
   const { result: annualDeclaration, loading: loadingAnnualDeclaration } =
     useQuery(getAnnualDeclaration, {
       key,
-      params: [entity.id, parsedYear],
+      params: [entity.id, parsedYear, selectedEntityId],
     })
 
   if (loadingAnnualDeclaration && !annualDeclaration) return <LoaderOverlay />
