@@ -4,6 +4,7 @@ import { useRoutes } from "common/hooks/routes"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { useNavigate } from "react-router-dom"
 import { BiomethaneProducer } from "../../types"
+import { useAnnualDeclarationYearsAdmin } from "../hooks/use-annual-declaration-years-admin"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -20,11 +21,12 @@ export const DeclarationDetailHeader = ({
   producers,
 }: DeclarationDetailHeaderProps) => {
   const { selectedEntityId } = useSelectedEntity()
+  const years = useAnnualDeclarationYearsAdmin()
   const navigate = useNavigate()
   const routes = useRoutes()
 
   return (
-    <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
+    <Row style={{ alignItems: "center" }} gap="md">
       <Select
         options={producers}
         normalize={normalizeProducer}
@@ -34,6 +36,11 @@ export const DeclarationDetailHeader = ({
             navigate(routes.BIOMETHANE().ADMIN.DECLARATION_DETAIL(value).ROOT)
           }
         }}
+      />
+      <Select
+        options={years.options}
+        value={years.selected}
+        onChange={years.setYear}
       />
     </Row>
   )

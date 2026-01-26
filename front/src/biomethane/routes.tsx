@@ -140,13 +140,17 @@ export const BiomethaneAdminRoutes = () => {
         />
 
         <Route
-          path="declarations/:selectedEntityId/*"
+          path="declarations/:selectedEntityId/:year/*"
           element={<BiomethaneAdminDeclarationDetailPage />}
         >
           <Route index element={<Navigate replace to="digestate" />} />
           <Route path="digestate" element={<Digestate />} />
           <Route path="energy" element={<div>energy</div>} />
         </Route>
+        <Route
+          path="declarations/:selectedEntityId"
+          element={<Navigate replace to="2026" />}
+        />
       </Route>
     </Routes>
   )
