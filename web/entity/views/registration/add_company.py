@@ -174,16 +174,17 @@ def send_email_to_user(entity, request):
     )
 
 
-def send_email_to_admin(entity, request, extra_recipients=None):
+def send_email_to_admin(entity, request):
     today = datetime.now().strftime("%d/%m/%Y")
     subject = "Demande d'inscription de la société " + entity.name
-    if settings.WITH_EMAIL_DECORATED_AS_TEST:
-        subject = f"TEST {subject}"
 
     recipient_list = ["carbure@beta.gouv.fr"]
-
     if entity.entity_type == Entity.AIRLINE:
         recipient_list += list_dgac_emails()
+
+    if settings.WITH_EMAIL_DECORATED_AS_TEST:
+        subject = f"TEST {subject}"
+        recipient_list = ["carbure@beta.gouv.fr"]
 
     text_message = f"""
     Bonjour,
