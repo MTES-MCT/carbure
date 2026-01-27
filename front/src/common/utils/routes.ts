@@ -62,11 +62,29 @@ export const ROUTE_URLS = {
     const baseUrlWithYear = year ? `${baseUrl}/${year}` : baseUrl
     return {
       ROOT: `${baseUrl}`,
-      SUPPLY_PLAN: `${baseUrlWithYear}/supply-plan`,
-      SUPPLY_PLAN_IMPORT: `${baseUrlWithYear}/supply-plan#import`,
-      SUPPLY_PLAN_ADD_INPUT: `${baseUrlWithYear}/supply-plan#create`,
-      DIGESTATE: `${baseUrlWithYear}/digestate`,
-      ENERGY: `${baseUrlWithYear}/energy`,
+      PRODUCER: {
+        SUPPLY_PLAN: `${baseUrlWithYear}/supply-plan`,
+        SUPPLY_PLAN_IMPORT: `${baseUrlWithYear}/supply-plan#import`,
+        SUPPLY_PLAN_ADD_INPUT: `${baseUrlWithYear}/supply-plan#create`,
+        DIGESTATE: `${baseUrlWithYear}/digestate`,
+        ENERGY: `${baseUrlWithYear}/energy`,
+      },
+      ADMIN: {
+        SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
+        DECLARATIONS: `${baseUrl}/admin/declarations`,
+        DECLARATION_DETAIL: (producer_id: number) => {
+          const declarationDetailUrl = `${baseUrl}/admin/declarations/${producer_id}`
+          return {
+            ROOT: declarationDetailUrl,
+            DIGESTATE: `${declarationDetailUrl}/digestate`,
+            ENERGY: `${declarationDetailUrl}/energy`,
+            SUPPLY_PLAN: `${declarationDetailUrl}/supply-plan`,
+            CONTRACT: `${declarationDetailUrl}/contract`,
+            CONTACTS: `${declarationDetailUrl}/contacts`,
+          }
+        },
+        EXPORTS: `${baseUrl}/admin/exports`,
+      },
     }
   },
 

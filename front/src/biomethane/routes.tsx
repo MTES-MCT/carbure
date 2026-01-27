@@ -10,6 +10,14 @@ import {
 } from "./providers/annual-declaration"
 import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
+import { ExternalAdminPages } from "common/types"
+
+const BiomethaneAdminDeclarationDetailPage = lazy(
+  () => import("biomethane/pages/admin/declaration-detail")
+)
+const BiomethaneAdminDeclarationsPage = lazy(
+  () => import("biomethane/pages/admin/declarations")
+)
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -51,7 +59,9 @@ const RedirectToCurrentYearRoute = ({ path }: { path: REDIRECTED_ROUTES }) => (
 )
 
 export const BiomethaneRoutes = () => {
-  const { isBiomethaneProducer } = useEntity()
+  const { isBiomethaneProducer, hasAdminRight } = useEntity()
+
+  if (hasAdminRight(ExternalAdminPages.DREAL)) return <BiomethaneAdminRoutes />
 
   if (!isBiomethaneProducer) return null
 
@@ -114,6 +124,29 @@ export const BiomethaneSettingsRoutes = () => {
         <Route path="contract" element={<BiomethaneContractPage />} />
         <Route path="production" element={<BiomethaneProductionPage />} />
         <Route path="injection" element={<BiomethaneInjectionPage />} />
+      </Route>
+    </Routes>
+  )
+}
+
+export const BiomethaneAdminRoutes = () => {
+  return (
+    <Routes>
+      <Route path="admin" element={<Outlet />}>
+        <Route index element={<Navigate replace to="declarations" />} />
+        <Route
+          path="declarations"
+          element={<BiomethaneAdminDeclarationsPage />}
+        />
+
+        <Route
+          path="declarations/:selectedEntityId/*"
+          element={<BiomethaneAdminDeclarationDetailPage />}
+        >
+          <Route index element={<Navigate replace to="digestate" />} />
+          <Route path="digestate" element={<div>digestate</div>} />
+          <Route path="energy" element={<div>energy</div>} />
+        </Route>
       </Route>
     </Routes>
   )
