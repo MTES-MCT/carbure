@@ -1,9 +1,9 @@
 import os
 import traceback
 
-import sentry_sdk
 from django.conf import settings
 
+from adapters.logger import log_exception
 from core.carburetypes import CarbureError
 from core.common import ErrorResponse
 
@@ -18,7 +18,7 @@ class ExceptionMiddleware:
 
     def process_exception(self, _, exception):
         if not os.getenv("TEST") and os.getenv("IMAGE_TAG") in ("dev", "staging", "prod"):
-            sentry_sdk.capture_exception(exception)
+            log_exception(exception)
 
         if settings.DEBUG or os.getenv("TEST"):
             traceback.print_exc()
