@@ -9,6 +9,8 @@ import { mergeDeepRight } from "ramda"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneEnergy, BiomethaneEnergyMonthlyReport } from "../../types"
+import { mockUser } from "common/__test__/helpers"
+import { EntityType } from "common/types"
 
 const meta: Meta<typeof InjectedBiomethane> = {
   title: "modules/biomethane/pages/energy/components/InjectedBiomethane",
@@ -17,6 +19,7 @@ const meta: Meta<typeof InjectedBiomethane> = {
     parameters: {
       msw: {
         handlers: [
+          mockUser(EntityType.Producteur_de_biom_thane),
           ...AnnualDeclarationStoryUtils.parameters.msw.handlers,
           ...mswHandlers,
         ],
