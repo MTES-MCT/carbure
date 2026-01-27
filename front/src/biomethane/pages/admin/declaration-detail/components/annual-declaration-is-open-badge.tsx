@@ -9,7 +9,7 @@ export const AnnualDeclarationIsOpenBadge = ({
 }: AnnualDeclarationIsOpenBadgeProps) => {
   const { t } = useTranslation()
   return (
-    <Badge severity={isDeclarationOpen ? "success" : "warning"}>
+    <Badge severity="info" noIcon>
       {isDeclarationOpen ? t("Déclaration ouverte") : t("Déclaration fermée")}
     </Badge>
   )

@@ -78,9 +78,13 @@ export const saveSupplyInput = async (
     })
     .then((res) => res.data)
 
-export function downloadSupplyPlan(query: BiomethaneSupplyInputQuery) {
+export function downloadSupplyPlan(
+  query: BiomethaneSupplyInputQuery,
+  selectedEntityId?: number
+) {
   return download(`/biomethane/supply-input/export/`, {
     ...query,
+    producer_id: selectedEntityId?.toString(),
   })
 }
 

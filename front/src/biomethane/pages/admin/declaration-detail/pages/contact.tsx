@@ -1,4 +1,5 @@
 import { getCompanyDetails } from "common/api"
+import { LoaderOverlay } from "common/components/scaffold"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
@@ -8,7 +9,7 @@ export const Contact = () => {
   const entity = useEntity()
   const { selectedEntityId } = useSelectedEntity()
 
-  const company = useQuery(getCompanyDetails, {
+  const { result, loading } = useQuery(getCompanyDetails, {
     key: "entity-details",
     params: [entity.id, selectedEntityId!],
   })
@@ -17,5 +18,9 @@ export const Contact = () => {
     throw new Error("Selected entity ID is required")
   }
 
-  return <CompanyInfo readOnly company={company.result?.data} />
+  if (loading) {
+    return <LoaderOverlay />
+  }
+
+  return <CompanyInfo readOnly company={result?.data} />
 }

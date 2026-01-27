@@ -35,8 +35,7 @@ export const SupplyPlan = () => {
   const { selectedYear, canEditDeclaration } = useAnnualDeclaration()
   const columns = useSupplyPlanColumns()
   const { selectedEntityId, hasSelectedEntity } = useSelectedEntity()
-  console.log("selectedEntityId", selectedEntityId)
-  console.log("hasSelectedEntity", hasSelectedEntity)
+
   const { state, actions, query } = useQueryBuilder<
     BiomethaneSupplyInputQueryBuilder["config"]
   >({
@@ -91,7 +90,10 @@ export const SupplyPlan = () => {
             {t("Ajouter un intrant")}
           </Button>
         )}
-        <ExportButton query={query} download={downloadSupplyPlan} />
+        <ExportButton
+          query={query}
+          download={(query) => downloadSupplyPlan(query, selectedEntityId)}
+        />
       </ActionBar>
       <FilterMultiSelect2
         filterLabels={filterLabels}

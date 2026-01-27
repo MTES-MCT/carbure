@@ -24,7 +24,7 @@ export const DeclarationDetailHeader = ({
   producers,
 }: DeclarationDetailHeaderProps) => {
   const { selectedEntityId } = useSelectedEntity()
-  const years = useAnnualDeclarationYearsAdmin()
+
   const { annualDeclaration } = useAnnualDeclaration()
   const navigate = useNavigate()
   const routes = useRoutes()
@@ -41,15 +41,24 @@ export const DeclarationDetailHeader = ({
           }
         }}
       />
-      <Select
-        options={years.options}
-        value={years.selected}
-        onChange={years.setYear}
-      />
+
+      <SelectYears key={selectedEntityId} />
       <AnnualDeclarationIsOpenBadge
         isDeclarationOpen={annualDeclaration?.is_open ?? false}
       />
       <ToggleDeclarationButton />
     </Row>
+  )
+}
+
+// Use a separate component to set a key to the select to force a re-render when the selected entity changes
+const SelectYears = () => {
+  const years = useAnnualDeclarationYearsAdmin()
+  return (
+    <Select
+      options={years.options}
+      value={years.selected}
+      onChange={years.setYear}
+    />
   )
 }
