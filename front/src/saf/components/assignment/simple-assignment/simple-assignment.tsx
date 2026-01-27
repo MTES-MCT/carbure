@@ -24,9 +24,6 @@ export const TicketAssignment = ({
 
   const notifyError = useNotifyError()
 
-  const remainingVolume =
-    ticketSource.total_volume - ticketSource.assigned_volume
-
   const assignSafTicket = useMutation(api.assignSafTicket, {
     invalidates: [
       "ticket-source-details",
@@ -93,10 +90,14 @@ export const TicketAssignment = ({
         </p>
 
         <AssignmentForm
+          showPosNumber
+          showOriginDepot
           posNumber={ticketSource?.origin_lot?.pos_number ?? undefined}
           originDepot={ticketSource?.origin_lot_site}
           deliveryPeriod={ticketSource.delivery_period}
-          remainingVolume={remainingVolume}
+          remainingVolume={
+            ticketSource.total_volume - ticketSource.assigned_volume
+          }
           onSubmit={assignTicket}
         />
       </Dialog>

@@ -17349,6 +17349,8 @@ components:
           readOnly: true
         origin_lot:
           $ref: "#/components/schemas/SafParentLot"
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -17399,8 +17401,6 @@ components:
         ghg_total:
           type: number
           format: double
-        origin_lot_site:
-          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets
@@ -17585,6 +17585,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/SafParentLot"
           readOnly: true
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets

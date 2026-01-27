@@ -35,6 +35,8 @@ const TicketsGroupedAssignment = ({
     (a, b) => b.delivery_period - a.delivery_period
   )[0]?.delivery_period
 
+  const isSingleSelection = ticketSources.length === 1
+
   const groupedAssignSafTicket = useMutation(api.groupedAssignSafTicket, {
     invalidates: ["ticket-sources", "operator-snapshot"],
 
@@ -129,9 +131,11 @@ const TicketsGroupedAssignment = ({
         </Collapse>
 
         <AssignmentForm
-          groupSize={ticketSources.length}
+          showPosNumber={isSingleSelection}
+          showOriginDepot={isSingleSelection}
           deliveryPeriod={lastDeliveryPeriod}
           remainingVolume={remainingVolume}
+          originDepot={ticketSources[0]?.origin_lot_site}
           onSubmit={groupedAssignTicket}
         />
       </Dialog>

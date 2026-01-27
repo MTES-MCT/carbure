@@ -5566,6 +5566,7 @@ export interface components {
             parent_ticket?: components["schemas"]["SafParentTicket"];
             readonly added_by: components["schemas"]["EntityPreview"];
             origin_lot?: components["schemas"]["SafParentLot"];
+            origin_lot_site?: components["schemas"]["Site"];
             readonly carbure_producer: components["schemas"]["EntityPreview"];
             unknown_producer?: string | null;
             readonly carbure_production_site: components["schemas"]["ProductionSite"];
@@ -5592,7 +5593,6 @@ export interface components {
             eee?: number;
             /** Format: double */
             ghg_total?: number;
-            origin_lot_site?: components["schemas"]["Site"];
         };
         SafTicketSourceAssignment: {
             client_id: number;
@@ -5655,6 +5655,7 @@ export interface components {
             parent_ticket?: components["schemas"]["SafParentTicket"];
             readonly added_by: components["schemas"]["EntityPreview"];
             readonly origin_lot: components["schemas"]["SafParentLot"];
+            origin_lot_site?: components["schemas"]["Site"];
         };
         SeachCompanyRequest: {
             registration_id: string;
