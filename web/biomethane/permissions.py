@@ -60,5 +60,7 @@ def get_biomethane_permissions(write_actions, action):
         raise ValueError("write_actions must be a list")
 
     if action in write_actions:
+        if action == "partial_update":
+            return [(HasBiomethaneProducerWriteRights | HasDrealRights)()]
         return [HasBiomethaneProducerWriteRights()]
     return [HasDrealOrProducerRights()]

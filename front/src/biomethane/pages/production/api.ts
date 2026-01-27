@@ -38,11 +38,15 @@ export const saveProductionUnit = async (
 
 // Digestate Storage API
 
-export const getDigestateStorages = async (entity_id: number) => {
+export const getDigestateStorages = async (
+  entity_id: number,
+  selected_entity_id?: number
+) => {
   const response = await api.GET("/biomethane/digestate-storage/", {
     params: {
       query: {
         entity_id,
+        producer_id: selected_entity_id?.toString(),
       },
     },
   })

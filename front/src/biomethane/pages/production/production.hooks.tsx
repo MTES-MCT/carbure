@@ -72,9 +72,10 @@ export const useSaveProductionUnit = (
 // Digestate Storage hooks
 export const useDigestateStorages = () => {
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
   const query = useQuery(getDigestateStorages, {
     key: "digestate-storages",
-    params: [entity.id],
+    params: [entity.id, selectedEntityId],
   })
 
   return query
