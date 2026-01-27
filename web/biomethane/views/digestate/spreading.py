@@ -18,6 +18,13 @@ from biomethane.serializers.digestate.spreading import (
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="producer_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Producer entity ID (optional, used by DREAL to filter specific producer).",
+            required=False,
+        ),
     ]
 )
 class BiomethaneDigestateSpreadingViewSet(GenericViewSet, CreateModelMixin, DestroyModelMixin):

@@ -31,6 +31,13 @@ from .mixins import ValidateActionMixin
             location=OpenApiParameter.QUERY,
             description="Year of the annual declaration",
         ),
+        OpenApiParameter(
+            name="producer_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Producer entity ID (optional, used by DREAL to filter specific producer).",
+            required=False,
+        ),
     ]
 )
 class BiomethaneAnnualDeclarationViewSet(

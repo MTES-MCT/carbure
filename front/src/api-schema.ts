@@ -6375,6 +6375,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the annual declaration */
                 year?: number;
             };
@@ -6409,6 +6411,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the annual declaration */
                 year?: number;
             };
@@ -6439,6 +6443,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the annual declaration */
                 year?: number;
             };
@@ -6469,6 +6475,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the annual declaration */
                 year?: number;
             };
@@ -6506,6 +6514,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the annual declaration */
                 year?: number;
             };
@@ -6530,6 +6540,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path?: never;
@@ -6552,6 +6564,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path?: never;
@@ -6664,6 +6678,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path?: never;
@@ -6687,6 +6703,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the energy declaration. */
                 year: number;
             };
@@ -6711,6 +6729,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the energy declaration. */
                 year: number;
             };
@@ -6917,6 +6937,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the energy declaration. */
                 year: number;
             };
@@ -6948,6 +6970,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path?: never;
@@ -6976,6 +7000,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path: {
@@ -7000,6 +7026,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the energy declaration. */
                 year: number;
             };
@@ -7024,6 +7052,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the energy declaration. */
                 year: number;
             };
@@ -7129,6 +7159,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description Year of the energy declaration. */
                 year: number;
             };
@@ -7315,7 +7347,8 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
-                producer_id?: string;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description A search term. */
                 search?: string;
                 /** @description * `INTERNAL` - Interne
@@ -7345,6 +7378,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path?: never;
@@ -7373,6 +7408,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path: {
@@ -7398,6 +7435,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path: {
@@ -7429,6 +7468,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path: {
@@ -7460,6 +7501,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path?: never;
@@ -7492,7 +7535,8 @@ export interface operations {
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                producer_id?: string;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
                 /** @description A search term. */
                 search?: string;
                 /** @description * `INTERNAL` - Interne
@@ -7541,6 +7585,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
             };
             header?: never;
             path?: never;
