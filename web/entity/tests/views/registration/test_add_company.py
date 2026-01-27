@@ -95,6 +95,7 @@ class SendEmailToDGECTest(TestCase):
         )
 
     def test_sends_email_to_dgac(self):
+        self.patched_settings.WITH_EMAIL_DECORATED_AS_TEST = False
         self.patched_list_dgac_emails.return_value = ["admin@dgac.fr"]
 
         entity = MagicMock()
@@ -109,4 +110,21 @@ class SendEmailToDGECTest(TestCase):
             message=ANY,
             from_email=ANY,
             recipient_list=["carbure@beta.gouv.fr", "admin@dgac.fr"],
+        )
+
+    def test_sends_email_to_dgac_if_feature_flipped(self):
+        self.patched_settings.WITH_EMAIL_DECORATED_AS_TEST = True
+
+        entity = MagicMock()
+        entity.name = "NOM_SOCIETE"
+        request = MagicMock()
+
+        send_email_to_admin(entity, request)
+
+        self.patched_send_mail.assert_called_with(
+            request=request,
+            subject=ANY,
+            message=ANY,
+            from_email=ANY,
+            recipient_list=["carbure@beta.gouv.fr"],
         )

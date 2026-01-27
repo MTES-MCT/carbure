@@ -199,6 +199,7 @@ def send_email_to_admin(entity, request):
 
     Bonne journée
     """
+
     send_mail(
         request=request,
         subject=subject,
