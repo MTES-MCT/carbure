@@ -53,6 +53,7 @@ class GroupAssignActionMixin:
         reception_airport = serializer.validated_data.get("reception_airport")
         consumption_type = serializer.validated_data.get("consumption_type")
         shipping_method = serializer.validated_data.get("shipping_method")
+        has_intermediary_depot = serializer.validated_data.get("has_intermediary_depot")
 
         ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by(
             "created_at"
@@ -95,7 +96,9 @@ class GroupAssignActionMixin:
                 if ticket_volume <= 0:
                     break
 
-                if not is_shipping_route_available(ticket_source.origin_lot_site, reception_airport, shipping_method):
+                if not is_shipping_route_available(
+                    ticket_source.origin_lot_site, reception_airport, shipping_method, has_intermediary_depot
+                ):
                     raise ValidationError({"message": SafTicketAssignError.SHIPPING_ROUTE_NOT_REGISTERED})
 
                 ticket = create_ticket_from_source(

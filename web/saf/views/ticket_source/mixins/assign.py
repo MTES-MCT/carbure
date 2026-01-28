@@ -55,6 +55,7 @@ class AssignActionMixin:
         reception_airport = serializer.validated_data.get("reception_airport")
         consumption_type = serializer.validated_data.get("consumption_type")
         shipping_method = serializer.validated_data.get("shipping_method")
+        has_intermediary_depot = serializer.validated_data.get("has_intermediary_depot")
 
         pos_number = serializer.validated_data.get("pos_number")
         origin_lot_pos_number = ticket_source.origin_lot.pos_number if ticket_source.origin_lot else None
@@ -68,7 +69,9 @@ class AssignActionMixin:
         if pos_number and origin_lot_pos_number and pos_number != origin_lot_pos_number:
             raise ValidationError({"message": SafTicketAssignError.POS_NUMBER_MISMATCH})
 
-        if not is_shipping_route_available(ticket_source.origin_lot_site, reception_airport, shipping_method):
+        if not is_shipping_route_available(
+            ticket_source.origin_lot_site, reception_airport, shipping_method, has_intermediary_depot
+        ):
             raise ValidationError({"message": SafTicketAssignError.SHIPPING_ROUTE_NOT_REGISTERED})
 
         with transaction.atomic():
