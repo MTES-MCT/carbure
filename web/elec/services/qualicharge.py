@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from rest_framework import serializers
 
 from core.models import Entity
@@ -92,27 +93,66 @@ def process_certificates_batch(validated_data, double_validated):
         list: List of error dictionaries for certificates that failed to process
     """
     errors = []
+    certificates_to_create = []
+    certificates_to_update = []
 
+    # Collect all station_ids to fetch existing certificates in one query
+    all_station_keys = []
+    for item in validated_data:
+        for unit in item["operational_units"]:
+            for station in unit.get("stations", []):
+                station_id = station["id"]
+                date_from = unit["from"]
+                date_to = unit["to"]
+                all_station_keys.append((station_id, date_from, date_to))
+
+    # Fetch existing certificates in one query
+    existing_certs = {}
+    if all_station_keys:
+        query = Q()
+        for station_id, date_from, date_to in all_station_keys:
+            query |= Q(station_id=station_id, date_from=date_from, date_to=date_to)
+
+        for cert in ElecProvisionCertificateQualicharge.objects.filter(query):
+            existing_certs[(cert.station_id, cert.date_from, cert.date_to)] = cert
+
+    # Prepare bulk operations
     for item in validated_data:
         siren = item["siren"]
         cpo, unknown_siren = resolve_cpo(siren)
 
         for unit in item["operational_units"]:
-            unit_errors = _process_operational_unit(unit, cpo, unknown_siren, double_validated)
+            unit_errors = _prepare_certificates_bulk(
+                unit, cpo, unknown_siren, double_validated, existing_certs, certificates_to_create, certificates_to_update
+            )
             errors.extend(unit_errors)
+
+    # Execute bulk operations
+    if certificates_to_create:
+        ElecProvisionCertificateQualicharge.objects.bulk_create(certificates_to_create, batch_size=100)
+
+    if certificates_to_update:
+        ElecProvisionCertificateQualicharge.objects.bulk_update(
+            certificates_to_update,
+            ["cpo", "unknown_siren", "year", "operating_unit", "energy_amount", "is_controlled_by_qualicharge"],
+            batch_size=100,
+        )
 
     return errors
 
 
-def _process_operational_unit(unit, cpo, unknown_siren, double_validated):
+def _prepare_certificates_bulk(unit, cpo, unknown_siren, double_validated, existing_certs, to_create, to_update):
     """
-    Process an operational unit and create/update certificates for its stations.
+    Prepare certificates for bulk create/update operations.
 
     Args:
         unit: Operational unit data
         cpo: Resolved CPO entity (can be None)
         unknown_siren: SIREN that couldn't be resolved (can be None)
         double_validated: Set of already double-validated certificates
+        existing_certs: Dict of existing certificates by (station_id, date_from, date_to)
+        to_create: List to append new certificates
+        to_update: List to append certificates to update
 
     Returns:
         list: List of error dictionaries for stations that failed to process
@@ -131,21 +171,34 @@ def _process_operational_unit(unit, cpo, unknown_siren, double_validated):
             errors.append({"station_id": station_id, "error": "Provision certificate already validated and created"})
             continue
 
-        # Create or update the certificate
         try:
-            ElecProvisionCertificateQualicharge.objects.update_or_create(
-                station_id=station_id,
-                date_from=date_from,
-                date_to=date_to,
-                defaults={
-                    "cpo": cpo,
-                    "unknown_siren": unknown_siren,
-                    "year": year,
-                    "operating_unit": code,
-                    "energy_amount": station["energy"],
-                    "is_controlled_by_qualicharge": station["is_controlled"],
-                },
-            )
+            key = (station_id, date_from, date_to)
+
+            if key in existing_certs:
+                # Update existing certificate
+                cert = existing_certs[key]
+                cert.cpo = cpo
+                cert.unknown_siren = unknown_siren
+                cert.year = year
+                cert.operating_unit = code
+                cert.energy_amount = station["energy"]
+                cert.is_controlled_by_qualicharge = station["is_controlled"]
+                to_update.append(cert)
+            else:
+                # Create new certificate
+                to_create.append(
+                    ElecProvisionCertificateQualicharge(
+                        station_id=station_id,
+                        date_from=date_from,
+                        date_to=date_to,
+                        cpo=cpo,
+                        unknown_siren=unknown_siren,
+                        year=year,
+                        operating_unit=code,
+                        energy_amount=station["energy"],
+                        is_controlled_by_qualicharge=station["is_controlled"],
+                    )
+                )
         except Exception as e:
             errors.append({"station_id": station_id, "error": str(e)})
 
