@@ -155,6 +155,7 @@ class SafAssignTicketTest(TestCase):
             origin_depot=origin_depot,
             destination_airport=destination_airport,
             shipping_method=SafLogistics.BARGE,
+            has_intermediary_depot=False,
         )
 
         ticket_source = SafTicketSourceFactory.create(
@@ -175,6 +176,7 @@ class SafAssignTicketTest(TestCase):
             "assignment_period": 202203,
             "shipping_method": SafLogistics.TRAIN,
             "reception_airport": destination_airport.pk,
+            "has_intermediary_depot": False,
         }
 
         response = self.assign_ticket(body, ticket_source_id=ticket_source.pk)

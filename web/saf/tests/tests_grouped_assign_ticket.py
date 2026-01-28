@@ -141,18 +141,21 @@ class SafGroupedAssignTicketTest(TestCase):
             origin_depot=origin_depot_a,
             destination_airport=destination_airport,
             shipping_method=SafLogistics.BARGE,
+            has_intermediary_depot=False,
         )
 
         SafLogisticsFactory.create(
             origin_depot=origin_depot_a,
             destination_airport=destination_airport,
             shipping_method=SafLogistics.TRAIN,
+            has_intermediary_depot=False,
         )
 
         SafLogisticsFactory.create(
             origin_depot=origin_depot_b,
             destination_airport=destination_airport,
             shipping_method=SafLogistics.TRAIN,
+            has_intermediary_depot=False,
         )
 
         ticket_source_a = SafTicketSourceFactory.create(
@@ -184,6 +187,7 @@ class SafGroupedAssignTicketTest(TestCase):
             "assignment_period": 202206,
             "reception_airport": destination_airport.pk,
             "shipping_method": SafLogistics.BARGE,
+            "has_intermediary_depot": False,
         }
 
         response = self.group_assign_tickets(body)
