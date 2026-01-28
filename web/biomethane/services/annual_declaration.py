@@ -12,6 +12,8 @@ from biomethane.models import (
 
 
 class BiomethaneAnnualDeclarationService:
+    OVERDUE_DATE = date(date.today().year, 3, 31)  # 31st March of the current year
+
     @staticmethod
     def get_current_declaration_year():
         """
@@ -45,8 +47,8 @@ class BiomethaneAnnualDeclarationService:
         """
         Returns the status of a biomethane annual declaration.
 
-        If the declaration's year is earlier than the current declaration period and its status is not 'DECLARED',
-        the method returns 'OVERDUE'. Otherwise, it returns the current status of the declaration.
+        If the declaration is for a past year or if the current date is past the overdue date (31st March)
+        and the declaration is not marked as DECLARED, the status is set to OVERDUE.
 
         Args:
             declaration: An object representing the biomethane annual declaration.
@@ -54,9 +56,13 @@ class BiomethaneAnnualDeclarationService:
         Returns:
             str: The status of the declaration, either 'OVERDUE' or its current status.
         """
-        current_declaration_period = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        current_declaration_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        limit_declaration = BiomethaneAnnualDeclarationService.OVERDUE_DATE
 
-        if declaration.year < current_declaration_period and declaration.status != BiomethaneAnnualDeclaration.DECLARED:
+        if (
+            declaration.year < current_declaration_year  # Case of past years
+            or limit_declaration < date.today()  # Case of current declaration, after 31st March
+        ) and declaration.status != BiomethaneAnnualDeclaration.DECLARED:
             return BiomethaneAnnualDeclaration.OVERDUE
 
         return declaration.status

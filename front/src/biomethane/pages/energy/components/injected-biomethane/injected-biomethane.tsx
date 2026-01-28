@@ -1,6 +1,5 @@
 import { Button } from "common/components/button2"
 import { NumberInput } from "common/components/inputs2"
-import { Grid } from "common/components/scaffold"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
@@ -8,9 +7,16 @@ import { DeepPartial } from "common/types"
 import { BiomethaneEnergy, BiomethaneEnergyInputRequest } from "../../types"
 import { useSaveEnergy } from "../../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
-import { isTariffReference2011Or2020 } from "biomethane/pages/contract"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useInjectedBiomethane } from "./injected-biomethane.hooks"
+import { roundNumber } from "common/utils/formatters"
+
+const calculateInjectedBiomethaneNm3PerYear = (
+  gwhPcsPerYear: number,
+  pcsKwhPerNm3: number
+) => {
+  return roundNumber(gwhPcsPerYear * pcsKwhPerNm3 * Math.pow(10, -6), 2)
+}
 
 export type InjectedBiomethaneForm = DeepPartial<
   Pick<
@@ -70,48 +76,57 @@ export function InjectedBiomethane({
             {...bind("injected_biomethane_gwh_pcs_per_year")}
             required
           />
-          <Grid cols={2} gap="lg">
-            {isTariffReference2011Or2020(contract?.tariff_reference) && (
-              <NumberInput
-                readOnly={!isEditing}
-                label={t("Quantité de biométhane injecté (Nm3/an)")}
-                type="number"
-                {...bind("injected_biomethane_nm3_per_year")}
-                required
-              />
-            )}
+          <NumberInput
+            readOnly={!isEditing}
+            label={t("PCS du biométhane injecté (kWh/Nm3)")}
+            hintText={t("Valeur moyenne de l'année de déclaration")}
+            type="number"
+            {...bind("injected_biomethane_pcs_kwh_per_nm3")}
+            required
+          />
 
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("Taux de CH4 dans le biométhane injecté (%)")}
-              hintText={t("Valeur moyenne de l'année de déclaration")}
-              type="number"
-              min={0}
-              max={100}
-              {...bind("injected_biomethane_ch4_rate_percent")}
-              required
-            />
-            <NumberInput
-              readOnly={!isEditing}
-              label={t("PCS du biométhane injecté (kWh/Nm3)")}
-              hintText={t("Valeur moyenne de l'année de déclaration")}
-              type="number"
-              {...bind("injected_biomethane_pcs_kwh_per_nm3")}
-              required
-            />
-            <NumberInput
-              label={t("Nombre d'heures de fonctionnement (h)")}
-              hintText={t(
-                "Fonctionnement à plein régime (à la capacité maximale inscrite dans le contrat)"
-              )}
-              {...bind("operating_hours")}
-              disabled
-              required
-              readOnly={!isEditing}
-              hasTooltip
-              title={rule}
-            />
-          </Grid>
+          <NumberInput
+            readOnly={!isEditing}
+            label={t("Quantité de biométhane injecté (Nm3/an)")}
+            hasTooltip
+            title={t(
+              "Quantité de biométhane injecté (Nm3/an) = Quantité de biométhane injecté (GWhPCS/an) * PCS du biométhane injecté (kWh/Nm3) * 10^-6"
+            )}
+            type="number"
+            {...bind("injected_biomethane_nm3_per_year", {
+              value: calculateInjectedBiomethaneNm3PerYear(
+                value.injected_biomethane_gwh_pcs_per_year ?? 0,
+                value.injected_biomethane_pcs_kwh_per_nm3 ?? 0
+              ),
+            })}
+            disabled
+          />
+
+          <div />
+
+          <NumberInput
+            readOnly={!isEditing}
+            label={t("Taux de CH4 dans le biométhane injecté (%)")}
+            hintText={t("Valeur moyenne de l'année de déclaration")}
+            type="number"
+            min={0}
+            max={100}
+            {...bind("injected_biomethane_ch4_rate_percent")}
+            required
+          />
+
+          <NumberInput
+            label={t("Nombre d'heures de fonctionnement (h)")}
+            hintText={t(
+              "Fonctionnement à plein régime (à la capacité maximale inscrite dans le contrat)"
+            )}
+            {...bind("operating_hours")}
+            disabled
+            required
+            readOnly={!isEditing}
+            hasTooltip
+            title={rule}
+          />
           {isEditing && (
             <Button
               type="submit"

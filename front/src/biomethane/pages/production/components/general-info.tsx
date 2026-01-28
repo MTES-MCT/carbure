@@ -43,6 +43,7 @@ export function GeneralInfo({
     postal_code: productionUnit?.postal_code,
     city: productionUnit?.city,
     department: productionUnit?.department,
+    insee_code: productionUnit?.insee_code,
   })
 
   const { execute: saveProductionUnit, loading } =
