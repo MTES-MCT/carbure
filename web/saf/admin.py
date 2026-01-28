@@ -127,15 +127,11 @@ class SafLogisticsAdmin(ImportExportWithTemplateModelAdmin):
     import_template_columns = [
         {
             "header": "origin_depot",
-            "options": (
-                Depot.objects.filter(is_enabled=True, site_type__in=SAF_DEPOT_TYPES)
-                .order_by("name")
-                .values_list("name", flat=True)
-            ),
+            "options": (Depot.objects.filter(site_type__in=SAF_DEPOT_TYPES).order_by("name").values_list("name", flat=True)),
         },
         {
             "header": "destination_airport",
-            "options": Airport.objects.filter(is_enabled=True).order_by("name").values_list("name", flat=True),
+            "options": Airport.objects.order_by("name").values_list("name", flat=True),
         },
         {
             "header": "shipping_method",
