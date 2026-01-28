@@ -8,6 +8,7 @@ import { useAnnualDeclarationYearsAdmin } from "../hooks/use-annual-declaration-
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationIsOpenBadge } from "./annual-declaration-is-open-badge"
 import { ToggleDeclarationButton } from "./toggle-declaration-button"
+import useEntity from "common/hooks/entity"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -24,7 +25,7 @@ export const DeclarationDetailHeader = ({
   producers,
 }: DeclarationDetailHeaderProps) => {
   const { selectedEntityId } = useSelectedEntity()
-
+  const entity = useEntity()
   const { annualDeclaration } = useAnnualDeclaration()
   const navigate = useNavigate()
   const routes = useRoutes()
@@ -43,10 +44,13 @@ export const DeclarationDetailHeader = ({
       />
 
       <SelectYears key={selectedEntityId} />
-      <AnnualDeclarationIsOpenBadge
-        isDeclarationOpen={annualDeclaration?.is_open ?? false}
-      />
-      <ToggleDeclarationButton />
+      {/* Only display the open badge if the declaration exists */}
+      {annualDeclaration && (
+        <AnnualDeclarationIsOpenBadge
+          isDeclarationOpen={annualDeclaration?.is_open ?? false}
+        />
+      )}
+      {entity.canWrite() && <ToggleDeclarationButton />}
     </Row>
   )
 }
