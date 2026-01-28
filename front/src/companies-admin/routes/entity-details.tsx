@@ -61,7 +61,7 @@ const EntityDetails = () => {
         <Row style={{ alignItems: "center", gap: "var(--spacing-m)" }}>
           <Button
             icon={ChevronLeft}
-            action={() => navigate("..")}
+            action={() => navigate(-1)}
             label="Retour"
           />
           <h1>{entityData?.name}</h1>

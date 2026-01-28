@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import * as api from "../api"
@@ -19,22 +18,18 @@ import {
 } from "common/utils/normalizers"
 import useEntity from "common/hooks/entity"
 import Tag from "common/components/tag"
+import {
+  EntitySummaryFilter,
+  Operation,
+  useEntitySummaryFilters,
+} from "./entity-summary.hooks"
+import { SearchInput } from "common/components/input"
 
-type EntitySummaryProps = {
-  search?: string
-}
-
-type Operation =
-  | "authorize"
-  | "user"
-  | "certificate"
-  | "double-counting"
-  | "charge-points"
-  | "meter-readings"
-
-export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
+export const EntitySummary = () => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const [entitySummaryFilters, setEntitySummaryFilters] =
+    useEntitySummaryFilters()
   const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
   const isAdminDC = entity.isExternal && entity.hasAdminRight("DCA")
 
@@ -43,30 +38,53 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
     params: [entity.id],
   })
 
-  const [types, setTypes] = useState<EntityType[] | undefined>(
-    hasAirlineOnly ? [EntityType.Airline, EntityType.SAF_Trader] : undefined
-  )
-  const [operation, setOperations] = useState<Operation | undefined>(undefined)
-
   const entityData = entities.result?.data ?? []
-  // const entityData = companiesSummary // TEST data
 
   const matchedEntities = entityData.filter(
     (e) =>
-      matchesSearch(search, [e.entity.name]) &&
-      hasTypes(e, types) &&
-      hasOperation(e, operation)
+      matchesSearch(entitySummaryFilters.search, [e.entity.name]) &&
+      hasTypes(e, entitySummaryFilters.types) &&
+      hasOperation(e, entitySummaryFilters.operation)
   )
 
   const hasResults = matchedEntities.length > 0
+
+  const handleTypesChange = (types: EntityType[] | undefined) => {
+    setEntitySummaryFilters((prev) => ({
+      ...prev,
+      [EntitySummaryFilter.Types]: types,
+    }))
+  }
+
+  const handleOperationChange = (operation: Operation | undefined) => {
+    setEntitySummaryFilters((prev) => ({
+      ...prev,
+      [EntitySummaryFilter.Operation]: operation,
+    }))
+  }
+
+  const handleSearchChange = (search: string | undefined) => {
+    setEntitySummaryFilters((prev) => ({
+      ...prev,
+      [EntitySummaryFilter.Search]: search,
+    }))
+  }
   return (
     <>
+      <SearchInput
+        clear
+        debounce={250}
+        label={t("Recherche")}
+        placeholder={t("Entrez du texte pour filtrer les résultats...")}
+        value={entitySummaryFilters.search}
+        onChange={handleSearchChange}
+      />
       <Grid>
         {!hasAirlineOnly && (
           <MultiSelect
             clear
-            value={types}
-            onChange={setTypes}
+            value={entitySummaryFilters.types}
+            onChange={handleTypesChange}
             label={t("Types d'entité")}
             placeholder={t("Choisissez un ou plusieurs types")}
             normalize={normalizeEntityType}
@@ -84,8 +102,8 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
         )}
         <Select
           clear
-          value={operation}
-          onChange={setOperations}
+          value={entitySummaryFilters.operation}
+          onChange={handleOperationChange}
           label={t("Opérations en attente")}
           placeholder={t("Choisissez une opération")}
           options={compact([
@@ -156,8 +174,10 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                 ),
               },
               entity.isAdmin &&
-                (!operation ||
-                  !["charge-points", "meter-readings"].includes(operation)) && {
+                (!entitySummaryFilters.operation ||
+                  !["charge-points", "meter-readings"].includes(
+                    entitySummaryFilters.operation
+                  )) && {
                   key: "factories",
                   header: t("Production / Stockage"),
                   orderBy: (e) => e.production_sites + e.depots,
@@ -179,12 +199,12 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   ),
                 },
               (entity.isAdmin || isAdminDC) &&
-                (!operation ||
+                (!entitySummaryFilters.operation ||
                   ![
                     "double-counting",
                     "charge-points",
                     "meter-readings",
-                  ].includes(operation)) && {
+                  ].includes(entitySummaryFilters.operation)) && {
                   key: "certificates",
                   header: t("Certificats"),
                   orderBy: (e) => e.certificates,
@@ -209,7 +229,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   ),
                 },
               (entity.isAdmin || isAdminDC) &&
-                operation === "double-counting" && {
+                entitySummaryFilters.operation === "double-counting" && {
                   key: "double-counting",
                   header: t("Double comptage"),
                   orderBy: (e) =>
@@ -235,7 +255,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   ),
                 },
               entity.isAdmin &&
-                "charge-points" === operation && {
+                "charge-points" === entitySummaryFilters.operation && {
                   key: "charge-points",
                   header: t("Points de recharge"),
                   orderBy: (e) =>
@@ -261,7 +281,7 @@ export const EntitySummary = ({ search = "" }: EntitySummaryProps) => {
                   ),
                 },
               entity.isAdmin &&
-                "meter-readings" === operation && {
+                "meter-readings" === entitySummaryFilters.operation && {
                   key: "meter-readings",
                   header: t("Relevés trimestriels"),
                   orderBy: (e) =>
