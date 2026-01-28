@@ -33,7 +33,7 @@ def get_airports(request, *args, **kwargs):
     query = serializer.validated_data.get("query", None)
     origin_depot_id = serializer.validated_data.get("origin_depot_id", None)
     shipping_method = serializer.validated_data.get("shipping_method", None)
-    has_intermediary_depot = serializer.validated_data.get("has_intermediary_depot", False)
+    has_intermediary_depot = serializer.validated_data.get("has_intermediary_depot") or False
 
     sites = Airport.objects.all().order_by("name").filter(is_enabled=True)
 
@@ -41,7 +41,7 @@ def get_airports(request, *args, **kwargs):
         sites = sites.filter(private=False)
     if query:
         sites = sites.filter(Q(name__icontains=query) | Q(customs_id__icontains=query) | Q(city__icontains=query))
-    if origin_depot_id and shipping_method:
+    if origin_depot_id and shipping_method is not None and shipping_method != SafLogistics.TRUCK:
         if SafLogistics.objects.filter(
             origin_depot_id=origin_depot_id,
             shipping_method=shipping_method,
