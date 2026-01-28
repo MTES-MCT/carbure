@@ -1,5 +1,4 @@
 import os
-import traceback
 
 from django.conf import settings
 
@@ -17,11 +16,9 @@ class ExceptionMiddleware:
         return self.get_response(request)
 
     def process_exception(self, _, exception):
-        if not os.getenv("TEST") and os.getenv("IMAGE_TAG") in ("dev", "staging", "prod"):
-            log_exception(exception)
+        log_exception(exception)
 
         if settings.DEBUG or os.getenv("TEST"):
-            traceback.print_exc()
             return ErrorResponse(500, CarbureError.UNKNOWN_ERROR, message=str(exception))
         else:
             return ErrorResponse(500, CarbureError.UNKNOWN_ERROR)
