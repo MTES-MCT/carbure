@@ -70,12 +70,12 @@ def resolve_cpo(siren):
             - If multiple found but no master: (None, siren)
     """
     try:
-        return Entity.objects.get(registration_id=siren), None
+        return Entity.objects.get(registration_id=siren, entity_type=Entity.CPO, is_enabled=True), None
     except Entity.DoesNotExist:
         return None, siren
     except Entity.MultipleObjectsReturned:
         try:
-            return Entity.objects.get(registration_id=siren, is_master=True), None
+            return Entity.objects.get(registration_id=siren, entity_type=Entity.CPO, is_master=True, is_enabled=True), None
         except Entity.DoesNotExist:
             return None, siren
 
