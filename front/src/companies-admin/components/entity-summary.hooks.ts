@@ -1,5 +1,5 @@
 import { EntityType } from "common/types"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 
 export type Operation =
@@ -54,5 +54,53 @@ export const useEntitySummaryFilters = () => {
     return filters
   }, [filtersParams])
 
-  return [filters, setFiltersParams] as const
+  const updateFilter = useCallback(
+    (filter: EntitySummaryFilter, value: string | string[] | undefined) => {
+      setFiltersParams((prev) => {
+        const newParams = new URLSearchParams(prev)
+
+        // Supprimer toutes les valeurs existantes pour ce filtre
+        newParams.delete(filter)
+
+        if (value !== undefined && value !== "") {
+          if (Array.isArray(value)) {
+            value.forEach((v) => newParams.append(filter, v))
+          } else {
+            newParams.set(filter, value)
+          }
+        }
+
+        return newParams
+      })
+    },
+    [setFiltersParams]
+  )
+
+  const handleTypesChange = useCallback(
+    (types: EntityType[] | undefined) => {
+      updateFilter(EntitySummaryFilter.Types, types)
+    },
+    [updateFilter]
+  )
+
+  const handleOperationChange = useCallback(
+    (operation: Operation | undefined) => {
+      updateFilter(EntitySummaryFilter.Operation, operation)
+    },
+    [updateFilter]
+  )
+
+  const handleSearchChange = useCallback(
+    (search: string | undefined) => {
+      updateFilter(EntitySummaryFilter.Search, search)
+    },
+    [updateFilter]
+  )
+
+  return {
+    filters,
+    handleTypesChange,
+    handleOperationChange,
+    handleSearchChange,
+  } as const
 }

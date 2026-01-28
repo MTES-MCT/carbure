@@ -18,18 +18,18 @@ import {
 } from "common/utils/normalizers"
 import useEntity from "common/hooks/entity"
 import Tag from "common/components/tag"
-import {
-  EntitySummaryFilter,
-  Operation,
-  useEntitySummaryFilters,
-} from "./entity-summary.hooks"
+import { Operation, useEntitySummaryFilters } from "./entity-summary.hooks"
 import { SearchInput } from "common/components/input"
 
 export const EntitySummary = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const [entitySummaryFilters, setEntitySummaryFilters] =
-    useEntitySummaryFilters()
+  const {
+    filters: entitySummaryFilters,
+    handleTypesChange,
+    handleOperationChange,
+    handleSearchChange,
+  } = useEntitySummaryFilters()
   const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
   const isAdminDC = entity.isExternal && entity.hasAdminRight("DCA")
 
@@ -48,27 +48,6 @@ export const EntitySummary = () => {
   )
 
   const hasResults = matchedEntities.length > 0
-
-  const handleTypesChange = (types: EntityType[] | undefined) => {
-    setEntitySummaryFilters((prev) => ({
-      ...prev,
-      [EntitySummaryFilter.Types]: types,
-    }))
-  }
-
-  const handleOperationChange = (operation: Operation | undefined) => {
-    setEntitySummaryFilters((prev) => ({
-      ...prev,
-      [EntitySummaryFilter.Operation]: operation,
-    }))
-  }
-
-  const handleSearchChange = (search: string | undefined) => {
-    setEntitySummaryFilters((prev) => ({
-      ...prev,
-      [EntitySummaryFilter.Search]: search,
-    }))
-  }
   return (
     <>
       <SearchInput
