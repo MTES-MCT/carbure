@@ -61,7 +61,7 @@ class BiomethaneAnnualDeclarationService:
 
         if (
             declaration.year < current_declaration_year  # Case of past years
-            or limit_declaration > date.today()  # Case of current declaration, after 31st March
+            or limit_declaration < date.today()  # Case of current declaration, after 31st March
         ) and declaration.status != BiomethaneAnnualDeclaration.DECLARED:
             return BiomethaneAnnualDeclaration.OVERDUE
 
