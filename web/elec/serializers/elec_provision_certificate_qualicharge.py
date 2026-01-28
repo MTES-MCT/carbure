@@ -13,6 +13,25 @@ class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer)
     cpo = EntityPreviewSerializer(read_only=True)
 
 
+class ElecProvisionCertificateQualichargeGroupedSerializer(serializers.Serializer):
+    """Serializer for grouped provision certificate data by operating unit."""
+
+    cpo = serializers.SerializerMethodField()
+    operating_unit = serializers.CharField()
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+    year = serializers.IntegerField()
+    energy_amount = serializers.FloatField()
+
+    def get_cpo(self, obj):
+        return {
+            "id": obj.get("cpo__id"),
+            "name": obj.get("cpo__name"),
+            "entity_type": obj.get("cpo__entity_type"),
+            "registration_id": obj.get("cpo__registration_id"),
+        }
+
+
 class StationSerializer(serializers.Serializer):
     id = serializers.RegexField(regex=r"^FR[A-Z0-9]{3}P.*", min_length=7)
     energy = serializers.FloatField()
