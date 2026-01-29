@@ -31,4 +31,5 @@ class ElecProvisionCertificateQualicharge(models.Model):
         verbose_name_plural = "Certificats de Fourniture Qualicharge (elec)"
 
     def __str__(self):
-        return f"{self.cpo.name} - {self.station_id} - {self.date_from} to {self.date_to}"
+        cpo = self.cpo.name if self.cpo else "Unknown CPO"
+        return f"{cpo} - {self.station_id} - {self.date_from} to {self.date_to}"
