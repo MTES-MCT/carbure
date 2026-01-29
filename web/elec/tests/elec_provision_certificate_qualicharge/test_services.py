@@ -6,7 +6,7 @@ from core.models import Entity
 from elec.factories.provision_certificate_qualicharge import ElecProvisionCertificateQualichargeFactory
 from elec.models import ElecProvisionCertificate, ElecProvisionCertificateQualicharge
 from elec.services.qualicharge import (
-    _process_operational_unit,
+    _prepare_certificates_bulk,
     create_provision_certificates_from_qualicharge,
     process_certificates_batch,
     resolve_cpo,
@@ -145,8 +145,8 @@ class ProcessCertificatesBatchTest(TestCase):
         self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 2)
 
 
-class ProcessOperationalUnitTest(TestCase):
-    """Tests for the _process_operational_unit function"""
+class PrepareCertificatesBulkTest(TestCase):
+    """Tests for the _prepare_certificates_bulk function"""
 
     def setUp(self):
         self.cpo = Entity.objects.create(
@@ -168,14 +168,20 @@ class ProcessOperationalUnitTest(TestCase):
             ],
         }
         self.double_validated = set()
+        self.existing_certs = {}
+        self.to_create = []
+        self.to_update = []
 
     def test_create_certificate_with_cpo(self):
         """Test creating certificate with a valid CPO"""
-        errors = _process_operational_unit(self.unit_data, self.cpo, None, self.double_validated)
+        errors = _prepare_certificates_bulk(
+            self.unit_data, self.cpo, None, self.double_validated, self.existing_certs, self.to_create, self.to_update
+        )
 
         self.assertEqual(len(errors), 0)
-        self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 1)
-        cert = ElecProvisionCertificateQualicharge.objects.first()
+        self.assertEqual(len(self.to_create), 1)
+        self.assertEqual(len(self.to_update), 0)
+        cert = self.to_create[0]
         self.assertEqual(cert.cpo, self.cpo)
         self.assertEqual(cert.station_id, "FRXYZP123456")
         self.assertEqual(cert.energy_amount, 1000.0)
@@ -183,11 +189,13 @@ class ProcessOperationalUnitTest(TestCase):
 
     def test_create_certificate_with_unknown_siren(self):
         """Test creating certificate with unknown SIREN"""
-        errors = _process_operational_unit(self.unit_data, None, "999999999", self.double_validated)
+        errors = _prepare_certificates_bulk(
+            self.unit_data, None, "999999999", self.double_validated, self.existing_certs, self.to_create, self.to_update
+        )
 
         self.assertEqual(len(errors), 0)
-        self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 1)
-        cert = ElecProvisionCertificateQualicharge.objects.first()
+        self.assertEqual(len(self.to_create), 1)
+        cert = self.to_create[0]
         self.assertIsNone(cert.cpo)
         self.assertEqual(cert.unknown_siren, "999999999")
 
@@ -195,11 +203,14 @@ class ProcessOperationalUnitTest(TestCase):
         """Test rejecting already double-validated certificates"""
         self.double_validated = {("FRXYZP123456", datetime.date(2023, 1, 1), datetime.date(2023, 3, 31))}
 
-        errors = _process_operational_unit(self.unit_data, self.cpo, None, self.double_validated)
+        errors = _prepare_certificates_bulk(
+            self.unit_data, self.cpo, None, self.double_validated, self.existing_certs, self.to_create, self.to_update
+        )
 
         self.assertEqual(len(errors), 1)
         self.assertIn("already validated", errors[0]["error"])
-        self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 0)
+        self.assertEqual(len(self.to_create), 0)
+        self.assertEqual(len(self.to_update), 0)
 
     def test_process_multiple_stations(self):
         """Test processing multiple stations in one operational unit"""
@@ -211,14 +222,16 @@ class ProcessOperationalUnitTest(TestCase):
             }
         )
 
-        errors = _process_operational_unit(self.unit_data, self.cpo, None, self.double_validated)
+        errors = _prepare_certificates_bulk(
+            self.unit_data, self.cpo, None, self.double_validated, self.existing_certs, self.to_create, self.to_update
+        )
 
         self.assertEqual(len(errors), 0)
-        self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 2)
+        self.assertEqual(len(self.to_create), 2)
 
     def test_update_existing_certificate(self):
         """Test updating an existing certificate"""
-        ElecProvisionCertificateQualicharge.objects.create(
+        existing_cert = ElecProvisionCertificateQualicharge.objects.create(
             cpo=self.cpo,
             station_id="FRXYZP123456",
             date_from=datetime.date(2023, 1, 1),
@@ -229,11 +242,18 @@ class ProcessOperationalUnitTest(TestCase):
             is_controlled_by_qualicharge=False,
         )
 
-        errors = _process_operational_unit(self.unit_data, self.cpo, None, self.double_validated)
+        # Add to existing_certs dict
+        key = ("FRXYZP123456", datetime.date(2023, 1, 1), datetime.date(2023, 3, 31))
+        self.existing_certs[key] = existing_cert
+
+        errors = _prepare_certificates_bulk(
+            self.unit_data, self.cpo, None, self.double_validated, self.existing_certs, self.to_create, self.to_update
+        )
 
         self.assertEqual(len(errors), 0)
-        self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 1)
-        cert = ElecProvisionCertificateQualicharge.objects.first()
+        self.assertEqual(len(self.to_create), 0)
+        self.assertEqual(len(self.to_update), 1)
+        cert = self.to_update[0]
         self.assertEqual(cert.energy_amount, 1000.0)  # Updated
         self.assertTrue(cert.is_controlled_by_qualicharge)  # Updated
 
