@@ -113,7 +113,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         )}
         {ticket.shipping_method && (
           <TextInput
-            label={t("Méthode de livraison")}
+            label={t("Mode de livraison")}
             value={ticket.shipping_method}
             readOnly
           />

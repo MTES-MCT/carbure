@@ -166,7 +166,7 @@ export const AssignmentForm = ({
             normalize={norm.normalizeAirport}
             hasTooltip
             title={t(
-              "Si vous ne retrouvez pas l'aéroport désiré dans la liste, merci de contacter la DGEC en indiquant le dépôt d'incorporation et la méthode de livraison."
+              "Si vous ne retrouvez pas l'aéroport désiré dans la liste, merci de contacter la DGEC en indiquant le dépôt d'incorporation et le mode de livraison."
             )}
             {...bind("reception_airport")}
           />
