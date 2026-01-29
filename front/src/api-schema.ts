@@ -4291,6 +4291,19 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string | null;
         };
+        /** @description Serializer for grouped provision certificate data by operating unit. */
+        ElecProvisionCertificateQualichargeGrouped: {
+            readonly cpo: components["schemas"]["EntityPreview"];
+            operating_unit: string;
+            /** Format: date */
+            date_from: string;
+            /** Format: date */
+            date_to: string;
+            year: number;
+            /** Format: double */
+            energy_amount: number;
+        };
+        ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
         /**
          * @description * `MANUAL` - MANUAL
          *     * `METER_READINGS` - METER_READINGS
@@ -5127,7 +5140,7 @@ export interface components {
             results: components["schemas"]["ElecProvisionCertificate"][];
             available_energy?: number;
         };
-        PaginatedElecProvisionCertificateQualichargeList: {
+        PaginatedElecProvisionCertificateQualichargeResponseList: {
             /** @example 123 */
             count: number;
             /**
@@ -5140,7 +5153,7 @@ export interface components {
              * @example http://api.example.org/accounts/?page=2
              */
             previous?: string | null;
-            results: components["schemas"]["ElecProvisionCertificateQualicharge"][];
+            results: components["schemas"]["ElecProvisionCertificateQualichargeResponse"][];
             total_quantity?: number;
         };
         PaginatedElecTransferCertificateList: {
@@ -7517,6 +7530,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -8429,6 +8444,8 @@ export interface operations {
                 date_from?: string;
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
@@ -8460,7 +8477,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeList"];
+                    "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeResponseList"];
                 };
             };
         };
@@ -8558,6 +8575,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
@@ -12847,6 +12866,9 @@ export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
     MANUAL = "MANUAL",
     METER_READINGS = "METER_READINGS",
     QUALICHARGE = "QUALICHARGE"
+}
+export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by {
+    operating_unit = "operating_unit"
 }
 export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by {
     BOTH = "BOTH",

@@ -1,4 +1,5 @@
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema, extend_schema_view
+from rest_framework import status
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -41,6 +42,21 @@ class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination
             required=True,
         ),
     ]
+)
+@extend_schema_view(
+    list=extend_schema(
+        responses={
+            status.HTTP_200_OK: PolymorphicProxySerializer(
+                many=True,
+                component_name="ElecProvisionCertificateQualichargeResponse",
+                serializers=[
+                    ElecProvisionCertificateQualichargeGroupedSerializer,
+                    ElecProvisionCertificateQualichargeSerializer,
+                ],
+                resource_type_field_name=None,
+            )
+        },
+    )
 )
 class ElecProvisionCertificateQualichargeViewSet(ListModelMixin, RetrieveModelMixin, ActionMixin, GenericViewSet):
     queryset = ElecProvisionCertificateQualicharge.objects.all()

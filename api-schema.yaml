@@ -2093,6 +2093,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -3588,6 +3594,17 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: group_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - operating_unit
+          description: "* `operating_unit` - operating_unit"
+          explode: true
+          style: form
+        - in: query
           name: not_validated
           schema:
             type: boolean
@@ -3665,7 +3682,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeList"
+                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeRespons\
+                  eList"
           description: ""
   /api/elec/provision-certificates-qualicharge/{id}/:
     get:
@@ -3805,6 +3823,17 @@ paths:
               - year
           description: Filter string to apply
           required: true
+        - in: query
+          name: group_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - operating_unit
+          description: "* `operating_unit` - operating_unit"
+          explode: true
+          style: form
         - in: query
           name: not_validated
           schema:
@@ -14218,6 +14247,38 @@ components:
         - operating_unit
         - station_id
         - year
+    ElecProvisionCertificateQualichargeGrouped:
+      type: object
+      description: Serializer for grouped provision certificate data by operating unit.
+      properties:
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        operating_unit:
+          type: string
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
+        year:
+          type: integer
+        energy_amount:
+          type: number
+          format: double
+      required:
+        - cpo
+        - date_from
+        - date_to
+        - energy_amount
+        - operating_unit
+        - year
+    ElecProvisionCertificateQualichargeResponse:
+      oneOf:
+        - $ref: "#/components/schemas/ElecProvisionCertificateQualichargeGrouped"
+        - $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
     ElecProvisionCertificateSourceEnum:
       enum:
         - MANUAL
@@ -14305,6 +14366,7 @@ components:
         energy_amount:
           type: number
           format: double
+          minimum: 0.01
         client:
           type: integer
         is_readjustment:
@@ -16132,7 +16194,7 @@ components:
             $ref: "#/components/schemas/ElecProvisionCertificate"
         available_energy:
           type: number
-    PaginatedElecProvisionCertificateQualichargeList:
+    PaginatedElecProvisionCertificateQualichargeResponseList:
       type: object
       required:
         - count
@@ -16154,7 +16216,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+            $ref: "#/components/schemas/ElecProvisionCertificateQualichargeResponse"
         total_quantity:
           type: number
     PaginatedElecTransferCertificateList:
@@ -16812,7 +16874,7 @@ components:
         pos_number:
           type: string
           nullable: true
-          maxLength: 64
+          maxLength: 128
       required:
         - id
     SafParentTicket:

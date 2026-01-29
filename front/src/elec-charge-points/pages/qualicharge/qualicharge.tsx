@@ -29,6 +29,8 @@ import { QualichargeDataDetail } from "./components/qualicharge-data-detail"
 import { useValidateVolumes } from "./hooks/use-validate-volumes"
 import useEntity from "common/hooks/entity"
 import { ExternalAdminPages } from "common/types"
+import { Button } from "common/components/button2"
+import { ValidateAllDataDialog } from "./components/validate-all-data-dialog"
 
 export const Qualicharge = () => {
   const { state, actions, query, status, years } = useQualichargeQueryBuilder()
@@ -56,6 +58,8 @@ export const Qualicharge = () => {
       })
     },
   })
+
+  const hasNoData = result?.data?.results?.length === 0
 
   const filterLabels = {
     ...((entity.isAdmin || entity.hasAdminRight(ExternalAdminPages.ELEC)) && {
@@ -91,7 +95,12 @@ export const Qualicharge = () => {
     ))
   }
 
+  const openValidateAllDataModal = () => {
+    portal((close) => <ValidateAllDataDialog onClose={close} query={query} />)
+  }
+
   usePrivateNavigation(t("Données Qualicharge"))
+
   return (
     <Main>
       <Select
@@ -135,7 +144,7 @@ export const Qualicharge = () => {
           <Route
             path="/:status"
             element={
-              !loading && result?.data?.results?.length === 0 ? (
+              !loading && hasNoData ? (
                 <NoResult />
               ) : (
                 <>
@@ -162,6 +171,13 @@ export const Qualicharge = () => {
                       }
                     )}
                   />
+
+                  <Button
+                    priority="secondary"
+                    onClick={openValidateAllDataModal}
+                  >
+                    Valider toutes les données
+                  </Button>
                   <Table
                     rows={result?.data?.results ?? []}
                     columns={columns}

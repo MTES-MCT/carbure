@@ -1,14 +1,18 @@
 import {
   PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter as QualichargeFilter,
   PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by as QualichargeValidatedBy,
+  PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by as QualichargeGroupBy,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes, QueryParams } from "common/services/api-fetch.types"
 
-export { QualichargeValidatedBy, QualichargeFilter }
+export { QualichargeValidatedBy, QualichargeFilter, QualichargeGroupBy }
 
 export type ElecDataQualichargeOverview =
   apiTypes["ElecProvisionCertificateQualicharge"]
+
+export type ElecDataQualichargeGroupedByOperatingUnit =
+  apiTypes["ElecProvisionCertificateQualichargeGrouped"]
 
 export enum QualichargeTab {
   PENDING = "pending",

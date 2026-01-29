@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.models import Entity
@@ -23,6 +24,7 @@ class ElecProvisionCertificateQualichargeGroupedSerializer(serializers.Serialize
     year = serializers.IntegerField()
     energy_amount = serializers.FloatField()
 
+    @extend_schema_field(EntityPreviewSerializer())
     def get_cpo(self, obj):
         return {
             "id": obj.get("cpo__id"),

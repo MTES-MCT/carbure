@@ -4,7 +4,9 @@ import {
   QualichargeTab,
   QualichargeValidatedBy,
   QualichargeQuery,
+  QualichargeGroupBy,
 } from "./types"
+import { apiTypes } from "common/services/api-fetch.types"
 
 const getQuery = (query: QualichargeQuery) => {
   const query2 =
@@ -46,12 +48,48 @@ export function getQualichargeFilters(
     })
     .then((res) => res.data ?? [])
 }
+
+const getQualichargeDataResponse = <
+  T extends
+    | apiTypes["ElecProvisionCertificateQualicharge"]
+    | apiTypes["ElecProvisionCertificateQualichargeGrouped"],
+>(
+  query: QualichargeQuery
+) => {
+  return api
+    .GET("/elec/provision-certificates-qualicharge/", {
+      params: {
+        query: getQuery(query),
+      },
+    })
+    .then((res) => {
+      return {
+        ...res,
+        data: {
+          ...res.data,
+          results: res.data?.results as T[],
+        },
+      }
+    })
+}
+// This endpoint can returned a list of certificates, but when the props group_by is set, it returns a list of grouped certificates
+// So we need to force the type of the results to the correct type
 export function getQualichargeData(query: QualichargeQuery) {
-  return api.GET("/elec/provision-certificates-qualicharge/", {
-    params: {
-      query: getQuery(query),
-    },
-  })
+  return getQualichargeDataResponse<
+    apiTypes["ElecProvisionCertificateQualicharge"]
+  >(query)
+}
+
+export function getQualichargeDataGroupedByOperatingUnit(
+  query: QualichargeQuery
+) {
+  const queryWithGroupBy = {
+    ...query,
+    group_by: [QualichargeGroupBy.operating_unit],
+  }
+  return getQualichargeDataResponse<
+    apiTypes["ElecProvisionCertificateQualichargeGrouped"]
+  >(queryWithGroupBy)
 }
 
 export function getQualichargeDataDetail(id: number, entity_id: number) {
