@@ -106,13 +106,16 @@ export function getQualichargeDataDetail(id: number, entity_id: number) {
 export function validateQualichargeVolumes(
   entity_id: number,
   certificate_ids: number[],
-  validated_by: QualichargeValidatedBy
+  validated_by: QualichargeValidatedBy,
+  query?: QualichargeQuery
 ) {
   return api.POST("/elec/provision-certificates-qualicharge/bulk-update/", {
     params: {
-      query: {
-        entity_id,
-      },
+      query: query
+        ? getQuery(query)
+        : {
+            entity_id,
+          },
     },
     body: {
       certificate_ids,

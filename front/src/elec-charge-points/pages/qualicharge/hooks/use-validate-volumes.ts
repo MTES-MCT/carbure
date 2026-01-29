@@ -1,7 +1,7 @@
 import { useMutation } from "common/hooks/async"
 import { validateQualichargeVolumes } from "../api"
 import useEntity from "common/hooks/entity"
-import { QualichargeValidatedBy } from "../types"
+import { QualichargeQuery, QualichargeValidatedBy } from "../types"
 import { ExternalAdminPages } from "common/types"
 
 export type UseValidateVolumesProps = {
@@ -21,12 +21,16 @@ export const useValidateVolumes = ({ onSuccess }: UseValidateVolumesProps) => {
         ? QualichargeValidatedBy.CPO
         : undefined
 
-  const handleValidateVolumes = (volumes: number[]) => {
-    if (volumes.length > 0) {
-      if (validator) {
-        return validateVolumes.execute(entity.id, volumes, validator)
-      }
+  // When query is provided, we validate all data for the given query
+  // Otherwise, we validate the given volumes
+  const handleValidateVolumes = (
+    volumes: number[],
+    query?: QualichargeQuery
+  ) => {
+    if (validator) {
+      return validateVolumes.execute(entity.id, volumes, validator, query)
     }
+
     return Promise.resolve()
   }
 

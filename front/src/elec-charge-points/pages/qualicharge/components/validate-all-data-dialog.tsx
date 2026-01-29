@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { Text } from "common/components/text"
+import { Button } from "common/components/button2"
+import { useValidateVolumes } from "../hooks/use-validate-volumes"
 
 export type ValidateAllDataDialogProps = {
   onClose: () => void
@@ -33,8 +35,18 @@ export const ValidateAllDataDialog = ({
       params: [query],
     }
   )
+  const validateAllData = useValidateVolumes({
+    onSuccess: () => {
+      onClose()
+    },
+  })
+
   if (!result && loading) {
     return <LoaderOverlay />
+  }
+
+  const handleValidateAllData = () => {
+    validateAllData.handleValidateVolumes([], query)
   }
 
   const columns: Column<ElecDataQualichargeGroupedByOperatingUnit>[] = compact([
@@ -65,13 +77,23 @@ export const ValidateAllDataDialog = ({
   return (
     <Dialog
       header={<Dialog.Title>Valider toutes les données</Dialog.Title>}
+      footer={
+        <Button
+          priority="primary"
+          iconId="ri-check-line"
+          onClick={handleValidateAllData}
+          loading={validateAllData.loading}
+        >
+          {t("Valider")}
+        </Button>
+      }
       onClose={onClose}
       size="large"
     >
       <Text>
-        Cette vue récapitule les données Qualicharge à valider groupées par
-        unité d'exploitation et debut/fin de mesure. Vérifiez les données et
-        validez les volumes.
+        {t(
+          "Cette vue récapitule les données Qualicharge à valider filtrées et groupées par unité d'exploitation et debut/fin de mesure. Vérifiez les données et validez les volumes."
+        )}
       </Text>
       <RecapQuantity
         text={t("{{count}} volumes pour un total de {{total}} MWh", {
