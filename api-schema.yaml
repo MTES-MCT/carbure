@@ -17020,7 +17020,7 @@ components:
         pos_number:
           type: string
           nullable: true
-          maxLength: 64
+          maxLength: 128
       required:
         - id
     SafParentTicket:
@@ -17441,6 +17441,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
       required:
@@ -17475,6 +17478,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
           minLength: 1
@@ -17510,6 +17516,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
           minLength: 1

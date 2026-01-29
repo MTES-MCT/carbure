@@ -5605,6 +5605,8 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            /** @default false */
+            has_intermediary_depot: boolean;
             pos_number?: string;
         };
         SafTicketSourceAssignmentRequest: {
@@ -5618,6 +5620,8 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            /** @default false */
+            has_intermediary_depot: boolean;
             pos_number?: string;
         };
         SafTicketSourceGroupAssignmentRequest: {
@@ -5631,6 +5635,8 @@ export interface components {
             reception_airport?: number | null;
             consumption_type?: string | null;
             shipping_method?: string | null;
+            /** @default false */
+            has_intermediary_depot: boolean;
             pos_number?: string;
             ticket_sources_ids: number[];
         };

@@ -15,7 +15,7 @@ class SafTicketSourceAssignmentSerializer(serializers.Serializer):
     )
     consumption_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     shipping_method = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    has_intermediary_depot = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    has_intermediary_depot = serializers.BooleanField(required=False, default=False)
     pos_number = serializers.CharField(required=False)
 
 
