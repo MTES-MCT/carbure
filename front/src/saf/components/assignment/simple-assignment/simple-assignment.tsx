@@ -51,6 +51,7 @@ export const TicketAssignment = ({
       value.free_field,
       value.reception_airport?.id,
       value.shipping_method,
+      value.has_intermediary_depot,
       value.consumption_type,
       value.pos_number
     )

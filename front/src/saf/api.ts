@@ -171,6 +171,7 @@ export function assignSafTicket(
   free_field?: string,
   reception_airport?: number,
   shipping_method?: SafShippingMethod,
+  has_intermediary_depot?: boolean,
   consumption_type?: ConsumptionType,
   pos_number?: string
 ) {
@@ -192,6 +193,7 @@ export function assignSafTicket(
       agreement_date: "",
       reception_airport,
       shipping_method,
+      has_intermediary_depot: has_intermediary_depot ?? false,
       consumption_type,
       pos_number,
     },
@@ -208,6 +210,7 @@ export function groupedAssignSafTicket(
   free_field?: string,
   reception_airport?: number,
   shipping_method?: SafShippingMethod,
+  has_intermediary_depot?: boolean,
   consumption_type?: ConsumptionType
 ) {
   return api.POST("/saf/ticket-sources/group-assign/", {
@@ -225,6 +228,7 @@ export function groupedAssignSafTicket(
       free_field,
       reception_airport,
       shipping_method,
+      has_intermediary_depot: has_intermediary_depot ?? false,
       consumption_type,
     },
   })
