@@ -54,8 +54,16 @@ class ProvisionCertificateBulkSerializer(serializers.Serializer):
 
 
 class ProvisionCertificateUpdateBulkSerializer(serializers.Serializer):
-    certificate_ids = serializers.ListField(child=serializers.IntegerField(), min_length=1)
+    certificate_ids = serializers.ListField(child=serializers.IntegerField(), required=False)
     validated_by = serializers.ChoiceField(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES)
+    cpo = serializers.ListField(child=serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all()), required=False)
+    status = serializers.ListField(
+        child=serializers.ChoiceField(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES),
+        required=False,
+    )
+    operating_unit = serializers.ListField(child=serializers.CharField(), required=False)
+    station_id = serializers.ListField(child=serializers.CharField(), required=False)
+    date_from = serializers.ListField(child=serializers.DateField(), required=False)
 
 
 class TransferCertificateSerializer(serializers.Serializer):

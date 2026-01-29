@@ -31,7 +31,23 @@ class BulkUpdateMixin:
         certificate_ids = serializer.validated_data.get("certificate_ids", [])
         validated_by = serializer.validated_data.get("validated_by")
 
-        qualicharge_certificates = ElecProvisionCertificateQualicharge.objects.filter(id__in=certificate_ids)
+        filters = {}
+        if certificate_ids:
+            filters = {"id__in": certificate_ids}
+        else:
+            if "cpo" in serializer.validated_data:
+                filters["cpo__in"] = serializer.validated_data["cpo"]
+            if "status" in serializer.validated_data:
+                filters["validated_by__in"] = serializer.validated_data["status"]
+            if "operating_unit" in serializer.validated_data:
+                filters["operating_unit__in"] = serializer.validated_data["operating_unit"]
+            if "station_id" in serializer.validated_data:
+                filters["station_id__in"] = serializer.validated_data["station_id"]
+            if "date_from" in serializer.validated_data:
+                filters["date_from__in"] = serializer.validated_data["date_from"]
+
+        qualicharge_certificates = ElecProvisionCertificateQualicharge.objects.filter(**filters)
+
         if not qualicharge_certificates.exists():
             return Response(
                 {"status": "error", "errors": ["No valid certificates found"]}, status=status.HTTP_400_BAD_REQUEST
