@@ -35,7 +35,16 @@ const TicketsGroupedAssignment = ({
     (a, b) => b.delivery_period - a.delivery_period
   )[0]?.delivery_period
 
-  const isSingleSelection = ticketSources.length === 1
+  const posNumber = ticketSources[0]?.parent_lot?.pos_number ?? undefined
+  const originDepot = ticketSources[0]?.origin_lot_site ?? undefined
+
+  const showPosNumber =
+    posNumber !== undefined &&
+    ticketSources.every((t) => t.parent_lot.pos_number === posNumber)
+
+  const showOriginDepot =
+    originDepot !== undefined &&
+    ticketSources.every((t) => t.origin_lot_site?.id === originDepot?.id)
 
   const groupedAssignSafTicket = useMutation(api.groupedAssignSafTicket, {
     invalidates: ["ticket-sources", "operator-snapshot"],
@@ -132,11 +141,12 @@ const TicketsGroupedAssignment = ({
         </Collapse>
 
         <AssignmentForm
-          showPosNumber={isSingleSelection}
-          showOriginDepot={isSingleSelection}
+          showPosNumber={showPosNumber}
+          showOriginDepot={showOriginDepot}
           deliveryPeriod={lastDeliveryPeriod}
           remainingVolume={remainingVolume}
-          originDepot={ticketSources[0]?.origin_lot_site}
+          posNumber={posNumber}
+          originDepot={originDepot}
           onSubmit={groupedAssignTicket}
         />
       </Dialog>
