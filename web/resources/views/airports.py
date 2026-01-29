@@ -16,7 +16,7 @@ class AirportQueryParamsSerializer(serializers.Serializer):
     public_only = serializers.BooleanField(required=False, default=False)
     origin_depot_id = serializers.IntegerField(required=False)
     shipping_method = serializers.ChoiceField(required=False, choices=extract_enum(SafLogistics, "shipping_method"))
-    has_intermediary_depot = serializers.BooleanField(required=False, default=False)
+    has_intermediary_depot = serializers.BooleanField(required=False, allow_null=True)
 
 
 @extend_schema(
@@ -33,7 +33,7 @@ def get_airports(request, *args, **kwargs):
     query = serializer.validated_data.get("query", None)
     origin_depot_id = serializer.validated_data.get("origin_depot_id", None)
     shipping_method = serializer.validated_data.get("shipping_method", None)
-    has_intermediary_depot = serializer.validated_data.get("has_intermediary_depot") or False
+    has_intermediary_depot = serializer.validated_data.get("has_intermediary_depot")
 
     sites = Airport.objects.all().order_by("name").filter(is_enabled=True)
 
@@ -41,7 +41,7 @@ def get_airports(request, *args, **kwargs):
         sites = sites.filter(private=False)
     if query:
         sites = sites.filter(Q(name__icontains=query) | Q(customs_id__icontains=query) | Q(city__icontains=query))
-    if (origin_depot_id or shipping_method) and shipping_method != SafLogistics.TRUCK:
+    if (origin_depot_id or shipping_method or has_intermediary_depot is not None) and shipping_method != SafLogistics.TRUCK:
         sites = sites.filter(
             airport_from_depot_routes__origin_depot_id=origin_depot_id,
             airport_from_depot_routes__shipping_method=shipping_method,

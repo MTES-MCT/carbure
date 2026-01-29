@@ -60,10 +60,6 @@ class AirportTest(TestCase):
         data = self.get_airports(public_only=True)
         self.assertCountEqual(data, ["Aéroport Marseille"])
 
-    def test_list_all_airpots_when_no_route_defined_for_depot(self):
-        data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.TRAIN)
-        self.assertCountEqual(data, ["Aéroport Paris", "Aéroport Marseille"])
-
     def test_list_airpots_for_depot_and_shipping_method(self):
         SafLogisticsFactory.create(
             origin_depot=self.depot_a,
@@ -84,11 +80,13 @@ class AirportTest(TestCase):
             has_intermediary_depot=True,
         )
 
-        # incomplete queries get ignored
+        # partial queries return nothing
         data = self.get_airports(origin_depot=self.depot_a)
-        self.assertCountEqual(data, ["Aéroport Paris", "Aéroport Marseille"])
+        self.assertCountEqual(data, [])
+        data = self.get_airports(shipping_method=SafLogistics.TRAIN)
+        self.assertCountEqual(data, [])
         data = self.get_airports(has_intermediary_depot=True)
-        self.assertCountEqual(data, ["Aéroport Paris", "Aéroport Marseille"])
+        self.assertCountEqual(data, [])
 
         # queries for shipping_method=TRUCK always return all airports, ignoring defined routes
         data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.TRUCK, has_intermediary_depot=False)
