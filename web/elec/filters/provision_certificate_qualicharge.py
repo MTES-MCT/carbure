@@ -1,18 +1,18 @@
-from django_filters import BaseInFilter, BooleanFilter, FilterSet, MultipleChoiceFilter
+from django_filters import AllValuesMultipleFilter, BooleanFilter, FilterSet, MultipleChoiceFilter
 
 from elec.models import ElecProvisionCertificateQualicharge
 
 
 class ProvisionCertificateQualichargeFilter(FilterSet):
-    cpo = BaseInFilter(field_name="cpo__name", lookup_expr="in")
+    cpo = AllValuesMultipleFilter(field_name="cpo__name")
     not_validated = BooleanFilter(method="filter_not_validated")
     validated_by = MultipleChoiceFilter(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES)
-    operating_unit = BaseInFilter(lookup_expr="in", field_name="operating_unit")
-    station_id = BaseInFilter(lookup_expr="in", field_name="station_id")
+    operating_unit = AllValuesMultipleFilter(field_name="operating_unit")
+    station_id = AllValuesMultipleFilter(field_name="station_id")
     group_by = MultipleChoiceFilter(
         choices=[("operating_unit", "operating_unit")], field_name="group_by", method="filter_group_by"
     )
-    date_from = BaseInFilter(lookup_expr="in", field_name="date_from")
+    date_from = AllValuesMultipleFilter(field_name="date_from")
 
     def filter_not_validated(self, queryset, name, value):
         if value:
