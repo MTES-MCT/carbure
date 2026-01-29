@@ -41,12 +41,4 @@ class ProvisionCertificateQualichargeFilter(FilterSet):
 
     class Meta:
         model = ElecProvisionCertificateQualicharge
-        fields = [
-            "cpo",
-            "year",
-            "validated_by",
-            "not_validated",
-            "operating_unit",
-            "station_id",
-            "date_from",
-        ]
+        fields = ["year"]
