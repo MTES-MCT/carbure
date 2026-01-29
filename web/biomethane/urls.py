@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 
 from .views import (
+    BiomethaneAdminAnnualDeclarationViewSet,
     BiomethaneAnnualDeclarationViewSet,
     BiomethaneContractAmendmentViewSet,
     BiomethaneContractViewSet,
@@ -43,6 +44,11 @@ router.register(
     "admin/producers",
     BiomethaneProducersViewSet,
     basename="biomethane-admin-producers",
+)
+router.register(
+    "admin/annual-declarations",
+    BiomethaneAdminAnnualDeclarationViewSet,
+    basename="biomethane-admin-annual-declarations",
 )
 
 contract_viewset = BiomethaneContractViewSet.as_view(
