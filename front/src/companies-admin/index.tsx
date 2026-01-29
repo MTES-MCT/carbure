@@ -91,17 +91,19 @@ const EntityList = () => {
       </header>
 
       <section>
-        <SearchInput
-          clear
-          debounce={250}
-          label={t("Recherche")}
-          placeholder={t("Entrez du texte pour filtrer les résultats...")}
-          value={search}
-          onChange={setSearch}
-        />
-        {tab === "entities" && <EntitySummary search={search} />}
+        {tab === "entities" && <EntitySummary />}
         {(entity.isAdmin || isAdminDC) && tab === "certificates" && (
-          <Certificates search={search} />
+          <>
+            <SearchInput
+              clear
+              debounce={250}
+              label={t("Recherche")}
+              placeholder={t("Entrez du texte pour filtrer les résultats...")}
+              value={search}
+              onChange={setSearch}
+            />
+            <Certificates search={search} />
+          </>
         )}
       </section>
     </Main>
