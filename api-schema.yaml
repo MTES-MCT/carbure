@@ -4241,7 +4241,33 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
+              enum:
+                - 1
+                - 10
+                - 11
+                - 12
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+          description: |-
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
           explode: true
           style: form
         - in: query
@@ -4535,7 +4561,33 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
+              enum:
+                - 1
+                - 10
+                - 11
+                - 12
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+          description: |-
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
           explode: true
           style: form
         - in: query
@@ -14231,7 +14283,7 @@ components:
         is_controlled_by_qualicharge:
           type: boolean
         validated_by:
-          $ref: "#/components/schemas/ValidatedByEnum"
+          $ref: "#/components/schemas/ElecProvisionCertificateQualichargeStatusEnum"
         created_at:
           type: string
           format: date-time
@@ -14279,6 +14331,18 @@ components:
       oneOf:
         - $ref: "#/components/schemas/ElecProvisionCertificateQualichargeGrouped"
         - $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+    ElecProvisionCertificateQualichargeStatusEnum:
+      enum:
+        - NO_ONE
+        - DGEC
+        - CPO
+        - BOTH
+      type: string
+      description: |-
+        * `NO_ONE` - NO_ONE
+        * `DGEC` - DGEC
+        * `CPO` - CPO
+        * `BOTH` - BOTH
     ElecProvisionCertificateSourceEnum:
       enum:
         - MANUAL
@@ -16642,11 +16706,32 @@ components:
           type: array
           items:
             type: integer
-          minItems: 1
         validated_by:
-          $ref: "#/components/schemas/ValidatedByEnum"
+          $ref: "#/components/schemas/ElecProvisionCertificateQualichargeStatusEnum"
+        cpo:
+          type: array
+          items:
+            type: integer
+        status:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecProvisionCertificateQualichargeStatusEnum"
+        operating_unit:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        station_id:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        date_from:
+          type: array
+          items:
+            type: string
+            format: date
       required:
-        - certificate_ids
         - validated_by
     QuarterEnum:
       enum:
@@ -18176,18 +18261,6 @@ components:
         - email
         - requests
         - rights
-    ValidatedByEnum:
-      enum:
-        - NO_ONE
-        - DGEC
-        - CPO
-        - BOTH
-      type: string
-      description: |-
-        * `NO_ONE` - NO_ONE
-        * `DGEC` - DGEC
-        * `CPO` - CPO
-        * `BOTH` - BOTH
     VerifyOTPRequest:
       type: object
       description: A serializer for submitting the OTP sent via email. Includes

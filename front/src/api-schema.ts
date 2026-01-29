@@ -4287,7 +4287,7 @@ export interface components {
             /** Format: double */
             energy_amount: number;
             is_controlled_by_qualicharge?: boolean;
-            validated_by?: components["schemas"]["ValidatedByEnum"];
+            validated_by?: components["schemas"]["ElecProvisionCertificateQualichargeStatusEnum"];
             /** Format: date-time */
             readonly created_at: string | null;
         };
@@ -4304,6 +4304,14 @@ export interface components {
             energy_amount: number;
         };
         ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
+        /**
+         * @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH
+         * @enum {string}
+         */
+        ElecProvisionCertificateQualichargeStatusEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
         /**
          * @description * `MANUAL` - MANUAL
          *     * `METER_READINGS` - METER_READINGS
@@ -5361,8 +5369,13 @@ export interface components {
             operational_units: components["schemas"]["OperationalUnitRequest"][];
         };
         ProvisionCertificateUpdateBulkRequest: {
-            certificate_ids: number[];
-            validated_by: components["schemas"]["ValidatedByEnum"];
+            certificate_ids?: number[];
+            validated_by: components["schemas"]["ElecProvisionCertificateQualichargeStatusEnum"];
+            cpo?: number[];
+            status?: components["schemas"]["ElecProvisionCertificateQualichargeStatusEnum"][];
+            operating_unit?: string[];
+            station_id?: string[];
+            date_from?: string[];
         };
         /**
          * @description * `1` - T1
@@ -5964,14 +5977,6 @@ export interface components {
             rights: components["schemas"]["UserRights"][];
             requests: components["schemas"]["UserRightsRequests"][];
         };
-        /**
-         * @description * `NO_ONE` - NO_ONE
-         *     * `DGEC` - DGEC
-         *     * `CPO` - CPO
-         *     * `BOTH` - BOTH
-         * @enum {string}
-         */
-        ValidatedByEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
         /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
         VerifyOTPRequest: {
             /** Entrez le code à 6 chiffres reçu par email */
@@ -8805,7 +8810,19 @@ export interface operations {
                 cpo?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                month?: string[];
+                /** @description * `1` - 1
+                 *     * `2` - 2
+                 *     * `3` - 3
+                 *     * `4` - 4
+                 *     * `5` - 5
+                 *     * `6` - 6
+                 *     * `7` - 7
+                 *     * `8` - 8
+                 *     * `9` - 9
+                 *     * `10` - 10
+                 *     * `11` - 11
+                 *     * `12` - 12 */
+                month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8993,7 +9010,19 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
-                month?: string[];
+                /** @description * `1` - 1
+                 *     * `2` - 2
+                 *     * `3` - 3
+                 *     * `4` - 4
+                 *     * `5` - 5
+                 *     * `6` - 6
+                 *     * `7` - 7
+                 *     * `8` - 8
+                 *     * `9` - 9
+                 *     * `10` - 10
+                 *     * `11` - 11
+                 *     * `12` - 12 */
+                month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -12891,6 +12920,20 @@ export enum PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter {
     quarter = "quarter",
     source = "source",
     year = "year"
+}
+export enum PathsApiElecTransferCertificatesGetParametersQueryMonth {
+    Value1 = 1,
+    Value10 = 10,
+    Value11 = 11,
+    Value12 = 12,
+    Value2 = 2,
+    Value3 = 3,
+    Value4 = 4,
+    Value5 = 5,
+    Value6 = 6,
+    Value7 = 7,
+    Value8 = 8,
+    Value9 = 9
 }
 export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
