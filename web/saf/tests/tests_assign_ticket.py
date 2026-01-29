@@ -1,9 +1,12 @@
-from datetime import datetime
-
 from django.urls import reverse
 
+from saf.factories.saf_logistics import SafLogisticsFactory
+from saf.factories.saf_ticket_source import SafTicketSourceFactory
 from saf.models import SafTicket
+from saf.models.saf_logistics import SafLogistics
 from saf.tests import TestCase
+from transactions.factories.site import SiteFactory
+from transactions.models.site import Site
 
 
 class SafAssignTicketTest(TestCase):
@@ -20,7 +23,7 @@ class SafAssignTicketTest(TestCase):
         )
 
     def test_assign_saf_ticket(self):
-        query = {
+        body = {
             "entity_id": self.entity.id,
             "ticket_source_id": self.ticket_source.id,
             "client_id": self.ticket_client.id,
@@ -31,14 +34,7 @@ class SafAssignTicketTest(TestCase):
             "pos_number": "ABCDEF",
         }
 
-        datetime.today()
-
-        query_params = f"?entity_id={self.entity.id}"
-        response = self.client.post(
-            reverse("saf-ticket-sources-assign", kwargs={"id": self.ticket_source.id}) + query_params,
-            query,
-        )
-
+        response = self.assign_ticket(body)
         assert response.status_code == 200
 
         tickets = SafTicket.objects.all()
@@ -82,7 +78,7 @@ class SafAssignTicketTest(TestCase):
         assert ticket.parent_ticket_source_id == self.ticket_source.id
 
     def test_assign_saf_ticket_fail_if_too_big(self):
-        query = {
+        body = {
             "entity_id": self.entity.id,
             "ticket_source_id": self.ticket_source.id,
             "client_id": self.ticket_client.id,
@@ -93,17 +89,13 @@ class SafAssignTicketTest(TestCase):
             "pos_number": "ABCDEF",
         }
 
-        query_params = f"?entity_id={self.entity.id}"
-        response = self.client.post(
-            reverse("saf-ticket-sources-assign", kwargs={"id": self.ticket_source.id}) + query_params,
-            query,
-        )
+        response = self.assign_ticket(body)
 
         assert response.status_code == 400
         assert response.json()["message"] == "VOLUME_TOO_BIG"
 
     def test_assign_saf_ticket_fail_if_too_early(self):
-        query = {
+        body = {
             "entity_id": self.entity.id,
             "ticket_source_id": self.ticket_source.id,
             "client_id": self.ticket_client.id,
@@ -111,15 +103,9 @@ class SafAssignTicketTest(TestCase):
             "agreement_reference": "AGREF",
             "agreement_date": "2022-06-01",
             "assignment_period": 202201,
-            "pos_number": "ABCDEF",
         }
 
-        query_params = f"?entity_id={self.entity.id}"
-        response = self.client.post(
-            reverse("saf-ticket-sources-assign", kwargs={"id": self.ticket_source.id}) + query_params,
-            query,
-        )
-
+        response = self.assign_ticket(body)
         assert response.status_code == 400
         assert response.json()["message"] == "ASSIGNMENT_BEFORE_DELIVERY"
 
@@ -160,3 +146,43 @@ class SafAssignTicketTest(TestCase):
 
         self.lot.refresh_from_db()
         self.assertEqual(self.lot.pos_number, "ZYXWVU")
+
+    def test_assign_ticket_with_incompatible_logistics(self):
+        origin_depot = SiteFactory.create(site_type=Site.EFPE)
+        destination_airport = SiteFactory.create(site_type=Site.AIRPORT)
+
+        SafLogisticsFactory.create(
+            origin_depot=origin_depot,
+            destination_airport=destination_airport,
+            shipping_method=SafLogistics.BARGE,
+            has_intermediary_depot=False,
+        )
+
+        ticket_source = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id,
+            delivery_period=202202,
+            total_volume=30000,
+            assigned_volume=10000,
+            origin_lot_site=origin_depot,
+        )
+
+        body = {
+            "entity_id": self.entity.pk,
+            "ticket_source_id": ticket_source.pk,
+            "client_id": self.ticket_client.pk,
+            "volume": 1000,
+            "agreement_reference": "AGREF",
+            "agreement_date": "2022-06-01",
+            "assignment_period": 202203,
+            "shipping_method": SafLogistics.TRAIN,
+            "reception_airport": destination_airport.pk,
+            "has_intermediary_depot": False,
+        }
+
+        response = self.assign_ticket(body, ticket_source_id=ticket_source.pk)
+        assert response.status_code == 400
+        assert response.json()["message"] == "SHIPPING_ROUTE_NOT_REGISTERED"
+
+        body = {**body, "shipping_method": SafLogistics.BARGE}
+        response = self.assign_ticket(body, ticket_source_id=ticket_source.pk)
+        assert response.status_code == 200

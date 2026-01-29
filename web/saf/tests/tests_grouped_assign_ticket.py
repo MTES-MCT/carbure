@@ -1,8 +1,12 @@
 from django.urls import reverse
 
 from saf.factories import SafTicketSourceFactory
+from saf.factories.saf_logistics import SafLogisticsFactory
 from saf.models import SafTicket
+from saf.models.saf_logistics import SafLogistics
 from saf.tests import TestCase
+from transactions.factories.site import SiteFactory
+from transactions.models.site import Site
 
 
 class SafGroupedAssignTicketTest(TestCase):
@@ -20,6 +24,13 @@ class SafGroupedAssignTicketTest(TestCase):
         )
 
         SafTicket.objects.all().delete()
+
+    def group_assign_tickets(self, body):
+        return self.client.post(
+            reverse("saf-ticket-sources-grouped-assign"),
+            body,
+            query_params={"entity_id": self.entity.id},
+        )
 
     def test_grouped_assign_saf_ticket_not_enough_volume(self):
         query = {
@@ -120,3 +131,69 @@ class SafGroupedAssignTicketTest(TestCase):
         assert tickets[1].parent_ticket_source.assigned_volume == 20000
         assert tickets[2].volume == 5000
         assert tickets[2].parent_ticket_source.assigned_volume == 10000
+
+    def test_assign_ticket_with_incompatible_logistics(self):
+        origin_depot_a = SiteFactory.create(site_type=Site.EFPE)
+        origin_depot_b = SiteFactory.create(site_type=Site.EFPE)
+        destination_airport = SiteFactory.create(site_type=Site.AIRPORT)
+
+        SafLogisticsFactory.create(
+            origin_depot=origin_depot_a,
+            destination_airport=destination_airport,
+            shipping_method=SafLogistics.BARGE,
+            has_intermediary_depot=False,
+        )
+
+        SafLogisticsFactory.create(
+            origin_depot=origin_depot_a,
+            destination_airport=destination_airport,
+            shipping_method=SafLogistics.TRAIN,
+            has_intermediary_depot=False,
+        )
+
+        SafLogisticsFactory.create(
+            origin_depot=origin_depot_b,
+            destination_airport=destination_airport,
+            shipping_method=SafLogistics.TRAIN,
+            has_intermediary_depot=False,
+        )
+
+        ticket_source_a = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id,
+            delivery_period=202202,
+            total_volume=30000,
+            assigned_volume=0,
+            origin_lot_site=origin_depot_a,
+        )
+
+        ticket_source_b = SafTicketSourceFactory.create(
+            added_by_id=self.entity.id,
+            delivery_period=202202,
+            total_volume=30000,
+            assigned_volume=0,
+            origin_lot_site=origin_depot_b,
+        )
+
+        body = {
+            "entity_id": self.entity.id,
+            "ticket_sources_ids": [
+                ticket_source_a.pk,
+                ticket_source_b.pk,
+            ],
+            "client_id": self.ticket_client.id,
+            "volume": 55000,
+            "agreement_reference": "AGREF",
+            "agreement_date": "2022-06-01",
+            "assignment_period": 202206,
+            "reception_airport": destination_airport.pk,
+            "shipping_method": SafLogistics.BARGE,
+            "has_intermediary_depot": False,
+        }
+
+        response = self.group_assign_tickets(body)
+        assert response.status_code == 400
+        assert response.json()["message"] == "SHIPPING_ROUTE_NOT_REGISTERED"
+
+        body = {**body, "shipping_method": SafLogistics.TRAIN}
+        response = self.group_assign_tickets(body)
+        assert response.status_code == 200

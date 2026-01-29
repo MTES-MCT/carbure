@@ -1,12 +1,13 @@
 import os
 import unicodedata
+from typing import Type
 
 import pandas as pd
 import xlsxwriter
 from django import forms
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.db import connection, transaction
+from django.db import connection, models, transaction
 from rest_framework.pagination import PageNumberPagination
 
 from core.models import Entity, UserRights
@@ -237,3 +238,7 @@ def is_bool_or_none(column):
     false_mask = (values == "false") | (values == "0") | (values == "non") | (values == "no")
     result[false_mask] = False
     return result
+
+
+def extract_enum(Model: Type[models.Model], field: str) -> list:
+    return [value for value, _ in Model._meta.get_field(field).choices]

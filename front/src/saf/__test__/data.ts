@@ -89,6 +89,10 @@ export const safTicketSource: SafTicketSourcePreview = {
     id: 1,
     carbure_id: "1",
   },
+  origin_lot: {
+    id: 1,
+    carbure_id: "1",
+  },
   parent_ticket: undefined,
   added_by: operator,
 }
@@ -183,6 +187,10 @@ export const safTicketSource2: SafTicketSourcePreview = {
   country_of_origin: country1,
   ghg_reduction: 64,
   parent_lot: {
+    id: 1,
+    carbure_id: "1",
+  },
+  origin_lot: {
     id: 1,
     carbure_id: "1",
   },

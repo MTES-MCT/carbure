@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
 import { SafTicketSourcePreview } from "saf/types"
 import { AssignmentForm, AssignmentFormData } from "./assignment-form"
+import { useNotifyError } from "common/components/notifications"
 
 export interface TicketsGroupedAssignmentProps {
   ticketSources: SafTicketSourcePreview[]
@@ -28,13 +29,33 @@ const TicketsGroupedAssignment = ({
 }: TicketsGroupedAssignmentProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const notifyError = useNotifyError()
 
   const lastDeliveryPeriod = ticketSources.sort(
     (a, b) => b.delivery_period - a.delivery_period
   )[0]?.delivery_period
 
+  const posNumber = ticketSources[0]?.parent_lot?.pos_number ?? undefined
+  const originDepot = ticketSources[0]?.origin_lot_site ?? undefined
+
+  const showPosNumber =
+    posNumber !== undefined &&
+    ticketSources.every((t) => t.parent_lot.pos_number === posNumber)
+
+  const showOriginDepot =
+    originDepot !== undefined &&
+    ticketSources.every((t) => t.origin_lot_site?.id === originDepot?.id)
+
   const groupedAssignSafTicket = useMutation(api.groupedAssignSafTicket, {
     invalidates: ["ticket-sources", "operator-snapshot"],
+
+    onError: (e) => {
+      notifyError(e, undefined, {
+        SHIPPING_ROUTE_NOT_REGISTERED: t(
+          "Aucune route n'a été trouvée entre le dépôt d'incorporation et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
+        ),
+      })
+    },
   })
 
   const groupedAssignTicket = async (value: AssignmentFormData) => {
@@ -48,6 +69,7 @@ const TicketsGroupedAssignment = ({
       value.free_field,
       value.reception_airport?.id,
       value.shipping_method,
+      value.has_intermediary_depot,
       value.consumption_type
     )
 
@@ -119,9 +141,12 @@ const TicketsGroupedAssignment = ({
         </Collapse>
 
         <AssignmentForm
-          grouped
+          showPosNumber={showPosNumber}
+          showOriginDepot={showOriginDepot}
           deliveryPeriod={lastDeliveryPeriod}
           remainingVolume={remainingVolume}
+          posNumber={posNumber}
+          originDepot={originDepot}
           onSubmit={groupedAssignTicket}
         />
       </Dialog>

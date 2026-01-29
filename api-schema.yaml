@@ -4208,7 +4208,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
           explode: true
           style: form
         - in: query
@@ -4502,7 +4502,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
           explode: true
           style: form
         - in: query
@@ -6491,15 +6491,50 @@ paths:
       operationId: resources_airports_list
       parameters:
         - in: query
+          name: has_intermediary_depot
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: origin_depot_id
+          schema:
+            type: integer
+        - in: query
           name: public_only
           schema:
             type: boolean
-          description: Public Only
+            default: false
         - in: query
           name: query
           schema:
             type: string
-          description: Search within the fields `name`, `icao_code` and `city`
+        - in: query
+          name: shipping_method
+          schema:
+            enum:
+              - TRUCK
+              - BARGE
+              - TRAIN
+              - SHIP
+              - PIPELINE
+              - PIPELINE_DMM
+              - PIPELINE_LHP
+              - PIPELINE_ODC
+              - PIPELINE_SPMR
+              - PIPELINE_SPSE
+            type: string
+            minLength: 1
+          description: |-
+            * `TRUCK` - TRUCK
+            * `BARGE` - BARGE
+            * `TRAIN` - TRAIN
+            * `SHIP` - SHIP
+            * `PIPELINE` - PIPELINE
+            * `PIPELINE_DMM` - PIPELINE_DMM
+            * `PIPELINE_LHP` - PIPELINE_LHP
+            * `PIPELINE_ODC` - PIPELINE_ODC
+            * `PIPELINE_SPMR` - PIPELINE_SPMR
+            * `PIPELINE_SPSE` - PIPELINE_SPSE
       tags:
         - resources
       security:
@@ -6904,14 +6939,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -6933,22 +6960,22 @@ paths:
               type: string
               enum:
                 - -added_by
+                - -delivery
                 - -feedstock
                 - -ghg_reduction
-                - -period
                 - -volume
                 - added_by
+                - delivery
                 - feedstock
                 - ghg_reduction
-                - period
                 - volume
           description: |-
             Ordre
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
-            * `period` - Period
-            * `-period` - Period (décroissant)
+            * `delivery` - Delivery
+            * `-delivery` - Delivery (décroissant)
             * `feedstock` - Feedstock
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
@@ -6963,6 +6990,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -7015,9 +7050,8 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -7135,14 +7169,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7164,22 +7190,22 @@ paths:
               type: string
               enum:
                 - -added_by
+                - -delivery
                 - -feedstock
                 - -ghg_reduction
-                - -period
                 - -volume
                 - added_by
+                - delivery
                 - feedstock
                 - ghg_reduction
-                - period
                 - volume
           description: |-
             Ordre
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
-            * `period` - Period
-            * `-period` - Period (décroissant)
+            * `delivery` - Delivery
+            * `-delivery` - Delivery (décroissant)
             * `feedstock` - Feedstock
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
@@ -7194,6 +7220,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -7234,9 +7268,8 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -7286,14 +7319,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7311,7 +7336,19 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - added_by
+              - client
+              - country_of_origin
+              - feedstock
+              - order_by
+              - origin_depot
+              - period
+              - production_site
+              - supplier
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -7320,22 +7357,22 @@ paths:
               type: string
               enum:
                 - -added_by
+                - -delivery
                 - -feedstock
                 - -ghg_reduction
-                - -period
                 - -volume
                 - added_by
+                - delivery
                 - feedstock
                 - ghg_reduction
-                - period
                 - volume
           description: |-
             Ordre
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
-            * `period` - Period
-            * `-period` - Period (décroissant)
+            * `delivery` - Delivery
+            * `-delivery` - Delivery (décroissant)
             * `feedstock` - Feedstock
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
@@ -7350,6 +7387,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -7390,9 +7435,8 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -7413,11 +7457,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - added_by
+                    - client
+                    - country_of_origin
+                    - feedstock
+                    - order_by
                   summary: Example of filters response.
           description: ""
   /api/saf/ticket-sources/group-assign/:
@@ -7465,7 +7509,7 @@ paths:
       operationId: saf_tickets_list
       parameters:
         - in: query
-          name: biofuel
+          name: client
           schema:
             type: array
             items:
@@ -7473,11 +7517,39 @@ paths:
           explode: true
           style: form
         - in: query
-          name: client
+          name: client_type
           schema:
             type: array
             items:
               type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
           explode: true
           style: form
         - in: query
@@ -7571,6 +7643,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -7850,7 +7930,7 @@ paths:
       operationId: saf_tickets_export_retrieve
       parameters:
         - in: query
-          name: biofuel
+          name: client
           schema:
             type: array
             items:
@@ -7858,11 +7938,39 @@ paths:
           explode: true
           style: form
         - in: query
-          name: client
+          name: client_type
           schema:
             type: array
             items:
               type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
           explode: true
           style: form
         - in: query
@@ -7956,6 +8064,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -8033,7 +8149,7 @@ paths:
       operationId: saf_tickets_filters_retrieve
       parameters:
         - in: query
-          name: biofuel
+          name: client
           schema:
             type: array
             items:
@@ -8041,11 +8157,39 @@ paths:
           explode: true
           style: form
         - in: query
-          name: client
+          name: client_type
           schema:
             type: array
             items:
               type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
           explode: true
           style: form
         - in: query
@@ -8089,7 +8233,22 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - client
+              - client_type
+              - consumption_type
+              - country_of_origin
+              - feedstock
+              - order_by
+              - origin_depot
+              - period
+              - production_site
+              - reception_airport
+              - status
+              - supplier
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -8144,6 +8303,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -8216,11 +8383,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - client
+                    - client_type
+                    - consumption_type
+                    - country_of_origin
+                    - feedstock
                   summary: Example of filters response.
           description: ""
   /api/saf/years/:
@@ -16853,7 +17020,7 @@ components:
         pos_number:
           type: string
           nullable: true
-          maxLength: 64
+          maxLength: 128
       required:
         - id
     SafParentTicket:
@@ -17182,6 +17349,8 @@ components:
           readOnly: true
         origin_lot:
           $ref: "#/components/schemas/SafParentLot"
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -17232,8 +17401,6 @@ components:
         ghg_total:
           type: number
           format: double
-        origin_lot_site:
-          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets
@@ -17274,6 +17441,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
       required:
@@ -17308,6 +17478,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
           minLength: 1
@@ -17343,6 +17516,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
           minLength: 1
@@ -17418,6 +17594,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/SafParentLot"
           readOnly: true
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets
@@ -17450,16 +17628,28 @@ components:
         - certificate_id
     ShippingMethodEnum:
       enum:
-        - PIPELINE
         - TRUCK
-        - TRAIN
         - BARGE
+        - TRAIN
+        - SHIP
+        - PIPELINE
+        - PIPELINE_DMM
+        - PIPELINE_LHP
+        - PIPELINE_ODC
+        - PIPELINE_SPMR
+        - PIPELINE_SPSE
       type: string
       description: |-
-        * `PIPELINE` - PIPELINE
-        * `TRUCK` - TRUCK
-        * `TRAIN` - TRAIN
-        * `BARGE` - BARGE
+        * `TRUCK` - Routier
+        * `BARGE` - Barge
+        * `TRAIN` - Train
+        * `SHIP` - Bateau
+        * `PIPELINE` - Oléoduc
+        * `PIPELINE_DMM` - Oléoduc DMM
+        * `PIPELINE_LHP` - Oléoduc LHP
+        * `PIPELINE_ODC` - Oléoduc ODC
+        * `PIPELINE_SPMR` - Oléoduc SPMR
+        * `PIPELINE_SPSE` - Oléoduc SPSE
     SimulationInputRequest:
       type: object
       properties:
