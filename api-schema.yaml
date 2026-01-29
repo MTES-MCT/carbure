@@ -3585,8 +3585,13 @@ paths:
         - in: query
           name: date_from
           schema:
-            type: string
-            format: date
+            type: array
+            items:
+              type: string
+              format: date
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
         - in: query
           name: entity_id
           schema:
@@ -3802,8 +3807,13 @@ paths:
         - in: query
           name: date_from
           schema:
-            type: string
-            format: date
+            type: array
+            items:
+              type: string
+              format: date
+          description: Les valeurs multiples doivent être séparées par des virgules.
+          explode: false
+          style: form
         - in: query
           name: entity_id
           schema:
@@ -14283,7 +14293,7 @@ components:
         is_controlled_by_qualicharge:
           type: boolean
         validated_by:
-          $ref: "#/components/schemas/ElecProvisionCertificateQualichargeStatusEnum"
+          $ref: "#/components/schemas/ElecQualichargeStatusEnum"
         created_at:
           type: string
           format: date-time
@@ -14331,18 +14341,6 @@ components:
       oneOf:
         - $ref: "#/components/schemas/ElecProvisionCertificateQualichargeGrouped"
         - $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
-    ElecProvisionCertificateQualichargeStatusEnum:
-      enum:
-        - NO_ONE
-        - DGEC
-        - CPO
-        - BOTH
-      type: string
-      description: |-
-        * `NO_ONE` - NO_ONE
-        * `DGEC` - DGEC
-        * `CPO` - CPO
-        * `BOTH` - BOTH
     ElecProvisionCertificateSourceEnum:
       enum:
         - MANUAL
@@ -14357,6 +14355,18 @@ components:
         * `QUALICHARGE` - QUALICHARGE
         * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
         * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
+    ElecQualichargeStatusEnum:
+      enum:
+        - NO_ONE
+        - DGEC
+        - CPO
+        - BOTH
+      type: string
+      description: |-
+        * `NO_ONE` - NO_ONE
+        * `DGEC` - DGEC
+        * `CPO` - CPO
+        * `BOTH` - BOTH
     ElecTransferAcceptRequest:
       type: object
       properties:
@@ -16707,7 +16717,7 @@ components:
           items:
             type: integer
         validated_by:
-          $ref: "#/components/schemas/ElecProvisionCertificateQualichargeStatusEnum"
+          $ref: "#/components/schemas/ElecQualichargeStatusEnum"
         cpo:
           type: array
           items:
@@ -16715,7 +16725,7 @@ components:
         status:
           type: array
           items:
-            $ref: "#/components/schemas/ElecProvisionCertificateQualichargeStatusEnum"
+            $ref: "#/components/schemas/ElecQualichargeStatusEnum"
         operating_unit:
           type: array
           items:

@@ -4287,7 +4287,7 @@ export interface components {
             /** Format: double */
             energy_amount: number;
             is_controlled_by_qualicharge?: boolean;
-            validated_by?: components["schemas"]["ElecProvisionCertificateQualichargeStatusEnum"];
+            validated_by?: components["schemas"]["ElecQualichargeStatusEnum"];
             /** Format: date-time */
             readonly created_at: string | null;
         };
@@ -4305,14 +4305,6 @@ export interface components {
         };
         ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
         /**
-         * @description * `NO_ONE` - NO_ONE
-         *     * `DGEC` - DGEC
-         *     * `CPO` - CPO
-         *     * `BOTH` - BOTH
-         * @enum {string}
-         */
-        ElecProvisionCertificateQualichargeStatusEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
-        /**
          * @description * `MANUAL` - MANUAL
          *     * `METER_READINGS` - METER_READINGS
          *     * `QUALICHARGE` - QUALICHARGE
@@ -4321,6 +4313,14 @@ export interface components {
          * @enum {string}
          */
         ElecProvisionCertificateSourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
+        /**
+         * @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH
+         * @enum {string}
+         */
+        ElecQualichargeStatusEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
         ElecTransferAcceptRequest: {
             used_in_tiruert: string;
             /** Format: date */
@@ -5370,9 +5370,9 @@ export interface components {
         };
         ProvisionCertificateUpdateBulkRequest: {
             certificate_ids?: number[];
-            validated_by: components["schemas"]["ElecProvisionCertificateQualichargeStatusEnum"];
+            validated_by: components["schemas"]["ElecQualichargeStatusEnum"];
             cpo?: number[];
-            status?: components["schemas"]["ElecProvisionCertificateQualichargeStatusEnum"][];
+            status?: components["schemas"]["ElecQualichargeStatusEnum"][];
             operating_unit?: string[];
             station_id?: string[];
             date_from?: string[];
@@ -8446,7 +8446,8 @@ export interface operations {
             query: {
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                date_from?: string;
+                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description * `operating_unit` - operating_unit */
@@ -8575,7 +8576,8 @@ export interface operations {
             query: {
                 /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                date_from?: string;
+                /** @description Les valeurs multiples doivent être séparées par des virgules. */
+                date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */

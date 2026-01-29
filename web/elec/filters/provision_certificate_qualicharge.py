@@ -12,6 +12,7 @@ class ProvisionCertificateQualichargeFilter(FilterSet):
     group_by = MultipleChoiceFilter(
         choices=[("operating_unit", "operating_unit")], field_name="group_by", method="filter_group_by"
     )
+    date_from = BaseInFilter(lookup_expr="in", field_name="date_from")
 
     def filter_not_validated(self, queryset, name, value):
         if value:

@@ -171,13 +171,14 @@ export const Qualicharge = () => {
                       }
                     )}
                   />
-
-                  <Button
-                    priority="secondary"
-                    onClick={openValidateAllDataModal}
-                  >
-                    Valider toutes les données
-                  </Button>
+                  {status === QualichargeTab.PENDING && (
+                    <Button
+                      priority="secondary"
+                      onClick={openValidateAllDataModal}
+                    >
+                      {t("Valider toutes les données")}
+                    </Button>
+                  )}
                   <Table
                     rows={result?.data?.results ?? []}
                     columns={columns}

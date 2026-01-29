@@ -34,5 +34,5 @@ export type QualichargeQueryBuilder = QueryBuilder<QualichargeTab>
 export type QualichargeQuery = QualichargeQueryBuilder["query"] &
   Pick<
     QueryParams<"/elec/provision-certificates-qualicharge/">,
-    "validated_by" | "date_from" | "operating_unit"
+    "validated_by" | "date_from" | "operating_unit" | "cpo" | "station_id"
   >

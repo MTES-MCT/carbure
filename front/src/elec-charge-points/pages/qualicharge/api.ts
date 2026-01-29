@@ -109,17 +109,24 @@ export function validateQualichargeVolumes(
   validated_by: QualichargeValidatedBy,
   query?: QualichargeQuery
 ) {
+  const filters = {
+    status: query?.validated_by,
+    date_from: query?.date_from,
+    operating_unit: query?.operating_unit,
+    cpo: query?.cpo?.map((cpo) => Number(cpo)),
+    station_id: query?.station_id,
+  }
+
   return api.POST("/elec/provision-certificates-qualicharge/bulk-update/", {
     params: {
-      query: query
-        ? getQuery(query)
-        : {
-            entity_id,
-          },
+      query: {
+        entity_id,
+      },
     },
     body: {
       certificate_ids,
       validated_by,
+      ...filters,
     },
   })
 }
