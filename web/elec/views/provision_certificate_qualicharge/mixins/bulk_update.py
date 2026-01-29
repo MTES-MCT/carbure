@@ -46,7 +46,7 @@ class BulkUpdateMixin:
             if "date_from" in serializer.validated_data:
                 filters["date_from__in"] = serializer.validated_data["date_from"]
 
-        qualicharge_certificates = ElecProvisionCertificateQualicharge.objects.filter(**filters)
+        qualicharge_certificates = self.get_queryset().filter(**filters)
 
         if not qualicharge_certificates.exists():
             return Response(
