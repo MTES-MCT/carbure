@@ -1,3 +1,4 @@
+from django.db.models import F, Sum
 from django_filters import AllValuesMultipleFilter, BooleanFilter, FilterSet, MultipleChoiceFilter
 
 from elec.models import ElecProvisionCertificateQualicharge
@@ -21,10 +22,10 @@ class ProvisionCertificateQualichargeFilter(FilterSet):
 
     def filter_group_by(self, queryset, name, value):
         if "operating_unit" in value:
-            from django.db.models import Sum
-
+            # Calculate renewable_energy per row BEFORE grouping
             return (
-                queryset.values(
+                queryset.annotate(renewable_energy_item=F("energy_amount") * F("enr_ratio"))
+                .values(
                     "cpo__id",
                     "cpo__name",
                     "cpo__entity_type",
@@ -34,7 +35,10 @@ class ProvisionCertificateQualichargeFilter(FilterSet):
                     "date_to",
                     "year",
                 )
-                .annotate(energy_amount=Sum("energy_amount"))
+                .annotate(
+                    energy_amount=Sum("energy_amount"),
+                    renewable_energy=Sum("renewable_energy_item"),
+                )
                 .order_by("cpo__id", "operating_unit", "date_from")
             )
         return queryset

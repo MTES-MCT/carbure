@@ -12,6 +12,7 @@ class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer)
         fields = "__all__"
 
     cpo = EntityPreviewSerializer(read_only=True)
+    renewable_energy = serializers.FloatField()
 
 
 class ElecProvisionCertificateQualichargeGroupedSerializer(serializers.Serializer):
@@ -23,6 +24,7 @@ class ElecProvisionCertificateQualichargeGroupedSerializer(serializers.Serialize
     date_to = serializers.DateField()
     year = serializers.IntegerField()
     energy_amount = serializers.FloatField()
+    renewable_energy = serializers.FloatField()
 
     @extend_schema_field(EntityPreviewSerializer())
     def get_cpo(self, obj):
