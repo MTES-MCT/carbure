@@ -24,7 +24,7 @@ class BulkUpdateMixin:
         url_path="bulk-update",
     )
     def bulk_update(self, request, *args, **kwargs):
-        serializer = ProvisionCertificateUpdateBulkSerializer(data=request.data, many=False)
+        serializer = ProvisionCertificateUpdateBulkSerializer(data=request.data, many=False, context={"request": request})
         serializer.is_valid(raise_exception=True)
         errors = []
 

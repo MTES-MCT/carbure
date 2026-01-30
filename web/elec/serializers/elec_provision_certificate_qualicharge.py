@@ -4,6 +4,7 @@ from rest_framework import serializers
 from core.models import Entity
 from core.serializers import EntityPreviewSerializer
 from elec.models import ElecProvisionCertificateQualicharge
+from elec.permissions import HasElecAdminRights
 
 
 class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer):
@@ -68,6 +69,14 @@ class ProvisionCertificateUpdateBulkSerializer(serializers.Serializer):
     operating_unit = serializers.ListField(child=serializers.CharField(), required=False)
     station_id = serializers.ListField(child=serializers.CharField(), required=False)
     date_from = serializers.ListField(child=serializers.DateField(), required=False)
+
+    def validate_validated_by(self, value):
+        request = self.context.get("request")
+        if value == ElecProvisionCertificateQualicharge.DGEC:
+            # Check permissions HasElecAdminRights
+            if not HasElecAdminRights().has_permission(request, None):
+                raise serializers.ValidationError("You do not have permission to validate as DGEC.")
+        return value
 
 
 class TransferCertificateSerializer(serializers.Serializer):
