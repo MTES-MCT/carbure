@@ -58,7 +58,9 @@ class ProvisionCertificateBulkSerializer(serializers.Serializer):
 class ProvisionCertificateUpdateBulkSerializer(serializers.Serializer):
     certificate_ids = serializers.ListField(child=serializers.IntegerField(), required=False)
     validated_by = serializers.ChoiceField(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES)
-    cpo = serializers.ListField(child=serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all()), required=False)
+    cpo = serializers.ListField(
+        child=serializers.SlugRelatedField(slug_field="name", queryset=Entity.objects.all()), required=False
+    )
     status = serializers.ListField(
         child=serializers.ChoiceField(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES),
         required=False,

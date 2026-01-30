@@ -113,7 +113,7 @@ export function validateQualichargeVolumes(
     status: query?.validated_by,
     date_from: query?.date_from,
     operating_unit: query?.operating_unit,
-    cpo: query?.cpo?.map((cpo) => Number(cpo)),
+    cpo: query?.cpo,
     station_id: query?.station_id,
   }
 
