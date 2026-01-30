@@ -27,7 +27,11 @@ class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination
 
         for qualichargeData in self.queryset:
             # Handle both model instances and dict
-            energy = qualichargeData["energy_amount"] if isinstance(qualichargeData, dict) else qualichargeData.energy_amount
+            energy = (
+                qualichargeData["renewable_energy"]
+                if isinstance(qualichargeData, dict)
+                else qualichargeData.renewable_energy
+            )
             metadata["total_quantity"] += energy
         return metadata
 

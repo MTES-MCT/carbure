@@ -79,7 +79,7 @@ export const Qualicharge = () => {
         state.selection.includes(qualichargeData.id)
       ) ?? []
     const volume = qualichargeRows?.reduce(
-      (sum, data) => sum + data.energy_amount,
+      (sum, data) => sum + data.renewable_energy,
       0
     )
     portal((close) => (

@@ -3579,8 +3579,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: date_from
@@ -3589,8 +3588,7 @@ paths:
             items:
               type: string
               format: date
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -3619,8 +3617,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: ordering
           required: false
@@ -3652,8 +3649,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: validated_by
@@ -3801,8 +3797,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: date_from
@@ -3811,8 +3806,7 @@ paths:
             items:
               type: string
               format: date
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: entity_id
@@ -3854,8 +3848,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: ordering
           required: false
@@ -3875,8 +3868,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: validated_by
@@ -14267,6 +14259,9 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        renewable_energy:
+          type: number
+          format: double
         unknown_siren:
           type: string
           nullable: true
@@ -14290,6 +14285,9 @@ components:
         energy_amount:
           type: number
           format: double
+        enr_ratio:
+          type: number
+          format: double
         is_controlled_by_qualicharge:
           type: boolean
         validated_by:
@@ -14307,6 +14305,7 @@ components:
         - energy_amount
         - id
         - operating_unit
+        - renewable_energy
         - station_id
         - year
     ElecProvisionCertificateQualichargeGrouped:
@@ -14330,12 +14329,16 @@ components:
         energy_amount:
           type: number
           format: double
+        renewable_energy:
+          type: number
+          format: double
       required:
         - cpo
         - date_from
         - date_to
         - energy_amount
         - operating_unit
+        - renewable_energy
         - year
     ElecProvisionCertificateQualichargeResponse:
       oneOf:

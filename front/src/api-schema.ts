@@ -4276,6 +4276,8 @@ export interface components {
         ElecProvisionCertificateQualicharge: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
+            /** Format: double */
+            renewable_energy: number;
             unknown_siren?: string | null;
             /** Format: date */
             date_from: string;
@@ -4286,6 +4288,8 @@ export interface components {
             station_id: string;
             /** Format: double */
             energy_amount: number;
+            /** Format: double */
+            enr_ratio?: number;
             is_controlled_by_qualicharge?: boolean;
             validated_by?: components["schemas"]["ElecQualichargeStatusEnum"];
             /** Format: date-time */
@@ -4302,6 +4306,8 @@ export interface components {
             year: number;
             /** Format: double */
             energy_amount: number;
+            /** Format: double */
+            renewable_energy: number;
         };
         ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
         /**
@@ -8444,16 +8450,13 @@ export interface operations {
     elec_provision_certificates_qualicharge_list: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description * `operating_unit` - operating_unit */
                 group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8463,7 +8466,6 @@ export interface operations {
                 page_size?: number;
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 station_id?: string[];
                 /** @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC
@@ -8574,9 +8576,7 @@ export interface operations {
     filter_provision_certificates_qualicharge: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -8585,13 +8585,11 @@ export interface operations {
                 /** @description * `operating_unit` - operating_unit */
                 group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 station_id?: string[];
                 /** @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC

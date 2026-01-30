@@ -54,7 +54,9 @@ export const useQualichargeColumns = (status: QualichargeTab) => {
     {
       header: t("Energie (MWh)"),
       cell: (data) => (
-        <Cell text={formatNumber(data.energy_amount, { fractionDigits: 2 })} />
+        <Cell
+          text={formatNumber(data.renewable_energy, { fractionDigits: 2 })}
+        />
       ),
     },
   ])
