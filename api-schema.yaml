@@ -16296,6 +16296,8 @@ components:
             $ref: "#/components/schemas/ElecProvisionCertificateQualichargeResponse"
         total_quantity:
           type: number
+        total_quantity_renewable:
+          type: number
     PaginatedElecTransferCertificateList:
       type: object
       required:
@@ -16724,7 +16726,8 @@ components:
         cpo:
           type: array
           items:
-            type: integer
+            type: string
+            minLength: 1
         status:
           type: array
           items:
