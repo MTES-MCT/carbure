@@ -2,16 +2,19 @@ from django.db.models import Case, Q, Value, When
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from biomethane.filters.admin.annual_declaration import BiomethaneAdminAnnualDeclarationFilter
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.permissions import HasDrealRights
 from biomethane.serializers.admin.annual_declaration import BiomethaneAdminAnnualDeclarationSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from core.filters import FiltersActionFactory
 
 
-class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin):
+class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, FiltersActionFactory()):
     """Liste des déclarations annuelles des producteurs de biométhane pour l'année courante (vue DREAL)."""
 
     queryset = BiomethaneAnnualDeclaration.objects.all()
+    filterset_class = BiomethaneAdminAnnualDeclarationFilter
     permission_classes = [HasDrealRights]
     serializer_class = BiomethaneAdminAnnualDeclarationSerializer
 

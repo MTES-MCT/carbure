@@ -459,6 +459,14 @@ paths:
       description: Liste des déclarations annuelles des producteurs de biométhane pour
         l'année courante (vue DREAL).
       parameters:
+        - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: ordering
           required: false
           in: query
@@ -483,6 +491,38 @@ paths:
           description: A search term.
           schema:
             type: string
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - DECLARED
+                - IN_PROGRESS
+          description: |-
+            * `IN_PROGRESS` - IN_PROGRESS
+            * `DECLARED` - DECLARED
+          explode: true
+          style: form
+        - in: query
+          name: tariff_reference
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "2011"
+                - "2020"
+                - "2021"
+                - "2023"
+          description: |-
+            * `2011` - 2011
+            * `2020` - 2020
+            * `2021` - 2021
+            * `2023` - 2023
+          explode: true
+          style: form
       tags:
         - biomethane
       security:
@@ -494,6 +534,95 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedBiomethaneAdminAnnualDeclarationList"
+          description: ""
+  /api/biomethane/admin/annual-declarations/filters/:
+    get:
+      operationId: biomethane_admin_annual_declarations_filters_retrieve
+      description: Liste des déclarations annuelles des producteurs de biométhane pour
+        l'année courante (vue DREAL).
+      parameters:
+        - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - department
+              - status
+              - tariff_reference
+          description: Filter string to apply
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - DECLARED
+                - IN_PROGRESS
+          description: |-
+            * `IN_PROGRESS` - IN_PROGRESS
+            * `DECLARED` - DECLARED
+          explode: true
+          style: form
+        - in: query
+          name: tariff_reference
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "2011"
+                - "2020"
+                - "2021"
+                - "2023"
+          description: |-
+            * `2011` - 2011
+            * `2020` - 2020
+            * `2021` - 2021
+            * `2023` - 2023
+          explode: true
+          style: form
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - department
+                    - status
+                    - tariff_reference
+                  summary: Example of filters response.
           description: ""
   /api/biomethane/admin/producers/:
     get:
