@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from adapters.logger import log_error
 from core.models import CarbureLot
-from edelivery.adapters.logger import log_error
 from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
 from edelivery.ebms.ntr import from_national_trade_register
 

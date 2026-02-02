@@ -2,30 +2,32 @@ import useEntity from "common/hooks/entity"
 import { EntityPreview, EntityType, Airport } from "common/types"
 import * as norm from "common/utils/normalizers"
 import Form, { useForm } from "common/components/form"
-import { TextInput } from "common/components/inputs2"
+import { RadioGroup, TextInput } from "common/components/inputs2"
 import { formatPeriodFromDate } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
-import * as apiResources from "common/api"
 import { PeriodSelect } from "./period-select"
 import { VolumeInput } from "./volume-input"
-import { ShippingMethodEnum } from "api-schema"
 import { Autocomplete } from "common/components/autocomplete2"
-import { ConsumptionType } from "saf/types"
+import { ConsumptionType, SafShippingMethod, SafTicketSource } from "saf/types"
 
 export interface AssignmentFormProps {
-  grouped?: boolean
+  showPosNumber?: boolean
+  showOriginDepot?: boolean
   deliveryPeriod?: number
   remainingVolume: number
   posNumber?: string
+  originDepot?: SafTicketSource["origin_lot_site"]
   onSubmit: (form: AssignmentFormData) => void
 }
 
 export const AssignmentForm = ({
-  grouped,
+  showPosNumber = false,
+  showOriginDepot = false,
   deliveryPeriod,
   remainingVolume,
   posNumber,
+  originDepot,
   onSubmit,
 }: AssignmentFormProps) => {
   const { t } = useTranslation()
@@ -46,7 +48,13 @@ export const AssignmentForm = ({
   }
 
   const findAirports = (query: string) => {
-    return apiResources.findAirports(query)
+    return api.findAirports(
+      query,
+      false,
+      originDepot?.id,
+      value.shipping_method,
+      value.has_intermediary_depot
+    )
   }
 
   const handleSubmit = () => {
@@ -94,35 +102,78 @@ export const AssignmentForm = ({
         />
       )}
 
+      {showOriginDepot && originDepot && (
+        <TextInput
+          disabled
+          label={t("Dépôt d'incorporation")}
+          value={originDepot.name}
+        />
+      )}
+
       {(clientIsAirline || clientIsSafTrader) && (
         <>
+          <Autocomplete
+            label={t("Mode d'expédition")}
+            placeholder={t("Sélectionnez un mode")}
+            hasTooltip
+            title={t(
+              "En choisissant un mode d'expédition, la liste des aéroports accessibles s'adaptera en fonction du dépôt d'incorporation."
+            )}
+            {...bind("shipping_method")}
+            options={[
+              { value: SafShippingMethod.TRUCK, label: t("Camion") },
+              { value: SafShippingMethod.TRAIN, label: t("Train") },
+              { value: SafShippingMethod.BARGE, label: t("Barge") },
+              { value: SafShippingMethod.SHIP, label: t("Bateau") },
+              {
+                value: SafShippingMethod.PIPELINE_DMM,
+                label: t("Oléoduc DMM"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_LHP,
+                label: t("Oléoduc LHP"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_ODC,
+                label: t("Oléoduc ODC"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_SPMR,
+                label: t("Oléoduc SPMR"),
+              },
+              {
+                value: SafShippingMethod.PIPELINE_SPSE,
+                label: t("Oléoduc SPSE"),
+              },
+            ]}
+          />
+
+          <RadioGroup
+            label={t("Dépôt intermédiaire ?")}
+            hasTooltip
+            title={t(
+              "Ce champ permet d'indiquer la présence d'un dépôt de stockage intermédiaire avant la livraison finale à l'aéroport."
+            )}
+            options={norm.getYesNoOptions()}
+            {...bind("has_intermediary_depot")}
+          />
+
           <Autocomplete
             required
             label={t("Aéroport de réception")}
             placeholder={t("Sélectionnez un aéroport")}
             getOptions={findAirports}
             normalize={norm.normalizeAirport}
+            hasTooltip
+            title={t(
+              "Si vous ne retrouvez pas l'aéroport désiré dans la liste, merci de contacter la DGEC en indiquant le dépôt d'incorporation et le mode de livraison."
+            )}
             {...bind("reception_airport")}
-          />
-
-          <Autocomplete
-            label={t("Mode d'expédition")}
-            placeholder={t("Sélectionnez un mode")}
-            {...bind("shipping_method")}
-            options={[
-              {
-                value: ShippingMethodEnum.PIPELINE,
-                label: t("Oléoduc"),
-              },
-              { value: ShippingMethodEnum.TRUCK, label: t("Camion") },
-              { value: ShippingMethodEnum.TRAIN, label: t("Train") },
-              { value: ShippingMethodEnum.BARGE, label: t("Barge") },
-            ]}
           />
         </>
       )}
 
-      {!grouped && (
+      {showPosNumber && (
         <TextInput
           label={t("Numéro de POS")}
           placeholder="Ex: PC-ISCC-12345678"
@@ -169,9 +220,10 @@ const defaultAssignment = {
   agreement_reference: "" as string | undefined, //TODO for transfer only
   free_field: "" as string | undefined,
   reception_airport: undefined as Airport | undefined,
-  shipping_method: undefined as ShippingMethodEnum | undefined,
+  shipping_method: undefined as SafShippingMethod | undefined,
   consumption_type: undefined as ConsumptionType | undefined,
   pos_number: undefined as string | undefined,
+  has_intermediary_depot: false,
 }
 
 export type AssignmentFormData = typeof defaultAssignment

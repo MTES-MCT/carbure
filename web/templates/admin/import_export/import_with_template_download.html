@@ -1,0 +1,11 @@
+{% extends "admin/import_export/import.html" %}
+
+{% block content %}
+  {% if import_template_download_url %}
+    <div class="submit-row" style="margin-bottom: 12px">
+      <a class="button" href="{{ import_template_download_url }}">Download import template (XLSX)</a>
+    </div>
+  {% endif %}
+
+  {{ block.super }}
+{% endblock %}

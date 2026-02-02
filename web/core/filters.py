@@ -1,4 +1,4 @@
-from django_filters import TypedMultipleChoiceFilter
+import django_filters
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -88,7 +88,11 @@ def FiltersActionFactory():
             """
             Get dynamically the list of available filter fields from the filterset class.
             """
-            return self._get_available_filter_fields_static(self.filterset_class, self.get_queryset())
+            qs = self.get_queryset()
+            filterset_class = self.filterset_class
+            if hasattr(self, "get_filterset_class"):
+                filterset_class = self.get_filterset_class()
+            return self._get_available_filter_fields_static(filterset_class, qs)
 
         @action(methods=["get"], detail=False)
         def filters(self, request):
@@ -116,24 +120,61 @@ def FiltersActionFactory():
     return FiltersActionMixin
 
 
-class MultipleBooleanFilter(TypedMultipleChoiceFilter):
+class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
+    """
+    Use this filter for boolean filtering, it will automatically give you True/False checks
+    and allows you to have both selected at the same time.
+    """
+
     def __init__(self, field_name, **kwargs):
         super().__init__(
             field_name=field_name,
-            coerce=strtobool,
+            coerce=MultipleBooleanFilter.strtobool,
             choices=[("true", "True"), ("false", "False")],
             **kwargs,
         )
 
+    @staticmethod
+    def strtobool(val: str) -> bool:
+        return val.lower() == "true"
 
-def strtobool(val: str) -> bool:
-    """(imported from the deprecated lib distutils)
-    Convert a string representation of truth to true (1) or false (0).
+
+class AllAnnotatedValuesMultipleFilter(django_filters.MultipleChoiceFilter):
     """
-    val = val.lower()
-    if val in ("y", "yes", "t", "true", "on", "1"):
-        return True
-    elif val in ("n", "no", "f", "false", "off", "0"):
-        return False
-    else:
-        raise ValueError(f"invalid truth value {val!r}")
+    A modified version of AllValuesMultipleFilter that allows adding annotation to the current query
+    and filtering on the obtained values. It is compatible with the FiltersActionMixin.
+
+    Usage:
+
+    class TicketSourceFilter(django_filters.FilterSet):
+
+        supplier = AllAnnotatedValuesMultipleFilter(
+            field_name="supplier",
+            annotation=Coalesce(
+                "parent_lot__carbure_supplier__name",
+                "parent_lot__unknown_supplier",
+                "parent_ticket__supplier__name",
+            ),
+        )
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.annotation = kwargs.pop("annotation")
+        super().__init__(*args, **kwargs)
+
+    @property
+    def field(self):
+        qs = self.model._default_manager.distinct()
+        qs = self.annotate(qs)
+        qs = qs.order_by(self.field_name).values_list(self.field_name, flat=True)
+        self.extra["choices"] = [(o, o) for o in qs]
+        return super().field
+
+    def filter(self, qs, value):
+        qs = self.annotate(qs)
+        return super().filter(qs, value)
+
+    def annotate(self, qs):
+        annotation = {self.field_name: self.annotation}
+        return qs.annotate(**annotation)

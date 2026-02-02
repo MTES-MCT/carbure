@@ -1,12 +1,12 @@
 from unittest.mock import Mock, patch
 
 import numpy as np
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from tiruert.services.teneur import TeneurService, TeneurServiceErrors
 
 
-class TeneurServiceOptimizeBiofuelBlendingTest(TestCase):
+class TeneurServiceOptimizeBiofuelBlendingTest(SimpleTestCase):
     """Test TeneurService.optimize_biofuel_blending() method"""
 
     def test_optimize_biofuel_blending_successful_optimization(self):
@@ -116,7 +116,7 @@ class TeneurServiceOptimizeBiofuelBlendingTest(TestCase):
             self.assertEqual(volume, round(volume, 2))
 
 
-class TeneurServiceEmissionBoundsTest(TestCase):
+class TeneurServiceEmissionBoundsTest(SimpleTestCase):
     """Test TeneurService.emission_bounds() method"""
 
     def test_emission_bounds_returns_min_and_max(self):
@@ -172,7 +172,7 @@ class TeneurServiceEmissionBoundsTest(TestCase):
         self.assertEqual(str(context.exception), TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
 
-class TeneurServiceConvertInLitersTest(TestCase):
+class TeneurServiceConvertInLitersTest(SimpleTestCase):
     """Test TeneurService._convert_in_liters() method"""
 
     def test_convert_in_liters_returns_same_for_liter_unit(self):
@@ -205,7 +205,7 @@ class TeneurServiceConvertInLitersTest(TestCase):
         self.assertEqual(result, 100.0)  # 85 / 0.85 = 100
 
 
-class TeneurServiceConvertEmissionsTest(TestCase):
+class TeneurServiceConvertEmissionsTest(SimpleTestCase):
     """Test TeneurService.convert_producted_emissions_to_avoided_emissions() method"""
 
     def test_convert_producted_emissions_to_avoided_emissions(self):
@@ -234,7 +234,7 @@ class TeneurServiceConvertEmissionsTest(TestCase):
         self.assertLess(result, 0)
 
 
-class TeneurServicePrepareDataAndOptimizeTest(TestCase):
+class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
     """Test TeneurService.prepare_data_and_optimize() method"""
 
     @patch("tiruert.services.teneur.TeneurService.prepare_data")
@@ -295,8 +295,30 @@ class TeneurServicePrepareDataAndOptimizeTest(TestCase):
         np.testing.assert_array_equal(call_args[1], emissions)
         self.assertEqual(call_args[2], target_volume)
 
+    @patch("tiruert.services.teneur.log_warning")
+    def test_logs_negative_volumes(self, patched_log_warning):
+        data = {"biofuel": "Biofuel infos", "customs_category": "Some category", "other_key": "Other value"}
+        debited_entity = "Some entity"
+        volumes = np.array([10, -20, 50, -30, 40])
+        lot_ids = np.array([1, 2, 5, 3, 4])
+        negative_volumes = np.array([-20, -30])
+        patched_log_warning.assert_not_called()
 
-class TeneurServiceGetMinAndMaxEmissionsTest(TestCase):
+        TeneurService.log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes)
+        expected_logged_message = (
+            "Negative volumes detected in balance calculation: "
+            "2 lots with volumes ranging from -30.00L to -20.00L. "
+            "Lot IDs: [2, 3]"
+        )
+        expected_additional_informations = {
+            "biofuel": "Biofuel infos",
+            "customs_category": "Some category",
+            "debited_entity": "Some entity",
+        }
+        patched_log_warning.assert_called_with(expected_logged_message, expected_additional_informations)
+
+
+class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):
     """Test TeneurService.get_min_and_max_emissions() method"""
 
     @patch("tiruert.services.teneur.TeneurService.prepare_data")

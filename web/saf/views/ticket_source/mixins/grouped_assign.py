@@ -3,12 +3,14 @@ from django.db.models.aggregates import Max, Sum
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from core.models import CarbureNotification
 from saf.models import SafTicketSource, create_ticket_from_source
 from saf.serializers import SafTicketSourceGroupAssignmentSerializer
 from saf.serializers.schema import ErrorResponseSerializer
+from saf.services.is_shipping_route_available import is_shipping_route_available
 
 from .utils import SafTicketAssignError
 
@@ -51,6 +53,7 @@ class GroupAssignActionMixin:
         reception_airport = serializer.validated_data.get("reception_airport")
         consumption_type = serializer.validated_data.get("consumption_type")
         shipping_method = serializer.validated_data.get("shipping_method")
+        has_intermediary_depot = serializer.validated_data.get("has_intermediary_depot")
 
         ticket_sources = SafTicketSource.objects.filter(id__in=ticket_sources_ids, added_by_id=entity_id).order_by(
             "created_at"
@@ -92,6 +95,11 @@ class GroupAssignActionMixin:
                 # do not
                 if ticket_volume <= 0:
                     break
+
+                if not is_shipping_route_available(
+                    ticket_source.origin_lot_site, reception_airport, shipping_method, has_intermediary_depot
+                ):
+                    raise ValidationError({"message": SafTicketAssignError.SHIPPING_ROUTE_NOT_REGISTERED})
 
                 ticket = create_ticket_from_source(
                     ticket_source,

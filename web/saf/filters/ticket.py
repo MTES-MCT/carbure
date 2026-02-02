@@ -6,20 +6,20 @@ from saf.models import SafTicket
 
 class TicketFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(choices=SafTicket.ticket_statuses)
-    entity_id = django_filters.NumberFilter(field_name="entity_id", method="filter_type", required=True)
     year = django_filters.NumberFilter(field_name="year")
 
-    period = django_filters.AllValuesMultipleFilter(field_name="assignment_period")
-    biofuel = django_filters.AllValuesMultipleFilter(field_name="biofuel__code")
-    feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
-    client = django_filters.AllValuesMultipleFilter(field_name="client__name")
     supplier = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
+    client = django_filters.AllValuesMultipleFilter(field_name="client__name")
+    client_type = django_filters.AllValuesMultipleFilter(field_name="client__entity_type")
+    period = django_filters.AllValuesMultipleFilter(field_name="assignment_period")
+    feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
     country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
     production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
     consumption_type = django_filters.MultipleChoiceFilter(
         field_name="consumption_type", choices=SafTicket.CONSUMPTION_TYPES
     )
     reception_airport = django_filters.AllValuesMultipleFilter(field_name="reception_airport__name")
+    origin_depot = django_filters.AllValuesMultipleFilter(field_name="origin_lot_site__name")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -48,15 +48,16 @@ class TicketFilter(django_filters.FilterSet):
     class Meta:
         model = SafTicket
         fields = [
-            "entity_id",
             "status",
             "year",
+            "supplier",
+            "client",
+            "client_type",
             "period",
             "feedstock",
-            "client",
-            "supplier",
             "country_of_origin",
             "production_site",
             "consumption_type",
             "reception_airport",
+            "origin_depot",
         ]

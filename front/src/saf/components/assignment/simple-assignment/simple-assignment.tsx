@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import * as api from "saf/api"
 import { SafTicketSourceDetails } from "saf/types"
 import { AssignmentForm, AssignmentFormData } from "../assignment-form"
+import { useNotifyError } from "common/components/notifications"
 
 export interface TicketAssignmentProps {
   ticketSource: SafTicketSourceDetails
@@ -21,8 +22,7 @@ export const TicketAssignment = ({
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const remainingVolume =
-    ticketSource.total_volume - ticketSource.assigned_volume
+  const notifyError = useNotifyError()
 
   const assignSafTicket = useMutation(api.assignSafTicket, {
     invalidates: [
@@ -30,6 +30,14 @@ export const TicketAssignment = ({
       "ticket-sources",
       "operator-snapshot",
     ],
+
+    onError: (e) => {
+      notifyError(e, undefined, {
+        SHIPPING_ROUTE_NOT_REGISTERED: t(
+          "Aucune route n'a été trouvée entre le dépôt d'incorporation et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
+        ),
+      })
+    },
   })
 
   const assignTicket = async (value: AssignmentFormData) => {
@@ -43,6 +51,7 @@ export const TicketAssignment = ({
       value.free_field,
       value.reception_airport?.id,
       value.shipping_method,
+      value.has_intermediary_depot,
       value.consumption_type,
       value.pos_number
     )
@@ -82,9 +91,14 @@ export const TicketAssignment = ({
         </p>
 
         <AssignmentForm
+          showPosNumber
+          showOriginDepot
           posNumber={ticketSource?.origin_lot?.pos_number ?? undefined}
+          originDepot={ticketSource?.origin_lot_site}
           deliveryPeriod={ticketSource.delivery_period}
-          remainingVolume={remainingVolume}
+          remainingVolume={
+            ticketSource.total_volume - ticketSource.assigned_volume
+          }
           onSubmit={assignTicket}
         />
       </Dialog>
