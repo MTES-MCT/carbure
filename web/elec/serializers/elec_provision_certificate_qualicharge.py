@@ -1,8 +1,10 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.models import Entity
 from core.serializers import EntityPreviewSerializer
 from elec.models import ElecProvisionCertificateQualicharge
+from elec.permissions import HasElecAdminRights
 
 
 class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer):
@@ -11,6 +13,7 @@ class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer)
         fields = "__all__"
 
     cpo = EntityPreviewSerializer(read_only=True)
+    renewable_energy = serializers.FloatField()
 
 
 class ElecProvisionCertificateQualichargeGroupedSerializer(serializers.Serializer):
@@ -22,7 +25,9 @@ class ElecProvisionCertificateQualichargeGroupedSerializer(serializers.Serialize
     date_to = serializers.DateField()
     year = serializers.IntegerField()
     energy_amount = serializers.FloatField()
+    renewable_energy = serializers.FloatField()
 
+    @extend_schema_field(EntityPreviewSerializer())
     def get_cpo(self, obj):
         return {
             "id": obj.get("cpo__id"),
@@ -52,8 +57,28 @@ class ProvisionCertificateBulkSerializer(serializers.Serializer):
 
 
 class ProvisionCertificateUpdateBulkSerializer(serializers.Serializer):
-    certificate_ids = serializers.ListField(child=serializers.IntegerField(), min_length=1)
+    certificate_ids = serializers.ListField(child=serializers.IntegerField(), required=False)
     validated_by = serializers.ChoiceField(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES)
+    cpo = serializers.ListField(
+        child=serializers.SlugRelatedField(slug_field="name", queryset=Entity.objects.all()), required=False
+    )
+    status = serializers.ListField(
+        child=serializers.ChoiceField(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES),
+        required=False,
+    )
+    operating_unit = serializers.ListField(child=serializers.CharField(), required=False)
+    station_id = serializers.ListField(child=serializers.CharField(), required=False)
+    date_from = serializers.ListField(child=serializers.DateField(), required=False)
+
+    def validate_validated_by(self, value):
+        request = self.context.get("request")
+        if value == ElecProvisionCertificateQualicharge.DGEC:
+            # DGEC validation requires authentication and admin rights
+            if not request or not hasattr(request, "user") or not request.user or not request.user.is_authenticated:
+                raise serializers.ValidationError("Authentication required for DGEC validation.")
+            if not HasElecAdminRights().has_permission(request, None):
+                raise serializers.ValidationError("You do not have permission to validate as DGEC.")
+        return value
 
 
 class TransferCertificateSerializer(serializers.Serializer):

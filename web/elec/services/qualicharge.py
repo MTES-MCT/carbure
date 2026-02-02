@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from core.models import Entity
 from elec.models import ElecProvisionCertificate, ElecProvisionCertificateQualicharge
+from elec.repositories.meter_reading_repository import MeterReadingRepository
 
 
 def handle_bulk_create_validation_errors(request, serializer):
@@ -162,6 +163,7 @@ def _prepare_certificates_bulk(unit, cpo, unknown_siren, double_validated, exist
     date_from = unit["from"]
     date_to = unit["to"]
     year = date_from.year
+    enr_ratio = MeterReadingRepository.get_renewable_share(year)
 
     for station in unit.get("stations", []):
         station_id = station["id"]
@@ -197,6 +199,7 @@ def _prepare_certificates_bulk(unit, cpo, unknown_siren, double_validated, exist
                         operating_unit=code,
                         energy_amount=station["energy"],
                         is_controlled_by_qualicharge=station["is_controlled"],
+                        enr_ratio=enr_ratio,
                     )
                 )
         except Exception as e:

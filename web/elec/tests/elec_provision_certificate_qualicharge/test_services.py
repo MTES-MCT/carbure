@@ -11,6 +11,7 @@ from elec.services.qualicharge import (
     process_certificates_batch,
     resolve_cpo,
 )
+from transactions.models import YearConfig
 
 
 class ResolveCpoTest(TestCase):
@@ -82,6 +83,9 @@ class ProcessCertificatesBatchTest(TestCase):
     """Tests for the process_certificates_batch function - orchestration only"""
 
     def setUp(self):
+        # Create YearConfig for tests
+        YearConfig.objects.get_or_create(year=2023, defaults={"renewable_share": 0.25})
+
         self.cpo = Entity.objects.create(
             name="Test CPO",
             entity_type=Entity.CPO,
@@ -149,6 +153,9 @@ class PrepareCertificatesBulkTest(TestCase):
     """Tests for the _prepare_certificates_bulk function"""
 
     def setUp(self):
+        # Create YearConfig for tests
+        YearConfig.objects.get_or_create(year=2023, defaults={"renewable_share": 0.25})
+
         self.cpo = Entity.objects.create(
             name="Test CPO",
             entity_type=Entity.CPO,

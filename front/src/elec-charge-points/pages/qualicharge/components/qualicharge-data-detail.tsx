@@ -44,7 +44,7 @@ export const QualichargeDataDetail = () => {
   const openValidateDataModal = () => {
     portal((close) => (
       <ValidateDataDialog
-        volume={result?.data?.energy_amount ?? 0}
+        volume={result?.data?.renewable_energy ?? 0}
         onConfirm={() =>
           validateVolumes.handleValidateVolumes([result?.data?.id as number])
         }
@@ -111,14 +111,16 @@ export const QualichargeDataDetail = () => {
                 value={result?.data?.date_to}
                 readOnly
               />
-
               <TextInput
                 label={t("Energie (MWh)")}
-                value={formatNumber(result?.data?.energy_amount ?? 0)}
+                value={formatNumber(result?.data?.renewable_energy ?? 0)}
                 readOnly
               />
-
-              <TextInput label={t("Taux utilisé")} value="25%" readOnly />
+              <TextInput
+                label={t("Taux utilisé")}
+                value={(result?.data?.enr_ratio ?? 0) * 100 + " %"}
+                readOnly
+              />
             </Grid>
           </Box>
         )}

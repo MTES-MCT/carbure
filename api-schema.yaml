@@ -2093,6 +2093,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -3573,20 +3579,34 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: date_from
           schema:
-            type: string
-            format: date
+            type: array
+            items:
+              type: string
+              format: date
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: group_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - operating_unit
+          description: "* `operating_unit` - operating_unit"
+          explode: true
+          style: form
         - in: query
           name: not_validated
           schema:
@@ -3597,8 +3617,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: ordering
           required: false
@@ -3630,8 +3649,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: validated_by
@@ -3665,7 +3683,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeList"
+                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeRespons\
+                  eList"
           description: ""
   /api/elec/provision-certificates-qualicharge/{id}/:
     get:
@@ -3778,14 +3797,17 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: date_from
           schema:
-            type: string
-            format: date
+            type: array
+            items:
+              type: string
+              format: date
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
@@ -3806,6 +3828,17 @@ paths:
           description: Filter string to apply
           required: true
         - in: query
+          name: group_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - operating_unit
+          description: "* `operating_unit` - operating_unit"
+          explode: true
+          style: form
+        - in: query
           name: not_validated
           schema:
             type: boolean
@@ -3815,8 +3848,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: ordering
           required: false
@@ -3836,8 +3868,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: validated_by
@@ -4212,7 +4243,33 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
+              enum:
+                - 1
+                - 10
+                - 11
+                - 12
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+          description: |-
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
           explode: true
           style: form
         - in: query
@@ -4506,7 +4563,33 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
+              enum:
+                - 1
+                - 10
+                - 11
+                - 12
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+          description: |-
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
           explode: true
           style: form
         - in: query
@@ -14176,6 +14259,9 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        renewable_energy:
+          type: number
+          format: double
         unknown_siren:
           type: string
           nullable: true
@@ -14199,10 +14285,13 @@ components:
         energy_amount:
           type: number
           format: double
+        enr_ratio:
+          type: number
+          format: double
         is_controlled_by_qualicharge:
           type: boolean
         validated_by:
-          $ref: "#/components/schemas/ValidatedByEnum"
+          $ref: "#/components/schemas/ElecQualichargeStatusEnum"
         created_at:
           type: string
           format: date-time
@@ -14216,8 +14305,45 @@ components:
         - energy_amount
         - id
         - operating_unit
+        - renewable_energy
         - station_id
         - year
+    ElecProvisionCertificateQualichargeGrouped:
+      type: object
+      description: Serializer for grouped provision certificate data by operating unit.
+      properties:
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        operating_unit:
+          type: string
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
+        year:
+          type: integer
+        energy_amount:
+          type: number
+          format: double
+        renewable_energy:
+          type: number
+          format: double
+      required:
+        - cpo
+        - date_from
+        - date_to
+        - energy_amount
+        - operating_unit
+        - renewable_energy
+        - year
+    ElecProvisionCertificateQualichargeResponse:
+      oneOf:
+        - $ref: "#/components/schemas/ElecProvisionCertificateQualichargeGrouped"
+        - $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
     ElecProvisionCertificateSourceEnum:
       enum:
         - MANUAL
@@ -14232,6 +14358,18 @@ components:
         * `QUALICHARGE` - QUALICHARGE
         * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
         * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
+    ElecQualichargeStatusEnum:
+      enum:
+        - NO_ONE
+        - DGEC
+        - CPO
+        - BOTH
+      type: string
+      description: |-
+        * `NO_ONE` - NO_ONE
+        * `DGEC` - DGEC
+        * `CPO` - CPO
+        * `BOTH` - BOTH
     ElecTransferAcceptRequest:
       type: object
       properties:
@@ -14305,6 +14443,7 @@ components:
         energy_amount:
           type: number
           format: double
+          minimum: 0.01
         client:
           type: integer
         is_readjustment:
@@ -16132,7 +16271,7 @@ components:
             $ref: "#/components/schemas/ElecProvisionCertificate"
         available_energy:
           type: number
-    PaginatedElecProvisionCertificateQualichargeList:
+    PaginatedElecProvisionCertificateQualichargeResponseList:
       type: object
       required:
         - count
@@ -16154,7 +16293,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+            $ref: "#/components/schemas/ElecProvisionCertificateQualichargeResponse"
         total_quantity:
           type: number
     PaginatedElecTransferCertificateList:
@@ -16580,11 +16719,32 @@ components:
           type: array
           items:
             type: integer
-          minItems: 1
         validated_by:
-          $ref: "#/components/schemas/ValidatedByEnum"
+          $ref: "#/components/schemas/ElecQualichargeStatusEnum"
+        cpo:
+          type: array
+          items:
+            type: integer
+        status:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecQualichargeStatusEnum"
+        operating_unit:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        station_id:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        date_from:
+          type: array
+          items:
+            type: string
+            format: date
       required:
-        - certificate_ids
         - validated_by
     QuarterEnum:
       enum:
@@ -16812,7 +16972,7 @@ components:
         pos_number:
           type: string
           nullable: true
-          maxLength: 64
+          maxLength: 128
       required:
         - id
     SafParentTicket:
@@ -18114,18 +18274,6 @@ components:
         - email
         - requests
         - rights
-    ValidatedByEnum:
-      enum:
-        - NO_ONE
-        - DGEC
-        - CPO
-        - BOTH
-      type: string
-      description: |-
-        * `NO_ONE` - NO_ONE
-        * `DGEC` - DGEC
-        * `CPO` - CPO
-        * `BOTH` - BOTH
     VerifyOTPRequest:
       type: object
       description: A serializer for submitting the OTP sent via email. Includes

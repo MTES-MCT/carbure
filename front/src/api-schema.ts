@@ -4276,6 +4276,8 @@ export interface components {
         ElecProvisionCertificateQualicharge: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
+            /** Format: double */
+            renewable_energy: number;
             unknown_siren?: string | null;
             /** Format: date */
             date_from: string;
@@ -4286,11 +4288,28 @@ export interface components {
             station_id: string;
             /** Format: double */
             energy_amount: number;
+            /** Format: double */
+            enr_ratio?: number;
             is_controlled_by_qualicharge?: boolean;
-            validated_by?: components["schemas"]["ValidatedByEnum"];
+            validated_by?: components["schemas"]["ElecQualichargeStatusEnum"];
             /** Format: date-time */
             readonly created_at: string | null;
         };
+        /** @description Serializer for grouped provision certificate data by operating unit. */
+        ElecProvisionCertificateQualichargeGrouped: {
+            readonly cpo: components["schemas"]["EntityPreview"];
+            operating_unit: string;
+            /** Format: date */
+            date_from: string;
+            /** Format: date */
+            date_to: string;
+            year: number;
+            /** Format: double */
+            energy_amount: number;
+            /** Format: double */
+            renewable_energy: number;
+        };
+        ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
         /**
          * @description * `MANUAL` - MANUAL
          *     * `METER_READINGS` - METER_READINGS
@@ -4300,6 +4319,14 @@ export interface components {
          * @enum {string}
          */
         ElecProvisionCertificateSourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
+        /**
+         * @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH
+         * @enum {string}
+         */
+        ElecQualichargeStatusEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
         ElecTransferAcceptRequest: {
             used_in_tiruert: string;
             /** Format: date */
@@ -5127,7 +5154,7 @@ export interface components {
             results: components["schemas"]["ElecProvisionCertificate"][];
             available_energy?: number;
         };
-        PaginatedElecProvisionCertificateQualichargeList: {
+        PaginatedElecProvisionCertificateQualichargeResponseList: {
             /** @example 123 */
             count: number;
             /**
@@ -5140,7 +5167,7 @@ export interface components {
              * @example http://api.example.org/accounts/?page=2
              */
             previous?: string | null;
-            results: components["schemas"]["ElecProvisionCertificateQualicharge"][];
+            results: components["schemas"]["ElecProvisionCertificateQualichargeResponse"][];
             total_quantity?: number;
         };
         PaginatedElecTransferCertificateList: {
@@ -5348,8 +5375,13 @@ export interface components {
             operational_units: components["schemas"]["OperationalUnitRequest"][];
         };
         ProvisionCertificateUpdateBulkRequest: {
-            certificate_ids: number[];
-            validated_by: components["schemas"]["ValidatedByEnum"];
+            certificate_ids?: number[];
+            validated_by: components["schemas"]["ElecQualichargeStatusEnum"];
+            cpo?: number[];
+            status?: components["schemas"]["ElecQualichargeStatusEnum"][];
+            operating_unit?: string[];
+            station_id?: string[];
+            date_from?: string[];
         };
         /**
          * @description * `1` - T1
@@ -5951,14 +5983,6 @@ export interface components {
             rights: components["schemas"]["UserRights"][];
             requests: components["schemas"]["UserRightsRequests"][];
         };
-        /**
-         * @description * `NO_ONE` - NO_ONE
-         *     * `DGEC` - DGEC
-         *     * `CPO` - CPO
-         *     * `BOTH` - BOTH
-         * @enum {string}
-         */
-        ValidatedByEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
         /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
         VerifyOTPRequest: {
             /** Entrez le code à 6 chiffres reçu par email */
@@ -7517,6 +7541,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -8424,13 +8450,13 @@ export interface operations {
     elec_provision_certificates_qualicharge_list: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                date_from?: string;
+                date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8440,7 +8466,6 @@ export interface operations {
                 page_size?: number;
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 station_id?: string[];
                 /** @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC
@@ -8460,7 +8485,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeList"];
+                    "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeResponseList"];
                 };
             };
         };
@@ -8551,21 +8576,20 @@ export interface operations {
     filter_provision_certificates_qualicharge: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                date_from?: string;
+                date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 station_id?: string[];
                 /** @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC
@@ -8786,7 +8810,19 @@ export interface operations {
                 cpo?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                month?: string[];
+                /** @description * `1` - 1
+                 *     * `2` - 2
+                 *     * `3` - 3
+                 *     * `4` - 4
+                 *     * `5` - 5
+                 *     * `6` - 6
+                 *     * `7` - 7
+                 *     * `8` - 8
+                 *     * `9` - 9
+                 *     * `10` - 10
+                 *     * `11` - 11
+                 *     * `12` - 12 */
+                month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8974,7 +9010,19 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
-                month?: string[];
+                /** @description * `1` - 1
+                 *     * `2` - 2
+                 *     * `3` - 3
+                 *     * `4` - 4
+                 *     * `5` - 5
+                 *     * `6` - 6
+                 *     * `7` - 7
+                 *     * `8` - 8
+                 *     * `9` - 9
+                 *     * `10` - 10
+                 *     * `11` - 11
+                 *     * `12` - 12 */
+                month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -12848,6 +12896,9 @@ export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
     METER_READINGS = "METER_READINGS",
     QUALICHARGE = "QUALICHARGE"
 }
+export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by {
+    operating_unit = "operating_unit"
+}
 export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by {
     BOTH = "BOTH",
     CPO = "CPO",
@@ -12869,6 +12920,20 @@ export enum PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter {
     quarter = "quarter",
     source = "source",
     year = "year"
+}
+export enum PathsApiElecTransferCertificatesGetParametersQueryMonth {
+    Value1 = 1,
+    Value10 = 10,
+    Value11 = 11,
+    Value12 = 12,
+    Value2 = 2,
+    Value3 = 3,
+    Value4 = 4,
+    Value5 = 5,
+    Value6 = 6,
+    Value7 = 7,
+    Value8 = 8,
+    Value9 = 9
 }
 export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
