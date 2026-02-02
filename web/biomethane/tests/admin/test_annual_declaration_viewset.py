@@ -2,8 +2,8 @@
 Tests for BiomethaneAdminAnnualDeclarationViewSet.
 
 Covers filtering of annual declarations by department (DREAL):
-- by production unit (biomethane_production_unit__department)
-- by registered zipcode (registered_zipcode) when no production unit
+- by production unit (biomethane_production_unit__department) only
+- ordering by priority (IN_PROGRESS first) then by producer name
 """
 
 from django.contrib.contenttypes.models import ContentType
@@ -120,7 +120,8 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        declaration_ids = [d["id"] for d in data]
+        results = data["results"]
+        declaration_ids = [d["id"] for d in results]
         expected_declaration_ids = [declaration_dept_01.id, declaration_dept_02.id]
 
         self.assertEqual(declaration_ids, expected_declaration_ids)
@@ -137,9 +138,10 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        self.assertEqual(len(data), 1)
+        results = data["results"]
+        self.assertEqual(len(results), 1)
         self.assertEqual(
-            BiomethaneAnnualDeclaration.objects.get(pk=data[0]["id"]).producer_id,
+            BiomethaneAnnualDeclaration.objects.get(pk=results[0]["id"]).producer_id,
             self.producer_no_unit_zipcode_01.id,
         )
 
@@ -155,7 +157,8 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        self.assertEqual(len(data), 0)
+        results = data["results"]
+        self.assertEqual(len(results), 0)
 
     def test_list_filters_by_current_year(self):
         """list returns only declarations for the current declaration year."""
@@ -174,8 +177,9 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["year"], self.current_year)
+        results = data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["year"], self.current_year)
 
     def test_list_orders_by_producer_name(self):
         """list returns declarations ordered by producer name."""
@@ -194,7 +198,8 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        names = [d["entity_name"] for d in data]
+        results = data["results"]
+        names = [d["entity_name"] for d in results]
         self.assertEqual(names, ["Producteur Dépt 01", "Producteur Dépt 02"])
 
     def test_list_different_dreal_sees_different_declarations(self):
@@ -222,9 +227,10 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        self.assertEqual(len(data), 1)
+        results = data["results"]
+        self.assertEqual(len(results), 1)
         self.assertEqual(
-            BiomethaneAnnualDeclaration.objects.get(pk=data[0]["id"]).producer_id,
+            BiomethaneAnnualDeclaration.objects.get(pk=results[0]["id"]).producer_id,
             self.producer_dept_03.id,
         )
 
@@ -232,5 +238,8 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
         """list returns an empty list when no declarations match."""
         response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
 
+        data = response.json()
+        results = data["results"]
+
+        self.assertEqual(len(results), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), [])

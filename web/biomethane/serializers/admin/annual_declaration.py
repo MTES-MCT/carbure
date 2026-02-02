@@ -1,38 +1,44 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneAnnualDeclaration
-from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from biomethane.serializers.annual_declaration.annual_declaration import (
+    BiomethaneAnnualDeclarationStatusSerializer,
+)
 
 
-class BiomethaneAdminAnnualDeclarationSerializer(serializers.ModelSerializer):
+class BiomethaneAdminAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSerializer):
     """Serializer pour la liste admin des déclarations annuelles biométhane (DREAL)."""
 
     entity_name = serializers.CharField(source="producer.name", read_only=True)
-    effective_date = serializers.SerializerMethodField()
-    tariff_reference = serializers.SerializerMethodField()
+    tariff_reference = serializers.CharField(
+        source="producer.biomethane_contract.tariff_reference",
+        read_only=True,
+        allow_null=True,
+    )
+    effective_date = serializers.DateField(
+        source="producer.biomethane_contract.effective_date",
+        read_only=True,
+        allow_null=True,
+    )
     department = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
 
-    class Meta:
+    class Meta(BiomethaneAnnualDeclarationStatusSerializer.Meta):
         model = BiomethaneAnnualDeclaration
-        fields = [
+        fields = BiomethaneAnnualDeclarationStatusSerializer.Meta.fields + [
             "id",
             "entity_name",
             "effective_date",
             "tariff_reference",
             "department",
-            "status",
             "year",
         ]
 
-    def get_effective_date(self, declaration):
-        contract = getattr(declaration.producer, "biomethane_contract", None)
-        return contract.effective_date if contract else None
-
-    def get_tariff_reference(self, declaration):
-        contract = getattr(declaration.producer, "biomethane_contract", None)
-        return contract.tariff_reference if contract else None
-
+    @extend_schema_field(
+        {
+            "type": "string",
+        }
+    )
     def get_department(self, declaration):
         production_unit = getattr(declaration.producer, "biomethane_production_unit", None)
         if production_unit and production_unit.department:
@@ -41,6 +47,3 @@ class BiomethaneAdminAnnualDeclarationSerializer(serializers.ModelSerializer):
         zipcode = getattr(declaration.producer, "registered_zipcode", None)
 
         return zipcode or None
-
-    def get_status(self, declaration):
-        return BiomethaneAnnualDeclarationService.get_declaration_status(declaration)

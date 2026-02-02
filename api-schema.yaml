@@ -453,6 +453,48 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/biomethane/admin/annual-declarations/:
+    get:
+      operationId: biomethane_admin_annual_declarations_list
+      description: Liste des déclarations annuelles des producteurs de biométhane pour
+        l'année courante (vue DREAL).
+      parameters:
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedBiomethaneAdminAnnualDeclarationList"
+          description: ""
   /api/biomethane/admin/producers/:
     get:
       operationId: biomethane_admin_producers_list
@@ -11584,17 +11626,53 @@ components:
         - code
         - name
         - name_en
+    BiomethaneAdminAnnualDeclaration:
+      type: object
+      description: Serializer pour la liste admin des déclarations annuelles
+        biométhane (DREAL).
+      properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        id:
+          type: integer
+          readOnly: true
+        entity_name:
+          type: string
+          readOnly: true
+        effective_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        tariff_reference:
+          type: string
+          readOnly: true
+          nullable: true
+        department:
+          type: string
+          readOnly: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+        - department
+        - effective_date
+        - entity_name
+        - id
+        - tariff_reference
+        - year
     BiomethaneAnnualDeclaration:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         producer:
           type: integer
         year:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         missing_fields:
           type: object
           properties:
@@ -11629,14 +11707,14 @@ components:
     BiomethaneAnnualDeclarationRequest:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         producer:
           type: integer
         year:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         is_open:
           type: boolean
       required:
@@ -16398,6 +16476,29 @@ components:
             $ref: "#/components/schemas/BalanceResponse"
         total_quantity:
           type: number
+    PaginatedBiomethaneAdminAnnualDeclarationList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneAdminAnnualDeclaration"
     PaginatedBiomethaneContractAmendmentList:
       type: object
       required:
@@ -16695,14 +16796,14 @@ components:
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         producer:
           type: integer
         year:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         is_open:
           type: boolean
     PatchedBiomethaneDigestateStorageInputRequest:

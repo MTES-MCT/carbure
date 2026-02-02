@@ -5,28 +5,36 @@ from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.services import BiomethaneAnnualDeclarationService
 
 
-class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
-    missing_fields = serializers.SerializerMethodField()
-    is_complete = serializers.SerializerMethodField()
+class BiomethaneAnnualDeclarationStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BiomethaneAnnualDeclaration
+        fields = ["status"]
+
     status = serializers.ChoiceField(
-        choices=[
-            (BiomethaneAnnualDeclaration.IN_PROGRESS, BiomethaneAnnualDeclaration.IN_PROGRESS),
-            (BiomethaneAnnualDeclaration.DECLARED, BiomethaneAnnualDeclaration.DECLARED),
-            (BiomethaneAnnualDeclaration.OVERDUE, BiomethaneAnnualDeclaration.OVERDUE),
-        ],
+        choices=BiomethaneAnnualDeclaration.DECLARATION_STATUS_CHOICES,
         required=False,
     )
 
-    class Meta:
-        model = BiomethaneAnnualDeclaration
-        fields = ["producer", "year", "status", "missing_fields", "is_complete", "is_open"]
-        read_only_fields = ["missing_fields", "is_complete"]
-
     def to_representation(self, instance):
-        # Override status in representation to use computed value
         representation = super().to_representation(instance)
         representation["status"] = BiomethaneAnnualDeclarationService.get_declaration_status(instance)
         return representation
+
+
+class BiomethaneAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSerializer):
+    missing_fields = serializers.SerializerMethodField()
+    is_complete = serializers.SerializerMethodField()
+
+    class Meta(BiomethaneAnnualDeclarationStatusSerializer.Meta):
+        model = BiomethaneAnnualDeclaration
+        fields = BiomethaneAnnualDeclarationStatusSerializer.Meta.fields + [
+            "producer",
+            "year",
+            "missing_fields",
+            "is_complete",
+            "is_open",
+        ]
+        read_only_fields = ["missing_fields", "is_complete"]
 
     @extend_schema_field(
         {
