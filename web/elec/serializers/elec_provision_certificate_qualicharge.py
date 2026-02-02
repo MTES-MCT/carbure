@@ -73,7 +73,9 @@ class ProvisionCertificateUpdateBulkSerializer(serializers.Serializer):
     def validate_validated_by(self, value):
         request = self.context.get("request")
         if value == ElecProvisionCertificateQualicharge.DGEC:
-            # Check permissions HasElecAdminRights
+            # DGEC validation requires authentication and admin rights
+            if not request or not hasattr(request, "user") or not request.user or not request.user.is_authenticated:
+                raise serializers.ValidationError("Authentication required for DGEC validation.")
             if not HasElecAdminRights().has_permission(request, None):
                 raise serializers.ValidationError("You do not have permission to validate as DGEC.")
         return value
