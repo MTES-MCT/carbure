@@ -16,6 +16,7 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { Text } from "common/components/text"
 import { Button } from "common/components/button2"
 import { useValidateVolumes } from "../hooks/use-validate-volumes"
+import { useNotify } from "common/components/notifications"
 
 export type ValidateAllDataDialogProps = {
   onClose: () => void
@@ -28,6 +29,7 @@ export const ValidateAllDataDialog = ({
 }: ValidateAllDataDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const notify = useNotify()
   const { result, loading } = useQuery(
     getQualichargeDataGroupedByOperatingUnit,
     {
@@ -38,6 +40,9 @@ export const ValidateAllDataDialog = ({
   const validateAllData = useValidateVolumes({
     onSuccess: () => {
       onClose()
+      notify(t("Les volumes ont été validés avec succès."), {
+        variant: "success",
+      })
     },
   })
 
