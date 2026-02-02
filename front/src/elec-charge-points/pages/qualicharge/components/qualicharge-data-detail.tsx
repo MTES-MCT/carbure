@@ -113,7 +113,7 @@ export const QualichargeDataDetail = () => {
               />
               <TextInput
                 label={t("Energie (MWh)")}
-                value={formatNumber(result?.data?.renewable_energy ?? 0)}
+                value={formatNumber(result?.data?.energy_amount ?? 0)}
                 readOnly
               />
               <TextInput

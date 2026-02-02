@@ -74,9 +74,7 @@ export const ValidateAllDataDialog = ({
     {
       header: t("Energie (MWh)"),
       cell: (data) => (
-        <Cell
-          text={formatNumber(data.renewable_energy, { fractionDigits: 2 })}
-        />
+        <Cell text={formatNumber(data.energy_amount, { fractionDigits: 2 })} />
       ),
     },
   ])
@@ -99,16 +97,25 @@ export const ValidateAllDataDialog = ({
     >
       <Text>
         {t(
-          "Cette vue récapitule les données Qualicharge à valider filtrées et groupées par unité d'exploitation et debut/fin de mesure. Vérifiez les données et validez les volumes."
+          "Cette vue récapitule les données Qualicharge à valider, filtrées et groupées par unité d'exploitation et debut/fin de mesure. Vérifiez les données et validez les volumes."
         )}
       </Text>
       <RecapQuantity
-        text={t("{{count}} volumes pour un total de {{total}} MWh", {
-          count: result?.data?.count,
-          total: formatNumber(result?.data?.total_quantity ?? 0, {
-            fractionDigits: 0,
-          }),
-        })}
+        text={t(
+          "{{count}} volumes pour un total de {{total}} MWh ({{total_renewable}} MWh renouvelable)",
+          {
+            count: result?.data?.count,
+            total: formatNumber(result?.data?.total_quantity ?? 0, {
+              fractionDigits: 0,
+            }),
+            total_renewable: formatNumber(
+              result?.data?.total_quantity_renewable ?? 0,
+              {
+                fractionDigits: 2,
+              }
+            ),
+          }
+        )}
       />
       <Table
         columns={columns}
