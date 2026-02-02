@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -21,10 +22,16 @@ class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin):
         year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         accessible_dept_codes = list(entity.get_accessible_departments().values_list("code_dept", flat=True))
 
-        entities = Entity.objects.filter(
-            entity_type=Entity.BIOMETHANE_PRODUCER,
-            biomethane_production_unit__department__code_dept__in=accessible_dept_codes,
-        ).values_list("pk", flat=True)
+        entities = (
+            Entity.objects.filter(
+                entity_type=Entity.BIOMETHANE_PRODUCER,
+            )
+            .filter(
+                Q(biomethane_production_unit__department__code_dept__in=accessible_dept_codes)
+                # | Q(registered_zipcode__in=accessible_dept_codes)
+            )
+            .values_list("pk", flat=True)
+        )
 
         declarations = (
             BiomethaneAnnualDeclaration.objects.filter(producer_id__in=entities, year=year)

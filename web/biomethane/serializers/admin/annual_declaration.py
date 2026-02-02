@@ -37,7 +37,10 @@ class BiomethaneAdminAnnualDeclarationSerializer(serializers.ModelSerializer):
         production_unit = getattr(declaration.producer, "biomethane_production_unit", None)
         if production_unit and production_unit.department:
             return production_unit.department.code_dept
-        return None
+
+        zipcode = getattr(declaration.producer, "registered_zipcode", None)
+
+        return zipcode or None
 
     def get_status(self, declaration):
         return BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
