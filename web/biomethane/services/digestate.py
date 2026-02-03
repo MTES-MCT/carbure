@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from biomethane.models.biomethane_digestate import BiomethaneDigestate
+from django.core.exceptions import ObjectDoesNotExist
+
+from biomethane.models import BiomethaneDigestate, BiomethaneProductionUnit
 from biomethane.services.rules import FieldClearingRule, RuleBuilder, get_fields_from_applied_rules
 
 
@@ -43,8 +45,6 @@ class BiomethaneDigestateService:
     @staticmethod
     def _extract_data(instance) -> DigestateContext:
         """Extract data from a digestate instance and return structured context."""
-        from django.core.exceptions import ObjectDoesNotExist
-
         # Extract producer and related objects
         producer = getattr(instance, "producer", None)
         production_unit = None
@@ -52,7 +52,7 @@ class BiomethaneDigestateService:
 
         if producer:
             try:
-                production_unit = producer.biomethane_production_unit
+                production_unit = BiomethaneProductionUnit.objects.filter(created_by=producer).first()
             except ObjectDoesNotExist:
                 production_unit = None
 

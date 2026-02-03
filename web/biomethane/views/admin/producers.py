@@ -40,7 +40,7 @@ class BiomethaneProducersViewSet(GenericViewSet, ListModelMixin):
         producers = (
             Entity.objects.filter(
                 entity_type=Entity.BIOMETHANE_PRODUCER,
-                biomethane_production_unit__department__code_dept__in=accessible_dept_codes,
+                site__biomethaneproductionunit__department__code_dept__in=accessible_dept_codes,
             )
             .distinct()
             .order_by("name")

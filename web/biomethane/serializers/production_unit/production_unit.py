@@ -26,7 +26,7 @@ class BaseBiomethaneProductionUnitSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneProductionUnit
-        exclude = ["producer"]
+        exclude = ["created_by"]
 
 
 class BiomethaneProductionUnitSerializer(BaseBiomethaneProductionUnitSerializer):
@@ -37,7 +37,7 @@ class BiomethaneProductionUnitSerializer(BaseBiomethaneProductionUnitSerializer)
 class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSerializer):
     def create(self, validated_data):
         entity = self.context.get("entity")
-        validated_data["producer"] = entity
+        validated_data["created_by"] = entity
         return super().create(validated_data)
 
     def update(self, instance, validated_data):

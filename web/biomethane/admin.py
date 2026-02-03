@@ -39,9 +39,9 @@ class BiomethaneInjectionSiteAdmin(admin.ModelAdmin):
 
 @admin.register(BiomethaneProductionUnit)
 class BiomethaneProductionUnitAdmin(admin.ModelAdmin):
-    list_display = ("id", "producer", "department", "unit_name", "siret_number", "unit_type")
+    list_display = ("id", "producer", "department", "name", "site_siret", "unit_type")
     list_filter = ("unit_type", "department")
-    search_fields = ("unit_name", "siret_number", "producer__name", "producer__pk")
+    search_fields = ("name", "site_siret", "producer__name", "producer__pk")
 
 
 @admin.register(BiomethaneDigestateStorage)
