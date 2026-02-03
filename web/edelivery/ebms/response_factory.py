@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 
-from edelivery.ebms.request_responses import InvalidRequestErrorResponse, NotFoundErrorResponse
+from edelivery.ebms.request_responses import InvalidRequestErrorResponse, NotFoundErrorResponse, UnknownStatusErrorResponse
 
 
 class ResponseFactory:
@@ -17,7 +17,12 @@ class ResponseFactory:
     def response(self):
         response_status = self.udb_response_status()
         status_found = response_status == "FOUND"
-        response_class = self.response_class if status_found else self._ERROR_RESPONSE_CLASSES[response_status]
+        response_class = (
+            self.response_class
+            if status_found
+            else self._ERROR_RESPONSE_CLASSES.get(response_status, UnknownStatusErrorResponse)
+        )
+
         return response_class(self.payload)
 
     def udb_response_status(self):

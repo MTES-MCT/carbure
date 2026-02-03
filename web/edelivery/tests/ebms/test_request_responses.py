@@ -7,6 +7,7 @@ from edelivery.ebms.request_responses import (
     EOGetTransactionResponse,
     InvalidRequestErrorResponse,
     NotFoundErrorResponse,
+    UnknownStatusErrorResponse,
 )
 
 
@@ -67,6 +68,29 @@ class NotFoundErrorResponseTest(TestCase):
         result = response.post_retrieval_action_result()
         patched_log_error.assert_called_with("Search returned no result")
         self.assertEqual({"error": "Not found"}, result)
+
+
+class UnknownStatusErrorResponseTest(TestCase):
+    @staticmethod
+    def payload(status="SOME_ERROR_STATUS"):
+        return f"""\
+<?xml version="1.0" encoding="UTF-8"?>
+<udb:ErrorResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <RESPONSE_HEADER REQUEST_ID="123" STATUS="{status}" />
+</udb:ErrorResponse>"""
+
+    def test_knows_its_status(self):
+        response = UnknownStatusErrorResponse(self.payload(status="SOME_UNKNOWN_STATUS"))
+        self.assertEqual("SOME_UNKNOWN_STATUS", response.status())
+
+    @patch("edelivery.ebms.request_responses.log_error")
+    def test_logs_error_as_post_retrieval_action(self, patched_log_error):
+        response = UnknownStatusErrorResponse(self.payload(status="SOME_UNKNOWN_STATUS"))
+        patched_log_error.assert_not_called()
+
+        result = response.post_retrieval_action_result()
+        patched_log_error.assert_called_with("Received UDB response with unknown status", {"status": "SOME_UNKNOWN_STATUS"})
+        self.assertEqual({"error": "Unknown response status", "status": "SOME_UNKNOWN_STATUS"}, result)
 
 
 class EOGetTransactionResponseTest(TestCase):

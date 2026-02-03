@@ -36,6 +36,16 @@ class NotFoundErrorResponse(BaseRequestResponse):
         return {"error": "Not found"}
 
 
+class UnknownStatusErrorResponse(BaseRequestResponse):
+    def status(self):
+        return self.parsed_XML.find("./RESPONSE_HEADER").attrib["STATUS"]
+
+    def post_retrieval_action_result(self):
+        status = self.status()
+        log_error("Received UDB response with unknown status", {"status": status})
+        return {"error": "Unknown response status", "status": status}
+
+
 class EOGetTransactionResponse(BaseRequestResponse):
     def __init__(self, payload):
         super().__init__(payload)

@@ -4,6 +4,7 @@ from edelivery.ebms.request_responses import (
     BaseRequestResponse,
     InvalidRequestErrorResponse,
     NotFoundErrorResponse,
+    UnknownStatusErrorResponse,
 )
 from edelivery.ebms.response_factory import ResponseFactory
 
@@ -38,3 +39,8 @@ class ResponseFactoryTest(TestCase):
         factory = ResponseFactory(BaseRequestResponse, self.payload(status="INVALID_REQUEST"))
         response = factory.response()
         self.assertIsInstance(response, InvalidRequestErrorResponse)
+
+    def test_returns_an_error_response_on_UDB_response_with_unknown_status(self):
+        factory = ResponseFactory(BaseRequestResponse, self.payload(status="UNKNOWN_STATUS"))
+        response = factory.response()
+        self.assertIsInstance(response, UnknownStatusErrorResponse)
