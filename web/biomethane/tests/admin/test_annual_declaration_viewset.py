@@ -4,6 +4,7 @@ Tests for BiomethaneAdminAnnualDeclarationViewSet.
 Covers filtering of annual declarations by department (DREAL):
 - by production unit (biomethane_production_unit__department) only
 - ordering by priority (IN_PROGRESS first) then by producer name
+- filters endpoint (department, status, tariff_reference)
 """
 
 from django.contrib.contenttypes.models import ContentType
@@ -11,15 +12,16 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
-from biomethane.factories import BiomethaneProductionUnitFactory
+from biomethane.factories import BiomethaneContractFactory, BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from biomethane.views.admin import BiomethaneAdminAnnualDeclarationViewSet
 from core.models import Department, Entity, ExternalAdminRights
-from core.tests_utils import setup_current_user
+from core.tests_utils import FiltersActionTestMixin, setup_current_user
 from entity.models import EntityScope
 
 
-class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
+class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMixin):
     """Tests for BiomethaneAdminAnnualDeclarationViewSet (DREAL list of annual declarations)."""
 
     @classmethod
@@ -251,3 +253,35 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
 
         self.assertEqual(len(results), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_filters_return_expected_values_for_accessible_declarations(self):
+        """filters endpoint returns only department, status and tariff_reference values from current year declarations in
+        accessible departments."""
+        BiomethaneContractFactory.create(
+            producer=self.producer_dept_01,
+            tariff_reference="2011",
+        )
+        BiomethaneContractFactory.create(
+            producer=self.producer_dept_02,
+            tariff_reference="2023",
+        )
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_01,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_02,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.DECLARED,
+        )
+
+        self.assertFilters(
+            BiomethaneAdminAnnualDeclarationViewSet,
+            {
+                "department": ["01", "02"],
+                "status": ["DECLARED", "IN_PROGRESS"],
+                "tariff_reference": ["2011", "2023"],
+            },
+            entity=self.dreal,
+        )

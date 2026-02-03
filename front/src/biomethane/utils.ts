@@ -1,3 +1,6 @@
+import i18next from "i18next"
+import { AnnualDeclarationStatus } from "./types"
+
 /**
  * Determines the declaration interval based on the current system date.
  *
@@ -41,3 +44,12 @@ export function getDeclarationInterval() {
 }
 
 export const declarationInterval = getDeclarationInterval()
+
+export const getDeclarationStatusLabel = (status: AnnualDeclarationStatus) => {
+  const labelMapping = {
+    [AnnualDeclarationStatus.IN_PROGRESS]: i18next.t("Déclaration en cours"),
+    [AnnualDeclarationStatus.DECLARED]: i18next.t("Déclaration transmise"),
+    [AnnualDeclarationStatus.OVERDUE]: i18next.t("Déclaration en retard"),
+  }
+  return labelMapping[status]
+}

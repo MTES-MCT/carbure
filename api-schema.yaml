@@ -11785,7 +11785,8 @@ components:
           readOnly: true
           nullable: true
         tariff_reference:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/TariffReferenceEnum"
           readOnly: true
           nullable: true
         department:

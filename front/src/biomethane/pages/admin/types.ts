@@ -3,14 +3,9 @@ import { QueryBuilder } from "common/hooks/query-builder-2"
 import {
   PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter as BiomethaneAdminAnnualDeclarationFilters,
   PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus as DashboardStatus,
-  PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference as DashboardTariffReference,
 } from "api-schema"
 
-export {
-  BiomethaneAdminAnnualDeclarationFilters,
-  DashboardStatus,
-  DashboardTariffReference,
-}
+export { BiomethaneAdminAnnualDeclarationFilters, DashboardStatus }
 export type BiomethaneProducer = apiTypes["BiomethaneProducer"]
 
 export type BiomethaneAdminAnnualDeclaration =

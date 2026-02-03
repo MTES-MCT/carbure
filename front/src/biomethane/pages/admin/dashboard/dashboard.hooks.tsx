@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next"
 import Tag from "@codegouvfr/react-dsfr/Tag"
 import { getDepartmentName } from "common/utils/geography"
 import { getBiomethaneAdminDashboardFilters } from "../api"
-import { defaultNormalizer } from "common/utils/normalize"
 import { formatDate } from "common/utils/formatters"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 import { BiomethaneAdminAnnualDeclarationFilters } from "../types"
@@ -12,22 +11,14 @@ import type {
   BiomethaneAdminDashboardQuery,
 } from "../types"
 import { AnnualDeclarationStatus } from "biomethane/types"
-import { useTariffReferenceOptions } from "biomethane/pages/contract/components/contract-infos/contract-infos.hooks"
-import { useCallback } from "react"
+import { useGetTariffReferenceLabel } from "biomethane/pages/contract/components/contract-infos/contract-infos.hooks"
+import { getDeclarationStatusLabel } from "biomethane/utils"
+import { TariffReference } from "biomethane/pages/contract/types"
 
 export const useDashboardColumns =
   (): Column<BiomethaneAdminAnnualDeclaration>[] => {
     const { t } = useTranslation()
-    const tariffReferenceOptions = useTariffReferenceOptions()
-    const getTariffReferenceLabel = useCallback(
-      (value: string) => {
-        return (
-          tariffReferenceOptions.find((option) => option.value === value)
-            ?.label ?? value
-        )
-      },
-      [tariffReferenceOptions]
-    )
+    const getTariffReferenceLabel = useGetTariffReferenceLabel()
     return [
       {
         header: t("Installation"),
@@ -80,7 +71,7 @@ export const useGetDashboardFilterOptions = (
   query: BiomethaneAdminDashboardQuery
 ) => {
   const { t } = useTranslation()
-
+  const getTariffReferenceLabel = useGetTariffReferenceLabel()
   const filterLabels: Record<BiomethaneAdminAnnualDeclarationFilters, string> =
     {
       [BiomethaneAdminAnnualDeclarationFilters.status]: t("Statut"),
@@ -89,27 +80,17 @@ export const useGetDashboardFilterOptions = (
       [BiomethaneAdminAnnualDeclarationFilters.department]: t("Départements"),
     }
 
-  const statusLabel = (value: string) => {
-    switch (value) {
-      case "DECLARED":
-        return t("Déclaration transmise")
-      case "IN_PROGRESS":
-        return t("Déclaration en cours")
-      case "OVERDUE":
-        return t("Déclaration en retard")
-      default:
-        return value
-    }
-  }
-
   const normalizers = {
     [BiomethaneAdminAnnualDeclarationFilters.status]: (value: string) => ({
       value,
-      label: statusLabel(value),
+      label: getDeclarationStatusLabel(value as AnnualDeclarationStatus),
     }),
     [BiomethaneAdminAnnualDeclarationFilters.tariff_reference]: (
       value: string
-    ) => defaultNormalizer(value),
+    ) => ({
+      value,
+      label: getTariffReferenceLabel(value as TariffReference),
+    }),
     [BiomethaneAdminAnnualDeclarationFilters.department]: (value: string) => ({
       value,
       label: `${value} - ${getDepartmentName(value) ?? value}`,

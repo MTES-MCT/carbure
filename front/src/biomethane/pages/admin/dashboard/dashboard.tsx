@@ -12,7 +12,7 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { BiomethaneAdminDashboardQueryBuilder } from "../types"
 import { Pagination } from "common/components/pagination2"
-import { Content, Main } from "common/components/scaffold"
+import { Content, LoaderOverlay, Main } from "common/components/scaffold"
 import { useRoutes } from "common/hooks/routes"
 
 const currentYear = new Date().getFullYear()
@@ -73,6 +73,7 @@ const Dashboard = () => {
             />
           </>
         )}
+        {loading && <LoaderOverlay />}
       </Content>
     </Main>
   )

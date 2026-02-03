@@ -3177,7 +3177,7 @@ export interface components {
             producer: components["schemas"]["EntityPreview"];
             /** Format: date */
             readonly effective_date: string | null;
-            readonly tariff_reference: string | null;
+            readonly tariff_reference: components["schemas"]["TariffReferenceEnum"] | null;
             readonly department: string | null;
             year: number;
         };

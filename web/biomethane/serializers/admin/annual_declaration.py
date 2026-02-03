@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneAnnualDeclaration
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.serializers.annual_declaration.annual_declaration import (
     BiomethaneAnnualDeclarationStatusSerializer,
 )
@@ -11,7 +12,8 @@ class BiomethaneAdminAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStat
     """Serializer pour la liste admin des déclarations annuelles biométhane (DREAL)."""
 
     producer = EntityPreviewSerializer()
-    tariff_reference = serializers.CharField(
+    tariff_reference = serializers.ChoiceField(
+        choices=BiomethaneContract.TARIFF_REFERENCE_CHOICES,
         source="producer.biomethane_contract.tariff_reference",
         read_only=True,
         allow_null=True,
