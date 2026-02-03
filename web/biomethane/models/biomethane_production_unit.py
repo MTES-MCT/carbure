@@ -2,24 +2,14 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from core.models import Department, Entity
+from transactions.models import Site
 
 
-class BiomethaneProductionUnit(models.Model):
-    # Propriétaire de l'unité de production
-    producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_production_unit")
+class BiomethaneProductionUnit(Site):
+    # Inherited from Site: name, site_siret, address, postal_code, city, country, created_by (producer)
 
-    # Nom de l'unité
-    unit_name = models.CharField(max_length=128, null=True, blank=True)
-
-    # SIRET
-    siret_number = models.CharField(max_length=16, null=True, blank=True)
-
-    # Adresse de la société
-    company_address = models.CharField(max_length=256, null=True, blank=True)
-    postal_code = models.CharField(max_length=10, null=True, blank=True)
-    city = models.CharField(max_length=128, null=True, blank=True)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    # Specific fields for biomethane production units
+    department = models.ForeignKey("core.Department", on_delete=models.SET_NULL, null=True, blank=True)
     insee_code = models.CharField(max_length=5, null=True, blank=True)
 
     # légende
@@ -205,6 +195,10 @@ class BiomethaneProductionUnit(models.Model):
         db_table = "biomethane_production_unit"
         verbose_name = "Unité de Production"
         verbose_name_plural = "Unités de Production"
+
+    @property
+    def producer(self):
+        return self.created_by
 
     @property
     def watched_fields(self):
