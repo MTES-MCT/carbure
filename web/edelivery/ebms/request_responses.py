@@ -21,7 +21,13 @@ class BaseRequestResponse:
 
 
 class InvalidRequestErrorResponse(BaseRequestResponse):
-    pass
+    def error_message(self):
+        return self.parsed_XML.find("./RESPONSE_HEADER").attrib["OBSERVATION"]
+
+    def post_retrieval_action_result(self):
+        error_message = self.error_message()
+        log_error("Invalid request", {"error": error_message})
+        return {"error": "Invalid request", "message": error_message}
 
 
 class NotFoundErrorResponse(BaseRequestResponse):

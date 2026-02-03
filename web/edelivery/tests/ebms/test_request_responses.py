@@ -5,6 +5,7 @@ from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from edelivery.ebms.request_responses import (
     BaseRequestResponse,
     EOGetTransactionResponse,
+    InvalidRequestErrorResponse,
     NotFoundErrorResponse,
 )
 
@@ -24,6 +25,28 @@ class BaseRequestResponseTest(TestCase):
         response = BaseRequestResponse(self.payload("12345"))
         self.assertEqual("12345", response.request_id())
 
+
+class InvalidRequestErrorResponseTest(TestCase):
+    @staticmethod
+    def payload(message="Error!"):
+        return f"""\
+<?xml version="1.0" encoding="UTF-8"?>
+<udb:ErrorResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <RESPONSE_HEADER REQUEST_ID="123" STATUS="INVALID_REQUEST" OBSERVATION="{message}" />
+</udb:ErrorResponse>"""
+
+    def test_knows_its_error_message(self):
+        response = InvalidRequestErrorResponse(self.payload(message="Oops"))
+        self.assertEqual("Oops", response.error_message())
+
+    @patch("edelivery.ebms.request_responses.log_error")
+    def test_sends_sentry_alert_as_post_retrieval_action(self, patched_log_error):
+        response = InvalidRequestErrorResponse(self.payload(message="Oops"))
+        patched_log_error.assert_not_called()
+
+        result = response.post_retrieval_action_result()
+        patched_log_error.assert_called_with("Invalid request", {"error": "Oops"})
+        self.assertEqual({"error": "Invalid request", "message": "Oops"}, result)
 
 
 class NotFoundErrorResponseTest(TestCase):
