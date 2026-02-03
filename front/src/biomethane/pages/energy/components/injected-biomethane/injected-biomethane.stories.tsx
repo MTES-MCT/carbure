@@ -54,7 +54,6 @@ const monthlyReports2011: BiomethaneEnergyMonthlyReport[] = Array.from(
   })
 )
 
-// Calculation = 4500 * 8760 / (12 * 500) = 6570
 export const WithContract2011: Story = {
   args: {
     contract: {
@@ -75,7 +74,6 @@ export const WithContract2011: Story = {
   },
 }
 
-// Calculation = 3600 * 8760 / (12 * 300) = 8760
 export const WithContract2020: Story = {
   args: {
     contract: {
@@ -96,7 +94,6 @@ export const WithContract2020: Story = {
   },
 }
 
-// Calculation = 8760 * 8 / 10 = 7008
 export const WithContract2021: Story = {
   args: {
     contract: {
@@ -117,7 +114,6 @@ export const WithContract2021: Story = {
   },
 }
 
-// Calculation = 8760 * 1.2 / 10 = 1051.2
 export const WithContract2023: Story = {
   args: {
     contract: {
