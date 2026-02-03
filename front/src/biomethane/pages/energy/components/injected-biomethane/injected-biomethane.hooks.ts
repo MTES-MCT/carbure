@@ -6,14 +6,14 @@ import {
 } from "biomethane/pages/contract/contract.utils"
 import { InjectedBiomethaneForm } from "./injected-biomethane"
 import { useFormContext } from "common/components/form2"
-import { roundNumber } from "common/utils/formatters"
+import { CONVERSIONS, roundNumber } from "common/utils/formatters"
 import { BiomethaneEnergyMonthlyReport } from "../../types"
 import { useTranslation } from "react-i18next"
 
 /**
  * Calculates operating hours according to the rules:
- * - For contracts 2011 and 2020: "Injected biomethane quantity (Nm3/year)" / (sum of injection hours * contract Cmax)
- * - For contracts 2021 and 2023: "Injected biomethane quantity (GWh PCS/year)" / "contract PAP"
+ * - For contracts 2011 and 2020: "8760 * Quantité de biométhane injectée (Nm3/an)" / (somme du nombre d'heures d'injection [du tableau section Production mensuelle de biométhane] * Cmax du contrat)
+ * - For contracts 2021 and 2023: "8760 * Quantité de biométhane injectée (GWh PCS/an)" / "PAP du contrat"
  */
 export const useInjectedBiomethane = (
   monthlyReports: BiomethaneEnergyMonthlyReport[],
@@ -48,8 +48,10 @@ export const useInjectedBiomethane = (
 
       if (totalInjectionHours === 0) return undefined
 
-      // Calculation: Injected quantity (Nm3/year) / (sum of injection hours * Cmax)
-      const calculatedHours = injectedNm3PerYear / (totalInjectionHours * cmax)
+      // Calculation: 8760 * Injected quantity (Nm3/year) / (sum of injection hours * Cmax)
+      const calculatedHours =
+        (CONVERSIONS.hours.yearsToHours(1) * injectedNm3PerYear) /
+        (totalInjectionHours * cmax)
       return roundNumber(calculatedHours, 0)
     }
 
@@ -60,8 +62,10 @@ export const useInjectedBiomethane = (
 
       if (!injectedGwhPcsPerYear || !papContracted) return undefined
 
-      // Calculation: Injected quantity (GWh PCS/year) / contract PAP
-      const calculatedHours = injectedGwhPcsPerYear / papContracted
+      // Calculation: 8760 * Injected quantity (GWh PCS/year) / contract PAP
+      const calculatedHours =
+        (CONVERSIONS.hours.yearsToHours(1) * injectedGwhPcsPerYear) /
+        papContracted
       return roundNumber(calculatedHours, 0)
     }
 
@@ -75,11 +79,13 @@ export const useInjectedBiomethane = (
 
     if (isTariffReference2011Or2020(tariffReference)) {
       return t(
-        "Quantité de biométhane injectée (Nm3/an) / (somme du nombre d'heures d'injection [du tableau renseigné dans la section Production mensuelle de biométhane] * Cmax du contrat)"
+        "8760 * Quantité de biométhane injectée (Nm3/an) / (somme du nombre d'heures d'injection [du tableau renseigné dans la section Production mensuelle de biométhane] * Cmax du contrat)"
       )
     }
 
-    return t("Quantité de biométhane injectée (GWh PCS/an) / PAP du contrat")
+    return t(
+      "8760 * Quantité de biométhane injectée (GWh PCS/an) / PAP du contrat"
+    )
   }, [energy, contract, t])
 
   // Set the operating hours in the form when it is calculated

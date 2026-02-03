@@ -54,7 +54,7 @@ const monthlyReports2011: BiomethaneEnergyMonthlyReport[] = Array.from(
   })
 )
 
-// Calculation = 45000 / (12 * 500) = 7.5
+// Calculation = 4500 * 8760 / (12 * 500) = 6570
 export const WithContract2011: Story = {
   args: {
     contract: {
@@ -64,19 +64,19 @@ export const WithContract2011: Story = {
     },
     energy: {
       ...energyData,
-      injected_biomethane_nm3_per_year: 45000,
+      injected_biomethane_nm3_per_year: 4500,
       monthly_reports: monthlyReports2011,
     },
   },
   parameters: {
     docs: {
       description:
-        "Contrat 2011 : Le calcul utilise la formule 'Quantité injectée (Nm3/an) / (somme heures d'injection * Cmax)'. Le champ Nm3/an est visible.",
+        "Contrat 2011 : Le calcul utilise la formule '8760 * Quantité injectée (Nm3/an) / (somme heures d'injection * Cmax)'. Le champ Nm3/an est visible.",
     },
   },
 }
 
-// Calculation = 36000 / (12 * 300) = 10
+// Calculation = 3600 * 8760 / (12 * 300) = 8760
 export const WithContract2020: Story = {
   args: {
     contract: {
@@ -86,7 +86,7 @@ export const WithContract2020: Story = {
     },
     energy: {
       ...energyData,
-      injected_biomethane_nm3_per_year: 36000,
+      injected_biomethane_nm3_per_year: 3600,
       monthly_reports: monthlyReports2011,
     },
   },
@@ -98,7 +98,7 @@ export const WithContract2020: Story = {
   },
 }
 
-// Calculation = 80 / 10 = 8
+// Calculation = 8760 * 8 / 10 = 7008
 export const WithContract2021: Story = {
   args: {
     contract: {
@@ -108,18 +108,18 @@ export const WithContract2021: Story = {
     },
     energy: {
       ...energyData,
-      injected_biomethane_gwh_pcs_per_year: 80,
+      injected_biomethane_gwh_pcs_per_year: 8,
     },
   },
   parameters: {
     docs: {
       description:
-        "Contrat 2021 : Le calcul utilise la formule 'Quantité injectée (GWh PCS/an) / PAP du contrat'. Le champ Nm3/an n'est pas visible.",
+        "Contrat 2021 : Le calcul utilise la formule '8760 * Quantité injectée (GWh PCS/an) / PAP du contrat'. Le champ Nm3/an n'est pas visible.",
     },
   },
 }
 
-// Calculation = 120 / 10 = 12
+// Calculation = 8760 * 1.2 / 10 = 1051.2
 export const WithContract2023: Story = {
   args: {
     contract: {
@@ -129,7 +129,7 @@ export const WithContract2023: Story = {
     },
     energy: {
       ...energyData,
-      injected_biomethane_gwh_pcs_per_year: 120,
+      injected_biomethane_gwh_pcs_per_year: 1.2,
     },
   },
   parameters: {

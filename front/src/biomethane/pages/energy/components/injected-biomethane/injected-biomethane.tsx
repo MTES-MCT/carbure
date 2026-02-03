@@ -9,7 +9,7 @@ import { useSaveEnergy } from "../../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useInjectedBiomethane } from "./injected-biomethane.hooks"
-import { roundNumber } from "common/utils/formatters"
+import { CONVERSIONS, roundNumber } from "common/utils/formatters"
 
 const calculateInjectedBiomethaneNm3PerYear = (
   gwhPcsPerYear: number,
@@ -126,6 +126,7 @@ export function InjectedBiomethane({
             readOnly={!isEditing}
             hasTooltip
             title={rule}
+            max={CONVERSIONS.hours.yearsToHours(1)}
           />
           {isEditing && (
             <Button
