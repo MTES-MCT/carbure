@@ -43,7 +43,7 @@ class NotFoundErrorResponseTest(TestCase):
         patched_log_error.assert_not_called()
 
         result = response.post_retrieval_action_result()
-        patched_log_error.assert_called_with("Search returned no result")
+        patched_log_error.assert_called_with("UDB Search returned no result")
         self.assertEqual({"error": "Not found"}, result)
 
 

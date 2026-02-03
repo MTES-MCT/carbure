@@ -14,7 +14,7 @@ class InvalidRequestErrorResponse(BaseRequestResponse):
 
 class NotFoundErrorResponse(BaseRequestResponse):
     def post_retrieval_action_result(self):
-        log_error("Search returned no result")
+        log_error("UDB Search returned no result")
         return {"error": "Not found"}
 
 
