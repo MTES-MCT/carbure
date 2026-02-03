@@ -25,13 +25,8 @@ class BaseRequestResponseTest(TestCase):
         self.assertEqual("12345", response.request_id())
 
 
+
 class NotFoundErrorResponseTest(TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     @staticmethod
     def payload():
         return """\
