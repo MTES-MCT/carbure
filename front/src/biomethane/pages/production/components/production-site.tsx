@@ -134,6 +134,7 @@ export function ProductionSite({
             hintText={t(
               "Rendement global de l'installation (comprenant notamment le rendement de l'épurateur)"
             )}
+            step={0.1}
             {...bind("production_efficiency")}
           />
           <CheckboxGroup

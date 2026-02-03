@@ -61,7 +61,7 @@ export const ContractAidOrganism = ({
             <>
               <CheckboxGroup
                 readOnly={!isEditing}
-                label={t("Organisme qui a attribué l'aide complémentaire")}
+                label={t("Aide complémentaire attribuée par")}
                 options={complementaryAidOrganismOptions}
                 {...bind("complementary_aid_organisms")}
                 required
