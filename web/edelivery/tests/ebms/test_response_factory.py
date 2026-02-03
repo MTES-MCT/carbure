@@ -1,11 +1,7 @@
 from unittest import TestCase
 
-from edelivery.ebms.request_responses import (
-    BaseRequestResponse,
-    InvalidRequestErrorResponse,
-    NotFoundErrorResponse,
-    UnknownStatusErrorResponse,
-)
+from edelivery.ebms.error_responses import InvalidRequestErrorResponse, NotFoundErrorResponse, UnknownStatusErrorResponse
+from edelivery.ebms.request_responses import BaseRequestResponse
 from edelivery.ebms.response_factory import ResponseFactory
 
 

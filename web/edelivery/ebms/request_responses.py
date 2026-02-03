@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from adapters.logger import log_error
 from core.models import CarbureLot
 from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
 from edelivery.ebms.ntr import from_national_trade_register
@@ -18,32 +17,6 @@ class BaseRequestResponse:
 
     def post_retrieval_action_result(self):
         pass
-
-
-class InvalidRequestErrorResponse(BaseRequestResponse):
-    def error_message(self):
-        return self.parsed_XML.find("./RESPONSE_HEADER").attrib["OBSERVATION"]
-
-    def post_retrieval_action_result(self):
-        error_message = self.error_message()
-        log_error("Invalid request", {"error": error_message})
-        return {"error": "Invalid request", "message": error_message}
-
-
-class NotFoundErrorResponse(BaseRequestResponse):
-    def post_retrieval_action_result(self):
-        log_error("Search returned no result")
-        return {"error": "Not found"}
-
-
-class UnknownStatusErrorResponse(BaseRequestResponse):
-    def status(self):
-        return self.parsed_XML.find("./RESPONSE_HEADER").attrib["STATUS"]
-
-    def post_retrieval_action_result(self):
-        status = self.status()
-        log_error("Received UDB response with unknown status", {"status": status})
-        return {"error": "Unknown response status", "status": status}
 
 
 class EOGetTransactionResponse(BaseRequestResponse):

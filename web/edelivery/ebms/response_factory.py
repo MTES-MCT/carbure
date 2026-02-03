@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 
-from edelivery.ebms.request_responses import InvalidRequestErrorResponse, NotFoundErrorResponse, UnknownStatusErrorResponse
+from edelivery.ebms.error_responses import InvalidRequestErrorResponse, NotFoundErrorResponse, UnknownStatusErrorResponse
 
 
 class ResponseFactory:
