@@ -3478,11 +3478,43 @@ export interface components {
             digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             department?: string;
-            unit_name?: string | null;
-            siret_number?: string | null;
-            company_address?: string | null;
-            postal_code?: string | null;
-            city?: string | null;
+            name: string;
+            site_siret?: string;
+            customs_id?: string;
+            icao_code?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            address?: string;
+            postal_code?: string;
+            city?: string;
+            gps_coordinates?: string | null;
+            accise?: string;
+            /**
+             * Format: double
+             * @description Entre 0 et 1
+             */
+            electrical_efficiency?: number | null;
+            /**
+             * Format: double
+             * @description Entre 0 et 1
+             */
+            thermal_efficiency?: number | null;
+            /**
+             * Format: double
+             * @description En degrés Celsius
+             */
+            useful_temperature?: number | null;
+            ges_option?: components["schemas"]["GesOptionEnum"];
+            eligible_dc?: boolean;
+            dc_number?: string;
+            dc_reference?: string;
+            manager_name?: string;
+            manager_phone?: string;
+            manager_email?: string;
+            private?: boolean;
+            is_enabled?: boolean;
+            /** Format: date */
+            date_mise_en_service?: string | null;
+            is_ue_airport?: boolean;
             insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
@@ -3502,18 +3534,51 @@ export interface components {
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
-            producer: number;
+            country?: number | null;
+            created_by?: number | null;
         };
         BiomethaneProductionUnitUpsertRequest: {
             installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             department?: string;
-            unit_name?: string | null;
-            siret_number?: string | null;
-            company_address?: string | null;
-            postal_code?: string | null;
-            city?: string | null;
+            name: string;
+            site_siret?: string;
+            customs_id?: string;
+            icao_code?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            address?: string;
+            postal_code?: string;
+            city?: string;
+            gps_coordinates?: string | null;
+            accise?: string;
+            /**
+             * Format: double
+             * @description Entre 0 et 1
+             */
+            electrical_efficiency?: number | null;
+            /**
+             * Format: double
+             * @description Entre 0 et 1
+             */
+            thermal_efficiency?: number | null;
+            /**
+             * Format: double
+             * @description En degrés Celsius
+             */
+            useful_temperature?: number | null;
+            ges_option?: components["schemas"]["GesOptionEnum"];
+            eligible_dc?: boolean;
+            dc_number?: string;
+            dc_reference?: string;
+            manager_name?: string;
+            manager_phone?: string;
+            manager_email?: string;
+            private?: boolean;
+            is_enabled?: boolean;
+            /** Format: date */
+            date_mise_en_service?: string | null;
+            is_ue_airport?: boolean;
             insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
@@ -3533,6 +3598,8 @@ export interface components {
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
             digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
+            country?: number | null;
+            created_by?: number | null;
         };
         BiomethaneSupplyInput: {
             readonly id: number;
@@ -5745,6 +5812,7 @@ export interface components {
          *     * `POWER PLANT` - POWER PLANT
          *     * `COGENERATION PLANT` - COGENERATION PLANT
          *     * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
+         *     * `PRODUCTION_BIOGAZ` - PRODUCTION BIOGAZ
          *     * `EFCA` - EFCA
          *     * `AIRPORT` - AIRPORT
          * @enum {string}
@@ -7218,7 +7286,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
@@ -10480,7 +10548,7 @@ export interface operations {
     resources_airports_list: {
         parameters: {
             query?: {
-                has_intermediary_depot?: boolean;
+                has_intermediary_depot?: boolean | null;
                 origin_depot_id?: number;
                 public_only?: boolean;
                 query?: string;
@@ -13439,6 +13507,7 @@ export enum SiteTypeEnum {
     POWER_PLANT = "POWER PLANT",
     COGENERATION_PLANT = "COGENERATION PLANT",
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
+    PRODUCTION_BIOGAZ = "PRODUCTION_BIOGAZ",
     EFCA = "EFCA",
     AIRPORT = "AIRPORT"
 }

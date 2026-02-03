@@ -1585,6 +1585,7 @@ paths:
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/BiomethaneProductionUnitUpsertRequest"
+        required: true
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -6494,7 +6495,7 @@ paths:
           name: has_intermediary_depot
           schema:
             type: boolean
-            default: false
+            nullable: true
         - in: query
           name: origin_depot_id
           schema:
@@ -12296,26 +12297,84 @@ components:
             $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
         department:
           type: string
-        unit_name:
+        name:
           type: string
-          nullable: true
           maxLength: 128
-        siret_number:
+        site_siret:
           type: string
-          nullable: true
-          maxLength: 16
-        company_address:
+          maxLength: 64
+        customs_id:
           type: string
-          nullable: true
+          maxLength: 32
+        icao_code:
+          type: string
+          maxLength: 32
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
+          type: string
           maxLength: 256
         postal_code:
           type: string
-          nullable: true
-          maxLength: 10
+          maxLength: 32
         city:
           type: string
-          nullable: true
           maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        accise:
+          type: string
+          maxLength: 32
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+          description: En degrés Celsius
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_number:
+          type: string
+          maxLength: 64
+        dc_reference:
+          type: string
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        private:
+          type: boolean
+        is_enabled:
+          type: boolean
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        is_ue_airport:
+          type: boolean
         insee_code:
           type: string
           nullable: true
@@ -12378,11 +12437,15 @@ components:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
           nullable: true
-        producer:
+        country:
           type: integer
+          nullable: true
+        created_by:
+          type: integer
+          nullable: true
       required:
         - id
-        - producer
+        - name
     BiomethaneProductionUnitUpsertRequest:
       type: object
       properties:
@@ -12401,26 +12464,85 @@ components:
         department:
           type: string
           minLength: 1
-        unit_name:
+        name:
           type: string
-          nullable: true
+          minLength: 1
           maxLength: 128
-        siret_number:
+        site_siret:
           type: string
-          nullable: true
-          maxLength: 16
-        company_address:
+          maxLength: 64
+        customs_id:
           type: string
-          nullable: true
+          maxLength: 32
+        icao_code:
+          type: string
+          maxLength: 32
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
+          type: string
           maxLength: 256
         postal_code:
           type: string
-          nullable: true
-          maxLength: 10
+          maxLength: 32
         city:
           type: string
-          nullable: true
           maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        accise:
+          type: string
+          maxLength: 32
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+          nullable: true
+          description: Entre 0 et 1
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+          description: En degrés Celsius
+        ges_option:
+          $ref: "#/components/schemas/GesOptionEnum"
+        eligible_dc:
+          type: boolean
+        dc_number:
+          type: string
+          maxLength: 64
+        dc_reference:
+          type: string
+          maxLength: 64
+        manager_name:
+          type: string
+          maxLength: 64
+        manager_phone:
+          type: string
+          maxLength: 64
+        manager_email:
+          type: string
+          maxLength: 64
+        private:
+          type: boolean
+        is_enabled:
+          type: boolean
+        date_mise_en_service:
+          type: string
+          format: date
+          nullable: true
+        is_ue_airport:
+          type: boolean
         insee_code:
           type: string
           nullable: true
@@ -12483,6 +12605,14 @@ components:
           allOf:
             - $ref: "#/components/schemas/DigestateSaleTypeEnum"
           nullable: true
+        country:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          nullable: true
+      required:
+        - name
     BiomethaneSupplyInput:
       type: object
       properties:
@@ -17783,6 +17913,7 @@ components:
         - POWER PLANT
         - COGENERATION PLANT
         - PRODUCTION BIOLIQUID
+        - PRODUCTION_BIOGAZ
         - EFCA
         - AIRPORT
       type: string
@@ -17796,6 +17927,7 @@ components:
         * `POWER PLANT` - POWER PLANT
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
+        * `PRODUCTION_BIOGAZ` - PRODUCTION BIOGAZ
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
     SpreadingManagementMethodsEnum:
