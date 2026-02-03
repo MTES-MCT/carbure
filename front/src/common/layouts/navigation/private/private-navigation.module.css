@@ -72,4 +72,5 @@
   padding: var(--spacing-l);
   overflow-y: auto;
   flex-grow: 1;
+  background-color: var(--background-default-grey-hover);
 }

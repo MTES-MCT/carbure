@@ -25,9 +25,14 @@ class ValidateActionMixin:
         try:
             declaration = self.filter_queryset(self.get_queryset()).get()
 
-            if BiomethaneAnnualDeclarationService.is_declaration_complete(declaration):
+            if BiomethaneAnnualDeclarationService.is_declaration_complete(declaration) and declaration.is_open:
+                current_status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+                if current_status == BiomethaneAnnualDeclaration.OVERDUE:
+                    declaration.is_open = False
+
                 declaration.status = BiomethaneAnnualDeclaration.DECLARED
-                declaration.save(update_fields=["status"])
+
+                declaration.save(update_fields=["status", "is_open"])
                 return Response(status=status.HTTP_200_OK)
 
             return Response(status=status.HTTP_400_BAD_REQUEST)

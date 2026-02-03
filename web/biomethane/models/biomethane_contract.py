@@ -51,7 +51,7 @@ class BiomethaneContract(models.Model):
     producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_contract")
     installation_category = models.CharField(choices=INSTALLATION_CATEGORIES, max_length=32, null=True, blank=True)
     cmax = models.FloatField(null=True, blank=True)
-    cmax_annualized = models.BooleanField(default=False)
+    cmax_annualized = models.BooleanField(default=False, null=True, blank=True)
     cmax_annualized_value = models.FloatField(null=True, blank=True)
     pap_contracted = models.FloatField(null=True, blank=True)
     signature_date = models.DateField(null=True, blank=True)

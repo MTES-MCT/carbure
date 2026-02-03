@@ -93,9 +93,13 @@ const AddContractContent = ({
           )}
           {currentStep?.key === "general" && (
             <FileInput
+              {...form.bind("general_conditions_file")}
               required
               label={t("Conditions générales")}
-              {...form.bind("general_conditions_file")}
+              state="info"
+              stateRelatedMessage={t(
+                "Vos conditions générales et particulières doivent être déposées en 2 fichiers distincts"
+              )}
             />
           )}
           {currentStep?.key === "specific" && (

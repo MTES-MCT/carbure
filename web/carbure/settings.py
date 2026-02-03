@@ -42,6 +42,8 @@ env = environ.Env(
     METABASE_SECRET_KEY=(str, ""),
     FAKE_PROD=(bool, False),
     WITH_EMAIL_DECORATED_AS_TEST=(bool, False),
+    WITH_UDB_ACCEPTANCE_DATA=(bool, False),
+    ELEC_READJUSTMENT_ENTITY=(str, ""),
 )
 
 # ensure a `BASE_URL` env var is present before starting
@@ -66,7 +68,7 @@ if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
-        environment=f"carbure-{image_tag}",
+        environment=f"{image_tag}",
     )
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
@@ -118,6 +120,7 @@ INSTALLED_APPS = [
     "user",
     "biomethane",
     "edelivery",
+    "anonymization",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -235,7 +238,6 @@ if env("IMAGE_TAG") in ["dev", "staging", "prod"]:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, "../front/build")]
 
 
-WITH_EMAIL_DECORATED_AS_TEST = env("WITH_EMAIL_DECORATED_AS_TEST")
 DEFAULT_FROM_EMAIL = "noreply@carbure.beta.gouv.fr"
 if env("IMAGE_TAG") in ["dev", "staging", "prod"] and not env("FAKE_PROD"):
     EMAIL_HOST = env("EMAIL_HOST")
@@ -434,6 +436,7 @@ SPECTACULAR_SETTINGS = {
         "ElecOperationStatusEnum": "tiruert.models.ElecOperation.OPERATION_STATUSES",
         "ElecOperationTypeEnum": "tiruert.models.ElecOperation.OPERATION_TYPES",
         "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
+        "ElecQualichargeStatusEnum": "elec.models.ElecProvisionCertificateQualicharge.VALIDATION_CHOICES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
@@ -480,3 +483,9 @@ if env("TEST"):
     PASSWORD_HASHERS = [
         "django.contrib.auth.hashers.MD5PasswordHasher",
     ]
+
+# Feature flags
+WITH_EMAIL_DECORATED_AS_TEST = env("WITH_EMAIL_DECORATED_AS_TEST")
+WITH_UDB_ACCEPTANCE_DATA = env("WITH_UDB_ACCEPTANCE_DATA")
+# this env var will hold the name of the entity CPOs will send their readjustement certificates to
+ELEC_READJUSTMENT_ENTITY = env("ELEC_READJUSTMENT_ENTITY")

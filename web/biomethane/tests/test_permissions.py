@@ -3,6 +3,7 @@ from django.test import TestCase
 from biomethane.permissions import (
     HasBiomethaneProducerWriteRights,
     HasDrealOrProducerRights,
+    HasDrealRights,
     get_biomethane_permissions,
 )
 from biomethane.views import (
@@ -15,6 +16,7 @@ from biomethane.views import (
     BiomethaneEnergyMonthlyReportViewSet,
     BiomethaneEnergyViewSet,
     BiomethaneInjectionSiteViewSet,
+    BiomethaneProducersViewSet,
     BiomethaneProductionUnitViewSet,
     BiomethaneSupplyInputViewSet,
     BiomethaneSupplyPlanViewSet,
@@ -161,5 +163,14 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             [
                 (["list", "retrieve"], [HasDrealOrProducerRights()]),
                 (["create", "destroy", "partial_update", "update"], [HasBiomethaneProducerWriteRights()]),
+            ],
+        )
+
+    def test_producers_permissions(self):
+        """Test BiomethaneProducersViewSet permissions"""
+        self.assertViewPermissions(
+            BiomethaneProducersViewSet,
+            [
+                (["list"], [HasDrealRights()]),
             ],
         )

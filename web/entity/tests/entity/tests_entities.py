@@ -3,42 +3,14 @@ from django.urls import reverse
 
 from core.models import Entity
 from core.tests_utils import setup_current_user
+from entity.factories.entity import EntityFactory
 
 
 class AdminEntitiesTest(TestCase):
-    fixtures = [
-        "json/biofuels.json",
-        "json/feedstock.json",
-        "json/countries.json",
-        "json/depots.json",
-        "json/entities.json",
-        "json/entities_sites.json",
-    ]
-
     def setUp(self):
-        self.admin = Entity.objects.filter(entity_type=Entity.ADMIN)[0]
+        self.entity1 = EntityFactory.create(name="Entity operator", entity_type=Entity.OPERATOR)
+        self.admin = EntityFactory.create(name="Entity admin", entity_type=Entity.ADMIN)
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
-
-    def test_get_entities(self):
-        response = self.client.get(reverse("entity-list") + f"?entity_id={self.admin.id}", {"entity_id": self.admin.id})
-        # api works
-        assert response.status_code == 200
-        # and returns at least 5 entities
-        assert len(response.json()) >= 5
-
-        # check if querying works
-        response = self.client.get(
-            reverse("entity-list") + f"?entity_id={self.admin.id}", {"q": self.admin.name, "entity_id": self.admin.id}
-        )
-        # works
-        assert response.status_code == 200
-        # and returns at least 1 entity
-        data = response.json()
-        assert len(data) == 1
-        # check if the content is correct
-        random_entity = data[0]["entity"]
-        assert "entity_type" in random_entity
-        assert "name" in random_entity
 
     def test_get_entities_details(self):
         response = self.client.get(

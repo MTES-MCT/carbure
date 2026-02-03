@@ -1,23 +1,77 @@
+from datetime import date
+from unittest.mock import patch
+
 from django.test import TestCase
 
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.energy import BiomethaneEnergyFactory
+from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 
 
 class BiomethaneAnnualDeclarationServiceTests(TestCase):
+    fixtures = ["json/countries.json"]
+
     def setUp(self):
         self.producer_entity = Entity.objects.create(
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+
+    @patch("biomethane.services.annual_declaration.date")
+    def test_get_declaration_period(self, mock_date):
+        """Test get_current_declaration_year returns previous year based on current date"""
+        # Test that get_current_declaration_year always returns previous year
+        mock_date.today.return_value = date(2026, 1, 1)
+        result = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        self.assertEqual(result, 2025)
+
+        mock_date.today.return_value = date(2026, 12, 31)
+        result = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        self.assertEqual(result, 2025)
+
+    def test_is_declaration_period_open_with_period_exists(self):
+        """Test is_declaration_period_open when BiomethaneDeclarationPeriod exists"""
+        from biomethane.models import BiomethaneDeclarationPeriod
+
+        # Create a declaration period for 2025
+        BiomethaneDeclarationPeriod.objects.create(
+            year=2025,
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 3, 31),
+        )
+
+        # Test when we're in the period - need to mock date in both service and model
+        with (
+            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("biomethane.models.biomethane_declaration_period.date") as mock_date_model,
+        ):
+            mock_date_service.today.return_value = date(2026, 2, 15)
+            mock_date_model.today.return_value = date(2026, 2, 15)
+            result = BiomethaneAnnualDeclarationService.is_declaration_period_open()
+            self.assertTrue(result)
+
+        # Test when we're after the period
+        with (
+            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("biomethane.models.biomethane_declaration_period.date") as mock_date_model,
+        ):
+            mock_date_service.today.return_value = date(2026, 5, 15)
+            mock_date_model.today.return_value = date(2026, 5, 15)
+            result = BiomethaneAnnualDeclarationService.is_declaration_period_open()
+            self.assertFalse(result)
+
+    def test_is_declaration_period_open_without_period(self):
+        """Test is_declaration_period_open when BiomethaneDeclarationPeriod doesn't exist"""
+        result = BiomethaneAnnualDeclarationService.is_declaration_period_open()
+        self.assertFalse(result)
 
     def test_get_missing_fields_both_models_exist(self):
-        """Test get_missing_fields structure when both digestate and energy exist"""
+        """Test get_missing_fields structure when digestate, energy and supply_plan exist"""
         BiomethaneDigestateFactory.create(
             producer=self.producer_entity,
             year=self.current_year,
@@ -27,6 +81,12 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             producer=self.producer_entity,
             year=self.current_year,
         )
+
+        supply_plan = BiomethaneSupplyPlanFactory.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+        )
+        BiomethaneSupplyInputFactory.create(supply_plan=supply_plan)
 
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -39,11 +99,13 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIsInstance(missing_fields, dict)
         self.assertIn("digestate_missing_fields", missing_fields)
         self.assertIn("energy_missing_fields", missing_fields)
+        self.assertIn("supply_plan_valid", missing_fields)
         self.assertIsInstance(missing_fields["digestate_missing_fields"], list)
         self.assertIsInstance(missing_fields["energy_missing_fields"], list)
+        self.assertTrue(missing_fields["supply_plan_valid"])
 
     def test_get_missing_fields_both_not_exist(self):
-        """Test get_missing_fields when neither digestate nor energy exist"""
+        """Test get_missing_fields when neither digestate, energy nor supply_plan exist"""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=self.current_year,
@@ -54,11 +116,12 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         self.assertIsNone(missing_fields["digestate_missing_fields"])
         self.assertIsNone(missing_fields["energy_missing_fields"])
+        self.assertFalse(missing_fields["supply_plan_valid"])
 
     def test_get_required_fields_with_valid_model(self):
         """Test get_required_fields returns all field names for a model"""
         # Test with BiomethaneDigestate model
-        fields = BiomethaneAnnualDeclarationService.get_required_fields(BiomethaneDigestate)
+        fields = BiomethaneAnnualDeclarationService.get_all_fields(BiomethaneDigestate)
 
         # Assert we get a list of field names
         self.assertIsInstance(fields, list)
@@ -69,11 +132,29 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIn("year", fields)
         self.assertIn("raw_digestate_tonnage_produced", fields)
 
+    def test_get_missing_fields_supply_plan_without_inputs(self):
+        """Test get_missing_fields when supply_plan exists but has no inputs"""
+        BiomethaneSupplyPlanFactory.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+        )
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+
+        self.assertFalse(missing_fields["supply_plan_valid"])
+
     def test_is_declaration_complete_with_incomplete_data(self):
         """Test is_declaration_complete returns False when required fields are missing"""
         missing_fields = {
             "digestate_missing_fields": ["xxx"],
             "energy_missing_fields": ["yyy"],
+            "supply_plan_valid": False,
         }
 
         # Create declaration
@@ -88,7 +169,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertFalse(is_complete)
 
     def test_is_declaration_complete_with_no_data(self):
-        """Test is_declaration_complete returns False when no digestate/energy exist"""
+        """Test is_declaration_complete returns False when no digestate/energy/supply plan exist"""
         # Create declaration without digestate and energy
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -105,6 +186,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         missing_fields = {
             "digestate_missing_fields": [],
             "energy_missing_fields": [],
+            "supply_plan_valid": True,
         }
 
         # Create declaration
@@ -217,3 +299,63 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         # Verify no declaration was created
         self.assertEqual(BiomethaneAnnualDeclaration.objects.filter(producer=self.producer_entity).count(), 0)
+
+    @patch("biomethane.services.annual_declaration.date")
+    def test_get_declaration_status_in_progress_current_year(self, mock_date):
+        """Test get_declaration_status returns IN_PROGRESS for current year declaration"""
+        mock_date.today.return_value = date(2026, 5, 15)
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=2026,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        self.assertEqual(status, BiomethaneAnnualDeclaration.IN_PROGRESS)
+
+    @patch("biomethane.services.annual_declaration.date")
+    def test_get_declaration_status_declared(self, mock_date):
+        """Test get_declaration_status returns DECLARED for declared declaration"""
+        mock_date.today.return_value = date(2026, 5, 15)
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=2025,
+            status=BiomethaneAnnualDeclaration.DECLARED,
+        )
+
+        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        self.assertEqual(status, BiomethaneAnnualDeclaration.DECLARED)
+
+    @patch("biomethane.services.annual_declaration.date")
+    def test_get_declaration_status_overdue_previous_year(self, mock_date):
+        """Test get_declaration_status returns OVERDUE for old year IN_PROGRESS declaration"""
+        # Current date in April 2026, so current declaration year is 2025 (year - 1)
+        mock_date.today.return_value = date(2026, 4, 15)
+
+        # Declaration for 2024 (< 2025) still IN_PROGRESS should be OVERDUE
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=2024,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        self.assertEqual(status, BiomethaneAnnualDeclaration.OVERDUE)
+
+    @patch("biomethane.services.annual_declaration.date")
+    def test_get_declaration_status_in_progress_current_declaration_year(self, mock_date):
+        """Test get_declaration_status returns IN_PROGRESS for current declaration year"""
+        # In January 2026, current declaration year is 2025 (year - 1)
+        mock_date.today.return_value = date(2026, 1, 15)
+
+        # Declaration for 2025 (current declaration year) should be IN_PROGRESS
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=2025,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        self.assertEqual(status, BiomethaneAnnualDeclaration.IN_PROGRESS)

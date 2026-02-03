@@ -1,13 +1,27 @@
-import { AnnualDeclarationProvider } from "biomethane/providers/annual-declaration"
+import {
+  AnnualDeclarationProvider,
+  useAnnualDeclaration,
+} from "biomethane/providers/annual-declaration"
 import { Outlet } from "react-router-dom"
 import { BiomethanePageHeader } from "./page-header"
+import { DeclarationNotFound } from "biomethane/components/declaration-not-found"
+
+export const AnnualDeclarationLayoutComponent = () => {
+  const { annualDeclaration } = useAnnualDeclaration()
+
+  if (annualDeclaration === undefined) return <DeclarationNotFound />
+
+  return (
+    <BiomethanePageHeader>
+      <Outlet />
+    </BiomethanePageHeader>
+  )
+}
 
 export const AnnualDeclarationLayout = () => {
   return (
     <AnnualDeclarationProvider>
-      <BiomethanePageHeader>
-        <Outlet />
-      </BiomethanePageHeader>
+      <AnnualDeclarationLayoutComponent />
     </AnnualDeclarationProvider>
   )
 }

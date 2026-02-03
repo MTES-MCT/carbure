@@ -8,6 +8,7 @@ from core.decorators import check_admin_rights
 from core.models import ExternalAdminRights
 from elec.models.elec_audit_charge_point import ElecAuditChargePoint
 from elec.models.elec_audit_sample import ElecAuditSample
+from elec.models.elec_meter_reading import ElecMeterReading
 from elec.repositories.meter_reading_repository import MeterReadingRepository
 from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer
 from elec.services.extract_audit_sample import extract_audit_sample
@@ -44,7 +45,11 @@ def generate_sample(request):
         return ErrorResponse(GenerateSampleErrors.ALREADY_AUDITED)
 
     charge_points = MeterReadingRepository.get_application_charge_points(application.cpo, application)
-    meter_readings = MeterReadingRepository.get_application_meter_readings(application.cpo, application)
+
+    # Get ElecMeterReading instances (not virtual) for the audit FK relationship
+    meter_readings = ElecMeterReading.objects.filter(
+        cpo=application.cpo, application=application, meter__charge_point__is_deleted=False
+    ).select_related("meter", "meter__charge_point")
 
     readings_by_charge_point_id = {}
     for meter_reading in meter_readings:

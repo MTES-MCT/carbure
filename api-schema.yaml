@@ -453,6 +453,57 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
+  /api/biomethane/admin/producers/:
+    get:
+      operationId: biomethane_admin_producers_list
+      description: |-
+        List biomethane producers visible by the current DREAL entity.
+
+        Returns producers that have production units in departments
+        accessible by the DREAL.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedBiomethaneProducerList"
+          description: ""
   /api/biomethane/annual-declaration/:
     get:
       operationId: biomethane_annual_declaration_retrieve
@@ -464,6 +515,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -484,16 +540,8 @@ paths:
           description: Declaration created for the entity
     patch:
       operationId: biomethane_annual_declaration_partial_update
-      description: >-
-        Mixin that provides get_object() method with filterset and permission
-        checks.
-
-
-        The ViewSet must have:
-
-        - filterset_class configured
-
-        - queryset defined
+      description: Partial update of the declaration for a producer and year (only
+        status field to IN_PROGRESS is allowed).
       parameters:
         - in: query
           name: entity_id
@@ -501,6 +549,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       requestBody:
@@ -544,6 +597,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -567,6 +625,11 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -845,6 +908,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1133,6 +1202,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
+          required: true
       tags:
         - biomethane
       security:
@@ -1249,6 +1324,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -1309,6 +1390,7 @@ paths:
           name: year
           schema:
             type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1333,6 +1415,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1372,6 +1460,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the energy declaration.
           required: true
       tags:
         - biomethane
@@ -1998,6 +2092,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
           required: true
       tags:
         - biomethane
@@ -3435,16 +3535,18 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
               enum:
+                - ADMIN_ERROR_COMPENSATION
+                - ENR_RATIO_COMPENSATION
                 - MANUAL
                 - METER_READINGS
-                - null
                 - QUALICHARGE
           description: |-
             * `MANUAL` - MANUAL
             * `METER_READINGS` - METER_READINGS
             * `QUALICHARGE` - QUALICHARGE
+            * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+            * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
         - in: query
@@ -3477,20 +3579,34 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: date_from
           schema:
-            type: string
-            format: date
+            type: array
+            items:
+              type: string
+              format: date
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: group_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - operating_unit
+          description: "* `operating_unit` - operating_unit"
+          explode: true
+          style: form
         - in: query
           name: not_validated
           schema:
@@ -3501,8 +3617,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: ordering
           required: false
@@ -3534,8 +3649,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: validated_by
@@ -3569,7 +3683,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeList"
+                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeRespons\
+                  eList"
           description: ""
   /api/elec/provision-certificates-qualicharge/{id}/:
     get:
@@ -3682,14 +3797,17 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: date_from
           schema:
-            type: string
-            format: date
+            type: array
+            items:
+              type: string
+              format: date
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
@@ -3710,6 +3828,17 @@ paths:
           description: Filter string to apply
           required: true
         - in: query
+          name: group_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - operating_unit
+          description: "* `operating_unit` - operating_unit"
+          explode: true
+          style: form
+        - in: query
           name: not_validated
           schema:
             type: boolean
@@ -3719,8 +3848,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - name: ordering
           required: false
@@ -3740,8 +3868,7 @@ paths:
             type: array
             items:
               type: string
-          description: Les valeurs multiples doivent être séparées par des virgules.
-          explode: false
+          explode: true
           style: form
         - in: query
           name: validated_by
@@ -3840,7 +3967,9 @@ paths:
                 type: object
                 properties:
                   balance:
-                    type: integer
+                    type: number
+                  readjustment_balance:
+                    type: number
           description: ""
   /api/elec/provision-certificates/export/:
     get:
@@ -3977,16 +4106,18 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
               enum:
+                - ADMIN_ERROR_COMPENSATION
+                - ENR_RATIO_COMPENSATION
                 - MANUAL
                 - METER_READINGS
-                - null
                 - QUALICHARGE
           description: |-
             * `MANUAL` - MANUAL
             * `METER_READINGS` - METER_READINGS
             * `QUALICHARGE` - QUALICHARGE
+            * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+            * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
         - in: query
@@ -4112,7 +4243,33 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
+              enum:
+                - 1
+                - 10
+                - 11
+                - 12
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+          description: |-
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
           explode: true
           style: form
         - in: query
@@ -4406,7 +4563,33 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
+              enum:
+                - 1
+                - 10
+                - 11
+                - 12
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+                - 9
+          description: |-
+            * `1` - 1
+            * `2` - 2
+            * `3` - 3
+            * `4` - 4
+            * `5` - 5
+            * `6` - 6
+            * `7` - 7
+            * `8` - 8
+            * `9` - 9
+            * `10` - 10
+            * `11` - 11
+            * `12` - 12
           explode: true
           style: form
         - in: query
@@ -11141,9 +11324,12 @@ components:
     BiomethaneAnnualDeclaration:
       type: object
       properties:
+        producer:
+          type: integer
         year:
           type: integer
-          readOnly: true
+          maximum: 2147483647
+          minimum: -2147483648
         status:
           $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         missing_fields:
@@ -11161,23 +11347,34 @@ components:
                 type: string
               nullable: true
               description: List of missing fields for energy
+            supply_plan_valid:
+              type: boolean
+              nullable: false
+              description: Whether the supply plan is valid
           description: Missing fields grouped by type
           readOnly: true
         is_complete:
           type: boolean
           readOnly: true
+        is_open:
+          type: boolean
+          readOnly: true
       required:
         - is_complete
+        - is_open
         - missing_fields
+        - producer
         - year
     BiomethaneAnnualDeclarationStatusEnum:
       enum:
         - IN_PROGRESS
         - DECLARED
+        - OVERDUE
       type: string
       description: |-
         * `IN_PROGRESS` - IN_PROGRESS
         * `DECLARED` - DECLARED
+        * `OVERDUE` - OVERDUE
     BiomethaneContract:
       type: object
       properties:
@@ -11208,6 +11405,7 @@ components:
           nullable: true
         cmax_annualized:
           type: boolean
+          nullable: true
         cmax_annualized_value:
           type: number
           format: double
@@ -11570,6 +11768,9 @@ components:
     BiomethaneDigestateSpreadingAddRequest:
       type: object
       properties:
+        year:
+          type: integer
+          writeOnly: true
         spreading_department:
           type: string
           minLength: 1
@@ -11584,6 +11785,7 @@ components:
         - spread_parcels_area
         - spread_quantity
         - spreading_department
+        - year
     BiomethaneDigestateStorage:
       type: object
       properties:
@@ -11970,6 +12172,18 @@ components:
         - network_manager_name
         - network_type
         - unique_identification_number
+    BiomethaneProducer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 64
+      required:
+        - id
+        - name
     BiomethaneProductionUnit:
       type: object
       properties:
@@ -13380,7 +13594,7 @@ components:
         - period_start
     DoubleCountingApplicationUpdate:
       type: object
-      description: Serializer pour la mise à jour partielle du statut uniquement.
+      description: Serializer for updating the status of a DoubleCountingApplication.
       properties:
         status:
           $ref: "#/components/schemas/DoubleCountingStatus"
@@ -14001,9 +14215,7 @@ components:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
         source:
-          allOf:
-            - $ref: "#/components/schemas/ElecProvisionCertificateSourceEnum"
-          nullable: true
+          $ref: "#/components/schemas/ElecProvisionCertificateSourceEnum"
         quarter:
           allOf:
             - $ref: "#/components/schemas/QuarterEnum"
@@ -14035,6 +14247,7 @@ components:
         - operating_unit
         - quarter
         - remaining_energy_amount
+        - source
         - year
     ElecProvisionCertificateQualicharge:
       type: object
@@ -14046,6 +14259,9 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
+        renewable_energy:
+          type: number
+          format: double
         unknown_siren:
           type: string
           nullable: true
@@ -14069,10 +14285,13 @@ components:
         energy_amount:
           type: number
           format: double
+        enr_ratio:
+          type: number
+          format: double
         is_controlled_by_qualicharge:
           type: boolean
         validated_by:
-          $ref: "#/components/schemas/ValidatedByEnum"
+          $ref: "#/components/schemas/ElecQualichargeStatusEnum"
         created_at:
           type: string
           format: date-time
@@ -14086,18 +14305,71 @@ components:
         - energy_amount
         - id
         - operating_unit
+        - renewable_energy
         - station_id
         - year
+    ElecProvisionCertificateQualichargeGrouped:
+      type: object
+      description: Serializer for grouped provision certificate data by operating unit.
+      properties:
+        cpo:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        operating_unit:
+          type: string
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
+        year:
+          type: integer
+        energy_amount:
+          type: number
+          format: double
+        renewable_energy:
+          type: number
+          format: double
+      required:
+        - cpo
+        - date_from
+        - date_to
+        - energy_amount
+        - operating_unit
+        - renewable_energy
+        - year
+    ElecProvisionCertificateQualichargeResponse:
+      oneOf:
+        - $ref: "#/components/schemas/ElecProvisionCertificateQualichargeGrouped"
+        - $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
     ElecProvisionCertificateSourceEnum:
       enum:
         - MANUAL
         - METER_READINGS
         - QUALICHARGE
+        - ENR_RATIO_COMPENSATION
+        - ADMIN_ERROR_COMPENSATION
       type: string
       description: |-
         * `MANUAL` - MANUAL
         * `METER_READINGS` - METER_READINGS
         * `QUALICHARGE` - QUALICHARGE
+        * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+        * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
+    ElecQualichargeStatusEnum:
+      enum:
+        - NO_ONE
+        - DGEC
+        - CPO
+        - BOTH
+      type: string
+      description: |-
+        * `NO_ONE` - NO_ONE
+        * `DGEC` - DGEC
+        * `CPO` - CPO
+        * `BOTH` - BOTH
     ElecTransferAcceptRequest:
       type: object
       properties:
@@ -14171,10 +14443,13 @@ components:
         energy_amount:
           type: number
           format: double
+          minimum: 0.01
         client:
           type: integer
+        is_readjustment:
+          type: boolean
+          default: false
       required:
-        - client
         - energy_amount
     EmptyResponse:
       type: object
@@ -15873,6 +16148,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BiomethaneContractAmendment"
+    PaginatedBiomethaneProducerList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneProducer"
     PaginatedBiomethaneSupplyInputList:
       type: object
       required:
@@ -15973,7 +16271,7 @@ components:
             $ref: "#/components/schemas/ElecProvisionCertificate"
         available_energy:
           type: number
-    PaginatedElecProvisionCertificateQualichargeList:
+    PaginatedElecProvisionCertificateQualichargeResponseList:
       type: object
       required:
         - count
@@ -15995,7 +16293,7 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+            $ref: "#/components/schemas/ElecProvisionCertificateQualichargeResponse"
         total_quantity:
           type: number
     PaginatedElecTransferCertificateList:
@@ -16147,6 +16445,12 @@ components:
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
+        producer:
+          type: integer
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
         status:
           $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
     PatchedBiomethaneDigestateStorageInputRequest:
@@ -16202,7 +16506,7 @@ components:
           maxLength: 3
     PatchedDoubleCountingApplicationUpdateRequest:
       type: object
-      description: Serializer pour la mise à jour partielle du statut uniquement.
+      description: Serializer for updating the status of a DoubleCountingApplication.
       properties:
         status:
           $ref: "#/components/schemas/DoubleCountingStatus"
@@ -16415,11 +16719,32 @@ components:
           type: array
           items:
             type: integer
-          minItems: 1
         validated_by:
-          $ref: "#/components/schemas/ValidatedByEnum"
+          $ref: "#/components/schemas/ElecQualichargeStatusEnum"
+        cpo:
+          type: array
+          items:
+            type: integer
+        status:
+          type: array
+          items:
+            $ref: "#/components/schemas/ElecQualichargeStatusEnum"
+        operating_unit:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        station_id:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        date_from:
+          type: array
+          items:
+            type: string
+            format: date
       required:
-        - certificate_ids
         - validated_by
     QuarterEnum:
       enum:
@@ -16647,7 +16972,7 @@ components:
         pos_number:
           type: string
           nullable: true
-          maxLength: 64
+          maxLength: 128
       required:
         - id
     SafParentTicket:
@@ -17949,18 +18274,6 @@ components:
         - email
         - requests
         - rights
-    ValidatedByEnum:
-      enum:
-        - NO_ONE
-        - DGEC
-        - CPO
-        - BOTH
-      type: string
-      description: |-
-        * `NO_ONE` - NO_ONE
-        * `DGEC` - DGEC
-        * `CPO` - CPO
-        * `BOTH` - BOTH
     VerifyOTPRequest:
       type: object
       description: A serializer for submitting the OTP sent via email. Includes

@@ -1,1 +1,2 @@
 from .provision_certificate_qualicharge import ElecProvisionCertificateQualichargeFactory
+from .transfer_certificate import ElecTransferCertificateFactory

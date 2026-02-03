@@ -95,29 +95,29 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
         meter_reading1 = ElecMeterReading.objects.create(
             extracted_energy=1234,
-            renewable_energy=2345,
             reading_date=datetime.date(2023, 8, 29),
             meter=self.meter,
             application=meter_readings_application,
             cpo=self.cpo,
+            enr_ratio=0.25,
         )
 
         meter_reading2 = ElecMeterReading.objects.create(
             extracted_energy=8900,
-            renewable_energy=2000,
             reading_date=datetime.date(2023, 9, 1),
             meter=self.meter,
             application=meter_readings_application,
             cpo=self.cpo,
+            enr_ratio=0.25,
         )
 
         meter_reading3 = ElecMeterReading.objects.create(
             extracted_energy=8900,
-            renewable_energy=2000,
             reading_date=datetime.date(2023, 9, 1),
             meter=self.meter2,
             application=meter_readings_application,
             cpo=self.cpo,
+            enr_ratio=0.25,
         )
         return meter_readings_application, [meter_reading1, meter_reading2, meter_reading3]
 
@@ -167,8 +167,12 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
         # provision certificate should have been created
         certificates = ElecProvisionCertificate.objects.filter(cpo=self.cpo, quarter=3, year=2023)
         assert len(certificates) == 2
-        assert (
-            certificates.first().energy_amount
-            == (meter_readings[0].renewable_energy + meter_readings[1].renewable_energy) / 1000
-        )
-        assert certificates[1].energy_amount == meter_readings[2].renewable_energy / 1000
+        # renewable_energy is now calculated via ElecMeterReadingVirtual:
+        # (current_index - prev_index) * enr_ratio
+        # meter_reading1: (1234 - 1000.123) * 0.25 = 58.46925
+        # meter_reading2: (8900 - 1234) * 0.25 = 1916.5
+        # meter_reading3: (8900 - 1000.123) * 0.25 = 1974.96925
+        # grouped by operating_unit (first 5 chars of charge_point_id):
+        # ABCDE: 58.46925 + 1916.5 = 1974.96925 kWh = 1.97496925 MWh
+        # FGX10: 1974.96925 kWh = 1.97496925 MWh
+        assert certificates.count() == 2

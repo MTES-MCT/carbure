@@ -651,6 +651,9 @@ class CarbureLot(models.Model):
     carbure_id = models.CharField(max_length=64, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
+    # UDB
+    udb_transaction_id = models.CharField(max_length=64, blank=True)
+
     # production data
     carbure_producer = models.ForeignKey(
         Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_producer"
@@ -815,7 +818,7 @@ class CarbureLot(models.Model):
     data_reliability_score = models.CharField(max_length=1, default="F")
 
     # saf
-    pos_number = models.CharField(max_length=64, null=True)
+    pos_number = models.CharField(max_length=128, null=True)
 
     class Meta:
         db_table = "carbure_lots"

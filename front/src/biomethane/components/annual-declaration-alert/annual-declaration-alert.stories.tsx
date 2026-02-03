@@ -42,7 +42,7 @@ export const DeclarationInProgress: Story = {
   },
   decorators: [
     generateAnnualDeclarationContextProvider({
-      isInDeclarationPeriod: true,
+      isDeclarationInCurrentPeriod: true,
     }),
   ],
 }
@@ -56,9 +56,9 @@ export const DeclarationAlreadySubmitted: Story = {
   },
   decorators: [
     generateAnnualDeclarationContextProvider({
-      isInDeclarationPeriod: true,
+      isDeclarationInCurrentPeriod: true,
       isDeclarationValidated: true,
-      currentAnnualDeclaration: createMockAnnualDeclaration(
+      annualDeclaration: createMockAnnualDeclaration(
         AnnualDeclarationStatus.DECLARED
       ),
     }),

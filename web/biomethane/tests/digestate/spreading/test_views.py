@@ -30,7 +30,7 @@ class BiomethaneDigestateSpreadingViewSetTests(TestCase):
         )
 
         self.url_base = reverse("biomethane-digestate-spreading-list")
-        self.base_params = {"entity_id": self.producer_entity.id}
+        self.base_params = {"entity_id": self.producer_entity.id, "year": self.digestate.year}
 
     def test_create_digestate_spreading_success(self):
         """Test successful creation of digestate spreading record."""
@@ -38,6 +38,7 @@ class BiomethaneDigestateSpreadingViewSetTests(TestCase):
             "spreading_department": "69",
             "spread_quantity": 150.0,
             "spread_parcels_area": 75.0,
+            "year": self.digestate.year,
         }
 
         response = self.client.post(self.url_base, create_data, query_params=self.base_params)

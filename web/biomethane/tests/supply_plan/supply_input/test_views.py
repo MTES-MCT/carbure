@@ -25,12 +25,12 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         )
 
         self.supply_plan = BiomethaneSupplyPlanFactory.create(
-            producer=self.producer_entity, year=BiomethaneAnnualDeclarationService.get_declaration_period()
+            producer=self.producer_entity, year=BiomethaneAnnualDeclarationService.get_current_declaration_year()
         )
 
         self.supply_input = BiomethaneSupplyInputFactory.create(supply_plan=self.supply_plan)
 
-        self.current_year = BiomethaneAnnualDeclarationService.get_declaration_period()
+        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.url_base = reverse("biomethane-supply-input-list")
         self.base_params = {"entity_id": self.producer_entity.id, "year": self.current_year}
 

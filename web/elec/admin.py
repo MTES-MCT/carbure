@@ -12,6 +12,7 @@ from elec.models import (
     ElecProvisionCertificateQualicharge,
     ElecTransferCertificate,
 )
+from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 
 
 @admin.register(ElecProvisionCertificate)
@@ -189,21 +190,66 @@ class ElecMeterAdmin(admin.ModelAdmin):
     autocomplete_fields = ["charge_point"]
 
 
+class UnknownSirenFilter(admin.SimpleListFilter):
+    title = "Siren inconnu"
+    parameter_name = "unknown_siren_filter"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", "Oui"),
+            ("no", "Non"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(cpo__isnull=True)
+        if self.value() == "no":
+            return queryset.filter(cpo__isnull=False)
+        return queryset
+
+
 @admin.register(ElecProvisionCertificateQualicharge)
 class ElecProvisionCertificateQualichargeAdmin(admin.ModelAdmin):
     list_display = [
         "cpo",
         "year",
+        "date_from",
+        "date_to",
         "operating_unit",
         "station_id",
         "energy_amount",
         "validated_by",
+        "unknown_siren",
     ]
     list_filter = [
         "validated_by",
+        "year",
+        UnknownSirenFilter,
     ]
     search_fields = [
+        "cpo__id",
         "cpo__name",
         "station_id",
         "operating_unit",
+        "unknown_siren",
+    ]
+
+
+@admin.register(ElecCertificateReadjustment)
+class ElecCertificateReadjustmentAdmin(admin.ModelAdmin):
+    list_display = [
+        "cpo",
+        "created_at",
+        "energy_amount",
+        "error_source",
+        "reason",
+    ]
+    list_filter = [
+        "cpo",
+        "error_source",
+    ]
+    search_fields = [
+        "cpo__name",
+        "error_source",
+        "reason",
     ]

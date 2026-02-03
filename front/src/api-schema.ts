@@ -191,6 +191,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/admin/producers/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List biomethane producers visible by the current DREAL entity.
+         *
+         *     Returns producers that have production units in departments
+         *     accessible by the DREAL. */
+        get: operations["biomethane_admin_producers_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/annual-declaration/": {
         parameters: {
             query?: never;
@@ -205,11 +225,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** @description Mixin that provides get_object() method with filterset and permission checks.
-         *
-         *     The ViewSet must have:
-         *     - filterset_class configured
-         *     - queryset defined */
+        /** @description Partial update of the declaration for a producer and year (only status field to IN_PROGRESS is allowed). */
         patch: operations["biomethane_annual_declaration_partial_update"];
         trace?: never;
     };
@@ -3116,7 +3132,8 @@ export interface components {
             code: string;
         };
         BiomethaneAnnualDeclaration: {
-            readonly year: number;
+            producer: number;
+            year: number;
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             /** @description Missing fields grouped by type */
             readonly missing_fields: {
@@ -3124,12 +3141,16 @@ export interface components {
                 digestate_missing_fields?: string[] | null;
                 /** @description List of missing fields for energy */
                 energy_missing_fields?: string[] | null;
+                /** @description Whether the supply plan is valid */
+                supply_plan_valid?: boolean;
             };
             readonly is_complete: boolean;
+            readonly is_open: boolean;
         };
         /**
          * @description * `IN_PROGRESS` - IN_PROGRESS
          *     * `DECLARED` - DECLARED
+         *     * `OVERDUE` - OVERDUE
          * @enum {string}
          */
         BiomethaneAnnualDeclarationStatusEnum: BiomethaneAnnualDeclarationStatusEnum;
@@ -3141,7 +3162,7 @@ export interface components {
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /** Format: double */
             cmax?: number | null;
-            cmax_annualized?: boolean;
+            cmax_annualized?: boolean | null;
             /** Format: double */
             cmax_annualized_value?: number | null;
             /** Format: double */
@@ -3290,6 +3311,7 @@ export interface components {
             spread_parcels_area: number;
         };
         BiomethaneDigestateSpreadingAddRequest: {
+            year: number;
             spreading_department: string;
             /** Format: double */
             spread_quantity: number;
@@ -3444,6 +3466,10 @@ export interface components {
             postal_code?: string | null;
             network_type: components["schemas"]["NetworkTypeEnum"] | null;
             network_manager_name: string | null;
+        };
+        BiomethaneProducer: {
+            readonly id: number;
+            name: string;
         };
         BiomethaneProductionUnit: {
             readonly id: number;
@@ -4014,7 +4040,7 @@ export interface components {
             period_end: string;
             status?: components["schemas"]["DoubleCountingStatus"];
         };
-        /** @description Serializer pour la mise à jour partielle du statut uniquement. */
+        /** @description Serializer for updating the status of a DoubleCountingApplication. */
         DoubleCountingApplicationUpdate: {
             status?: components["schemas"]["DoubleCountingStatus"];
         };
@@ -4236,7 +4262,7 @@ export interface components {
         ElecProvisionCertificate: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
-            source?: components["schemas"]["ElecProvisionCertificateSourceEnum"] | null;
+            source: components["schemas"]["ElecProvisionCertificateSourceEnum"];
             quarter: components["schemas"]["QuarterEnum"];
             year: number;
             operating_unit: string;
@@ -4250,6 +4276,8 @@ export interface components {
         ElecProvisionCertificateQualicharge: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
+            /** Format: double */
+            renewable_energy: number;
             unknown_siren?: string | null;
             /** Format: date */
             date_from: string;
@@ -4260,18 +4288,45 @@ export interface components {
             station_id: string;
             /** Format: double */
             energy_amount: number;
+            /** Format: double */
+            enr_ratio?: number;
             is_controlled_by_qualicharge?: boolean;
-            validated_by?: components["schemas"]["ValidatedByEnum"];
+            validated_by?: components["schemas"]["ElecQualichargeStatusEnum"];
             /** Format: date-time */
             readonly created_at: string | null;
         };
+        /** @description Serializer for grouped provision certificate data by operating unit. */
+        ElecProvisionCertificateQualichargeGrouped: {
+            readonly cpo: components["schemas"]["EntityPreview"];
+            operating_unit: string;
+            /** Format: date */
+            date_from: string;
+            /** Format: date */
+            date_to: string;
+            year: number;
+            /** Format: double */
+            energy_amount: number;
+            /** Format: double */
+            renewable_energy: number;
+        };
+        ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
         /**
          * @description * `MANUAL` - MANUAL
          *     * `METER_READINGS` - METER_READINGS
          *     * `QUALICHARGE` - QUALICHARGE
+         *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+         *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
          * @enum {string}
          */
         ElecProvisionCertificateSourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
+        /**
+         * @description * `NO_ONE` - NO_ONE
+         *     * `DGEC` - DGEC
+         *     * `CPO` - CPO
+         *     * `BOTH` - BOTH
+         * @enum {string}
+         */
+        ElecQualichargeStatusEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
         ElecTransferAcceptRequest: {
             used_in_tiruert: string;
             /** Format: date */
@@ -4304,7 +4359,9 @@ export interface components {
         ElecTransferRequest: {
             /** Format: double */
             energy_amount: number;
-            client: number;
+            client?: number;
+            /** @default false */
+            is_readjustment: boolean;
         };
         EmptyResponse: {
             empty?: string;
@@ -5018,6 +5075,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["BiomethaneContractAmendment"][];
         };
+        PaginatedBiomethaneProducerList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["BiomethaneProducer"][];
+        };
         PaginatedBiomethaneSupplyInputList: {
             /** @example 123 */
             count: number;
@@ -5082,7 +5154,7 @@ export interface components {
             results: components["schemas"]["ElecProvisionCertificate"][];
             available_energy?: number;
         };
-        PaginatedElecProvisionCertificateQualichargeList: {
+        PaginatedElecProvisionCertificateQualichargeResponseList: {
             /** @example 123 */
             count: number;
             /**
@@ -5095,7 +5167,7 @@ export interface components {
              * @example http://api.example.org/accounts/?page=2
              */
             previous?: string | null;
-            results: components["schemas"]["ElecProvisionCertificateQualicharge"][];
+            results: components["schemas"]["ElecProvisionCertificateQualichargeResponse"][];
             total_quantity?: number;
         };
         PaginatedElecTransferCertificateList: {
@@ -5193,6 +5265,8 @@ export interface components {
             total_available_volume?: number;
         };
         PatchedBiomethaneAnnualDeclarationRequest: {
+            producer?: number;
+            year?: number;
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
         };
         PatchedBiomethaneDigestateStorageInputRequest: {
@@ -5219,7 +5293,7 @@ export interface components {
             input_type?: string;
             origin_department?: string | null;
         };
-        /** @description Serializer pour la mise à jour partielle du statut uniquement. */
+        /** @description Serializer for updating the status of a DoubleCountingApplication. */
         PatchedDoubleCountingApplicationUpdateRequest: {
             status?: components["schemas"]["DoubleCountingStatus"];
         };
@@ -5301,8 +5375,13 @@ export interface components {
             operational_units: components["schemas"]["OperationalUnitRequest"][];
         };
         ProvisionCertificateUpdateBulkRequest: {
-            certificate_ids: number[];
-            validated_by: components["schemas"]["ValidatedByEnum"];
+            certificate_ids?: number[];
+            validated_by: components["schemas"]["ElecQualichargeStatusEnum"];
+            cpo?: number[];
+            status?: components["schemas"]["ElecQualichargeStatusEnum"][];
+            operating_unit?: string[];
+            station_id?: string[];
+            date_from?: string[];
         };
         /**
          * @description * `1` - T1
@@ -5904,14 +5983,6 @@ export interface components {
             rights: components["schemas"]["UserRights"][];
             requests: components["schemas"]["UserRightsRequests"][];
         };
-        /**
-         * @description * `NO_ONE` - NO_ONE
-         *     * `DGEC` - DGEC
-         *     * `CPO` - CPO
-         *     * `BOTH` - BOTH
-         * @enum {string}
-         */
-        ValidatedByEnum: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by;
         /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
         VerifyOTPRequest: {
             /** Entrez le code à 6 chiffres reçu par email */
@@ -6277,11 +6348,43 @@ export interface operations {
             };
         };
     };
+    biomethane_admin_producers_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedBiomethaneProducerList"];
+                };
+            };
+        };
+    };
     biomethane_annual_declaration_retrieve: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -6314,6 +6417,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -6342,6 +6447,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -6377,6 +6484,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -6580,6 +6689,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6784,6 +6895,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6889,6 +7002,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6932,6 +7047,7 @@ export interface operations {
                 producer_id?: string;
                 /** @description A search term. */
                 search?: string;
+                /** @description Year of the energy declaration. */
                 year: number;
             };
             header?: never;
@@ -6955,6 +7071,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -6989,6 +7107,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the energy declaration. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7421,6 +7541,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -8302,8 +8424,10 @@ export interface operations {
                 search?: string;
                 /** @description * `MANUAL` - MANUAL
                  *     * `METER_READINGS` - METER_READINGS
-                 *     * `QUALICHARGE` - QUALICHARGE */
-                source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
+                 *     * `QUALICHARGE` - QUALICHARGE
+                 *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
+                source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
                 status?: string;
                 year?: number;
             };
@@ -8326,13 +8450,13 @@ export interface operations {
     elec_provision_certificates_qualicharge_list: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                date_from?: string;
+                date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8342,7 +8466,6 @@ export interface operations {
                 page_size?: number;
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 station_id?: string[];
                 /** @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC
@@ -8362,7 +8485,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeList"];
+                    "application/json": components["schemas"]["PaginatedElecProvisionCertificateQualichargeResponseList"];
                 };
             };
         };
@@ -8453,21 +8576,20 @@ export interface operations {
     filter_provision_certificates_qualicharge: {
         parameters: {
             query: {
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 cpo?: string[];
-                date_from?: string;
+                date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecProvisionCertificatesQualichargeFiltersGetParametersQueryFilter;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
                 not_validated?: boolean;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 operating_unit?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A search term. */
                 search?: string;
-                /** @description Les valeurs multiples doivent être séparées par des virgules. */
                 station_id?: string[];
                 /** @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC
@@ -8536,6 +8658,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         balance?: number;
+                        readjustment_balance?: number;
                     };
                 };
             };
@@ -8598,8 +8721,10 @@ export interface operations {
                 search?: string;
                 /** @description * `MANUAL` - MANUAL
                  *     * `METER_READINGS` - METER_READINGS
-                 *     * `QUALICHARGE` - QUALICHARGE */
-                source?: (PathsApiElecProvisionCertificatesGetParametersQuerySource | null)[];
+                 *     * `QUALICHARGE` - QUALICHARGE
+                 *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
+                source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
                 status?: string;
                 year?: number;
             };
@@ -8685,7 +8810,19 @@ export interface operations {
                 cpo?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                month?: string[];
+                /** @description * `1` - 1
+                 *     * `2` - 2
+                 *     * `3` - 3
+                 *     * `4` - 4
+                 *     * `5` - 5
+                 *     * `6` - 6
+                 *     * `7` - 7
+                 *     * `8` - 8
+                 *     * `9` - 9
+                 *     * `10` - 10
+                 *     * `11` - 11
+                 *     * `12` - 12 */
+                month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -8873,7 +9010,19 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
-                month?: string[];
+                /** @description * `1` - 1
+                 *     * `2` - 2
+                 *     * `3` - 3
+                 *     * `4` - 4
+                 *     * `5` - 5
+                 *     * `6` - 6
+                 *     * `7` - 7
+                 *     * `8` - 8
+                 *     * `9` - 9
+                 *     * `10` - 10
+                 *     * `11` - 11
+                 *     * `12` - 12 */
+                month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /** @description Ordre
                  *
@@ -12741,9 +12890,14 @@ export enum PathsApiElecProvisionCertificatesGetParametersQueryQuarter {
     Value4 = 4
 }
 export enum PathsApiElecProvisionCertificatesGetParametersQuerySource {
+    ADMIN_ERROR_COMPENSATION = "ADMIN_ERROR_COMPENSATION",
+    ENR_RATIO_COMPENSATION = "ENR_RATIO_COMPENSATION",
     MANUAL = "MANUAL",
     METER_READINGS = "METER_READINGS",
     QUALICHARGE = "QUALICHARGE"
+}
+export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by {
+    operating_unit = "operating_unit"
 }
 export enum PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by {
     BOTH = "BOTH",
@@ -12766,6 +12920,20 @@ export enum PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter {
     quarter = "quarter",
     source = "source",
     year = "year"
+}
+export enum PathsApiElecTransferCertificatesGetParametersQueryMonth {
+    Value1 = 1,
+    Value10 = 10,
+    Value11 = 11,
+    Value12 = 12,
+    Value2 = 2,
+    Value3 = 3,
+    Value4 = 4,
+    Value5 = 5,
+    Value6 = 6,
+    Value7 = 7,
+    Value8 = 8,
+    Value9 = 9
 }
 export enum PathsApiElecTransferCertificatesGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
@@ -12979,7 +13147,8 @@ export enum AmendmentObjectEnum {
 }
 export enum BiomethaneAnnualDeclarationStatusEnum {
     IN_PROGRESS = "IN_PROGRESS",
-    DECLARED = "DECLARED"
+    DECLARED = "DECLARED",
+    OVERDUE = "OVERDUE"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

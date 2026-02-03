@@ -17,13 +17,14 @@ export const Spreading = ({
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
   const portal = usePortal()
-  const { canEditDeclaration } = useAnnualDeclaration()
+  const { canEditDeclaration, selectedYear } = useAnnualDeclaration()
 
   const openAddSpreadingDepartmentDialog = () => {
     portal((close) => (
       <AddSpreadingDepartment
         onClose={close}
         spreadings={digestate?.spreadings ?? []}
+        year={selectedYear}
       />
     ))
   }

@@ -191,6 +191,7 @@ export const ChooseRedIIEligibilityWithCMAXLowerThanThreshold: Story = {
     contract: {
       ...contractData,
       tariff_reference: TariffReference.Value2011,
+      cmax_annualized: false,
     },
   },
   play: async ({ canvasElement, step }) => {

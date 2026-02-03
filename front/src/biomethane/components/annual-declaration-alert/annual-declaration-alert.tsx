@@ -5,12 +5,12 @@ import { useTranslation } from "react-i18next"
 
 export const AnnualDeclarationAlert = () => {
   const { t } = useTranslation()
-  const { currentAnnualDeclaration, isInDeclarationPeriod } =
+  const { annualDeclaration, isDeclarationInCurrentPeriod } =
     useAnnualDeclaration()
 
   if (
-    !isInDeclarationPeriod ||
-    currentAnnualDeclaration?.status === AnnualDeclarationStatus.IN_PROGRESS
+    !isDeclarationInCurrentPeriod ||
+    annualDeclaration?.status === AnnualDeclarationStatus.IN_PROGRESS
   )
     return null
 
@@ -22,7 +22,7 @@ export const AnnualDeclarationAlert = () => {
       data-testid="annual-declaration-alert"
     >
       {t(
-        "En cas de modification de champs sur cette page, votre déclaration annuelle (digestat et énergie) devra être soumise à nouveau."
+        "En cas de modification de champs sur cette page, votre déclaration annuelle devra être soumise à nouveau."
       )}
     </Notice>
   )

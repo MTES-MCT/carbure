@@ -8,3 +8,5 @@ from .elec_audit_sample import ElecAuditSample
 from .elec_audit_charge_point import ElecAuditChargePoint
 from .elec_meter import ElecMeter
 from .elec_provision_certificate_qualicharge import ElecProvisionCertificateQualicharge
+from .elec_meter_reading_virtual import ElecMeterReadingVirtual
+from .elec_certificate_readjustment import ElecCertificateReadjustment

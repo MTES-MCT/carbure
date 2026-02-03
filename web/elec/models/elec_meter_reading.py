@@ -12,7 +12,6 @@ class ElecMeterReading(models.Model):
         verbose_name_plural = "Relevés de points de recharge"
 
     extracted_energy = models.FloatField(null=True, blank=True)  # unit = kWh
-    renewable_energy = models.FloatField(null=True, blank=True)  # unit = kWh
     reading_date = models.DateField()
     cpo = models.ForeignKey(Entity, on_delete=models.deletion.CASCADE, related_name="elec_meter_readings")
     application = models.ForeignKey(
@@ -21,10 +20,8 @@ class ElecMeterReading(models.Model):
     meter = models.ForeignKey(
         ElecMeter, on_delete=models.CASCADE, null=True, blank=False, related_name="elec_meter_readings"
     )
-
-    facteur_de_charge = models.FloatField(default=0.0)
-    energy_used_since_last_reading = models.FloatField(default=0.0)  # unit = kWh
-    days_since_last_reading = models.IntegerField(default=0)
+    enr_ratio = models.FloatField(null=True, blank=True)
+    operating_unit = models.CharField(max_length=64, null=True, blank=True)
 
     @property
     def charge_point(self):
