@@ -5,6 +5,7 @@ from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from edelivery.ebms.request_responses import (
     BaseRequestResponse,
     EOGetTransactionResponse,
+    InvalidRequestErrorResponse,
     NotFoundErrorResponse,
     ResponseFactory,
 )
@@ -35,6 +36,11 @@ class ResponseFactoryTest(TestCase):
         factory = ResponseFactory(BaseRequestResponse, self.payload(status="NOT_FOUND"))
         response = factory.response()
         self.assertIsInstance(response, NotFoundErrorResponse)
+
+    def test_returns_an_error_response_on_UDB_response_status_invalid_request(self):
+        factory = ResponseFactory(BaseRequestResponse, self.payload(status="INVALID_REQUEST"))
+        response = factory.response()
+        self.assertIsInstance(response, InvalidRequestErrorResponse)
 
 
 class BaseRequestResponseTest(TestCase):
