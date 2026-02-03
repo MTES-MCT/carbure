@@ -11,10 +11,10 @@ class BiomethaneProductionUnitFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneProductionUnit
 
-    producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
-    unit_name = factory.Faker("company")
-    siret_number = "12345678901234"
-    company_address = factory.Faker("address")
+    created_by = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
+    name = factory.Faker("company")
+    site_siret = "12345678901234"
+    address = factory.Faker("address")
     unit_type = BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS
     icpe_regime = BiomethaneProductionUnit.AUTHORIZATION
     process_type = BiomethaneProductionUnit.LIQUID_PROCESS
@@ -33,5 +33,5 @@ class BiomethaneDigestateStorageFactory(factory.django.DjangoModelFactory):
 
 
 def create_production_unit(producer: Entity, **kwargs):
-    BiomethaneProductionUnitFactory.create(producer=producer, **kwargs)
+    BiomethaneProductionUnitFactory.create(created_by=producer, **kwargs)
     BiomethaneDigestateStorageFactory.create_batch(2, producer=producer)

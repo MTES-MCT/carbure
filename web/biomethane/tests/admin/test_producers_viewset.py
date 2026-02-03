@@ -35,32 +35,32 @@ class BiomethaneProducersViewSetTest(TestCase):
         # Producer 1 has unit in dept 01 (accessible by DREAL)
         cls.producer1 = Entity.objects.create(name="Aardvark Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit1 = BiomethaneProductionUnitFactory.create(
-            producer=cls.producer1,
-            unit_name="Unit 1",
+            created_by=cls.producer1,
+            name="Unit 1",
             department=cls.dept_01,
         )
 
         # Producer 2 has unit in dept 01 (accessible by DREAL)
         cls.producer2 = Entity.objects.create(name="Banana Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit2 = BiomethaneProductionUnitFactory.create(
-            producer=cls.producer2,
-            unit_name="Unit 2",
+            created_by=cls.producer2,
+            name="Unit 2",
             department=cls.dept_01,
         )
 
         # Producer 3 has unit in dept 02 (accessible by DREAL)
         cls.producer3 = Entity.objects.create(name="Cherry Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit3 = BiomethaneProductionUnitFactory.create(
-            producer=cls.producer3,
-            unit_name="Unit 3",
+            created_by=cls.producer3,
+            name="Unit 3",
             department=cls.dept_02,
         )
 
         # Producer 4 has unit in dept 03 (NOT accessible by DREAL)
         cls.producer4 = Entity.objects.create(name="Dragon Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit4 = BiomethaneProductionUnitFactory.create(
-            producer=cls.producer4,
-            unit_name="Unit 4",
+            created_by=cls.producer4,
+            name="Unit 4",
             department=cls.dept_03,
         )
 

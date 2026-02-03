@@ -20,7 +20,7 @@ class EnergyContextExtractionTests(TestCase):
 
     def test_extract_data_with_production_unit_and_contract(self):
         """Test context extraction when both production unit and contract exist."""
-        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         contract = BiomethaneContractFactory.create(producer=self.producer_entity)
         energy = BiomethaneEnergyFactory.create(producer=self.producer_entity)
 
@@ -45,7 +45,7 @@ class EnergyContextExtractionTests(TestCase):
 
     def test_extract_data_without_contract(self):
         """Test context extraction when contract does not exist."""
-        BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         energy = BiomethaneEnergyFactory.create(producer=self.producer_entity)
 
         context = BiomethaneEnergyService._extract_data(energy)
@@ -97,7 +97,7 @@ class EnergyContextExtractionTests(TestCase):
 
     def test_context_tariff_reference_without_contract(self):
         """Test that tariff_reference returns None when no contract."""
-        BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         energy = BiomethaneEnergyFactory.create(producer=self.producer_entity)
 
         context = BiomethaneEnergyService._extract_data(energy)
@@ -244,7 +244,7 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        self.production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         self.contract = BiomethaneContractFactory.create(producer=self.producer_entity)
 
     def test_full_integration_malfunction_rules(self):

@@ -20,7 +20,7 @@ class DigestateContextExtractionTests(TestCase):
 
     def test_extract_data_with_full_context(self):
         """Test context extraction when all related objects exist."""
-        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         contract = BiomethaneContractFactory.create(producer=self.producer_entity)
         digestate = BiomethaneDigestateFactory.create(producer=self.producer_entity)
 
@@ -266,7 +266,7 @@ class BiomethaneDigestateServiceIntegrationTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        self.production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         self.contract = BiomethaneContractFactory.create(producer=self.producer_entity)
 
     def test_get_fields_to_clear_with_phase_separation(self):

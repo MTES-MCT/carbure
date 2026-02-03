@@ -30,7 +30,7 @@ class BiomethaneDigestateViewsTests(TestCase):
         )
 
         BiomethaneProductionUnitFactory.create(
-            producer=self.producer_entity,
+            created_by=self.producer_entity,
             has_digestate_phase_separation=False,
         )
 

@@ -58,7 +58,7 @@ class ClearEnergyFieldsSignalTests(TestCase):
     def test_handler_with_production_unit_sender_gets_latest_energy(self, mock_filter, mock_get_fields):
         """Test handler retrieves latest energy when sender is BiomethaneProductionUnit."""
         # Setup - create multiple energies with different years
-        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         BiomethaneEnergyFactory.create(producer=self.producer_entity, year=2022)
         BiomethaneEnergyFactory.create(producer=self.producer_entity, year=2023)
         energy_2024 = BiomethaneEnergyFactory.create(producer=self.producer_entity, year=2024)
@@ -105,7 +105,7 @@ class ClearEnergyFieldsSignalTests(TestCase):
     def test_handler_does_nothing_when_no_energy_exists(self, mock_filter, mock_get_fields):
         """Test handler exits gracefully when no energy instance exists."""
         # Setup - production unit without any energy
-        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         # No energy created
 
         # Execute

@@ -33,14 +33,14 @@ class HasDrealRightsUnitTest(TestCase):
 
         # Create production units
         self.unit_accessible = BiomethaneProductionUnitFactory.create(
-            producer=self.producer,
-            unit_name="Unit Accessible",
+            created_by=self.producer,
+            name="Unit Accessible",
             department=self.dept_01,
         )
 
         self.unit_inaccessible = BiomethaneProductionUnitFactory.create(
-            producer=self.producer2,
-            unit_name="Unit Inaccessible",
+            created_by=self.producer2,
+            name="Unit Inaccessible",
             department=self.dept_02,
         )
 

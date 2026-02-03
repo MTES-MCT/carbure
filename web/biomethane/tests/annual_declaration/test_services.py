@@ -246,7 +246,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
     def test_has_watched_field_changed_production_unit(self):
         """Test has_watched_field_changed detects production unit field changes"""
-        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
 
         # Test with watched field
         changed_fields = ["has_digestate_phase_separation"]

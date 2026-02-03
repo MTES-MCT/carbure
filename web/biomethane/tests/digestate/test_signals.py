@@ -57,7 +57,7 @@ class ClearDigestateFieldsSignalTests(TestCase):
     def test_handler_with_production_unit_sender_gets_latest_digestate(self, mock_filter, mock_get_fields):
         """Test handler retrieves latest digestate when sender is BiomethaneProductionUnit."""
         # Setup - create multiple digestates with different years
-        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2022)
         BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2023)
         digestate_2024 = BiomethaneDigestateFactory.create(producer=self.producer_entity, year=2024)
@@ -104,7 +104,7 @@ class ClearDigestateFieldsSignalTests(TestCase):
     def test_handler_does_nothing_when_no_digestate_exists(self, mock_filter, mock_get_fields):
         """Test handler exits gracefully when no digestate instance exists."""
         # Setup - production unit without any digestate
-        production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        production_unit = BiomethaneProductionUnitFactory.create(created_by=self.producer_entity)
         # No digestate created
 
         # Execute
