@@ -181,17 +181,25 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["year"], self.current_year)
 
-    def test_list_orders_by_producer_name(self):
-        """list returns declarations ordered by producer name."""
+    def test_list_is_ordered_by_priority_and_producer_name(self):
+        """list returns declarations ordered by priority (IN_PROGRESS first) then by producer name."""
+        EntityScope.objects.create(
+            entity=self.dreal, content_type=ContentType.objects.get_for_model(Department), object_id=self.dept_03.id
+        )
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_02,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
         BiomethaneAnnualDeclaration.objects.create(
-            producer=self.producer_dept_01,
+            producer=self.producer_dept_03,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_01,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.DECLARED,
         )
 
         response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
@@ -199,8 +207,8 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
         results = data["results"]
-        names = [d["entity_name"] for d in results]
-        self.assertEqual(names, ["Producteur Dépt 01", "Producteur Dépt 02"])
+        names = [d["producer"]["name"] for d in results]
+        self.assertEqual(names, ["Producteur Dépt 02", "Producteur Dépt 03", "Producteur Dépt 01"])
 
     def test_list_different_dreal_sees_different_declarations(self):
         """A different DREAL only sees declarations for producers in its accessible departments."""
