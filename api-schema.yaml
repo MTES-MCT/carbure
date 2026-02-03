@@ -6494,7 +6494,7 @@ paths:
           name: has_intermediary_depot
           schema:
             type: boolean
-            default: false
+            nullable: true
         - in: query
           name: origin_depot_id
           schema:
@@ -11976,19 +11976,11 @@ components:
           type: number
           format: double
           nullable: true
-        injected_biomethane_nm3_per_year:
-          type: number
-          format: double
-          nullable: true
         injected_biomethane_ch4_rate_percent:
           type: number
           format: double
           nullable: true
         injected_biomethane_pcs_kwh_per_nm3:
-          type: number
-          format: double
-          nullable: true
-        operating_hours:
           type: number
           format: double
           nullable: true
@@ -12081,19 +12073,11 @@ components:
           type: number
           format: double
           nullable: true
-        injected_biomethane_nm3_per_year:
-          type: number
-          format: double
-          nullable: true
         injected_biomethane_ch4_rate_percent:
           type: number
           format: double
           nullable: true
         injected_biomethane_pcs_kwh_per_nm3:
-          type: number
-          format: double
-          nullable: true
-        operating_hours:
           type: number
           format: double
           nullable: true

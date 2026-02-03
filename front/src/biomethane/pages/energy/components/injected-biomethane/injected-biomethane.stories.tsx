@@ -64,7 +64,6 @@ export const WithContract2011: Story = {
     },
     energy: {
       ...energyData,
-      injected_biomethane_nm3_per_year: 4500,
       monthly_reports: monthlyReports2011,
     },
   },
@@ -86,7 +85,6 @@ export const WithContract2020: Story = {
     },
     energy: {
       ...energyData,
-      injected_biomethane_nm3_per_year: 3600,
       monthly_reports: monthlyReports2011,
     },
   },
