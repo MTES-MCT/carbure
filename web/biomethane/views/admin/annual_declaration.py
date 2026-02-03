@@ -1,4 +1,5 @@
 from django.db.models import Case, Q, Value, When
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
@@ -10,6 +11,17 @@ from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationSe
 from core.filters import FiltersActionFactory
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ]
+)
 class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, FiltersActionFactory()):
     """Liste des déclarations annuelles des producteurs de biométhane pour l'année courante (vue DREAL)."""
 

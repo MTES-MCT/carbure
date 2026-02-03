@@ -467,6 +467,12 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - name: ordering
           required: false
           in: query
@@ -549,6 +555,12 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: query
           name: filter
           schema:
@@ -11765,9 +11777,8 @@ components:
         id:
           type: integer
           readOnly: true
-        entity_name:
-          type: string
-          readOnly: true
+        producer:
+          $ref: "#/components/schemas/EntityPreview"
         effective_date:
           type: string
           format: date
@@ -11780,6 +11791,7 @@ components:
         department:
           type: string
           readOnly: true
+          nullable: true
         year:
           type: integer
           maximum: 2147483647
@@ -11787,8 +11799,8 @@ components:
       required:
         - department
         - effective_date
-        - entity_name
         - id
+        - producer
         - tariff_reference
         - year
     BiomethaneAnnualDeclaration:

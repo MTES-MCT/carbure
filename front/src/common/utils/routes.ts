@@ -70,6 +70,7 @@ export const ROUTE_URLS = {
         ENERGY: `${baseUrlWithYear}/energy`,
       },
       ADMIN: {
+        DASHBOARD: `${baseUrl}/admin/dashboard`,
         SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
         DECLARATIONS: `${baseUrl}/admin/declarations`,
         DECLARATION_DETAIL: (producer_id: number) => {

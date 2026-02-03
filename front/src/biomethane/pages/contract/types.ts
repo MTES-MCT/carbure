@@ -1,8 +1,8 @@
 import {
-  TariffReferenceEnum as TariffReference,
   InstallationCategoryEnum as InstallationCategory,
   TrackedAmendmentTypesEnum as TrackedAmendmentTypes,
   ComplementaryAidOrganismsEnum as ComplementaryAidOrganisms,
+  PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference as TariffReference,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 

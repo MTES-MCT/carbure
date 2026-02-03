@@ -3174,11 +3174,11 @@ export interface components {
         BiomethaneAdminAnnualDeclaration: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             readonly id: number;
-            readonly entity_name: string;
+            producer: components["schemas"]["EntityPreview"];
             /** Format: date */
             readonly effective_date: string | null;
             readonly tariff_reference: string | null;
-            readonly department: string;
+            readonly department: string | null;
             year: number;
         };
         BiomethaneAnnualDeclaration: {
@@ -6411,8 +6411,10 @@ export interface operations {
     };
     biomethane_admin_annual_declarations_list: {
         parameters: {
-            query?: {
+            query: {
                 department?: string[];
+                /** @description Authorised entity ID. */
+                entity_id: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -6450,6 +6452,8 @@ export interface operations {
         parameters: {
             query: {
                 department?: string[];
+                /** @description Authorised entity ID. */
+                entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter;
                 /** @description Which field to use when ordering the results. */
