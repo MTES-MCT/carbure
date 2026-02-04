@@ -10,14 +10,17 @@ import { usePortal } from "common/components/portal"
 import { Confirm } from "common/components/dialog2"
 import useEntity from "common/hooks/entity"
 import Tag from "@codegouvfr/react-dsfr/Tag"
+import { compact } from "common/utils/collection"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useSpreadingColumns = () => {
   const { t } = useTranslation()
   const portal = usePortal()
   const deleteSpreading = useDeleteSpreading()
   const entity = useEntity()
+  const { canEditDeclaration } = useAnnualDeclaration()
 
-  const columns: Column<BiomethaneDigestateSpreading>[] = [
+  const columns: Column<BiomethaneDigestateSpreading>[] = compact([
     {
       header: t("Département"),
       cell: (spreadingData) => (
@@ -34,7 +37,7 @@ export const useSpreadingColumns = () => {
       header: t("Superficie des parcelles épandues (ha)"),
       cell: (spreadingData) => spreadingData.spread_parcels_area,
     },
-    {
+    canEditDeclaration && {
       header: t("Actions"),
       cell: (spreadingData) => (
         <Button
@@ -62,7 +65,7 @@ export const useSpreadingColumns = () => {
         />
       ),
     },
-  ]
+  ])
 
   return columns
 }

@@ -73,7 +73,8 @@ export const ROUTE_URLS = {
         SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
         DECLARATIONS: `${baseUrl}/admin/declarations`,
         DECLARATION_DETAIL: (producer_id: number) => {
-          const declarationDetailUrl = `${baseUrl}/admin/declarations/${producer_id}`
+          const currentYear = year ?? new Date().getFullYear()
+          const declarationDetailUrl = `${baseUrl}/admin/declarations/${producer_id}/${currentYear}`
           return {
             ROOT: declarationDetailUrl,
             DIGESTATE: `${declarationDetailUrl}/digestate`,

@@ -20,7 +20,7 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneAnnualDeclaration
         fields = ["producer", "year", "status", "missing_fields", "is_complete", "is_open"]
-        read_only_fields = ["missing_fields", "is_complete", "is_open"]
+        read_only_fields = ["missing_fields", "is_complete"]
 
     def to_representation(self, instance):
         # Override status in representation to use computed value
@@ -64,22 +64,43 @@ class BiomethaneAnnualDeclarationSerializer(serializers.ModelSerializer):
         return BiomethaneAnnualDeclarationService.is_declaration_complete(instance, missing_fields)
 
     def update(self, instance, validated_data):
-        if not instance.is_open:
-            raise serializers.ValidationError(
-                {"status": "La déclaration annuelle n'est pas modifiable dans son état actuel."}
-            )
+        is_dreal = self.context.get("is_dreal", False)
 
-        # Allow partial update of the declaration, only for status field to IN_PROGRESS
+        if is_dreal:
+            allowed_fields = ["is_open", "status"]
+        else:
+            allowed_fields = ["status"]
+
+            if not instance.is_open:
+                raise serializers.ValidationError(
+                    {"status": "La déclaration annuelle n'est pas modifiable dans son état actuel."}
+                )
+
+        # Filter validated_data to only include allowed fields
+        validated_data = {k: v for k, v in validated_data.items() if k in allowed_fields}
+
+        # Validate status changes
         status = validated_data.get("status")
         if status is not None:
-            if instance.status == BiomethaneAnnualDeclaration.IN_PROGRESS:
-                return instance
-
-            if status == BiomethaneAnnualDeclaration.IN_PROGRESS:
-                instance.status = status
-                instance.save()
+            if (
+                instance.status == BiomethaneAnnualDeclaration.IN_PROGRESS
+                and status == BiomethaneAnnualDeclaration.IN_PROGRESS
+            ):
+                # No change needed
+                validated_data.pop("status")
+            elif status == BiomethaneAnnualDeclaration.IN_PROGRESS:
+                # Allow changing to IN_PROGRESS
+                pass
             else:
                 raise serializers.ValidationError(
                     {"status": f"Seul le statut {BiomethaneAnnualDeclaration.IN_PROGRESS} est autorisé."}
                 )
+
+        # Update all allowed fields
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+
+        if validated_data:
+            instance.save()
+
         return instance

@@ -23,16 +23,18 @@ import {
 import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneDigestate } from "./types"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 const DigestatePage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { selectedYear } = useAnnualDeclaration()
   const form = useForm<BiomethaneDigestate | undefined | object>(undefined)
+  const { selectedEntityId } = useSelectedEntity()
 
   const { result: digestate, loading } = useQuery(getDigestate, {
     key: "digestate",
-    params: [entity.id, selectedYear],
+    params: [entity.id, selectedYear, selectedEntityId],
     onSuccess: (data) => {
       form.setValue(data?.data)
     },

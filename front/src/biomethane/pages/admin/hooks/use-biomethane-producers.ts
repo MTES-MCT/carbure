@@ -12,5 +12,9 @@ export const useBiomethaneProducers = () => {
   const isEntityMatchWithProducers = (selectedEntityId: string | number) =>
     producers?.some((producer) => producer.id === Number(selectedEntityId))
 
-  return { producers, loading, isEntityMatchWithProducers }
+  return {
+    producers,
+    loading,
+    isEntityMatchWithProducers,
+  }
 }

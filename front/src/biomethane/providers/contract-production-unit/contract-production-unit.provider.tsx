@@ -23,6 +23,9 @@ export const ContractProductionUnitContext =
 
 interface ContractProductionUnitProviderProps {
   children: ReactNode
+
+  // Whether to allow empty contract and production unit data
+  allowEmpty?: boolean
 }
 
 /**
@@ -37,6 +40,7 @@ interface ContractProductionUnitProviderProps {
  */
 export function ContractProductionUnitProvider({
   children,
+  allowEmpty = false,
 }: ContractProductionUnitProviderProps) {
   const { result: contractInfos, loading: loadingContract } =
     useGetContractInfos()
@@ -53,7 +57,11 @@ export function ContractProductionUnitProvider({
     loading,
   }
 
-  if (!loading && (contractInfos === undefined || productionUnit === undefined))
+  if (
+    !allowEmpty &&
+    !loading &&
+    (contractInfos === undefined || productionUnit === undefined)
+  )
     return (
       <SettingsNotFilled
         contractInfos={contractInfos}

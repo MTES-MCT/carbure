@@ -168,3 +168,15 @@ export async function findSystemNationalCertificates(query: string) {
 
   return res.data ?? []
 }
+
+/**
+ * Get the details of a specific company
+ */
+export function getCompanyDetails(entity_id: number, company_id: number) {
+  return apiFetch.GET("/entities/{id}/", {
+    params: {
+      path: { id: company_id },
+      query: { entity_id },
+    },
+  })
+}

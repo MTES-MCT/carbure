@@ -11,6 +11,9 @@ import {
 import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
 import { ExternalAdminPages } from "common/types"
+import { Contact } from "./pages/admin/declaration-detail/pages/contact"
+
+const currentYear = new Date().getFullYear()
 
 const BiomethaneAdminDeclarationDetailPage = lazy(
   () => import("biomethane/pages/admin/declaration-detail")
@@ -140,13 +143,20 @@ export const BiomethaneAdminRoutes = () => {
         />
 
         <Route
-          path="declarations/:selectedEntityId/*"
+          path="declarations/:selectedEntityId/:year/*"
           element={<BiomethaneAdminDeclarationDetailPage />}
         >
           <Route index element={<Navigate replace to="digestate" />} />
-          <Route path="digestate" element={<div>digestate</div>} />
-          <Route path="energy" element={<div>energy</div>} />
+          <Route path="digestate" element={<Digestate />} />
+          <Route path="energy" element={<Energy />} />
+          <Route path="supply-plan" element={<SupplyPlan />} />
+          <Route path="contract" element={<BiomethaneContractPage />} />
+          <Route path="contacts" element={<Contact />} />
         </Route>
+        <Route
+          path="declarations/:selectedEntityId"
+          element={<Navigate replace to={`${currentYear}`} />}
+        />
       </Route>
     </Routes>
   )

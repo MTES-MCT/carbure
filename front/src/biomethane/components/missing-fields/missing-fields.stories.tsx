@@ -7,8 +7,14 @@ import {
 } from "biomethane/tests/api"
 import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
 import GLOBAL_MOCKS from "@storybook/mocks"
+import { mockUser } from "common/__test__/helpers"
+import { EntityType } from "common/types"
 
-const MOCKS = [...GLOBAL_MOCKS, getAnnualDeclarationOk]
+const MOCKS = [
+  mockUser(EntityType.Producteur_de_biom_thane),
+  ...GLOBAL_MOCKS,
+  getAnnualDeclarationOk,
+]
 const clickOnLink = async (
   canvasElement: HTMLElement,
   linkName: string,

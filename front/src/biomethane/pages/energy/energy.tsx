@@ -21,17 +21,19 @@ import {
 } from "biomethane/components/missing-fields"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
   const form = useForm<BiomethaneEnergy | undefined | object>(undefined)
   const { selectedYear } = useAnnualDeclaration()
   const { contractInfos: contract } = useContractProductionUnit()
 
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "energy",
-    params: [entity.id, selectedYear],
+    params: [entity.id, selectedYear, selectedEntityId],
     onSuccess: (energy) => {
       form.setValue(energy)
     },

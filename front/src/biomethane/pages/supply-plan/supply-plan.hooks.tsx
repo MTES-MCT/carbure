@@ -18,6 +18,7 @@ import { getDepartmentName } from "common/utils/geography"
 import { getSupplyPlanInputFilters } from "./api"
 import { defaultNormalizer } from "common/utils/normalize"
 import { formatNumber } from "common/utils/formatters"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const useSupplyPlanColumns = () => {
   const { t } = useTranslation()
@@ -62,6 +63,7 @@ export const useSupplyPlanColumns = () => {
 
 export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
   const { t } = useTranslation()
+  const { selectedEntityId } = useSelectedEntity()
 
   const filterLabels = {
     [BiomethaneSupplyInputFilter.source]: t("Provenance"),
@@ -86,6 +88,6 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
     normalizers,
     filterLabels,
     getFilterOptions: (filter: BiomethaneSupplyInputFilter) =>
-      getSupplyPlanInputFilters(query, filter),
+      getSupplyPlanInputFilters(query, filter, selectedEntityId),
   }
 }

@@ -134,6 +134,7 @@ annual_declaration_viewset = BiomethaneAnnualDeclarationViewSet.as_view(
     {
         "get": "retrieve",
         "patch": "partial_update",
+        "post": "create",
     }
 )
 

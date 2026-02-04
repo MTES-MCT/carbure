@@ -13,6 +13,7 @@ import { userEvent, waitFor, within } from "@storybook/test"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
 
 const MOCKS = [
+  mockUser(EntityType.Producteur_de_biom_thane),
   GLOBAL_MOCKS,
   getAnnualDeclarationYearsOk,
   ...AnnualDeclarationStoryUtils.parameters.msw.handlers,

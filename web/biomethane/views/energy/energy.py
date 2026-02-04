@@ -32,6 +32,13 @@ from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
             description="Year of the energy declaration.",
             required=True,
         ),
+        OpenApiParameter(
+            name="producer_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Producer entity ID (optional, used by DREAL to filter specific producer).",
+            required=False,
+        ),
     ]
 )
 class BiomethaneEnergyViewSet(OptionalFieldsActionMixin, RetrieveSingleObjectMixin, GenericViewSet):

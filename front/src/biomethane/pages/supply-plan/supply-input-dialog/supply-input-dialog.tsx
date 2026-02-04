@@ -12,12 +12,14 @@ import { SupplyInputForm } from "./supply-input-form"
 import { Button } from "common/components/button2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const SupplyInputDialog = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const match = useHashMatch("supply-input/:id")
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
   const { t } = useTranslation()
   const notify = useNotify()
   const notifyError = useNotifyError()
@@ -26,7 +28,7 @@ export const SupplyInputDialog = () => {
 
   const { result: supplyInput, loading } = useQuery(getSupplyInput, {
     key: "supply-input",
-    params: [entity.id, supplyInputId],
+    params: [entity.id, supplyInputId, selectedEntityId],
   })
 
   const saveSupplyInputMutation = useMutation(saveSupplyInput, {

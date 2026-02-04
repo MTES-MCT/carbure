@@ -213,7 +213,8 @@ export const CustomTitle: Story = {
   decorators: [
     (Story) => {
       usePrivateNavigation(
-        <div style={{ color: "red" }}>this is a custom title</div>
+        <div style={{ color: "red" }}>this is a custom title</div>,
+        "custom-key-when-title-is-not-a-string"
       )
 
       return <Story />

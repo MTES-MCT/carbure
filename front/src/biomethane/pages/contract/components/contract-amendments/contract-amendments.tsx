@@ -12,6 +12,7 @@ import { AddAmendment } from "./add-amendment"
 import HashRoute from "common/components/hash-route"
 import { AmendmentDetail } from "./amendment-detail"
 import { formatDate } from "common/utils/formatters"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const ContractAmendments = ({
   contract,
@@ -20,8 +21,9 @@ export const ContractAmendments = ({
 }) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const amendments = contract?.amendments ?? []
+  const { hasSelectedEntity } = useSelectedEntity()
 
+  const amendments = contract?.amendments ?? []
   const columns: Column<BiomethaneContractAmendment>[] = [
     {
       header: t("N° avenant"),
@@ -58,15 +60,17 @@ export const ContractAmendments = ({
     <EditableCard
       title={t("Avenants au contrat d'achat")}
       headerActions={
-        <Button
-          iconId="ri-add-line"
-          disabled={
-            !contract || (contract && !contract.general_conditions_file)
-          }
-          onClick={openAddAmendmentDialog}
-        >
-          {t("Charger un avenant")}
-        </Button>
+        !hasSelectedEntity && (
+          <Button
+            iconId="ri-add-line"
+            disabled={
+              !contract || (contract && !contract.general_conditions_file)
+            }
+            onClick={openAddAmendmentDialog}
+          >
+            {t("Charger un avenant")}
+          </Button>
+        )
       }
     >
       {amendments.length === 0 ? (

@@ -6,6 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
 from biomethane.models import BiomethaneSupplyInput
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputCreateSerializer,
@@ -32,6 +33,13 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="producer_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Producer entity ID (optional, used by DREAL to filter specific producer).",
+            required=False,
+        ),
     ]
 )
 class BiomethaneSupplyInputViewSet(
@@ -54,7 +62,22 @@ class BiomethaneSupplyInputViewSet(
 
     def get_permission_object(self, first_obj):
         """Check permissions on the supply plan of the supply inputs."""
-        return first_obj.supply_plan if first_obj else None
+        if first_obj:
+            return first_obj.supply_plan
+
+        # When queryset is empty, retrieve contract from request params to check permissions
+        producer_id = self.request.query_params.get("producer_id")
+        entity_id = self.request.query_params.get("entity_id")
+
+        # DREAL case: producer_id provided
+        if producer_id:
+            return BiomethaneContract.objects.filter(producer_id=producer_id).first()
+
+        # Producer case: use entity_id
+        if entity_id:
+            return BiomethaneContract.objects.filter(producer_id=entity_id).first()
+
+        return None
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

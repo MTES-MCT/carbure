@@ -506,6 +506,12 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
           name: year
           schema:
             type: integer
@@ -528,10 +534,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
           description: Declaration created for the entity
-    patch:
-      operationId: biomethane_annual_declaration_partial_update
-      description: Partial update of the declaration for a producer and year (only
-        status field to IN_PROGRESS is allowed).
+    post:
+      operationId: biomethane_annual_declaration_create
+      description: >-
+        Mixin that provides get_object() method with filterset and permission
+        checks.
+
+
+        The ViewSet must have:
+
+        - filterset_class configured
+
+        - queryset defined
       parameters:
         - in: query
           name: entity_id
@@ -539,6 +553,57 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneAnnualDeclarationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneAnnualDeclarationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneAnnualDeclarationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: ""
+    patch:
+      operationId: biomethane_annual_declaration_partial_update
+      description: Partial update of the declaration for a producer and year
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -588,6 +653,12 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
           name: year
           schema:
             type: integer
@@ -615,6 +686,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -654,6 +731,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -676,6 +759,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -846,6 +935,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -871,6 +966,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -899,6 +1000,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1193,6 +1300,12 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
           name: year
           schema:
             type: integer
@@ -1225,6 +1338,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1266,6 +1385,12 @@ paths:
           description: A unique integer value identifying this Données d'épandage du
             digestat.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -1285,6 +1410,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1314,6 +1445,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1451,6 +1588,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1680,7 +1823,9 @@ paths:
         - in: query
           name: producer_id
           schema:
-            type: string
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - name: search
           required: false
           in: query
@@ -1736,6 +1881,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1785,6 +1936,12 @@ paths:
             type: integer
           description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -1821,6 +1978,12 @@ paths:
             type: integer
           description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1869,6 +2032,12 @@ paths:
             type: integer
           description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1911,6 +2080,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -1979,7 +2154,9 @@ paths:
         - in: query
           name: producer_id
           schema:
-            type: string
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - name: search
           required: false
           in: query
@@ -2060,6 +2237,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -11438,11 +11621,25 @@ components:
           readOnly: true
         is_open:
           type: boolean
-          readOnly: true
       required:
         - is_complete
-        - is_open
         - missing_fields
+        - producer
+        - year
+    BiomethaneAnnualDeclarationRequest:
+      type: object
+      properties:
+        producer:
+          type: integer
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        is_open:
+          type: boolean
+      required:
         - producer
         - year
     BiomethaneAnnualDeclarationStatusEnum:
@@ -16506,6 +16703,8 @@ components:
           minimum: -2147483648
         status:
           $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        is_open:
+          type: boolean
     PatchedBiomethaneDigestateStorageInputRequest:
       type: object
       properties:
