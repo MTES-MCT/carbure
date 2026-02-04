@@ -1,26 +1,9 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from adapters.logger import log_error
 from core.models import CarbureLot
 from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
 from edelivery.ebms.ntr import from_national_trade_register
-
-
-class ResponseFactory:
-    def __init__(self, response_class, payload):
-        self.response_class = response_class
-        self.payload = payload
-        self.parsed_XML = ET.fromstring(payload)
-
-    def response(self):
-        status_found = self.udb_response_status() == "FOUND"
-        response_class = self.response_class if status_found else NotFoundErrorResponse
-        return response_class(self.payload)
-
-    def udb_response_status(self):
-        response_header_element = self.parsed_XML.find("./RESPONSE_HEADER")
-        return response_header_element.attrib["STATUS"]
 
 
 class BaseRequestResponse:
@@ -34,12 +17,6 @@ class BaseRequestResponse:
 
     def post_retrieval_action_result(self):
         pass
-
-
-class NotFoundErrorResponse(BaseRequestResponse):
-    def post_retrieval_action_result(self):
-        log_error("Search returned no result")
-        return {"error": "Not found"}
 
 
 class EOGetTransactionResponse(BaseRequestResponse):

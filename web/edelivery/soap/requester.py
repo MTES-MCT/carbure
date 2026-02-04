@@ -2,7 +2,7 @@ from os import environ
 from time import sleep
 
 from edelivery.adapters.pub_sub_adapter import PubSubAdapter
-from edelivery.ebms.request_responses import ResponseFactory
+from edelivery.ebms.response_factory import ResponseFactory
 from edelivery.soap.actions import SubmitMessage
 
 
