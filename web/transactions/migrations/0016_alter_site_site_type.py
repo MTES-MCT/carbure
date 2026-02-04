@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                     ("POWER PLANT", "POWER PLANT"),
                     ("COGENERATION PLANT", "COGENERATION PLANT"),
                     ("PRODUCTION BIOLIQUID", "PRODUCTION BIOLIQUID"),
-                    ("PRODUCTION_BIOGAZ", "PRODUCTION BIOGAZ"),
+                    ("PRODUCTION BIOGAZ", "PRODUCTION BIOGAZ"),
                     ("EFCA", "EFCA"),
                     ("AIRPORT", "AIRPORT"),
                 ],

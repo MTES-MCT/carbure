@@ -4,6 +4,36 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def migrate_production_units_to_sites(apps, schema_editor):
+    BiomethaneProductionUnit = apps.get_model("biomethane", "BiomethaneProductionUnit")
+    Site = apps.get_model("transactions", "Site")
+
+    default_country_id = 77
+
+    for unit in BiomethaneProductionUnit.objects.all().iterator():
+        if getattr(unit, "site_ptr_id", None):
+            continue
+
+        producer = getattr(unit, "producer", None)
+        fallback_name = f"Biomethane production unit {unit.pk}"
+        name = unit.unit_name or (producer.name if producer else fallback_name)
+
+        site = Site.objects.create(
+            name=name,
+            site_siret=unit.siret_number or "",
+            address=unit.company_address or "",
+            postal_code=unit.postal_code or "",
+            city=unit.city or "",
+            country_id=default_country_id,
+            created_by_id=producer.id if producer else None,
+            site_type="PRODUCTION BIOGAZ",
+            is_ue_airport=False,
+        )
+
+        unit.site_ptr_id = site.id
+        unit.save(update_fields=["site_ptr"])
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("biomethane", "0035_biomethaneenergy_self_consumed_biogas_or_biomethane_kwh"),
@@ -11,46 +41,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="city",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="company_address",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="id",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="postal_code",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="producer",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="siret_number",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="unit_name",
-        ),
         migrations.AddField(
             model_name="biomethaneproductionunit",
             name="site_ptr",
             field=models.OneToOneField(
-                auto_created=True,
-                default=1,
+                null=True,
+                blank=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                parent_link=True,
-                primary_key=True,
-                serialize=False,
                 to="transactions.site",
             ),
-            preserve_default=False,
         ),
+        migrations.RunPython(migrate_production_units_to_sites, migrations.RunPython.noop),
     ]
