@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from adapters.logger import log_error
 from core.models import CarbureLot
-from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
+from edelivery.ebms.materials import UDBConversionError, from_UDB_biofuel_code, from_UDB_feedstock_code
 from edelivery.ebms.ntr import from_national_trade_register
 
 
@@ -71,13 +72,21 @@ class EOGetTransactionResponse(BaseRequestResponse):
         }
 
     def post_retrieval_action_result(self):
-        lot_attributes = self.to_lot_attributes()
-        lot, created = CarbureLot.objects.update_or_create(
-            udb_transaction_id=self.udb_transaction_id(),
-            defaults=lot_attributes,
-        )
+        try:
+            lot_attributes = self.to_lot_attributes()
+            lot, created = CarbureLot.objects.update_or_create(
+                udb_transaction_id=self.udb_transaction_id(),
+                defaults=lot_attributes,
+            )
 
-        return {"newLotCreated": created, "id": lot.id}
+            return {"newLotCreated": created, "id": lot.id}
+
+        except UDBConversionError as e:
+            error_message = "Unable to convert UDB transaction into CarbuRe lot"
+            cause = e.message
+            log_error(error_message, {"cause": cause})
+
+            return {"error": error_message, "cause": cause}
 
     def quantity(self):
         quantity = self.transaction_XML_element.find("./EO_TRANS_DETAIL_MATERIALS/QUANTITY").text
