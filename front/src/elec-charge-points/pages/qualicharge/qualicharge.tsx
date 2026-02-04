@@ -166,7 +166,7 @@ export const Qualicharge = () => {
                       {
                         count: result?.data?.count,
                         total: formatNumber(result?.data?.total_quantity ?? 0, {
-                          fractionDigits: 0,
+                          fractionDigits: 2,
                         }),
                         total_renewable: formatNumber(
                           result?.data?.total_quantity_renewable ?? 0,

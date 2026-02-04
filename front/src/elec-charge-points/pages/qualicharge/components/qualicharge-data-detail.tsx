@@ -15,7 +15,7 @@ import { useValidateVolumes } from "../hooks/use-validate-volumes"
 import { useNotify } from "common/components/notifications"
 import { QualichargeValidatedBy } from "../types"
 import { ExternalAdminPages } from "common/types"
-import { formatNumber } from "common/utils/formatters"
+import { CONVERSIONS, formatNumber } from "common/utils/formatters"
 
 export const QualichargeDataDetail = () => {
   const match = useHashMatch("data/:id")
@@ -112,8 +112,12 @@ export const QualichargeDataDetail = () => {
                 readOnly
               />
               <TextInput
-                label={t("Energie (MWh)")}
-                value={formatNumber(result?.data?.energy_amount ?? 0)}
+                label={t("Energie (kWh)")}
+                value={formatNumber(
+                  CONVERSIONS.energy.MWH_TO_KWH(
+                    result?.data?.energy_amount ?? 0
+                  )
+                )}
                 readOnly
               />
               <TextInput
