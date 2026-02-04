@@ -53,10 +53,8 @@ class BiomethaneEnergyViewSetTests(TestCase):
         # Test data for creating/updating an energy declaration
         self.valid_energy_data = {
             "injected_biomethane_gwh_pcs_per_year": 100.5,
-            "injected_biomethane_nm3_per_year": 15000.0,
             "injected_biomethane_ch4_rate_percent": 95.0,
             "injected_biomethane_pcs_kwh_per_nm3": 10.5,
-            "operating_hours": 8000.0,
         }
 
     def test_retrieve_energy_success(self):
@@ -108,7 +106,6 @@ class BiomethaneEnergyViewSetTests(TestCase):
         # Update data
         update_data = {
             "injected_biomethane_gwh_pcs_per_year": 200.0,
-            "operating_hours": 8500.0,
         }
 
         response = self.client.put(
@@ -122,7 +119,6 @@ class BiomethaneEnergyViewSetTests(TestCase):
 
         energy.refresh_from_db()
         self.assertEqual(energy.injected_biomethane_gwh_pcs_per_year, 200.0)
-        self.assertEqual(energy.operating_hours, 8500.0)
         self.assertEqual(energy.year, self.current_year)
 
     @patch(

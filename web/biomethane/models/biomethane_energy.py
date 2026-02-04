@@ -17,17 +17,11 @@ class BiomethaneEnergy(models.Model):
     # Quantité de biométhane injecté (GWhPCS/an)
     injected_biomethane_gwh_pcs_per_year = models.FloatField(null=True, blank=True)
 
-    # Quantité de biométhane injecté (Nm3/an)
-    injected_biomethane_nm3_per_year = models.FloatField(null=True, blank=True)
-
     # Taux de Ch4 dans le biométhane injecté (%)
     injected_biomethane_ch4_rate_percent = models.FloatField(null=True, blank=True)
 
     # PCS du biométhane injecté (kWh/Nm3)
     injected_biomethane_pcs_kwh_per_nm3 = models.FloatField(null=True, blank=True)
-
-    # Nombre d'heures de fonctionnement (h)
-    operating_hours = models.FloatField(null=True, blank=True)
 
     ## Production de biogaz
 

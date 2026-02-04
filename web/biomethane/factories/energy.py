@@ -21,10 +21,8 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
 
     # Biométhane injecté dans le réseau
     injected_biomethane_gwh_pcs_per_year = factory.Faker("pyfloat", min_value=0, max_value=1000, right_digits=2)
-    injected_biomethane_nm3_per_year = factory.Faker("pyfloat", min_value=0, max_value=100000, right_digits=2)
     injected_biomethane_ch4_rate_percent = factory.Faker("pyfloat", min_value=90, max_value=100, right_digits=1)
     injected_biomethane_pcs_kwh_per_nm3 = factory.Faker("pyfloat", min_value=9, max_value=12, right_digits=2)
-    operating_hours = factory.Faker("pyfloat", min_value=0, max_value=8760, right_digits=1)
 
     # Production de biogaz
     produced_biogas_nm3_per_year = factory.Faker("pyfloat", min_value=0, max_value=150000, right_digits=2)

@@ -3357,13 +3357,9 @@ export interface components {
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
             /** Format: double */
-            injected_biomethane_nm3_per_year?: number | null;
-            /** Format: double */
             injected_biomethane_ch4_rate_percent?: number | null;
             /** Format: double */
             injected_biomethane_pcs_kwh_per_nm3?: number | null;
-            /** Format: double */
-            operating_hours?: number | null;
             /** Format: double */
             produced_biogas_nm3_per_year?: number | null;
             /** Format: double */
@@ -3400,13 +3396,9 @@ export interface components {
             /** Format: double */
             injected_biomethane_gwh_pcs_per_year?: number | null;
             /** Format: double */
-            injected_biomethane_nm3_per_year?: number | null;
-            /** Format: double */
             injected_biomethane_ch4_rate_percent?: number | null;
             /** Format: double */
             injected_biomethane_pcs_kwh_per_nm3?: number | null;
-            /** Format: double */
-            operating_hours?: number | null;
             /** Format: double */
             produced_biogas_nm3_per_year?: number | null;
             /** Format: double */
@@ -10480,7 +10472,7 @@ export interface operations {
     resources_airports_list: {
         parameters: {
             query?: {
-                has_intermediary_depot?: boolean;
+                has_intermediary_depot?: boolean | null;
                 origin_depot_id?: number;
                 public_only?: boolean;
                 query?: string;

@@ -116,7 +116,6 @@ class EnergyRulesConfigurationTests(TestCase):
         expected_rule_names = [
             "not_old_tariff",
             "not_new_tariff",
-            "not_2011_2020_tariff",
             "no_malfunctions",
             "malfunction_no_other_type",
             "no_injection_difficulties",

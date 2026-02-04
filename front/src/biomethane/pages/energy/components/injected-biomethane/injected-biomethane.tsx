@@ -9,35 +9,24 @@ import { useSaveEnergy } from "../../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useInjectedBiomethane } from "./injected-biomethane.hooks"
-import { roundNumber } from "common/utils/formatters"
-
-const calculateInjectedBiomethaneNm3PerYear = (
-  gwhPcsPerYear: number,
-  pcsKwhPerNm3: number
-) => {
-  return roundNumber(gwhPcsPerYear * pcsKwhPerNm3 * Math.pow(10, -6), 2)
-}
+import { CONVERSIONS } from "common/utils/formatters"
 
 export type InjectedBiomethaneForm = DeepPartial<
   Pick<
     BiomethaneEnergyInputRequest,
     | "injected_biomethane_gwh_pcs_per_year"
-    | "injected_biomethane_nm3_per_year"
     | "injected_biomethane_ch4_rate_percent"
     | "injected_biomethane_pcs_kwh_per_nm3"
-    | "operating_hours"
   >
 >
 const extractValues = (energy?: InjectedBiomethaneForm) => {
   return {
     injected_biomethane_gwh_pcs_per_year:
       energy?.injected_biomethane_gwh_pcs_per_year,
-    injected_biomethane_nm3_per_year: energy?.injected_biomethane_nm3_per_year,
     injected_biomethane_ch4_rate_percent:
       energy?.injected_biomethane_ch4_rate_percent,
     injected_biomethane_pcs_kwh_per_nm3:
       energy?.injected_biomethane_pcs_kwh_per_nm3,
-    operating_hours: energy?.operating_hours,
   }
 }
 export function InjectedBiomethane({
@@ -51,13 +40,10 @@ export function InjectedBiomethane({
   const { bind, value } = useFormContext<InjectedBiomethaneForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
-  const { rule } = useInjectedBiomethane(
-    energy?.monthly_reports ?? [],
-    contract
-  )
+  const { rule, operatingHours, injectedBiomethaneNm3PerYear } =
+    useInjectedBiomethane(energy?.monthly_reports ?? [], contract)
 
   const handleSave = async () => saveEnergy.execute(extractValues(value))
-
   return (
     <ManagedEditableCard
       sectionId="injected-biomethane"
@@ -93,12 +79,7 @@ export function InjectedBiomethane({
               "Quantité de biométhane injecté (Nm3/an) = Quantité de biométhane injecté (GWhPCS/an) * PCS du biométhane injecté (kWh/Nm3) * 10^-6"
             )}
             type="number"
-            {...bind("injected_biomethane_nm3_per_year", {
-              value: calculateInjectedBiomethaneNm3PerYear(
-                value.injected_biomethane_gwh_pcs_per_year ?? 0,
-                value.injected_biomethane_pcs_kwh_per_nm3 ?? 0
-              ),
-            })}
+            value={injectedBiomethaneNm3PerYear}
             disabled
           />
 
@@ -111,6 +92,7 @@ export function InjectedBiomethane({
             type="number"
             min={0}
             max={100}
+            step={0.1}
             {...bind("injected_biomethane_ch4_rate_percent")}
             required
           />
@@ -120,12 +102,13 @@ export function InjectedBiomethane({
             hintText={t(
               "Fonctionnement à plein régime (à la capacité maximale inscrite dans le contrat)"
             )}
-            {...bind("operating_hours")}
+            value={operatingHours}
             disabled
             required
             readOnly={!isEditing}
             hasTooltip
             title={rule}
+            max={CONVERSIONS.hours.yearsToHours(1)}
           />
           {isEditing && (
             <Button

@@ -56,8 +56,6 @@ class BiomethaneEnergyService:
         "total_unit_electric_consumption_kwe",
     ]
 
-    TARIFF_2011_2020_FIELDS = ["injected_biomethane_nm3_per_year"]
-
     MALFUNCTION_FIELDS = [
         "malfunction_cumulative_duration_days",
         "malfunction_types",
@@ -155,13 +153,6 @@ def _build_energy_rules() -> list[FieldClearingRule]:
             ["2023"],
             BiomethaneEnergyService.NEW_TARIFF_FIELDS,
             "not_new_tariff",
-        ),
-        # Tariff rules - 2011 and 2020 specific fields
-        RuleBuilder.value_not_in_list(
-            lambda ctx: ctx.tariff_reference,
-            ["2011", "2020"],
-            BiomethaneEnergyService.TARIFF_2011_2020_FIELDS,
-            "not_2011_2020_tariff",
         ),
         # Malfunction rules - no malfunctions
         FieldClearingRule(
