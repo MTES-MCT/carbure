@@ -247,13 +247,6 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="double-counting" />} />
       )}
 
-      {(isAdmin || isExternal) && (
-        <>
-          <Route path="entities/*" element={<Entities />} />
-          <Route path="*" element={<Navigate replace to="entities" />} />
-        </>
-      )}
-
       {(isAdmin || isElecAdmin) && (
         <>
           <Route path="elec-admin-audit/:year/*" element={<ElecAdminAudit />} />
@@ -271,6 +264,13 @@ const Org = () => {
         <>
           <Route path="biomethane/*" element={<BiomethaneRoutes />} />
           <Route path="*" element={<Navigate replace to="biomethane" />} />
+        </>
+      )}
+
+      {(isAdmin || isExternal) && (
+        <>
+          <Route path="entities/*" element={<Entities />} />
+          <Route path="*" element={<Navigate replace to="entities" />} />
         </>
       )}
     </Routes>

@@ -31,6 +31,9 @@ const BiomethaneInjectionPage = lazy(() => import("biomethane/pages/injection"))
 const BiomethaneProductionPage = lazy(
   () => import("biomethane/pages/production")
 )
+const BiomethaneAdminDashboardPage = lazy(
+  () => import("biomethane/pages/admin/dashboard/dashboard")
+)
 
 type REDIRECTED_ROUTES = "digestate" | "energy" | "supply-plan"
 
@@ -157,7 +160,9 @@ export const BiomethaneAdminRoutes = () => {
           path="declarations/:selectedEntityId"
           element={<Navigate replace to={`${currentYear}`} />}
         />
+        <Route path="dashboard" element={<BiomethaneAdminDashboardPage />} />
       </Route>
+      <Route path="*" element={<Navigate replace to="admin/dashboard" />} />
     </Routes>
   )
 }

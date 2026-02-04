@@ -1,4 +1,8 @@
 import { api } from "common/services/api-fetch"
+import {
+  BiomethaneAdminAnnualDeclarationFilters,
+  BiomethaneAdminDashboardQuery,
+} from "./types"
 
 export const getBiomethaneProducers = (entity_id: number) =>
   api
@@ -30,3 +34,29 @@ export const createDeclaration = (
       is_open: true,
     },
   })
+
+export const getBiomethaneAdminDashboard = (
+  query: BiomethaneAdminDashboardQuery
+) =>
+  api
+    .GET("/biomethane/admin/annual-declarations/", {
+      params: {
+        query,
+      },
+    })
+    .then((res) => res.data)
+
+export const getBiomethaneAdminDashboardFilters = (
+  query: BiomethaneAdminDashboardQuery,
+  filter: BiomethaneAdminAnnualDeclarationFilters
+) =>
+  api
+    .GET("/biomethane/admin/annual-declarations/filters/", {
+      params: {
+        query: {
+          ...query,
+          filter,
+        },
+      },
+    })
+    .then((res) => res.data ?? [])

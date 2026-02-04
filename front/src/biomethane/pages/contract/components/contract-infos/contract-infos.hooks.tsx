@@ -12,6 +12,7 @@ import { usePortal } from "common/components/portal"
 import { AnnualDeclarationResetDialog } from "biomethane/components/annual-declaration-reset-dialog"
 import { useWatchedFields } from "biomethane/providers/watched-fields"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useCallback } from "react"
 
 export const useTariffReferenceOptions = () => {
   const { t } = useTranslation()
@@ -34,6 +35,17 @@ export const useTariffReferenceOptions = () => {
       value: TariffReference.Value2023,
     },
   ]
+}
+
+export const useGetTariffReferenceLabel = () => {
+  const tariffReferenceOptions = useTariffReferenceOptions()
+
+  return useCallback(
+    (value: TariffReference) =>
+      tariffReferenceOptions.find((option) => option.value === value)?.label ??
+      value,
+    [tariffReferenceOptions]
+  )
 }
 
 export const useInstallationCategoryOptions = () => {

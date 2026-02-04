@@ -21,6 +21,7 @@ from biomethane.views import (
     BiomethaneSupplyInputViewSet,
     BiomethaneSupplyPlanViewSet,
 )
+from biomethane.views.admin.annual_declaration import BiomethaneAdminAnnualDeclarationViewSet
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.tests_utils import PermissionTestMixin
 
@@ -176,5 +177,14 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             BiomethaneProducersViewSet,
             [
                 (["list"], [HasDrealRights()]),
+            ],
+        )
+
+    def test_annual_declaration_admin_permissions(self):
+        """Test BiomethaneAdminAnnualDeclarationViewSet permissions"""
+        self.assertViewPermissions(
+            BiomethaneAdminAnnualDeclarationViewSet,
+            [
+                (["list", "filters"], [HasDrealRights()]),
             ],
         )

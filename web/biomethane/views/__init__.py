@@ -1,5 +1,5 @@
 
-from .admin import BiomethaneProducersViewSet
+from .admin import BiomethaneAdminAnnualDeclarationViewSet, BiomethaneProducersViewSet
 from .annual_declaration import BiomethaneAnnualDeclarationViewSet, ValidateActionMixin
 from .contract import BiomethaneContractAmendmentViewSet, BiomethaneContractViewSet
 from .digestate import BiomethaneDigestateSpreadingViewSet, BiomethaneDigestateViewSet

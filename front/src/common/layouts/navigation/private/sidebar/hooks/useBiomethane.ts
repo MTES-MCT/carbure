@@ -50,6 +50,12 @@ export const useBiomethane = () => {
     title: t("Biométhane"),
     condition: hasAdminRight(ExternalAdminPages.DREAL),
     children: [
+      {
+        path: routes.BIOMETHANE().ADMIN.DASHBOARD,
+        title: t("Tableau de bord"),
+        icon: "ri-home-4-line",
+        iconActive: "ri-home-4-fill",
+      },
       // {
       //   path: routes.BIOMETHANE().ADMIN.SUPPLY_INPUTS,
       //   title: t("Intrants"),
@@ -62,12 +68,6 @@ export const useBiomethane = () => {
         icon: "ri-file-text-line",
         iconActive: "ri-file-text-fill",
       },
-      // {
-      //   path: routes.BIOMETHANE().ADMIN.EXPORTS,
-      //   title: t("Exportats"),
-      //   icon: "ri-file-download-line",
-      //   iconActive: "ri-file-download-fill",
-      // },
     ],
   }
 
