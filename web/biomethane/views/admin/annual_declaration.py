@@ -33,7 +33,7 @@ class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, Fi
     def get_queryset(self):
         entity = self.request.entity
         year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
-        accessible_dept_codes = list(entity.get_accessible_departments().values_list("code_dept", flat=True))
+        accessible_dept_codes = entity.get_accessible_departments().values_list("code_dept", flat=True)
         declarations = (
             BiomethaneAnnualDeclaration.objects.filter(year=year)
             .select_related(
