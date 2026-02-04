@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import ANY, patch
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
-from edelivery.ebms.materials import UDBConversionError
+from edelivery.ebms.converters import UDBConversionError
 from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
 
 
@@ -24,11 +24,12 @@ class BaseRequestResponseTest(TestCase):
 
 class EOGetTransactionResponseTest(TestCase):
     def setUp(self):
-        self.patched_from_UDB_feedstock_code = patch("edelivery.ebms.request_responses.from_UDB_feedstock_code").start()
-        self.patched_from_UDB_feedstock_code.return_value = MatierePremiere()
+        self.patched_MaterialConverter = patch("edelivery.ebms.request_responses.MaterialConverter").start()
+        self.patched_MaterialConverter.return_value.from_udb_feedstock_code.return_value = MatierePremiere()
+        self.patched_MaterialConverter.return_value.from_udb_biofuel_code.return_value = Biocarburant()
 
-        self.patched_from_UDB_biofuel_code = patch("edelivery.ebms.request_responses.from_UDB_biofuel_code").start()
-        self.patched_from_UDB_biofuel_code.return_value = Biocarburant()
+        self.patched_compute_lot_quantity = patch("edelivery.ebms.request_responses.compute_lot_quantity").start()
+        self.patched_compute_lot_quantity.return_value = {}
 
         self.patched_from_national_trade_register = patch(
             "edelivery.ebms.request_responses.from_national_trade_register",
@@ -141,7 +142,7 @@ class EOGetTransactionResponseTest(TestCase):
         self.assertEqual({"newLotCreated": True, "id": "12345"}, result)
 
     def test_logs_error_on_conversion_error(self):
-        self.patched_from_UDB_biofuel_code.side_effect = UDBConversionError("Oups")
+        self.patched_MaterialConverter.return_value.from_udb_biofuel_code.side_effect = UDBConversionError("Oups")
         response = EOGetTransactionResponse(self.payload())
         self.patched_log_error.assert_not_called()
 
@@ -202,30 +203,44 @@ class EOGetTransactionResponseTest(TestCase):
         self.assertEqual("PENDING", lot_attributes["lot_status"])
 
     def test_knows_its_feedstock_code(self):
-        self.patched_from_UDB_feedstock_code.return_value = MatierePremiere(name="Betterave")
+        patched_from_udb_feedstock_code = self.patched_MaterialConverter.return_value.from_udb_feedstock_code
+        patched_from_udb_feedstock_code.return_value = MatierePremiere(name="Betterave")
 
         response = EOGetTransactionResponse(self.payload(feedstock={"code": "URWS023", "name": "Sugar beet"}))
         self.assertEqual("URWS023", response.feedstock_code())
-        self.patched_from_UDB_feedstock_code.assert_not_called()
+        patched_from_udb_feedstock_code.assert_not_called()
 
         lot_attributes = response.to_lot_attributes()
-        self.patched_from_UDB_feedstock_code.assert_called_with("URWS023")
+        patched_from_udb_feedstock_code.assert_called_with("URWS023")
         self.assertEqual("Betterave", lot_attributes["feedstock"].name)
 
     def test_knows_its_biofuel_code(self):
-        self.patched_from_UDB_biofuel_code.return_value = Biocarburant(name="Biogaz")
+        patched_from_udb_biofuel_code = self.patched_MaterialConverter.return_value.from_udb_biofuel_code
+        patched_from_udb_biofuel_code.return_value = Biocarburant(name="Biogaz")
 
         response = EOGetTransactionResponse(self.payload(biofuel={"code": "SFC0015", "name": "Biogas"}))
         self.assertEqual("SFC0015", response.biofuel_code())
-        self.patched_from_UDB_biofuel_code.assert_not_called()
+        patched_from_udb_biofuel_code.assert_not_called()
 
         lot_attributes = response.to_lot_attributes()
-        self.patched_from_UDB_biofuel_code.assert_called_with("SFC0015")
+        patched_from_udb_biofuel_code.assert_called_with("SFC0015")
         self.assertEqual("Biogaz", lot_attributes["biofuel"].name)
 
-    def test_converts_MWh_quantity_to_MJ_lhv_amount(self):
+    def test_knows_its_biofuel_quantity_and_unit(self):
         response = EOGetTransactionResponse(self.payload(quantity={"unit": "MWh", "value": 10}))
+        self.assertEqual("MWh", response.unit())
         self.assertEqual(10, response.quantity())
 
+    def test_computes_missing_quantity_data(self):
+        biofuel = Biocarburant(name="EMAG")
+        self.patched_MaterialConverter.return_value.from_udb_biofuel_code.return_value = biofuel
+        self.patched_compute_lot_quantity.return_value = {"weight": 10, "volume": 20, "lhv_amount": 3600 * 10}
+
+        response = EOGetTransactionResponse(self.payload(quantity={"unit": "MWh", "value": 10}))
+        self.patched_compute_lot_quantity.assert_not_called()
+
         lot_attributes = response.to_lot_attributes()
+        self.patched_compute_lot_quantity.assert_called_with(biofuel, {"lhv_amount": 3600 * 10})
         self.assertEqual(3600 * 10, lot_attributes["lhv_amount"])
+        self.assertEqual(10, lot_attributes["weight"])
+        self.assertEqual(20, lot_attributes["volume"])
