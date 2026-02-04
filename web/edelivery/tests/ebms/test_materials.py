@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from core.models import Biocarburant, MatierePremiere
-from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
+from edelivery.ebms.materials import UDBConversionError, from_UDB_biofuel_code, from_UDB_feedstock_code
 
 
 class FromUDBBiofuelCodeTest(TestCase):
@@ -41,3 +41,16 @@ class FromUDBFeedstockCodeTest(TestCase):
         carbure_feedstock = from_UDB_feedstock_code("URWS023")
         get.assert_called_with(code="BETTERAVE")
         self.assertEqual(found_feedstock, carbure_feedstock)
+
+    @patch.dict("edelivery.ebms.materials._udb_code_to_carbure_code_mapping", {"udb_code": "carbure_code"})
+    def test_uses_conversion_table(self):
+        get = self.patched_MatierePremiere.objects.get
+        from_UDB_feedstock_code("udb_code")
+        get.assert_called_with(code="carbure_code")
+
+    @patch.dict("edelivery.ebms.materials._udb_code_to_carbure_code_mapping", clear=True)
+    def test_raises_error_if_udb_code_unknown(self):
+        with self.assertRaises(UDBConversionError) as context:
+            from_UDB_feedstock_code("unknown_code")
+
+        self.assertEqual("Unknown UDB Material code: unknown_code", context.exception.message)

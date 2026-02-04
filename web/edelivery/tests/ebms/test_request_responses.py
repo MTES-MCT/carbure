@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import ANY, patch
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
+from edelivery.ebms.materials import UDBConversionError
 from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
 
 
@@ -33,6 +34,8 @@ class EOGetTransactionResponseTest(TestCase):
             "edelivery.ebms.request_responses.from_national_trade_register",
         ).start()
         self.patched_from_national_trade_register.return_value = Entity()
+
+        self.patched_log_error = patch("edelivery.ebms.request_responses.log_error").start()
 
     def tearDown(self):
         patch.stopall()
@@ -136,6 +139,15 @@ class EOGetTransactionResponseTest(TestCase):
         result = response.post_retrieval_action_result()
         patched_update_or_create.assert_called_with(udb_transaction_id="TRN-0000000000001-1234567890", defaults=ANY)
         self.assertEqual({"newLotCreated": True, "id": "12345"}, result)
+
+    def test_logs_error_on_conversion_error(self):
+        self.patched_from_UDB_biofuel_code.side_effect = UDBConversionError("Oups")
+        response = EOGetTransactionResponse(self.payload())
+        self.patched_log_error.assert_not_called()
+
+        result = response.post_retrieval_action_result()
+        self.patched_log_error.assert_called_with("Unable to convert UDB transaction into CarbuRe lot", {"cause": "Oups"})
+        self.assertEqual({"error": "Unable to convert UDB transaction into CarbuRe lot", "cause": "Oups"}, result)
 
     def test_knows_its_delivery_date_in_ISO_format(self):
         response = EOGetTransactionResponse(self.payload(delivery_date="2025-12-22T00:00:00.000Z"))
