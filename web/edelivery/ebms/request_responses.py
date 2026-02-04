@@ -5,6 +5,7 @@ from adapters.logger import log_error
 from core.models import CarbureLot
 from edelivery.ebms.converters import MaterialConverter, QuantityConverter, UDBConversionError
 from edelivery.ebms.ntr import from_national_trade_register
+from transactions.helpers import compute_lot_quantity
 
 
 class BaseRequestResponse:
@@ -57,6 +58,7 @@ class EOGetTransactionResponse(BaseRequestResponse):
         client = from_national_trade_register(self.client_id())
         feedstock = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
         quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
+        computed_quantity_data = compute_lot_quantity(biofuel, quantity_data)
         supplier = from_national_trade_register(self.supplier_id())
 
         return {
@@ -68,7 +70,7 @@ class EOGetTransactionResponse(BaseRequestResponse):
             "period": self.period(),
             "lot_status": self.status(),
             "year": self.year(),
-            **quantity_data,
+            **computed_quantity_data,
         }
 
     def post_retrieval_action_result(self):
