@@ -1,7 +1,9 @@
 from core.models import Biocarburant, MatierePremiere
 
 _udb_code_to_carbure_code_mapping = {
+    "FBM0003": "EMAG",
     "SFC0015": "BG",
+    "URWR001": "COLZA",
     "URWS023": "BETTERAVE",
 }
 
