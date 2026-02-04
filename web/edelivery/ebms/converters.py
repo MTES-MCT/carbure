@@ -39,6 +39,7 @@ class MaterialConverter(BaseConverter):
 
 class QuantityConverter(BaseConverter):
     _default_conversion_mapping = {
+        "SL": (CarbureLot.volume.field.name, (lambda x: x)),
         "MWh": (CarbureLot.lhv_amount.field.name, (lambda x: x * 3600)),
     }
 
