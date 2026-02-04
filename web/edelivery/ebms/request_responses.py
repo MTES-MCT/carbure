@@ -3,8 +3,7 @@ from datetime import datetime
 
 from adapters.logger import log_error
 from core.models import CarbureLot
-from edelivery.ebms.converters import QuantityConverter
-from edelivery.ebms.materials import UDBConversionError, from_UDB_biofuel_code, from_UDB_feedstock_code
+from edelivery.ebms.converters import MaterialConverter, QuantityConverter, UDBConversionError
 from edelivery.ebms.ntr import from_national_trade_register
 
 
@@ -54,9 +53,9 @@ class EOGetTransactionResponse(BaseRequestResponse):
         return self.transaction_XML_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
 
     def to_lot_attributes(self):
-        biofuel = from_UDB_biofuel_code(self.biofuel_code())
+        biofuel = MaterialConverter().from_udb_biofuel_code(self.biofuel_code())
         client = from_national_trade_register(self.client_id())
-        feedstock = from_UDB_feedstock_code(self.feedstock_code())
+        feedstock = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
         quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
         supplier = from_national_trade_register(self.supplier_id())
 
