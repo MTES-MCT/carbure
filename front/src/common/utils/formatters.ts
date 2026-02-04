@@ -201,4 +201,7 @@ export const CONVERSIONS = {
   euros: {
     centsToKEuros: (value: number) => parseFloat((value / 100000).toFixed(2)),
   },
+  hours: {
+    yearsToHours: (value: number) => value * 8760,
+  },
 }

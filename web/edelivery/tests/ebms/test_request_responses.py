@@ -2,39 +2,8 @@ from unittest import TestCase
 from unittest.mock import ANY, patch
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
-from edelivery.ebms.request_responses import (
-    BaseRequestResponse,
-    EOGetTransactionResponse,
-    NotFoundErrorResponse,
-    ResponseFactory,
-)
-
-
-class ResponseFactoryTest(TestCase):
-    @staticmethod
-    def payload(status="FOUND"):
-        return f"""\
-<udb:EOGetTransactionResponse
-  xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <RESPONSE_HEADER REQUEST_ID="123"
-                   STATUS="{status}" />
-  <!-- … -->
-</udb:EOGetTransactionResponse>"""
-
-    def test_knows_UDB_response_status(self):
-        factory = ResponseFactory(BaseRequestResponse, self.payload(status="SOME_STATUS"))
-        self.assertEqual("SOME_STATUS", factory.udb_response_status())
-
-    def test_returns_a_request_response_with_found_data_on_UDB_response_status_found(self):
-        factory = ResponseFactory(BaseRequestResponse, self.payload())
-        response = factory.response()
-        self.assertIsInstance(response, BaseRequestResponse)
-        self.assertEqual(self.payload(), response.payload)
-
-    def test_returns_an_error_response_on_UDB_response_status_not_found(self):
-        factory = ResponseFactory(BaseRequestResponse, self.payload(status="NOT_FOUND"))
-        response = factory.response()
-        self.assertIsInstance(response, NotFoundErrorResponse)
+from edelivery.ebms.materials import UDBConversionError
+from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
 
 
 class BaseRequestResponseTest(TestCase):
@@ -53,32 +22,6 @@ class BaseRequestResponseTest(TestCase):
         self.assertEqual("12345", response.request_id())
 
 
-class NotFoundErrorResponseTest(TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    @staticmethod
-    def payload():
-        return """\
-<udb:EOGetTransactionResponse
-  xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <RESPONSE_HEADER REQUEST_ID="123" STATUS="NOT_FOUND" />
-  <!-- … -->
-</udb:EOGetTransactionResponse>"""
-
-    @patch("edelivery.ebms.request_responses.log_error")
-    def test_sends_sentry_alert_as_post_retrieval_action(self, patched_log_error):
-        response = NotFoundErrorResponse(self.payload())
-        patched_log_error.assert_not_called()
-
-        result = response.post_retrieval_action_result()
-        patched_log_error.assert_called_with("Search returned no result")
-        self.assertEqual({"error": "Not found"}, result)
-
-
 class EOGetTransactionResponseTest(TestCase):
     def setUp(self):
         self.patched_from_UDB_feedstock_code = patch("edelivery.ebms.request_responses.from_UDB_feedstock_code").start()
@@ -91,6 +34,8 @@ class EOGetTransactionResponseTest(TestCase):
             "edelivery.ebms.request_responses.from_national_trade_register",
         ).start()
         self.patched_from_national_trade_register.return_value = Entity()
+
+        self.patched_log_error = patch("edelivery.ebms.request_responses.log_error").start()
 
     def tearDown(self):
         patch.stopall()
@@ -194,6 +139,15 @@ class EOGetTransactionResponseTest(TestCase):
         result = response.post_retrieval_action_result()
         patched_update_or_create.assert_called_with(udb_transaction_id="TRN-0000000000001-1234567890", defaults=ANY)
         self.assertEqual({"newLotCreated": True, "id": "12345"}, result)
+
+    def test_logs_error_on_conversion_error(self):
+        self.patched_from_UDB_biofuel_code.side_effect = UDBConversionError("Oups")
+        response = EOGetTransactionResponse(self.payload())
+        self.patched_log_error.assert_not_called()
+
+        result = response.post_retrieval_action_result()
+        self.patched_log_error.assert_called_with("Unable to convert UDB transaction into CarbuRe lot", {"cause": "Oups"})
+        self.assertEqual({"error": "Unable to convert UDB transaction into CarbuRe lot", "cause": "Oups"}, result)
 
     def test_knows_its_delivery_date_in_ISO_format(self):
         response = EOGetTransactionResponse(self.payload(delivery_date="2025-12-22T00:00:00.000Z"))

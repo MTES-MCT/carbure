@@ -48,10 +48,8 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
   // Page Énergie
   "injected-biomethane": [
     "injected_biomethane_gwh_pcs_per_year",
-    "injected_biomethane_nm3_per_year",
     "injected_biomethane_ch4_rate_percent",
     "injected_biomethane_pcs_kwh_per_nm3",
-    "operating_hours",
   ],
   "biogas-production": [
     "produced_biogas_nm3_per_year",
