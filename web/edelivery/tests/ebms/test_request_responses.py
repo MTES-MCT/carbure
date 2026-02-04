@@ -225,6 +225,7 @@ class EOGetTransactionResponseTest(TestCase):
 
     def test_converts_MWh_quantity_to_MJ_lhv_amount(self):
         response = EOGetTransactionResponse(self.payload(quantity={"unit": "MWh", "value": 10}))
+        self.assertEqual("MWh", response.unit())
         self.assertEqual(10, response.quantity())
 
         lot_attributes = response.to_lot_attributes()

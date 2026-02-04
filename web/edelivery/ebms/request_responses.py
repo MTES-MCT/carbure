@@ -3,6 +3,7 @@ from datetime import datetime
 
 from adapters.logger import log_error
 from core.models import CarbureLot
+from edelivery.ebms.converters import QuantityConverter
 from edelivery.ebms.materials import UDBConversionError, from_UDB_biofuel_code, from_UDB_feedstock_code
 from edelivery.ebms.ntr import from_national_trade_register
 
@@ -56,7 +57,7 @@ class EOGetTransactionResponse(BaseRequestResponse):
         biofuel = from_UDB_biofuel_code(self.biofuel_code())
         client = from_national_trade_register(self.client_id())
         feedstock = from_UDB_feedstock_code(self.feedstock_code())
-        lhv_amount = self.quantity() * 3600
+        quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
         supplier = from_national_trade_register(self.supplier_id())
 
         return {
@@ -67,8 +68,8 @@ class EOGetTransactionResponse(BaseRequestResponse):
             "feedstock": feedstock,
             "period": self.period(),
             "lot_status": self.status(),
-            "lhv_amount": lhv_amount,
             "year": self.year(),
+            **quantity_data,
         }
 
     def post_retrieval_action_result(self):
@@ -94,6 +95,9 @@ class EOGetTransactionResponse(BaseRequestResponse):
 
     def udb_transaction_id(self):
         return self.transaction_XML_element.find("./TRANSACTION_ID").text
+
+    def unit(self):
+        return self.transaction_XML_element.find("./EO_TRANS_DETAIL_MATERIALS/MEASURE_UNIT").text
 
     def year(self):
         return self.delivery_date().year
