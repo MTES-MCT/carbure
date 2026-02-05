@@ -50,7 +50,10 @@ class EOGetTransactionRequest(BaseRequest):
         super().__init__(body, EOGetTransactionResponse)
 
     def search_fragment(self, *args, **kwargs):
-        if "from_creation_date" in kwargs:
+        if "to_creation_date" in kwargs:
+            if "from_creation_date" not in kwargs:
+                raise ValueError("`from_creation_date` keyword argument can't be `None` when `to_creation_date` is set")
+
             return f"""\
 <EO_ID_DETAIL_BY_CREATION_DATE>
   <ECONOMIC_OPERATOR_ID>{environ["CARBURE_NTR"]}</ECONOMIC_OPERATOR_ID>
