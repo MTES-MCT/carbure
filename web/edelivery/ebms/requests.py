@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from os import environ
 
 from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.adapters.zip_utils import zip_and_stream_udb_request
@@ -37,15 +38,28 @@ class GetSourcingContactByIdRequest(BaseRequest):
 
 
 class EOGetTransactionRequest(BaseRequest):
-    def __init__(self, *args):
-        xml_fragment = "".join([f"<TRANSACTION_ID>{transaction_id}</TRANSACTION_ID>" for transaction_id in args])
+    def __init__(self, *args, **kwargs):
+        search_fragment = self.search_fragment(*args, **kwargs)
         body = f"""\
 <udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
   <EO_GET_TRANS_HEADER>
-    <EO_TRANSACTION>
-      {xml_fragment}
-    </EO_TRANSACTION>
+    {search_fragment}
   </EO_GET_TRANS_HEADER>
 </udb:EOGetTransactionRequest>"""
 
         super().__init__(body, EOGetTransactionResponse)
+
+    def search_fragment(self, *args, **kwargs):
+        if "from_creation_date" in kwargs:
+            return f"""\
+<EO_ID_DETAIL_BY_CREATION_DATE>
+  <ECONOMIC_OPERATOR_ID>{environ["CARBURE_NTR"]}</ECONOMIC_OPERATOR_ID>
+  <CREATION_DATE_FROM>{kwargs["from_creation_date"].astimezone().isoformat()}</CREATION_DATE_FROM>
+  <CREATION_DATE_TO>{kwargs["to_creation_date"].astimezone().isoformat()}</CREATION_DATE_TO>
+</EO_ID_DETAIL_BY_CREATION_DATE>"""
+
+        xml_fragment = "".join([f"<TRANSACTION_ID>{transaction_id}</TRANSACTION_ID>" for transaction_id in args])
+        return f"""\
+<EO_TRANSACTION>
+  {xml_fragment}
+</EO_TRANSACTION>"""
