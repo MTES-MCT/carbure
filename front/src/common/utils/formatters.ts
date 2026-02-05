@@ -197,7 +197,6 @@ export const CONVERSIONS = {
   energy: {
     MJ_TO_GJ: (value: number) => value / 1000,
     GJ_TO_MJ: (value: number) => value * 1000,
-    MWH_TO_KWH: (value: number) => value * 1000,
   },
   euros: {
     centsToKEuros: (value: number) => parseFloat((value / 100000).toFixed(2)),
