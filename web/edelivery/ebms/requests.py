@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from os import environ
 
 from edelivery.adapters.uuid_generator import new_uuid
@@ -50,15 +51,17 @@ class EOGetTransactionRequest(BaseRequest):
         super().__init__(body, EOGetTransactionResponse)
 
     def search_fragment(self, *args, **kwargs):
-        if "to_creation_date" in kwargs:
-            if "from_creation_date" not in kwargs:
-                raise ValueError("`from_creation_date` keyword argument can't be `None` when `to_creation_date` is set")
+        if "to_creation_date" in kwargs and "from_creation_date" not in kwargs:
+            raise ValueError("`from_creation_date` keyword argument can't be `None` when `to_creation_date` is set")
+
+        if "from_creation_date" in kwargs:
+            to_creation_date = kwargs["to_creation_date"] if "to_creation_date" in kwargs else datetime.now()
 
             return f"""\
 <EO_ID_DETAIL_BY_CREATION_DATE>
   <ECONOMIC_OPERATOR_ID>{environ["CARBURE_NTR"]}</ECONOMIC_OPERATOR_ID>
   <CREATION_DATE_FROM>{kwargs["from_creation_date"].astimezone().isoformat()}</CREATION_DATE_FROM>
-  <CREATION_DATE_TO>{kwargs["to_creation_date"].astimezone().isoformat()}</CREATION_DATE_TO>
+  <CREATION_DATE_TO>{to_creation_date.astimezone().isoformat()}</CREATION_DATE_TO>
 </EO_ID_DETAIL_BY_CREATION_DATE>"""
 
         xml_fragment = "".join([f"<TRANSACTION_ID>{transaction_id}</TRANSACTION_ID>" for transaction_id in args])
