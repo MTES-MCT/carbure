@@ -1,11 +1,9 @@
 import xml.etree.ElementTree as ET
-from datetime import datetime
 
 from adapters.logger import log_error
 from core.models import CarbureLot
-from edelivery.ebms.converters import MaterialConverter, QuantityConverter, UDBConversionError
-from edelivery.ebms.ntr import from_national_trade_register
-from transactions.helpers import compute_lot_quantity
+from edelivery.ebms.converters import UDBConversionError
+from edelivery.ebms.transaction import Transaction
 
 
 class BaseRequestResponse:
@@ -22,62 +20,18 @@ class BaseRequestResponse:
 
 
 class EOGetTransactionResponse(BaseRequestResponse):
-    def __init__(self, payload):
-        super().__init__(payload)
-        self.transaction_XML_element = self.parsed_XML.find("./EO_TRANS_HEADER/EO_TRANSACTION")
-
-    def biofuel_code(self):
-        return self.transaction_XML_element.find("./MATERIAL_CODE").text
-
-    def client_id(self):
-        return self.transaction_XML_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text
-
-    def delivery_date(self):
-        delivery_date_text = self.transaction_XML_element.find("./DELIVERY_DATE").text
-        return datetime.fromisoformat(delivery_date_text)
-
-    def feedstock_code(self):
-        xpath = "./EO_TRANS_DETAIL_MATERIALS/POINT_OF_ORIGIN_MATERIAL_DATA/MATERIAL_CODE"
-        return self.transaction_XML_element.find(xpath).text
-
-    def iso_format_delivery_date(self):
-        return self.delivery_date().date().isoformat()
-
-    def period(self):
-        delivery_date = self.delivery_date()
-        return delivery_date.year * 100 + delivery_date.month
-
-    def status(self):
-        return self.transaction_XML_element.find("./STATUS").text
-
-    def supplier_id(self):
-        return self.transaction_XML_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
-
-    def to_lot_attributes(self):
-        biofuel = MaterialConverter().from_udb_biofuel_code(self.biofuel_code())
-        client = from_national_trade_register(self.client_id())
-        feedstock = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
-        quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
-        computed_quantity_data = compute_lot_quantity(biofuel, quantity_data)
-        supplier = from_national_trade_register(self.supplier_id())
-
-        return {
-            "biofuel": biofuel,
-            "carbure_client": client,
-            "carbure_supplier": supplier,
-            "delivery_date": self.iso_format_delivery_date(),
-            "feedstock": feedstock,
-            "period": self.period(),
-            "lot_status": self.status(),
-            "year": self.year(),
-            **computed_quantity_data,
-        }
-
     def post_retrieval_action_result(self):
+        return [self.update_or_create_lot(transaction) for transaction in self.transactions()]
+
+    def transactions(self):
+        for parsed_transaction_data in self.parsed_XML.iter("EO_TRANSACTION"):
+            yield Transaction(parsed_transaction_data)
+
+    def update_or_create_lot(self, transaction):
         try:
-            lot_attributes = self.to_lot_attributes()
+            lot_attributes = transaction.to_lot_attributes()
             lot, created = CarbureLot.objects.update_or_create(
-                udb_transaction_id=self.udb_transaction_id(),
+                udb_transaction_id=transaction.udb_transaction_id(),
                 defaults=lot_attributes,
             )
 
@@ -89,16 +43,3 @@ class EOGetTransactionResponse(BaseRequestResponse):
             log_error(error_message, {"cause": cause})
 
             return {"error": error_message, "cause": cause}
-
-    def quantity(self):
-        quantity = self.transaction_XML_element.find("./EO_TRANS_DETAIL_MATERIALS/QUANTITY").text
-        return int(quantity)
-
-    def udb_transaction_id(self):
-        return self.transaction_XML_element.find("./TRANSACTION_ID").text
-
-    def unit(self):
-        return self.transaction_XML_element.find("./EO_TRANS_DETAIL_MATERIALS/MEASURE_UNIT").text
-
-    def year(self):
-        return self.delivery_date().year
