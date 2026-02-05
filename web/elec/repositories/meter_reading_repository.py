@@ -1,4 +1,4 @@
-from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum, Value
+from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum
 from django.db.models.fields import FloatField
 from django.db.models.functions import Coalesce
 
@@ -13,17 +13,16 @@ from transactions.models.year_config import YearConfig
 class MeterReadingRepository:
     @staticmethod
     def get_annotated_applications():
-        # Subquery to calculate total renewable energy from ElecMeterReadingVirtual
-        energy_subquery = (
-            ElecMeterReadingVirtual.objects.filter(application_id=OuterRef("pk"))
-            .values("application_id")
-            .annotate(total=Sum((F("current_index") - F("prev_index")) * F("enr_ratio")))
-            .values("total")
-        )
-
-        return ElecMeterReadingApplication.objects.all().annotate(
-            charge_point_count=Count("elec_meter_readings__id"),
-            energy_total=Coalesce(Subquery(energy_subquery), Value(0.0), output_field=FloatField()),
+        return (
+            ElecMeterReadingApplication.objects.prefetch_related("elec_meter_reading_virtual_set")
+            .annotate(
+                energy_total=Sum(
+                    (F("elec_meter_reading_virtual_set__current_index") - F("elec_meter_reading_virtual_set__prev_index"))
+                    * F("elec_meter_reading_virtual_set__enr_ratio")
+                ),
+                charge_point_count=Count("elec_meter_reading_virtual_set"),
+            )
+            .all()
         )
 
     @staticmethod
@@ -40,10 +39,6 @@ class MeterReadingRepository:
     def get_cpo_application_for_quarter(cpo, year: int, quarter: int):
         return MeterReadingRepository.get_annotated_applications().filter(cpo=cpo, quarter=quarter, year=year).first()
 
-    # @staticmethod
-    # def get_cpo_meter_readings(cpo: Entity):
-    #    return ElecMeterReading.objects.filter(cpo=cpo).select_related("meter", "meter__charge_point")
-
     @staticmethod
     def get_previous_application(cpo: Entity, quarter=None, year=None):
         applications = ElecMeterReadingApplication.objects.filter(cpo=cpo, status=ElecMeterReadingApplication.ACCEPTED)
@@ -51,23 +46,9 @@ class MeterReadingRepository:
             applications = applications.filter(Q(year__lt=year) | (Q(year=year) & Q(quarter__lt=quarter)))
         return applications.order_by("-year", "-quarter").first()
 
-    # @staticmethod
-    # def get_replaceable_applications(cpo: Entity):
-    #    return ElecMeterReadingApplication.objects.filter(
-    #        cpo=cpo, status__in=[ElecMeterReadingApplication.PENDING, ElecMeterReadingApplication.REJECTED]
-    #    )
-
     @staticmethod
     def get_application_meter_readings(cpo: Entity, application: ElecMeterReadingApplication):
         return ElecMeterReadingVirtual.objects.filter(cpo=cpo, application=application).select_related("charge_point")
-
-    # @staticmethod
-    # def get_application_meter_readings_summary(cpo: Entity, application: ElecMeterReadingApplication):
-    #     return (
-    #         MeterReadingRepository.get_application_meter_readings(cpo, application)
-    #         .values("extracted_energy", "renewable_energy", "reading_date")
-    #         .annotate(charge_point_id=F("meter__charge_point__charge_point_id"))
-    #     )
 
     @staticmethod
     def get_application_charge_points(cpo: Entity, application: ElecMeterReadingApplication):
