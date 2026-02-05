@@ -4,7 +4,9 @@ import {
   QualichargeTab,
   QualichargeValidatedBy,
   QualichargeQuery,
+  QualichargeGroupBy,
 } from "./types"
+import { apiTypes } from "common/services/api-fetch.types"
 
 const getQuery = (query: QualichargeQuery) => {
   const query2 =
@@ -46,12 +48,48 @@ export function getQualichargeFilters(
     })
     .then((res) => res.data ?? [])
 }
+
+const getQualichargeDataResponse = <
+  T extends
+    | apiTypes["ElecProvisionCertificateQualicharge"]
+    | apiTypes["ElecProvisionCertificateQualichargeGrouped"],
+>(
+  query: QualichargeQuery
+) => {
+  return api
+    .GET("/elec/provision-certificates-qualicharge/", {
+      params: {
+        query: getQuery(query),
+      },
+    })
+    .then((res) => {
+      return {
+        ...res,
+        data: {
+          ...res.data,
+          results: res.data?.results as T[],
+        },
+      }
+    })
+}
+// This endpoint can returned a list of certificates, but when the props group_by is set, it returns a list of grouped certificates
+// So we need to force the type of the results to the correct type
 export function getQualichargeData(query: QualichargeQuery) {
-  return api.GET("/elec/provision-certificates-qualicharge/", {
-    params: {
-      query: getQuery(query),
-    },
-  })
+  return getQualichargeDataResponse<
+    apiTypes["ElecProvisionCertificateQualicharge"]
+  >(query)
+}
+
+export function getQualichargeDataGroupedByOperatingUnit(
+  query: QualichargeQuery
+) {
+  const queryWithGroupBy = {
+    ...query,
+    group_by: [QualichargeGroupBy.operating_unit],
+  }
+  return getQualichargeDataResponse<
+    apiTypes["ElecProvisionCertificateQualichargeGrouped"]
+  >(queryWithGroupBy)
 }
 
 export function getQualichargeDataDetail(id: number, entity_id: number) {
@@ -68,8 +106,17 @@ export function getQualichargeDataDetail(id: number, entity_id: number) {
 export function validateQualichargeVolumes(
   entity_id: number,
   certificate_ids: number[],
-  validated_by: QualichargeValidatedBy
+  validated_by: QualichargeValidatedBy,
+  query?: QualichargeQuery
 ) {
+  const filters = {
+    status: query?.validated_by,
+    date_from: query?.date_from,
+    operating_unit: query?.operating_unit,
+    cpo: query?.cpo,
+    station_id: query?.station_id,
+  }
+
   return api.POST("/elec/provision-certificates-qualicharge/bulk-update/", {
     params: {
       query: {
@@ -79,6 +126,7 @@ export function validateQualichargeVolumes(
     body: {
       certificate_ids,
       validated_by,
+      ...filters,
     },
   })
 }

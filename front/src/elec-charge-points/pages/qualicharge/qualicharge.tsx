@@ -29,6 +29,8 @@ import { QualichargeDataDetail } from "./components/qualicharge-data-detail"
 import { useValidateVolumes } from "./hooks/use-validate-volumes"
 import useEntity from "common/hooks/entity"
 import { ExternalAdminPages } from "common/types"
+import { Button } from "common/components/button2"
+import { ValidateAllDataDialog } from "./components/validate-all-data-dialog"
 
 export const Qualicharge = () => {
   const { state, actions, query, status, years } = useQualichargeQueryBuilder()
@@ -57,6 +59,8 @@ export const Qualicharge = () => {
     },
   })
 
+  const hasNoData = result?.data?.results?.length === 0
+
   const filterLabels = {
     ...((entity.isAdmin || entity.hasAdminRight(ExternalAdminPages.ELEC)) && {
       [QualichargeFilter.cpo]: t("Aménageur"),
@@ -75,7 +79,7 @@ export const Qualicharge = () => {
         state.selection.includes(qualichargeData.id)
       ) ?? []
     const volume = qualichargeRows?.reduce(
-      (sum, data) => sum + data.energy_amount,
+      (sum, data) => sum + data.renewable_energy,
       0
     )
     portal((close) => (
@@ -91,7 +95,12 @@ export const Qualicharge = () => {
     ))
   }
 
+  const openValidateAllDataModal = () => {
+    portal((close) => <ValidateAllDataDialog onClose={close} query={query} />)
+  }
+
   usePrivateNavigation(t("Données Qualicharge"))
+
   return (
     <Main>
       <Select
@@ -135,7 +144,7 @@ export const Qualicharge = () => {
           <Route
             path="/:status"
             element={
-              !loading && result?.data?.results?.length === 0 ? (
+              !loading && hasNoData ? (
                 <NoResult />
               ) : (
                 <>
@@ -153,15 +162,29 @@ export const Qualicharge = () => {
 
                   <RecapQuantity
                     text={t(
-                      "{{count}} volumes pour un total de {{total}} MWh",
+                      "{{count}} volumes pour un total de {{total}} MWh ({{total_renewable}} MWh renouvelable)",
                       {
                         count: result?.data?.count,
                         total: formatNumber(result?.data?.total_quantity ?? 0, {
-                          fractionDigits: 0,
+                          fractionDigits: 2,
                         }),
+                        total_renewable: formatNumber(
+                          result?.data?.total_quantity_renewable ?? 0,
+                          {
+                            fractionDigits: 2,
+                          }
+                        ),
                       }
                     )}
                   />
+                  {status === QualichargeTab.PENDING && (
+                    <Button
+                      priority="secondary"
+                      onClick={openValidateAllDataModal}
+                    >
+                      {t("Valider toutes les données")}
+                    </Button>
+                  )}
                   <Table
                     rows={result?.data?.results ?? []}
                     columns={columns}

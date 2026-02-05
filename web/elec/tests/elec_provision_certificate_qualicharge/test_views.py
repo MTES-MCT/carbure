@@ -45,6 +45,7 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
                 station_id=f"FRXYZP11111{i}",
                 energy_amount=1000.0 * (i + 1),
                 cpo_validated=True,
+                enr_ratio=0.25,
             )
 
         # Create certificate for another CPO (should not appear)
@@ -54,6 +55,7 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
             station_id="FRXYZP999999",
             energy_amount=9999.0,
             cpo_validated=True,
+            enr_ratio=0.25,
         )
 
         self.list_params = {
@@ -90,6 +92,7 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
             station_id="FRXYZP888888",
             energy_amount=8888.0,
             cpo_validated=True,
+            enr_ratio=0.25,
         )
 
         self.list_params["query_params"]["year"] = 2024
@@ -108,9 +111,11 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
         data = response.json()
 
         # Verify that total_quantity is present and correct
-        # Sum = 1000 + 2000 + 3000 + 4000 + 5000 = 15000
+        # Sum = (1000 + 2000 + 3000 + 4000 + 5000) = 15000
         self.assertIn("total_quantity", data)
         self.assertEqual(data["total_quantity"], 15000.0)
+        self.assertIn("total_quantity_renewable", data)
+        self.assertEqual(data["total_quantity_renewable"], 3750.0)  # 15000 * 0.25
 
     def test_retrieve_certificate(self):
         """Test certificate retrieval"""
@@ -123,6 +128,7 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
             station_id="FRXYZP123456",
             energy_amount=1000.0,
             cpo_validated=True,
+            enr_ratio=0.25,
         )
 
         response = self.client.get(
@@ -135,6 +141,7 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
         self.assertEqual(data["id"], certificate.id)
         self.assertEqual(data["station_id"], "FRXYZP123456")
         self.assertEqual(data["energy_amount"], 1000.0)
+        self.assertEqual(data["renewable_energy"], 250.0)  # 1000 * 0.25
 
     def test_retrieve_non_existing_certificate(self):
         """Test retrieval of non-existing certificate"""
@@ -184,6 +191,7 @@ class ElecProvisionCertificateQualichargeViewSetAdminTest(TestCase):
                 station_id=f"FRXYZP11111{i}",
                 energy_amount=1000.0,
                 cpo_validated=True,
+                enr_ratio=0.25,
             )
 
     def test_admin_can_see_all_certificates(self):
@@ -196,3 +204,129 @@ class ElecProvisionCertificateQualichargeViewSetAdminTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["count"], 3)
+
+
+class ElecProvisionCertificateQualichargeGroupByTest(TestCase):
+    """Tests for grouped certificate listing"""
+
+    def setUp(self):
+        self.cpo = EntityFactory.create(
+            name="Test CPO",
+            entity_type=Entity.CPO,
+            has_elec=True,
+            registration_id="123456789",
+        )
+
+        self.user = setup_current_user(
+            self,
+            "tester@carbure.local",
+            "Tester",
+            "gogogo",
+            [(self.cpo, "RW")],
+        )
+
+        # Create multiple certificates for same operating unit and period
+        ElecProvisionCertificateQualichargeFactory(
+            cpo=self.cpo,
+            date_from=datetime.date(2023, 1, 1),
+            date_to=datetime.date(2023, 3, 31),
+            year=2023,
+            operating_unit="FR001",
+            station_id="FRXYZP111111",
+            energy_amount=1000.0,
+            enr_ratio=0.25,
+        )
+        ElecProvisionCertificateQualichargeFactory(
+            cpo=self.cpo,
+            date_from=datetime.date(2023, 1, 1),
+            date_to=datetime.date(2023, 3, 31),
+            year=2023,
+            operating_unit="FR001",
+            station_id="FRXYZP222222",
+            energy_amount=2000.0,
+            enr_ratio=0.25,
+        )
+        # Different operating unit
+        ElecProvisionCertificateQualichargeFactory(
+            cpo=self.cpo,
+            date_from=datetime.date(2023, 1, 1),
+            date_to=datetime.date(2023, 3, 31),
+            year=2023,
+            operating_unit="FR002",
+            station_id="FRXYZP333333",
+            energy_amount=500.0,
+            enr_ratio=0.25,
+        )
+
+    def test_list_with_group_by_operating_unit(self):
+        """Test grouping by operating unit"""
+        response = self.client.get(
+            reverse("elec-provision-certificate-qualicharge-list"),
+            {
+                "entity_id": self.cpo.id,
+                "group_by": "operating_unit",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+
+        # Should have 2 groups (FR001 and FR002)
+        self.assertEqual(data["count"], 2)
+
+        # Find FR001 group
+        fr001_group = next((item for item in data["results"] if item["operating_unit"] == "FR001"), None)
+        self.assertIsNotNone(fr001_group)
+        self.assertEqual(fr001_group["energy_amount"], 3000.0)  # 1000 + 2000
+        self.assertEqual(fr001_group["renewable_energy"], 750.0)  # 3000 * 0.25
+
+        # Find FR002 group
+        fr002_group = next((item for item in data["results"] if item["operating_unit"] == "FR002"), None)
+        self.assertIsNotNone(fr002_group)
+        self.assertEqual(fr002_group["energy_amount"], 500.0)
+        self.assertEqual(fr002_group["renewable_energy"], 125.0)  # 500 * 0.25
+
+    def test_list_grouped_metadata(self):
+        """Test pagination metadata with grouped results"""
+        response = self.client.get(
+            reverse("elec-provision-certificate-qualicharge-list"),
+            {
+                "entity_id": self.cpo.id,
+                "group_by": "operating_unit",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+
+        # Total energy = (1000 + 2000 + 500) = 3500
+        self.assertIn("total_quantity", data)
+        self.assertEqual(data["total_quantity"], 3500.0)
+        self.assertIn("total_quantity_renewable", data)
+        self.assertEqual(data["total_quantity_renewable"], 875.0)  # 3500 * 0.25
+
+    def test_list_grouped_serializer_fields(self):
+        """Test that grouped results have correct fields"""
+        response = self.client.get(
+            reverse("elec-provision-certificate-qualicharge-list"),
+            {
+                "entity_id": self.cpo.id,
+                "group_by": "operating_unit",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+
+        result = data["results"][0]
+        # Check expected fields for grouped serializer
+        self.assertIn("cpo", result)
+        self.assertIn("operating_unit", result)
+        self.assertIn("date_from", result)
+        self.assertIn("date_to", result)
+        self.assertIn("year", result)
+        self.assertIn("energy_amount", result)
+        self.assertIn("renewable_energy", result)
+
+        # Should not have station_id (it's grouped)
+        self.assertNotIn("station_id", result)

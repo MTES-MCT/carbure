@@ -1,3 +1,5 @@
+from unittest.mock import Mock, patch
+
 from django.test import TestCase
 
 from elec.models import ElecProvisionCertificateQualicharge
@@ -239,18 +241,17 @@ class ProvisionCertificateUpdateBulkSerializerTest(TestCase):
             "certificate_ids": [1, 2, 3],
             "validated_by": ElecProvisionCertificateQualicharge.CPO,
         }
-        serializer = ProvisionCertificateUpdateBulkSerializer(data=data)
+        serializer = ProvisionCertificateUpdateBulkSerializer(data=data, context={"request": Mock()})
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
     def test_empty_certificate_ids(self):
-        """Test with an empty list of certificates"""
+        """Test with an empty list of certificates - should be valid as it's optional"""
         data = {
             "certificate_ids": [],
-            "validated_by": ElecProvisionCertificateQualicharge.DGEC,
+            "validated_by": ElecProvisionCertificateQualicharge.CPO,
         }
-        serializer = ProvisionCertificateUpdateBulkSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("certificate_ids", serializer.errors)
+        serializer = ProvisionCertificateUpdateBulkSerializer(data=data, context=Mock())
+        self.assertTrue(serializer.is_valid(), serializer.errors)
 
     def test_invalid_validated_by(self):
         """Test with an invalid value for validated_by"""
@@ -258,16 +259,15 @@ class ProvisionCertificateUpdateBulkSerializerTest(TestCase):
             "certificate_ids": [1, 2],
             "validated_by": "INVALID",
         }
-        serializer = ProvisionCertificateUpdateBulkSerializer(data=data)
+        serializer = ProvisionCertificateUpdateBulkSerializer(data=data, context={"request": Mock()})
         self.assertFalse(serializer.is_valid())
         self.assertIn("validated_by", serializer.errors)
 
     def test_all_validation_choices(self):
-        """Test that all validation choices are accepted"""
+        """Test that all validation choices are accepted (except DGEC which requires permissions)"""
         for choice in [
             ElecProvisionCertificateQualicharge.NO_ONE,
             ElecProvisionCertificateQualicharge.CPO,
-            ElecProvisionCertificateQualicharge.DGEC,
             ElecProvisionCertificateQualicharge.BOTH,
         ]:
             data = {
@@ -276,3 +276,30 @@ class ProvisionCertificateUpdateBulkSerializerTest(TestCase):
             }
             serializer = ProvisionCertificateUpdateBulkSerializer(data=data)
             self.assertTrue(serializer.is_valid(), f"Failed for choice: {choice}")
+
+    @patch("elec.serializers.elec_provision_certificate_qualicharge.HasElecAdminRights.has_permission")
+    def test_wrong_permissions_for_dgec(self, mock_has_permission):
+        """Test that DGEC validation without proper permissions raises an error"""
+        data = {
+            "certificate_ids": [1, 2],
+            "validated_by": ElecProvisionCertificateQualicharge.DGEC,
+        }
+
+        mock_has_permission.return_value = False
+
+        serializer = ProvisionCertificateUpdateBulkSerializer(data=data, context={"request": Mock()})
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("validated_by", serializer.errors)
+
+    def test_dgec_validation_without_request_context(self):
+        """Test that DGEC validation without request context raises an error (security)"""
+        data = {
+            "certificate_ids": [1, 2],
+            "validated_by": ElecProvisionCertificateQualicharge.DGEC,
+        }
+
+        # No request in context - should fail
+        serializer = ProvisionCertificateUpdateBulkSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("validated_by", serializer.errors)
+        self.assertIn("Authentication required", str(serializer.errors["validated_by"][0]))

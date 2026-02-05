@@ -210,6 +210,10 @@ class UnknownSirenFilter(admin.SimpleListFilter):
 
 @admin.register(ElecProvisionCertificateQualicharge)
 class ElecProvisionCertificateQualichargeAdmin(admin.ModelAdmin):
+    @admin.display(description="Energy Amount (MWh)")
+    def energy_amount_display(self, obj):
+        return obj.energy_amount
+
     list_display = [
         "cpo",
         "year",
@@ -217,7 +221,7 @@ class ElecProvisionCertificateQualichargeAdmin(admin.ModelAdmin):
         "date_to",
         "operating_unit",
         "station_id",
-        "energy_amount",
+        "energy_amount_display",
         "validated_by",
         "unknown_siren",
     ]

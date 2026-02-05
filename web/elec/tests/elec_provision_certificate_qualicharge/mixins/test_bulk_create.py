@@ -7,12 +7,16 @@ from core.tests_utils import setup_current_user_with_jwt
 from elec.factories import ElecProvisionCertificateQualichargeFactory
 from elec.models import ElecProvisionCertificateQualicharge
 from entity.factories import EntityFactory
+from transactions.models import YearConfig
 
 
 class BulkCreateMixinTest(TestCase):
     """Integration tests for bulk creation mixin - focuses on API integration, not business logic"""
 
     def setUp(self):
+        # Create YearConfig for tests
+        YearConfig.objects.get_or_create(year=2023, defaults={"renewable_share": 0.25})
+
         self.client = APIClient()
         self.cpo = EntityFactory.create(
             name="Test CPO",
