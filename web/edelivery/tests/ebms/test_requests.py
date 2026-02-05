@@ -130,3 +130,12 @@ class EOGetTransactionRequestTest(TestCase):
 </udb:EOGetTransactionRequest>"""
 
         self.assertEqual(expected_body, request.body)
+
+    def test_raises_an_error_if_range_incomplete(self):
+        with self.assertRaises(ValueError) as context:
+            EOGetTransactionRequest(to_creation_date=datetime(2026, 1, 25, 10, 0))
+
+        self.assertEqual(
+            "`from_creation_date` keyword argument can't be `None` when `to_creation_date` is set",
+            str(context.exception),
+        )
