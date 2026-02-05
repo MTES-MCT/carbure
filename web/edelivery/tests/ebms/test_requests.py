@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -70,9 +71,11 @@ class GetSourcingContactByIdRequestTest(TestCase):
         self.assertEqual(expected_body, request.body)
 
 
+@patch.dict("os.environ", {"CARBURE_NTR": "123"})
 class EOGetTransactionRequestTest(TestCase):
     def setUp(self):
         self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
+        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
 
     def tearDown(self):
         patch.stopall()
@@ -82,8 +85,6 @@ class EOGetTransactionRequestTest(TestCase):
         self.assertEqual(EOGetTransactionResponse, request.response_class)
 
     def test_injects_transaction_id_in_body(self):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
-
         request = EOGetTransactionRequest("99999")
         expected_body = """\
 <udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
@@ -98,8 +99,6 @@ class EOGetTransactionRequestTest(TestCase):
         self.assertEqual(expected_body, request.body)
 
     def test_injects_several_transaction_ids_at_once(self):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
-
         request = EOGetTransactionRequest("111", "222")
         expected_body = """\
 <udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
@@ -109,6 +108,24 @@ class EOGetTransactionRequestTest(TestCase):
       <TRANSACTION_ID>111</TRANSACTION_ID>
       <TRANSACTION_ID>222</TRANSACTION_ID>
     </EO_TRANSACTION>
+  </EO_GET_TRANS_HEADER>
+</udb:EOGetTransactionRequest>"""
+
+        self.assertEqual(expected_body, request.body)
+
+    def test_injects_creation_date_range_in_body(self):
+        d1 = datetime(2026, 1, 25, 8, 0)
+        d2 = datetime(2026, 1, 25, 10, 0)
+        request = EOGetTransactionRequest(from_creation_date=d1, to_creation_date=d2)
+        expected_body = """\
+<udb:EOGetTransactionRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
+  <EO_GET_TRANS_HEADER>
+    <EO_ID_DETAIL_BY_CREATION_DATE>
+      <ECONOMIC_OPERATOR_ID>123</ECONOMIC_OPERATOR_ID>
+      <CREATION_DATE_FROM>2026-01-25T08:00:00+01:00</CREATION_DATE_FROM>
+      <CREATION_DATE_TO>2026-01-25T10:00:00+01:00</CREATION_DATE_TO>
+    </EO_ID_DETAIL_BY_CREATION_DATE>
   </EO_GET_TRANS_HEADER>
 </udb:EOGetTransactionRequest>"""
 
