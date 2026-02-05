@@ -162,12 +162,18 @@ export const Qualicharge = () => {
 
                   <RecapQuantity
                     text={t(
-                      "{{count}} volumes pour un total de {{total}} MWh",
+                      "{{count}} volumes pour un total de {{total}} MWh ({{total_renewable}} MWh renouvelable)",
                       {
                         count: result?.data?.count,
                         total: formatNumber(result?.data?.total_quantity ?? 0, {
-                          fractionDigits: 0,
+                          fractionDigits: 2,
                         }),
+                        total_renewable: formatNumber(
+                          result?.data?.total_quantity_renewable ?? 0,
+                          {
+                            fractionDigits: 2,
+                          }
+                        ),
                       }
                     )}
                   />

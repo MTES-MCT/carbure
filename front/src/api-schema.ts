@@ -5169,6 +5169,7 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["ElecProvisionCertificateQualichargeResponse"][];
             total_quantity?: number;
+            total_quantity_renewable?: number;
         };
         PaginatedElecTransferCertificateList: {
             /** @example 123 */
@@ -5377,7 +5378,7 @@ export interface components {
         ProvisionCertificateUpdateBulkRequest: {
             certificate_ids?: number[];
             validated_by: components["schemas"]["ElecQualichargeStatusEnum"];
-            cpo?: number[];
+            cpo?: string[];
             status?: components["schemas"]["ElecQualichargeStatusEnum"][];
             operating_unit?: string[];
             station_id?: string[];

@@ -20,19 +20,22 @@ from .mixins import ActionMixin
 
 
 class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination):
-    aggregate_fields = {"total_quantity": 0}
+    aggregate_fields = {"total_quantity": 0, "total_quantity_renewable": 0}
 
     def get_extra_metadata(self):
-        metadata = {"total_quantity": 0}
+        metadata = {"total_quantity": 0, "total_quantity_renewable": 0}
 
         for qualichargeData in self.queryset:
             # Handle both model instances and dict
-            energy = (
-                qualichargeData["renewable_energy"]
-                if isinstance(qualichargeData, dict)
-                else qualichargeData.renewable_energy
-            )
+            if isinstance(qualichargeData, dict):
+                renewable_energy = qualichargeData.get("renewable_energy", 0)
+                energy = qualichargeData.get("energy_amount", 0)
+            else:
+                renewable_energy = qualichargeData.renewable_energy
+                energy = qualichargeData.energy_amount
+
             metadata["total_quantity"] += energy
+            metadata["total_quantity_renewable"] += renewable_energy
         return metadata
 
 
