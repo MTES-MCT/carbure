@@ -646,7 +646,7 @@ class ElecMeterReadingsTest(TestCase):
                 "applications": [
                     {
                         "application_date": mock.ANY,
-                        "charge_point_count": 2,
+                        "charge_point_count": 1,
                         "cpo": {
                             "entity_type": "Charge Point Operator",
                             "id": self.cpo.id,
