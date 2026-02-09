@@ -83,7 +83,7 @@ class BiomethaneDigestate(models.Model):
     def all_optional_fields(self):
         from biomethane.services import BiomethaneDigestateService
 
-        return BiomethaneDigestateService.get_all_optional_fields(self)
+        return BiomethaneDigestateService.get_all_optional_fields()
 
 
 @receiver(post_save, sender=BiomethaneDigestate)
