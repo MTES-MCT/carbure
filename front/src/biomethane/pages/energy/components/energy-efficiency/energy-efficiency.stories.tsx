@@ -25,6 +25,7 @@ const meta: Meta<typeof EnergyEfficiency> = {
           ...mswHandlers,
         ],
       },
+      mockingDate: new Date(2026, 1, 1),
     },
   }),
   decorators: [
@@ -88,4 +89,11 @@ export const WithErrorsNot2023Tariff: Story = {
     contract: { ...contractData, tariff_reference: TariffReference.Value2021 },
   },
   play: WithErrors2023Tariff.play,
+}
+
+export const WithDeclarationNotInCurrentPeriod: Story = {
+  args: With2023Tariff.args,
+  parameters: {
+    mockingDate: new Date(2027, 1, 1),
+  },
 }

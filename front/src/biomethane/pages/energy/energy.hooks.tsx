@@ -34,11 +34,7 @@ export const useSaveEnergy = () => {
 export const useDisplayConditionalSectionsEnergy = () => {
   const { isDeclarationInCurrentPeriod, annualDeclaration } =
     useAnnualDeclaration()
-  console.log(
-    "isDeclarationInCurrentPeriod",
-    isDeclarationInCurrentPeriod,
-    annualDeclaration
-  )
+
   return useMemo(() => {
     // If the declaration year selected is not the current year and the declaration is open, we don't display the conditional sections
     if (!isDeclarationInCurrentPeriod && annualDeclaration?.is_open)
