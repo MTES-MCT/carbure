@@ -1966,22 +1966,6 @@ paths:
       description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
-          name: category
-          schema:
-            type: string
-            enum:
-              - CIVE
-              - IAA_WASTE_RESIDUES
-              - INTERMEDIATE_CROPS
-              - LIVESTOCK_EFFLUENTS
-              - PRIMARY_CROPS
-          description: |-
-            * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-            * `PRIMARY_CROPS` - Culture principale
-            * `INTERMEDIATE_CROPS` - Culture intermédiaire
-            * `CIVE` - CIVE
-            * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -2035,6 +2019,7 @@ paths:
           name: year
           schema:
             type: integer
+          description: Year of the supply plan.
           required: true
       tags:
         - biomethane
@@ -2072,6 +2057,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -2127,6 +2118,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       security:
@@ -2169,6 +2166,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -2223,6 +2226,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -2271,6 +2280,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       security:
@@ -2297,22 +2312,6 @@ paths:
         queryset.
       parameters:
         - in: query
-          name: category
-          schema:
-            type: string
-            enum:
-              - CIVE
-              - IAA_WASTE_RESIDUES
-              - INTERMEDIATE_CROPS
-              - LIVESTOCK_EFFLUENTS
-              - PRIMARY_CROPS
-          description: |-
-            * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-            * `PRIMARY_CROPS` - Culture principale
-            * `INTERMEDIATE_CROPS` - Culture intermédiaire
-            * `CIVE` - CIVE
-            * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -2323,7 +2322,6 @@ paths:
           schema:
             type: string
             enum:
-              - category
               - producer_id
               - source
               - type
@@ -2362,6 +2360,12 @@ paths:
           name: type
           schema:
             type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       security:
@@ -2378,7 +2382,6 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - category
                     - producer_id
                     - source
                     - type
@@ -2428,6 +2431,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       security:
@@ -2501,7 +2510,7 @@ paths:
                             - This field is required.
                       - row: 5
                         errors:
-                          input_type:
+                          input_name:
                             - Invalid input type.
                     total_errors: 2
                     total_rows_processed: 10
@@ -6908,6 +6917,44 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
+  /api/feedstocks/feedstocks/:
+    get:
+      operationId: feedstocks_feedstocks_list
+      parameters:
+        - in: query
+          name: is_biofuel_feedstock
+          schema:
+            type: boolean
+        - in: query
+          name: is_methanogenic
+          schema:
+            type: boolean
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - feedstocks
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feedstocks"
+          description: ""
   /api/nav-stats:
     get:
       operationId: nav_stats_retrieve
@@ -12971,15 +13018,13 @@ components:
           readOnly: true
         origin_country:
           $ref: "#/components/schemas/Country"
+        input_name:
+          type: string
+          readOnly: true
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
-        input_type:
-          type: string
-          maxLength: 100
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13006,8 +13051,7 @@ components:
       required:
         - crop_type
         - id
-        - input_category
-        - input_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -13023,10 +13067,10 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        input_name:
+          type: string
         origin_country:
           type: string
         dry_matter_ratio_percent:
@@ -13044,9 +13088,6 @@ components:
           type: number
           format: double
           nullable: true
-        input_type:
-          type: string
-          maxLength: 100
         origin_department:
           type: string
           nullable: true
@@ -13054,8 +13095,7 @@ components:
       required:
         - crop_type
         - id
-        - input_category
-        - input_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -13067,10 +13107,10 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        input_name:
+          type: string
         origin_country:
           type: string
           minLength: 1
@@ -13089,18 +13129,13 @@ components:
           type: number
           format: double
           nullable: true
-        input_type:
-          type: string
-          minLength: 1
-          maxLength: 100
         origin_department:
           type: string
           nullable: true
           maxLength: 3
       required:
         - crop_type
-        - input_category
-        - input_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -13118,11 +13153,6 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
-        input_type:
-          type: string
-          maxLength: 100
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13144,10 +13174,11 @@ components:
           type: number
           format: double
           nullable: true
+        input_name:
+          type: integer
+          nullable: true
       required:
         - crop_type
-        - input_category
-        - input_type
         - material_unit
         - origin_country
         - source
@@ -15788,6 +15819,17 @@ components:
         - code
         - name
         - name_en
+    Feedstocks:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 256
+      required:
+        - id
     FieldData:
       type: object
       properties:
@@ -15999,20 +16041,6 @@ components:
 
         * `DECLARATION_PERIODIC_CONTROLS` - Déclaration (avec contrôles
         périodiques)
-    InputCategoryEnum:
-      enum:
-        - LIVESTOCK_EFFLUENTS
-        - PRIMARY_CROPS
-        - INTERMEDIATE_CROPS
-        - CIVE
-        - IAA_WASTE_RESIDUES
-      type: string
-      description: |-
-        * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-        * `PRIMARY_CROPS` - Culture principale
-        * `INTERMEDIATE_CROPS` - Culture intermédiaire
-        * `CIVE` - CIVE
-        * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
     InstallationCategoryEnum:
       enum:
         - INSTALLATION_CATEGORY_1
@@ -17109,10 +17137,10 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        input_name:
+          type: string
         origin_country:
           type: string
           minLength: 1
@@ -17131,10 +17159,6 @@ components:
           type: number
           format: double
           nullable: true
-        input_type:
-          type: string
-          minLength: 1
-          maxLength: 100
         origin_department:
           type: string
           nullable: true

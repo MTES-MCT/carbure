@@ -61,7 +61,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             "crop_type": "MAIN",
             "volume": 500.0,
             "input_category": "CIVE",
-            "input_type": "Maïs",
+            "input_name": "Maïs",
             "material_unit": "WET",
         }
 
@@ -81,7 +81,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         """Test successful update of a supply input."""
         update_data = {
             "volume": 750.0,
-            "input_type": "Résidus",
+            "input_name": "Résidus",
         }
 
         response = self.client.patch(

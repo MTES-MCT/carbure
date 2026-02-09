@@ -4,10 +4,12 @@ from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
 from core.models import Pays
 from core.serializers import CountrySerializer
+from feedstocks.models import Feedstock
 
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
+    input_name = serializers.SlugRelatedField(slug_field="name", read_only=True)
 
     class Meta:
         model = BiomethaneSupplyInput
@@ -18,9 +20,9 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     # Use custom choice fields that accept both values and labels
     source = LabelChoiceField(choices=BiomethaneSupplyInput.SOURCE_CHOICES)
     crop_type = LabelChoiceField(choices=BiomethaneSupplyInput.CROP_TYPE_CHOICES)
-    input_category = LabelChoiceField(choices=BiomethaneSupplyInput.INPUT_CATEGORY_CHOICES)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
 
+    input_name = serializers.SlugRelatedField(slug_field="name", queryset=Feedstock.objects.all())
     origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
 
     # Use European float fields for numeric values
