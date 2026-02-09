@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from core.tests_utils import setup_current_user
@@ -96,3 +96,15 @@ class AirportTest(TestCase):
         self.assertCountEqual(data, ["Aéroport Paris"])
         data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.BARGE, has_intermediary_depot=True)
         self.assertCountEqual(data, ["Aéroport Paris"])
+
+    @override_settings(ENABLE_SAF_LOGISTICS=False)
+    def test_disable_airport_logistics_filtering_with_feature_flag(self):
+        SafLogisticsFactory.create(
+            origin_depot=self.depot_a,
+            destination_airport=self.airport_a,
+            shipping_method=SafLogistics.TRAIN,
+            has_intermediary_depot=False,
+        )
+
+        data = self.get_airports(origin_depot=self.depot_a, shipping_method=SafLogistics.TRAIN, has_intermediary_depot=False)
+        self.assertCountEqual(data, ["Aéroport Paris", "Aéroport Marseille"])

@@ -46,6 +46,7 @@ env = environ.Env(
     WITH_SENTRY=(bool, False),
     WITH_UDB_ACCEPTANCE_DATA=(bool, False),
     ELEC_READJUSTMENT_ENTITY=(str, ""),
+    ENABLE_SAF_LOGISTICS=(bool, True),
 )
 
 # ensure a `BASE_URL` env var is present before starting
@@ -494,3 +495,6 @@ WITH_SENTRY = env("WITH_SENTRY")
 WITH_UDB_ACCEPTANCE_DATA = env("WITH_UDB_ACCEPTANCE_DATA")
 # this env var will hold the name of the entity CPOs will send their readjustement certificates to
 ELEC_READJUSTMENT_ENTITY = env("ELEC_READJUSTMENT_ENTITY")
+
+# having this var = True enables features related to SAF logistics (autocomplete & validation)
+ENABLE_SAF_LOGISTICS = env("ENABLE_SAF_LOGISTICS")
