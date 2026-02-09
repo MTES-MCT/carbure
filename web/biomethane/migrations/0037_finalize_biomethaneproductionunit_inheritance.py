@@ -11,44 +11,64 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="city",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="company_address",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="id",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="postal_code",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="producer",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="siret_number",
-        ),
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="unit_name",
-        ),
-        migrations.AlterField(
-            model_name="biomethaneproductionunit",
-            name="site_ptr",
-            field=models.OneToOneField(
-                auto_created=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                parent_link=True,
-                primary_key=True,
-                serialize=False,
-                to="transactions.site",
-            ),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                # Forward: Make site_ptr NOT NULL and PRIMARY KEY, drop old id
+                migrations.RunSQL(
+                    sql=[
+                        "ALTER TABLE biomethane_production_unit MODIFY COLUMN site_ptr_id bigint NOT NULL;",
+                        "ALTER TABLE biomethane_production_unit DROP PRIMARY KEY, ADD PRIMARY KEY (site_ptr_id);",
+                        "ALTER TABLE biomethane_production_unit DROP COLUMN id;",
+                    ],
+                    reverse_sql=[
+                        # Reverse: Drop site_ptr PRIMARY KEY, recreate id as PRIMARY KEY, then make site_ptr nullable
+                        "ALTER TABLE biomethane_production_unit DROP PRIMARY KEY;",
+                        "ALTER TABLE biomethane_production_unit ADD COLUMN id bigint AUTO_INCREMENT PRIMARY KEY FIRST;",
+                        "ALTER TABLE biomethane_production_unit MODIFY COLUMN site_ptr_id bigint NULL;",
+                    ],
+                ),
+            ],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="city",
+                ),
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="company_address",
+                ),
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="id",
+                ),
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="postal_code",
+                ),
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="producer",
+                ),
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="siret_number",
+                ),
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="unit_name",
+                ),
+                migrations.AlterField(
+                    model_name="biomethaneproductionunit",
+                    name="site_ptr",
+                    field=models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="transactions.site",
+                    ),
+                ),
+            ],
         ),
     ]
