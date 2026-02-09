@@ -9,6 +9,7 @@ import xlsxwriter
 
 from biomethane.models import BiomethaneSupplyInput
 from core.models import Department, Pays
+from feedstocks.models.feedstock import Feedstock
 
 
 def create_supply_plan_template() -> BufferedReader:
@@ -20,6 +21,7 @@ def create_supply_plan_template() -> BufferedReader:
     - Reference sheets for dropdown lists:
         - Departements (from model)
         - Pays (from model)
+        - Intrants (from model)
 
     Returns:
         BufferedReader: Excel file ready to be downloaded
@@ -35,27 +37,29 @@ def create_supply_plan_template() -> BufferedReader:
     eu_countries = list(Pays.objects.filter(is_in_europe=True).order_by("name"))
     # Get departments from database
     departments = list(Department.objects.all().order_by("code_dept"))
+    # Get intrants from database
+    inputs = list(Feedstock.objects.all().order_by("name"))
 
     # Create main sheet
-    _create_main_sheet(workbook, header_format, eu_countries, departments)
+    _create_main_sheet(workbook, header_format, eu_countries, departments, inputs)
 
     # Create reference sheets
     _create_departments_sheet(workbook, bold, departments)
     _create_countries_sheet(workbook, bold, eu_countries)
+    _create_inputs_sheet(workbook, bold, inputs)
 
     workbook.close()
     return open(location, "rb")
 
 
-def _create_main_sheet(workbook, header_format, countries, departments):
+def _create_main_sheet(workbook, header_format, countries, departments, inputs):
     """Create the main sheet with data validation."""
     sheet = workbook.add_worksheet("Plan d'approvisionnement")
 
     # Column headers
     headers = [
         ("Provenance", "source"),
-        ("Catégorie", "input_category"),
-        ("Intrant", "input_type"),
+        ("Intrant", "input_name"),
         ("Type de culture", "crop_type"),
         ("Unité", "material_unit"),
         ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
@@ -77,7 +81,7 @@ def _create_main_sheet(workbook, header_format, countries, departments):
     _add_country_formulas(sheet, countries)
 
     # Add all data validations
-    _add_dropdown_validations(sheet, countries, departments)
+    _add_dropdown_validations(sheet, countries, departments, inputs)
     _add_numeric_validations(sheet)
 
     # Protect sheet and format columns
@@ -100,7 +104,7 @@ def _add_country_formulas(sheet, countries):
         sheet.write_formula(row, 10, formula)  # column K (0-indexed = 10)
 
 
-def _add_dropdown_validations(sheet, countries, departments):
+def _add_dropdown_validations(sheet, countries, departments, inputs):
     """Add dropdown list validations to the main sheet."""
     # Provenance (column A)
     provenance_labels = [label for _, label in BiomethaneSupplyInput.SOURCE_CHOICES]
@@ -109,47 +113,47 @@ def _add_dropdown_validations(sheet, countries, departments):
         {"validate": "list", "source": provenance_labels},
     )
 
-    # Catégorie (column B)
-    category_labels = [label for _, label in BiomethaneSupplyInput.INPUT_CATEGORY_CHOICES]
+    # Intrant (column B) - using reference sheet
+    inputs_count = len(inputs)
     sheet.data_validation(
         "B3:B1000",
-        {"validate": "list", "source": category_labels},
+        {"validate": "list", "source": f"=Intrants!$A$2:$A${inputs_count + 1}"},
     )
 
-    # Type de culture (column D)
+    # Type de culture (column C)
     crop_type_labels = [label for _, label in BiomethaneSupplyInput.CROP_TYPE_CHOICES]
     sheet.data_validation(
-        "D3:D1000",
+        "C3:C1000",
         {"validate": "list", "source": crop_type_labels},
     )
 
-    # Unité (column E)
+    # Unité (column D)
     unit_labels = [label for _, label in BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES]
     sheet.data_validation(
-        "E3:E1000",
+        "D3:D1000",
         {"validate": "list", "source": unit_labels},
     )
 
-    # Département (column H) - using reference sheet
+    # Département (column G) - using reference sheet
     dept_count = len(departments)
     sheet.data_validation(
-        "H3:H1000",
+        "G3:G1000",
         {"validate": "list", "source": f"=Departements!$B$2:$B${dept_count + 1}"},
     )
 
-    # Pays d'origine (column K) - using reference sheet
+    # Pays d'origine (column J) - using reference sheet
     countries_count = len(countries)
     sheet.data_validation(
-        "K2:K1000",
+        "J2:J1000",
         {"validate": "list", "source": f"=Pays!$B$2:$B${countries_count + 1}"},
     )
 
 
 def _add_numeric_validations(sheet):
     """Add numeric validations with error messages to the main sheet."""
-    # Ratio de matière sèche (column F) - must be a number between 0 and 100
+    # Ratio de matière sèche (column E) - must be a number between 0 and 100
     sheet.data_validation(
-        "F3:F1000",
+        "E3:E1000",
         {
             "validate": "decimal",
             "criteria": "between",
@@ -160,9 +164,9 @@ def _add_numeric_validations(sheet):
         },
     )
 
-    # Volume (column G) - must be a positive number
+    # Volume (column F) - must be a positive number
     sheet.data_validation(
-        "G3:G1000",
+        "F3:F1000",
         {
             "validate": "decimal",
             "criteria": ">=",
@@ -172,9 +176,9 @@ def _add_numeric_validations(sheet):
         },
     )
 
-    # Distance moyenne pondérée (column I) - must be a positive number
+    # Distance moyenne pondérée (column H) - must be a positive number
     sheet.data_validation(
-        "I3:I1000",
+        "H3:H1000",
         {
             "validate": "decimal",
             "criteria": ">=",
@@ -184,9 +188,9 @@ def _add_numeric_validations(sheet):
         },
     )
 
-    # Distance maximale (column J) - must be a positive number
+    # Distance maximale (column I) - must be a positive number
     sheet.data_validation(
-        "J3:J1000",
+        "I3:I1000",
         {
             "validate": "decimal",
             "criteria": ">=",
@@ -223,13 +227,13 @@ def _protect_and_format_sheet(workbook, sheet):
 
     # Apply formats to columns
     for col in range(11):  # 11 columns (A to K)
-        if col == 5:  # Column F: Ratio de matière sèche (%)
+        if col == 4:  # Column E: Ratio de matière sèche (%)
             sheet.set_column(col, col, 25, unlocked_decimal_number)
-        elif col == 6:  # Column G: Volume (tMB ou tMS)
+        elif col == 5:  # Column F: Volume (tMB ou tMS)
             sheet.set_column(col, col, 25, unlocked_decimal_number)
-        elif col == 8:  # Column I: Distance moyenne pondérée (km)
+        elif col == 7:  # Column H: Distance moyenne pondérée (km)
             sheet.set_column(col, col, 25, unlocked_number)
-        elif col == 9:  # Column J: Distance maximale (km)
+        elif col == 8:  # Column I: Distance maximale (km)
             sheet.set_column(col, col, 25, unlocked_number)
         else:
             sheet.set_column(col, col, 25, unlocked)
@@ -258,6 +262,18 @@ def _create_countries_sheet(workbook, bold, countries):
     for row, country in enumerate(countries, start=1):
         sheet.write(row, 0, country.code_pays)
         sheet.write(row, 1, country.name)
+
+    sheet.hide()
+    sheet.protect()
+
+
+def _create_inputs_sheet(workbook, bold, feedstocks):
+    """Create the Intrants reference sheet."""
+    sheet = workbook.add_worksheet("Intrants")
+    sheet.write(0, 0, "Nom", bold)
+
+    for row, input in enumerate(feedstocks, start=1):
+        sheet.write(row, 0, input.name)
 
     sheet.hide()
     sheet.protect()
