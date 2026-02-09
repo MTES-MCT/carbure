@@ -19,12 +19,17 @@
   gap: var(--spacing-3w);
 }
 
+.main {
+  height: 100%;
+}
+
 .content {
   margin-top: calc(var(--spacing-3w) * -1);
   margin-left: calc(var(--spacing-3w) * -1);
   margin-right: calc(var(--spacing-3w) * -1);
   padding: var(--spacing-3w);
   background-color: white;
+  flex: 1;
 }
 
 .content--margin-top {

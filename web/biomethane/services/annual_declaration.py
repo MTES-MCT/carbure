@@ -83,12 +83,13 @@ class BiomethaneAnnualDeclarationService:
         energy = BiomethaneEnergy.objects.filter(producer=declaration.producer, year=declaration.year).first()
         supply_plan = BiomethaneSupplyPlan.objects.filter(producer=declaration.producer, year=declaration.year).first()
         is_current_declaration = declaration.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
+
+        digestate_missing_fields = (
+            BiomethaneAnnualDeclarationService._get_missing_fields(digestate, is_current_declaration) if digestate else None
+        )
         return {
-            "digestate_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(
-                digestate, is_current_declaration
-            )
-            if digestate
-            else None,
+            # If the declaration is not the current year, there is no fields to fill for digestate
+            "digestate_missing_fields": digestate_missing_fields if is_current_declaration else [],
             "energy_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(energy, is_current_declaration)
             if energy
             else None,

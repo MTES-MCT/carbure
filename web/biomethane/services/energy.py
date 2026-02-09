@@ -129,11 +129,21 @@ class BiomethaneEnergyService:
     @staticmethod
     def get_all_optional_fields():
         """
-        Return the list of all optional fields for energy instances.
+        Return the list of all optional fields for energy instance.
         """
         rules = _build_energy_rules()
+        fields = [field for rule in rules for field in rule.fields]
 
-        return [field for rule in rules for field in rule.fields]
+        # These fields are not included in the rules, but they are related to other models for calculation purposes
+        extra_fields = [
+            "injected_biomethane_gwh_pcs_per_year",
+            "injected_biomethane_ch4_rate_percent",
+            "injected_biomethane_pcs_kwh_per_nm3",
+            "energy_types",
+            "fossil_fuel_consumed_kwh",
+        ]
+
+        return fields + extra_fields
 
     @staticmethod
     def get_fields_to_clear(instance):
