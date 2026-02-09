@@ -3525,6 +3525,7 @@ export interface components {
             installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
+            digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
             unit_name?: string | null;
             siret_number?: string | null;
@@ -3549,13 +3550,13 @@ export interface components {
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
-            digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
             producer: number;
         };
         BiomethaneProductionUnitUpsertRequest: {
             installed_meters?: components["schemas"]["InstalledMetersEnum"][];
             digestate_valorization_methods?: components["schemas"]["DigestateValorizationMethodsEnum"][];
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
+            digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
             unit_name?: string | null;
             siret_number?: string | null;
@@ -3580,7 +3581,6 @@ export interface components {
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
-            digestate_sale_type?: components["schemas"]["DigestateSaleTypeEnum"] | null;
         };
         BiomethaneSupplyInput: {
             readonly id: number;
@@ -4013,12 +4013,14 @@ export interface components {
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
         /**
-         * @description * `DIG_AGRI_SPECIFICATIONS` - Cahier de charges DIG Agri
-         *     * `HOMOLOGATION` - Homologation
-         *     * `STANDARDIZED_PRODUCT` - Produit normé
+         * @description * `SPREADING_PLAN_ICPE` - Plan d'épandage (ICPE)
+         *     * `AMM` - Autorisation de mise sur le marché (AMM)
+         *     * `MANDATORY_STANDARD` - Norme rendue d'application obligatoire
+         *     * `EU_FERTILIZER_REGULATION` - Règlement européen sur les fertilisants
+         *     * `CDC_DIG` - Cahier des Charges CDC Dig
          * @enum {string}
          */
-        DigestateSaleTypeEnum: DigestateSaleTypeEnum;
+        DigestateSaleTypesEnum: DigestateSaleTypesEnum;
         /**
          * @description * `SPREADING` - Épandage
          *     * `COMPOSTING` - Compostage
@@ -13560,10 +13562,12 @@ export enum DeliveryTypeEnum {
     FLUSHED = "FLUSHED",
     CONSUMPTION = "CONSUMPTION"
 }
-export enum DigestateSaleTypeEnum {
-    DIG_AGRI_SPECIFICATIONS = "DIG_AGRI_SPECIFICATIONS",
-    HOMOLOGATION = "HOMOLOGATION",
-    STANDARDIZED_PRODUCT = "STANDARDIZED_PRODUCT"
+export enum DigestateSaleTypesEnum {
+    SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE",
+    AMM = "AMM",
+    MANDATORY_STANDARD = "MANDATORY_STANDARD",
+    EU_FERTILIZER_REGULATION = "EU_FERTILIZER_REGULATION",
+    CDC_DIG = "CDC_DIG"
 }
 export enum DigestateValorizationMethodsEnum {
     SPREADING = "SPREADING",
