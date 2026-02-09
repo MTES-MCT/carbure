@@ -24,7 +24,7 @@ with open(filename) as csvfile:
         city = row[3]
         coordinates = f"{row[4]},{row[5]}"
         is_eu_airport = row[6]
-        obj, created = Airport.objects.update_or_create(
+        obj, created = Airport.objects.get_or_create(
             icao_code=icao,
             defaults={
                 "name": name,
