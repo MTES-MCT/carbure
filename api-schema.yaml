@@ -12774,6 +12774,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+        digestate_sale_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateSaleTypesEnum"
         department:
           type: string
         unit_name:
@@ -12854,10 +12858,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_sale_type:
-          allOf:
-            - $ref: "#/components/schemas/DigestateSaleTypeEnum"
-          nullable: true
         producer:
           type: integer
       required:
@@ -12878,6 +12878,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+        digestate_sale_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateSaleTypesEnum"
         department:
           type: string
           minLength: 1
@@ -12959,10 +12963,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_sale_type:
-          allOf:
-            - $ref: "#/components/schemas/DigestateSaleTypeEnum"
-          nullable: true
     BiomethaneSupplyInput:
       type: object
       properties:
@@ -13987,16 +13987,20 @@ components:
         - country
         - id
         - name
-    DigestateSaleTypeEnum:
+    DigestateSaleTypesEnum:
       enum:
-        - DIG_AGRI_SPECIFICATIONS
-        - HOMOLOGATION
-        - STANDARDIZED_PRODUCT
+        - SPREADING_PLAN_ICPE
+        - AMM
+        - MANDATORY_STANDARD
+        - EU_FERTILIZER_REGULATION
+        - CDC_DIG
       type: string
       description: |-
-        * `DIG_AGRI_SPECIFICATIONS` - Cahier de charges DIG Agri
-        * `HOMOLOGATION` - Homologation
-        * `STANDARDIZED_PRODUCT` - Produit normé
+        * `SPREADING_PLAN_ICPE` - Plan d'épandage (ICPE)
+        * `AMM` - Autorisation de mise sur le marché (AMM)
+        * `MANDATORY_STANDARD` - Norme rendue d'application obligatoire
+        * `EU_FERTILIZER_REGULATION` - Règlement européen sur les fertilisants
+        * `CDC_DIG` - Cahier des Charges CDC Dig
     DigestateValorizationMethodsEnum:
       enum:
         - SPREADING

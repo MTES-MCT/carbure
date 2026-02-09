@@ -9,18 +9,18 @@ import { DeepPartial } from "common/types"
 import {
   BiomethaneProductionUnit,
   BiomethaneProductionUnitPatchRequest,
-  DigestateSaleType,
+  DigestateValorizationMethods,
+  SpreadingManagementMethods,
+  DigestateSaleTypes,
 } from "../types"
-import {
-  DigestateValorizationMethodsEnum as DigestateValorizationMethods,
-  SpreadingManagementMethodsEnum as SpreadingManagementMethods,
-} from "api-schema"
+
 import { useSaveProductionUnit } from "../production.hooks"
 
 type DigestateProcessingForm =
   DeepPartial<BiomethaneProductionUnitPatchRequest> & {
     digestate_valorization_methods?: DigestateValorizationMethods[]
     spreading_management_methods?: SpreadingManagementMethods[]
+    digestate_sale_types?: DigestateSaleTypes[]
   }
 
 export function DigestateProcessing({
@@ -40,7 +40,7 @@ export function DigestateProcessing({
     digestate_valorization_methods:
       productionUnit?.digestate_valorization_methods,
     spreading_management_methods: productionUnit?.spreading_management_methods,
-    digestate_sale_type: productionUnit?.digestate_sale_type,
+    digestate_sale_types: productionUnit?.digestate_sale_types,
   })
 
   const { execute: saveProductionUnit, loading } =
@@ -57,7 +57,7 @@ export function DigestateProcessing({
     },
     {
       value: DigestateValorizationMethods.INCINERATION_LANDFILLING,
-      label: t("Incinération / Enfouissement"),
+      label: t("Incinération / Enfouissement en centre de stockage"),
     },
   ]
 
@@ -72,7 +72,7 @@ export function DigestateProcessing({
     },
     {
       value: SpreadingManagementMethods.TRANSFER,
-      label: t("Cession"),
+      label: t("Cession gratuite"),
     },
     {
       value: SpreadingManagementMethods.SALE,
@@ -80,18 +80,26 @@ export function DigestateProcessing({
     },
   ]
 
-  const digestateSaleTypeOptions = [
+  const digestateSaleTypesOptions = [
     {
-      value: DigestateSaleType.DIG_AGRI_SPECIFICATIONS,
-      label: t("Cahier de charges DIG Agri"),
+      value: DigestateSaleTypes.SPREADING_PLAN_ICPE,
+      label: t("Plan d'épandage (ICPE)"),
     },
     {
-      value: DigestateSaleType.HOMOLOGATION,
-      label: t("Homologation"),
+      value: DigestateSaleTypes.AMM,
+      label: t("Autorisation de mise sur le marché (AMM)"),
     },
     {
-      value: DigestateSaleType.STANDARDIZED_PRODUCT,
-      label: t("Produit normé"),
+      value: DigestateSaleTypes.MANDATORY_STANDARD,
+      label: t("Norme rendue d'application obligatoire"),
+    },
+    {
+      value: DigestateSaleTypes.EU_FERTILIZER_REGULATION,
+      label: t("Règlement européen sur les fertilisants"),
+    },
+    {
+      value: DigestateSaleTypes.CDC_DIG,
+      label: t("Cahier des Charges CDC Dig"),
     },
   ]
 
@@ -147,25 +155,22 @@ export function DigestateProcessing({
             {value.digestate_valorization_methods?.includes(
               DigestateValorizationMethods.SPREADING
             ) && (
-              <CheckboxGroup
-                required
-                readOnly={!isEditing}
-                label={t("Gestion de l'épandage")}
-                options={spreadingManagementOptions}
-                {...bind("spreading_management_methods")}
-              />
-            )}
-
-            {value.spreading_management_methods?.includes(
-              SpreadingManagementMethods.SALE
-            ) && (
-              <RadioGroup
-                required
-                readOnly={!isEditing}
-                label={t("En cas de vente du digestat")}
-                options={digestateSaleTypeOptions}
-                {...bind("digestate_sale_type")}
-              />
+              <>
+                <CheckboxGroup
+                  required
+                  readOnly={!isEditing}
+                  label={t("Gestion de l'épandage")}
+                  options={spreadingManagementOptions}
+                  {...bind("spreading_management_methods")}
+                />
+                <CheckboxGroup
+                  required
+                  readOnly={!isEditing}
+                  label={t("Sous quel(s) statut(s) est valorisé le digestat")}
+                  options={digestateSaleTypesOptions}
+                  {...bind("digestate_sale_types")}
+                />
+              </>
             )}
           </Grid>
           {isEditing && (
