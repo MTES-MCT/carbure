@@ -8,7 +8,7 @@ import {
   SpreadingManagementMethods,
 } from "../production/types"
 import { Spreading } from "./components/spreading"
-import { LoaderOverlay } from "common/components/scaffold"
+import { ContainerFluid, LoaderOverlay } from "common/components/scaffold"
 import { Composting } from "./components/composting"
 import { IncinerationLandfill } from "./components/incineration-landfill"
 import { Sale } from "./components/sale"
@@ -24,11 +24,14 @@ import { FormContext, useForm } from "common/components/form2"
 import { BiomethaneDigestate } from "./types"
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useMemo } from "react"
+import { Title } from "common/components/title"
 
 const DigestatePage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { selectedYear } = useAnnualDeclaration()
+  const { selectedYear, isDeclarationInCurrentPeriod, annualDeclaration } =
+    useAnnualDeclaration()
   const form = useForm<BiomethaneDigestate | undefined | object>(undefined)
   const { selectedEntityId } = useSelectedEntity()
 
@@ -46,6 +49,16 @@ const DigestatePage = () => {
   const { contractInfos: contract, productionUnit } =
     useContractProductionUnit()
 
+  const displayConditionalSections = useMemo(() => {
+    if (!productionUnit) return false
+
+    // If the declaration year selected is not the current year and the declaration is not open, we don't display the conditional sections
+    if (!isDeclarationInCurrentPeriod && annualDeclaration?.is_open)
+      return false
+
+    return true
+  }, [productionUnit, isDeclarationInCurrentPeriod, annualDeclaration?.is_open])
+
   usePrivateNavigation(t("Digestat"))
   useMissingFields(form)
 
@@ -54,28 +67,44 @@ const DigestatePage = () => {
   return (
     <FormContext.Provider value={form}>
       <MissingFields />
-      {productionUnit && <Production productionUnit={productionUnit} />}
-
-      {productionUnit?.digestate_valorization_methods?.includes(
-        DigestateValorizationMethods.SPREADING
-      ) && (
+      {displayConditionalSections && (
         <>
-          <SpreadingDistance />
-          <Spreading digestate={digestate?.data} />
+          {productionUnit && <Production productionUnit={productionUnit} />}
+
+          {productionUnit?.digestate_valorization_methods?.includes(
+            DigestateValorizationMethods.SPREADING
+          ) && (
+            <>
+              <SpreadingDistance />
+              <Spreading digestate={digestate?.data} />
+            </>
+          )}
+
+          {productionUnit?.digestate_valorization_methods?.includes(
+            DigestateValorizationMethods.COMPOSTING
+          ) && <Composting />}
+
+          {productionUnit?.digestate_valorization_methods?.includes(
+            DigestateValorizationMethods.INCINERATION_LANDFILLING
+          ) && <IncinerationLandfill contract={contract} />}
+
+          {productionUnit?.spreading_management_methods?.includes(
+            SpreadingManagementMethods.SALE
+          ) && <Sale />}
         </>
       )}
-
-      {productionUnit?.digestate_valorization_methods?.includes(
-        DigestateValorizationMethods.COMPOSTING
-      ) && <Composting />}
-
-      {productionUnit?.digestate_valorization_methods?.includes(
-        DigestateValorizationMethods.INCINERATION_LANDFILLING
-      ) && <IncinerationLandfill contract={contract} />}
-
-      {productionUnit?.spreading_management_methods?.includes(
-        SpreadingManagementMethods.SALE
-      ) && <Sale />}
+      {!isDeclarationInCurrentPeriod && annualDeclaration?.is_open ? (
+        <ContainerFluid>
+          <Title is="h2" as="h5">
+            {t(
+              "Aucune donnée n'est à renseigner pour l'année {{year}} sur la page Digestat.",
+              {
+                year: selectedYear,
+              }
+            )}
+          </Title>
+        </ContainerFluid>
+      ) : null}
     </FormContext.Provider>
   )
 }
