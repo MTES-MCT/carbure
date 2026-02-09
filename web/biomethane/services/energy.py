@@ -73,6 +73,9 @@ class BiomethaneEnergyService:
 
     ENERGY_DETAILS_FIELD = ["energy_details"]
 
+    # Fields not included in the rules, but they are related to other models for calculation purposes
+    EXTRA_OPTIONAL_FIELDS = ["energy_types"]
+
     @staticmethod
     def _extract_data(instance) -> EnergyContext:
         """Extract data from an energy instance and return structured context."""
@@ -134,16 +137,7 @@ class BiomethaneEnergyService:
         rules = _build_energy_rules()
         fields = [field for rule in rules for field in rule.fields]
 
-        # These fields are not included in the rules, but they are related to other models for calculation purposes
-        extra_fields = [
-            "injected_biomethane_gwh_pcs_per_year",
-            "injected_biomethane_ch4_rate_percent",
-            "injected_biomethane_pcs_kwh_per_nm3",
-            "energy_types",
-            "fossil_fuel_consumed_kwh",
-        ]
-
-        return fields + extra_fields
+        return fields + BiomethaneEnergyService.EXTRA_OPTIONAL_FIELDS
 
     @staticmethod
     def get_fields_to_clear(instance):
