@@ -11,7 +11,7 @@ import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
 import { ExternalAdminPages } from "common/types"
 import { useTranslation } from "react-i18next"
-import { CONVERSIONS, formatDate, formatNumber } from "common/utils/formatters"
+import { formatDate, formatNumber } from "common/utils/formatters"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { Text } from "common/components/text"
 import { Button } from "common/components/button2"
@@ -72,14 +72,9 @@ export const ValidateAllDataDialog = ({
       cell: (data) => <Cell text={formatDate(data.date_to)} />,
     },
     {
-      header: t("Energie (kWh)"),
+      header: t("Energie (MWh)"),
       cell: (data) => (
-        <Cell
-          text={formatNumber(
-            CONVERSIONS.energy.MWH_TO_KWH(data.energy_amount),
-            { fractionDigits: 2 }
-          )}
-        />
+        <Cell text={formatNumber(data.energy_amount, { fractionDigits: 2 })} />
       ),
     },
   ])
@@ -111,7 +106,7 @@ export const ValidateAllDataDialog = ({
           {
             count: result?.data?.count,
             total: formatNumber(result?.data?.total_quantity ?? 0, {
-              fractionDigits: 2,
+              fractionDigits: 0,
             }),
             total_renewable: formatNumber(
               result?.data?.total_quantity_renewable ?? 0,
