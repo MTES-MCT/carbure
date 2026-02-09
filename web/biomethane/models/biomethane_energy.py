@@ -183,7 +183,7 @@ class BiomethaneEnergy(models.Model):
     def all_optional_fields(self):
         from biomethane.services import BiomethaneEnergyService
 
-        return BiomethaneEnergyService.get_all_optional_fields(self)
+        return BiomethaneEnergyService.get_all_optional_fields()
 
 
 @receiver(post_save, sender=BiomethaneEnergy)
