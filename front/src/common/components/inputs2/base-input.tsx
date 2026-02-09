@@ -111,7 +111,7 @@ export const Label = ({
   // Add a tooltip if the input has one
   if (hasTooltip) {
     baseLabel = (
-      <Tooltip title={title}>
+      <Tooltip title={title} style={{ pointerEvents: "none" }}>
         {baseLabel}
         <InformationLine size="sm" style={{ marginLeft: "6px" }} />
       </Tooltip>

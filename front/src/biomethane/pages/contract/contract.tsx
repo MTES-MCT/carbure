@@ -7,9 +7,12 @@ import { LoaderOverlay } from "common/components/scaffold"
 import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
 import { getContractWatchedFields } from "./api"
 import { WatchedFieldsProvider } from "biomethane/providers/watched-fields"
+import { ContractAidOrganism } from "./components/contract-aid-organism"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const BiomethaneContractPage = () => {
   const { result: contractInfos, loading } = useGetContractInfos()
+  const { hasSelectedEntity } = useSelectedEntity()
 
   if (loading) return <LoaderOverlay />
 
@@ -18,22 +21,18 @@ export const BiomethaneContractPage = () => {
       apiFunction={getContractWatchedFields}
       queryKey="contract-watched-fields"
     >
-      <AnnualDeclarationAlert />
+      {!hasSelectedEntity && <AnnualDeclarationAlert />}
       {contractInfos && contractInfos.tracked_amendment_types.length > 0 && (
         <ErrorTrackedAmendmentTypes
           trackedAmendmentTypes={contractInfos.tracked_amendment_types}
         />
       )}
-      {/* 
-        Render ContractInfos component in two cases:
-          - When contract data is available (contractInfos exists)
-          - When no data is available AND loading is finished (!loading)
-      */}
       {(contractInfos || (!contractInfos && !loading)) && (
         <ContractInfos contract={contractInfos} />
       )}
       <ContractFiles contract={contractInfos} />
       <ContractAmendments contract={contractInfos} />
+      <ContractAidOrganism contract={contractInfos} />
     </WatchedFieldsProvider>
   )
 }

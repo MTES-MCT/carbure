@@ -453,15 +453,20 @@ paths:
                     status: success
                   summary: Example response.
           description: ""
-  /api/biomethane/admin/producers/:
+  /api/biomethane/admin/annual-declarations/:
     get:
-      operationId: biomethane_admin_producers_list
-      description: |-
-        List biomethane producers visible by the current DREAL entity.
-
-        Returns producers that have production units in departments
-        accessible by the DREAL.
+      operationId: biomethane_admin_annual_declarations_list
+      description: Liste des déclarations annuelles des producteurs de biométhane pour
+        l'année courante (vue DREAL).
       parameters:
+        - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: entity_id
           schema:
@@ -492,6 +497,39 @@ paths:
           description: A search term.
           schema:
             type: string
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - DECLARED
+                - IN_PROGRESS
+          description: |-
+            * `IN_PROGRESS` - IN_PROGRESS
+            * `DECLARED` - DECLARED
+          explode: true
+          style: form
+        - in: query
+          name: tariff_reference
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - "2011"
+                - "2020"
+                - "2021"
+                - "2023"
+          description: |-
+            * `2011` - 2011
+            * `2020` - 2020
+            * `2021` - 2021
+            * `2023` - 2023
+          explode: true
+          style: form
       tags:
         - biomethane
       security:
@@ -502,7 +540,144 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedBiomethaneProducerList"
+                $ref: "#/components/schemas/PaginatedBiomethaneAdminAnnualDeclarationList"
+          description: ""
+  /api/biomethane/admin/annual-declarations/filters/:
+    get:
+      operationId: biomethane_admin_annual_declarations_filters_retrieve
+      description: Liste des déclarations annuelles des producteurs de biométhane pour
+        l'année courante (vue DREAL).
+      parameters:
+        - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - department
+              - status
+              - tariff_reference
+          description: Filter string to apply
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - DECLARED
+                - IN_PROGRESS
+          description: |-
+            * `IN_PROGRESS` - IN_PROGRESS
+            * `DECLARED` - DECLARED
+          explode: true
+          style: form
+        - in: query
+          name: tariff_reference
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - "2011"
+                - "2020"
+                - "2021"
+                - "2023"
+          description: |-
+            * `2011` - 2011
+            * `2020` - 2020
+            * `2021` - 2021
+            * `2023` - 2023
+          explode: true
+          style: form
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - department
+                    - status
+                    - tariff_reference
+                  summary: Example of filters response.
+          description: ""
+  /api/biomethane/admin/producers/:
+    get:
+      operationId: biomethane_admin_producers_list
+      description: |-
+        List biomethane producers visible by the current DREAL entity.
+
+        Returns producers that have production units in departments
+        accessible by the DREAL.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BiomethaneProducer"
           description: ""
   /api/biomethane/annual-declaration/:
     get:
@@ -515,6 +690,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -538,10 +719,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
           description: Declaration created for the entity
-    patch:
-      operationId: biomethane_annual_declaration_partial_update
-      description: Partial update of the declaration for a producer and year (only
-        status field to IN_PROGRESS is allowed).
+    post:
+      operationId: biomethane_annual_declaration_create
+      description: >-
+        Mixin that provides get_object() method with filterset and permission
+        checks.
+
+
+        The ViewSet must have:
+
+        - filterset_class configured
+
+        - queryset defined
       parameters:
         - in: query
           name: entity_id
@@ -549,6 +738,57 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
+      tags:
+        - biomethane
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BiomethaneAnnualDeclarationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BiomethaneAnnualDeclarationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BiomethaneAnnualDeclarationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomethaneAnnualDeclaration"
+          description: ""
+    patch:
+      operationId: biomethane_annual_declaration_partial_update
+      description: Partial update of the declaration for a producer and year
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -598,6 +838,12 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
           name: year
           schema:
             type: integer
@@ -625,6 +871,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -664,6 +916,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -686,6 +944,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -856,6 +1120,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -881,6 +1151,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -909,6 +1185,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1203,6 +1485,12 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
           name: year
           schema:
             type: integer
@@ -1235,6 +1523,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1276,6 +1570,12 @@ paths:
           description: A unique integer value identifying this Données d'épandage du
             digestat.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -1295,6 +1595,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1324,6 +1630,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1461,6 +1773,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - in: query
           name: year
           schema:
@@ -1690,7 +2008,9 @@ paths:
         - in: query
           name: producer_id
           schema:
-            type: string
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - name: search
           required: false
           in: query
@@ -1746,6 +2066,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1795,6 +2121,12 @@ paths:
             type: integer
           description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -1831,6 +2163,12 @@ paths:
             type: integer
           description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1879,6 +2217,12 @@ paths:
             type: integer
           description: A unique integer value identifying this Intrant d'approvisionnement.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       requestBody:
@@ -1921,6 +2265,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -1989,7 +2339,9 @@ paths:
         - in: query
           name: producer_id
           schema:
-            type: string
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
         - name: search
           required: false
           in: query
@@ -2070,6 +2422,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
       tags:
         - biomethane
       security:
@@ -6578,15 +6936,50 @@ paths:
       operationId: resources_airports_list
       parameters:
         - in: query
+          name: has_intermediary_depot
+          schema:
+            type: boolean
+            nullable: true
+        - in: query
+          name: origin_depot_id
+          schema:
+            type: integer
+        - in: query
           name: public_only
           schema:
             type: boolean
-          description: Public Only
+            default: false
         - in: query
           name: query
           schema:
             type: string
-          description: Search within the fields `name`, `icao_code` and `city`
+        - in: query
+          name: shipping_method
+          schema:
+            enum:
+              - TRUCK
+              - BARGE
+              - TRAIN
+              - SHIP
+              - PIPELINE
+              - PIPELINE_DMM
+              - PIPELINE_LHP
+              - PIPELINE_ODC
+              - PIPELINE_SPMR
+              - PIPELINE_SPSE
+            type: string
+            minLength: 1
+          description: |-
+            * `TRUCK` - TRUCK
+            * `BARGE` - BARGE
+            * `TRAIN` - TRAIN
+            * `SHIP` - SHIP
+            * `PIPELINE` - PIPELINE
+            * `PIPELINE_DMM` - PIPELINE_DMM
+            * `PIPELINE_LHP` - PIPELINE_LHP
+            * `PIPELINE_ODC` - PIPELINE_ODC
+            * `PIPELINE_SPMR` - PIPELINE_SPMR
+            * `PIPELINE_SPSE` - PIPELINE_SPSE
       tags:
         - resources
       security:
@@ -6991,14 +7384,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7020,22 +7405,22 @@ paths:
               type: string
               enum:
                 - -added_by
+                - -delivery
                 - -feedstock
                 - -ghg_reduction
-                - -period
                 - -volume
                 - added_by
+                - delivery
                 - feedstock
                 - ghg_reduction
-                - period
                 - volume
           description: |-
             Ordre
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
-            * `period` - Period
-            * `-period` - Period (décroissant)
+            * `delivery` - Delivery
+            * `-delivery` - Delivery (décroissant)
             * `feedstock` - Feedstock
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
@@ -7050,6 +7435,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -7102,9 +7495,8 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -7222,14 +7614,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7251,22 +7635,22 @@ paths:
               type: string
               enum:
                 - -added_by
+                - -delivery
                 - -feedstock
                 - -ghg_reduction
-                - -period
                 - -volume
                 - added_by
+                - delivery
                 - feedstock
                 - ghg_reduction
-                - period
                 - volume
           description: |-
             Ordre
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
-            * `period` - Period
-            * `-period` - Period (décroissant)
+            * `delivery` - Delivery
+            * `-delivery` - Delivery (décroissant)
             * `feedstock` - Feedstock
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
@@ -7281,6 +7665,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -7321,9 +7713,8 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -7373,14 +7764,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: delivery_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7398,7 +7781,19 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - added_by
+              - client
+              - country_of_origin
+              - feedstock
+              - order_by
+              - origin_depot
+              - period
+              - production_site
+              - supplier
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -7407,22 +7802,22 @@ paths:
               type: string
               enum:
                 - -added_by
+                - -delivery
                 - -feedstock
                 - -ghg_reduction
-                - -period
                 - -volume
                 - added_by
+                - delivery
                 - feedstock
                 - ghg_reduction
-                - period
                 - volume
           description: |-
             Ordre
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
-            * `period` - Period
-            * `-period` - Period (décroissant)
+            * `delivery` - Delivery
+            * `-delivery` - Delivery (décroissant)
             * `feedstock` - Feedstock
             * `-feedstock` - Feedstock (décroissant)
             * `ghg_reduction` - Ghg reduction
@@ -7437,6 +7832,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -7477,9 +7880,8 @@ paths:
             type: array
             items:
               type: string
-              minLength: 1
-          description: List of suppliers provided via
-            ?suppliers=supplier1&suppliers=supplier2&suppliers=supplier3
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -7500,11 +7902,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - added_by
+                    - client
+                    - country_of_origin
+                    - feedstock
+                    - order_by
                   summary: Example of filters response.
           description: ""
   /api/saf/ticket-sources/group-assign/:
@@ -7552,7 +7954,7 @@ paths:
       operationId: saf_tickets_list
       parameters:
         - in: query
-          name: biofuel
+          name: client
           schema:
             type: array
             items:
@@ -7560,11 +7962,39 @@ paths:
           explode: true
           style: form
         - in: query
-          name: client
+          name: client_type
           schema:
             type: array
             items:
               type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
           explode: true
           style: form
         - in: query
@@ -7658,6 +8088,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -7937,7 +8375,7 @@ paths:
       operationId: saf_tickets_export_retrieve
       parameters:
         - in: query
-          name: biofuel
+          name: client
           schema:
             type: array
             items:
@@ -7945,11 +8383,39 @@ paths:
           explode: true
           style: form
         - in: query
-          name: client
+          name: client_type
           schema:
             type: array
             items:
               type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
           explode: true
           style: form
         - in: query
@@ -8043,6 +8509,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -8120,7 +8594,7 @@ paths:
       operationId: saf_tickets_filters_retrieve
       parameters:
         - in: query
-          name: biofuel
+          name: client
           schema:
             type: array
             items:
@@ -8128,11 +8602,39 @@ paths:
           explode: true
           style: form
         - in: query
-          name: client
+          name: client_type
           schema:
             type: array
             items:
               type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
           explode: true
           style: form
         - in: query
@@ -8176,7 +8678,22 @@ paths:
           name: filter
           schema:
             type: string
+            enum:
+              - client
+              - client_type
+              - consumption_type
+              - country_of_origin
+              - feedstock
+              - order_by
+              - origin_depot
+              - period
+              - production_site
+              - reception_airport
+              - status
+              - supplier
+              - year
           description: Filter string to apply
+          required: true
         - in: query
           name: order_by
           schema:
@@ -8231,6 +8748,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_depot
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -8303,11 +8828,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - SHELL France
-                    - CIM SNC
-                    - ESSO SAF
-                    - TMF
-                    - TERF SAF
+                    - client
+                    - client_type
+                    - consumption_type
+                    - country_of_origin
+                    - feedstock
                   summary: Example of filters response.
           description: ""
   /api/saf/years/:
@@ -11321,17 +11846,54 @@ components:
         - code
         - name
         - name_en
+    BiomethaneAdminAnnualDeclaration:
+      type: object
+      description: Serializer pour la liste admin des déclarations annuelles
+        biométhane (DREAL).
+      properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        id:
+          type: integer
+          readOnly: true
+        producer:
+          $ref: "#/components/schemas/EntityPreview"
+        effective_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        tariff_reference:
+          allOf:
+            - $ref: "#/components/schemas/TariffReferenceEnum"
+          readOnly: true
+          nullable: true
+        department:
+          type: string
+          readOnly: true
+          nullable: true
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+        - department
+        - effective_date
+        - id
+        - producer
+        - tariff_reference
+        - year
     BiomethaneAnnualDeclaration:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         producer:
           type: integer
         year:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         missing_fields:
           type: object
           properties:
@@ -11358,11 +11920,25 @@ components:
           readOnly: true
         is_open:
           type: boolean
-          readOnly: true
       required:
         - is_complete
-        - is_open
         - missing_fields
+        - producer
+        - year
+    BiomethaneAnnualDeclarationRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        producer:
+          type: integer
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_open:
+          type: boolean
+      required:
         - producer
         - year
     BiomethaneAnnualDeclarationStatusEnum:
@@ -11391,6 +11967,10 @@ components:
           items:
             $ref: "#/components/schemas/TrackedAmendmentTypesEnum"
           readOnly: true
+        complementary_aid_organisms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
@@ -11430,6 +12010,13 @@ components:
           type: string
           format: uri
           nullable: true
+        has_complementary_investment_aid:
+          type: boolean
+          nullable: true
+        complementary_aid_other_organism_name:
+          type: string
+          nullable: true
+          maxLength: 255
         buyer:
           type: integer
           nullable: true
@@ -11437,6 +12024,7 @@ components:
           type: integer
       required:
         - amendments
+        - complementary_aid_organisms
         - id
         - producer
         - tracked_amendment_types
@@ -11531,6 +12119,10 @@ components:
           nullable: true
         is_red_ii:
           type: boolean
+        complementary_aid_organisms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
@@ -11568,6 +12160,13 @@ components:
           format: binary
           nullable: true
         tracked_amendment_types: {}
+        has_complementary_investment_aid:
+          type: boolean
+          nullable: true
+        complementary_aid_other_organism_name:
+          type: string
+          nullable: true
+          maxLength: 255
         buyer:
           type: integer
           nullable: true
@@ -11852,10 +12451,19 @@ components:
         id:
           type: integer
           readOnly: true
+        energy_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnergyTypesEnum"
         malfunction_types:
           type: array
           items:
             $ref: "#/components/schemas/MalfunctionTypesEnum"
+        monthly_reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneEnergyMonthlyReport"
+          readOnly: true
         year:
           type: integer
           maximum: 2147483647
@@ -11864,19 +12472,11 @@ components:
           type: number
           format: double
           nullable: true
-        injected_biomethane_nm3_per_year:
-          type: number
-          format: double
-          nullable: true
         injected_biomethane_ch4_rate_percent:
           type: number
           format: double
           nullable: true
         injected_biomethane_pcs_kwh_per_nm3:
-          type: number
-          format: double
-          nullable: true
-        operating_hours:
           type: number
           format: double
           nullable: true
@@ -11892,22 +12492,9 @@ components:
           type: number
           format: double
           nullable: true
-        attest_no_fossil_for_digester_heating_and_purification:
+        attest_no_fossil_for_energy:
           type: boolean
-        energy_used_for_digester_heating:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_digester_heating:
-          type: string
-          nullable: true
-        attest_no_fossil_for_installation_needs:
-          type: boolean
-        energy_used_for_installation_needs:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_installation_needs:
+        energy_details:
           type: string
           nullable: true
         purified_biogas_quantity_nm3:
@@ -11922,14 +12509,16 @@ components:
           type: number
           format: double
           nullable: true
+        self_consumed_biogas_or_biomethane_kwh:
+          type: number
+          format: double
+          nullable: true
         total_unit_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
         butane_or_propane_addition:
-          type: number
-          format: double
-          nullable: true
+          type: boolean
         fossil_fuel_consumed_kwh:
           type: number
           format: double
@@ -11962,11 +12551,16 @@ components:
           type: integer
       required:
         - id
+        - monthly_reports
         - producer
         - year
     BiomethaneEnergyInputRequest:
       type: object
       properties:
+        energy_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnergyTypesEnum"
         malfunction_types:
           type: array
           items:
@@ -11975,19 +12569,11 @@ components:
           type: number
           format: double
           nullable: true
-        injected_biomethane_nm3_per_year:
-          type: number
-          format: double
-          nullable: true
         injected_biomethane_ch4_rate_percent:
           type: number
           format: double
           nullable: true
         injected_biomethane_pcs_kwh_per_nm3:
-          type: number
-          format: double
-          nullable: true
-        operating_hours:
           type: number
           format: double
           nullable: true
@@ -12003,22 +12589,9 @@ components:
           type: number
           format: double
           nullable: true
-        attest_no_fossil_for_digester_heating_and_purification:
+        attest_no_fossil_for_energy:
           type: boolean
-        energy_used_for_digester_heating:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_digester_heating:
-          type: string
-          nullable: true
-        attest_no_fossil_for_installation_needs:
-          type: boolean
-        energy_used_for_installation_needs:
-          type: string
-          nullable: true
-          maxLength: 255
-        fossil_details_for_installation_needs:
+        energy_details:
           type: string
           nullable: true
         purified_biogas_quantity_nm3:
@@ -12033,14 +12606,16 @@ components:
           type: number
           format: double
           nullable: true
+        self_consumed_biogas_or_biomethane_kwh:
+          type: number
+          format: double
+          nullable: true
         total_unit_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
         butane_or_propane_addition:
-          type: number
-          format: double
-          nullable: true
+          type: boolean
         fossil_fuel_consumed_kwh:
           type: number
           format: double
@@ -12080,9 +12655,6 @@ components:
           type: number
           format: double
         average_monthly_flow_nm3_per_hour:
-          type: number
-          format: double
-        injection_hours:
           type: number
           format: double
         energy:
@@ -12202,6 +12774,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+        digestate_sale_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateSaleTypesEnum"
         department:
           type: string
         unit_name:
@@ -12224,6 +12800,10 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        insee_code:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -12278,10 +12858,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_sale_type:
-          allOf:
-            - $ref: "#/components/schemas/DigestateSaleTypeEnum"
-          nullable: true
         producer:
           type: integer
       required:
@@ -12302,6 +12878,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SpreadingManagementMethodsEnum"
+        digestate_sale_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/DigestateSaleTypesEnum"
         department:
           type: string
           minLength: 1
@@ -12325,6 +12905,10 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        insee_code:
+          type: string
+          nullable: true
+          maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
@@ -12379,10 +12963,6 @@ components:
           type: string
           nullable: true
           maxLength: 128
-        digestate_sale_type:
-          allOf:
-            - $ref: "#/components/schemas/DigestateSaleTypeEnum"
-          nullable: true
     BiomethaneSupplyInput:
       type: object
       properties:
@@ -12993,8 +13573,12 @@ components:
         department_code:
           type: string
           maxLength: 5
+        insee_code:
+          type: string
+          maxLength: 5
       required:
         - department_code
+        - insee_code
         - legal_name
         - name
         - registered_address
@@ -13002,6 +13586,16 @@ components:
         - registered_country
         - registered_zipcode
         - registration_id
+    ComplementaryAidOrganismsEnum:
+      enum:
+        - ADEME
+        - REGION
+        - OTHER
+      type: string
+      description: |-
+        * `ADEME` - Ademe
+        * `REGION` - Région
+        * `OTHER` - Autre
     CompostingLocationsEnum:
       enum:
         - ON_SITE
@@ -13393,16 +13987,20 @@ components:
         - country
         - id
         - name
-    DigestateSaleTypeEnum:
+    DigestateSaleTypesEnum:
       enum:
-        - DIG_AGRI_SPECIFICATIONS
-        - HOMOLOGATION
-        - STANDARDIZED_PRODUCT
+        - SPREADING_PLAN_ICPE
+        - AMM
+        - MANDATORY_STANDARD
+        - EU_FERTILIZER_REGULATION
+        - CDC_DIG
       type: string
       description: |-
-        * `DIG_AGRI_SPECIFICATIONS` - Cahier de charges DIG Agri
-        * `HOMOLOGATION` - Homologation
-        * `STANDARDIZED_PRODUCT` - Produit normé
+        * `SPREADING_PLAN_ICPE` - Plan d'épandage (ICPE)
+        * `AMM` - Autorisation de mise sur le marché (AMM)
+        * `MANDATORY_STANDARD` - Norme rendue d'application obligatoire
+        * `EU_FERTILIZER_REGULATION` - Règlement européen sur les fertilisants
+        * `CDC_DIG` - Cahier des Charges CDC Dig
     DigestateValorizationMethodsEnum:
       enum:
         - SPREADING
@@ -14462,6 +15060,43 @@ components:
         empty:
           type: string
           minLength: 1
+    EnergyTypesEnum:
+      enum:
+        - PRODUCED_BIOGAS
+        - PRODUCED_BIOMETHANE
+        - WASTE_HEAT_PREEXISTING
+        - WASTE_HEAT_PURIFICATION
+        - WASTE_HEAT_ON_SITE
+        - BIOMASS_BOILER
+        - SOLAR_THERMAL
+        - OTHER_RENEWABLE
+        - FOSSIL
+        - OTHER
+      type: string
+      description: >-
+        * `PRODUCED_BIOGAS` - Biogaz produit par l'installation
+
+        * `PRODUCED_BIOMETHANE` - Biométhane produit par l'installation
+
+        * `WASTE_HEAT_PREEXISTING` - Chaleur fatale [Energie thermique
+        résiduelle] (issue d'un équipement préexistant installé sur site ou sur
+        un site situé à proximité)
+
+        * `WASTE_HEAT_PURIFICATION` - Chaleur fatale (issue du système
+        d'épuration ou de compression de l'installation)
+
+        * `WASTE_HEAT_ON_SITE` - Chaleur fatale (issue d'un équipement installé
+        sur site)
+
+        * `BIOMASS_BOILER` - Chaudière biomasse
+
+        * `SOLAR_THERMAL` - Solaire thermique
+
+        * `OTHER_RENEWABLE` - Autre énergie renouvelable
+
+        * `FOSSIL` - Energie fossile
+
+        * `OTHER` - Autre
     Entity:
       type: object
       properties:
@@ -15552,13 +16187,9 @@ components:
         average_monthly_flow_nm3_per_hour:
           type: number
           format: double
-        injection_hours:
-          type: number
-          format: double
       required:
         - average_monthly_flow_nm3_per_hour
         - injected_volume_nm3
-        - injection_hours
         - month
     NavStats:
       type: object
@@ -16125,6 +16756,29 @@ components:
             $ref: "#/components/schemas/BalanceResponse"
         total_quantity:
           type: number
+    PaginatedBiomethaneAdminAnnualDeclarationList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneAdminAnnualDeclaration"
     PaginatedBiomethaneContractAmendmentList:
       type: object
       required:
@@ -16148,29 +16802,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BiomethaneContractAmendment"
-    PaginatedBiomethaneProducerList:
-      type: object
-      required:
-        - count
-        - results
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=2
-        results:
-          type: array
-          items:
-            $ref: "#/components/schemas/BiomethaneProducer"
     PaginatedBiomethaneSupplyInputList:
       type: object
       required:
@@ -16447,14 +17078,16 @@ components:
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
         producer:
           type: integer
         year:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
-        status:
-          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+        is_open:
+          type: boolean
     PatchedBiomethaneDigestateStorageInputRequest:
       type: object
       properties:
@@ -17304,6 +17937,8 @@ components:
           readOnly: true
         origin_lot:
           $ref: "#/components/schemas/SafParentLot"
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -17354,8 +17989,6 @@ components:
         ghg_total:
           type: number
           format: double
-        origin_lot_site:
-          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets
@@ -17396,6 +18029,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
       required:
@@ -17430,6 +18066,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
           minLength: 1
@@ -17465,6 +18104,9 @@ components:
         shipping_method:
           type: string
           nullable: true
+        has_intermediary_depot:
+          type: boolean
+          default: false
         pos_number:
           type: string
           minLength: 1
@@ -17540,6 +18182,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/SafParentLot"
           readOnly: true
+        origin_lot_site:
+          $ref: "#/components/schemas/Site"
       required:
         - added_by
         - assigned_tickets
@@ -17572,16 +18216,28 @@ components:
         - certificate_id
     ShippingMethodEnum:
       enum:
-        - PIPELINE
         - TRUCK
-        - TRAIN
         - BARGE
+        - TRAIN
+        - SHIP
+        - PIPELINE
+        - PIPELINE_DMM
+        - PIPELINE_LHP
+        - PIPELINE_ODC
+        - PIPELINE_SPMR
+        - PIPELINE_SPSE
       type: string
       description: |-
-        * `PIPELINE` - PIPELINE
-        * `TRUCK` - TRUCK
-        * `TRAIN` - TRAIN
-        * `BARGE` - BARGE
+        * `TRUCK` - Routier
+        * `BARGE` - Barge
+        * `TRAIN` - Train
+        * `SHIP` - Bateau
+        * `PIPELINE` - Oléoduc
+        * `PIPELINE_DMM` - Oléoduc DMM
+        * `PIPELINE_LHP` - Oléoduc LHP
+        * `PIPELINE_ODC` - Oléoduc ODC
+        * `PIPELINE_SPMR` - Oléoduc SPMR
+        * `PIPELINE_SPSE` - Oléoduc SPSE
     SimulationInputRequest:
       type: object
       properties:

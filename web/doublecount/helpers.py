@@ -5,12 +5,12 @@ import unicodedata
 from typing import List
 
 import pandas as pd
-import sentry_sdk
 from django.conf import settings
 from django.db import transaction
 from django.db.models.aggregates import Count, Sum
 from django.http import JsonResponse
 
+from adapters.logger import log_exception
 from certificates.models import DoubleCountingRegistration
 from core.common import CarbureException
 from core.helpers import send_mail
@@ -49,58 +49,61 @@ today = datetime.date.today()
 
 
 def send_dca_confirmation_email(dca, request):
-    # To the user
-    text_message = """
-    Bonjour,
+    try:
+        # To the user
+        text_message = """
+        Bonjour,
 
-    Nous vous confirmons la réception de votre dossier de demande d'agrément au double-comptage.
+        Nous vous confirmons la réception de votre dossier de demande d'agrément au double-comptage.
 
-    Bonne journée,
-    L'équipe CarbuRe
-    """
-    email_subject = "Carbure - Dossier Double Comptage"
+        Bonne journée,
+        L'équipe CarbuRe
+        """
+        email_subject = "Carbure - Dossier Double Comptage"
 
-    recipients = [
-        r.user.email
-        for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
-            role__in=[UserRights.AUDITOR, UserRights.RO]
+        recipients = [
+            r.user.email
+            for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(
+                role__in=[UserRights.AUDITOR, UserRights.RO]
+            )
+        ]
+        cc = ["carbure@beta.gouv.fr"]
+
+        send_mail(
+            request=request,
+            subject=email_subject,
+            message=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=recipients,
+            bcc=cc,
         )
-    ]
-    cc = ["carbure@beta.gouv.fr"]
 
-    send_mail(
-        request=request,
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=recipients,
-        bcc=cc,
-    )
+        # To the manager
+        dca_created_at = dca.created_at.strftime("%d/%m/%Y")
+        text_message = f"""
+        Bonjour,
 
-    # To the manager
-    dca_created_at = dca.created_at.strftime("%d/%m/%Y")
-    text_message = f"""
-    Bonjour,
+        Une nouvelle demande d'agrément double comptage vient d'être déposée par le producteur {dca.producer.name}
+        à la date du {dca_created_at}.
 
-    Une nouvelle demande d'agrément double comptage vient d'être déposée par le producteur {dca.producer.name}
-    à la date du {dca_created_at}.
+        Le dossier est disponible ici {os.environ.get('BASE_URL')}/org/{dca.producer_id}/double-counting/applications.
 
-    Le dossier est disponible ici {os.environ.get('BASE_URL')}/org/{dca.producer_id}/double-counting/applications.
+        Bonne journée,
+        L'équipe CarbuRe
+        """
+        if os.getenv("IMAGE_TAG", "dev") == "prod":
+            recipients = ["emilien.baudet@developpement-durable.gouv.fr"]
 
-    Bonne journée,
-    L'équipe CarbuRe
-    """
-    if os.getenv("IMAGE_TAG", "dev") == "prod":
-        recipients = ["emilien.baudet@developpement-durable.gouv.fr"]
-
-    send_mail(
-        request=request,
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=recipients,
-        bcc=cc,
-    )
+        send_mail(
+            request=request,
+            subject=email_subject,
+            message=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=recipients,
+            bcc=cc,
+        )
+    except Exception as e:
+        log_exception(e)
 
 
 def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[SourcingRow]):
@@ -454,7 +457,7 @@ def check_dc_file(file):
             excel_error = error(DoubleCountingError.BAD_WORKSHEET_NAME, is_blocking=True, meta=e.meta)
 
     except Exception as e:
-        sentry_sdk.capture_exception(e)
+        log_exception(e)
 
         # bad tab name
         sheetNameRegexp = r"'Worksheet (.*) does not exist.'"

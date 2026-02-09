@@ -5,16 +5,22 @@ import {
   BiomethaneSupplyInputQuery,
 } from "./types"
 
-export const getSupplyPlanInputs = async (query: BiomethaneSupplyInputQuery) =>
+export const getSupplyPlanInputs = async (
+  query: BiomethaneSupplyInputQuery,
+  selectedEntityId?: number
+) =>
   api
     .GET("/biomethane/supply-input/", {
-      params: { query },
+      params: {
+        query: { ...query, producer_id: selectedEntityId },
+      },
     })
     .then((res) => res.data)
 
 export const getSupplyPlanInputFilters = async (
   query: BiomethaneSupplyInputQuery,
-  filter: BiomethaneSupplyInputFilter
+  filter: BiomethaneSupplyInputFilter,
+  selected_entity_id?: number
 ) =>
   api
     .GET("/biomethane/supply-input/filters/", {
@@ -22,6 +28,7 @@ export const getSupplyPlanInputFilters = async (
         query: {
           ...query,
           filter,
+          producer_id: selected_entity_id,
         },
       },
     })
@@ -29,7 +36,8 @@ export const getSupplyPlanInputFilters = async (
 
 export const getSupplyInput = async (
   entity_id: number,
-  supply_input_id: number
+  supply_input_id: number,
+  selected_entity_id?: number
 ) =>
   api
     .GET("/biomethane/supply-input/{id}/", {
@@ -37,7 +45,7 @@ export const getSupplyInput = async (
         path: {
           id: supply_input_id,
         },
-        query: { entity_id },
+        query: { entity_id, producer_id: selected_entity_id },
       },
     })
     .then((res) => res.data)
@@ -70,9 +78,13 @@ export const saveSupplyInput = async (
     })
     .then((res) => res.data)
 
-export function downloadSupplyPlan(query: BiomethaneSupplyInputQuery) {
+export function downloadSupplyPlan(
+  query: BiomethaneSupplyInputQuery,
+  selectedEntityId?: number
+) {
   return download(`/biomethane/supply-input/export/`, {
     ...query,
+    producer_id: selectedEntityId,
   })
 }
 

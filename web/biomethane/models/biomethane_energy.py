@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
@@ -17,17 +17,11 @@ class BiomethaneEnergy(models.Model):
     # Quantité de biométhane injecté (GWhPCS/an)
     injected_biomethane_gwh_pcs_per_year = models.FloatField(null=True, blank=True)
 
-    # Quantité de biométhane injecté (Nm3/an)
-    injected_biomethane_nm3_per_year = models.FloatField(null=True, blank=True)
-
     # Taux de Ch4 dans le biométhane injecté (%)
     injected_biomethane_ch4_rate_percent = models.FloatField(null=True, blank=True)
 
     # PCS du biométhane injecté (kWh/Nm3)
     injected_biomethane_pcs_kwh_per_nm3 = models.FloatField(null=True, blank=True)
-
-    # Nombre d'heures de fonctionnement (h)
-    operating_hours = models.FloatField(null=True, blank=True)
 
     ## Production de biogaz
 
@@ -40,30 +34,59 @@ class BiomethaneEnergy(models.Model):
     # Nombre d'heures de fonctionnement de la torchère (h)
     flaring_operating_hours = models.FloatField(null=True, blank=True)
 
+    MALFUNCTION_TYPE_CONCEPTION = "CONCEPTION"
+
+    MALFUNCTION_TYPES = [
+        (MALFUNCTION_TYPE_CONCEPTION, "Conception"),
+    ]
+
     ## Nature de l'énergie utilisée pour les besoins de l'installation
 
-    # Besoins en énergie liés au chauffage du digesteur pour une installation de méthanisation
-    # ainsi qu’à l’épuration du biogaz et à l’oxydation des évents
-    # J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d’origine fossile.
-    attest_no_fossil_for_digester_heating_and_purification = models.BooleanField(default=False)
+    # Types d'énergie possibles
+    ENERGY_TYPE_PRODUCED_BIOGAS = "PRODUCED_BIOGAS"
+    ENERGY_TYPE_PRODUCED_BIOMETHANE = "PRODUCED_BIOMETHANE"
+    ENERGY_TYPE_WASTE_HEAT_PREEXISTING = "WASTE_HEAT_PREEXISTING"
+    ENERGY_TYPE_WASTE_HEAT_PURIFICATION = "WASTE_HEAT_PURIFICATION"
+    ENERGY_TYPE_WASTE_HEAT_ON_SITE = "WASTE_HEAT_ON_SITE"
+    ENERGY_TYPE_BIOMASS_BOILER = "BIOMASS_BOILER"
+    ENERGY_TYPE_SOLAR_THERMAL = "SOLAR_THERMAL"
+    ENERGY_TYPE_OTHER_RENEWABLE = "OTHER_RENEWABLE"
+    ENERGY_TYPE_FOSSIL = "FOSSIL"
+    ENERGY_TYPE_OTHER = "OTHER"
+
+    ENERGY_TYPES = [
+        (ENERGY_TYPE_PRODUCED_BIOGAS, "Biogaz produit par l'installation"),
+        (ENERGY_TYPE_PRODUCED_BIOMETHANE, "Biométhane produit par l'installation"),
+        (
+            ENERGY_TYPE_WASTE_HEAT_PREEXISTING,
+            "Chaleur fatale [Energie thermique résiduelle] (issue d'un équipement préexistant installé sur site "
+            + "ou sur un site situé à proximité)",
+        ),
+        (
+            ENERGY_TYPE_WASTE_HEAT_PURIFICATION,
+            "Chaleur fatale (issue du système d'épuration ou de compression de l'installation)",
+        ),
+        (
+            ENERGY_TYPE_WASTE_HEAT_ON_SITE,
+            "Chaleur fatale (issue d'un équipement installé sur site)",
+        ),
+        (ENERGY_TYPE_BIOMASS_BOILER, "Chaudière biomasse"),
+        (ENERGY_TYPE_SOLAR_THERMAL, "Solaire thermique"),
+        (ENERGY_TYPE_OTHER_RENEWABLE, "Autre énergie renouvelable"),
+        (ENERGY_TYPE_FOSSIL, "Energie fossile"),
+        (ENERGY_TYPE_OTHER, "Autre"),
+    ]
+
+    # Besoins en énergie de l'installation de production de biométhane / au chauffage du digesteur
+    attest_no_fossil_for_energy = models.BooleanField(default=False)
 
     # Type d'énergie utilisée pour le chauffage du digesteur
-    energy_used_for_digester_heating = models.CharField(max_length=255, null=True, blank=True)
-
-    # Précisions (si utilisation d’énergie d’origine fossile)
-    fossil_details_for_digester_heating = models.TextField(null=True, blank=True)
-
-    # Besoins en énergie de l’installation de production de biométhane (notamment liés à la pasteurisation, l’hygiénisation
-    # et le prétraitement des intrants, le chauffage du digesteur et l’épuration du biogaz)
-    # J'atteste que les besoins en énergie cités ci-dessus ont pas satisfaits par une énergie d’origine fossile.
-    attest_no_fossil_for_installation_needs = models.BooleanField(default=False)
-
     # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
     # le chauffage du digesteur et l’épuration du biogaz
-    energy_used_for_installation_needs = models.CharField(max_length=255, null=True, blank=True)
+    energy_types = models.JSONField(null=True, blank=True, default=list)
 
-    # Précisions (si utilisation d’énergie d’origine fossile)
-    fossil_details_for_installation_needs = models.TextField(null=True, blank=True)
+    # Précisions
+    energy_details = models.TextField(null=True, blank=True)
 
     ## Efficacité énergétique
 
@@ -74,19 +97,24 @@ class BiomethaneEnergy(models.Model):
     purification_electric_consumption_kwe = models.FloatField(null=True, blank=True)
 
     # Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants,
-    # le chauffage du digesteur et l’épuration du biogaz  (Nm3)
+    # le chauffage du digesteur et l'épuration du biogaz  (Nm3)
     self_consumed_biogas_nm3 = models.FloatField(null=True, blank=True)
+
+    # Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh)
+    # ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
+    # le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+    self_consumed_biogas_or_biomethane_kwh = models.FloatField(null=True, blank=True)
 
     # Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
     total_unit_electric_consumption_kwe = models.FloatField(null=True, blank=True)
 
     # Addition de butane ou propane lors de l'injection du biométhane dans le réseau
-    butane_or_propane_addition = models.FloatField(null=True, blank=True)
+    butane_or_propane_addition = models.BooleanField(default=False)
 
     # Quantité de combustible fossile consommé (kWh)
     fossil_fuel_consumed_kwh = models.FloatField(null=True, blank=True)
 
-    ## Acceptabilité
+    ## Questions diverses
 
     # L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement
     # d'une opposition ou de plaintes de voisinage ?
@@ -184,3 +212,19 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
         update_data = {field: None for field in fields_to_clear}
 
         BiomethaneEnergy.objects.filter(pk=energy_instance.pk).update(**update_data)
+
+
+@receiver(pre_save, sender=BiomethaneContract)
+def update_energy_fields_on_contract_save(sender, instance, **kwargs):
+    old_contract = sender.objects.filter(pk=instance.pk).first()
+
+    if old_contract and (
+        old_contract.tariff_reference != instance.tariff_reference
+        or old_contract.installation_category != instance.installation_category
+    ):
+        producer = instance.producer
+        energy_instance = producer.biomethane_energies.order_by("-year").first()
+        if energy_instance:
+            fields_to_clear = ["energy_types"]
+            update_data = {field: None for field in fields_to_clear}
+            BiomethaneEnergy.objects.filter(pk=energy_instance.pk).update(**update_data)

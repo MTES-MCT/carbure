@@ -15,4 +15,5 @@ export const companyResult: SearchCompanyPreview = {
   registered_city: "Paris",
   registered_zipcode: "75001",
   registered_country: country,
+  insee_code: "75001",
 }

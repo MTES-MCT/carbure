@@ -47,7 +47,7 @@ class EntityListActionMixin:
 
         # limit entities for DGAC
         if entity.has_external_admin_right(ExternalAdminRights.AIRLINE):
-            filter_condition |= Q(entity_type=Entity.AIRLINE)
+            filter_condition |= Q(entity_type=Entity.AIRLINE) | Q(entity_type=Entity.SAF_TRADER)
 
         # limit entities for Elec stuff
         if entity.has_external_admin_right(ExternalAdminRights.ELEC):

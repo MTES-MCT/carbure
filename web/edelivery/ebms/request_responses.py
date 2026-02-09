@@ -1,26 +1,11 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from adapters.logger import log_error
 from core.models import CarbureLot
-from edelivery.adapters.logger import log_error
-from edelivery.ebms.materials import from_UDB_biofuel_code, from_UDB_feedstock_code
+from edelivery.ebms.converters import MaterialConverter, QuantityConverter, UDBConversionError
 from edelivery.ebms.ntr import from_national_trade_register
-
-
-class ResponseFactory:
-    def __init__(self, response_class, payload):
-        self.response_class = response_class
-        self.payload = payload
-        self.parsed_XML = ET.fromstring(payload)
-
-    def response(self):
-        status_found = self.udb_response_status() == "FOUND"
-        response_class = self.response_class if status_found else NotFoundErrorResponse
-        return response_class(self.payload)
-
-    def udb_response_status(self):
-        response_header_element = self.parsed_XML.find("./RESPONSE_HEADER")
-        return response_header_element.attrib["STATUS"]
+from transactions.helpers import compute_lot_quantity
 
 
 class BaseRequestResponse:
@@ -34,12 +19,6 @@ class BaseRequestResponse:
 
     def post_retrieval_action_result(self):
         pass
-
-
-class NotFoundErrorResponse(BaseRequestResponse):
-    def post_retrieval_action_result(self):
-        log_error("Search returned no result")
-        return {"error": "Not found"}
 
 
 class EOGetTransactionResponse(BaseRequestResponse):
@@ -75,10 +54,11 @@ class EOGetTransactionResponse(BaseRequestResponse):
         return self.transaction_XML_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
 
     def to_lot_attributes(self):
-        biofuel = from_UDB_biofuel_code(self.biofuel_code())
+        biofuel = MaterialConverter().from_udb_biofuel_code(self.biofuel_code())
         client = from_national_trade_register(self.client_id())
-        feedstock = from_UDB_feedstock_code(self.feedstock_code())
-        lhv_amount = self.quantity() * 3600
+        feedstock = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
+        quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
+        computed_quantity_data = compute_lot_quantity(biofuel, quantity_data)
         supplier = from_national_trade_register(self.supplier_id())
 
         return {
@@ -89,18 +69,26 @@ class EOGetTransactionResponse(BaseRequestResponse):
             "feedstock": feedstock,
             "period": self.period(),
             "lot_status": self.status(),
-            "lhv_amount": lhv_amount,
             "year": self.year(),
+            **computed_quantity_data,
         }
 
     def post_retrieval_action_result(self):
-        lot_attributes = self.to_lot_attributes()
-        lot, created = CarbureLot.objects.update_or_create(
-            udb_transaction_id=self.udb_transaction_id(),
-            defaults=lot_attributes,
-        )
+        try:
+            lot_attributes = self.to_lot_attributes()
+            lot, created = CarbureLot.objects.update_or_create(
+                udb_transaction_id=self.udb_transaction_id(),
+                defaults=lot_attributes,
+            )
 
-        return {"newLotCreated": created, "id": lot.id}
+            return {"newLotCreated": created, "id": lot.id}
+
+        except UDBConversionError as e:
+            error_message = "Unable to convert UDB transaction into CarbuRe lot"
+            cause = e.message
+            log_error(error_message, {"cause": cause})
+
+            return {"error": error_message, "cause": cause}
 
     def quantity(self):
         quantity = self.transaction_XML_element.find("./EO_TRANS_DETAIL_MATERIALS/QUANTITY").text
@@ -108,6 +96,9 @@ class EOGetTransactionResponse(BaseRequestResponse):
 
     def udb_transaction_id(self):
         return self.transaction_XML_element.find("./TRANSACTION_ID").text
+
+    def unit(self):
+        return self.transaction_XML_element.find("./EO_TRANS_DETAIL_MATERIALS/MEASURE_UNIT").text
 
     def year(self):
         return self.delivery_date().year

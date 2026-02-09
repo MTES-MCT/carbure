@@ -47,6 +47,13 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={norm.normalizeCountry(ticket.country_of_origin).label}
           readOnly
         />
+        {ticket.origin_lot_site && (
+          <TextInput
+            readOnly
+            label={t("Dépôt d'incorporation")}
+            value={ticket.origin_lot_site.name}
+          />
+        )}
         {ticket.origin_lot?.pos_number && (
           <TextInput
             label={t("Numéro de POS")}
@@ -106,7 +113,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         )}
         {ticket.shipping_method && (
           <TextInput
-            label={t("Méthode de livraison")}
+            label={t("Mode de livraison")}
             value={ticket.shipping_method}
             readOnly
           />

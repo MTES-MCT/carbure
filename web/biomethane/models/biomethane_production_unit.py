@@ -20,6 +20,7 @@ class BiomethaneProductionUnit(models.Model):
     postal_code = models.CharField(max_length=10, null=True, blank=True)
     city = models.CharField(max_length=128, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    insee_code = models.CharField(max_length=5, null=True, blank=True)
 
     # légende
     AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS"
@@ -113,7 +114,7 @@ class BiomethaneProductionUnit(models.Model):
         blank=True,
     )
 
-    # Rendement de l'installation de production de biométhane %
+    # Rendement moyen de l'épurateur de l'installation %
     production_efficiency = models.FloatField(null=True, blank=True)
 
     # Équipements installés (débitmètres et compteurs)
@@ -184,21 +185,22 @@ class BiomethaneProductionUnit(models.Model):
 
     spreading_management_methods = models.JSONField(default=list, blank=True)
 
-    # En cas de vente du digestat
-    DIG_AGRI_SPECIFICATIONS = "DIG_AGRI_SPECIFICATIONS"
-    HOMOLOGATION = "HOMOLOGATION"
-    STANDARDIZED_PRODUCT = "STANDARDIZED_PRODUCT"
+    # Sous quel(s) statut(s) est valorisé le digestat
+    SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE"
+    AMM = "AMM"
+    MANDATORY_STANDARD = "MANDATORY_STANDARD"
+    EU_FERTILIZER_REGULATION = "EU_FERTILIZER_REGULATION"
+    CDC_DIG = "CDC_DIG"
 
-    digestate_sale_type = models.CharField(
-        max_length=32,
-        choices=[
-            (DIG_AGRI_SPECIFICATIONS, "Cahier de charges DIG Agri"),
-            (HOMOLOGATION, "Homologation"),
-            (STANDARDIZED_PRODUCT, "Produit normé"),
-        ],
-        null=True,
-        blank=True,
-    )
+    DIGESTATE_SALE_TYPES_CHOICES = [
+        (SPREADING_PLAN_ICPE, "Plan d'épandage (ICPE)"),
+        (AMM, "Autorisation de mise sur le marché (AMM)"),
+        (MANDATORY_STANDARD, "Norme rendue d'application obligatoire"),
+        (EU_FERTILIZER_REGULATION, "Règlement européen sur les fertilisants"),
+        (CDC_DIG, "Cahier des Charges CDC Dig"),
+    ]
+
+    digestate_sale_types = models.JSONField(default=list, blank=True)
 
     class Meta:
         db_table = "biomethane_production_unit"
@@ -232,13 +234,17 @@ def clear_production_unit_fields_on_save(sender, instance, **kwargs):
         fields_to_clear.append("hygienization_exemption_type")
 
     # Clear digestate treatment steps based on phase separation setting
-    if instance.has_digestate_phase_separation:
-        # If phase separation is enabled, clear raw digestate treatment steps
-        fields_to_clear.append("raw_digestate_treatment_steps")
-    else:
+    if not instance.has_digestate_phase_separation:
         # If phase separation is disabled, clear liquid and solid phase treatment steps
         fields_to_clear.extend(["liquid_phase_treatment_steps", "solid_phase_treatment_steps"])
 
+    if BiomethaneProductionUnit.SPREADING not in instance.digestate_valorization_methods:
+        fields_to_clear.extend(["spreading_management_methods", "digestate_sale_types"])
+
     if fields_to_clear:
-        update_data = {field: None for field in fields_to_clear}
+        update_data = {}
+        for field in fields_to_clear:
+            # Special case: list fields should be set to empty list, not None
+            new_value = [] if field in ("spreading_management_methods", "digestate_sale_types") else None
+            update_data[field] = new_value
         BiomethaneProductionUnit.objects.filter(pk=instance.pk).update(**update_data)

@@ -16,6 +16,7 @@ import os
 import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -42,8 +43,10 @@ env = environ.Env(
     METABASE_SECRET_KEY=(str, ""),
     FAKE_PROD=(bool, False),
     WITH_EMAIL_DECORATED_AS_TEST=(bool, False),
+    WITH_SENTRY=(bool, False),
     WITH_UDB_ACCEPTANCE_DATA=(bool, False),
     ELEC_READJUSTMENT_ENTITY=(str, ""),
+    ENABLE_SAF_LOGISTICS=(bool, True),
 )
 
 # ensure a `BASE_URL` env var is present before starting
@@ -61,14 +64,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURE_DIRS = (os.path.join(BASE_DIR, "fixtures"),)
 
 if env("TEST") is False and env("IMAGE_TAG") in ("dev", "staging", "prod"):
-    image_tag = env("IMAGE_TAG")
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
-        integrations=[DjangoIntegration()],
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
+        environment=env("IMAGE_TAG"),
+        enable_logs=True,
         send_default_pii=True,
-        environment=f"{image_tag}",
+        integrations=[
+            DjangoIntegration(),
+            LoggingIntegration(sentry_logs_level=logging.WARNING),
+        ],
     )
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
@@ -436,6 +440,7 @@ SPECTACULAR_SETTINGS = {
         "ElecOperationStatusEnum": "tiruert.models.ElecOperation.OPERATION_STATUSES",
         "ElecOperationTypeEnum": "tiruert.models.ElecOperation.OPERATION_TYPES",
         "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
+        "BiomethaneAnnualDeclarationStatusEnum": "biomethane.models.BiomethaneAnnualDeclaration.DECLARATION_STATUS_CHOICES",
         "ElecQualichargeStatusEnum": "elec.models.ElecProvisionCertificateQualicharge.VALIDATION_CHOICES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
@@ -486,6 +491,10 @@ if env("TEST"):
 
 # Feature flags
 WITH_EMAIL_DECORATED_AS_TEST = env("WITH_EMAIL_DECORATED_AS_TEST")
+WITH_SENTRY = env("WITH_SENTRY")
 WITH_UDB_ACCEPTANCE_DATA = env("WITH_UDB_ACCEPTANCE_DATA")
 # this env var will hold the name of the entity CPOs will send their readjustement certificates to
 ELEC_READJUSTMENT_ENTITY = env("ELEC_READJUSTMENT_ENTITY")
+
+# having this var = True enables features related to SAF logistics (autocomplete & validation)
+ENABLE_SAF_LOGISTICS = env("ENABLE_SAF_LOGISTICS")

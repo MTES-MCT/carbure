@@ -4,12 +4,17 @@ import {
   BiomethaneDigestateSpreadingAddRequest,
 } from "./types"
 
-export const getDigestate = (entity_id: number, year: number) =>
+export const getDigestate = (
+  entity_id: number,
+  year: number,
+  selected_entity_id?: number
+) =>
   api.GET("/biomethane/digestate/", {
     params: {
       query: {
         entity_id,
         year,
+        producer_id: selected_entity_id,
       },
     },
   })

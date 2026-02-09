@@ -44,6 +44,7 @@ function useYears(
       const rx = new RegExp(`${root}/[0-9]+`)
       const replacement = `${root}/${year}`
       const pathname = location.pathname.replace(rx, replacement)
+
       navigate(pathname)
       setSelectedYear(year ?? currentYear)
     },

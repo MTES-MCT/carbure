@@ -12,7 +12,7 @@ const Balances = () => {
   const { category } = useParams()
   const navigate = useNavigate()
   const { t } = useTranslation()
-  usePrivateNavigation(<BetaPage title={t("Comptabilité")} />)
+  usePrivateNavigation(<BetaPage title={t("Comptabilité")} />, "balances")
 
   useEffect(() => {
     if (!category) navigate(`${SectorTabs.BIOFUELS}`)

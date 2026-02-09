@@ -29,6 +29,7 @@ import useEntity from "common/hooks/entity"
 import { useState } from "react"
 import { usePortal } from "common/components/portal"
 import { RedIIDialog } from "./red-ii-dialog"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 type ContractInfosForm = DeepPartial<BiomethaneContractPatchRequest>
 
@@ -50,6 +51,7 @@ export const ContractInfos = ({
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const { hasSelectedEntity } = useSelectedEntity()
   const portal = usePortal()
   const [isEditing, setIsEditing] = useState(false)
   const { bind, value } = useForm<ContractInfosForm>(
@@ -88,6 +90,7 @@ export const ContractInfos = ({
       title={t("Caractéristiques du contrat d’achat à tarif réglementé")}
       isEditing={isEditing}
       onEdit={setIsEditing}
+      readOnly={hasSelectedEntity}
     >
       <Form onSubmit={onSubmit}>
         {isContractRedii(value) && (

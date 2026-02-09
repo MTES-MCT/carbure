@@ -21,6 +21,7 @@ from biomethane.views import (
     BiomethaneSupplyInputViewSet,
     BiomethaneSupplyPlanViewSet,
 )
+from biomethane.views.admin.annual_declaration import BiomethaneAdminAnnualDeclarationViewSet
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.tests_utils import PermissionTestMixin
 
@@ -113,7 +114,9 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             BiomethaneAnnualDeclarationViewSet,
             [
                 (["retrieve", "get_years"], [HasDrealOrProducerRights()]),
-                (["partial_update", "validate_annual_declaration"], [HasBiomethaneProducerWriteRights()]),
+                (["validate_annual_declaration"], [HasBiomethaneProducerWriteRights()]),
+                (["create"], [HasDrealRights()]),
+                (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
             ],
         )
 
@@ -133,7 +136,8 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             BiomethaneSupplyInputViewSet,
             [
                 (["retrieve", "list", "export_supply_plan_to_excel", "filters"], [HasDrealOrProducerRights()]),
-                (["create", "update", "partial_update"], [HasBiomethaneProducerWriteRights()]),
+                (["create", "update"], [HasBiomethaneProducerWriteRights()]),
+                (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
             ],
         )
 
@@ -162,7 +166,8 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             BiomethaneDigestateStorageViewSet,
             [
                 (["list", "retrieve"], [HasDrealOrProducerRights()]),
-                (["create", "destroy", "partial_update", "update"], [HasBiomethaneProducerWriteRights()]),
+                (["create", "destroy", "update"], [HasBiomethaneProducerWriteRights()]),
+                (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
             ],
         )
 
@@ -172,5 +177,14 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             BiomethaneProducersViewSet,
             [
                 (["list"], [HasDrealRights()]),
+            ],
+        )
+
+    def test_annual_declaration_admin_permissions(self):
+        """Test BiomethaneAdminAnnualDeclarationViewSet permissions"""
+        self.assertViewPermissions(
+            BiomethaneAdminAnnualDeclarationViewSet,
+            [
+                (["list", "filters"], [HasDrealRights()]),
             ],
         )

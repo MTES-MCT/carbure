@@ -6,7 +6,7 @@ import {
   MethanizationProcessEnum as MethanizationProcess,
   DigestateValorizationMethodsEnum as DigestateValorizationMethods,
   SpreadingManagementMethodsEnum as SpreadingManagementMethods,
-  DigestateSaleTypeEnum as DigestateSaleType,
+  DigestateSaleTypesEnum as DigestateSaleTypes,
   InstalledMetersEnum as InstalledMeters,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
@@ -19,7 +19,7 @@ export {
   MethanizationProcess,
   DigestateValorizationMethods,
   SpreadingManagementMethods,
-  DigestateSaleType,
+  DigestateSaleTypes,
   InstalledMeters,
 }
 

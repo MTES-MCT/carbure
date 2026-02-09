@@ -91,13 +91,13 @@ export const useMissingFieldsMessages = ({
       pages.push({
         page: t("Digestat"),
         count: digestateCount,
-        url: biomethaneRoutes.DIGESTATE,
+        url: biomethaneRoutes.PRODUCER.DIGESTATE,
       })
     if (energyCount > 0)
       pages.push({
         page: t("Energie"),
         count: energyCount,
-        url: biomethaneRoutes.ENERGY,
+        url: biomethaneRoutes.PRODUCER.ENERGY,
       })
 
     return pages.map(({ page, count, url }, index) =>
@@ -107,8 +107,8 @@ export const useMissingFieldsMessages = ({
     digestateCount,
     energyCount,
     t,
-    biomethaneRoutes.DIGESTATE,
-    biomethaneRoutes.ENERGY,
+    biomethaneRoutes.PRODUCER.DIGESTATE,
+    biomethaneRoutes.PRODUCER.ENERGY,
     onPageClick,
   ])
 
@@ -128,8 +128,9 @@ export const useMissingFieldsMessages = ({
               <Button
                 customPriority="link"
                 linkProps={{
-                  to: biomethaneRoutes.SUPPLY_PLAN,
-                  onClick: () => onPageClick?.(biomethaneRoutes.SUPPLY_PLAN),
+                  to: biomethaneRoutes.PRODUCER.SUPPLY_PLAN,
+                  onClick: () =>
+                    onPageClick?.(biomethaneRoutes.PRODUCER.SUPPLY_PLAN),
                 }}
               />
             ),
@@ -139,7 +140,12 @@ export const useMissingFieldsMessages = ({
         <br />
       </span>
     )
-  }, [t, hasAtLeastOneSupplyInput, biomethaneRoutes.SUPPLY_PLAN, onPageClick])
+  }, [
+    t,
+    hasAtLeastOneSupplyInput,
+    biomethaneRoutes.PRODUCER.SUPPLY_PLAN,
+    onPageClick,
+  ])
 
   const errorMessage = useMemo(() => {
     // Filter out null values (when supplyPlanErrorMessage is null)

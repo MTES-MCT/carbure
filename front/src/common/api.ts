@@ -123,14 +123,6 @@ export async function findDepots(query?: string, public_only?: boolean) {
   return res.data ?? []
 }
 
-export async function findAirports(query?: string, public_only?: boolean) {
-  const res = await apiFetch.GET("/resources/airports", {
-    params: { query: { query, public_only } },
-  })
-
-  return res.data ?? []
-}
-
 export async function findCertificates(
   query: string,
   options?: { date?: string }
@@ -175,4 +167,16 @@ export async function findSystemNationalCertificates(query: string) {
   })
 
   return res.data ?? []
+}
+
+/**
+ * Get the details of a specific company
+ */
+export function getCompanyDetails(entity_id: number, company_id: number) {
+  return apiFetch.GET("/entities/{id}/", {
+    params: {
+      path: { id: company_id },
+      query: { entity_id },
+    },
+  })
 }

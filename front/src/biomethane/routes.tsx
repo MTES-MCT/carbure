@@ -10,6 +10,17 @@ import {
 } from "./providers/annual-declaration"
 import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
+import { ExternalAdminPages } from "common/types"
+import { Contact } from "./pages/admin/declaration-detail/pages/contact"
+
+const currentYear = new Date().getFullYear()
+
+const BiomethaneAdminDeclarationDetailPage = lazy(
+  () => import("biomethane/pages/admin/declaration-detail")
+)
+const BiomethaneAdminDeclarationsPage = lazy(
+  () => import("biomethane/pages/admin/declarations")
+)
 
 const Digestate = lazy(() => import("biomethane/pages/digestate"))
 const Energy = lazy(() => import("biomethane/pages/energy"))
@@ -19,6 +30,9 @@ const BiomethaneContractPage = lazy(() => import("biomethane/pages/contract"))
 const BiomethaneInjectionPage = lazy(() => import("biomethane/pages/injection"))
 const BiomethaneProductionPage = lazy(
   () => import("biomethane/pages/production")
+)
+const BiomethaneAdminDashboardPage = lazy(
+  () => import("biomethane/pages/admin/dashboard/dashboard")
 )
 
 type REDIRECTED_ROUTES = "digestate" | "energy" | "supply-plan"
@@ -51,7 +65,9 @@ const RedirectToCurrentYearRoute = ({ path }: { path: REDIRECTED_ROUTES }) => (
 )
 
 export const BiomethaneRoutes = () => {
-  const { isBiomethaneProducer } = useEntity()
+  const { isBiomethaneProducer, hasAdminRight } = useEntity()
+
+  if (hasAdminRight(ExternalAdminPages.DREAL)) return <BiomethaneAdminRoutes />
 
   if (!isBiomethaneProducer) return null
 
@@ -115,6 +131,38 @@ export const BiomethaneSettingsRoutes = () => {
         <Route path="production" element={<BiomethaneProductionPage />} />
         <Route path="injection" element={<BiomethaneInjectionPage />} />
       </Route>
+    </Routes>
+  )
+}
+
+export const BiomethaneAdminRoutes = () => {
+  return (
+    <Routes>
+      <Route path="admin" element={<Outlet />}>
+        <Route index element={<Navigate replace to="declarations" />} />
+        <Route
+          path="declarations"
+          element={<BiomethaneAdminDeclarationsPage />}
+        />
+
+        <Route
+          path="declarations/:selectedEntityId/:year/*"
+          element={<BiomethaneAdminDeclarationDetailPage />}
+        >
+          <Route index element={<Navigate replace to="digestate" />} />
+          <Route path="digestate" element={<Digestate />} />
+          <Route path="energy" element={<Energy />} />
+          <Route path="supply-plan" element={<SupplyPlan />} />
+          <Route path="contract" element={<BiomethaneContractPage />} />
+          <Route path="contacts" element={<Contact />} />
+        </Route>
+        <Route
+          path="declarations/:selectedEntityId"
+          element={<Navigate replace to={`${currentYear}`} />}
+        />
+        <Route path="dashboard" element={<BiomethaneAdminDashboardPage />} />
+      </Route>
+      <Route path="*" element={<Navigate replace to="admin/dashboard" />} />
     </Routes>
   )
 }
