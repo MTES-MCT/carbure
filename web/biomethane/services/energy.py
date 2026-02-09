@@ -71,6 +71,8 @@ class BiomethaneEnergyService:
         "self_consumed_biogas_or_biomethane_kwh",
     ]
 
+    ENERGY_DETAILS_FIELD = ["energy_details"]
+
     @staticmethod
     def _extract_data(instance) -> EnergyContext:
         """Extract data from an energy instance and return structured context."""
@@ -125,6 +127,15 @@ class BiomethaneEnergyService:
         return BiomethaneEnergyService._get_fields_to_clear(instance)
 
     @staticmethod
+    def get_all_optional_fields():
+        """
+        Return the list of all optional fields for energy instances.
+        """
+        rules = _build_energy_rules()
+
+        return [field for rule in rules for field in rule.fields]
+
+    @staticmethod
     def get_fields_to_clear(instance):
         """
         Return the list of fields to clear for a given instance.
@@ -177,7 +188,7 @@ def _build_energy_rules() -> list[FieldClearingRule]:
         # Energy details rules
         FieldClearingRule(
             name="no_fossil_for_energy",
-            fields=["energy_details"],
+            fields=BiomethaneEnergyService.ENERGY_DETAILS_FIELD,
             condition=lambda ctx: not any(
                 energy_type
                 in [
