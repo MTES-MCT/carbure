@@ -386,6 +386,8 @@ class MatierePremiere(models.Model):
     is_displayed = models.BooleanField(default=True)
     category = models.CharField(max_length=32, choices=MP_CATEGORIES, default="CONV")
     dgddi_category = models.CharField(max_length=32, blank=True, null=True, default=None)
+    is_methanogenic = models.BooleanField(default=False)
+    is_biofuel_feedstock = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
