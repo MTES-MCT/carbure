@@ -8,7 +8,7 @@ class ElecMeterReadingVirtual(models.Model):
         on_delete=models.DO_NOTHING,
         db_column="application_id",
         db_constraint=False,
-        related_name="+",
+        related_name="elec_meter_reading_virtual_set",
     )
     meter = models.ForeignKey(
         "elec.ElecMeter",

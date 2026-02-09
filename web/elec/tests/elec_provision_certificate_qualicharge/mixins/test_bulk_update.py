@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Entity
+from core.models import Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
 from elec.factories import ElecProvisionCertificateQualichargeFactory
 from elec.models import ElecProvisionCertificate, ElecProvisionCertificateQualicharge
@@ -12,6 +12,13 @@ class BulkUpdateMixinTest(TestCase):
     """Integration tests for the bulk update mixin - focuses on validation state transitions"""
 
     def setUp(self):
+        # Create admin entity with ELEC rights for DGEC validation tests
+        self.admin_entity = EntityFactory.create(
+            name="Admin DGEC",
+            entity_type=Entity.EXTERNAL_ADMIN,
+        )
+        ExternalAdminRights.objects.create(entity=self.admin_entity, right=ExternalAdminRights.ELEC)
+
         self.cpo = EntityFactory.create(
             name="Test CPO",
             entity_type=Entity.CPO,
@@ -35,13 +42,15 @@ class BulkUpdateMixinTest(TestCase):
             validated_by=ElecProvisionCertificateQualicharge.NO_ONE,
         )
 
-        self.user = setup_current_user(
+        self.user_cpo = setup_current_user(
             self,
             "tester@carbure.local",
             "Tester",
             "gogogo",
             [(self.cpo, "RW")],
         )
+
+        self.user = self.user_cpo  # Default user
 
         # Base data for tests
         self.data = {
@@ -74,7 +83,17 @@ class BulkUpdateMixinTest(TestCase):
 
     def test_bulk_update_no_one_to_dgec(self):
         """Test updating from NO_ONE to DGEC"""
+        # Switch to admin user for DGEC validation
+        self.user = setup_current_user(
+            self,
+            "admin@carbure.local",
+            "Admin",
+            "adminpwd",
+            [(self.admin_entity, "ADMIN")],
+        )
+
         self.data["validated_by"] = ElecProvisionCertificateQualicharge.DGEC
+        self.post_params["query_params"]["entity_id"] = self.admin_entity.id
 
         response = self.client.post(
             **self.post_params,
@@ -90,12 +109,22 @@ class BulkUpdateMixinTest(TestCase):
 
     def test_bulk_update_cpo_to_both(self):
         """Test updating from CPO to BOTH (DGEC validation)"""
+        # Switch to admin user for DGEC validation
+        self.user = setup_current_user(
+            self,
+            "admin@carbure.local",
+            "Admin",
+            "adminpwd",
+            [(self.admin_entity, "ADMIN")],
+        )
+
         self.cert1.validated_by = ElecProvisionCertificateQualicharge.CPO
         self.cert1.save()
         self.cert2.validated_by = ElecProvisionCertificateQualicharge.CPO
         self.cert2.save()
 
         self.data["validated_by"] = ElecProvisionCertificateQualicharge.DGEC
+        self.post_params["query_params"]["entity_id"] = self.admin_entity.id
 
         response = self.client.post(
             **self.post_params,
@@ -170,12 +199,22 @@ class BulkUpdateMixinTest(TestCase):
 
     def test_bulk_update_mixed_validation_states(self):
         """Test updating with mixed validation states"""
+        # Switch to admin user for DGEC validation
+        self.user = setup_current_user(
+            self,
+            "admin@carbure.local",
+            "Admin",
+            "adminpwd",
+            [(self.admin_entity, "ADMIN")],
+        )
+
         self.cert1.validated_by = ElecProvisionCertificateQualicharge.NO_ONE
         self.cert1.save()
         self.cert2.validated_by = ElecProvisionCertificateQualicharge.CPO
         self.cert2.save()
 
         self.data["validated_by"] = ElecProvisionCertificateQualicharge.DGEC
+        self.post_params["query_params"]["entity_id"] = self.admin_entity.id
 
         response = self.client.post(
             **self.post_params,
