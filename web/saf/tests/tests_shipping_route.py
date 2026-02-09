@@ -1,3 +1,5 @@
+from django.test import override_settings
+
 from saf.factories.saf_logistics import SafLogisticsFactory
 from saf.models.saf_logistics import SafLogistics
 from saf.services.is_shipping_route_available import is_shipping_route_available
@@ -93,5 +95,16 @@ class SafShippingRoutesTest(TestCase):
                 destination_airport=self.not_registered_airport,
                 shipping_method=SafLogistics.TRUCK,
                 has_intermediary_depot=True,
+            )
+        )
+
+    @override_settings(ENABLE_SAF_LOGISTICS=False)
+    def test_skip_logistics_validation_with_feature_flag(self):
+        self.assertTrue(
+            is_shipping_route_available(
+                origin_depot=self.origin_depot,
+                destination_airport=self.destination_airport,
+                shipping_method=SafLogistics.TRAIN,
+                has_intermediary_depot=False,
             )
         )

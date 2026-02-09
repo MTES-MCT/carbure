@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
@@ -41,13 +42,15 @@ def get_airports(request, *args, **kwargs):
         sites = sites.filter(private=False)
     if query:
         sites = sites.filter(Q(name__icontains=query) | Q(customs_id__icontains=query) | Q(city__icontains=query))
-    if (origin_depot_id or shipping_method or has_intermediary_depot is not None) and shipping_method != SafLogistics.TRUCK:
-        sites = sites.filter(
-            airport_from_depot_routes__origin_depot_id=origin_depot_id,
-            airport_from_depot_routes__shipping_method=shipping_method,
-            airport_from_depot_routes__has_intermediary_depot=has_intermediary_depot,
-        )
+
+    if settings.ENABLE_SAF_LOGISTICS:
+        should_filter = origin_depot_id or shipping_method or has_intermediary_depot is not None
+        if should_filter and shipping_method != SafLogistics.TRUCK:
+            sites = sites.filter(
+                airport_from_depot_routes__origin_depot_id=origin_depot_id,
+                airport_from_depot_routes__shipping_method=shipping_method,
+                airport_from_depot_routes__has_intermediary_depot=has_intermediary_depot,
+            )
 
     serializer = AirportSerializer(sites, many=True)
-
     return Response(serializer.data)

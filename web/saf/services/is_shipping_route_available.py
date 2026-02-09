@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from saf.models.saf_logistics import SafLogistics
 from transactions.models import Airport
 from transactions.models.depot import Depot
@@ -9,6 +11,10 @@ def is_shipping_route_available(
     shipping_method: str,
     has_intermediary_depot: bool,
 ):
+    # ignorer cette validation si la fonctionnalité est désactivée
+    if not settings.ENABLE_SAF_LOGISTICS:
+        return True
+
     # accepter les tickets sans aéroport et méthode de transport
     # pour tolérer les échanges directs entre 2 opérateurs pétroliers
     if not destination_airport and not shipping_method:
