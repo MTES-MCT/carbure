@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.test import TestCase
 
@@ -169,7 +169,7 @@ class DigestateRulesConfigurationTests(TestCase):
         expected_fields = (
             BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS
             + BiomethaneDigestateService.ON_SITE_FIELDS
-            + ["composting_locations"]
+            + BiomethaneDigestateService.COMPOSTING_LOCATIONS_FIELD
         )
         self.assertEqual(composting_disabled_rule.fields, expected_fields)
 
@@ -256,6 +256,18 @@ class DigestateRulesConfigurationTests(TestCase):
         # Should not trigger when no contract (rule checks contract existence first)
         mock_ctx.contract = None
         self.assertFalse(wwtp_rule.condition(mock_ctx))
+
+    @patch("biomethane.services.digestate._build_digestate_rules")
+    def test_get_all_optional_fields_returns_all_optional_fields_defined_in_rules(self, mock_build_digestate_rules):
+        """Test that get_all_optional_fields returns all the fields from the rules."""
+        mock_build_digestate_rules.return_value = [
+            Mock(fields=["field1", "field2"], condition=lambda ctx: True),
+            Mock(fields=["field3", "field4"], condition=lambda ctx: False),
+        ]
+
+        fields = BiomethaneDigestateService.get_all_optional_fields()
+
+        self.assertEqual(fields, ["field1", "field2", "field3", "field4"])
 
 
 class BiomethaneDigestateServiceIntegrationTests(TestCase):
@@ -361,3 +373,22 @@ class BiomethaneDigestateServiceIntegrationTests(TestCase):
         fields_to_clear = BiomethaneDigestateService.get_fields_to_clear(digestate)
 
         self.assertEqual(optional_fields, fields_to_clear)
+
+    def test_get_all_optional_fields_returns_correct_fields(self):
+        """Test that get_all_optional_fields returns the correct fields."""
+        fields = sorted(set(BiomethaneDigestateService.get_all_optional_fields()))
+        expected_fields = sorted(
+            set(
+                BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS
+                + BiomethaneDigestateService.ON_SITE_FIELDS
+                + BiomethaneDigestateService.RAW_DIGESTATE_FIELDS
+                + BiomethaneDigestateService.SEPARATED_DIGESTATE_FIELDS
+                + BiomethaneDigestateService.SPREADING_FIELDS
+                + BiomethaneDigestateService.INCINERATION_FIELDS
+                + BiomethaneDigestateService.WWTP_FIELDS
+                + BiomethaneDigestateService.SALE_FIELDS
+                + BiomethaneDigestateService.COMPOSTING_LOCATIONS_FIELD,
+            )
+        )
+
+        self.assertEqual(fields, expected_fields)

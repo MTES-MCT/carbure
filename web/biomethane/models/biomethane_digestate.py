@@ -79,6 +79,12 @@ class BiomethaneDigestate(models.Model):
 
         return BiomethaneDigestateService.get_optional_fields(self)
 
+    @property
+    def all_optional_fields(self):
+        from biomethane.services import BiomethaneDigestateService
+
+        return BiomethaneDigestateService.get_all_optional_fields(self)
+
 
 @receiver(post_save, sender=BiomethaneDigestate)
 @receiver(post_save, sender=BiomethaneProductionUnit)
