@@ -22,17 +22,16 @@ import {
 import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
-import { useMemo } from "react"
+import { useDisplayConditionalSectionsEnergy } from "./energy.hooks"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { selectedEntityId } = useSelectedEntity()
   const form = useForm<BiomethaneEnergy | undefined | object>(undefined)
-  const { selectedYear, isDeclarationInCurrentPeriod, annualDeclaration } =
-    useAnnualDeclaration()
+  const { selectedYear } = useAnnualDeclaration()
   const { contractInfos: contract } = useContractProductionUnit()
-
+  const displayConditionalSections = useDisplayConditionalSectionsEnergy()
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "energy",
     params: [entity.id, selectedYear, selectedEntityId],
@@ -45,14 +44,6 @@ const EnergyPage = () => {
     },
   })
 
-  const displayConditionalSections = useMemo(() => {
-    // If the declaration year selected is not the current year and the declaration is not open, we don't display the conditional sections
-    if (!isDeclarationInCurrentPeriod && annualDeclaration?.is_open)
-      return false
-
-    return true
-  }, [isDeclarationInCurrentPeriod, annualDeclaration?.is_open])
-
   usePrivateNavigation(t("Énergie"))
   useMissingFields(form)
 
@@ -61,20 +52,16 @@ const EnergyPage = () => {
   return (
     <FormContext.Provider value={form}>
       <MissingFields />
-      {displayConditionalSections && (
-        <InjectedBiomethane energy={energy} contract={contract} />
-      )}
+      <InjectedBiomethane energy={energy} contract={contract} />
 
       <BiogasProduction />
-      {displayConditionalSections && (
-        <>
-          <InstallationEnergyNeeds contract={contract} />
-          <EnergyEfficiency energy={energy} contract={contract} />
-          {isTariffReference2011Or2020(contract?.tariff_reference) && (
-            <MonthlyBiomethaneInjection energy={energy} />
-          )}
-        </>
-      )}
+      <InstallationEnergyNeeds contract={contract} />
+      <EnergyEfficiency energy={energy} contract={contract} />
+
+      {displayConditionalSections &&
+        isTariffReference2011Or2020(contract?.tariff_reference) && (
+          <MonthlyBiomethaneInjection energy={energy} />
+        )}
 
       <Malfunction />
       <VariousQuestions />

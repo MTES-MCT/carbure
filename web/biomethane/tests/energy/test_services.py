@@ -244,7 +244,7 @@ class EnergyRulesConfigurationTests(TestCase):
 
         fields = BiomethaneEnergyService.get_all_optional_fields()
 
-        self.assertEqual(fields, ["field1", "field2", "field3", "field4"])
+        self.assertEqual(fields, ["field1", "field2", "field3", "field4"] + BiomethaneEnergyService.EXTRA_OPTIONAL_FIELDS)
 
 
 class BiomethaneEnergyServiceIntegrationTests(TestCase):
@@ -330,7 +330,8 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
             + BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD
             + BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS
             + BiomethaneEnergyService.ENERGY_TYPE_CONDITIONAL_FIELDS
-            + BiomethaneEnergyService.ENERGY_DETAILS_FIELD,
+            + BiomethaneEnergyService.ENERGY_DETAILS_FIELD
+            + BiomethaneEnergyService.EXTRA_OPTIONAL_FIELDS,
         )
 
         self.assertEqual(fields, expected_fields)

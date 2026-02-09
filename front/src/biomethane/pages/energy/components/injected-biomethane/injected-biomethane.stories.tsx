@@ -24,6 +24,7 @@ const meta: Meta<typeof InjectedBiomethane> = {
           ...mswHandlers,
         ],
       },
+      mockingDate: new Date(2026, 1, 1),
     },
   }),
   decorators: [
@@ -134,5 +135,12 @@ export const WithContract2023: Story = {
       description:
         "Contrat 2023 : Même formule que 2021. Le champ 'Nombre d'heures de fonctionnement' est calculé et affiché automatiquement.",
     },
+  },
+}
+
+export const WithDeclarationNotInCurrentPeriod: Story = {
+  args: WithContract2023.args,
+  parameters: {
+    mockingDate: new Date(2027, 1, 1),
   },
 }

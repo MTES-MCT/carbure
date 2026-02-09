@@ -5,6 +5,7 @@ import useEntity from "common/hooks/entity"
 import { saveEnergy } from "./api"
 import { BiomethaneEnergyInputRequest } from "./types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useMemo } from "react"
 
 export const useSaveEnergy = () => {
   const { t } = useTranslation()
@@ -28,4 +29,21 @@ export const useSaveEnergy = () => {
   )
 
   return saveEnergyMutation
+}
+
+export const useDisplayConditionalSectionsEnergy = () => {
+  const { isDeclarationInCurrentPeriod, annualDeclaration } =
+    useAnnualDeclaration()
+  console.log(
+    "isDeclarationInCurrentPeriod",
+    isDeclarationInCurrentPeriod,
+    annualDeclaration
+  )
+  return useMemo(() => {
+    // If the declaration year selected is not the current year and the declaration is open, we don't display the conditional sections
+    if (!isDeclarationInCurrentPeriod && annualDeclaration?.is_open)
+      return false
+
+    return true
+  }, [isDeclarationInCurrentPeriod, annualDeclaration?.is_open])
 }

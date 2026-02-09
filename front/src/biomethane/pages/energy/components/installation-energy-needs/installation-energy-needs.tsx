@@ -4,7 +4,10 @@ import { ManagedEditableCard } from "common/molecules/editable-card/managed-edit
 import { useTranslation } from "react-i18next"
 import { useFormContext } from "common/components/form2"
 import { BiomethaneEnergyInputRequest, EnergyType } from "../../types"
-import { useSaveEnergy } from "../../energy.hooks"
+import {
+  useDisplayConditionalSectionsEnergy,
+  useSaveEnergy,
+} from "../../energy.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useAttestNoFossilForEnergy } from "./installation-energy-needs.hooks"
@@ -36,6 +39,7 @@ export function InstallationEnergyNeeds({
   const attestNoFossilForEnergyTexts = useAttestNoFossilForEnergy(
     contract?.tariff_reference
   )
+  const displayConditionalSections = useDisplayConditionalSectionsEnergy()
 
   const handleSubmit = async () => saveEnergy.execute(extractValues(value))
 
@@ -59,15 +63,20 @@ export function InstallationEnergyNeeds({
             {...attestNoFossilForEnergyTexts}
             {...bind("attest_no_fossil_for_energy")}
           />
-          <EnergyTypes contract={contract} isReadOnly={!isEditing} />
-          {displayDetailsField && (
-            <TextInput
-              readOnly={!isEditing}
-              label={t("Précisions")}
-              {...bind("energy_details")}
-              required
-            />
+          {displayConditionalSections && (
+            <>
+              <EnergyTypes contract={contract} isReadOnly={!isEditing} />
+              {displayDetailsField && (
+                <TextInput
+                  readOnly={!isEditing}
+                  label={t("Précisions")}
+                  {...bind("energy_details")}
+                  required
+                />
+              )}
+            </>
           )}
+
           {isEditing && (
             <Button
               type="submit"
