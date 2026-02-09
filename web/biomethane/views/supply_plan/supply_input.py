@@ -40,6 +40,13 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
             description="Producer entity ID (optional, used by DREAL to filter specific producer).",
             required=False,
         ),
+        OpenApiParameter(
+            name="year",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.QUERY,
+            description="Year of the supply plan.",
+            required=True,
+        ),
     ]
 )
 class BiomethaneSupplyInputViewSet(
@@ -54,7 +61,7 @@ class BiomethaneSupplyInputViewSet(
 ):
     queryset = BiomethaneSupplyInput.objects.all()
     filterset_class = BiomethaneSupplyInputFilter
-    search_fields = ["input_type", "input_category"]
+    search_fields = ["input_name"]
     pagination_class = BiomethaneSupplyInputPagination
 
     def get_permissions(self):

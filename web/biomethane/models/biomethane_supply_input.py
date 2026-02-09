@@ -31,25 +31,8 @@ class BiomethaneSupplyInput(models.Model):
 
     crop_type = models.CharField(max_length=15, choices=CROP_TYPE_CHOICES)
 
-    # Catégorie intrants
-    LIVESTOCK_EFFLUENTS = "LIVESTOCK_EFFLUENTS"
-    PRIMARY_CROPS = "PRIMARY_CROPS"
-    INTERMEDIATE_CROPS = "INTERMEDIATE_CROPS"
-    CIVE = "CIVE"
-    IAA_WASTE_RESIDUES = "IAA_WASTE_RESIDUES"
-
-    INPUT_CATEGORY_CHOICES = [
-        (LIVESTOCK_EFFLUENTS, "Effluents d'élevage"),
-        (PRIMARY_CROPS, "Culture principale"),
-        (INTERMEDIATE_CROPS, "Culture intermédiaire"),
-        (CIVE, "CIVE"),
-        (IAA_WASTE_RESIDUES, "Déchets/Résidus d'IAA"),
-    ]
-
-    input_category = models.CharField(max_length=30, choices=INPUT_CATEGORY_CHOICES)
-
-    # Intrants (type spécifique)
-    input_type = models.CharField(max_length=100)
+    # Intrants
+    input_name = models.ForeignKey("feedstocks.Feedstock", null=True, on_delete=models.PROTECT)
 
     # Unité matière
     DRY = "DRY"
@@ -95,4 +78,4 @@ class BiomethaneSupplyInput(models.Model):
         return None
 
     def __str__(self):
-        return f"Intrant n°{self.id} - {self.input_type} ({self.supply_plan.year})"
+        return f"Intrant n°{self.id} - {self.input_name} ({self.supply_plan.year})"

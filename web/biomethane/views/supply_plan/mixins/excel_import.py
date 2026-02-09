@@ -35,7 +35,7 @@ class ExcelImportActionMixin:
                 value={
                     "validation_errors": [
                         {"row": 3, "errors": {"volume": ["This field is required."]}},
-                        {"row": 5, "errors": {"input_type": ["Invalid input type."]}},
+                        {"row": 5, "errors": {"input_name": ["Invalid input type."]}},
                     ],
                     "total_errors": 2,
                     "total_rows_processed": 10,

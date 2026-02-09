@@ -7,6 +7,7 @@ from faker import Faker
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from core.models import Entity, Pays
 from entity.factories.entity import EntityFactory
+from feedstocks.models import Feedstock
 
 faker = Faker()
 
@@ -29,7 +30,7 @@ class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
     source = fuzzy.FuzzyChoice(BiomethaneSupplyInput.SOURCE_CHOICES, getter=lambda x: x[0])
     crop_type = fuzzy.FuzzyChoice(BiomethaneSupplyInput.CROP_TYPE_CHOICES, getter=lambda x: x[0])
     input_category = fuzzy.FuzzyChoice(BiomethaneSupplyInput.INPUT_CATEGORY_CHOICES, getter=lambda x: x[0])
-    input_type = factory.Faker("word")
+    input_name = factory.LazyFunction(lambda: Feedstock.objects.order_by("?").first())
     material_unit = fuzzy.FuzzyChoice(BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES, getter=lambda x: x[0])
 
     dry_matter_ratio_percent = factory.LazyAttribute(
