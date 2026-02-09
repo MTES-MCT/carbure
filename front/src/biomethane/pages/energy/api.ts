@@ -26,7 +26,6 @@ export const saveEnergy = (
   year: number,
   body: BiomethaneEnergyInputRequest
 ) => {
-  console.log("saveEnergy", { entity_id, year, body })
   return api.PUT("/biomethane/energy/", {
     params: {
       query: {
