@@ -1,2 +1,0 @@
-
-from .feedstock import FeedstockFilter
