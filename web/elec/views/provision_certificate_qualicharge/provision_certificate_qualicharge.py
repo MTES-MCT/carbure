@@ -77,6 +77,11 @@ class ElecProvisionCertificateQualichargeViewSet(ListModelMixin, RetrieveModelMi
             return ElecProvisionCertificateQualichargeGroupedSerializer
         return self.serializer_class
 
+    def paginate_queryset(self, queryset):
+        if "group_by" in self.request.query_params:
+            return None
+        return super().paginate_queryset(queryset)
+
     def initialize_request(self, request, *args, **kwargs):
         if request.method == "POST" and request.path.endswith("bulk-create/"):  # Not found better way to check this
             self.authentication_classes = [JWTAuthentication]
