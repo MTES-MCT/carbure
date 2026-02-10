@@ -1,10 +1,14 @@
 from django.db.models import Sum
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters import BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
+from biomethane.filters import (
+    BaseBiomethaneSupplyInputFilter,
+    BiomethaneSupplyInputCreateFilter,
+    BiomethaneSupplyInputFilter,
+)
 from biomethane.models import BiomethaneSupplyInput
 from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.permissions import get_biomethane_permissions
@@ -49,6 +53,11 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
         ),
     ]
 )
+@extend_schema_view(
+    retrieve=extend_schema(parameters=[OpenApiParameter(name="year", exclude=True)]),
+    update=extend_schema(parameters=[OpenApiParameter(name="year", exclude=True)]),
+    partial_update=extend_schema(parameters=[OpenApiParameter(name="year", exclude=True)]),
+)
 class BiomethaneSupplyInputViewSet(
     ListWithObjectPermissionsMixin,
     GenericViewSet,
@@ -60,7 +69,6 @@ class BiomethaneSupplyInputViewSet(
     FiltersActionFactory(),
 ):
     queryset = BiomethaneSupplyInput.objects.all()
-    filterset_class = BiomethaneSupplyInputFilter
     search_fields = ["input_name"]
     pagination_class = BiomethaneSupplyInputPagination
 
@@ -93,9 +101,12 @@ class BiomethaneSupplyInputViewSet(
         return context
 
     def get_filterset_class(self):
-        if self.action in ["list", "export_supply_plan_to_excel"]:
-            return self.filterset_class
-        return BiomethaneSupplyInputCreateFilter
+        if self.action in ["retrieve", "update", "partial_update"]:
+            return BaseBiomethaneSupplyInputFilter
+        elif self.action in ["create"]:
+            return BiomethaneSupplyInputCreateFilter
+        else:
+            return BiomethaneSupplyInputFilter
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
