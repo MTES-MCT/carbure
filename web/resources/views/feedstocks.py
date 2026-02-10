@@ -30,12 +30,18 @@ from core.serializers import FeedStockSerializer
 def get_feedstocks(request, *args, **kwargs):
     query = request.query_params.get("query")
     double_count_only = request.query_params.get("double_count_only", False)
+    is_methanogenic = request.query_params.get("is_methanogenic")
+    is_biofuel_feedstock = request.query_params.get("is_biofuel_feedstock")
 
     mps = MatierePremiere.objects.filter(is_displayed=True).order_by("name")
     if double_count_only == "true":
         mps = mps.filter(is_double_compte=True)
     if query:
         mps = mps.filter(Q(name__icontains=query) | Q(name_en__icontains=query) | Q(code__icontains=query))
+    if is_methanogenic == "true":
+        mps = mps.filter(is_methanogenic=True)
+    if is_biofuel_feedstock == "true":
+        mps = mps.filter(is_biofuel_feedstock=True)
 
     serializer = FeedStockSerializer(mps, many=True)
     return Response(serializer.data)
