@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { useNavigate, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { ChevronLeft } from "common/components/icons"
 import { Button } from "common/components/button"
 import UserRights from "../components/user-rights"
@@ -27,6 +27,7 @@ import { getEntityTypeLabel } from "common/utils/normalizers"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const entity = useEntity()
   const { id = "" } = useParams<"id">()
   const companyId = parseInt(id, 10)
@@ -63,7 +64,7 @@ const EntityDetails = () => {
         <Row style={{ alignItems: "center", gap: "var(--spacing-m)" }}>
           <Button
             icon={ChevronLeft}
-            action={() => navigate(-1)}
+            action={() => navigate({ pathname: "..", search: location.search })}
             label="Retour"
           />
           <Row style={{ alignItems: "center", gap: "var(--spacing-m)" }}>

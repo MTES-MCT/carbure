@@ -17,12 +17,14 @@ import {
   normalizeEntityType,
 } from "common/utils/normalizers"
 import useEntity from "common/hooks/entity"
+import { useLocation } from "react-router-dom"
 import Tag from "common/components/tag"
 import { Operation, useEntitySummaryFilters } from "./entity-summary.hooks"
 import { SearchInput } from "common/components/input"
 
 export const EntitySummary = () => {
   const { t } = useTranslation()
+  const location = useLocation()
   const entity = useEntity()
   const {
     filters: entitySummaryFilters,
@@ -121,7 +123,10 @@ export const EntitySummary = () => {
           <Table<EntityDetails>
             loading={entities.loading}
             rows={matchedEntities}
-            rowLink={(e) => `${e.entity.id}`}
+            rowLink={(e) => ({
+              pathname: `${e.entity.id}`,
+              search: location.search,
+            })}
             columns={compact([
               {
                 key: "acces",

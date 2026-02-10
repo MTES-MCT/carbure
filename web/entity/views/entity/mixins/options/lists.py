@@ -2,7 +2,7 @@ from django.db.models import Count, Q, Value
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.response import Response
 
-from core.models import Entity, ExternalAdminRights
+from core.models import Entity
 from doublecount.models import DoubleCountingApplication
 from elec.models import ElecChargePointApplication, ElecMeterReadingApplication
 from entity.serializers import EntityMetricsSerializer
@@ -41,27 +41,10 @@ class EntityListActionMixin:
         entity = Entity.objects.prefetch_related("externaladminrights_set").get(id=entity_id)
         q = request.query_params.get("q", None)
         has_requests = request.query_params.get("has_requests", None)
-        entities = Entity.objects.all().order_by("name").prefetch_related("registered_country", "externaladminrights_set")
 
-        filter_condition = Q()
-
-        # limit entities for DGAC
-        if entity.has_external_admin_right(ExternalAdminRights.AIRLINE):
-            filter_condition |= Q(entity_type=Entity.AIRLINE) | Q(entity_type=Entity.SAF_TRADER)
-
-        # limit entities for Elec stuff
-        if entity.has_external_admin_right(ExternalAdminRights.ELEC):
-            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True)
-
-        if entity.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
-            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR)
-
-        # limit entities related to double counting
-        if entity.has_external_admin_right(ExternalAdminRights.DOUBLE_COUNTING):
-            filter_condition |= Q(entity_type=Entity.PRODUCER)
-
-        if filter_condition:
-            entities = entities.filter(filter_condition)
+        entities = (
+            entity.get_allowed_entities().order_by("name").prefetch_related("registered_country", "externaladminrights_set")
+        )
 
         # initialize counters for all expected values
         entities = entities.annotate(
