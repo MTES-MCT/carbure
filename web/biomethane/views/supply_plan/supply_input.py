@@ -69,6 +69,7 @@ class BiomethaneSupplyInputViewSet(
     FiltersActionFactory(),
 ):
     queryset = BiomethaneSupplyInput.objects.all()
+    filterset_class = BiomethaneSupplyInputFilter
     search_fields = ["input_name"]
     pagination_class = BiomethaneSupplyInputPagination
 
