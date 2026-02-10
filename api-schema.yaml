@@ -1971,6 +1971,10 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: input_name
+          schema:
+            type: string
         - name: ordering
           required: false
           in: query
@@ -2011,10 +2015,6 @@ paths:
           description: |-
             * `INTERNAL` - Interne
             * `EXTERNAL` - Externe
-        - in: query
-          name: type
-          schema:
-            type: string
         - in: query
           name: year
           schema:
@@ -2118,12 +2118,6 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Year of the supply plan.
-          required: true
       tags:
         - biomethane
       security:
@@ -2166,12 +2160,6 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Year of the supply plan.
-          required: true
       tags:
         - biomethane
       requestBody:
@@ -2226,12 +2214,6 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Year of the supply plan.
-          required: true
       tags:
         - biomethane
       requestBody:
@@ -2322,12 +2304,16 @@ paths:
           schema:
             type: string
             enum:
+              - input_name
               - producer_id
               - source
-              - type
               - year
           description: Filter string to apply
           required: true
+        - in: query
+          name: input_name
+          schema:
+            type: string
         - name: ordering
           required: false
           in: query
@@ -2357,10 +2343,6 @@ paths:
             * `INTERNAL` - Interne
             * `EXTERNAL` - Externe
         - in: query
-          name: type
-          schema:
-            type: string
-        - in: query
           name: year
           schema:
             type: integer
@@ -2382,9 +2364,9 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
+                    - input_name
                     - producer_id
                     - source
-                    - type
                     - year
                   summary: Example of filters response.
           description: ""
