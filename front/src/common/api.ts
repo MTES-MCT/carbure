@@ -180,3 +180,28 @@ export function getCompanyDetails(entity_id: number, company_id: number) {
     },
   })
 }
+
+/**
+ * Retrieve the new list of feedstocks classification, according to the european union database
+ */
+export const findFeedstocksClassification = (
+  options: {
+    is_biofuel_feedstock?: boolean
+    is_methanogenic?: boolean
+    query?: string
+  } = {}
+) => {
+  const defaultOptions = {
+    is_biofuel_feedstock: true,
+    is_methanogenic: false,
+    query: "",
+  }
+  const mergedOptions = { ...defaultOptions, ...options }
+  return apiFetch
+    .GET("/feedstocks/feedstocks/", {
+      params: {
+        query: mergedOptions,
+      },
+    })
+    .then((res) => res.data ?? [])
+}

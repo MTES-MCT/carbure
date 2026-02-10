@@ -23,6 +23,8 @@ export type UserRightRequest = apiTypes["UserRightsRequests"]
 
 export type Feedstock = apiTypes["FeedStock"]
 
+export type FeedstockClassification = apiTypes["Feedstocks"]
+
 export type Biofuel = apiTypes["Biofuel"]
 
 export type Country = apiTypes["Country"]
