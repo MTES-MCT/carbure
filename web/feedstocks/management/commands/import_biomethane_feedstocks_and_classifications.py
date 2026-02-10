@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from core.models import MatierePremiere
-from feedstocks.models import Classification, Feedstock
+from feedstocks.models import Classification
 
 
 class Command(BaseCommand):
@@ -69,7 +69,6 @@ class Command(BaseCommand):
             "matiere_premiere_created": 0,
             "matiere_premiere_updated": 0,
             "classification_created": 0,
-            "feedstock_created": 0,
             "skipped": 0,
             "errors": 0,
         }
@@ -90,6 +89,9 @@ class Command(BaseCommand):
                         str(row.get("Code affichage", "")).strip() if pd.notna(row.get("Code affichage")) else ""
                     )
 
+                    if code_affichage:
+                        intrant = code_affichage  # Override intrant with code_affichage if provided
+
                     if not intrant:
                         self.stdout.write(self.style.WARNING(f"Row {index + 1}: Missing 'Intrant', skipping"))
                         stats["skipped"] += 1
@@ -97,9 +99,24 @@ class Command(BaseCommand):
 
                     self.stdout.write(f"\nProcessing row {index + 1}: {intrant}")
 
-                    # 1. Get or create MatierePremiere and update is_methanogenic
+                    # 1. Get or create Classification
+                    classification, class_created = Classification.objects.get_or_create(
+                        group=groupe,
+                        category=categorie,
+                        subcategory=sous_categorie,
+                    )
+
+                    if class_created:
+                        self.stdout.write(
+                            self.style.SUCCESS(f"  - Created Classification: {groupe} / {categorie} / {sous_categorie}")
+                        )
+                        stats["classification_created"] += 1
+                    else:
+                        self.stdout.write(f"  - Found existing Classification: {groupe} / {categorie} / {sous_categorie}")
+
+                    # 2. Update or create MatierePremiere and update is_methanogenic
                     try:
-                        matiere_premiere = MatierePremiere.objects.get(name=intrant)
+                        matiere_premiere = MatierePremiere.objects.get(name=intrant, classification=classification)
                         # Update is_methanogenic if not already set
                         if not matiere_premiere.is_methanogenic:
                             matiere_premiere.is_methanogenic = True
@@ -115,42 +132,15 @@ class Command(BaseCommand):
                     except MatierePremiere.DoesNotExist:
                         # Create new MatierePremiere
                         matiere_premiere = MatierePremiere.objects.create(
-                            name=intrant[:128],
-                            name_en=intrant[:128],
-                            code=intrant.upper().replace(" ", "_")[:64],
+                            name=intrant[:256],
+                            name_en=intrant[:256],
+                            code=f"{intrant.upper().replace(' ', '_')[:60]}_{index}",
                             is_methanogenic=True,
+                            classification=classification,
                             description="",
                         )
                         self.stdout.write(self.style.SUCCESS(f"  - Created MatierePremiere: {matiere_premiere.name}"))
                         stats["matiere_premiere_created"] += 1
-
-                    # 2. Get or create Classification
-                    classification, class_created = Classification.objects.get_or_create(
-                        group=groupe,
-                        category=categorie,
-                        subcategory=sous_categorie,
-                    )
-
-                    if class_created:
-                        self.stdout.write(
-                            self.style.SUCCESS(f"  - Created Classification: {groupe} / {categorie} / {sous_categorie}")
-                        )
-                        stats["classification_created"] += 1
-                    else:
-                        self.stdout.write(f"  - Found existing Classification: {groupe} / {categorie} / {sous_categorie}")
-
-                    # 3. Create Feedstock (link between MatierePremiere and Classification)
-                    feedstock, feedstock_created = Feedstock.objects.get_or_create(
-                        matiere_premiere=matiere_premiere,
-                        classification=classification,
-                        defaults={"name": code_affichage},
-                    )
-
-                    if feedstock_created:
-                        self.stdout.write(self.style.SUCCESS(f"  - Created Feedstock: {feedstock.name}"))
-                        stats["feedstock_created"] += 1
-                    else:
-                        self.stdout.write(f"  - Feedstock already exists: {feedstock.name}")
 
                 except Exception as e:
                     self.stderr.write(self.style.ERROR(f"Row {index + 1}: Error processing row: {e}"))
@@ -163,7 +153,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"MatierePremiere created: {stats['matiere_premiere_created']}"))
         self.stdout.write(self.style.SUCCESS(f"MatierePremiere updated: {stats['matiere_premiere_updated']}"))
         self.stdout.write(self.style.SUCCESS(f"Classification created: {stats['classification_created']}"))
-        self.stdout.write(self.style.SUCCESS(f"Feedstock created: {stats['feedstock_created']}"))
         self.stdout.write(self.style.WARNING(f"Skipped: {stats['skipped']} rows"))
         self.stdout.write(self.style.ERROR(f"Errors: {stats['errors']} rows"))
         self.stdout.write(self.style.SUCCESS("\nAll changes saved to database"))
