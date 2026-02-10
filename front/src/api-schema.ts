@@ -7507,6 +7507,7 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                input_name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -7520,7 +7521,6 @@ export interface operations {
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
-                type?: string;
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -7579,8 +7579,6 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
-                /** @description Year of the supply plan. */
-                year: number;
             };
             header?: never;
             path: {
@@ -7608,8 +7606,6 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
-                /** @description Year of the supply plan. */
-                year: number;
             };
             header?: never;
             path: {
@@ -7643,8 +7639,6 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
-                /** @description Year of the supply plan. */
-                year: number;
             };
             header?: never;
             path: {
@@ -7704,6 +7698,7 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
+                input_name?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
@@ -7713,7 +7708,6 @@ export interface operations {
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
-                type?: string;
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -13161,9 +13155,9 @@ export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
     INTERNAL = "INTERNAL"
 }
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
+    input_name = "input_name",
     producer_id = "producer_id",
     source = "source",
-    type = "type",
     year = "year"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {

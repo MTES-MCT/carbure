@@ -58,7 +58,7 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
 
   const filterLabels = {
     [BiomethaneSupplyInputFilter.source]: t("Provenance"),
-    [BiomethaneSupplyInputFilter.type]: t("Intrant"),
+    [BiomethaneSupplyInputFilter.input_name]: t("Intrant"),
   }
 
   const normalizers = {
@@ -66,7 +66,7 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
       value,
       label: getSupplyPlanInputSource(value as BiomethaneSupplyInputSource),
     }),
-    [BiomethaneSupplyInputFilter.type]: (value: string) =>
+    [BiomethaneSupplyInputFilter.input_name]: (value: string) =>
       defaultNormalizer(value),
   }
 
