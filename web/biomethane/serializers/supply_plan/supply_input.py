@@ -91,6 +91,7 @@ class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreate
 class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField(source="supply_plan.year", read_only=True)
     origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    input_name = serializers.SlugRelatedField(slug_field="name", read_only=True)
 
     class Meta:
         model = BiomethaneSupplyInput
