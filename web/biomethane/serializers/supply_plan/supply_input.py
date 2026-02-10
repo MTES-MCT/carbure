@@ -2,15 +2,13 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
-from core.models import Pays
-from core.serializers import CountrySerializer
-from feedstocks.models import Feedstock
-from feedstocks.serializers.feedstock import FeedstocksSerializer
+from core.models import MatierePremiere, Pays
+from core.serializers import CountrySerializer, FeedStockSerializer
 
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
-    input_name = FeedstocksSerializer()
+    input_name = FeedStockSerializer()
 
     class Meta:
         model = BiomethaneSupplyInput
@@ -23,7 +21,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     crop_type = LabelChoiceField(choices=BiomethaneSupplyInput.CROP_TYPE_CHOICES)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
 
-    input_name = serializers.SlugRelatedField(slug_field="name", queryset=Feedstock.objects.all())
+    input_name = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.objects.all())
     origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
 
     # Use European float fields for numeric values

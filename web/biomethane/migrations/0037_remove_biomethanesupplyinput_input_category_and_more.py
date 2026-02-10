@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("biomethane", "0036_remove_biomethaneenergy_injected_biomethane_nm3_per_year_and_more"),
-        ("feedstocks", "0001_initial"),
+        ("core", "0061_matierepremiere_classification_and_more"),
     ]
 
     operations = [
@@ -22,6 +22,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="biomethanesupplyinput",
             name="input_name",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to="feedstocks.feedstock"),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to="core.MatierePremiere"),
         ),
     ]

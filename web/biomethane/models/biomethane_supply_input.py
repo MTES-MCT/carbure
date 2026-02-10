@@ -32,7 +32,7 @@ class BiomethaneSupplyInput(models.Model):
     crop_type = models.CharField(max_length=15, choices=CROP_TYPE_CHOICES)
 
     # Intrants
-    input_name = models.ForeignKey("feedstocks.Feedstock", null=True, on_delete=models.PROTECT)
+    input_name = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.PROTECT)
 
     # Unité matière
     DRY = "DRY"

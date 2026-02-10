@@ -8,8 +8,7 @@ from io import BufferedReader
 import xlsxwriter
 
 from biomethane.models import BiomethaneSupplyInput
-from core.models import Department, Pays
-from feedstocks.models.feedstock import Feedstock
+from core.models import Department, MatierePremiere, Pays
 
 
 def create_supply_plan_template() -> BufferedReader:
@@ -38,7 +37,7 @@ def create_supply_plan_template() -> BufferedReader:
     # Get departments from database
     departments = list(Department.objects.all().order_by("code_dept"))
     # Get intrants from database
-    inputs = list(Feedstock.objects.all().order_by("name"))
+    inputs = list(MatierePremiere.objects.all().order_by("name"))
 
     # Create main sheet
     _create_main_sheet(workbook, header_format, eu_countries, departments, inputs)
