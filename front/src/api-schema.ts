@@ -3601,7 +3601,7 @@ export interface components {
         BiomethaneSupplyInput: {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
-            readonly input_name: string;
+            input_name: components["schemas"]["Feedstocks"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];

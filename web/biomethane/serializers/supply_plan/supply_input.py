@@ -5,11 +5,12 @@ from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, L
 from core.models import Pays
 from core.serializers import CountrySerializer
 from feedstocks.models import Feedstock
+from feedstocks.serializers.feedstock import FeedstocksSerializer
 
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
-    input_name = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    input_name = FeedstocksSerializer()
 
     class Meta:
         model = BiomethaneSupplyInput
