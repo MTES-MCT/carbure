@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -12,12 +13,37 @@ class DepotManager(SiteManager):
 
 class Depot(Site):
     class Meta:
-        proxy = True
         verbose_name = "Dépôt"
         verbose_name_plural = "Dépôts"
         ordering = ["name"]
 
+    customs_id = models.CharField(max_length=32, blank=True)
+    accise = models.CharField(max_length=32, blank=True)
+    electrical_efficiency = models.FloatField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Entre 0 et 1",
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
+    thermal_efficiency = models.FloatField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Entre 0 et 1",
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+    )
+    useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
+
     objects = DepotManager()
+
+    @property
+    def depot_type(self):
+        return self.site_type
+
+    @property
+    def depot_id(self):
+        return self.customs_id
 
     def natural_key(self):
         return {

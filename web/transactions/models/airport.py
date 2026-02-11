@@ -1,3 +1,5 @@
+from django.db import models
+
 from transactions.models import Site, SiteManager
 
 
@@ -8,10 +10,12 @@ class AirportManager(SiteManager):
 
 class Airport(Site):
     class Meta:
-        proxy = True
         verbose_name = "Aéroport"
         verbose_name_plural = "Aéroports"
         ordering = ["name"]
+
+    icao_code = models.CharField(max_length=32, blank=True)
+    is_ue_airport = models.BooleanField(default=True)
 
     objects = AirportManager()
 
