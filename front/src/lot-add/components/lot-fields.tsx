@@ -128,7 +128,7 @@ export const FeedstockField = (props: AutocompleteProps<Feedstock>) => {
       icon={icon}
       label={t("Matière première")}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={api.findFeedstocks}
+      getOptions={(query) => api.findFeedstocks({ query })}
       normalize={norm.normalizeFeedstock}
       {...bound}
       {...props}

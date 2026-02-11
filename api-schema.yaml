@@ -1974,7 +1974,11 @@ paths:
         - in: query
           name: input_name
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: ordering
           required: false
           in: query
@@ -2008,13 +2012,17 @@ paths:
         - in: query
           name: source
           schema:
-            type: string
-            enum:
-              - EXTERNAL
-              - INTERNAL
+            type: array
+            items:
+              type: string
+              enum:
+                - EXTERNAL
+                - INTERNAL
           description: |-
             * `INTERNAL` - Interne
             * `EXTERNAL` - Externe
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -2313,7 +2321,11 @@ paths:
         - in: query
           name: input_name
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: ordering
           required: false
           in: query
@@ -2335,13 +2347,17 @@ paths:
         - in: query
           name: source
           schema:
-            type: string
-            enum:
-              - EXTERNAL
-              - INTERNAL
+            type: array
+            items:
+              type: string
+              enum:
+                - EXTERNAL
+                - INTERNAL
           description: |-
             * `INTERNAL` - Interne
             * `EXTERNAL` - Externe
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -6899,44 +6915,6 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
-  /api/feedstocks/feedstocks/:
-    get:
-      operationId: feedstocks_feedstocks_list
-      parameters:
-        - in: query
-          name: is_biofuel_feedstock
-          schema:
-            type: boolean
-        - in: query
-          name: is_methanogenic
-          schema:
-            type: boolean
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-      tags:
-        - feedstocks
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Feedstocks"
-          description: ""
   /api/nav-stats:
     get:
       operationId: nav_stats_retrieve
@@ -13001,7 +12979,7 @@ components:
         origin_country:
           $ref: "#/components/schemas/Country"
         input_name:
-          $ref: "#/components/schemas/Feedstocks"
+          $ref: "#/components/schemas/FeedStock"
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
@@ -13092,6 +13070,7 @@ components:
           $ref: "#/components/schemas/MaterialUnitEnum"
         input_name:
           type: string
+          minLength: 1
         origin_country:
           type: string
           minLength: 1
@@ -13130,6 +13109,9 @@ components:
         origin_country:
           type: string
           readOnly: true
+        input_name:
+          type: string
+          readOnly: true
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
@@ -13155,11 +13137,9 @@ components:
           type: number
           format: double
           nullable: true
-        input_name:
-          type: integer
-          nullable: true
       required:
         - crop_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -15762,10 +15742,10 @@ components:
       properties:
         name:
           type: string
-          maxLength: 128
+          maxLength: 256
         name_en:
           type: string
-          maxLength: 128
+          maxLength: 256
         code:
           type: string
           maxLength: 64
@@ -15783,11 +15763,11 @@ components:
         name:
           type: string
           minLength: 1
-          maxLength: 128
+          maxLength: 256
         name_en:
           type: string
           minLength: 1
-          maxLength: 128
+          maxLength: 256
         code:
           type: string
           minLength: 1
@@ -15800,17 +15780,6 @@ components:
         - code
         - name
         - name_en
-    Feedstocks:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 256
-      required:
-        - id
     FieldData:
       type: object
       properties:
@@ -17122,6 +17091,7 @@ components:
           $ref: "#/components/schemas/MaterialUnitEnum"
         input_name:
           type: string
+          minLength: 1
         origin_country:
           type: string
           minLength: 1

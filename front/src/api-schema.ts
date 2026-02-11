@@ -2045,22 +2045,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/feedstocks/feedstocks/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["feedstocks_feedstocks_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/nav-stats": {
         parameters: {
             query?: never;
@@ -3601,7 +3585,7 @@ export interface components {
         BiomethaneSupplyInput: {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
-            input_name: components["schemas"]["Feedstocks"];
+            input_name: components["schemas"]["FeedStock"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
@@ -3652,6 +3636,7 @@ export interface components {
         BiomethaneSupplyInputExport: {
             readonly year: number;
             readonly origin_country: string;
+            readonly input_name: string;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
@@ -3664,7 +3649,6 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            input_name?: number | null;
         };
         /**
          * @description * `INTERNAL` - Interne
@@ -4717,10 +4701,6 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
-        };
-        Feedstocks: {
-            readonly id: number;
-            name?: string;
         };
         FieldData: {
             name: string;
@@ -7509,7 +7489,7 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                input_name?: string;
+                input_name?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -7522,7 +7502,7 @@ export interface operations {
                 search?: string;
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -7700,7 +7680,7 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
-                input_name?: string;
+                input_name?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
@@ -7709,7 +7689,7 @@ export interface operations {
                 search?: string;
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -10719,32 +10699,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-        };
-    };
-    feedstocks_feedstocks_list: {
-        parameters: {
-            query?: {
-                is_biofuel_feedstock?: boolean;
-                is_methanogenic?: boolean;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description A search term. */
-                search?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Feedstocks"][];
                 };
             };
         };

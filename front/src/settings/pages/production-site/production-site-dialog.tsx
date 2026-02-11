@@ -305,7 +305,7 @@ export const ProductionSiteForm = ({
           readOnly={readOnly}
           placeholder={t("Ajouter matières premières...")}
           defaultOptions={value.matieres_premieres}
-          getOptions={common.findFeedstocks}
+          getOptions={(query) => common.findFeedstocks({ query })}
           normalize={normalizeFeedstock}
           {...bind("matieres_premieres")}
           required

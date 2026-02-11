@@ -11,17 +11,6 @@ export function extract<T>(res: AxiosResponse<Api<T[]>>) {
   return res.data ?? []
 }
 
-export async function findFeedstocks(
-  query: string,
-  double_count_only?: boolean
-) {
-  const res = await apiFetch.GET("/resources/feedstocks", {
-    params: { query: { query, double_count_only } },
-  })
-
-  return res.data ?? []
-}
-
 export async function findBiofuels(query: string) {
   const res = await apiFetch.GET("/resources/biofuels", {
     params: { query: { query } },
@@ -182,23 +171,25 @@ export function getCompanyDetails(entity_id: number, company_id: number) {
 }
 
 /**
- * Retrieve the new list of feedstocks classification, according to the european union database
+ * Retrieve the new list of feedstocks, according to the european union database
  */
-export const findFeedstocksClassification = (
+export const findFeedstocks = (
   options: {
     is_biofuel_feedstock?: boolean
     is_methanogenic?: boolean
     query?: string
+    double_count_only?: boolean
   } = {}
 ) => {
   const defaultOptions = {
     is_biofuel_feedstock: true,
     is_methanogenic: false,
     query: "",
+    double_count_only: false,
   }
   const mergedOptions = { ...defaultOptions, ...options }
   return apiFetch
-    .GET("/feedstocks/feedstocks/", {
+    .GET("/resources/feedstocks", {
       params: {
         query: mergedOptions,
       },

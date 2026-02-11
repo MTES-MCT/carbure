@@ -20,7 +20,6 @@ import {
   EntityCertificate,
   EntityDepot,
   EntityPreview,
-  FeedstockClassification,
 } from "common/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { formatMonth, formatPeriod } from "common/utils/formatters"
@@ -33,13 +32,6 @@ export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
 export const normalizeFeedstock: Normalizer<Feedstock> = (feedstock) => ({
   value: feedstock,
   label: i18next.t(feedstock.code, { ns: "feedstocks" }),
-})
-
-export const normalizeFeedstockClassification: Normalizer<
-  FeedstockClassification
-> = (feedstockClassification) => ({
-  value: feedstockClassification,
-  label: feedstockClassification.name ?? i18next.t("Inconnu"),
 })
 
 export const normalizeCountry: Normalizer<Country> = (country) => ({
