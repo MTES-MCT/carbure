@@ -1,11 +1,6 @@
 from django.db import models
 
-from transactions.models import Site, SiteManager
-
-
-class AirportManager(SiteManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(site_type__in=Site.AIRPORT_TYPES)
+from transactions.models import Site
 
 
 class Airport(Site):
@@ -16,8 +11,6 @@ class Airport(Site):
 
     icao_code = models.CharField(max_length=32, blank=True)
     is_ue_airport = models.BooleanField(default=True)
-
-    objects = AirportManager()
 
     def natural_key(self):
         return {

@@ -1,12 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from transactions.models import Site, SiteManager
-
-
-class ProductionSiteManager(SiteManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(site_type__in=Site.PRODUCTION_SITE_TYPES)
+from transactions.models import Site
 
 
 class ProductionSite(Site):
@@ -24,8 +19,6 @@ class ProductionSite(Site):
     manager_name = models.CharField(max_length=64, blank=True)
     manager_phone = models.CharField(max_length=64, blank=True)
     manager_email = models.CharField(max_length=64, blank=True)
-
-    objects = ProductionSiteManager()
 
     @property
     def producer(self):

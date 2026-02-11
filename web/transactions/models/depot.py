@@ -3,12 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from transactions.models import Site, SiteManager
-
-
-class DepotManager(SiteManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(site_type__in=Site.DEPOT_TYPES)
+from transactions.models import Site
 
 
 class Depot(Site):
@@ -34,8 +29,6 @@ class Depot(Site):
         validators=[MinValueValidator(0), MaxValueValidator(1)],
     )
     useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
-
-    objects = DepotManager()
 
     @property
     def depot_type(self):
