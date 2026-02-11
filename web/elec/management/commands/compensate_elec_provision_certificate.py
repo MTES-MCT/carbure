@@ -1,8 +1,6 @@
-from datetime import date
-
 from django.core.management.base import BaseCommand
 
-from elec.management.scripts import generate_compensate_elec_provision_certificate
+from elec.management.scripts import compensate_elec_provision_certificate
 
 
 class Command(BaseCommand):
@@ -10,15 +8,32 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--percent",
+            "--enr_ratio",
             type=int,
-            default=25,
-            help="Percent to use (default = 25%)",
+            help="Current ENR ratio",
+            required=True,
+        )
+        parser.add_argument(
+            "--apply",
+            action="store_true",
+            default=False,
+            help="Apply the compensation",
+        )
+        parser.add_argument(
+            "--store-file",
+            action="store_true",
+            default=False,
+            help="Store the data used to create the certificates in a file",
+        )
+        parser.add_argument(
+            "--log",
+            action="store_true",
+            default=False,
+            help="Log the compensation",
         )
 
     def handle(self, *args, **options):
-        percent = options["percent"]
-        self.stdout.write(f" -- Running with renewable_share = {percent}%.")
-        today = date.today()
-        last_year = today.year - 1
-        generate_compensate_elec_provision_certificate(last_year, percent)
+        enr_ratio = options["enr_ratio"]
+        self.stdout.write(f" -- Running with ENR ratio = {enr_ratio}%.")
+
+        compensate_elec_provision_certificate(enr_ratio, options["apply"], options["store_file"], options["log"])
