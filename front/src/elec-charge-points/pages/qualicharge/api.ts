@@ -49,13 +49,7 @@ export function getQualichargeFilters(
     .then((res) => res.data ?? [])
 }
 
-const getQualichargeDataResponse = <
-  T extends
-    | apiTypes["ElecProvisionCertificateQualicharge"]
-    | apiTypes["ElecProvisionCertificateQualichargeGrouped"],
->(
-  query: QualichargeQuery
-) => {
+export const getQualichargeData = (query: QualichargeQuery) => {
   return api
     .GET("/elec/provision-certificates-qualicharge/", {
       params: {
@@ -67,19 +61,15 @@ const getQualichargeDataResponse = <
         ...res,
         data: {
           ...res.data,
-          results: res.data?.results as T[],
+          results: res.data
+            ?.results as apiTypes["ElecProvisionCertificateQualicharge"][],
         },
       }
     })
 }
-// This endpoint can returned a list of certificates, but when the props group_by is set, it returns a list of grouped certificates
-// So we need to force the type of the results to the correct type
-export function getQualichargeData(query: QualichargeQuery) {
-  return getQualichargeDataResponse<
-    apiTypes["ElecProvisionCertificateQualicharge"]
-  >(query)
-}
 
+// This endpoint can return a list of certificates paginated, but when the props group_by is set, it returns a list of grouped certificates
+// So we need to force the type of the results to the correct type (backend can't return the correct type because of the polymorphic serializer)
 export function getQualichargeDataGroupedByOperatingUnit(
   query: QualichargeQuery
 ) {
@@ -87,9 +77,29 @@ export function getQualichargeDataGroupedByOperatingUnit(
     ...query,
     group_by: [QualichargeGroupBy.operating_unit],
   }
-  return getQualichargeDataResponse<
-    apiTypes["ElecProvisionCertificateQualichargeGrouped"]
-  >(queryWithGroupBy)
+  return api
+    .GET("/elec/provision-certificates-qualicharge/", {
+      params: {
+        query: getQuery(queryWithGroupBy),
+      },
+    })
+    .then((res) => {
+      const certificates =
+        res.data as unknown as apiTypes["ElecProvisionCertificateQualichargeGrouped"][]
+      return {
+        ...res,
+        data: certificates,
+        count: certificates.length,
+        total_quantity: certificates.reduce(
+          (acc, certificate) => acc + certificate.energy_amount,
+          0
+        ),
+        total_quantity_renewable: certificates.reduce(
+          (acc, certificate) => acc + certificate.renewable_energy,
+          0
+        ),
+      }
+    })
 }
 
 export function getQualichargeDataDetail(id: number, entity_id: number) {
