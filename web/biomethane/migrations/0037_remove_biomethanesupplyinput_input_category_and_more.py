@@ -7,7 +7,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("biomethane", "0036_remove_biomethaneenergy_injected_biomethane_nm3_per_year_and_more"),
-        ("core", "0061_matierepremiere_classification_and_more"),
     ]
 
     operations = [
