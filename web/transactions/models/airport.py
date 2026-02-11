@@ -5,6 +5,7 @@ from transactions.models import Site
 
 class Airport(Site):
     class Meta:
+        db_table = "sites_airports"
         verbose_name = "Aéroport"
         verbose_name_plural = "Aéroports"
         ordering = ["name"]

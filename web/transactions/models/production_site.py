@@ -6,6 +6,7 @@ from transactions.models import Site
 
 class ProductionSite(Site):
     class Meta:
+        db_table = "sites_productionsites"
         verbose_name = "Site de Production"
         verbose_name_plural = "Sites de Production"
 
