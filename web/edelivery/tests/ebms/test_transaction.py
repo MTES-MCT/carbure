@@ -121,3 +121,11 @@ class TransactionTest(TestCase):
         self.assertNotIn("quantity", lot_attributes)
         self.assertNotIn("volume", lot_attributes)
         self.assertNotIn("weight", lot_attributes)
+
+    def test_knows_its_ETD_ghg_value(self):
+        xml_data = transaction_data(etd=5.5)
+        transaction = Transaction.from_xml(xml_data)
+        self.assertEqual(5.5, transaction.etd())
+
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertEqual(5.5, lot_attributes["etd"])
