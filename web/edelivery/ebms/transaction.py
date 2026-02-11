@@ -24,6 +24,12 @@ class Transaction:
         delivery_date_text = self.xml_root_element.find("./DELIVERY_DATE").text
         return datetime.fromisoformat(delivery_date_text)
 
+    def eec(self):
+        eec_element = self.xml_root_element.find("./EO_TRANS_DETAIL_MATERIALS/GHG_DETAILS/EEC")
+        if eec_element is None: return None
+
+        return float(eec_element.text)
+
     def feedstock_code(self):
         xpath = "./EO_TRANS_DETAIL_MATERIALS/POINT_OF_ORIGIN_MATERIAL_DATA/MATERIAL_CODE"
         return self.xml_root_element.find(xpath).text
@@ -49,6 +55,11 @@ class Transaction:
         computed_quantity_data = compute_lot_quantity(biofuel, quantity_data)
         supplier = from_national_trade_register(self.supplier_id())
 
+        ghg_data = {}
+        eec = self.eec()
+        if eec is not None:
+            ghg_data["eec"] = eec
+
         return {
             "biofuel": biofuel,
             "carbure_client": client,
@@ -59,6 +70,7 @@ class Transaction:
             "lot_status": self.status(),
             "year": self.year(),
             **computed_quantity_data,
+            **ghg_data,
         }
 
     def quantity(self):

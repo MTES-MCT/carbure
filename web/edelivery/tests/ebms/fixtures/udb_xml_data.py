@@ -1,8 +1,25 @@
+def ghg_details_fragment(ghg_details):
+    eec_fragment = f"<EEC>{ghg_details['eec']}</EEC>" if "eec" in ghg_details else ""
+
+    return f"""\
+<GHG_DETAILS>
+  <GHG_METHOD_TYPE>AV</GHG_METHOD_TYPE>
+  <GHG_TOTAL_VALUE>22</GHG_TOTAL_VALUE>
+  <GHG_MEASURING_UNIT_ACR>gCO2eq/MJ</GHG_MEASURING_UNIT_ACR>
+  {eec_fragment}
+  <EP>20</EP>
+  <ETD>2</ETD>
+  <EU>0</EU>
+  <DDV_APPLIED_FOR_SOIL_N2O_EMISSIONS>false</DDV_APPLIED_FOR_SOIL_N2O_EMISSIONS>
+  <FUEL_BONUS_IF_BIOMASS_FROM_RESTORED_DEGRADED_LAND>false</FUEL_BONUS_IF_BIOMASS_FROM_RESTORED_DEGRADED_LAND>
+</GHG_DETAILS>"""
+
 def transaction_data(
     biofuel=None,
     client_id="FR_SIREN_CD222222222",
     delivery_date="2025-01-30T00:00:00.000Z",
     feedstock=None,
+    ghg_details=None,
     quantity=None,
     status="ACCEPTED",
     supplier_id="FR_SIREN_CD111111111",
@@ -12,6 +29,8 @@ def transaction_data(
         biofuel = {"code": "SFC0015", "name": "Biogas"}
     if feedstock is None:
         feedstock = {"code": "URWS023", "name": "Sugar beet"}
+    if ghg_details is None:
+        ghg_details = {"eec": 50, "el": 40, "ep": 30, "etd": 20, "eu": 10, "esca": 5, "eccs": 3, "eccr": 2}
     if quantity is None:
         quantity = {"unit": "MWh", "value": 2000}
 
@@ -50,17 +69,7 @@ def transaction_data(
       <LOW_ILUC>false</LOW_ILUC>
       <COUNTRY_OF_ORIGIN>FR</COUNTRY_OF_ORIGIN>
     </POINT_OF_ORIGIN_MATERIAL_DATA>
-    <GHG_DETAILS>
-      <GHG_METHOD_TYPE>AV</GHG_METHOD_TYPE>
-      <GHG_TOTAL_VALUE>31.8</GHG_TOTAL_VALUE>
-      <GHG_MEASURING_UNIT_ACR>gCO2eq/MJ</GHG_MEASURING_UNIT_ACR>
-      <EEC>10</EEC>
-      <EP>20</EP>
-      <ETD>1.8</ETD>
-      <DISTANCE_ROAD>100</DISTANCE_ROAD>
-      <DDV_APPLIED_FOR_SOIL_N2O_EMISSIONS>false</DDV_APPLIED_FOR_SOIL_N2O_EMISSIONS>
-      <FUEL_BONUS_IF_BIOMASS_FROM_RESTORED_DEGRADED_LAND>false</FUEL_BONUS_IF_BIOMASS_FROM_RESTORED_DEGRADED_LAND>
-    </GHG_DETAILS>
+    {ghg_details_fragment(ghg_details)}
   </EO_TRANS_DETAIL_MATERIALS>
   <POS_DATA>
     <POS_FLAG>true</POS_FLAG>

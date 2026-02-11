@@ -132,3 +132,27 @@ class TransactionTest(TestCase):
         self.assertEqual(3600 * 10, lot_attributes["lhv_amount"])
         self.assertEqual(10, lot_attributes["weight"])
         self.assertEqual(20, lot_attributes["volume"])
+
+    def test_knows_its_EEC_ghg_value(self):
+        xml_data = transaction_data(ghg_details={"eec": 12.8})
+        transaction = Transaction.from_xml(xml_data)
+        self.assertEqual(12.8, transaction.eec())
+
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertEqual(12.8, lot_attributes["eec"])
+
+    def test_handles_absent_GHG_values(self):
+        xml_data = transaction_data(ghg_details={})
+        transaction = Transaction.from_xml(xml_data)
+        self.assertEqual(None, transaction.eec())
+
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertTrue("eec" not in lot_attributes)
+
+    def _test_knows_all_ghg_values(self):
+        xml_data = transaction_data(ghg_details={"eec": 128, "el": 64, "ep": 32, "etd": 16, "eu": 8, "esca": 4, "eccs": 2, "eccr": 1})
+        transaction = Transaction.from_xml(xml_data)
+        self.assertEqual(128, transaction.eec())
+
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertEqual(128, lot_attributes["eec"])
