@@ -30,6 +30,10 @@ class Transaction:
         delivery_date_text = delivery_date_element.text
         return datetime.fromisoformat(delivery_date_text).date()
 
+    def etd(self):
+        etd_element = self.xml_root_element.find("./POS_DATA/ETD")
+        return float(etd_element.text)
+
     def feedstock_code(self):
         xpath = "./EO_TRANS_DETAIL_MATERIALS/POINT_OF_ORIGIN_MATERIAL_DATA/MATERIAL_CODE"
         return self.xml_root_element.find(xpath).text
@@ -57,6 +61,7 @@ class Transaction:
             "carbure_client_id": client_id,
             "carbure_supplier_id": supplier_id,
             "dispatch_date": self.loading_date(),
+            "etd": self.etd(),
             "feedstock_code": feedstock_code,
             "lot_status": lot_status,
             "udb_transaction_id": self.udb_transaction_id(),
