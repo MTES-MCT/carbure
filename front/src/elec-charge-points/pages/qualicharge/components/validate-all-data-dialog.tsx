@@ -104,12 +104,12 @@ export const ValidateAllDataDialog = ({
         text={t(
           "{{count}} volumes pour un total de {{total}} MWh ({{total_renewable}} MWh renouvelable)",
           {
-            count: result?.data?.count,
-            total: formatNumber(result?.data?.total_quantity ?? 0, {
+            count: result?.count,
+            total: formatNumber(result?.total_quantity ?? 0, {
               fractionDigits: 0,
             }),
             total_renewable: formatNumber(
-              result?.data?.total_quantity_renewable ?? 0,
+              result?.total_quantity_renewable ?? 0,
               {
                 fractionDigits: 2,
               }
@@ -117,11 +117,7 @@ export const ValidateAllDataDialog = ({
           }
         )}
       />
-      <Table
-        columns={columns}
-        rows={result?.data?.results ?? []}
-        loading={loading}
-      />
+      <Table columns={columns} rows={result?.data ?? []} loading={loading} />
     </Dialog>
   )
 }
