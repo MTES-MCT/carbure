@@ -21,7 +21,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     crop_type = LabelChoiceField(choices=BiomethaneSupplyInput.CROP_TYPE_CHOICES)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
 
-    input_name = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.objects.all())
+    input_name = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.biomethane.all())
     origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
 
     # Use European float fields for numeric values

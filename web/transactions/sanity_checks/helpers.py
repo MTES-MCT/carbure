@@ -143,7 +143,7 @@ def get_prefetched_data(entity=None):
 
     data["countries"] = {p.code_pays: p for p in Pays.objects.all()}
     data["biofuels"] = {b.code: b for b in Biocarburant.objects.all()}
-    data["feedstocks"] = {m.code: m for m in MatierePremiere.objects.all()}
+    data["feedstocks"] = {m.code: m for m in MatierePremiere.biofuel.all()}
     data["depots"] = {d.depot_id: d for d in Depot.objects.all()}
     data["depotsbyname"] = {d.name.upper(): d for d in data["depots"].values()}
     data["locked_years"] = [locked_year.year for locked_year in YearConfig.objects.filter(locked=True)]

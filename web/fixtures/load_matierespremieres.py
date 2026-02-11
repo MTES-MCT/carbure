@@ -25,7 +25,7 @@ with open(filename) as csvfile:
         is_huile_vegetale = row[5]
         is_displayed = row[6]
         category = row[7]
-        obj, created = MatierePremiere.objects.update_or_create(
+        obj, created = MatierePremiere.biofuel.update_or_create(
             code=code,
             defaults={
                 "name": name,

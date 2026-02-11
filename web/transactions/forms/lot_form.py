@@ -12,7 +12,7 @@ class LotForm(forms.Form):
     ENTITIES = Entity.objects.all()
     PRODUCERS = Entity.objects.filter(entity_type=Entity.PRODUCER)
     BIOFUELS = Biocarburant.objects.all()
-    FEEDSTOCKS = MatierePremiere.objects.all()
+    FEEDSTOCKS = MatierePremiere.biofuel.all()
     COUNTRIES = Pays.objects.all()
     PRODUCTION_SITES = ProductionSite.objects.all()
     DEPOTS = Depot.objects.all()

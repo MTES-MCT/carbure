@@ -2,18 +2,25 @@ from django.test import TestCase
 
 from biomethane.models import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateSerializer
+from core.models import MatierePremiere
 
 
 class BiomethaneSupplyInputSerializerTests(TestCase):
     fixtures = ["json/countries.json"]
 
     def setUp(self):
+        self.matiere_premiere = MatierePremiere.objects.create(
+            name="Maïs",
+            name_en="Corn",
+            code="MAIS",
+            is_methanogenic=True,
+        )
+
         self.valid_data = {
             "material_unit": BiomethaneSupplyInput.WET,
             "dry_matter_ratio_percent": None,
             "source": BiomethaneSupplyInput.INTERNAL,
             "crop_type": BiomethaneSupplyInput.MAIN,
-            "input_category": BiomethaneSupplyInput.CIVE,
             "input_name": "Maïs",
             "volume": 1000.0,
             "origin_country": "FR",

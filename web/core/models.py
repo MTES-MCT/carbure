@@ -357,6 +357,16 @@ class Biocarburant(models.Model):
         ordering = ["name"]
 
 
+class MatierePremiereBiofuelManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_biofuel_feedstock=True)
+
+
+class MatierePremiereBiomethaneManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_methanogenic=True)
+
+
 class MatierePremiere(models.Model):
     CONV = "CONV"  # CONV
     IXA = "ANN-IX-A"  # Av DC
@@ -406,6 +416,10 @@ class MatierePremiere(models.Model):
         verbose_name = "Matiere Premiere"
         verbose_name_plural = "Matieres Premieres"
         ordering = ["name"]
+
+    objects = models.Manager()
+    biofuel = MatierePremiereBiofuelManager()
+    biomethane = MatierePremiereBiomethaneManager()
 
 
 class Depot(models.Model):

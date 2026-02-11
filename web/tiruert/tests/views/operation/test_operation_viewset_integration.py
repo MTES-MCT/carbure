@@ -27,7 +27,7 @@ class OperationViewSetIntegrationTest(TestCase):
         cls.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
         cls.other_entity = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=cls.entity.id).first()
         cls.depot = Depot.objects.first()
-        cls.feedstock_conv = MatierePremiere.objects.filter(category="CONV").first()
+        cls.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
         cls.biofuel_eth = Biocarburant.objects.get(code="ETH")
 
         # Create TIRUERT operations directly for testing ViewSet

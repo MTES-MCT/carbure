@@ -15,7 +15,7 @@ class ProductionSiteInputFactory(factory.django.DjangoModelFactory):
         model = ProductionSiteInput
 
     production_site = factory.SubFactory(SiteFactory)
-    matiere_premiere = factory.Iterator(MatierePremiere.objects.all())
+    matiere_premiere = factory.Iterator(MatierePremiere.biofuel.all())
     status = "Valid"
 
 

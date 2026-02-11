@@ -38,7 +38,7 @@ class ProductionSiteSerializerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.country = Pays.objects.get(code_pays="FR")
-        cls.feedstock = MatierePremiere.objects.get(code="BLE")
+        cls.feedstock = MatierePremiere.biofuel.get(code="BLE")
         cls.biofuel = Biocarburant.objects.get(code="ETH")
 
         cls.producer = EntityFactory.create(name="Producer")
