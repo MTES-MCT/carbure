@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 
 from entity.services import enable_depot
-from transactions.models import EntitySite, Site
+from transactions.models import Airport, Depot, EntitySite, ProductionSite, Site
 
 from .models import YearConfig
 
@@ -24,19 +24,16 @@ class EntitySiteInline(admin.TabularInline):
 class SiteAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "customs_id",
         "get_owner",
         "site_type",
         "city",
         "country",
-        "date_mise_en_service",
-        "ges_option",
         "gps_coordinates",
         "private",
         "is_enabled",
     )
-    search_fields = ("name", "city", "country__name", "ges_option", "customs_id")
-    list_filter = ("site_type", "country", "ges_option", "eligible_dc")
+    search_fields = ("name", "city", "country__name")
+    list_filter = ("site_type", "country")
     actions = ["enable_site"]
     inlines = [EntitySiteInline]
 
@@ -52,3 +49,55 @@ class SiteAdmin(admin.ModelAdmin):
         return [entity_site.entity.name for entity_site in entity_sites]
 
     get_owner.short_description = "Owners"
+
+
+@admin.register(Depot)
+class DepotAdmin(SiteAdmin):
+    list_display = (
+        "name",
+        "customs_id",
+        "get_owner",
+        "site_type",
+        "city",
+        "country",
+        "gps_coordinates",
+        "private",
+        "is_enabled",
+    )
+    search_fields = ("name", "city", "country__name", "customs_id")
+    list_filter = ("site_type", "country")
+
+
+@admin.register(ProductionSite)
+class ProductionSiteAdmin(SiteAdmin):
+    list_display = (
+        "name",
+        "get_owner",
+        "city",
+        "country",
+        "date_mise_en_service",
+        "ges_option",
+        "eligible_dc",
+        "gps_coordinates",
+        "private",
+        "is_enabled",
+    )
+    search_fields = ("name", "city", "country__name", "ges_option")
+    list_filter = ("country", "ges_option", "eligible_dc")
+
+
+@admin.register(Airport)
+class AirportAdmin(SiteAdmin):
+    list_display = (
+        "name",
+        "icao_code",
+        "get_owner",
+        "city",
+        "country",
+        "is_ue_airport",
+        "gps_coordinates",
+        "private",
+        "is_enabled",
+    )
+    search_fields = ("name", "city", "country__name", "icao_code")
+    list_filter = ("country", "is_ue_airport")
