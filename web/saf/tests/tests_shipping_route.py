@@ -4,7 +4,8 @@ from saf.factories.saf_logistics import SafLogisticsFactory
 from saf.models.saf_logistics import SafLogistics
 from saf.services.is_shipping_route_available import is_shipping_route_available
 from saf.tests import TestCase
-from transactions.factories.site import SiteFactory
+from transactions.factories.airport import AirportFactory
+from transactions.factories.depot import DepotFactory
 from transactions.models.site import Site
 
 
@@ -12,11 +13,11 @@ class SafShippingRoutesTest(TestCase):
     def setUp(self):
         super().setUp()
 
-        self.origin_depot = SiteFactory.create(site_type=Site.EFCA)
-        self.destination_airport = SiteFactory.create(site_type=Site.AIRPORT)
+        self.origin_depot = DepotFactory.create(site_type=Site.EFCA)
+        self.destination_airport = AirportFactory.create(site_type=Site.AIRPORT)
 
-        self.not_regsitered_depot = SiteFactory.create(site_type=Site.EFCA)
-        self.not_registered_airport = SiteFactory.create(site_type=Site.AIRPORT)
+        self.not_regsitered_depot = DepotFactory.create(site_type=Site.EFCA)
+        self.not_registered_airport = AirportFactory.create(site_type=Site.AIRPORT)
 
         SafLogisticsFactory.create(
             origin_depot=self.origin_depot,

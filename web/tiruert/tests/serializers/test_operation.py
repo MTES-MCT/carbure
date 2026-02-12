@@ -11,6 +11,7 @@ from tiruert.serializers.operation import (
     OperationUpdateSerializer,
 )
 from transactions.factories import CarbureLotFactory
+from transactions.factories.production_site import ProductionSiteFactory
 from transactions.models import Depot
 
 
@@ -104,7 +105,9 @@ class OperationInputSerializerCreateTest(TestCase):
         from core.models import Entity
 
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        self.producer = Entity.objects.filter(entity_type=Entity.PRODUCER).first()
         self.depot = Depot.objects.first()
+        self.production_site = ProductionSiteFactory.create(created_by=self.producer)
         self.biofuel_eth = Biocarburant.objects.get(code="ETH")
         self.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
 
@@ -116,7 +119,12 @@ class OperationInputSerializerCreateTest(TestCase):
     def test_create_calls_service_perform_checks(self, mock_service):
         """Should call OperationService.perform_checks_before_create()."""
         # Create real CarbureLot for FK constraint
-        lot = CarbureLotFactory(volume=500, added_by=self.entity, carbure_production_site=self.depot)
+        lot = CarbureLotFactory(
+            volume=500,
+            added_by=self.entity,
+            carbure_producer=self.producer,
+            carbure_production_site=self.production_site,
+        )
 
         serializer = OperationInputSerializer(context={"request": self.mock_request})
         validated_data = {
@@ -143,7 +151,12 @@ class OperationInputSerializerCreateTest(TestCase):
     def test_create_calls_service_define_status(self, mock_service):
         """Should call OperationService.define_operation_status()."""
         # Create real CarbureLot for FK constraint
-        lot = CarbureLotFactory(volume=500, added_by=self.entity, carbure_production_site=self.depot)
+        lot = CarbureLotFactory(
+            volume=500,
+            added_by=self.entity,
+            carbure_producer=self.producer,
+            carbure_production_site=self.production_site,
+        )
 
         serializer = OperationInputSerializer(context={"request": self.mock_request})
         validated_data = {

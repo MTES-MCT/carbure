@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
-from transactions.models import Site
+from transactions.models import Depot, ProductionSite, Site
 
 
 class ResourcesTest(TestCase):
@@ -216,10 +216,10 @@ class ResourcesTest(TestCase):
     def test_get_delivery_sites(self):
         # create delivery sites
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Depot1", customs_id="007", country=fr)
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers", customs_id="042", country=fr)
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers 2", customs_id="043", country=fr)
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Carcassonne", customs_id="044", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Depot1", customs_id="007", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers", customs_id="042", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers 2", customs_id="043", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Carcassonne", customs_id="044", country=fr)
 
         url = "resources-depots"
         response = self.client.get(reverse(url))
@@ -240,28 +240,28 @@ class ResourcesTest(TestCase):
         other_producer, _ = Entity.objects.update_or_create(name="tata", entity_type="Producteur")
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         today = datetime.date.today()
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine1",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine2",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine3",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine4",
             created_by_id=other_producer.id,

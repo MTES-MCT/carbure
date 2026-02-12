@@ -170,7 +170,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         agreement = DoubleCountingRegistration.objects.get(certificate_id=application.certificate_id)
         assert agreement.valid_from == date(2023, 1, 1)
         assert agreement.valid_until == date(2024, 12, 31)
-        assert agreement.production_site == application.production_site
+        assert agreement.production_site_id == application.production_site_id
         assert agreement.certificate_id == application.certificate_id
         assert agreement.application.id == application.id
 
