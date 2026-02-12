@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from transactions.models import Site
+from .site import Site
 
 
 class ProductionSite(Site):

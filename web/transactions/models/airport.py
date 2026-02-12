@@ -1,6 +1,6 @@
 from django.db import models
 
-from transactions.models import Site
+from .site import Site
 
 
 class Airport(Site):
