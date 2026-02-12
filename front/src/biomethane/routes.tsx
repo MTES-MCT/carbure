@@ -31,6 +31,10 @@ const BiomethaneInjectionPage = lazy(() => import("biomethane/pages/injection"))
 const BiomethaneProductionPage = lazy(
   () => import("biomethane/pages/production")
 )
+
+const CustomerSatisfaction = lazy(
+  () => import("biomethane/pages/customer-satisfaction")
+)
 const BiomethaneAdminDashboardPage = lazy(
   () => import("biomethane/pages/admin/dashboard/dashboard")
 )
@@ -102,7 +106,7 @@ export const BiomethaneRoutes = () => {
       </Route>
 
       <Route path="closed-declaration" element={<ClosedDeclaration />} />
-
+      <Route path="customer-satisfaction" element={<CustomerSatisfaction />} />
       <Route
         path=""
         element={
