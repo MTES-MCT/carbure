@@ -16,12 +16,11 @@ from entity.factories.entity import EntityFactory
 FIXED_TODAY = date(2026, 2, 15)
 
 
-def run_command(enr_ratio, apply=False, store_file=False, log=False):
+def run_command(enr_ratio, apply=False, log=False):
     report = call_command(
         "compensate_elec_provision_certificate",
         enr_ratio=enr_ratio,
         apply=apply,
-        store_file=store_file,
         log=log,
         stdout=StringIO(),
     )
@@ -52,14 +51,14 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
         self.assertEqual(len(result), 2)
 
         # The energy amount before compensation is 25 kWh, the energy amount
-        # after compensation is 30 kWh, so the delta is 5 kWh
+        # after compensation is 30 kWh, so the delta is 5 kWh / 1000 = 0.005 MWh (rounded to 2 decimal places) = 0.01 MWh
         expected_data = [
             {
                 "cpo_id": self.cpo1.id,
                 "quarter": 1,
                 "year": 2025,
                 "operating_unit": "00001",
-                "energy_amount": 5,
+                "energy_amount": 0.01,
                 "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
             },
             {
@@ -67,7 +66,7 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
                 "quarter": 2,
                 "year": 2025,
                 "operating_unit": "00001",
-                "energy_amount": 5,
+                "energy_amount": 0.01,
                 "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
             },
         ]

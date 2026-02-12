@@ -6,10 +6,6 @@ from django.db.models import CharField, Sum
 from django.db.models.expressions import F, Value
 from django.db.models.functions import Cast, Concat, Round
 
-from elec.management.helpers.prepare_excel_provision_certificate_compensation import (
-    create_excel_file,
-    prepare_excel_data,
-)
 from elec.models import ElecMeterReadingVirtual, ElecProvisionCertificate
 from transactions.models import YearConfig
 
@@ -29,12 +25,6 @@ class Command(BaseCommand):
             action="store_true",
             default=False,
             help="Apply the compensation",
-        )
-        parser.add_argument(
-            "--store-file",
-            action="store_true",
-            default=False,
-            help="Store the data used to create the certificates in a file",
         )
         parser.add_argument(
             "--log",
@@ -90,8 +80,6 @@ class Command(BaseCommand):
         )
 
         elec_provision_certificates = []
-        meter_readings_for_csv = []
-        cpo_totals = {}
 
         for meter_reading in meter_readings:
             # Delta in KWH (value retrieved from the meter readings)
@@ -106,17 +94,7 @@ class Command(BaseCommand):
 
             # Check if there is a delta between the energy declared, and the energy calculated by the new ENR ratio.
             # If there is a delta, and the certificate has not already been created, create a new certificate.
-            if delta_in_kwh > 0 and key not in certificates_already_created:
-                # Prepare the data for the Excel file.
-                meter_reading_for_csv, cpo_totals_for_csv = prepare_excel_data(
-                    meter_reading,
-                    cpo_totals.get(meter_reading["cpo__name"]),
-                    delta_in_kwh,
-                    delta_in_mwh,
-                )
-                meter_readings_for_csv.append(meter_reading_for_csv)
-                cpo_totals[meter_reading["cpo__name"]] = cpo_totals_for_csv
-
+            if delta_in_mwh > 0 and key not in certificates_already_created:
                 elec_provision_certificates.append(
                     ElecProvisionCertificate(
                         cpo_id=meter_reading["cpo__id"],
@@ -139,10 +117,7 @@ class Command(BaseCommand):
 
             YearConfig.objects.filter(year=today.year).update(renewable_share=new_enr_ratio)
 
-        if options["store_file"] and meter_readings_for_csv:
-            create_excel_file(meter_readings_for_csv, cpo_totals, last_year, options["log"])
-
-        # Sortie JSON sur stdout uniquement (récupérable dans les tests)
+        # Return the result as a JSON object for the tests.
         result = [
             {
                 "cpo_id": c.cpo_id,
