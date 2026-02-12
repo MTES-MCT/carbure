@@ -17,6 +17,7 @@ import { MissingFields } from "biomethane/components/missing-fields"
 import { Text } from "common/components/text"
 import { useNavigateToMissingFields } from "biomethane/components/missing-fields"
 import { AnnualDeclarationStatus } from "biomethane/types"
+import { DeclarationValidatedModalStep1 } from "./declaration-validated-modal/declaration-validated-modal-step1"
 
 export const usePageHeaderActions = () => {
   const { t } = useTranslation()
@@ -37,6 +38,7 @@ export const usePageHeaderActions = () => {
         notify(t("Votre déclaration a bien été transmise."), {
           variant: "success",
         })
+        portal((close) => <DeclarationValidatedModalStep1 onClose={close} />)
       },
       onError: (err) => {
         const errorCode = (err as HttpError).status
