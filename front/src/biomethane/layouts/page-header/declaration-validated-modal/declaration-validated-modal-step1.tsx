@@ -2,12 +2,20 @@ import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { CustomStepper } from "./custom-stepper"
 import { Text } from "common/components/text"
+import { usePortal } from "common/components/portal"
+import { DeclarationValidatedModalStep2 } from "./declaration-validated-modal-step2"
 
 export const DeclarationValidatedModalStep1 = ({
   onClose,
 }: {
   onClose: () => void
 }) => {
+  const portal = usePortal()
+  const goToStep2 = () => {
+    portal((close) => <DeclarationValidatedModalStep2 onClose={close} />)
+    onClose()
+  }
+
   return (
     <Dialog
       onClose={onClose}
@@ -17,7 +25,7 @@ export const DeclarationValidatedModalStep1 = ({
         </Dialog.Title>
       }
       footer={
-        <Button priority="primary" onClick={onClose}>
+        <Button priority="primary" onClick={goToStep2}>
           Suivant
         </Button>
       }
