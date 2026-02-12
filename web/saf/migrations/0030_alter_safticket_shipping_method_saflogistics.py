@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("saf", "0029_safticket_pos_poc_number"),
-        ("transactions", "0015_alter_site_collation"),
+        ("transactions", "0016_split_site_into_concrete_models"),
     ]
 
     operations = [

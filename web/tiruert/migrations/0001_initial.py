@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("core", "0036_alter_depot_depot_type"),
-        ("transactions", "0007_depot_productionsite"),
+        ("transactions", "0016_split_site_into_concrete_models"),
     ]
 
     operations = [

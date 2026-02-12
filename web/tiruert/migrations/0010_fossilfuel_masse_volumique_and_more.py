@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("core", "0040_entity_accise_number_entity_is_tiruert_liable"),
         ("tiruert", "0009_fossilfuelcategory_fossilfuel_objective"),
-        ("transactions", "0013_alter_yearconfig_renewable_share"),
+        ("transactions", "0016_split_site_into_concrete_models"),
     ]
 
     operations = [
