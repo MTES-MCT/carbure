@@ -229,23 +229,24 @@ class Entity(models.Model):
     # Return the entities that are allowed to be accessed by this entity
     def get_allowed_entities(self):
         entities = Entity.objects.all()
+        filter_condition = Q()
 
         if self.has_external_admin_right(ExternalAdminRights.AIRLINE):
-            entities = entities.filter(Q(entity_type=Entity.AIRLINE) | Q(entity_type=Entity.SAF_TRADER))
+            filter_condition |= Q(entity_type=Entity.AIRLINE) | Q(entity_type=Entity.SAF_TRADER)
         if self.has_external_admin_right(ExternalAdminRights.ELEC):
-            entities = entities.filter(Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True))
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True)
         if self.has_external_admin_right(ExternalAdminRights.DOUBLE_COUNTING):
-            entities = entities.filter(entity_type=Entity.PRODUCER)
+            filter_condition |= Q(entity_type=Entity.PRODUCER)
         if self.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
-            entities = entities.filter(Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR))
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR)
         if self.has_external_admin_right(ExternalAdminRights.DREAL):
             accessible_dept_codes = self.get_accessible_departments().values_list("code_dept", flat=True)
-            entities = entities.filter(
+            filter_condition |= Q(
                 biomethane_production_unit__department__code_dept__in=accessible_dept_codes,
                 entity_type=Entity.BIOMETHANE_PRODUCER,
             )
 
-        return entities
+        return entities.filter(filter_condition)
 
     class Meta:
         db_table = "entities"
