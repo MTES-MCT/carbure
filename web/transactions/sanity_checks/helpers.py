@@ -162,12 +162,13 @@ def get_prefetched_data(entity=None):
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2], 'entity2': [depot42]}
     depotsbyentities = {}
-    associated_depots = EntitySite.objects.select_related("entity", "site").filter(site__in=Depot.objects.all())
+    associated_depots = EntitySite.objects.select_related("entity", "site__depot").filter(site__in=Depot.objects.all())
     for entitydepot in associated_depots:
+        depot = entitydepot.site.depot
         if entitydepot.entity.pk in depotsbyentities:
-            depotsbyentities[entitydepot.entity.pk].append(entitydepot.site.depot_id)
+            depotsbyentities[entitydepot.entity.pk].append(depot.depot_id)
         else:
-            depotsbyentities[entitydepot.entity.pk] = [entitydepot.site.depot_id]
+            depotsbyentities[entitydepot.entity.pk] = [depot.depot_id]
     data["depotsbyentity"] = depotsbyentities
 
     # MAPPING OF ENTITIES AND THEIR CERTIFICATES
