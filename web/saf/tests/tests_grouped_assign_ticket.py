@@ -136,7 +136,7 @@ class SafGroupedAssignTicketTest(TestCase):
     def test_assign_ticket_with_incompatible_logistics(self):
         origin_depot_a = DepotFactory.create(site_type=Site.EFPE)
         origin_depot_b = DepotFactory.create(site_type=Site.EFPE)
-        destination_airport = AirportFactory.create()
+        destination_airport = AirportFactory.create(site_type=Site.AIRPORT)
 
         SafLogisticsFactory.create(
             origin_depot=origin_depot_a,

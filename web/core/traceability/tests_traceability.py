@@ -38,7 +38,6 @@ class TraceabilityTest(TestCase):
         self.entity2 = entities[1]
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
 
-        # Get real Depot instances from fixtures
         self.depot = Depot.objects.first()
         self.depot2 = Depot.objects.last()
 

@@ -21,10 +21,12 @@ class AirportTest(TestCase):
         self.airport_a = AirportFactory.create(
             name="Aéroport Paris",
             private=True,
+            site_type=Site.AIRPORT,
         )
         self.airport_b = AirportFactory.create(
             name="Aéroport Marseille",
             private=False,
+            site_type=Site.AIRPORT,
         )
 
     def get_airports(
