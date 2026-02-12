@@ -5,30 +5,27 @@
     "fields": {
       "name": "Rocheval Storage Yard",
       "site_siret": "FR000000001",
-      "customs_id": "RV-DEP-01",
-      "icao_code": "",
       "site_type": "OTHER",
       "address": "12 Zone Logistique",
       "postal_code": "33080",
       "city": "Bordeaux",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 14
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 1,
+    "fields": {
+      "customs_id": "RV-DEP-01",
       "accise": "FR-ACC-001",
       "electrical_efficiency": null,
       "thermal_efficiency": null,
       "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Helene Brard",
-      "manager_phone": "+33 5 57 00 11 22",
-      "manager_email": "helene.brard@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2015-04-01",
-      "created_by": 14,
-      "is_ue_airport": true
+      "site_ptr": 1
     }
   },
   {
@@ -37,30 +34,27 @@
     "fields": {
       "name": "Seaside EFS Terminal",
       "site_siret": "FR000000002",
-      "customs_id": "EFS-0012",
-      "icao_code": "",
       "site_type": "EFS",
       "address": "Quai des Marées",
       "postal_code": "76600",
       "city": "Le Havre",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 14
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 2,
+    "fields": {
+      "customs_id": "EFS-0012",
       "accise": "FR-EFS-012",
       "electrical_efficiency": null,
       "thermal_efficiency": null,
       "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Adrien Coste",
-      "manager_phone": "+33 2 35 00 22 33",
-      "manager_email": "a.coste@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2017-06-12",
-      "created_by": 14,
-      "is_ue_airport": true
+      "site_ptr": 2
     }
   },
   {
@@ -69,30 +63,27 @@
     "fields": {
       "name": "Valmont EFPE Hub",
       "site_siret": "FR000000003",
-      "customs_id": "EFPE-4492",
-      "icao_code": "",
       "site_type": "EFPE",
       "address": "4 Rue des Ateliers",
       "postal_code": "44000",
       "city": "Nantes",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 2
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 91,
+    "fields": {
+      "customs_id": "EFPE-4492",
       "accise": "FR-EFPE-022",
       "electrical_efficiency": null,
       "thermal_efficiency": null,
       "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Noemie Valois",
-      "manager_phone": "+33 2 40 00 44 55",
-      "manager_email": "noemie.valois@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2019-02-10",
-      "created_by": 2,
-      "is_ue_airport": true
+      "site_ptr": 91
     }
   },
   {
@@ -101,30 +92,27 @@
     "fields": {
       "name": "Canopy Oil Depot",
       "site_siret": "FR000000004",
-      "customs_id": "OIL-7810",
-      "icao_code": "",
       "site_type": "OIL DEPOT",
       "address": "Route des Carburants",
       "postal_code": "13015",
       "city": "Marseille",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 2
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 4,
+    "fields": {
+      "customs_id": "OIL-7810",
       "accise": "FR-OIL-7810",
       "electrical_efficiency": null,
       "thermal_efficiency": null,
       "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Yanis Bellot",
-      "manager_phone": "+33 4 91 00 55 66",
-      "manager_email": "yanis.bellot@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2013-11-05",
-      "created_by": 2,
-      "is_ue_airport": true
+      "site_ptr": 4
     }
   },
   {
@@ -133,30 +121,27 @@
     "fields": {
       "name": "Loire Biofuel Depot",
       "site_siret": "FR000000005",
-      "customs_id": "BIO-2213",
-      "icao_code": "",
       "site_type": "BIOFUEL DEPOT",
       "address": "Parc Industriel Sud",
       "postal_code": "37000",
       "city": "Tours",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 5,
+    "fields": {
+      "customs_id": "BIO-2213",
       "accise": "FR-BIO-2213",
       "electrical_efficiency": null,
       "thermal_efficiency": null,
       "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Meline Baron",
-      "manager_phone": "+33 2 47 00 77 88",
-      "manager_email": "meline.baron@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2018-08-28",
-      "created_by": 1,
-      "is_ue_airport": true
+      "site_ptr": 5
     }
   },
   {
@@ -165,30 +150,27 @@
     "fields": {
       "name": "Montard Heat Plant",
       "site_siret": "FR000000006",
-      "customs_id": "",
-      "icao_code": "",
       "site_type": "HEAT PLANT",
       "address": "Chemin des Sources",
       "postal_code": "84000",
       "city": "Avignon",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 10
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 6,
+    "fields": {
+      "customs_id": "",
       "accise": "",
       "electrical_efficiency": null,
       "thermal_efficiency": 0.82,
       "useful_temperature": 92.5,
-      "ges_option": "Actual",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Corinne Vidal",
-      "manager_phone": "+33 4 32 00 10 20",
-      "manager_email": "c.vidal@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2016-03-22",
-      "created_by": 10,
-      "is_ue_airport": true
+      "site_ptr": 6
     }
   },
   {
@@ -197,30 +179,27 @@
     "fields": {
       "name": "Riverbend Power Plant",
       "site_siret": "FR000000007",
-      "customs_id": "",
-      "icao_code": "",
       "site_type": "POWER PLANT",
       "address": "Zone Energie 5",
       "postal_code": "31000",
       "city": "Toulouse",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 10
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 7,
+    "fields": {
+      "customs_id": "",
       "accise": "",
       "electrical_efficiency": 0.42,
       "thermal_efficiency": null,
       "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Lucien Rey",
-      "manager_phone": "+33 5 61 00 99 00",
-      "manager_email": "lucien.rey@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2012-10-30",
-      "created_by": 10,
-      "is_ue_airport": true
+      "site_ptr": 7
     }
   },
   {
@@ -229,30 +208,27 @@
     "fields": {
       "name": "DualStream Cogen Plant",
       "site_siret": "FR000000008",
-      "customs_id": "",
-      "icao_code": "",
       "site_type": "COGENERATION PLANT",
       "address": "Avenue des Techniques",
       "postal_code": "59000",
       "city": "Lille",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 10
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 8,
+    "fields": {
+      "customs_id": "",
       "accise": "",
       "electrical_efficiency": 0.36,
       "thermal_efficiency": 0.44,
       "useful_temperature": 78.0,
-      "ges_option": "Actual",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Ariane Couderc",
-      "manager_phone": "+33 3 20 00 12 13",
-      "manager_email": "ariane.couderc@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2020-01-15",
-      "created_by": 10,
-      "is_ue_airport": true
+      "site_ptr": 8
     }
   },
   {
@@ -261,30 +237,22 @@
     "fields": {
       "name": "Atlas Bioliquid Facility",
       "site_siret": "FR000000009",
-      "customs_id": "",
-      "icao_code": "",
       "site_type": "PRODUCTION BIOLIQUID",
       "address": "Zone Verte 3",
       "postal_code": "21000",
       "city": "Dijon",
       "country": 77,
       "gps_coordinates": null,
-      "accise": "",
-      "electrical_efficiency": 0.31,
-      "thermal_efficiency": null,
-      "useful_temperature": null,
-      "ges_option": "Actual",
-      "eligible_dc": true,
-      "dc_number": "DC-AT-01",
-      "dc_reference": "REF-ATLAS",
-      "manager_name": "Sonia Carrel",
-      "manager_phone": "+33 3 80 00 45 46",
-      "manager_email": "sonia.carrel@example.fr",
       "private": false,
       "is_enabled": true,
-      "date_mise_en_service": "2014-09-01",
-      "created_by": 1,
-      "is_ue_airport": true
+      "created_by": 1
+    }
+  },
+  {
+    "model": "transactions.productionsite",
+    "pk": 9,
+    "fields": {
+      "site_ptr": 9
     }
   },
   {
@@ -293,30 +261,22 @@
     "fields": {
       "name": "Lumen Bioliquid Works",
       "site_siret": "FR000000010",
-      "customs_id": "",
-      "icao_code": "",
       "site_type": "PRODUCTION BIOLIQUID",
       "address": "Parc Bioenergie 18",
       "postal_code": "59800",
       "city": "Lille",
       "country": 77,
       "gps_coordinates": null,
-      "accise": "",
-      "electrical_efficiency": null,
-      "thermal_efficiency": null,
-      "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Ilan Perret",
-      "manager_phone": "+33 3 28 00 33 34",
-      "manager_email": "ilan.perret@example.fr",
       "private": false,
       "is_enabled": true,
-      "date_mise_en_service": "2020-11-20",
-      "created_by": 1,
-      "is_ue_airport": true
+      "created_by": 1
+    }
+  },
+  {
+    "model": "transactions.productionsite",
+    "pk": 199,
+    "fields": {
+      "site_ptr": 199
     }
   },
   {
@@ -325,30 +285,27 @@
     "fields": {
       "name": "Frontier EFCA Station",
       "site_siret": "FR000000011",
-      "customs_id": "EFCA-7701",
-      "icao_code": "",
       "site_type": "EFCA",
       "address": "Voie Industrielle 9",
       "postal_code": "77100",
       "city": "Meaux",
       "country": 77,
       "gps_coordinates": null,
+      "private": false,
+      "is_enabled": true,
+      "created_by": 2
+    }
+  },
+  {
+    "model": "transactions.depot",
+    "pk": 11,
+    "fields": {
+      "customs_id": "EFCA-7701",
       "accise": "FR-EFCA-7701",
       "electrical_efficiency": null,
       "thermal_efficiency": null,
       "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Myriam Paret",
-      "manager_phone": "+33 1 60 00 55 20",
-      "manager_email": "myriam.paret@example.fr",
-      "private": false,
-      "is_enabled": true,
-      "date_mise_en_service": "2018-01-09",
-      "created_by": 2,
-      "is_ue_airport": true
+      "site_ptr": 11
     }
   },
   {
@@ -357,30 +314,22 @@
     "fields": {
       "name": "Valbonne Regional Airport",
       "site_siret": "FR000000012",
-      "customs_id": "",
-      "icao_code": "VBX",
       "site_type": "AIRPORT",
       "address": "Aéroport de Valbonne",
       "postal_code": "06560",
       "city": "Valbonne",
       "country": 77,
       "gps_coordinates": null,
-      "accise": "",
-      "electrical_efficiency": null,
-      "thermal_efficiency": null,
-      "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Claire Houart",
-      "manager_phone": "+33 4 93 00 21 22",
-      "manager_email": "claire.houart@example.fr",
       "private": false,
       "is_enabled": true,
-      "date_mise_en_service": "2008-05-14",
-      "created_by": 7,
-      "is_ue_airport": true
+      "created_by": 7
+    }
+  },
+  {
+    "model": "transactions.airport",
+    "pk": 12,
+    "fields": {
+      "site_ptr": 12
     }
   },
   {
@@ -389,30 +338,22 @@
     "fields": {
       "name": "Northbay Airfield",
       "site_siret": "FR000000013",
-      "customs_id": "",
-      "icao_code": "NBAF",
       "site_type": "AIRPORT",
       "address": "Coastal Air Park",
       "postal_code": "29600",
       "city": "Morlaix",
       "country": 77,
       "gps_coordinates": null,
-      "accise": "",
-      "electrical_efficiency": null,
-      "thermal_efficiency": null,
-      "useful_temperature": null,
-      "ges_option": "Default",
-      "eligible_dc": false,
-      "dc_number": "",
-      "dc_reference": "",
-      "manager_name": "Nolwenn Pichon",
-      "manager_phone": "+33 2 98 00 77 21",
-      "manager_email": "n.pichon@example.fr",
       "private": false,
       "is_enabled": true,
-      "date_mise_en_service": "2010-09-07",
-      "created_by": 7,
-      "is_ue_airport": false
+      "created_by": 7
+    }
+  },
+  {
+    "model": "transactions.airport",
+    "pk": 13,
+    "fields": {
+      "site_ptr": 13
     }
   },
   {
@@ -421,30 +362,22 @@
     "fields": {
       "name": "Riviera Biofuel Plant",
       "site_siret": "FR000000010",
-      "customs_id": "",
-      "icao_code": "",
       "site_type": "PRODUCTION BIOLIQUID",
       "address": "Parc Industriel du Littoral",
       "postal_code": "06200",
       "city": "Nice",
       "country": 77,
       "gps_coordinates": null,
-      "accise": "",
-      "electrical_efficiency": 0.34,
-      "thermal_efficiency": null,
-      "useful_temperature": null,
-      "ges_option": "Actual",
-      "eligible_dc": true,
-      "dc_number": "DC-RB-02",
-      "dc_reference": "REF-RIVIERA",
-      "manager_name": "Marc Delon",
-      "manager_phone": "+33 4 93 00 12 34",
-      "manager_email": "marc.delon@example.fr",
       "private": false,
       "is_enabled": true,
-      "date_mise_en_service": "2017-06-15",
-      "created_by": 1,
-      "is_ue_airport": false
+      "created_by": 1
+    }
+  },
+  {
+    "model": "transactions.productionsite",
+    "pk": 10,
+    "fields": {
+      "site_ptr": 10
     }
   }
 ]
