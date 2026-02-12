@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -224,6 +225,28 @@ class Entity(models.Model):
 
     def get_admin_users_emails(self):
         return self.get_users_emails(role=UserRights.ADMIN)
+
+    # Return the entities that are allowed to be accessed by this entity
+    def get_allowed_entities(self):
+        entities = Entity.objects.all()
+        filter_condition = Q()
+
+        if self.has_external_admin_right(ExternalAdminRights.AIRLINE):
+            filter_condition |= Q(entity_type=Entity.AIRLINE) | Q(entity_type=Entity.SAF_TRADER)
+        if self.has_external_admin_right(ExternalAdminRights.ELEC):
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True)
+        if self.has_external_admin_right(ExternalAdminRights.DOUBLE_COUNTING):
+            filter_condition |= Q(entity_type=Entity.PRODUCER)
+        if self.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR)
+        if self.has_external_admin_right(ExternalAdminRights.DREAL):
+            accessible_dept_codes = self.get_accessible_departments().values_list("code_dept", flat=True)
+            filter_condition |= Q(
+                biomethane_production_unit__department__code_dept__in=accessible_dept_codes,
+                entity_type=Entity.BIOMETHANE_PRODUCER,
+            )
+
+        return entities.filter(filter_condition)
 
     class Meta:
         db_table = "entities"

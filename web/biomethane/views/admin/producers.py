@@ -32,19 +32,7 @@ class BiomethaneProducersViewSet(GenericViewSet, ListModelMixin):
         Returns producers that have production units in departments
         accessible by the DREAL.
         """
-        entity = request.entity
-
-        accessible_dept_codes = entity.get_accessible_departments().values_list("code_dept", flat=True)
-
-        # Get producers with production units in accessible departments
-        producers = (
-            Entity.objects.filter(
-                entity_type=Entity.BIOMETHANE_PRODUCER,
-                biomethane_production_unit__department__code_dept__in=accessible_dept_codes,
-            )
-            .distinct()
-            .order_by("name")
-        )
+        producers = request.entity.get_allowed_entities().distinct().order_by("name")
 
         data = self.get_serializer(producers, many=True).data
         return Response(data)
