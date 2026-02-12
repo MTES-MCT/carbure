@@ -1,6 +1,17 @@
-from django.core.management.base import BaseCommand
+import json
+from datetime import date
 
-from elec.management.scripts import compensate_elec_provision_certificate
+from django.core.management.base import BaseCommand
+from django.db.models import CharField, Sum
+from django.db.models.expressions import F, Value
+from django.db.models.functions import Cast, Concat, Round
+
+from elec.management.helpers.prepare_excel_provision_certificate_compensation import (
+    create_excel_file,
+    prepare_excel_data,
+)
+from elec.models import ElecMeterReadingVirtual, ElecProvisionCertificate
+from transactions.models import YearConfig
 
 
 class Command(BaseCommand):
@@ -34,6 +45,113 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         enr_ratio = options["enr_ratio"]
-        self.stdout.write(f" -- Running with ENR ratio = {enr_ratio}%.")
+        if options["log"]:
+            print(f" -- Running with ENR ratio = {enr_ratio}%.")
 
-        compensate_elec_provision_certificate(enr_ratio, options["apply"], options["store_file"], options["log"])
+        today = date.today()
+        last_year = today.year - 1
+        new_enr_ratio = enr_ratio / 100  # 25 -> 0.25
+
+        meter_readings = (
+            ElecMeterReadingVirtual.objects.prefetch_related("application", "cpo")
+            .filter(application__year=last_year)
+            .values(
+                "cpo__id",
+                "cpo__name",
+                "operating_unit",
+                "application__year",
+                "application__quarter",
+            )
+            .annotate(
+                total_energy_used=Round(Sum((F("current_index") - F("prev_index")) * F("enr_ratio")), 3),
+                recalculated_energy_amount=Round(Sum((F("current_index") - F("prev_index")) * new_enr_ratio), 3),
+            )
+            .order_by("cpo__name", "operating_unit", "application_id")
+        )
+
+        certificates_already_created = (
+            ElecProvisionCertificate.objects.filter(
+                year=last_year,
+                source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
+            )
+            .values("cpo_id", "quarter", "year", "operating_unit")
+            .annotate(
+                key=Concat(
+                    Cast(F("cpo_id"), output_field=CharField()),
+                    Value("-"),
+                    Cast(F("quarter"), output_field=CharField()),
+                    Value("-"),
+                    Cast(F("year"), output_field=CharField()),
+                    Value("-"),
+                    F("operating_unit"),
+                )
+            )
+            .values_list("key", flat=True)
+        )
+
+        elec_provision_certificates = []
+        meter_readings_for_csv = []
+        cpo_totals = {}
+
+        for meter_reading in meter_readings:
+            # Delta in KWH (value retrieved from the meter readings)
+            delta_in_kwh = float(meter_reading["recalculated_energy_amount"] - meter_reading["total_energy_used"])
+            delta_in_mwh = round(delta_in_kwh / 1000, 2)
+
+            # Unique key to check if the certificate has already been created.
+            key = (
+                f"{meter_reading['cpo__id']}-{meter_reading['application__quarter']}"
+                f"-{meter_reading['application__year']}-{meter_reading['operating_unit']}"
+            )
+
+            # Check if there is a delta between the energy declared, and the energy calculated by the new ENR ratio.
+            # If there is a delta, and the certificate has not already been created, create a new certificate.
+            if delta_in_kwh > 0 and key not in certificates_already_created:
+                # Prepare the data for the Excel file.
+                meter_reading_for_csv, cpo_totals_for_csv = prepare_excel_data(
+                    meter_reading,
+                    cpo_totals.get(meter_reading["cpo__name"]),
+                    delta_in_kwh,
+                    delta_in_mwh,
+                )
+                meter_readings_for_csv.append(meter_reading_for_csv)
+                cpo_totals[meter_reading["cpo__name"]] = cpo_totals_for_csv
+
+                elec_provision_certificates.append(
+                    ElecProvisionCertificate(
+                        cpo_id=meter_reading["cpo__id"],
+                        quarter=meter_reading["application__quarter"],
+                        year=last_year,
+                        operating_unit=meter_reading["operating_unit"],
+                        energy_amount=delta_in_mwh,
+                        remaining_energy_amount=delta_in_mwh,
+                        source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
+                    )
+                )
+
+        if options["apply"]:
+            if elec_provision_certificates:
+                ElecProvisionCertificate.objects.bulk_create(elec_provision_certificates, batch_size=10)
+                if options["log"]:
+                    print(f"Created {len(elec_provision_certificates)} new certificates")
+            elif options["log"]:
+                print("No new certificates to create")
+
+            YearConfig.objects.filter(year=today.year).update(renewable_share=new_enr_ratio)
+
+        if options["store_file"] and meter_readings_for_csv:
+            create_excel_file(meter_readings_for_csv, cpo_totals, last_year, options["log"])
+
+        # Sortie JSON sur stdout uniquement (récupérable dans les tests)
+        result = [
+            {
+                "cpo_id": c.cpo_id,
+                "quarter": c.quarter,
+                "year": c.year,
+                "operating_unit": c.operating_unit,
+                "energy_amount": c.energy_amount,
+                "source": c.source,
+            }
+            for c in elec_provision_certificates
+        ]
+        return json.dumps(result)
