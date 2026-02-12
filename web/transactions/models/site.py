@@ -60,6 +60,34 @@ class Site(models.Model):
     def is_depot(self):
         return self.site_type in self.DEPOT_TYPES
 
+    @property
+    def depot_id(self):
+        """Delegate to child Depot model if this site is a depot."""
+        try:
+            return self.depot.customs_id
+        except self.__class__.depot.RelatedObjectDoesNotExist:
+            return None
+
+    @property
+    def depot_type(self):
+        """Return site_type if this is a depot, else None."""
+        try:
+            return self.depot.site_type
+        except self.__class__.depot.RelatedObjectDoesNotExist:
+            return None
+
+    @property
+    def producer(self):
+        return self.created_by
+
+    @property
+    def dc_reference(self):
+        """Delegate to child ProductionSite model."""
+        try:
+            return self.productionsite.dc_reference
+        except self.__class__.productionsite.RelatedObjectDoesNotExist:
+            return None
+
     def __str__(self):
         creator = self.created_by.name if self.created_by else ""
         return "%s - %s (%s)" % (self.name, creator, self.site_type)
