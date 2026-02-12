@@ -1,13 +1,13 @@
 from django.db import models
 
 from core.models import Biocarburant, MatierePremiere
-from transactions.models import Site
+from transactions.models.production_site import ProductionSite
 
 
 class ProductionSiteInput(models.Model):
     INPUT_STATUS = (("Pending", "En attente de validation"), ("Valid", "Validé"))
 
-    production_site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
     matiere_premiere = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
     status = models.CharField(max_length=16, choices=INPUT_STATUS, default="Pending")
 
@@ -26,7 +26,7 @@ class ProductionSiteInput(models.Model):
 class ProductionSiteOutput(models.Model):
     OUTPUT_STATUS = (("Pending", "En attente de validation"), ("Valid", "Validé"))
 
-    production_site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
     biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
     status = models.CharField(max_length=16, choices=OUTPUT_STATUS, default="Pending")
 

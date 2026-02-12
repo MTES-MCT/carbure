@@ -9,7 +9,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from transactions.models import Site
+from transactions.models import Depot, ProductionSite
 
 usermodel = get_user_model()
 
@@ -558,7 +558,9 @@ class CarbureLot(models.Model):
         Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_producer"
     )
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
-    carbure_production_site = models.ForeignKey(Site, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    carbure_production_site = models.ForeignKey(
+        ProductionSite, null=True, blank=True, default=None, on_delete=models.SET_NULL
+    )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_country = models.ForeignKey(
         Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="production_country"
@@ -607,7 +609,7 @@ class CarbureLot(models.Model):
     unknown_client = models.CharField(max_length=64, blank=True, null=True, default=None)
     dispatch_date = models.DateField(blank=True, null=True)
     carbure_dispatch_site = models.ForeignKey(
-        Site, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_dispatch_site"
+        Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_dispatch_site"
     )
     unknown_dispatch_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     dispatch_site_country = models.ForeignKey(
@@ -615,7 +617,7 @@ class CarbureLot(models.Model):
     )
     delivery_date = models.DateField(blank=True, null=True)
     carbure_delivery_site = models.ForeignKey(
-        Site, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_delivery_site"
+        Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_delivery_site"
     )
     unknown_delivery_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     delivery_site_country = models.ForeignKey(
@@ -1049,7 +1051,7 @@ class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
     parent_transformation = models.ForeignKey(CarbureStockTransformation, null=True, blank=True, on_delete=models.CASCADE)
     carbure_id = models.CharField(max_length=64, blank=False, null=False, default="")
-    depot = models.ForeignKey(Site, null=True, blank=True, on_delete=models.SET_NULL)
+    depot = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
     carbure_client = models.ForeignKey(
         Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name="stock_carbure_client"
     )
@@ -1060,7 +1062,7 @@ class CarbureStock(models.Model):
     biofuel = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
     country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name="stock_country_of_origin")
     carbure_production_site = models.ForeignKey(
-        Site, null=True, blank=True, on_delete=models.SET_NULL, related_name="stock_production_site"
+        ProductionSite, null=True, blank=True, on_delete=models.SET_NULL, related_name="stock_production_site"
     )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_country = models.ForeignKey(
