@@ -1,13 +1,13 @@
+import json
 from datetime import date
+from io import StringIO
 from unittest.mock import patch
 
+from django.core.management import call_command
 from django.test import TestCase
 
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data
-from elec.management.scripts.compensate_elec_provision_certificate import (
-    compensate_elec_provision_certificate,
-)
 from elec.models import ElecProvisionCertificate
 from elec.tests.utils import setup_cpo_with_meter_readings
 from entity.factories.entity import EntityFactory
@@ -16,24 +16,36 @@ from entity.factories.entity import EntityFactory
 FIXED_TODAY = date(2026, 2, 15)
 
 
+def run_command(enr_ratio, apply=False, store_file=False, log=False):
+    report = call_command(
+        "compensate_elec_provision_certificate",
+        enr_ratio=enr_ratio,
+        apply=apply,
+        store_file=store_file,
+        log=log,
+        stdout=StringIO(),
+    )
+    return json.loads(report)
+
+
 class CompensateElecProvisionCertificateCommandTest(TestCase):
     def setUp(self):
         self.cpo1 = EntityFactory.create(entity_type=Entity.CPO)
 
-    @patch("elec.management.scripts.compensate_elec_provision_certificate.date")
+    @patch("elec.management.commands.compensate_elec_provision_certificate.date")
     def test_returns_empty_list_when_no_meter_readings(self, mock_date):
         mock_date.today.return_value = FIXED_TODAY
 
-        result = compensate_elec_provision_certificate(30)
+        result = run_command(enr_ratio=30)
 
         self.assertEqual(result, [])
 
-    @patch("elec.management.scripts.compensate_elec_provision_certificate.date")
+    @patch("elec.management.commands.compensate_elec_provision_certificate.date")
     def test_returns_certificates_when_delta_positive(self, mock_date):
         mock_date.today.return_value = FIXED_TODAY
         setup_cpo_with_meter_readings(self.cpo1, charge_points_count=1, quarters=[1, 2])
 
-        result = compensate_elec_provision_certificate(30)
+        result = run_command(enr_ratio=30)
 
         # It should return 2 certificates, data contains 1 meter reading application for
         # each quarter of the year * 1 meter reading per application (2 quarters * 1 meter reading = 2)
@@ -66,28 +78,28 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
                 expected_data[i],
             )
 
-    @patch("elec.management.scripts.compensate_elec_provision_certificate.date")
+    @patch("elec.management.commands.compensate_elec_provision_certificate.date")
     def test_returns_no_certificate_when_delta_zero(self, mock_date):
         mock_date.today.return_value = FIXED_TODAY
         setup_cpo_with_meter_readings(self.cpo1, charge_points_count=1, quarters=[1, 2])
 
-        result = compensate_elec_provision_certificate(25)
+        result = run_command(enr_ratio=25)
 
         # It should return an empty list because the enr ratio is the same as the energy
         # amount before compensation, so the delta is 0
         self.assertEqual(result, [])
 
-    @patch("elec.management.scripts.compensate_elec_provision_certificate.date")
+    @patch("elec.management.commands.compensate_elec_provision_certificate.date")
     def test_returns_no_certificate_when_certificate_already_created(self, mock_date):
         mock_date.today.return_value = FIXED_TODAY
         setup_cpo_with_meter_readings(self.cpo1, charge_points_count=1, quarters=[1, 2])
 
         # Create certificates
-        result = compensate_elec_provision_certificate(30, apply=True)
+        result = run_command(enr_ratio=30, apply=True)
 
         self.assertEqual(len(result), 2)
 
         # Should return no certificates because the certificates are already created
-        new_result = compensate_elec_provision_certificate(35, apply=True)
+        new_result = run_command(enr_ratio=35, apply=True)
 
         self.assertEqual(new_result, [])
