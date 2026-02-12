@@ -11,7 +11,7 @@ class MaterialConverterTest(TestCase):
         self.patched_Biocarburant.objects.get.return_value = Biocarburant()
 
         self.patched_MatierePremiere = patch("edelivery.ebms.converters.MatierePremiere").start()
-        self.patched_MatierePremiere.biofuel.get.return_value = MatierePremiere()
+        self.patched_MatierePremiere.objects.get.return_value = MatierePremiere()
 
     def tearDown(self):
         patch.stopall()
@@ -30,7 +30,7 @@ class MaterialConverterTest(TestCase):
 
     def test_converts_udb_rapeseed_to_carbure_feedstock(self):
         found_feedstock = MatierePremiere(code="COLZA")
-        get = self.patched_MatierePremiere.biofuel.get
+        get = self.patched_MatierePremiere.objects.get
         get.return_value = found_feedstock
 
         converter = MaterialConverter({"URWR001": "COLZA"})

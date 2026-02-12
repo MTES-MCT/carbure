@@ -62,7 +62,7 @@ operators["WALLACH"] = operators["VARO MAG"]
 operators["TOTAL MS"] = operators["TMF"]
 
 
-MatierePremiere.biofuel.update_or_create(code="PFAD", name="PFAD", name_en="PFAD", is_displayed=False)
+MatierePremiere.objects.update_or_create(code="PFAD", name="PFAD", name_en="PFAD", is_displayed=False)
 mps = {mp.code: mp for mp in MatierePremiere.biofuel.all()}
 mps["RÉSIDUS DE TRANSFORMATION FORESTIÈRE"] = mps["DECHETS_BOIS"]
 mps["MATIÈRE CELLULOSIQUE : COUVERT FORESTIER À COURTE ROTATION"] = mps["DECHETS_BOIS"]
