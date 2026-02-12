@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
     def flag_existing_matiere_premiere(self):
         """Flag existing MatierePremiere as is_biofuel_feedstock=True before importing new ones for biomethane."""
-        MatierePremiere.biofuel.update(is_biofuel_feedstock=True)
+        MatierePremiere.objects.update(is_biofuel_feedstock=True)
 
     def get_xlsx_file_path(self):
         """Return the path to the XLSX file to import."""
@@ -116,7 +116,7 @@ class Command(BaseCommand):
 
                     # 2. Update or create MatierePremiere and update is_methanogenic
                     try:
-                        matiere_premiere = MatierePremiere.biofuel.get(name=intrant, classification=classification)
+                        matiere_premiere = MatierePremiere.objects.get(name=intrant, classification=classification)
                         # Update is_methanogenic if not already set
                         if not matiere_premiere.is_methanogenic:
                             matiere_premiere.is_methanogenic = True
