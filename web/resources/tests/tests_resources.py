@@ -38,6 +38,48 @@ class ResourcesTest(TestCase):
         data = response.json()
         assert len(data) == 1
 
+    def test_get_feedstocks_is_methanogenic(self):
+        # create matieres premieres with is_methanogenic flag
+        MatierePremiere.objects.update_or_create(name="Lisier bovin", code="LISIER", defaults={"is_methanogenic": True})
+        MatierePremiere.objects.update_or_create(name="Colza", code="COLZA", defaults={"is_methanogenic": False})
+        MatierePremiere.objects.update_or_create(name="Fumier", code="FUMIER", defaults={"is_methanogenic": True})
+
+        url = "resources-feedstocks"
+        # test filtering by is_methanogenic=true
+        response = self.client.get(reverse(url) + "?is_methanogenic=true")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 2
+        assert all(item["code"] in ["LISIER", "FUMIER"] for item in data)
+
+        # test filtering by is_methanogenic=false
+        response = self.client.get(reverse(url) + "?is_methanogenic=false")
+        assert response.status_code == 200
+        data = response.json()
+        assert any(item["code"] == "COLZA" for item in data)
+
+    def test_get_feedstocks_is_biofuel_feedstock(self):
+        # create matieres premieres with is_biofuel_feedstock flag
+        MatierePremiere.objects.update_or_create(name="Betterave", code="BETTERAVE", defaults={"is_biofuel_feedstock": True})
+        MatierePremiere.objects.update_or_create(
+            name="Dechets organiques", code="DECHETS", defaults={"is_biofuel_feedstock": False}
+        )
+        MatierePremiere.objects.update_or_create(name="Tournesol", code="TOURNESOL", defaults={"is_biofuel_feedstock": True})
+
+        url = "resources-feedstocks"
+        # test filtering by is_biofuel_feedstock=true
+        response = self.client.get(reverse(url) + "?is_biofuel_feedstock=true")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 2
+        assert all(item["code"] in ["BETTERAVE", "TOURNESOL"] for item in data)
+
+        # test filtering by is_biofuel_feedstock=false
+        response = self.client.get(reverse(url) + "?is_biofuel_feedstock=false")
+        assert response.status_code == 200
+        data = response.json()
+        assert any(item["code"] == "DECHETS" for item in data)
+
     def test_get_bcs(self):
         # create biocarburants
         Biocarburant.objects.update_or_create(name="BC1", code="BC1")

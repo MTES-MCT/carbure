@@ -12,8 +12,8 @@ class SafTicketFiltersTest(TestCase, FiltersActionTestMixin):
     def setUp(self):
         super().setUp()
 
-        self.hau = MatierePremiere.objects.get(code="HUILE_ALIMENTAIRE_USAGEE")
-        self.hga = MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2")
+        self.hau = MatierePremiere.biofuel.get(code="HUILE_ALIMENTAIRE_USAGEE")
+        self.hga = MatierePremiere.biofuel.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2")
         self.fr = Pays.objects.create(code_pays="FR", name="France", name_en="France")
         self.psite = ProductionSiteFactory.create(name="Production Site 1")
         self.depot = DepotFactory.create(name="Depot 1")

@@ -33,7 +33,7 @@ def load_dc_file(filepath):
 
 def load_dc_sourcing_data(dca, sourcing_data):
     # preload data
-    feedstocks = {f.code: f for f in MatierePremiere.objects.filter(is_double_compte=True)}
+    feedstocks = {f.code: f for f in MatierePremiere.biofuel.filter(is_double_compte=True)}
     countries = {f.code_pays: f for f in Pays.objects.all()}
 
     DoubleCountingSourcing.objects.filter(dca=dca).delete()
@@ -53,7 +53,7 @@ def load_dc_sourcing_data(dca, sourcing_data):
 
 
 def load_dc_production_data(dca, production_data):
-    feedstocks = {f.code: f for f in MatierePremiere.objects.filter(is_double_compte=True)}
+    feedstocks = {f.code: f for f in MatierePremiere.biofuel.filter(is_double_compte=True)}
     biofuels = {f.code: f for f in Biocarburant.objects.all()}
 
     DoubleCountingProduction.objects.filter(dca=dca).delete()

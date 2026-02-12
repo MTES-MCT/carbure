@@ -32,8 +32,8 @@ operators["RAISINOR"] = producers["RAISINOR"]
 operators["SAIPOL"] = producers["SAIPOL"]
 
 
-MatierePremiere.objects.update_or_create(code="PFAD", name="PFAD", name_en="PFAD", is_displayed=False)
-mps = {mp.code: mp for mp in MatierePremiere.objects.all()}
+MatierePremiere.biofuel.update_or_create(code="PFAD", name="PFAD", name_en="PFAD", is_displayed=False)
+mps = {mp.code: mp for mp in MatierePremiere.biofuel.all()}
 bcs = {bc.code: bc for bc in Biocarburant.objects.all()}
 bcs["HVHTG"] = bcs["HVOG"]
 bcs["HVHTE"] = bcs["HVOE"]

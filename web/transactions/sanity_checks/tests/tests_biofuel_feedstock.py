@@ -33,8 +33,8 @@ class BiofuelFeedstockSanityChecksTest(TestCase):
     def test_deprecated_mp(self):
         error = CarbureSanityCheckErrors.DEPRECATED_MP
 
-        colza = MatierePremiere.objects.get(code="COLZA")
-        residus_viniques = MatierePremiere.objects.get(code="RESIDUS_VINIQUES")
+        colza = MatierePremiere.biofuel.get(code="COLZA")
+        residus_viniques = MatierePremiere.biofuel.get(code="RESIDUS_VINIQUES")
 
         lot = self.create_lot(feedstock=colza)
 

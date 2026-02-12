@@ -25,7 +25,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     volume = factory.Faker("random_int", min=5000, max=10000)
     weight = factory.Faker("random_int", min=5000, max=10000)
     lhv_amount = factory.Faker("random_int", min=5000, max=10000)
-    feedstock = factory.Iterator(MatierePremiere.objects.all())
+    feedstock = factory.Iterator(MatierePremiere.biofuel.all())
     biofuel = factory.Iterator(Biocarburant.objects.all())
     country_of_origin = factory.Iterator(Pays.objects.all())
 

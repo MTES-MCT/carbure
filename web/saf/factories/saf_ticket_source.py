@@ -23,7 +23,7 @@ class SafTicketSourceFactory(factory.django.DjangoModelFactory):
     total_volume = factory.Faker("random_int", min=10000, max=500000)
     assigned_volume = factory.Faker("random_int", min=0, max=10000)
 
-    feedstock = factory.Iterator(MatierePremiere.objects.all())
+    feedstock = factory.Iterator(MatierePremiere.biofuel.all())
     biofuel = factory.Iterator(Biocarburant.objects.all())
     country_of_origin = factory.Iterator(Pays.objects.all())
 

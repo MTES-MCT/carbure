@@ -3585,10 +3585,9 @@ export interface components {
         BiomethaneSupplyInput: {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
+            input_name: components["schemas"]["FeedStock"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
-            input_type: string;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3605,8 +3604,8 @@ export interface components {
             readonly id: number;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            input_name: string;
             origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3616,14 +3615,13 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            input_type: string;
             origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            input_name: string;
             origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3633,16 +3631,14 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            input_type: string;
             origin_department?: string | null;
         };
         BiomethaneSupplyInputExport: {
             readonly year: number;
             readonly origin_country: string;
+            readonly input_name: string;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
-            input_type: string;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -4792,15 +4788,6 @@ export interface components {
          */
         IcpeRegimeEnum: IcpeRegimeEnum;
         /**
-         * @description * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-         *     * `PRIMARY_CROPS` - Culture principale
-         *     * `INTERMEDIATE_CROPS` - Culture intermédiaire
-         *     * `CIVE` - CIVE
-         *     * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
-         * @enum {string}
-         */
-        InputCategoryEnum: PathsApiBiomethaneSupplyInputGetParametersQueryCategory;
-        /**
          * @description * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
          *     * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
          *     * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
@@ -5354,8 +5341,8 @@ export interface components {
         PatchedBiomethaneSupplyInputCreateRequest: {
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type?: components["schemas"]["CropTypeEnum"];
-            input_category?: components["schemas"]["InputCategoryEnum"];
             material_unit?: components["schemas"]["MaterialUnitEnum"];
+            input_name?: string;
             origin_country?: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -5365,7 +5352,6 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            input_type?: string;
             origin_department?: string | null;
         };
         /** @description Serializer for updating the status of a DoubleCountingApplication. */
@@ -7501,14 +7487,9 @@ export interface operations {
     biomethane_supply_input_list: {
         parameters: {
             query: {
-                /** @description * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-                 *     * `PRIMARY_CROPS` - Culture principale
-                 *     * `INTERMEDIATE_CROPS` - Culture intermédiaire
-                 *     * `CIVE` - CIVE
-                 *     * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA */
-                category?: PathsApiBiomethaneSupplyInputGetParametersQueryCategory;
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                input_name?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -7521,8 +7502,8 @@ export interface operations {
                 search?: string;
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
-                type?: string;
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /** @description Year of the supply plan. */
                 year: number;
             };
             header?: never;
@@ -7548,6 +7529,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7671,6 +7654,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7691,16 +7676,11 @@ export interface operations {
     biomethane_supply_input_filters_retrieve: {
         parameters: {
             query: {
-                /** @description * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-                 *     * `PRIMARY_CROPS` - Culture principale
-                 *     * `INTERMEDIATE_CROPS` - Culture intermédiaire
-                 *     * `CIVE` - CIVE
-                 *     * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA */
-                category?: PathsApiBiomethaneSupplyInputGetParametersQueryCategory;
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
+                input_name?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
@@ -7709,8 +7689,9 @@ export interface operations {
                 search?: string;
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
-                type?: string;
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7755,6 +7736,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -13123,22 +13106,14 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFi
     status = "status",
     tariff_reference = "tariff_reference"
 }
-export enum PathsApiBiomethaneSupplyInputGetParametersQueryCategory {
-    CIVE = "CIVE",
-    IAA_WASTE_RESIDUES = "IAA_WASTE_RESIDUES",
-    INTERMEDIATE_CROPS = "INTERMEDIATE_CROPS",
-    LIVESTOCK_EFFLUENTS = "LIVESTOCK_EFFLUENTS",
-    PRIMARY_CROPS = "PRIMARY_CROPS"
-}
 export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
     EXTERNAL = "EXTERNAL",
     INTERNAL = "INTERNAL"
 }
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
-    category = "category",
+    input_name = "input_name",
     producer_id = "producer_id",
     source = "source",
-    type = "type",
     year = "year"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {

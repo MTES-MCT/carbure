@@ -34,7 +34,7 @@ class MaterialConverter(BaseConverter):
 
     def from_udb_feedstock_code(self, udb_code):
         carbure_code = self._from_udb_material(udb_code)
-        return MatierePremiere.objects.get(code=carbure_code)
+        return MatierePremiere.biofuel.get(code=carbure_code)
 
 
 class QuantityConverter(BaseConverter):

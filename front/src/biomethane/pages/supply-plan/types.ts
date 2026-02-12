@@ -1,7 +1,6 @@
 import { apiTypes } from "common/services/api-fetch.types"
 import {
   PathsApiBiomethaneSupplyInputGetParametersQuerySource as BiomethaneSupplyInputSource,
-  PathsApiBiomethaneSupplyInputGetParametersQueryCategory as BiomethaneSupplyInputCategory,
   PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter as BiomethaneSupplyInputFilter,
   CropTypeEnum as BiomethaneSupplyInputCropType,
   MaterialUnitEnum as BiomethaneSupplyInputMaterialUnit,
@@ -19,7 +18,6 @@ export type BiomethaneSupplyInputForm = apiTypes["BiomethaneSupplyInputCreate"]
 export {
   BiomethaneSupplyInputSource,
   BiomethaneSupplyInputFilter,
-  BiomethaneSupplyInputCategory,
   BiomethaneSupplyInputCropType,
   BiomethaneSupplyInputMaterialUnit,
 }

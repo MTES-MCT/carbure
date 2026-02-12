@@ -65,7 +65,7 @@ class EntityProductionSiteWriteSerializer(serializers.ModelSerializer):
     inputs = serializers.SlugRelatedField(
         many=True,
         slug_field="code",
-        queryset=MatierePremiere.objects.all(),
+        queryset=MatierePremiere.biofuel.all(),
         allow_empty=False,
     )
 

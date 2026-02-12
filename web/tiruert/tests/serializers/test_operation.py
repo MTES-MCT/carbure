@@ -106,7 +106,7 @@ class OperationInputSerializerCreateTest(TestCase):
         self.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
         self.depot = Depot.objects.first()
         self.biofuel_eth = Biocarburant.objects.get(code="ETH")
-        self.feedstock_conv = MatierePremiere.objects.filter(category="CONV").first()
+        self.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
 
         self.mock_request = Mock()
         self.mock_request.entity.id = self.entity.id

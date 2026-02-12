@@ -357,6 +357,16 @@ class Biocarburant(models.Model):
         ordering = ["name"]
 
 
+class MatierePremiereBiofuelManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_biofuel_feedstock=True)
+
+
+class MatierePremiereBiomethaneManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_methanogenic=True)
+
+
 class MatierePremiere(models.Model):
     CONV = "CONV"  # CONV
     IXA = "ANN-IX-A"  # Av DC
@@ -374,8 +384,8 @@ class MatierePremiere(models.Model):
         (EP2AM, "EP2AM"),
     )
 
-    name = models.CharField(max_length=128)
-    name_en = models.CharField(max_length=128)
+    name = models.CharField(max_length=256)
+    name_en = models.CharField(max_length=256)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
     code = models.CharField(max_length=64, unique=True)
@@ -384,8 +394,11 @@ class MatierePremiere(models.Model):
     is_double_compte = models.BooleanField(default=False)
     is_huile_vegetale = models.BooleanField(default=False)
     is_displayed = models.BooleanField(default=True)
-    category = models.CharField(max_length=32, choices=MP_CATEGORIES, default="CONV")
+    category = models.CharField(max_length=32, choices=MP_CATEGORIES, default="")
     dgddi_category = models.CharField(max_length=32, blank=True, null=True, default=None)
+    is_methanogenic = models.BooleanField(default=False)
+    is_biofuel_feedstock = models.BooleanField(default=False)
+    classification = models.ForeignKey("feedstocks.Classification", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -403,6 +416,10 @@ class MatierePremiere(models.Model):
         verbose_name = "Matiere Premiere"
         verbose_name_plural = "Matieres Premieres"
         ordering = ["name"]
+
+    objects = models.Manager()
+    biofuel = MatierePremiereBiofuelManager()
+    biomethane = MatierePremiereBiomethaneManager()
 
 
 class Depot(models.Model):

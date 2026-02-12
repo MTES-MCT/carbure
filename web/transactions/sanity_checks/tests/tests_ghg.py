@@ -145,8 +145,8 @@ class GhgSanityChecksTest(TestCase):
     def test_ghg_eec_0(self):
         error = CarbureSanityCheckErrors.GHG_EEC_0
 
-        conv_feedstock = MatierePremiere.objects.filter(category="CONV").first()
-        other_feedstock = MatierePremiere.objects.exclude(category="CONV").first()
+        conv_feedstock = MatierePremiere.biofuel.filter(category="CONV").first()
+        other_feedstock = MatierePremiere.biofuel.exclude(category="CONV").first()
 
         lot = self.create_lot(eec=0, feedstock=other_feedstock)
 
@@ -167,9 +167,9 @@ class GhgSanityChecksTest(TestCase):
     def test_eec_with_residue(self):
         error = CarbureSanityCheckErrors.EEC_WITH_RESIDUE
 
-        conv_feedstock = MatierePremiere.objects.filter(category="CONV").exclude(code="EP2").first()
-        other_feedstock = MatierePremiere.objects.exclude(category="CONV", code="EP2").first()
-        ep2 = MatierePremiere.objects.get(code="EP2")
+        conv_feedstock = MatierePremiere.biofuel.filter(category="CONV").exclude(code="EP2").first()
+        other_feedstock = MatierePremiere.biofuel.exclude(category="CONV", code="EP2").first()
+        ep2 = MatierePremiere.biofuel.get(code="EP2")
 
         lot = self.create_lot(feedstock=other_feedstock, eec=1)
 

@@ -3,8 +3,8 @@ from django.urls import reverse
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
-from core.models import Entity
-from core.tests_utils import assert_object_contains_data, setup_current_user
+from core.models import Entity, MatierePremiere
+from core.tests_utils import setup_current_user
 
 
 class BiomethaneSupplyInputViewSetTests(TestCase):
@@ -22,6 +22,20 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             "Tester",
             "gogogo",
             [(self.producer_entity, "RW")],
+        )
+
+        self.matiere_mais = MatierePremiere.objects.create(
+            name="Maïs",
+            name_en="Corn",
+            code="MAIS",
+            is_methanogenic=True,
+        )
+
+        self.matiere_residus = MatierePremiere.objects.create(
+            name="Résidus",
+            name_en="Residues",
+            code="RESIDUS",
+            is_methanogenic=True,
         )
 
         self.supply_plan = BiomethaneSupplyPlanFactory.create(
@@ -60,8 +74,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             "origin_department": "75",
             "crop_type": "MAIN",
             "volume": 500.0,
-            "input_category": "CIVE",
-            "input_type": "Maïs",
+            "input_name": "Maïs",
             "material_unit": "WET",
         }
 
@@ -69,19 +82,16 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             self.url_base, new_supply_data, content_type="application/json", query_params=self.base_params
         )
 
-        expected_data = {
-            **new_supply_data,
-            "origin_country": {"name": "France", "name_en": "France", "code_pays": "FR", "is_in_europe": True},
-        }
-
         self.assertEqual(response.status_code, 201)
-        assert_object_contains_data(self, response.data, expected_data, object_name="supply input")
+        self.assertEqual(response.data["input_name"]["name"], "Maïs")
+        self.assertEqual(response.data["origin_country"]["code_pays"], "FR")
+        self.assertEqual(response.data["volume"], 500.0)
 
     def test_update_supply_input_success(self):
         """Test successful update of a supply input."""
         update_data = {
             "volume": 750.0,
-            "input_type": "Résidus",
+            "input_name": "Résidus",
         }
 
         response = self.client.patch(
@@ -92,7 +102,8 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        assert_object_contains_data(self, response.data, update_data, object_name="supply input")
+        self.assertEqual(response.data["volume"], 750.0)
+        self.assertEqual(response.data["input_name"]["name"], "Résidus")
 
     def test_create_supply_input_invalid_data(self):
         """Test creation of a supply input with invalid data."""
