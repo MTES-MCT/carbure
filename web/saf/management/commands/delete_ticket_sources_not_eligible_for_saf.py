@@ -1,6 +1,6 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from core.models import CarbureLot, Entity
 from saf.models.constants import SAF_BIOFUEL_TYPES
@@ -22,14 +22,20 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         call_command("propagate_saf_origin")
 
+        saf_filter = Q(biofuel__code__in=SAF_BIOFUEL_TYPES)
+
+        owner_filter = (
+            Q(added_by__entity_type=Entity.OPERATOR, added_by__has_saf=True)  #
+            | Q(added_by__entity_type=Entity.SAF_TRADER)
+        )
+
+        origin_lot_filter = Q(
+            origin_lot__lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
+            origin_lot__delivery_type__in=[CarbureLot.BLENDING, CarbureLot.DIRECT, CarbureLot.UNKNOWN],
+        )
+
         ticket_sources = (
-            SafTicketSource.objects.exclude(
-                biofuel__code__in=SAF_BIOFUEL_TYPES,
-                added_by__entity_type=Entity.OPERATOR,
-                added_by__has_saf=True,
-                origin_lot__lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
-                origin_lot__delivery_type__in=[CarbureLot.BLENDING, CarbureLot.DIRECT],
-            )
+            SafTicketSource.objects.exclude(saf_filter & owner_filter & origin_lot_filter)
             .annotate(created_tickets=Count("saf_tickets"))
             .filter(created_tickets=0)
         )
