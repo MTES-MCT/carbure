@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import { TicketAssignment } from "saf/components/assignment/simple-assignment"
-import { TicketSourceParent } from "./components/ticket-source-parent"
 import TicketSourceTag from "../../components/ticket-source-tag"
 import AssignedTickets from "./components/assigned-tickets"
 import TicketSourceFields from "./components/fields"
@@ -19,6 +18,7 @@ import {
   NavigationButtons,
   NavigationButtonsProps,
 } from "common/components/navigation"
+import SafOrigin from "saf/components/saf_origin"
 
 export type TicketSourceDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -123,7 +123,7 @@ export const TicketSourceDetails = ({
         </section>
 
         <section>
-          <TicketSourceParent ticketSource={ticketSource} />
+          <SafOrigin ticketSource={ticketSource} canAccess />
         </section>
 
         {hasAssignements && (
