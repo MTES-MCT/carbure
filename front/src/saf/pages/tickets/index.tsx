@@ -44,12 +44,7 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
 
   const entity = useEntity()
   const status = useAutoStatus()
-  // const [state, actions] = useCBQueryParamsStore(entity, year, status, type)
-  // const query = useCBQueryBuilder<
-  //   SafTicketOrder[],
-  //   SafTicketStatus,
-  //   SafTicketType
-  // >(state)
+
   const { query, state, actions } = useSafTicketsQueryBuilder({ type, year })
   const apiGetTickets = (query: SafTicketQuery) => getTickets(query)
 

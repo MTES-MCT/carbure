@@ -20,8 +20,9 @@ export function useAutoStatus() {
     matchView.params.view === "tickets-assigned" ||
     matchView.params.view === "tickets-received"
   ) {
-    const status = matchStatus?.params?.status?.toUpperCase() as SafTicketStatus
-    return status ?? SafTicketStatus.PENDING
+    const status = matchStatus?.params?.status?.toUpperCase()
+    if (status == "ALL") return undefined
+    return (status as SafTicketStatus) ?? SafTicketStatus.PENDING
   }
 
   return SafTicketStatus.PENDING
@@ -47,9 +48,10 @@ export const useSafTicketsQueryBuilder = ({
   const query = useMemo(
     () => ({
       ..._query,
+      status,
       type,
     }),
-    [_query, type]
+    [_query, type, status]
   )
 
   return { query, state, actions }
