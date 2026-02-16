@@ -18,6 +18,8 @@ import {
   useGetFiltersOptionsAdmin,
   useSupplyInputsColumnsAdmin,
 } from "./supply-inputs.hooks"
+import HashRoute from "common/components/hash-route"
+import { SupplyInputDialog } from "biomethane/pages/supply-plan/supply-input-dialog"
 
 export const SupplyInputsAdminPage = () => {
   const { t } = useTranslation()
@@ -73,6 +75,10 @@ export const SupplyInputsAdminPage = () => {
           supplyPlan={supplyPlan}
           queryBuilder={queryBuilder}
           columns={columns}
+        />
+        <HashRoute
+          path="/supply-input/:id"
+          element={<SupplyInputDialog isReadOnly />}
         />
       </Content>
     </Main>

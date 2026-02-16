@@ -10,8 +10,6 @@ import { useTranslation } from "react-i18next"
 import { useSupplyPlanColumns } from "./supply-plan-table.hooks"
 import { useLocation } from "react-router-dom"
 import { Pagination } from "common/components/pagination2"
-import HashRoute from "common/components/hash-route"
-import { SupplyInputDialog } from "../../supply-input-dialog"
 
 type SupplyPlanTableProps = {
   supplyPlan: {
@@ -63,7 +61,6 @@ export const SupplyPlanTable = ({
         onLimit={queryBuilder.actions.setLimit}
         disabled={supplyPlan.loading}
       />
-      <HashRoute path="/supply-input/:id" element={<SupplyInputDialog />} />
     </>
   )
 }
