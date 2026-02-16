@@ -71,7 +71,7 @@ export const ROUTE_URLS = {
       },
       ADMIN: {
         DASHBOARD: `${baseUrl}/admin/dashboard`,
-        SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
+        SUPPLY_INPUTS: `${baseUrl}/admin/supply-plan`,
         DECLARATIONS: `${baseUrl}/admin/declarations`,
         DECLARATION_DETAIL: (producer_id: number) => {
           const currentYear = year ?? new Date().getFullYear()

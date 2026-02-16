@@ -19,9 +19,9 @@ class BaseBiomethaneSupplyInputFilter(FilterSet):
         - Otherwise (Producer case), filter by supply_plan__producer_id = entity_id
         """
 
-        entity = self.request.entity
+        entity = getattr(self.request, "entity", None)
 
-        if entity.has_external_admin_right(ExternalAdminRights.DREAL):
+        if entity and entity.has_external_admin_right(ExternalAdminRights.DREAL):
             if "producer_id" in self.data:
                 return queryset
             else:

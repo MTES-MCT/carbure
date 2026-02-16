@@ -108,7 +108,7 @@ def FiltersActionFactory():
             # Remove filter param and create filterset
             query_params = request.GET.copy()
             query_params.pop(filter_param, None)
-            filterset = self.filterset_class(query_params, queryset=self.get_queryset())
+            filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
 
             # Get DB field from FilterSet programmatically
             filter_obj = filterset.filters.get(filter_param)
