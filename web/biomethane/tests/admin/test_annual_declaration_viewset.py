@@ -50,7 +50,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         )
         BiomethaneProductionUnitFactory.create(
             producer=cls.producer_dept_01,
-            unit_name="Unité 01",
+            name="Unité 01",
             department=cls.dept_01,
         )
 
@@ -60,7 +60,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         )
         BiomethaneProductionUnitFactory.create(
             producer=cls.producer_dept_02,
-            unit_name="Unité 02",
+            name="Unité 02",
             department=cls.dept_02,
         )
 
@@ -70,7 +70,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         )
         BiomethaneProductionUnitFactory.create(
             producer=cls.producer_dept_03,
-            unit_name="Unité 03",
+            name="Unité 03",
             department=cls.dept_03,
         )
 

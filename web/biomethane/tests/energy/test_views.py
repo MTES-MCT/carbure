@@ -37,7 +37,7 @@ class BiomethaneEnergyViewSetTests(TestCase):
         # Create production unit and contract to avoid field clearing by service
         self.production_unit = BiomethaneProductionUnit.objects.create(
             producer=self.producer_entity,
-            unit_name="Test Unit",
+            name="Test Unit",
         )
 
         self.contract = BiomethaneContract.objects.create(

@@ -36,7 +36,7 @@ class BiomethaneProducersViewSetTest(TestCase):
         cls.producer1 = Entity.objects.create(name="Aardvark Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit1 = BiomethaneProductionUnitFactory.create(
             producer=cls.producer1,
-            unit_name="Unit 1",
+            name="Unit 1",
             department=cls.dept_01,
         )
 
@@ -44,7 +44,7 @@ class BiomethaneProducersViewSetTest(TestCase):
         cls.producer2 = Entity.objects.create(name="Banana Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit2 = BiomethaneProductionUnitFactory.create(
             producer=cls.producer2,
-            unit_name="Unit 2",
+            name="Unit 2",
             department=cls.dept_01,
         )
 
@@ -52,7 +52,7 @@ class BiomethaneProducersViewSetTest(TestCase):
         cls.producer3 = Entity.objects.create(name="Cherry Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit3 = BiomethaneProductionUnitFactory.create(
             producer=cls.producer3,
-            unit_name="Unit 3",
+            name="Unit 3",
             department=cls.dept_02,
         )
 
@@ -60,7 +60,7 @@ class BiomethaneProducersViewSetTest(TestCase):
         cls.producer4 = Entity.objects.create(name="Dragon Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
         cls.unit4 = BiomethaneProductionUnitFactory.create(
             producer=cls.producer4,
-            unit_name="Unit 4",
+            name="Unit 4",
             department=cls.dept_03,
         )
 
