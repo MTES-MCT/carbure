@@ -9,7 +9,8 @@ import {
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
 export type BiomethaneSupplyInput = apiTypes["BiomethaneSupplyInput"]
-
+export type BiomethaneSupplyInputResponse =
+  apiTypes["PaginatedBiomethaneSupplyInputList"]
 export type BiomethaneSupplyInputQueryBuilder = QueryBuilder<never, never>
 export type BiomethaneSupplyInputQuery =
   BiomethaneSupplyInputQueryBuilder["query"]

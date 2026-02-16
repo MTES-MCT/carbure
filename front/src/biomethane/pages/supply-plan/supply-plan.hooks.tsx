@@ -1,26 +1,32 @@
-import { Cell, Column } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import {
   BiomethaneSupplyInput,
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputQuery,
+  BiomethaneSupplyInputQueryBuilder,
 } from "./types"
 import Tag from "@codegouvfr/react-dsfr/Tag"
 import { convertSupplyPlanInputVolume } from "./utils"
 import { getDepartmentName } from "common/utils/geography"
-import { deleteSupplyInput, getSupplyPlanInputFilters } from "./api"
+import {
+  deleteSupplyInput,
+  getSupplyPlanInputFilters,
+  getSupplyPlanInputs,
+} from "./api"
 import { defaultNormalizer } from "common/utils/normalize"
-import { formatNumber } from "common/utils/formatters"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { Button } from "common/components/button2"
 import { Confirm } from "common/components/dialog2"
 import { usePortal } from "common/components/portal"
-import { useMutation } from "common/hooks/async"
+import { useQuery, useMutation } from "common/hooks/async"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { compact } from "common/utils/collection"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { Cell, Column } from "common/components/table2"
+import { formatNumber } from "common/utils/formatters"
 
 const useDeleteSupplyInput = () => {
   const { t } = useTranslation()
@@ -133,5 +139,28 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
     filterLabels,
     getFilterOptions: (filter: BiomethaneSupplyInputFilter) =>
       getSupplyPlanInputFilters(query, filter, selectedEntityId),
+  }
+}
+
+export const useSupplyPlanQuery = (year: number) => {
+  const { selectedEntityId } = useSelectedEntity()
+  const { state, actions, query } = useQueryBuilder<
+    BiomethaneSupplyInputQueryBuilder["config"]
+  >({
+    year,
+  })
+
+  const { getFilterOptions, filterLabels, normalizers } =
+    useGetFilterOptions(query)
+
+  const { result: supplyInputs, loading } = useQuery(getSupplyPlanInputs, {
+    key: `supply-plan-inputs`,
+    params: [query, selectedEntityId],
+  })
+
+  return {
+    queryBuilder: { state, actions, query },
+    filterOptions: { getFilterOptions, filterLabels, normalizers },
+    supplyPlan: { supplyInputs, loading },
   }
 }
