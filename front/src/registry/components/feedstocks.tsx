@@ -9,7 +9,7 @@ const Feedstocks = () => {
 
   const feedstocks = useQuery(findFeedstocks, {
     key: "feedstocks",
-    params: [{}],
+    params: [],
   })
 
   const feedstocksData = feedstocks.result ?? []
