@@ -14,7 +14,10 @@ import { useAnnualDeclarationYearsAdmin } from "../hooks/use-annual-declaration-
 import { Tabs } from "common/components/tabs2"
 import { useMemo } from "react"
 import { useRoutes } from "common/hooks/routes"
-import { useGetFiltersOptionsAdmin } from "./supply-inputs.hooks"
+import {
+  useGetFiltersOptionsAdmin,
+  useSupplyInputsColumnsAdmin,
+} from "./supply-inputs.hooks"
 
 export const SupplyInputsAdminPage = () => {
   const { t } = useTranslation()
@@ -27,6 +30,7 @@ export const SupplyInputsAdminPage = () => {
 
   const { queryBuilder, supplyPlan } = useSupplyPlanQuery(year)
   const filterOptions = useGetFiltersOptionsAdmin(queryBuilder.query)
+  const columns = useSupplyInputsColumnsAdmin()
 
   const tabs = useMemo(
     () => [
@@ -65,7 +69,11 @@ export const SupplyInputsAdminPage = () => {
           getFilterOptions={filterOptions.getFilterOptions}
           normalizers={filterOptions.normalizers}
         />
-        <SupplyPlanTable supplyPlan={supplyPlan} queryBuilder={queryBuilder} />
+        <SupplyPlanTable
+          supplyPlan={supplyPlan}
+          queryBuilder={queryBuilder}
+          columns={columns}
+        />
       </Content>
     </Main>
   )

@@ -1,5 +1,6 @@
-import { Table } from "common/components/table2"
+import { Column, Table } from "common/components/table2"
 import {
+  BiomethaneSupplyInput,
   BiomethaneSupplyInputQueryBuilder,
   BiomethaneSupplyInputResponse,
 } from "../../types"
@@ -18,14 +19,18 @@ type SupplyPlanTableProps = {
     loading: boolean
   }
   queryBuilder: Omit<BiomethaneSupplyInputQueryBuilder, "config">
+  columns?: Column<BiomethaneSupplyInput>[]
 }
 export const SupplyPlanTable = ({
   supplyPlan,
   queryBuilder,
+  columns: overiddenColumns = [],
 }: SupplyPlanTableProps) => {
   const { t } = useTranslation()
-  const columns = useSupplyPlanColumns()
+  const _columns = useSupplyPlanColumns()
   const location = useLocation()
+
+  const columns = overiddenColumns.length > 0 ? overiddenColumns : _columns
 
   if (
     !supplyPlan.loading &&

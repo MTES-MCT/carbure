@@ -13017,6 +13017,8 @@ components:
           $ref: "#/components/schemas/Country"
         input_name:
           $ref: "#/components/schemas/FeedStock"
+        producer:
+          $ref: "#/components/schemas/EntityPreview"
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
@@ -13050,6 +13052,7 @@ components:
         - input_name
         - material_unit
         - origin_country
+        - producer
         - source
         - supply_plan
         - volume

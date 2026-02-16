@@ -11,6 +11,7 @@ import { defaultNormalizer } from "common/utils/normalize"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { useQuery } from "common/hooks/async"
+import { normalizeDepartment } from "common/utils/normalizers"
 
 export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
   const { t } = useTranslation()
@@ -29,8 +30,10 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
     }),
     [BiomethaneSupplyInputFilter.input_name]: (value: string) =>
       defaultNormalizer(value),
-    [BiomethaneSupplyInputFilter.department]: (value: string) =>
-      defaultNormalizer(value),
+    [BiomethaneSupplyInputFilter.department]: (value: string) => {
+      const { label, value: normalizedValue } = normalizeDepartment(value)
+      return { label, value: normalizedValue }
+    },
   }
 
   return {
