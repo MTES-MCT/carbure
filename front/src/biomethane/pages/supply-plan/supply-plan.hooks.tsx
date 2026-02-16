@@ -27,6 +27,7 @@ import { compact } from "common/utils/collection"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { Cell, Column } from "common/components/table2"
 import { formatNumber } from "common/utils/formatters"
+import { normalizeDepartment } from "common/utils/normalizers"
 
 const useDeleteSupplyInput = () => {
   const { t } = useTranslation()
@@ -136,8 +137,10 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
       defaultNormalizer(value),
     [BiomethaneSupplyInputFilter.source]: (value: string) =>
       defaultNormalizer(value),
-    [BiomethaneSupplyInputFilter.department]: (value: string) =>
-      defaultNormalizer(value),
+    [BiomethaneSupplyInputFilter.department]: (value: string) => {
+      const { label, value: normalizedValue } = normalizeDepartment(value)
+      return { label, value: normalizedValue }
+    },
   }
 
   return {

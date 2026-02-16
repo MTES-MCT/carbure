@@ -13062,6 +13062,8 @@ components:
           $ref: "#/components/schemas/Country"
         feedstock:
           $ref: "#/components/schemas/FeedStockClassification"
+        producer:
+          $ref: "#/components/schemas/EntityPreview"
         source:
           allOf:
             - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
@@ -13108,6 +13110,7 @@ components:
         - feedstock
         - id
         - origin_country
+        - producer
         - supply_plan
     BiomethaneSupplyInputCreate:
       type: object

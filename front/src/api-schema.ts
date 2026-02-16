@@ -3602,6 +3602,7 @@ export interface components {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
             feedstock: components["schemas"]["FeedStockClassification"];
+            producer: components["schemas"]["EntityPreview"];
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;

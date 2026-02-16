@@ -4,13 +4,14 @@ from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
 from biomethane.services.supply_plan import apply_feedstock_field_rules
 from core.models import MatierePremiere, Pays
-from core.serializers import CountrySerializer
+from core.serializers import CountrySerializer, EntityPreviewSerializer
 from feedstocks.serializers.feedstock_classification import FeedStockClassificationSerializer
 
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
     feedstock = FeedStockClassificationSerializer()
+    producer = EntityPreviewSerializer(source="supply_plan.producer")
 
     class Meta:
         model = BiomethaneSupplyInput
