@@ -6,7 +6,10 @@ import { useTranslation } from "react-i18next"
 import { useSupplyPlanQuery } from "./supply-plan.hooks"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import HashRoute from "common/components/hash-route"
-import { CreateSupplyInputDialog } from "./supply-input-dialog"
+import {
+  CreateSupplyInputDialog,
+  SupplyInputDialog,
+} from "./supply-input-dialog"
 import { ExcelImportDialog } from "./supply-excel-import-dialog"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -83,7 +86,10 @@ export const SupplyPlan = () => {
         normalizers={filterOptions.normalizers}
       />
       <SupplyPlanTable supplyPlan={supplyPlan} queryBuilder={queryBuilder} />
-
+      <HashRoute
+        path="/supply-input/:id"
+        element={<SupplyInputDialog isReadOnly={!canEditDeclaration} />}
+      />
       <HashRoute
         path="/import"
         element={
