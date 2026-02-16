@@ -7487,6 +7487,7 @@ export interface operations {
     biomethane_supply_input_list: {
         parameters: {
             query: {
+                department?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 input_name?: string[];
@@ -7498,6 +7499,7 @@ export interface operations {
                 page_size?: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
                 /** @description * `INTERNAL` - Interne
@@ -7676,6 +7678,7 @@ export interface operations {
     biomethane_supply_input_filters_retrieve: {
         parameters: {
             query: {
+                department?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
@@ -7685,6 +7688,7 @@ export interface operations {
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
                 /** @description * `INTERNAL` - Interne
@@ -13111,8 +13115,10 @@ export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
     INTERNAL = "INTERNAL"
 }
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
+    department = "department",
     input_name = "input_name",
     producer_id = "producer_id",
+    producer_name = "producer_name",
     source = "source",
     year = "year"
 }

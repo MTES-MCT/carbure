@@ -9,6 +9,10 @@ class BaseBiomethaneSupplyInputFilter(FilterSet):
     producer_id = CharFilter(field_name="supply_plan__producer__id", lookup_expr="exact")
     input_name = AllValuesMultipleFilter(field_name="input_name__name", lookup_expr="exact", required=False)
     source = MultipleChoiceFilter(field_name="source", choices=BiomethaneSupplyInput.SOURCE_CHOICES, required=False)
+    department = AllValuesMultipleFilter(field_name="origin_department", lookup_expr="exact", required=False)
+
+    # Filter used for admin supply inputs page
+    producer_name = AllValuesMultipleFilter(field_name="supply_plan__producer__name", lookup_expr="exact", required=False)
 
     def filter_by_entity(self, queryset, name, value):
         """
@@ -37,7 +41,7 @@ class BiomethaneSupplyInputFilter(BaseBiomethaneSupplyInputFilter):
 
     class Meta:
         model = BiomethaneSupplyInput
-        fields = ["entity_id", "producer_id", "year", "input_name", "source"]
+        fields = ["entity_id", "producer_id", "year", "input_name", "source", "producer_name"]
 
 
 class BiomethaneSupplyInputCreateFilter(BiomethaneSupplyInputFilter):

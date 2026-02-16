@@ -1966,6 +1966,15 @@ paths:
       description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -2003,6 +2012,14 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: producer_name
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -2302,6 +2319,15 @@ paths:
         queryset.
       parameters:
         - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -2312,8 +2338,10 @@ paths:
           schema:
             type: string
             enum:
+              - department
               - input_name
               - producer_id
+              - producer_name
               - source
               - year
           description: Filter string to apply
@@ -2338,6 +2366,14 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: producer_name
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -2380,10 +2416,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
+                    - department
                     - input_name
                     - producer_id
+                    - producer_name
                     - source
-                    - year
                   summary: Example of filters response.
           description: ""
   /api/biomethane/supply-plan/download-template/:
