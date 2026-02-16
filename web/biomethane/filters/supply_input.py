@@ -1,4 +1,4 @@
-from django_filters import AllValuesMultipleFilter, CharFilter, FilterSet, NumberFilter
+from django_filters import AllValuesMultipleFilter, CharFilter, FilterSet, MultipleChoiceFilter, NumberFilter
 
 from biomethane.models import BiomethaneSupplyInput
 from core.models import ExternalAdminRights
@@ -8,6 +8,11 @@ class BaseBiomethaneSupplyInputFilter(FilterSet):
     entity_id = CharFilter(method="filter_by_entity")
     producer_id = CharFilter(field_name="supply_plan__producer__id", lookup_expr="exact")
     feedstock = AllValuesMultipleFilter(field_name="feedstock__name", lookup_expr="exact", required=False)
+    source = MultipleChoiceFilter(field_name="source", choices=BiomethaneSupplyInput.SOURCE_CHOICES, required=False)
+    department = AllValuesMultipleFilter(field_name="origin_department", lookup_expr="exact", required=False)
+
+    # Filter used for admin supply inputs page
+    producer_name = AllValuesMultipleFilter(field_name="supply_plan__producer__name", lookup_expr="exact", required=False)
 
     def filter_by_entity(self, queryset, name, value):
         """
@@ -36,7 +41,7 @@ class BiomethaneSupplyInputFilter(BaseBiomethaneSupplyInputFilter):
 
     class Meta:
         model = BiomethaneSupplyInput
-        fields = ["entity_id", "producer_id", "year", "feedstock"]
+        fields = ["entity_id", "producer_id", "year", "feedstock", "source", "producer_name"]
 
 
 class BiomethaneSupplyInputCreateFilter(BiomethaneSupplyInputFilter):

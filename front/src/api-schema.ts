@@ -3680,7 +3680,7 @@ export interface components {
          *     * `EXTERNAL` - Externe
          * @enum {string}
          */
-        BiomethaneSupplyInputSourceEnum: BiomethaneSupplyInputSourceEnum;
+        BiomethaneSupplyInputSourceEnum: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
         BiomethaneUploadExcelRequest: {
             /** Format: binary */
             file: File;
@@ -7535,6 +7535,7 @@ export interface operations {
     biomethane_supply_input_list: {
         parameters: {
             query: {
+                department?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -7546,8 +7547,12 @@ export interface operations {
                 page_size?: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
+                /** @description * `INTERNAL` - Interne
+                 *     * `EXTERNAL` - Externe */
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -7747,6 +7752,7 @@ export interface operations {
     biomethane_supply_input_filters_retrieve: {
         parameters: {
             query: {
+                department?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -7756,8 +7762,12 @@ export interface operations {
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
+                /** @description * `INTERNAL` - Interne
+                 *     * `EXTERNAL` - Externe */
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -13167,9 +13177,16 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFi
     status = "status",
     tariff_reference = "tariff_reference"
 }
+export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
+    EXTERNAL = "EXTERNAL",
+    INTERNAL = "INTERNAL"
+}
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
+    department = "department",
     feedstock = "feedstock",
     producer_id = "producer_id",
+    producer_name = "producer_name",
+    source = "source",
     year = "year"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
@@ -13533,10 +13550,6 @@ export enum BiomethaneAnnualDeclarationStatusEnum {
     IN_PROGRESS = "IN_PROGRESS",
     DECLARED = "DECLARED",
     OVERDUE = "OVERDUE"
-}
-export enum BiomethaneSupplyInputSourceEnum {
-    INTERNAL = "INTERNAL",
-    EXTERNAL = "EXTERNAL"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

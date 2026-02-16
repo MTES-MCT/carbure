@@ -1967,6 +1967,15 @@ paths:
       description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -2004,12 +2013,35 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: producer_name
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
           description: A search term.
           schema:
             type: string
+        - in: query
+          name: source
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - EXTERNAL
+                - INTERNAL
+          description: |-
+            * `INTERNAL` - Interne
+            * `EXTERNAL` - Externe
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -2327,6 +2359,15 @@ paths:
         queryset.
       parameters:
         - in: query
+          name: department
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -2345,8 +2386,11 @@ paths:
           schema:
             type: string
             enum:
+              - department
               - feedstock
               - producer_id
+              - producer_name
+              - source
               - year
           description: Filter string to apply
           required: true
@@ -2362,12 +2406,35 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: producer_name
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
           description: A search term.
           schema:
             type: string
+        - in: query
+          name: source
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - EXTERNAL
+                - INTERNAL
+          description: |-
+            * `INTERNAL` - Interne
+            * `EXTERNAL` - Externe
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
@@ -2390,9 +2457,11 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
+                    - department
                     - feedstock
                     - producer_id
-                    - year
+                    - producer_name
+                    - source
                   summary: Example of filters response.
           description: ""
   /api/biomethane/supply-plan/download-template/:

@@ -126,11 +126,17 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
   const { selectedEntityId } = useSelectedEntity()
 
   const filterLabels = {
+    [BiomethaneSupplyInputFilter.source]: t("Provenance"),
     [BiomethaneSupplyInputFilter.feedstock]: t("Intrant"),
+    [BiomethaneSupplyInputFilter.department]: t("Département"),
   }
 
   const normalizers = {
     [BiomethaneSupplyInputFilter.feedstock]: (value: string) =>
+      defaultNormalizer(value),
+    [BiomethaneSupplyInputFilter.source]: (value: string) =>
+      defaultNormalizer(value),
+    [BiomethaneSupplyInputFilter.department]: (value: string) =>
       defaultNormalizer(value),
   }
 
