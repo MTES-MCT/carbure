@@ -1,9 +1,10 @@
 import { Tab, Tabs } from "common/components/tabs2"
+import useEntity from "common/hooks/entity"
 import { useTranslation } from "react-i18next"
 import { SafSnapshot, SafTicketType, SafTicketStatus } from "saf/types"
 
 interface StatusSwitcherProps {
-  status: SafTicketStatus
+  status?: SafTicketStatus
   count?: SafSnapshot
   type: SafTicketType
   onSwitch: (status: SafTicketStatus) => void
@@ -16,7 +17,11 @@ export const StatusSwitcher = ({
 }: StatusSwitcherProps) => {
   const { t } = useTranslation()
 
+  const entity = useEntity()
   const tabs: Tab<string>[] = []
+
+  const isAdmin =
+    entity.isAdmin || (entity.isExternal && entity.hasAdminRight("AIRLINE"))
 
   if (type === "received") {
     tabs.push(
@@ -27,7 +32,6 @@ export const StatusSwitcher = ({
         icon: "fr-icon-draft-line",
         iconActive: "fr-icon-draft-fill",
       },
-
       {
         key: SafTicketStatus.ACCEPTED,
         path: `../tickets-received/accepted`,
@@ -37,6 +41,16 @@ export const StatusSwitcher = ({
       }
     )
   } else if (type === "assigned") {
+    if (isAdmin) {
+      tabs.push({
+        key: "all",
+        path: `../tickets-assigned/all`,
+        label: `${t("Tous")} (${count?.tickets_assigned})`,
+        icon: "fr-icon-layout-grid-line",
+        iconActive: "fr-icon-layout-grid-fill",
+      })
+    }
+
     tabs.push(
       {
         key: SafTicketStatus.PENDING,
