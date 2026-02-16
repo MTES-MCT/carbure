@@ -30,8 +30,7 @@ import { Title } from "common/components/title"
 const DigestatePage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { selectedYear, isDeclarationInCurrentPeriod, annualDeclaration } =
-    useAnnualDeclaration()
+  const { selectedYear, isDeclarationInCurrentPeriod } = useAnnualDeclaration()
   const form = useForm<BiomethaneDigestate | undefined | object>(undefined)
   const { selectedEntityId } = useSelectedEntity()
 
@@ -53,11 +52,10 @@ const DigestatePage = () => {
     if (!productionUnit) return false
 
     // If the declaration year selected is not the current year and the declaration is not open, we don't display the conditional sections
-    if (!isDeclarationInCurrentPeriod && annualDeclaration?.is_open)
-      return false
+    if (!isDeclarationInCurrentPeriod && !digestate) return false
 
     return true
-  }, [productionUnit, isDeclarationInCurrentPeriod, annualDeclaration?.is_open])
+  }, [productionUnit, isDeclarationInCurrentPeriod, digestate])
 
   usePrivateNavigation(t("Digestat"))
   useMissingFields(form)
@@ -93,7 +91,7 @@ const DigestatePage = () => {
           ) && <Sale />}
         </>
       )}
-      {!isDeclarationInCurrentPeriod && annualDeclaration?.is_open ? (
+      {!isDeclarationInCurrentPeriod && !digestate ? (
         <ContainerFluid>
           <Title is="h2" as="h5">
             {t(
