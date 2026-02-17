@@ -22,6 +22,7 @@ import {
 import { UserRole } from "common/types"
 import { getTicketDetails } from "saf/api"
 import AcceptAssignment from "./components/accept-assignment"
+import SafOrigin from "saf/components/saf_origin"
 
 export type TicketDetailsProps = Partial<
   Omit<NavigationButtonsProps, "closeAction">
@@ -159,12 +160,7 @@ export const TicketDetails = ({
 
         <ClientComment ticket={ticket} />
 
-        {(isSupplier || isAdmin) && (
-          <LinkedTicketSource
-            ticket_source={ticket?.parent_ticket_source}
-            title={t("Volume parent")}
-          />
-        )}
+        <SafOrigin ticket={ticket} canAccess={isSupplier || isAdmin} />
 
         {hasChildVolume && (isClient || isAdmin) && (
           <LinkedTicketSource
