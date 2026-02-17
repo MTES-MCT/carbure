@@ -23,6 +23,7 @@ class BiomethaneProducersViewSet(GenericViewSet, ListModelMixin):
     queryset = Entity.objects.filter(entity_type=Entity.BIOMETHANE_PRODUCER)
     permission_classes = [HasDrealRights]
     serializer_class = BiomethaneProducerSerializer
+    pagination_class = None
 
     def list(self, request):
         """

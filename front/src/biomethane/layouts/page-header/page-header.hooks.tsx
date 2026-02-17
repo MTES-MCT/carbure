@@ -8,7 +8,7 @@ import {
   useAnnualDeclaration,
 } from "biomethane/providers/annual-declaration"
 import {
-  correctAnnualDeclaration,
+  patchAnnualDeclaration,
   validateAnnualDeclaration,
 } from "biomethane/api"
 import useEntity from "common/hooks/entity"
@@ -52,7 +52,10 @@ export const usePageHeaderActions = () => {
     }
   )
   const correctAnnualDeclarationMutation = useMutation(
-    () => correctAnnualDeclaration(entity.id, selectedYear),
+    () =>
+      patchAnnualDeclaration(entity.id, selectedYear, {
+        status: AnnualDeclarationStatus.IN_PROGRESS,
+      }),
     {
       invalidates: [annualDeclarationKey],
       onSuccess: () => {

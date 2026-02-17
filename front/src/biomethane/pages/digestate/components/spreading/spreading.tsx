@@ -8,6 +8,7 @@ import { Notice } from "common/components/notice"
 import { usePortal } from "common/components/portal"
 import { AddSpreadingDepartment } from "./add-spreading-department"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const Spreading = ({
   digestate,
@@ -18,6 +19,7 @@ export const Spreading = ({
   const columns = useSpreadingColumns()
   const portal = usePortal()
   const { canEditDeclaration, selectedYear } = useAnnualDeclaration()
+  const { hasSelectedEntity } = useSelectedEntity()
 
   const openAddSpreadingDepartmentDialog = () => {
     portal((close) => (
@@ -46,13 +48,15 @@ export const Spreading = ({
         </>
       }
       headerActions={
-        <Button
-          iconId="ri-add-line"
-          onClick={openAddSpreadingDepartmentDialog}
-          disabled={!digestate || !canEditDeclaration}
-        >
-          {t("Ajouter un département")}
-        </Button>
+        !hasSelectedEntity && (
+          <Button
+            iconId="ri-add-line"
+            onClick={openAddSpreadingDepartmentDialog}
+            disabled={!digestate || !canEditDeclaration}
+          >
+            {t("Ajouter un département")}
+          </Button>
+        )
       }
       readOnly={!canEditDeclaration}
     >

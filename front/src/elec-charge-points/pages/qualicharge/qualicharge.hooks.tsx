@@ -9,7 +9,7 @@ import {
   QualichargeValidatedBy,
 } from "./types"
 import { QualichargeBadge } from "./components/qualicharge-badge"
-import { CONVERSIONS, formatDate, formatNumber } from "common/utils/formatters"
+import { formatDate, formatNumber } from "common/utils/formatters"
 import { getQualichargeFilters, getYears } from "./api"
 import { formatQualichargeStatus } from "./formatters"
 import { compact } from "common/utils/collection"
@@ -52,16 +52,9 @@ export const useQualichargeColumns = (status: QualichargeTab) => {
       cell: (data) => <Cell text={formatDate(data.date_to)} />,
     },
     {
-      header: t("Energie (kWh)"),
+      header: t("Energie (MWh)"),
       cell: (data) => (
-        <Cell
-          text={formatNumber(
-            CONVERSIONS.energy.MWH_TO_KWH(data.energy_amount),
-            {
-              fractionDigits: 2,
-            }
-          )}
-        />
+        <Cell text={formatNumber(data.energy_amount, { fractionDigits: 2 })} />
       ),
     },
   ])

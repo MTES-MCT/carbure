@@ -36,7 +36,7 @@ export const usePrivateSidebar = () => {
 
   return [
     admin,
-    biomethane,
+    ...biomethane,
     ...biofuels,
     ...doubleCount,
     ...elec,

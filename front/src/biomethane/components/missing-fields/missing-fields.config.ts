@@ -48,10 +48,8 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
   // Page Énergie
   "injected-biomethane": [
     "injected_biomethane_gwh_pcs_per_year",
-    "injected_biomethane_nm3_per_year",
     "injected_biomethane_ch4_rate_percent",
     "injected_biomethane_pcs_kwh_per_nm3",
-    "operating_hours",
   ],
   "biogas-production": [
     "produced_biogas_nm3_per_year",
@@ -59,17 +57,15 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     "flaring_operating_hours",
   ],
   "installation-energy-needs": [
-    "attest_no_fossil_for_digester_heating_and_purification",
-    "energy_used_for_digester_heating",
-    "fossil_details_for_digester_heating",
-    "attest_no_fossil_for_installation_needs",
-    "energy_used_for_installation_needs",
-    "fossil_details_for_installation_needs",
+    "attest_no_fossil_for_energy",
+    "energy_types",
+    "energy_details",
   ],
   "energy-efficiency": [
     "purified_biogas_quantity_nm3",
     "purification_electric_consumption_kwe",
     "self_consumed_biogas_nm3",
+    "self_consumed_biogas_or_biomethane_kwh",
     "total_unit_electric_consumption_kwe",
     "butane_or_propane_addition",
     "fossil_fuel_consumed_kwh",

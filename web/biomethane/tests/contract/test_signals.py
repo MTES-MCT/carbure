@@ -160,5 +160,6 @@ class ClearFieldsSignalTests(TestCase):
 
         clear_contract_fields_on_save(sender=BiomethaneContract, instance=contract)
 
-        # Filter should not be called when update_data is empty
-        mock_filter.assert_not_called()
+        # Update should not be called when update_data is empty
+        mock_queryset = mock_filter.return_value
+        mock_queryset.update.assert_not_called()

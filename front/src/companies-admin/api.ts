@@ -25,15 +25,6 @@ export function addCompany(
   })
 }
 
-export function getCompanyDetails(entity_id: number, company_id: number) {
-  return apiFetch.GET("/entities/{id}/", {
-    params: {
-      path: { id: company_id },
-      query: { entity_id },
-    },
-  })
-}
-
 export function getCompanyDepots(entity_id: number, company_id: number) {
   return apiFetch.GET("/entities/depots/", {
     params: { query: { entity_id, company_id } },

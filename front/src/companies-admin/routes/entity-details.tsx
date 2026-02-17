@@ -22,6 +22,8 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { ExtAdminPagesEnum } from "api-schema"
 import { ApplicationDetailsDialog } from "double-counting-admin/components/applications/application-details-dialog"
 import { AgreementDetailsDialog } from "double-counting-admin/components/agreements/agreement-details-dialog"
+import { getCompanyDetails } from "common/api"
+import { getEntityTypeLabel } from "common/utils/normalizers"
 
 const EntityDetails = () => {
   const navigate = useNavigate()
@@ -31,7 +33,7 @@ const EntityDetails = () => {
   const { t } = useTranslation()
   usePrivateNavigation(t("Sociétés"))
 
-  const company = useQuery(api.getCompanyDetails, {
+  const company = useQuery(getCompanyDetails, {
     key: "entity-details",
     params: [entity.id, companyId],
   })
@@ -61,10 +63,17 @@ const EntityDetails = () => {
         <Row style={{ alignItems: "center", gap: "var(--spacing-m)" }}>
           <Button
             icon={ChevronLeft}
-            action={() => navigate("..")}
+            action={() => navigate(-1)}
             label="Retour"
           />
-          <h1>{entityData?.name}</h1>
+          <Row style={{ alignItems: "center", gap: "var(--spacing-m)" }}>
+            <h1>
+              {entityData?.name} -{" "}
+              {entityData?.entity_type
+                ? getEntityTypeLabel(entityData?.entity_type)
+                : ""}
+            </h1>
+          </Row>
         </Row>
       </header>
 

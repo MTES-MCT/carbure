@@ -21,16 +21,17 @@ export function SafFilters({
   const { t } = useTranslation()
 
   const filterLabels = {
-    [SafFilter.Periods]: t("Périodes"),
-    [SafFilter.Feedstocks]: t("Matières Premières"),
-    [SafFilter.Clients]: t("Clients"),
-    [SafFilter.Suppliers]: t("Fournisseurs"),
-    [SafFilter.AddedBy]: t("Ajouté par"),
-    [SafFilter.CountriesOfOrigin]: t("Pays d'origine"),
-    [SafFilter.ProductionSites]: t("Sites de production"),
-    [SafFilter.DeliverySites]: t("Sites de livraison"),
-    [SafFilter.ConsumptionTypes]: t("Types de consommation"),
-    [SafFilter.Airport]: t("Aéroport"),
+    [SafFilter.period]: t("Périodes"),
+    [SafFilter.feedstock]: t("Matières Premières"),
+    [SafFilter.client]: t("Clients"),
+    [SafFilter.supplier]: t("Fournisseurs"),
+    [SafFilter.added_by]: t("Ajouté par"),
+    [SafFilter.country_of_origin]: t("Pays d'origine"),
+    [SafFilter.production_site]: t("Sites de production"),
+    [SafFilter.origin_depot]: t("Dépôt d'incorporation"),
+    [SafFilter.consumption_type]: t("Types de consommation"),
+    [SafFilter.reception_airport]: t("Aéroport"),
+    [SafFilter.client_type]: t("Type de client"),
   }
 
   const computedFilters = filters.reduce(
@@ -55,16 +56,17 @@ export function SafFilters({
 type FilterNormalizers = Partial<Record<SafFilter, Normalizer<any>>>
 
 const filterNormalizers: FilterNormalizers = {
-  [SafFilter.Feedstocks]: norm.normalizeFeedstockFilter,
-  [SafFilter.Periods]: norm.normalizePeriodFilter,
-  [SafFilter.Clients]: norm.normalizeUnknownFilter,
-  [SafFilter.AddedBy]: norm.normalizeUnknownFilter,
-  [SafFilter.Suppliers]: norm.normalizeUnknownFilter,
-  [SafFilter.CountriesOfOrigin]: norm.normalizeCountryFilter,
-  [SafFilter.ProductionSites]: norm.normalizeUnknownFilter,
-  [SafFilter.DeliverySites]: norm.normalizeUnknownFilter,
-  [SafFilter.ConsumptionTypes]: normalizeConsumptionType,
-  [SafFilter.Airport]: norm.normalizeUnknownFilter,
+  [SafFilter.feedstock]: norm.normalizeFeedstockFilter,
+  [SafFilter.period]: norm.normalizePeriodFilter,
+  [SafFilter.client]: norm.normalizeUnknownFilter,
+  [SafFilter.added_by]: norm.normalizeUnknownFilter,
+  [SafFilter.supplier]: norm.normalizeUnknownFilter,
+  [SafFilter.country_of_origin]: norm.normalizeCountryFilter,
+  [SafFilter.production_site]: norm.normalizeUnknownFilter,
+  [SafFilter.origin_depot]: norm.normalizeUnknownFilter,
+  [SafFilter.consumption_type]: normalizeConsumptionType,
+  [SafFilter.reception_airport]: norm.normalizeUnknownFilter,
+  [SafFilter.client_type]: norm.normalizeEntityType,
 }
 
 export default SafFilters

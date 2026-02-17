@@ -18,6 +18,10 @@ class BaseBiomethaneProductionUnitSerializer(serializers.ModelSerializer):
         child=serializers.ChoiceField(choices=BiomethaneProductionUnit.SPREADING_MANAGEMENT_METHODS_CHOICES),
         required=False,
     )
+    digestate_sale_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=BiomethaneProductionUnit.DIGESTATE_SALE_TYPES_CHOICES),
+        required=False,
+    )
     department = serializers.SlugRelatedField(
         slug_field="code_dept",
         queryset=Department.objects.all(),

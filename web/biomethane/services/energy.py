@@ -26,16 +26,16 @@ class EnergyContext:
         return getattr(self.instance, "has_injection_difficulties_due_to_network_saturation", False)
 
     @property
-    def attest_no_fossil_for_digester_heating_and_purification(self) -> bool:
-        return getattr(self.instance, "attest_no_fossil_for_digester_heating_and_purification", False)
-
-    @property
-    def attest_no_fossil_for_installation_needs(self) -> bool:
-        return getattr(self.instance, "attest_no_fossil_for_installation_needs", False)
+    def energy_types(self) -> Optional[list]:
+        return getattr(self.instance, "energy_types", None) or []
 
     @property
     def tariff_reference(self) -> Optional[str]:
         return getattr(self.contract, "tariff_reference", None) if self.contract else None
+
+    @property
+    def installation_category(self) -> Optional[str]:
+        return getattr(self.contract, "installation_category", None) if self.contract else None
 
 
 class BiomethaneEnergyService:
@@ -44,26 +44,17 @@ class BiomethaneEnergyService:
     All validation rules and conditional field logic are defined here.
     """
 
-    # Field groups definition
-    FLARING_FIELDS = ["flaring_operating_hours"]
-
     # Fields for tariff reference 2011, 2020, 2021
     OLD_TARIFF_FIELDS = [
-        "energy_used_for_digester_heating",
-        "fossil_details_for_digester_heating",
         "purified_biogas_quantity_nm3",
         "purification_electric_consumption_kwe",
     ]
 
     # Fields for tariff reference 2023
     NEW_TARIFF_FIELDS = [
-        "energy_used_for_installation_needs",
-        "fossil_details_for_installation_needs",
         "self_consumed_biogas_nm3",
         "total_unit_electric_consumption_kwe",
     ]
-
-    TARIFF_2011_2020_FIELDS = ["injected_biomethane_nm3_per_year"]
 
     MALFUNCTION_FIELDS = [
         "malfunction_cumulative_duration_days",
@@ -74,6 +65,11 @@ class BiomethaneEnergyService:
     MALFUNCTION_DETAILS_FIELD = ["malfunction_details"]
 
     INJECTION_DIFFICULTY_FIELDS = ["injection_impossibility_hours"]
+
+    # Fields conditional on energy types (PRODUCED_BIOGAS or PRODUCED_BIOMETHANE)
+    ENERGY_TYPE_CONDITIONAL_FIELDS = [
+        "self_consumed_biogas_or_biomethane_kwh",
+    ]
 
     @staticmethod
     def _extract_data(instance) -> EnergyContext:
@@ -142,16 +138,8 @@ def _build_energy_rules() -> list[FieldClearingRule]:
     """
     Build the list of field clearing rules for energy instances.
     """
-    from biomethane.models import BiomethaneProductionUnit
 
     return [
-        # Flaring rules
-        RuleBuilder.required_value_not_in_list(
-            lambda ctx: ctx.production_unit.installed_meters if ctx.production_unit else [],
-            BiomethaneProductionUnit.FLARING_FLOWMETER,
-            BiomethaneEnergyService.FLARING_FIELDS,
-            "flaring_not_installed",
-        ),
         # Tariff rules - Old tariff fields (2011, 2020, 2021)
         RuleBuilder.value_not_in_list(
             lambda ctx: ctx.tariff_reference,
@@ -165,13 +153,6 @@ def _build_energy_rules() -> list[FieldClearingRule]:
             ["2023"],
             BiomethaneEnergyService.NEW_TARIFF_FIELDS,
             "not_new_tariff",
-        ),
-        # Tariff rules - 2011 and 2020 specific fields
-        RuleBuilder.value_not_in_list(
-            lambda ctx: ctx.tariff_reference,
-            ["2011", "2020"],
-            BiomethaneEnergyService.TARIFF_2011_2020_FIELDS,
-            "not_2011_2020_tariff",
         ),
         # Malfunction rules - no malfunctions
         FieldClearingRule(
@@ -193,15 +174,31 @@ def _build_energy_rules() -> list[FieldClearingRule]:
             fields=BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS,
             condition=lambda ctx: not ctx.has_injection_difficulties,
         ),
-        # Installation energy needs rules
+        # Energy details rules
         FieldClearingRule(
-            name="no_fossil_for_digester_heating",
-            fields=["fossil_details_for_digester_heating"],
-            condition=lambda ctx: ctx.attest_no_fossil_for_digester_heating_and_purification,
+            name="no_fossil_for_energy",
+            fields=["energy_details"],
+            condition=lambda ctx: not any(
+                energy_type
+                in [
+                    BiomethaneEnergy.ENERGY_TYPE_FOSSIL,
+                    BiomethaneEnergy.ENERGY_TYPE_OTHER_RENEWABLE,
+                    BiomethaneEnergy.ENERGY_TYPE_OTHER,
+                ]
+                for energy_type in ctx.energy_types
+            ),
         ),
+        # Energy type conditional fields - only visible if PRODUCED_BIOGAS or PRODUCED_BIOMETHANE
         FieldClearingRule(
-            name="no_fossil_for_installation_needs",
-            fields=["fossil_details_for_installation_needs"],
-            condition=lambda ctx: ctx.attest_no_fossil_for_installation_needs,
+            name="no_biogas_or_biomethane_energy_type",
+            fields=BiomethaneEnergyService.ENERGY_TYPE_CONDITIONAL_FIELDS,
+            condition=lambda ctx: not any(
+                energy_type
+                in [
+                    BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOGAS,
+                    BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOMETHANE,
+                ]
+                for energy_type in ctx.energy_types
+            ),
         ),
     ]

@@ -22,6 +22,7 @@ class BiomethaneProductionUnitSerializerTests(TestCase):
             ],
             "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
             "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
+            "digestate_sale_types": [BiomethaneProductionUnit.SPREADING_PLAN_ICPE],
         }
         serializer = BiomethaneProductionUnitUpsertSerializer(data=valid_data, context={"entity": self.producer_entity})
 
@@ -66,3 +67,16 @@ class BiomethaneProductionUnitSerializerTests(TestCase):
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("spreading_management_methods", serializer.errors)
+
+    def test_json_field_validation_invalid_digestate_sale_types(self):
+        """Test validation rejects invalid digestate sale types."""
+        invalid_data = {
+            "unit_name": "Test Unit",
+            "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
+            "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
+            "digestate_sale_types": ["INVALID_SALE_TYPE"],
+        }
+        serializer = BiomethaneProductionUnitUpsertSerializer(data=invalid_data, context={"entity": self.producer_entity})
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("digestate_sale_types", serializer.errors)

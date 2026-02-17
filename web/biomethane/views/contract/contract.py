@@ -12,8 +12,6 @@ from biomethane.serializers.contract import (
 )
 from biomethane.views.mixins import RetrieveSingleObjectMixin, WatchedFieldsActionMixin
 
-# from .mixins import ActionMixin
-
 
 @extend_schema(
     parameters=[
@@ -23,6 +21,13 @@ from biomethane.views.mixins import RetrieveSingleObjectMixin, WatchedFieldsActi
             location=OpenApiParameter.QUERY,
             description="Authorised entity ID.",
             required=True,
+        ),
+        OpenApiParameter(
+            name="producer_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Producer entity ID (optional, used by DREAL to filter specific producer).",
+            required=False,
         ),
     ]
 )

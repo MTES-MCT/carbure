@@ -6,11 +6,15 @@ import {
 
 // Production Unit API
 
-export const getProductionUnit = async (entity_id: number) => {
+export const getProductionUnit = async (
+  entity_id: number,
+  selected_entity_id?: number
+) => {
   const response = await api.GET("/biomethane/production-unit/", {
     params: {
       query: {
         entity_id,
+        producer_id: selected_entity_id,
       },
     },
   })
@@ -34,11 +38,15 @@ export const saveProductionUnit = async (
 
 // Digestate Storage API
 
-export const getDigestateStorages = async (entity_id: number) => {
+export const getDigestateStorages = async (
+  entity_id: number,
+  selected_entity_id?: number
+) => {
   const response = await api.GET("/biomethane/digestate-storage/", {
     params: {
       query: {
         entity_id,
+        producer_id: selected_entity_id?.toString(),
       },
     },
   })

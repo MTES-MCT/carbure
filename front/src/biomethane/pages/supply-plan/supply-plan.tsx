@@ -1,6 +1,6 @@
 import { Button } from "common/components/button2"
 import { SearchInput } from "common/components/inputs2"
-import { ActionBar, Row } from "common/components/scaffold"
+import { ActionBar } from "common/components/scaffold"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import { getSupplyPlanInputs, downloadSupplyPlan } from "./api"
@@ -23,15 +23,18 @@ import { ExcelImportDialog } from "./supply-excel-import-dialog"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
+import { MissingFields } from "biomethane/components/missing-fields"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const routes = useRoutes()
-  usePrivateNavigation(t("Mes plans d'approvisionnement"))
+  usePrivateNavigation(t("Plan d'approvisionnement"))
   const { selectedYear, canEditDeclaration } = useAnnualDeclaration()
   const columns = useSupplyPlanColumns()
+  const { selectedEntityId, hasSelectedEntity } = useSelectedEntity()
 
   const { state, actions, query } = useQueryBuilder<
     BiomethaneSupplyInputQueryBuilder["config"]
@@ -43,7 +46,7 @@ export const SupplyPlan = () => {
 
   const { result: supplyInputs, loading } = useQuery(getSupplyPlanInputs, {
     key: `supply-plan-inputs`,
-    params: [query],
+    params: [query, selectedEntityId],
   })
 
   const onClose = () => {
@@ -52,10 +55,13 @@ export const SupplyPlan = () => {
 
   return (
     <>
-      <Row>
+      <MissingFields />
+      {!hasSelectedEntity && (
         <Button
           onClick={() =>
-            navigate(routes.BIOMETHANE(selectedYear).SUPPLY_PLAN_IMPORT)
+            navigate(
+              routes.BIOMETHANE(selectedYear).PRODUCER.SUPPLY_PLAN_IMPORT
+            )
           }
           iconId="ri-upload-line"
           disabled={!canEditDeclaration}
@@ -63,24 +69,31 @@ export const SupplyPlan = () => {
         >
           {t("Charger un plan d'approvisionnement")}
         </Button>
-      </Row>
+      )}
 
       <ActionBar>
         <ActionBar.Grow>
           <SearchInput value={state.search} onChange={actions.setSearch} />
         </ActionBar.Grow>
-        <Button
-          onClick={() =>
-            navigate(routes.BIOMETHANE(selectedYear).SUPPLY_PLAN_ADD_INPUT)
-          }
-          iconId="ri-add-line"
-          asideX
-          priority="secondary"
-          disabled={!canEditDeclaration}
-        >
-          {t("Ajouter un intrant")}
-        </Button>
-        <ExportButton query={query} download={downloadSupplyPlan} />
+        {!hasSelectedEntity && (
+          <Button
+            onClick={() =>
+              navigate(
+                routes.BIOMETHANE(selectedYear).PRODUCER.SUPPLY_PLAN_ADD_INPUT
+              )
+            }
+            iconId="ri-add-line"
+            asideX
+            priority="secondary"
+            disabled={!canEditDeclaration}
+          >
+            {t("Ajouter un intrant")}
+          </Button>
+        )}
+        <ExportButton
+          query={query}
+          download={(query) => downloadSupplyPlan(query, selectedEntityId)}
+        />
       </ActionBar>
       <FilterMultiSelect2
         filterLabels={filterLabels}

@@ -6,18 +6,21 @@ import {
   BiomethaneContractPatchRequest,
 } from "./types"
 
-// TODO: Add a new entity type for buyer of biomethane
 export const findBuyerBiomethaneEntities = async (query: string) =>
   findEntities(query, {
     is_enabled: true,
     entity_type: [EntityType.Fournisseur_de_biom_thane],
   })
 
-export const getContract = async (entity_id: number) => {
+export const getContract = async (
+  entity_id: number,
+  selected_entity_id?: number
+) => {
   const response = await api.GET("/biomethane/contract/", {
     params: {
       query: {
         entity_id,
+        producer_id: selected_entity_id,
       },
     },
   })
@@ -69,11 +72,15 @@ export const getAmendment = async (entity_id: number, amendment_id: number) => {
   return response.data
 }
 
-export const getContractWatchedFields = async (entity_id: number) => {
+export const getContractWatchedFields = async (
+  entity_id: number,
+  selectedEntityId?: number
+) => {
   const response = await api.GET("/biomethane/contract/watched-fields/", {
     params: {
       query: {
         entity_id,
+        producer_id: selectedEntityId,
       },
     },
   })

@@ -1,106 +1,62 @@
-from django.urls import reverse
-
-from core.models import MatierePremiere
+from core.models import MatierePremiere, Pays
+from core.tests_utils import FiltersActionTestMixin
+from resources.factories.production_site import ProductionSiteFactory
 from saf.factories import SafTicketFactory
 from saf.models import SafTicket
 from saf.tests import TestCase
+from saf.views import SafTicketViewSet
+from transactions.factories.depot import DepotFactory
 
 
-class SafTicketFiltersTest(TestCase):
+class SafTicketFiltersTest(TestCase, FiltersActionTestMixin):
     def setUp(self):
         super().setUp()
 
         self.hau = MatierePremiere.objects.get(code="HUILE_ALIMENTAIRE_USAGEE")
         self.hga = MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2")
+        self.fr = Pays.objects.create(code_pays="FR", name="France", name_en="France")
+        self.psite = ProductionSiteFactory.create(name="Production Site 1")
+        self.depot = DepotFactory.create(name="Depot 1")
 
         SafTicket.objects.all().delete()
 
-        SafTicketFactory.create(
-            year=2022,
-            assignment_period=202201,
-            supplier_id=self.entity.id,
-            client_id=self.client1.id,
-            feedstock=self.hau,
-            status=SafTicket.PENDING,
-        )
-        SafTicketFactory.create(
-            year=2022,
-            assignment_period=202202,
-            supplier_id=self.entity.id,
-            client_id=self.client2.id,
-            feedstock=self.hau,
-            status=SafTicket.ACCEPTED,
-        )
-        SafTicketFactory.create(
-            year=2022,
-            assignment_period=202202,
-            supplier_id=self.entity.id,
-            client_id=self.client2.id,
-            feedstock=self.hga,
-            status=SafTicket.PENDING,
-        )
+        self.create_ticket()
+        self.create_ticket(assignment_period=202202, client_id=self.client2.id, status=SafTicket.ACCEPTED)
+        self.create_ticket(client_id=self.client2.id, feedstock=self.hga, status=SafTicket.PENDING)
 
-    def test_empty_ticket_filters(self):
-        query = {
-            "entity_id": self.entity.id,
-            "year": 2021,
-            "status": "PENDING",
-            "type": "assigned",
-            "filter": "feedstock",
+    def create_ticket(self, **overrides):
+        props = {
+            "year": 2022,
+            "assignment_period": 202201,
+            "supplier_id": self.entity.id,
+            "client_id": self.client1.id,
+            "feedstock": self.hau,
+            "status": SafTicket.PENDING,
+            "country_of_origin": self.fr,
+            "carbure_production_site": self.psite,
+            "origin_lot_site": self.depot,
+            **overrides,
         }
-        response = self.client.get(reverse("saf-tickets-filters"), query)
-        assert response.status_code == 200
-        assert response.json() == []
+
+        return SafTicketFactory.create(**props)
 
     def test_ticket_filters_feedstock(self):
-        query = {
-            "entity_id": self.entity.id,
-            "year": 2022,
-            "status": "PENDING",
-            "type": "assigned",
-            "filter": "feedstock",
-        }
-        response = self.client.get(reverse("saf-tickets-filters"), query)
-
-        assert response.status_code == 200
-        assert sorted(response.json()) == sorted(["HUILE_ALIMENTAIRE_USAGEE", "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"])
-
-    def test_ticket_filters_period_feedstock(self):
-        query = {
-            "entity_id": self.entity.id,
-            "year": 2022,
-            "status": "PENDING",
-            "type": "assigned",
-            "filter": "feedstock",
-            "period": 202201,
-        }
-        response = self.client.get(reverse("saf-tickets-filters"), query)
-
-        assert response.status_code == 200
-        assert sorted(response.json()) == sorted(["HUILE_ALIMENTAIRE_USAGEE"])
-
-    def test_ticket_filters_period(self):
-        query = {
-            "entity_id": self.entity.id,
-            "year": 2022,
-            "status": "PENDING",
-            "type": "assigned",
-            "filter": "period",
-        }
-        response = self.client.get(reverse("saf-tickets-filters"), query)
-
-        assert response.status_code == 200
-        assert sorted(response.json()) == sorted([202201, 202202])
-
-    def test_ticket_filters_client(self):
-        query = {
-            "entity_id": self.entity.id,
-            "year": 2022,
-            "status": "PENDING",
-            "type": "assigned",
-            "filter": "client",
-        }
-        response = self.client.get(reverse("saf-tickets-filters"), query)
-
-        assert response.status_code == 200
-        assert sorted(response.json()) == sorted([self.client1.name, self.client2.name])
+        self.assertFilters(
+            SafTicketViewSet,
+            {
+                "status": [SafTicket.ACCEPTED, SafTicket.PENDING],
+                "year": [2022],
+                "supplier": [self.entity.name],
+                "client": [self.client1.name, self.client2.name],
+                "client_type": [self.client1.entity_type],
+                "feedstock": [self.hau.code, self.hga.code],
+                "period": [202201, 202202],
+                "country_of_origin": [self.fr.code_pays],
+                "production_site": [self.psite.name],
+                "consumption_type": [],
+                "reception_airport": [],
+                "origin_depot": [self.depot.name],
+            },
+            entity=self.entity,
+            ignore=["order_by"],
+        )

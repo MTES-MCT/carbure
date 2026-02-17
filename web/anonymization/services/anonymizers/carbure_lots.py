@@ -34,6 +34,7 @@ class CarbureLotAnonymizer(Anonymizer):
             "vendor_certificate_type",
             "transport_document_reference",
             "free_field",
+            "pos_number",
         ]
 
     def process(self, lot):
@@ -53,6 +54,7 @@ class CarbureLotAnonymizer(Anonymizer):
             "vendor_certificate_type": self.fake.bothify(text="VEN-TYPE-####"),
             "transport_document_reference": self.fake.bothify(text="DOC-####-####"),
             "free_field": self.fake.text(max_nb_chars=200),
+            "pos_number": self.fake.bothify(text="POS-######"),
         }
 
         return anonymize_fields_and_collect_modifications(lot, fields_to_anonymize)

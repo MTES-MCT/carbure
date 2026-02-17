@@ -3,9 +3,9 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 import scipy.optimize
-import sentry_sdk
 from django.db.models import Q
 
+from adapters.logger import log_warning
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
@@ -325,7 +325,7 @@ class TeneurService:
         if len(volumes) > 0:
             negative_volumes = volumes[volumes < 0]
             if len(negative_volumes) > 0:
-                TeneurService._send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes)
+                TeneurService.log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes)
                 # Fix negative volumes by setting them to 0
                 volumes = np.maximum(volumes, 0)
 
@@ -346,7 +346,7 @@ class TeneurService:
             return quantity
 
     @staticmethod
-    def _send_to_sentry(data, debited_entity, volumes, lot_ids, negative_volumes):
+    def log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes):
         # Get the lot_ids corresponding to negative volumes
         negative_indices = np.where(volumes < 0)[0]
         negative_lot_ids = lot_ids[negative_indices].tolist()
@@ -358,13 +358,11 @@ class TeneurService:
             f"Lot IDs: {negative_lot_ids}"
         )
 
-        with sentry_sdk.push_scope() as scope:
-            scope.set_context(
-                "request_data",
-                {
-                    "biofuel": str(data["biofuel"]),
-                    "customs_category": data["customs_category"],
-                    "debited_entity": str(debited_entity),
-                },
-            )
-            sentry_sdk.capture_message(message, level="warning")
+        log_warning(
+            message,
+            {
+                "biofuel": str(data["biofuel"]),
+                "customs_category": data["customs_category"],
+                "debited_entity": str(debited_entity),
+            },
+        )

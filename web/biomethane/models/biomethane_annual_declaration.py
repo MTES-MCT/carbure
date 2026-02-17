@@ -8,7 +8,7 @@ class BiomethaneAnnualDeclaration(models.Model):
     DECLARED = "DECLARED"
     OVERDUE = "OVERDUE"  # Virtual status
     DECLARATION_STATUS = [(IN_PROGRESS, IN_PROGRESS), (DECLARED, DECLARED)]
-
+    DECLARATION_STATUS_CHOICES = [(IN_PROGRESS, IN_PROGRESS), (DECLARED, DECLARED), (OVERDUE, OVERDUE)]
     # Propriétaire de la déclaration annuelle
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_declarations")
 

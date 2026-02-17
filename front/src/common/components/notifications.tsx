@@ -14,10 +14,13 @@ export type Notifier = (
   content: React.ReactNode,
   options?: NotificationOptions
 ) => void
+
 export interface NotificationOptions {
   variant?: NotificationVariant
   timeout?: number
 }
+
+export type ErrorMap = Record<string, React.ReactNode>
 
 export function useNotify(): Notifier {
   const portal = usePortal(notifications)
@@ -47,14 +50,22 @@ export function useNotifyError() {
     </>
   )
 
-  const getErrorText = (error: Error, defaultMessage?: React.ReactNode) => {
+  const getErrorText = (
+    error: Error,
+    defaultMessage?: React.ReactNode,
+    errorMap?: ErrorMap
+  ) => {
     let errorText: React.ReactNode = defaultMessage ?? DEFAULT_MESSAGE
 
     if (error instanceof AxiosError) {
       const errorCode = error.response?.data?.error
       if (errorCode) {
-        const customErrorText = t(errorCode, { ns: "errors" })
-        if (customErrorText !== errorCode) errorText = customErrorText
+        if (errorMap && errorCode in errorMap) {
+          errorText = errorMap[errorCode]
+        } else {
+          const customErrorText = t(errorCode, { ns: "errors" })
+          if (customErrorText !== errorCode) errorText = customErrorText
+        }
       }
     } else if (error instanceof HttpError) {
       if (error.data instanceof Object) {
@@ -64,8 +75,11 @@ export function useNotifyError() {
         )
         if (isRecordOfStringArrays) {
           errorText = <FormErrors errors={error.data} />
-        } else if (typeof error.data.detail === "string") {
-          errorText = error.data.detail
+        } else {
+          const errorCode = error.data.detail ?? error.data.message
+          if (typeof errorCode === "string") {
+            errorText = errorMap?.[errorCode] ?? errorCode
+          }
         }
       }
     }
@@ -73,14 +87,17 @@ export function useNotifyError() {
     return errorText
   }
 
-  const notifyError = useCallback((error?: Error, defaultMessage?: string) => {
-    // If no error is provided, use the default message
-    const errorText = error
-      ? getErrorText(error, defaultMessage)
-      : DEFAULT_MESSAGE
-    return notify(errorText, { variant: "danger" })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const notifyError = useCallback(
+    (error?: Error, defaultMessage?: string, errorMap?: ErrorMap) => {
+      // If no error is provided, use the default message
+      const errorText = error
+        ? getErrorText(error, defaultMessage, errorMap)
+        : DEFAULT_MESSAGE
+      return notify(errorText, { variant: "danger" })
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    []
+  )
 
   return notifyError
 }

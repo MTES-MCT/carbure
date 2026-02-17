@@ -1,1 +1,2 @@
+from .annual_declaration import BiomethaneAdminAnnualDeclarationViewSet
 from .producers import BiomethaneProducersViewSet

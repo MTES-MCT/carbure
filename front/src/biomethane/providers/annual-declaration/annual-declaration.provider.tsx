@@ -5,6 +5,7 @@ import useEntity from "common/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
 import { AnnualDeclaration, AnnualDeclarationStatus } from "biomethane/types"
 import { useParams } from "react-router-dom"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export interface AnnualDeclarationContextValue {
   /** Selected year for the annual declaration */
@@ -60,10 +61,12 @@ export function AnnualDeclarationProvider({
   // We need to use the current year inside the provider to mock the date when the provider is mounted
   const currentYear = new Date().getFullYear()
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
+
   const { result: annualDeclaration, loading: loadingAnnualDeclaration } =
     useQuery(getAnnualDeclaration, {
       key,
-      params: [entity.id, parsedYear],
+      params: [entity.id, parsedYear, selectedEntityId],
     })
 
   if (loadingAnnualDeclaration && !annualDeclaration) return <LoaderOverlay />
@@ -78,10 +81,21 @@ export function AnnualDeclarationProvider({
   const isDeclarationValidated =
     annualDeclaration?.status === AnnualDeclarationStatus.DECLARED
 
-  const canEditDeclaration =
+  // For biomethane producers, the declaration can be edited if :
+  // - it is not validated
+  // - the declaration is open
+  // - the entity has write rights
+  const canEditDeclarationBiomethaneProducer =
     !isDeclarationValidated &&
     Boolean(annualDeclaration?.is_open) &&
     entity.canWrite()
+
+  // For dreals, the declaration can't be edited
+  const canEditDeclarationAdmin = false
+
+  const canEditDeclaration = entity.isBiomethaneProducer
+    ? canEditDeclarationBiomethaneProducer
+    : canEditDeclarationAdmin
 
   const hasAnnualDeclarationMissingObjects =
     annualDeclaration?.missing_fields?.digestate_missing_fields === null ||

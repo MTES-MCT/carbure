@@ -127,6 +127,7 @@ class SafTicketSourcesTest(TestCase):
             "ghg_reduction": 65.0,
             "parent_lot": None,
             "origin_lot": None,
+            "origin_lot_site": None,
             "assigned_tickets": [
                 {
                     "agreement_date": "2022-06-20",
