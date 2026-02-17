@@ -49,9 +49,7 @@ export function getTicketFilters(field: SafFilter, query: SafTicketQuery) {
 
 export function getTickets(query: SafTicketQuery) {
   return api.GET("/saf/tickets/", {
-    params: {
-      query,
-    },
+    params: { query },
   })
 }
 
