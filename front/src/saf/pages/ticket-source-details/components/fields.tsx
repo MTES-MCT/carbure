@@ -22,6 +22,11 @@ export const TicketSourceFields = ({
     <div className={cl(css.form, css.columns)}>
       <Dialog.Section label={t("Lot")}>
         <TextInput
+          label={t("Lot d'origine")}
+          value={ticketSource.origin_lot?.carbure_id ?? "N/A"}
+          readOnly
+        />
+        <TextInput
           label={t("Volume")}
           value={`${formatNumber(ticketSource.total_volume)} L`}
           readOnly

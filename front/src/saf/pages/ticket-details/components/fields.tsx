@@ -28,6 +28,11 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
     <div className={cl(css.form, css.columns)}>
       <Dialog.Section label={t("Lot")}>
         <TextInput
+          label={t("Lot d'origine")}
+          value={ticket.origin_lot?.carbure_id ?? "N/A"}
+          readOnly
+        />
+        <TextInput
           label={t("Volume")}
           value={`${formatNumber(ticket.volume)} L`}
           readOnly
@@ -52,13 +57,6 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
             readOnly
             label={t("Dépôt d'incorporation")}
             value={ticket.origin_lot_site.name}
-          />
-        )}
-        {ticket.origin_lot?.pos_number && (
-          <TextInput
-            label={t("Numéro de POS")}
-            value={ticket.origin_lot.pos_number}
-            readOnly
           />
         )}
       </Dialog.Section>
@@ -104,13 +102,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={formatPeriod(ticket.assignment_period)}
           readOnly
         />
-        {ticket.free_field && (
-          <TextInput
-            label={t("Champ libre")}
-            value={ticket.free_field}
-            readOnly
-          />
-        )}
+
         {ticket.shipping_method && (
           <TextInput
             label={t("Mode de livraison")}
@@ -136,6 +128,13 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           <TextInput
             label={t("Déclaration ETS")}
             value={etsStatusMap[ticket.ets_status]}
+            readOnly
+          />
+        )}
+        {ticket.free_field && (
+          <TextInput
+            label={t("Champ libre")}
+            value={ticket.free_field}
             readOnly
           />
         )}
