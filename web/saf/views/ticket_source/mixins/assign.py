@@ -46,7 +46,7 @@ class AssignActionMixin:
         serializer = SafTicketSourceAssignmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        client_id = serializer.validated_data["client_id"]
+        client = serializer.validated_data["client_id"]
         volume = serializer.validated_data["volume"]
         agreement_reference = serializer.validated_data.get("agreement_reference")
         agreement_date = serializer.validated_data.get("agreement_date")
@@ -77,7 +77,7 @@ class AssignActionMixin:
         with transaction.atomic():
             ticket = create_ticket_from_source(
                 ticket_source,
-                client_id=client_id,
+                client_id=client.id,
                 volume=volume,
                 agreement_date=agreement_date,
                 agreement_reference=agreement_reference,
@@ -98,7 +98,7 @@ class AssignActionMixin:
 
             CarbureNotification.objects.create(
                 type=CarbureNotification.SAF_TICKET_RECEIVED,
-                dest_id=client_id,
+                dest_id=client.id,
                 send_by_email=False,
                 meta={
                     "supplier": ticket.supplier.name,
