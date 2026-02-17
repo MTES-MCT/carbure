@@ -64,6 +64,11 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
 
   const expiring = isExpiring(lotData?.lot)
 
+  const canControl =
+    entity.isAuditor ||
+    entity.isAdmin ||
+    (entity.isExternal && entity.hasAdminRight("BIOFUEL"))
+
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
   }
@@ -72,7 +77,9 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
     <Portal onClose={closeDialog}>
       <Dialog onClose={closeDialog}>
         <header>
-          {lotData && <Score big lot={lotData.lot} details={lotData.score} />}
+          {canControl && lotData && (
+            <Score big lot={lotData.lot} details={lotData.score} />
+          )}
           {lotData && <LotTag big lot={lotData.lot} />}
           <h1>
             {t("Lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
@@ -97,31 +104,31 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             <LotForm readOnly form={form} />
           </section>
 
-          {errors.length > 0 && (
+          {canControl && errors.length > 0 && (
             <section>
               <BlockingAnomalies anomalies={errors} />
             </section>
           )}
 
-          {warnings.length > 0 && (
+          {canControl && warnings.length > 0 && (
             <section>
               <WarningAnomalies lot={lotData!.lot} anomalies={warnings} />
             </section>
           )}
 
-          {lotData && comments.length > 0 && (
+          {canControl && lotData && comments.length > 0 && (
             <section>
               <Comments readOnly lot={lotData?.lot} comments={comments} />
             </section>
           )}
 
-          {lotData && (
+          {canControl && lotData && (
             <section>
               <ControlComments lot={lotData?.lot} comments={controlComments} />
             </section>
           )}
 
-          {hasTraceability(lotData) && (
+          {canControl && hasTraceability(lotData) && (
             <section>
               <LotTraceability
                 details={lotData}
@@ -133,7 +140,7 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
             </section>
           )}
 
-          {changes.length > 0 && (
+          {canControl && changes.length > 0 && (
             <section>
               <LotHistory changes={changes} />
             </section>
@@ -141,8 +148,8 @@ export const LotDetails = ({ neighbors }: LotDetailsProps) => {
         </main>
 
         <footer>
-          {lotData && <AlertOneButton lot={lotData.lot} />}
-          {lotData && entity.isAuditor && (
+          {canControl && lotData && <AlertOneButton lot={lotData.lot} />}
+          {canControl && lotData && entity.isAuditor && (
             <SetOneConformityButton lot={lotData.lot} />
           )}
           <NavigationButtons neighbors={neighbors} closeAction={closeDialog} />
