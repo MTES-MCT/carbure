@@ -18,6 +18,7 @@ class ObjectiveSectorSerializer(serializers.Serializer):
     declared_teneur = RoundedFloatField()
     available_balance = RoundedFloatField()
     unit = serializers.CharField()
+    energy_basis = serializers.FloatField(default=0)
     objective = ObjectiveSerializer()
 
 

@@ -164,7 +164,7 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
         if not operations.exists():
             return
 
-        # 1. Calculate "assiette" used for objectives calculation
+        # 1. Calculate "assiette" used for objectives calculation (global, for categories and main objective)
         energy_basis = ObjectiveService.calculate_energy_basis(macs, year=query_params.get("year"))
 
         # 2. Calculate the balances per category and sector
@@ -172,26 +172,28 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
             operations, target_entity_id, date_from
         )
 
-        # 3. Calculate the objectives per category and sector
+        # 3. Calculate the objectives per category (using global energy_basis)
         objective_per_category = ObjectiveService.calculate_objectives_and_penalties(
             balance_per_category,
             objectives,
-            energy_basis,
             Objective.BIOFUEL_CATEGORY,
+            energy_basis=energy_basis,
         )
 
+        # 4. Calculate the objectives per sector (using sector-specific energy_basis)
         objective_per_sector = ObjectiveService.calculate_objectives_and_penalties(
             balance_per_sector,
             objectives,
-            energy_basis,
             Objective.SECTOR,
+            mac_queryset=macs,
+            year=query_params.get("year"),
         )
 
-        # 4. Calculate elec category
+        # 5. Calculate elec category
         elec_ops = ElecOperationFilterForBalance(query_params, queryset=ElecOperation.objects.all(), request=request).qs
         elec_category = ObjectiveService.get_elec_category(elec_ops, target_entity_id, date_from)
 
-        # 5. Calculate the global objective (aggregated from sectors + elec)
+        # 6. Calculate the global objective (aggregated from sectors + elec)
         global_objective = ObjectiveService.calculate_global_objective(
             objective_per_sector, elec_category, objectives, energy_basis
         )
