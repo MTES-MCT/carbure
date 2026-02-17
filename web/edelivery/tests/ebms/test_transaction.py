@@ -78,13 +78,13 @@ class TransactionTest(TestCase):
         self.patched_from_national_trade_register.assert_any_call("FR_SIREN_CD123123123")
         self.assertEqual("Some Entity", lot_attributes["carbure_client"].name)
 
-    def test_knows_its_status(self):
-        xml_data = transaction_data(status="PENDING")
+    def test_translates_its_status(self):
+        xml_data = transaction_data(status="CREATED")
         transaction = Transaction.from_xml(xml_data)
-        self.assertEqual("PENDING", transaction.status())
+        self.assertEqual("CREATED", transaction.status())
 
         lot_attributes = transaction.to_lot_attributes()
-        self.assertEqual("PENDING", lot_attributes["lot_status"])
+        self.assertEqual("DRAFT", lot_attributes["lot_status"])
 
     def test_knows_its_feedstock_code(self):
         patched_from_udb_feedstock_code = self.patched_MaterialConverter.return_value.from_udb_feedstock_code
