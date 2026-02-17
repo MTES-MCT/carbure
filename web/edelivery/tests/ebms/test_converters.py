@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from core.models import Biocarburant, MatierePremiere
-from edelivery.ebms.converters import MaterialConverter, QuantityConverter, UDBConversionError
+from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter, UDBConversionError
 
 
 class MaterialConverterTest(TestCase):
@@ -61,3 +61,18 @@ class QuantityConverterTest(TestCase):
             converter.from_udb("UNKNOWN_UNIT", 10)
 
         self.assertEqual("Unknown UDB Unit: UNKNOWN_UNIT", context.exception.message)
+
+
+class StatusConverterTest(TestCase):
+    def test_converts_udb_transaction_status_to_carbure_lot_status(self):
+        conversion_mapping = {"UDB_STATUS": "CARBURE_STATUS"}
+        converter = StatusConverter(conversion_mapping)
+        self.assertEqual("CARBURE_STATUS", converter.from_udb("UDB_STATUS"))
+
+    def test_raises_udb_conversion_error_if_status_unknown(self):
+        conversion_mapping = {}
+        converter = StatusConverter(conversion_mapping)
+        with self.assertRaises(UDBConversionError) as context:
+            converter.from_udb("UNKNOWN_STATUS")
+
+        self.assertEqual("Unknown UDB Status: UNKNOWN_STATUS", context.exception.message)
