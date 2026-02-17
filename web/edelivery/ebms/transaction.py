@@ -1,7 +1,7 @@
 from datetime import datetime
 from xml.etree import ElementTree as ET
 
-from edelivery.ebms.converters import MaterialConverter, QuantityConverter
+from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter
 from edelivery.ebms.ntr import from_national_trade_register
 from transactions.helpers import compute_lot_quantity
 
@@ -45,6 +45,7 @@ class Transaction:
         biofuel = MaterialConverter().from_udb_biofuel_code(self.biofuel_code())
         client = from_national_trade_register(self.client_id())
         feedstock = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
+        lot_status = StatusConverter().from_udb(self.status())
         quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
         computed_quantity_data = compute_lot_quantity(biofuel, quantity_data)
         supplier = from_national_trade_register(self.supplier_id())
@@ -56,7 +57,7 @@ class Transaction:
             "delivery_date": self.iso_format_delivery_date(),
             "feedstock": feedstock,
             "period": self.period(),
-            "lot_status": self.status(),
+            "lot_status": lot_status,
             "year": self.year(),
             **computed_quantity_data,
         }
