@@ -36,6 +36,12 @@ class TransactionTest(TestCase):
         lot_attributes = transaction.to_lot_attributes()
         self.assertEqual("2025-12-22", lot_attributes["delivery_date"])
 
+    def test_handles_absent_delivery_date(self):
+        xml_data = transaction_data(delivery_date=None)
+        transaction = Transaction.from_xml(xml_data)
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertTrue("delivery_date" not in lot_attributes)
+
     def test_knows_its_delivery_month_period(self):
         xml_data = transaction_data(delivery_date="2025-12-22T00:00:00.000Z")
         transaction = Transaction.from_xml(xml_data)

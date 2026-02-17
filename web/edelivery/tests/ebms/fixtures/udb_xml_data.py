@@ -15,6 +15,12 @@ def transaction_data(
     if quantity is None:
         quantity = {"unit": "MWh", "value": 2000}
 
+    delivery_date_xml_fragment = (
+        f"<DELIVERY_DATE>{delivery_date}</DELIVERY_DATE>" 
+        if delivery_date is not None
+        else ""
+    )
+
     return f"""\
 <EO_TRANSACTION>
   <SELLER_ECONOMIC_OPERATOR_NUMBER>{supplier_id}</SELLER_ECONOMIC_OPERATOR_NUMBER>
@@ -23,7 +29,7 @@ def transaction_data(
   <LOADING_DATE>2025-12-26T00:00:00.000Z</LOADING_DATE>
   <PLACE_OF_LOADING_NAME>TestSite004</PLACE_OF_LOADING_NAME>
   <PLACE_OF_LOADING_POSTCODE>1004</PLACE_OF_LOADING_POSTCODE>
-  <DELIVERY_DATE>{delivery_date}</DELIVERY_DATE>
+  {delivery_date_xml_fragment}
   <REFERENCE_NUMBER>SOME_REFERENCE</REFERENCE_NUMBER>
   <TRADE_DATE>2025-12-22T00:00:00.000Z</TRADE_DATE>
   <MATERIAL_CODE>{biofuel["code"]}</MATERIAL_CODE>

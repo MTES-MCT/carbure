@@ -21,7 +21,11 @@ class Transaction:
         return self.xml_root_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text
 
     def delivery_date(self):
-        delivery_date_text = self.xml_root_element.find("./DELIVERY_DATE").text
+        delivery_date_element = self.xml_root_element.find("./DELIVERY_DATE")
+        if delivery_date_element is None:
+            return None
+
+        delivery_date_text = delivery_date_element.text
         return datetime.fromisoformat(delivery_date_text)
 
     def feedstock_code(self):
