@@ -12,19 +12,17 @@ type SafOriginProps = {
 const SafOrigin = ({ ticket, ticketSource, canAccess }: SafOriginProps) => {
   const { t } = useTranslation()
 
-  const originLot = ticketSource?.origin_lot ?? ticket?.origin_lot
   const parentLot = ticketSource?.parent_lot
   const parentTicket = ticketSource?.parent_ticket
   const parentTicketSource = ticket?.parent_ticket_source
 
+  if (!canAccess) return null
+
   return (
-    <Collapse label={t("Origine")} defaultExpanded>
+    <Collapse label={t("Parent")} defaultExpanded>
       <section>
         <ul>
-          {originLot && originLot?.id !== parentLot?.id && (
-            <li>{<p>{`${t("POS")} #${originLot.carbure_id}`}</p>}</li>
-          )}
-          {canAccess && parentLot && (
+          {parentLot && (
             <li>
               <Button
                 customPriority="link"
@@ -34,7 +32,7 @@ const SafOrigin = ({ ticket, ticketSource, canAccess }: SafOriginProps) => {
               </Button>
             </li>
           )}
-          {canAccess && parentTicketSource && (
+          {parentTicketSource && (
             <li>
               <Button
                 customPriority="link"
@@ -44,7 +42,7 @@ const SafOrigin = ({ ticket, ticketSource, canAccess }: SafOriginProps) => {
               </Button>
             </li>
           )}
-          {canAccess && parentTicket && (
+          {parentTicket && (
             <li>
               <Button
                 customPriority="link"
