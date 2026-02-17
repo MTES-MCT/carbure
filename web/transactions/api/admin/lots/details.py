@@ -6,6 +6,7 @@ from core.decorators import check_admin_rights
 from core.helpers import get_known_certificates, get_lot_comments, get_lot_errors, get_lot_updates, get_transaction_distance
 from core.models import CarbureLot, CarbureStock, ExternalAdminRights
 from core.serializers import CarbureLotAdminSerializer, CarbureLotReliabilityScoreSerializer, CarbureStockPublicSerializer
+from saf.models.saf_ticket_source import SafTicketSource
 from transactions.api.admin.helpers import get_admin_lot_comments
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerAdminSerializer
 
@@ -14,13 +15,18 @@ class AdminControlsLotsDetailsForm(forms.Form):
     lot_id = forms.ModelChoiceField(queryset=CarbureLot.objects.all())
 
 
-@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
+@check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL, ExternalAdminRights.AIRLINE])
 def get_lot_details(request, entity):
     form = AdminControlsLotsDetailsForm(request.GET)
     if not form.is_valid():
         return ErrorResponse(400, CarbureError.MALFORMED_PARAMS, form.errors)
 
     lot = form.cleaned_data["lot_id"]
+
+    # forbid airline admins from accessing lots that aren't part of the SAF chains
+    if entity.has_external_admin_right(ExternalAdminRights.AIRLINE):
+        if not SafTicketSource.objects.filter(parent_lot=lot).exists():
+            return ErrorResponse(403)
 
     data = {}
     data["lot"] = CarbureLotPowerOrHeatProducerAdminSerializer(lot).data
