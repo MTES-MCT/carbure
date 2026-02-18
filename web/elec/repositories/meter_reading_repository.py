@@ -26,10 +26,27 @@ class MeterReadingRepository:
         )
 
     @staticmethod
-    def get_annotated_applications_details():
-        return MeterReadingRepository.get_annotated_applications().annotate(
-            power_total=Sum("elec_meter_readings__meter__charge_point__nominal_power"),
+    def get_annotated_applications_details(application):
+        # Annotate to the application the energy total, charge point count and power total
+        stats = (
+            ElecMeterReadingVirtual.objects.values("application_id")
+            .annotate(
+                energy_total=Sum((F("current_index") - F("prev_index")) * F("enr_ratio")),
+                charge_point_count=Count("reading_id"),
+                power_total=Sum("charge_point__nominal_power"),
+            )
+            .get(application_id=application.id)
         )
+        if stats:
+            application.energy_total = stats["energy_total"]
+            application.charge_point_count = stats["charge_point_count"]
+            application.power_total = stats["power_total"]
+        else:
+            application.energy_total = None
+            application.charge_point_count = 0
+            application.power_total = None
+
+        return application
 
     @staticmethod
     def get_annotated_applications_by_cpo(cpo):

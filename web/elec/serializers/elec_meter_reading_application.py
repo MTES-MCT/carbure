@@ -3,7 +3,6 @@ from rest_framework import serializers
 
 from core.serializers import EntityPreviewSerializer
 from elec.models import ElecMeterReadingApplication
-from elec.models.elec_charge_point import ElecChargePoint
 from elec.serializers.elec_charge_point import ElecChargePointSampleSerializer
 
 
@@ -58,7 +57,8 @@ class ElecMeterReadingApplicationDetailsSerializer(ElecMeterReadingApplicationSe
             return None
 
         audited_charge_points = audit_sample.audited_charge_points.all()
-        charge_points = ElecChargePoint.objects.filter(charge_point_audit__in=audited_charge_points)
+        # Utiliser les instances déjà préchargées (charge_point + current_meter) pour éviter N+1 sur elec_meter
+        charge_points = [acp.charge_point for acp in audited_charge_points if acp.charge_point_id is not None]
 
         return {
             "application_id": instance.id,
