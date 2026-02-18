@@ -26,10 +26,10 @@ class ElecMeterReadingApplicationSerializer(serializers.ModelSerializer):
     energy_total = serializers.SerializerMethodField()
 
     def get_charge_point_count(self, instance):
-        return instance.charge_point_count
+        return getattr(instance, "charge_point_count", 0) or 0
 
     def get_energy_total(self, instance):
-        return round(instance.energy_total or 0, 3)
+        return round(getattr(instance, "energy_total", 0) or 0, 3)
 
 
 class ElecMeterReadingApplicationDetailsSerializer(ElecMeterReadingApplicationSerializer):
