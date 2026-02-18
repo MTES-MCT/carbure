@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("tiruert", "0004_alter_operation_type"),
-        ("transactions", "0016_split_site_into_concrete_models"),
+        ("transactions", "0008_alter_site_site_type"),
     ]
 
     operations = [
