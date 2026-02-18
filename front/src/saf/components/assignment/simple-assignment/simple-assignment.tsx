@@ -34,7 +34,7 @@ export const TicketAssignment = ({
     onError: (e) => {
       notifyError(e, undefined, {
         SHIPPING_ROUTE_NOT_REGISTERED: t(
-          "Aucune route n'a été trouvée entre le dépôt d'incorporation et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
+          "Aucune route n'a été trouvée entre le dépôt d'origine et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
         ),
       })
     },

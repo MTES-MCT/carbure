@@ -28,7 +28,7 @@ export function SafFilters({
     [SafFilter.added_by]: t("Ajouté par"),
     [SafFilter.country_of_origin]: t("Pays d'origine"),
     [SafFilter.production_site]: t("Sites de production"),
-    [SafFilter.origin_depot]: t("Dépôt d'incorporation"),
+    [SafFilter.origin_depot]: t("Dépôt d'origine"),
     [SafFilter.consumption_type]: t("Types de consommation"),
     [SafFilter.reception_airport]: t("Aéroport"),
     [SafFilter.client_type]: t("Type de client"),
