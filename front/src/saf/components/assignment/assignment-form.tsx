@@ -105,7 +105,7 @@ export const AssignmentForm = ({
       {showOriginDepot && originDepot && (
         <TextInput
           disabled
-          label={t("Dépôt d'incorporation")}
+          label={t("Dépôt du lot d'origine")}
           value={originDepot.name}
         />
       )}
@@ -117,7 +117,7 @@ export const AssignmentForm = ({
             placeholder={t("Sélectionnez un mode")}
             hasTooltip
             title={t(
-              "En choisissant un mode d'expédition, la liste des aéroports accessibles s'adaptera en fonction du dépôt d'incorporation."
+              "En choisissant un mode d'expédition, la liste des aéroports accessibles s'adaptera en fonction du dépôt d'origine."
             )}
             {...bind("shipping_method")}
             options={[
@@ -166,7 +166,7 @@ export const AssignmentForm = ({
             normalize={norm.normalizeAirport}
             hasTooltip
             title={t(
-              "Si vous ne retrouvez pas l'aéroport désiré dans la liste, merci de contacter la DGEC en indiquant le dépôt d'incorporation et le mode de livraison."
+              "Si vous ne retrouvez pas l'aéroport désiré dans la liste, merci de contacter la DGEC en indiquant le dépôt d'origine et le mode de livraison."
             )}
             {...bind("reception_airport")}
           />

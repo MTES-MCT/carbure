@@ -55,7 +55,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         {ticket.origin_lot_site && (
           <TextInput
             readOnly
-            label={t("Dépôt d'incorporation")}
+            label={t("Dépôt du lot d'origine")}
             value={ticket.origin_lot_site.name}
           />
         )}
