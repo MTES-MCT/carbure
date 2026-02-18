@@ -6,3 +6,4 @@ from .fossil_fuel_category_consideration_rate import FossilFuelCategoryConsidera
 from .objective import Objective
 from .mac_fossil_fuel import MacFossilFuel
 from .elec_operation import ElecOperation
+from .declaration_period import TiruertDeclarationPeriod
