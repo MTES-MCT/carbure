@@ -24,6 +24,7 @@ from core.models import (
     CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
+    DeclarationPeriod,
     Department,
     EntityCertificate,
     ExternalAdminRights,
@@ -691,3 +692,13 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ("code_dept", "name")
     search_fields = ("code_dept", "name")
     ordering = ("code_dept",)
+
+
+@admin.register(DeclarationPeriod)
+class DeclarationPeriodAdmin(admin.ModelAdmin):
+    list_display = ("year", "start_date", "end_date", "app")
+    search_fields = ("year",)
+    list_filter = [
+        "year",
+        "app",
+    ]
