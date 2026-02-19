@@ -28,7 +28,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
     <div className={cl(css.form, css.columns)}>
       <Dialog.Section label={t("Lot")}>
         <TextInput
-          label={t("Lot d'origine")}
+          label={t("Lot d'origine (Carbure)")}
           value={ticket.origin_lot?.carbure_id ?? "N/A"}
           readOnly
         />
@@ -57,6 +57,13 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
             readOnly
             label={t("Dépôt du lot d'origine")}
             value={ticket.origin_lot_site.name}
+          />
+        )}
+        {ticket.origin_lot?.pos_number && (
+          <TextInput
+            readOnly
+            label={t("N˚ de POS (hors Carbure)")}
+            value={ticket.origin_lot?.pos_number}
           />
         )}
       </Dialog.Section>

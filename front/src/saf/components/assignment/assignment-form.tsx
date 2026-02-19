@@ -175,10 +175,14 @@ export const AssignmentForm = ({
 
       {showPosNumber && (
         <TextInput
-          label={t("Numéro de POS")}
+          label={t("Numéro de POS (hors Carbure)")}
           placeholder="Ex: PC-ISCC-12345678"
           {...bind("pos_number")}
           disabled={Boolean(posNumber)}
+          hasTooltip
+          title={t(
+            "Remplissez ce champ si vous souhaitez que votre client puisse connaître le numéro de POS du lot d'origine généré par d'autres plateformes que Carbure. Notez qu'il sera ensuite affiché sur tous les tickets issus de ce lot."
+          )}
         />
       )}
 
