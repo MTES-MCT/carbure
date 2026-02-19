@@ -39,8 +39,9 @@ const TicketsGroupedAssignment = ({
   const originDepot = ticketSources[0]?.origin_lot_site ?? undefined
 
   const showPosNumber =
-    posNumber !== undefined &&
-    ticketSources.every((t) => t.parent_lot.pos_number === posNumber)
+    ticketSources.length === 1 ||
+    (posNumber !== undefined &&
+      ticketSources.every((t) => t.parent_lot.pos_number === posNumber))
 
   const showOriginDepot =
     originDepot !== undefined &&
