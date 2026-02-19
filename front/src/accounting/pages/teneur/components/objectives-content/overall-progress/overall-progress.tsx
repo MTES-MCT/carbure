@@ -1,11 +1,11 @@
-import { MainObjective } from "../../types"
-import { CardProgress } from "../card-progress"
+import { MainObjective } from "../../../types"
+import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
-import { RecapData } from "../recap-data"
+import { RecapData } from "../../recap-data"
 import { floorNumber, formatNumber } from "common/utils/formatters"
 import useEntity from "common/hooks/entity"
-import { downloadMacFossilFuel } from "../../api"
+import { downloadMacFossilFuel } from "../../../api"
 import { Download } from "common/components/download"
 
 type OverallProgressProps = {
@@ -25,7 +25,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           {!isAdminOrExternal && (
             <>
               <Trans
-                i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d’un PCI théorique."
+                i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d'un PCI théorique."
                 components={{
                   a: (
                     <Download

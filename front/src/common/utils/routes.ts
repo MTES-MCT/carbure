@@ -34,6 +34,11 @@ export const ROUTE_URLS = {
         ELEC: `${baseUrl}/balances/elec`,
       },
       TENEUR: `${baseUrl}/teneur`,
+      ADMIN: {
+        OBJECTIVES: `${baseUrl}/admin/objectives`,
+        OBJECTIVES_ENTITY: (entityId: number) =>
+          `${baseUrl}/admin/objectives/${entityId}`,
+      },
     }
   },
 

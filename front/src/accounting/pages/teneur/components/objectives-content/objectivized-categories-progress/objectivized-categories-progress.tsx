@@ -1,31 +1,32 @@
 import { useTranslation } from "react-i18next"
-import { CardProgress } from "../card-progress"
+import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
-import { RecapData } from "../recap-data"
-import { CategoryObjective, TargetType } from "../../types"
-import Badge from "@codegouvfr/react-dsfr/Badge"
-import { CardGrid } from "../card-grid"
-import { computeObjectiveEnergy } from "../../utils/formatters"
+import { RecapData } from "../../recap-data"
+import { CategoryObjective, TargetType } from "../../../types"
+import { CardGrid } from "../../card-grid"
+import { computeObjectiveEnergy } from "../../../utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 
-type CappedCategoriesProgressProps = {
+type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
   onCategoryClick: (category: CategoryObjective, targetType: TargetType) => void
   readOnly: boolean
 }
 
-export const CappedCategoriesProgress = ({
+export const ObjectivizedCategoriesProgress = ({
   categories,
   onCategoryClick,
   readOnly,
-}: CappedCategoriesProgressProps) => {
+}: ObjectivizedCategoriesProgressProps) => {
   const { t } = useTranslation()
 
   return (
     <ObjectiveSection
-      title={t("Catégories plafonnées")}
-      description={t("Catégories dans lesquelles un plafond est fixé.")}
+      title={t("Catégories objectivées")}
+      description={t(
+        "Catégories pour lesquelles un objectif minimal est requis."
+      )}
       size="small"
     >
       <CardGrid>
@@ -33,10 +34,11 @@ export const CappedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={category.code}
-            mainValue={floorNumber(
-              category.teneur_declared + category.teneur_declared_month,
-              0
-            )}
+            mainValue={
+              floorNumber(category.teneur_declared, 0) +
+              floorNumber(category.teneur_declared_month, 0)
+            }
+            mainText={t("GJ")}
             description={t(
               "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
               {
@@ -47,23 +49,23 @@ export const CappedCategoriesProgress = ({
                 target_percent: formatNumber(category.target_percent),
               }
             )}
-            mainText={t("GJ")}
             baseQuantity={floorNumber(category.teneur_declared, 0)}
             targetQuantity={floorNumber(category.target, 0)}
             declaredQuantity={floorNumber(category.teneur_declared_month, 0)}
             badge={
-              category.teneur_declared + category.teneur_declared_month >=
-              category.target ? (
-                <Badge severity="error" small>
-                  {t("Plafond atteint")}
-                </Badge>
-              ) : null
+              <CardProgress.DefaultBadge
+                targetQuantity={floorNumber(category.target, 0)}
+                declaredQuantity={
+                  floorNumber(category.teneur_declared, 0) +
+                  floorNumber(category.teneur_declared_month, 0)
+                }
+              />
             }
             penalty={category.penalty}
             onClick={
               readOnly
                 ? undefined
-                : () => onCategoryClick(category, TargetType.CAP)
+                : () => onCategoryClick(category, TargetType.REACH)
             }
           >
             <ul>
@@ -79,7 +81,7 @@ export const CappedCategoriesProgress = ({
                 />
               </li>
               <li>
-                <RecapData.RemainingQuantityBeforeLimit
+                <RecapData.RemainingQuantityBeforeObjective
                   value={formatUnit(
                     computeObjectiveEnergy(category),
                     ExtendedUnit.GJ,

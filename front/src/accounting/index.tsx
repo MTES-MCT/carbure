@@ -7,6 +7,8 @@ import Balances from "./pages/balances"
 import useEntity from "common/hooks/entity"
 import { TeneurLayout } from "./layouts/teneur-layout"
 import { useLastSectorVisited } from "./hooks/last-sector-visited"
+import { ObjectivesLayout } from "./pages/admin/objectives/objectives-layout"
+import { Objectives } from "./pages/admin/objectives/objectives"
 
 const MaterialAccounting = () => {
   const entity = useEntity()
@@ -31,10 +33,16 @@ const MaterialAccounting = () => {
             element={<Navigate replace to={lastSector} />}
           />
         </Route>
-        {(entity.is_tiruert_liable || isAdmin || allowAccounting) && (
+        {entity.is_tiruert_liable && (
           <Route element={<TeneurLayout />}>
             <Route path="teneur" element={<Navigate replace to="2025" />} />
             <Route path="teneur/:year" element={<Teneur />} />
+          </Route>
+        )}
+        {(isAdmin || allowAccounting) && (
+          <Route path="admin/objectives" element={<ObjectivesLayout />}>
+            <Route index element={<Objectives />} />
+            <Route path=":entityId" element={<Objectives />} />
           </Route>
         )}
         <Route path="*" element={<Navigate replace to="operations" />} />

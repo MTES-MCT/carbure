@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { OverallProgress } from "./overall-progress"
-import { overallObjective } from "../../__test__/data"
+import { overallObjective } from "../../../__test__/data"
 
 const meta: Meta<typeof OverallProgress> = {
-  title: "modules/accounting/pages/teneur/components/OverallProgress",
+  title:
+    "modules/accounting/pages/teneur/components/objectives-content/OverallProgress",
   component: OverallProgress,
 }
 
