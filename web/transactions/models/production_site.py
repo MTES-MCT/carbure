@@ -1,20 +1,29 @@
 from django.core.exceptions import ValidationError
+from django.db import models
 
-from transactions.models import Site, SiteManager
-
-
-class ProductionSiteManager(SiteManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(site_type__in=Site.PRODUCTION_SITE_TYPES)
+from .site import Site
 
 
 class ProductionSite(Site):
     class Meta:
-        proxy = True
+        db_table = "sites_productionsites"
         verbose_name = "Site de Production"
         verbose_name_plural = "Sites de Production"
 
-    objects = ProductionSiteManager()
+    GES_OPTIONS = [("Default", "Valeurs par défaut"), ("Actual", "Valeurs réelles"), ("NUTS2", "Valeurs NUTS2")]
+
+    date_mise_en_service = models.DateField(null=True, blank=True)
+    ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default="Default")
+    eligible_dc = models.BooleanField(default=False)
+    dc_number = models.CharField(max_length=64, blank=True)
+    dc_reference = models.CharField(max_length=64, blank=True)
+    manager_name = models.CharField(max_length=64, blank=True)
+    manager_phone = models.CharField(max_length=64, blank=True)
+    manager_email = models.CharField(max_length=64, blank=True)
+
+    @property
+    def producer(self):
+        return self.created_by
 
     def natural_key(self):
         return {

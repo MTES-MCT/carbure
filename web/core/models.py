@@ -4,14 +4,13 @@ from calendar import monthrange
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from transactions.models import Site
+from transactions.models import Depot, ProductionSite
 
 usermodel = get_user_model()
 
@@ -445,126 +444,6 @@ class MatierePremiere(models.Model):
     biomethane = MatierePremiereBiomethaneManager()
 
 
-class Depot(models.Model):
-    OTHER = "OTHER"
-    EFS = "EFS"
-    EFPE = "EFPE"
-    OILDEPOT = "OIL DEPOT"
-    BIOFUELDEPOT = "BIOFUEL DEPOT"
-    HEAT_PLANT = "HEAT PLANT"
-    POWER_PLANT = "POWER PLANT"
-    COGENERATION_PLANT = "COGENERATION PLANT"
-    EFCA = "EFCA"
-
-    TYPE_DEPOT = (
-        (OTHER, "Autre"),
-        (EFS, "EFS"),
-        (EFPE, "EFPE"),
-        (OILDEPOT, "OIL DEPOT"),
-        (BIOFUELDEPOT, "BIOFUEL DEPOT"),
-        (HEAT_PLANT, "HEAT PLANT"),
-        (POWER_PLANT, "POWER PLANT"),
-        (COGENERATION_PLANT, "COGENERATION PLANT"),
-        (EFCA, "EFCA"),
-    )
-
-    name = models.CharField(max_length=128, null=False, blank=False)
-    city = models.CharField(max_length=128, null=True, blank=True)
-    depot_id = models.CharField(max_length=32, null=False, blank=False)
-    country = models.ForeignKey(Pays, null=True, blank=False, on_delete=models.SET_NULL)
-    depot_type = models.CharField(max_length=32, choices=TYPE_DEPOT, default=OTHER)
-
-    address = models.CharField(max_length=128, blank=True)
-    postal_code = models.CharField(max_length=32, blank=True)
-
-    gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)
-    accise = models.CharField(max_length=32, blank=True, null=True, default=None)
-    private = models.BooleanField(default=False)
-
-    electrical_efficiency = models.FloatField(
-        blank=True,
-        null=True,
-        default=None,
-        help_text="Entre 0 et 1",
-        validators=[MinValueValidator(0), MaxValueValidator(1)],
-    )
-    thermal_efficiency = models.FloatField(
-        blank=True,
-        null=True,
-        default=None,
-        help_text="Entre 0 et 1",
-        validators=[MinValueValidator(0), MaxValueValidator(1)],
-    )
-    useful_temperature = models.FloatField(blank=True, null=True, default=None, help_text="En degrés Celsius")
-
-    is_enabled = models.BooleanField(default=True)
-    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
-
-    def __str__(self):
-        return self.name
-
-    def natural_key(self):
-        return {
-            "depot_id": self.depot_id,
-            "name": self.name,
-            "city": self.city,
-            "country": self.country.natural_key(),
-            "depot_type": self.depot_type,
-            "address": self.address,
-            "postal_code": self.postal_code,
-            "electrical_efficiency": self.electrical_efficiency,
-            "thermal_efficiency": self.thermal_efficiency,
-            "useful_temperature": self.useful_temperature,
-        }
-
-    def clean(self):
-        fields_to_clear = {
-            Depot.POWER_PLANT: ["thermal_efficiency", "useful_temperature"],
-            Depot.HEAT_PLANT: ["electrical_efficiency", "useful_temperature"],
-        }
-
-        fields = fields_to_clear.get(self.depot_type, [])
-        for field in fields:
-            setattr(self, field, None)
-
-        super().clean()
-
-    class Meta:
-        db_table = "depots"
-        verbose_name = "Dépôt"
-        verbose_name_plural = "Dépôts"
-        ordering = ["name"]
-
-
-class EntityDepot(models.Model):
-    OWN = "OWN"
-    THIRD_PARTY = "THIRD_PARTY"
-    PROCESSING = "PROCESSING"
-    TYPE_OWNERSHIP = ((OWN, "Propre"), (THIRD_PARTY, "Tiers"), (PROCESSING, "Processing"))
-
-    entity = models.ForeignKey(Entity, null=False, blank=False, on_delete=models.CASCADE)
-    depot = models.ForeignKey(Depot, null=False, blank=False, on_delete=models.CASCADE)
-    ownership_type = models.CharField(max_length=32, choices=TYPE_OWNERSHIP, default=THIRD_PARTY)
-    blending_is_outsourced = models.BooleanField(default=False)
-    blender = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE, related_name="blender_old")
-
-    def __str__(self):
-        return str(self.id)
-
-    def natural_key(self):
-        return {
-            "depot": self.depot.natural_key(),
-            "ownership_type": self.ownership_type,
-            "blending_is_outsourced": self.blending_is_outsourced,
-            "blender": self.blender.natural_key() if self.blender else None,
-        }
-
-    class Meta:
-        db_table = "entity_depot"
-        verbose_name = "Dépôt Entité"
-        verbose_name_plural = "Dépôts Entité"
-
-
 class SustainabilityDeclaration(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     declared = models.BooleanField(default=False)
@@ -702,7 +581,9 @@ class CarbureLot(models.Model):
         Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_producer"
     )
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
-    carbure_production_site = models.ForeignKey(Site, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    carbure_production_site = models.ForeignKey(
+        ProductionSite, null=True, blank=True, default=None, on_delete=models.SET_NULL
+    )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_country = models.ForeignKey(
         Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="production_country"
@@ -751,7 +632,7 @@ class CarbureLot(models.Model):
     unknown_client = models.CharField(max_length=64, blank=True, null=True, default=None)
     dispatch_date = models.DateField(blank=True, null=True)
     carbure_dispatch_site = models.ForeignKey(
-        Site, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_dispatch_site"
+        Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_dispatch_site"
     )
     unknown_dispatch_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     dispatch_site_country = models.ForeignKey(
@@ -759,7 +640,7 @@ class CarbureLot(models.Model):
     )
     delivery_date = models.DateField(blank=True, null=True)
     carbure_delivery_site = models.ForeignKey(
-        Site, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_delivery_site"
+        Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_delivery_site"
     )
     unknown_delivery_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     delivery_site_country = models.ForeignKey(
@@ -1193,7 +1074,7 @@ class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
     parent_transformation = models.ForeignKey(CarbureStockTransformation, null=True, blank=True, on_delete=models.CASCADE)
     carbure_id = models.CharField(max_length=64, blank=False, null=False, default="")
-    depot = models.ForeignKey(Site, null=True, blank=True, on_delete=models.SET_NULL)
+    depot = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
     carbure_client = models.ForeignKey(
         Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name="stock_carbure_client"
     )
@@ -1204,7 +1085,7 @@ class CarbureStock(models.Model):
     biofuel = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
     country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name="stock_country_of_origin")
     carbure_production_site = models.ForeignKey(
-        Site, null=True, blank=True, on_delete=models.SET_NULL, related_name="stock_production_site"
+        ProductionSite, null=True, blank=True, on_delete=models.SET_NULL, related_name="stock_production_site"
     )
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_country = models.ForeignKey(

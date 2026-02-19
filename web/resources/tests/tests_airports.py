@@ -4,7 +4,8 @@ from django.urls import reverse
 from core.tests_utils import setup_current_user
 from saf.factories.saf_logistics import SafLogisticsFactory
 from saf.models.saf_logistics import SafLogistics
-from transactions.factories.site import SiteFactory
+from transactions.factories.airport import AirportFactory
+from transactions.factories.depot import DepotFactory
 from transactions.models.site import Site
 
 
@@ -14,15 +15,15 @@ class AirportTest(TestCase):
     def setUp(self):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo")
 
-        self.depot_a = SiteFactory.create(site_type=Site.EFPE)
-        self.depot_b = SiteFactory.create(site_type=Site.EFS)
+        self.depot_a = DepotFactory.create(site_type=Site.EFPE)
+        self.depot_b = DepotFactory.create(site_type=Site.EFS)
 
-        self.airport_a = SiteFactory.create(
+        self.airport_a = AirportFactory.create(
             name="Aéroport Paris",
             private=True,
             site_type=Site.AIRPORT,
         )
-        self.airport_b = SiteFactory.create(
+        self.airport_b = AirportFactory.create(
             name="Aéroport Marseille",
             private=False,
             site_type=Site.AIRPORT,

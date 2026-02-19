@@ -5,7 +5,7 @@ from core.serializers import UserEntitySerializer
 from entity.factories.entity import EntityFactory
 from entity.serializers.depot import DepotProductionSiteSerializer, EntityDepotSerializer, EntitySiteSerializer
 from transactions.factories.depot import DepotFactory
-from transactions.factories.site import SiteFactory
+from transactions.factories.production_site import ProductionSiteFactory
 from transactions.models import Depot, EntitySite, Site
 
 
@@ -53,7 +53,7 @@ class EntitySiteSerializerTest(TestCase):
 
     def test_serialize_entity_site_with_production_site(self):
         """Test that the serializer returns the correct data for an EntitySite with a production site"""
-        production_site = SiteFactory.create(
+        production_site = ProductionSiteFactory.create(
             name="Site de production de test",
             site_type=Site.PRODUCTION_BIOLIQUID,
             country=self.country,

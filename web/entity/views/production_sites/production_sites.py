@@ -7,6 +7,7 @@ from core.models import CarbureLot, Entity
 from doublecount.permissions import HasDoubleCountingAdminRights
 from entity.permissions import HasProducerRights, HasProducerWriteRights
 from entity.serializers.production_sites import EntityProductionSiteSerializer, EntityProductionSiteWriteSerializer
+from transactions.models.production_site import ProductionSite
 from transactions.models.site import Site
 
 
@@ -28,7 +29,7 @@ from transactions.models.site import Site
     ],
 )
 class ProductionSiteViewSet(ModelViewSet[Site]):
-    queryset = Site.objects.filter(site_type=Site.PRODUCTION_BIOLIQUID)
+    queryset = ProductionSite.objects.filter(site_type=Site.PRODUCTION_BIOLIQUID)
     serializer_class = EntityProductionSiteSerializer
     permission_classes = [HasProducerRights | HasDoubleCountingAdminRights]
     lookup_field = "id"

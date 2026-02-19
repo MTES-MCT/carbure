@@ -28,9 +28,9 @@ class BiomethaneProductionUnitViewsTests(TestCase):
     def test_put_upsert_creates_production_unit(self):
         """Test that PUT creates a production unit when it doesn't exist."""
         upsert_data = {
-            "unit_name": "Upsert Unit",
-            "siret_number": "11111111111111",
-            "company_address": "100 Upsert Street",
+            "name": "Upsert Unit",
+            "site_siret": "11111111111111",
+            "address": "100 Upsert Street",
             "unit_type": "AGRICULTURAL_AUTONOMOUS",
         }
 
@@ -40,7 +40,7 @@ class BiomethaneProductionUnitViewsTests(TestCase):
 
         # Verify it was created in database
         production_unit = BiomethaneProductionUnit.objects.get(producer=self.producer_entity)
-        self.assertEqual(production_unit.unit_name, "Upsert Unit")
+        self.assertEqual(production_unit.name, "Upsert Unit")
 
         # Verify only one production unit exists
         self.assertEqual(BiomethaneProductionUnit.objects.filter(producer=self.producer_entity).count(), 1)
@@ -49,9 +49,9 @@ class BiomethaneProductionUnitViewsTests(TestCase):
         """Test that PUT updates an existing production unit."""
         # Create initial production unit
         upsert_data = {
-            "unit_name": "Upsert Unit",
-            "siret_number": "11111111111111",
-            "company_address": "100 Upsert Street",
+            "name": "Upsert Unit",
+            "site_siret": "11111111111111",
+            "address": "100 Upsert Street",
             "unit_type": "AGRICULTURAL_AUTONOMOUS",
         }
 
@@ -60,7 +60,7 @@ class BiomethaneProductionUnitViewsTests(TestCase):
 
         # Update the production unit
         updated_data = upsert_data.copy()
-        updated_data["unit_name"] = "Updated Upsert Unit"
+        updated_data["name"] = "Updated Upsert Unit"
         updated_data["production_efficiency"] = 90.5
 
         response = self.client.put(self.production_unit_url, updated_data, content_type="application/json")
@@ -68,7 +68,7 @@ class BiomethaneProductionUnitViewsTests(TestCase):
 
         # Verify it was updated in database
         production_unit = BiomethaneProductionUnit.objects.get(producer=self.producer_entity)
-        self.assertEqual(production_unit.unit_name, "Updated Upsert Unit")
+        self.assertEqual(production_unit.name, "Updated Upsert Unit")
         self.assertEqual(production_unit.production_efficiency, 90.5)
 
         # Verify only one production unit exists

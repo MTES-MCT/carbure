@@ -5,7 +5,8 @@ from saf.factories.saf_ticket_source import SafTicketSourceFactory
 from saf.models import SafTicket
 from saf.models.saf_logistics import SafLogistics
 from saf.tests import TestCase
-from transactions.factories.site import SiteFactory
+from transactions.factories.airport import AirportFactory
+from transactions.factories.depot import DepotFactory
 from transactions.models.site import Site
 
 
@@ -148,8 +149,8 @@ class SafAssignTicketTest(TestCase):
         self.assertEqual(self.lot.pos_number, "ZYXWVU")
 
     def test_assign_ticket_with_incompatible_logistics(self):
-        origin_depot = SiteFactory.create(site_type=Site.EFPE)
-        destination_airport = SiteFactory.create(site_type=Site.AIRPORT)
+        origin_depot = DepotFactory.create(site_type=Site.EFPE)
+        destination_airport = AirportFactory.create(site_type=Site.AIRPORT)
 
         SafLogisticsFactory.create(
             origin_depot=origin_depot,
