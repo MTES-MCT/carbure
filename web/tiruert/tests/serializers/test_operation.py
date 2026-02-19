@@ -86,7 +86,7 @@ class OperationSerializerTest(TestCase):
                 result = serializer.get_quantity_mj(instance)
 
                 # Should always call with "mj" regardless of context
-                instance.quantity.assert_called_once_with(unit="mj")
+                instance.quantity.assert_called_once_with(unit="mj", force=True)
                 self.assertEqual(result, 72000.0)
 
 
