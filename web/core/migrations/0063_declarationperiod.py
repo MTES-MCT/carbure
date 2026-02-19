@@ -5,7 +5,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0061_matierepremiere_classification_and_more"),
+        ("core", "0062_remove_entitydepot_depot_remove_entitydepot_blender_and_more"),
+        ("biomethane", "0029_biomethanedeclarationperiod"),
     ]
 
     operations = [
