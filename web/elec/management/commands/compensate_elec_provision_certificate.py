@@ -102,7 +102,6 @@ class Command(BaseCommand):
                         year=last_year,
                         operating_unit=meter_reading["operating_unit"],
                         energy_amount=delta_in_mwh,
-                        remaining_energy_amount=delta_in_mwh,
                         source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
                     )
                 )
