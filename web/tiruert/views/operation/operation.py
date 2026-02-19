@@ -17,6 +17,7 @@ from tiruert.serializers import (
     OperationSerializer,
     OperationUpdateSerializer,
 )
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.views.mixins import UnitMixin
 
 from .mixins import ActionMixin
@@ -82,6 +83,7 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["details"] = self.request.GET.get("details", "0") == "1"  # For debugging purposes
+        context["declaration_year"] = DeclarationPeriodService.get_current_declaration_year()
         return context
 
     def get_serializer_class(self):
