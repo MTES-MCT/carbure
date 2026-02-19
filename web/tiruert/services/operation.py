@@ -21,10 +21,11 @@ class OperationServiceErrors:
 
 class OperationService:
     @staticmethod
-    def perform_checks_before_create(request, entity_id, selected_lots, data, unit):
+    def perform_checks_before_create(request, entity_id, selected_lots, data, unit, declaration_year):
         OperationService.check_debited_entity(entity_id, data)
         OperationService.check_volumes(selected_lots, data, unit)
         OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
+        OperationService.check_declaration_year(declaration_year, data)
 
     @staticmethod
     def check_debited_entity(entity_id, data):
@@ -86,6 +87,13 @@ class OperationService:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )
+
+    @staticmethod
+    def check_declaration_year(declaration_year, validated_data):
+        if not declaration_year:
+            raise serializers.ValidationError({"declaration_year": "Declaration year is required"})
+
+        validated_data["declaration_year"] = declaration_year
 
     @staticmethod
     def define_operation_status(validated_data):
