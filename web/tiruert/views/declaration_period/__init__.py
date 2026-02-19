@@ -1,1 +1,2 @@
-from .is_open import declaration_period_is_open
+from .current_year import cuurent_declaration_period
+from .years import declaration_period_years
