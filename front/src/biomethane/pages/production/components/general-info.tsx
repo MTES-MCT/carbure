@@ -17,10 +17,10 @@ import { AutoCompleteDepartments } from "common/molecules/autocomplete-departmen
 type GeneralInfoForm = DeepPartial<
   Pick<
     BiomethaneProductionUnitPatchRequest,
-    | "unit_name"
-    | "siret_number"
+    | "name"
+    | "site_siret"
     | "unit_type"
-    | "company_address"
+    | "address"
     | "postal_code"
     | "city"
     | "department"
@@ -36,10 +36,10 @@ export function GeneralInfo({
   const { t } = useTranslation()
 
   const { bind, value, setField } = useForm<GeneralInfoForm>({
-    unit_name: productionUnit?.unit_name,
-    siret_number: productionUnit?.siret_number,
+    name: productionUnit?.name,
+    site_siret: productionUnit?.site_siret,
     unit_type: productionUnit?.unit_type,
-    company_address: productionUnit?.company_address,
+    address: productionUnit?.address,
     postal_code: productionUnit?.postal_code,
     city: productionUnit?.city,
     department: productionUnit?.department,
@@ -81,14 +81,14 @@ export function GeneralInfo({
               readOnly={!isEditing}
               label={t("Nom de l'unité")}
               required
-              {...bind("unit_name")}
+              {...bind("name")}
             />
             <SiretPicker
               label={t("SIRET")}
               required
               onSelect={(company) => {
                 if (company) {
-                  setField("company_address", company?.registered_address)
+                  setField("address", company?.registered_address)
                   setField("postal_code", company?.registered_zipcode)
                   setField("city", company?.registered_city)
                   setField("department", company?.department_code)
@@ -96,14 +96,14 @@ export function GeneralInfo({
                 }
               }}
               readOnly={!isEditing}
-              {...bind("siret_number")}
+              {...bind("site_siret")}
             />
           </Grid>
           <TextInput
             readOnly={!isEditing}
             label={t("Adresse de la société (Numéro et rue)")}
             required
-            {...bind("company_address")}
+            {...bind("address")}
           />
           <Grid cols={2} gap="lg">
             <AutoCompleteDepartments

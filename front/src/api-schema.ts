@@ -3527,11 +3527,15 @@ export interface components {
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
-            unit_name?: string | null;
-            siret_number?: string | null;
-            company_address?: string | null;
-            postal_code?: string | null;
-            city?: string | null;
+            name: string;
+            site_siret?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            address?: string;
+            postal_code?: string;
+            city?: string;
+            gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
             insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
@@ -3550,6 +3554,8 @@ export interface components {
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
+            country?: number | null;
+            created_by?: number | null;
             producer: number;
         };
         BiomethaneProductionUnitUpsertRequest: {
@@ -3558,11 +3564,15 @@ export interface components {
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
-            unit_name?: string | null;
-            siret_number?: string | null;
-            company_address?: string | null;
-            postal_code?: string | null;
-            city?: string | null;
+            name: string;
+            site_siret?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            address?: string;
+            postal_code?: string;
+            city?: string;
+            gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
             insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
@@ -3581,6 +3591,8 @@ export interface components {
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
+            country?: number | null;
+            created_by?: number | null;
         };
         BiomethaneSupplyInput: {
             readonly id: number;
@@ -3891,13 +3903,14 @@ export interface components {
             blending_entity_id?: number;
             name: string;
             site_siret?: string;
-            customs_id?: string;
-            icao_code?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
             address?: string;
             postal_code?: string;
             city?: string;
             gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
+            customs_id?: string;
             accise?: string;
             /**
              * Format: double
@@ -3914,18 +3927,6 @@ export interface components {
              * @description En degrés Celsius
              */
             useful_temperature?: number | null;
-            ges_option?: components["schemas"]["GesOptionEnum"];
-            eligible_dc?: boolean;
-            dc_number?: string;
-            dc_reference?: string;
-            manager_name?: string;
-            manager_phone?: string;
-            manager_email?: string;
-            private?: boolean;
-            is_enabled?: boolean;
-            /** Format: date */
-            date_mise_en_service?: string | null;
-            is_ue_airport?: boolean;
             country?: number | null;
             created_by?: number | null;
         };
@@ -5830,6 +5831,7 @@ export interface components {
          *     * `POWER PLANT` - POWER PLANT
          *     * `COGENERATION PLANT` - COGENERATION PLANT
          *     * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
+         *     * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
          *     * `EFCA` - EFCA
          *     * `AIRPORT` - AIRPORT
          * @enum {string}
@@ -7433,7 +7435,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
@@ -10079,7 +10081,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -10106,7 +10108,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -10139,7 +10141,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -10165,7 +10167,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -13713,6 +13715,7 @@ export enum SiteTypeEnum {
     POWER_PLANT = "POWER PLANT",
     COGENERATION_PLANT = "COGENERATION PLANT",
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
+    PRODUCTION_BIOGAZ = "PRODUCTION BIOGAZ",
     EFCA = "EFCA",
     AIRPORT = "AIRPORT"
 }
