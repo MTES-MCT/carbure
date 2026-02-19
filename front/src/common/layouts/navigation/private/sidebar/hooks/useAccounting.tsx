@@ -31,7 +31,9 @@ export const useAccounting = () => {
         condition: !isAdmin && !hasAdminRight("TIRIB"),
       },
       {
-        path: routes.ACCOUNTING.TENEUR,
+        path: isAdmin
+          ? routes.ACCOUNTING.ADMIN.OBJECTIVES
+          : routes.ACCOUNTING.TENEUR,
         title: t("Objectifs annuels"),
         icon: "ri-flashlight-line",
         iconActive: "ri-flashlight-fill",

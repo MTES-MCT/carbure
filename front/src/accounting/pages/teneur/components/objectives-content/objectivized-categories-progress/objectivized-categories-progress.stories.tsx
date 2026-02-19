@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { ObjectivizedCategoriesProgress } from "./objectivized-categories-progress"
-import { objectivizedCategories } from "../../__test__/data"
+import { objectivizedCategories } from "../../../__test__/data"
 
 const meta: Meta<typeof ObjectivizedCategoriesProgress> = {
   title:
-    "modules/accounting/pages/teneur/components/ObjectivizedCategoriesProgress",
+    "modules/accounting/pages/teneur/components/objectives-content/ObjectivizedCategoriesProgress",
   component: ObjectivizedCategoriesProgress,
 }
 
@@ -15,5 +15,7 @@ type Story = StoryObj<typeof ObjectivizedCategoriesProgress>
 export const Default: Story = {
   args: {
     categories: objectivizedCategories,
+    onCategoryClick: () => {},
+    readOnly: false,
   },
 }
