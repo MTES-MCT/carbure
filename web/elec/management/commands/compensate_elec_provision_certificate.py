@@ -29,7 +29,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--log",
             action="store_true",
-            default=False,
+            default=True,
             help="Log the compensation",
         )
 

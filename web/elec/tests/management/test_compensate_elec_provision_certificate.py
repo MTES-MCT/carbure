@@ -12,7 +12,6 @@ from elec.models import ElecProvisionCertificate
 from elec.tests.utils import setup_cpo_with_meter_readings
 from entity.factories.entity import EntityFactory
 
-# Date fixe pour que last_year soit 2023 dans tous les tests
 FIXED_TODAY = date(2026, 2, 15)
 
 
