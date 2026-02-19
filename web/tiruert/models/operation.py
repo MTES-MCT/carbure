@@ -170,8 +170,8 @@ class Operation(models.Model):
             return False
         return self.credited_entity.id == int(entity_id) and self.type == Operation.CESSION
 
-    def quantity(self, unit="l"):
-        if getattr(self, "_quantity", None) is not None:
+    def quantity(self, unit="l", force=False):
+        if getattr(self, "_quantity", None) is not None and not force:
             return round(self._quantity, 2)
 
         volume = self.volume_l

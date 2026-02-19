@@ -114,7 +114,7 @@ class OperationSerializer(BaseOperationSerializer):
         return instance.avoided_emissions
 
     def get_quantity_mj(self, instance) -> float:
-        return instance.quantity(unit="mj")
+        return instance.quantity(unit="mj", force=True)
 
 
 class OperationLotSerializer(serializers.Serializer):
