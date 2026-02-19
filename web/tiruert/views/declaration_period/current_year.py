@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -5,15 +6,30 @@ from rest_framework.response import Response
 from tiruert.services.declaration_period import DeclarationPeriodService
 
 
+@extend_schema(
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "year": {"type": "integer"},
+            },
+        },
+        503: {
+            "type": "object",
+            "properties": {
+                "error": {"type": "string"},
+                "message": {"type": "string"},
+            },
+        },
+    },
+)
 @api_view(["GET"])
-def declaration_period_is_open(request):
-    """Check if the declaration period is open for the current year."""
+def cuurent_declaration_period(request):
+    """Check if there is a current declaration period and return the year if there is one"""
     try:
-        is_open = DeclarationPeriodService.is_declaration_period_open()
         year = DeclarationPeriodService.get_current_declaration_year()
         return Response(
             {
-                "is_open": is_open,
                 "year": year,
             },
             status=status.HTTP_200_OK,
