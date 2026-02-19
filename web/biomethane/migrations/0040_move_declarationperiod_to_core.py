@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("biomethane", "0038_merge_20260211_1431"),
+        ("biomethane", "0039_convert_biomethaneproductionunit_to_site_inheritance"),
         ("core", "0063_declarationperiod"),
     ]
 
