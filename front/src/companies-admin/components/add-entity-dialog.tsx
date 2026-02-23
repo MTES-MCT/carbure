@@ -1,5 +1,5 @@
 import { AxiosError } from "axios"
-import useEntity, { EntityManager } from "common/hooks/entity"
+import useEntity from "common/hooks/entity"
 import { EntityType, ExternalAdminPages } from "common/types"
 import * as norm from "common/utils/normalizers"
 import { Autocomplete } from "common/components/autocomplete2"
@@ -11,26 +11,13 @@ import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api"
-import { useMemo } from "react"
 import { SiretPicker } from "common/molecules/siret-picker"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
+import { useCompanyTypesByEntity } from "companies-admin/hooks/useCompanyTypesByEntity"
 
 export interface AddEntityDialogProps {
   onClose: () => void
   onEntityAdded: (entityName: string) => void
-}
-
-const ADMIN_TO_ENTITIES: Partial<Record<ExternalAdminPages, EntityType[]>> = {
-  [ExternalAdminPages.DREAL]: [EntityType.Producteur_de_biom_thane],
-}
-
-const getCompanyTypesForAdmin = (entity: EntityManager) => {
-  return Object.entries(ADMIN_TO_ENTITIES).reduce((acc, [admin, entities]) => {
-    if (entity.hasAdminRight(admin as ExternalAdminPages)) {
-      return [...acc, ...entities]
-    }
-    return acc
-  }, [] as EntityType[])
 }
 
 export const AddEntityDialog = ({
@@ -39,7 +26,7 @@ export const AddEntityDialog = ({
 }: AddEntityDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const companyTypes = useMemo(() => getCompanyTypesForAdmin(entity), [entity])
+  const companyTypes = useCompanyTypesByEntity()
   const { value, bind, setField } = useForm<AddForm>({
     ...defaultEntity,
     entity_type:
