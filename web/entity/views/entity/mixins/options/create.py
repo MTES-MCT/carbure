@@ -21,11 +21,11 @@ class CreateEntityError:
 
 
 ENTITY_CREATE_FIELDS = ["name", "entity_type", "has_saf", "has_elec"]
-PRODUCTION_UNIT_CREATE_FIELDS = ["company_address", "postal_code", "city", "department", "insee_code"]
+SITE_CREATE_FIELDS = ["company_address", "postal_code", "city", "department", "insee_code"]
 
 
 class CreateEntitySerializer(ModelSerializer):
-    """Champs optionnels pour création d'une unité de production (DREAL uniquement)."""
+    """Optional fields for entity creation (DREAL only)."""
 
     company_address = serializers.CharField(required=False, allow_blank=True, max_length=256)
     postal_code = serializers.CharField(required=False, allow_blank=True, max_length=32)
@@ -35,7 +35,7 @@ class CreateEntitySerializer(ModelSerializer):
 
     class Meta:
         model = Entity
-        fields = ENTITY_CREATE_FIELDS + PRODUCTION_UNIT_CREATE_FIELDS
+        fields = ENTITY_CREATE_FIELDS + SITE_CREATE_FIELDS
 
     def validate_name(self, value):
         if Entity.objects.filter(name=value).exists():
@@ -44,7 +44,7 @@ class CreateEntitySerializer(ModelSerializer):
 
 
 def _should_create_production_unit(request):
-    """True si l'entité courante est EXTERNAL_ADMIN avec droit DREAL."""
+    """True if the current entity is an EXTERNAL_ADMIN with DREAL rights."""
     entity = getattr(request, "entity", None)
     if not entity:
         return False
@@ -52,7 +52,7 @@ def _should_create_production_unit(request):
 
 
 def _create_production_unit_for_entity(entity, validated_data):
-    """Crée un BiomethaneProductionUnit pour l'entité avec les champs fournis."""
+    """Create a production unit for the entity with the provided fields."""
     department = None
     if validated_data.get("department"):
         department = Department.objects.filter(code_dept=validated_data["department"].strip()).first()
@@ -114,9 +114,7 @@ class CreateEntityActionMixin:
         try:
             entity_data = {k: validated_data[k] for k in ENTITY_CREATE_FIELDS}
             entity = Entity.objects.create(**entity_data)
-            print("entity", entity)
-            print("validated_data", validated_data)
-            print("should create production unit", _should_create_production_unit(request))
+
             if _should_create_production_unit(request):
                 _create_production_unit_for_entity(entity, validated_data)
 
