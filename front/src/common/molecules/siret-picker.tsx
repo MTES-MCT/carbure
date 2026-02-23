@@ -44,7 +44,7 @@ export const SiretPicker = ({ onSelect, ...props }: SiretPickerProps) => {
 
   const checkSiretFormat = (siret: string) => {
     const siretInput = searchSiretRef.current
-    if (!siretInput || siret.length < 3) return false
+    if (!siretInput) return false
 
     if (siret.match(/^\d{14}$/) === null) {
       siretInput.setCustomValidity(

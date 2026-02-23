@@ -54,9 +54,8 @@ const EntityDetails = () => {
 
   const canApprove =
     entity.isAdmin ||
-    entity.hasAdminRight("AIRLINE") ||
     entity.hasAdminRight("ELEC") ||
-    entity.hasAdminRight(ExtAdminPagesEnum.DCA)
+    entity.hasAdminRight(ExtAdminPagesEnum.DREAL)
 
   return (
     <Main>

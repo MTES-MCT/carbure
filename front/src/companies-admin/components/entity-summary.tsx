@@ -21,11 +21,14 @@ import { useLocation } from "react-router-dom"
 import Tag from "common/components/tag"
 import { Operation, useEntitySummaryFilters } from "./entity-summary.hooks"
 import { SearchInput } from "common/components/input"
+import { useCompanyTypesByEntity } from "companies-admin/hooks/useCompanyTypesByEntity"
 
 export const EntitySummary = () => {
   const { t } = useTranslation()
   const location = useLocation()
   const entity = useEntity()
+  const companyTypes = useCompanyTypesByEntity()
+
   const {
     filters: entitySummaryFilters,
     handleTypesChange,
@@ -69,16 +72,7 @@ export const EntitySummary = () => {
             label={t("Types d'entité")}
             placeholder={t("Choisissez un ou plusieurs types")}
             normalize={normalizeEntityType}
-            options={[
-              EntityType.Operator,
-              EntityType.Producer,
-              EntityType.Trader,
-              EntityType.Auditor,
-              EntityType.Airline,
-              EntityType.CPO,
-              EntityType.PowerOrHeatProducer,
-              EntityType.SAF_Trader,
-            ]}
+            options={companyTypes}
           />
         )}
         <Select

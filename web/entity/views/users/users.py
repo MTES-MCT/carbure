@@ -53,6 +53,7 @@ class UserViewSet(UserActionMixin, viewsets.GenericViewSet):
                         ExternalAdminRights.AIRLINE,
                         ExternalAdminRights.ELEC,
                         ExternalAdminRights.DOUBLE_COUNTING,
+                        ExternalAdminRights.DREAL,
                     ],
                 )
             ]
