@@ -29,6 +29,7 @@ import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
 import { normalizeBoolean, normalizeMonth } from "common/utils/normalizers"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
+import useEntity from "common/hooks/entity"
 
 export interface TransferCertificatesProps {
   year: number
@@ -47,6 +48,7 @@ export const TransferCertificates = ({
 
   const location = useLocation()
   const status = useStatus()
+  const entity = useEntity()
 
   const { state, actions, query } = useQueryBuilder<
     TransferCertificatesQueryBuilder["config"]
@@ -67,6 +69,7 @@ export const TransferCertificates = ({
   const loading = transferCerts.loading
   const data = transferCerts.result?.data
   const isEmpty = !data?.results.length
+  const transferred = data?.transferred_energy ?? 0
 
   const showTransferCertificateDetail = (p: TransferCertificate) => {
     return {
@@ -124,18 +127,23 @@ export const TransferCertificates = ({
           <>
             <RecapQuantity
               text={
-                <Trans
-                  defaults="{{count}} certificats, {{total}} transférés (<b>solde disponible pour cession {{balance}}</b>)"
-                  values={{
-                    count: data.count,
-                    total: formatUnit(
-                      data!.transferred_energy ?? 0,
-                      ExtendedUnit.MWh
-                    ),
-                    balance: formattedBalance,
-                  }}
-                  components={{ b: <b /> }}
-                />
+                <>
+                  <Trans
+                    defaults="{{count}} certificats de cession pour <b>un total de {{total}}</b>"
+                    components={{ b: <b /> }}
+                    values={{
+                      count: data.count,
+                      total: formatUnit(transferred, ExtendedUnit.MWh),
+                    }}
+                  />
+                  {!entity.isOperator && (
+                    <Trans
+                      defaults=" et <b>{{balance}} disponibles pour cession</b>"
+                      components={{ b: <b /> }}
+                      values={{ balance: formattedBalance }}
+                    />
+                  )}
+                </>
               }
             />
 

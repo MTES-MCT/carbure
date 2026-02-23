@@ -306,7 +306,6 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
         self.assertEqual(cert.cpo, self.cpo)
         self.assertEqual(cert.operating_unit, "FR001")
         self.assertEqual(cert.energy_amount, 3000.0)
-        self.assertEqual(cert.remaining_energy_amount, 3000.0)
         self.assertEqual(cert.quarter, 1)
         self.assertEqual(cert.year, 2023)
         self.assertEqual(cert.source, ElecProvisionCertificate.QUALICHARGE)

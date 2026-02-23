@@ -97,7 +97,7 @@ export function useColumns() {
     },
     {
       key: "energy_amount",
-      header: t("Quantité transférée (MWh)"),
+      header: t("Quantité (MWh)"),
       cell: (p) => `${formatNumber(p.energy_amount)}`,
     },
   ]) satisfies Column<TransferCertificate>[]

@@ -36,15 +36,13 @@ from elec.permissions import HasCpoRights, HasElecAdminRights, HasElecOperatorRi
         200: {
             "type": "object",
             "properties": {
-                "provision_certificates_available": {"type": "integer"},
-                "provision_certificates_history": {"type": "integer"},
+                "provision_certificates": {"type": "integer"},
                 "transfer_certificates_pending": {"type": "integer"},
                 "transfer_certificates_accepted": {"type": "integer"},
                 "transfer_certificates_rejected": {"type": "integer"},
             },
             "required": [
-                "provision_certificates_available",
-                "provision_certificates_history",
+                "provision_certificates",
                 "transfer_certificates_pending",
                 "transfer_certificates_accepted",
                 "transfer_certificates_rejected",
@@ -71,8 +69,7 @@ def get_snapshot(request, *args, **kwargs):
         provision_certificates = provision_certificates.none()
 
     snapshot = {
-        "provision_certificates_available": provision_certificates.filter(remaining_energy_amount__gt=0.01).count(),
-        "provision_certificates_history": provision_certificates.filter(remaining_energy_amount__lte=0.01).count(),
+        "provision_certificates": provision_certificates.count(),
         "transfer_certificates_pending": transfer_certificates.filter(status=ElecTransferCertificate.PENDING).count(),
         "transfer_certificates_accepted": transfer_certificates.filter(status=ElecTransferCertificate.ACCEPTED).count(),
         "transfer_certificates_rejected": transfer_certificates.filter(status=ElecTransferCertificate.REJECTED).count(),
