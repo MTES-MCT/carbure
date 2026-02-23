@@ -200,9 +200,10 @@ class BiomethaneProductionUnit(Site):
         verbose_name_plural = "Unités de Production"
 
     def save(self, *args, **kwargs):
-        # Automatically set site_type for biomethane production units
-        if not self.site_type:
+        if self.site_type != Site.PRODUCTION_BIOGAZ:
             self.site_type = Site.PRODUCTION_BIOGAZ
+        if not self.created_by_id:
+            self.created_by_id = self.producer_id
         super().save(*args, **kwargs)
 
     @property
