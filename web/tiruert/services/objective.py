@@ -16,6 +16,7 @@ class ObjectiveService:
     def calculate_energy_basis(mac_queryset, year=datetime.now().year):
         """
         Calculate the energy basis (from fossil fuels mac), used for all objectives calculations
+        E_nt = ∑(Volume MaC x PCI relatif x Taux de prise en compte relatif)
         """
         total_energy = mac_queryset.annotate(
             energy=models.F("volume")
@@ -33,10 +34,29 @@ class ObjectiveService:
         return total_energy  # (MJ)
 
     @staticmethod
-    def calculate_objectives_and_penalties(balance, objective_queryset, energy_basis, objective_type):
+    def calculate_objectives_and_penalties(
+        balance, objective_queryset, objective_type, energy_basis=None, mac_queryset=None, year=None
+    ):
         """
-        Calculate the objective per category or sector
+        Calculate objectives per category or sector.
+
+        For SECTOR type: if mac_queryset is provided, calculates sector-specific energy basis
+        for each sector based on its fuel_category.
+
+        For BIOFUEL_CATEGORY type: uses the provided global energy_basis.
+
+        Args:
+            balance: Dict of balances per category/sector
+            objective_queryset: Queryset of objectives
+            objective_type: Type of objective (SECTOR or BIOFUEL_CATEGORY)
+            energy_basis: Global energy basis (required for BIOFUEL_CATEGORY)
+            mac_queryset: Queryset of MacFossilFuel (optional, for SECTOR with per-sector energy basis)
+            year: Year for calculation (required if mac_queryset provided)
+
+        Returns:
+            List of objectives with balances and energy basis
         """
+        # Initialize balance structure
         for key in balance:
             balance[key]["code"] = key
             balance[key]["objective"] = {
@@ -45,12 +65,17 @@ class ObjectiveService:
                 "penalty": None,
                 "target_percent": None,
             }
+            # Initialize energy_basis field for sectors
+            if objective_type == Objective.SECTOR:
+                balance[key]["energy_basis"] = 0
 
         objectives = objective_queryset.filter(type=objective_type)
         if not objectives.exists():
             return list(balance.values())
 
+        # Calculate objectives
         for objective in objectives:
+            # Determine balance key based on objective type
             if objective_type == Objective.BIOFUEL_CATEGORY:
                 key = objective.customs_category
             elif objective_type == Objective.SECTOR:
@@ -60,20 +85,35 @@ class ObjectiveService:
 
             if key not in balance:
                 continue
-            else:
-                target = ObjectiveService._calculate_target_for_objective(objective.target, energy_basis)
-                penalty_amout = ObjectiveService._calcule_penalty(
-                    objective.penalty,
-                    balance[key]["pending_teneur"] + balance[key]["declared_teneur"],
-                    target,
-                )
 
-                balance[key]["objective"] = {
-                    "target_mj": target,
-                    "target_type": objective.target_type,
-                    "penalty": penalty_amout,
-                    "target_percent": objective.target,
-                }
+            # Calculate energy basis for this objective
+            if objective_type == Objective.SECTOR and mac_queryset:
+                # Sector-specific energy basis: filter MAC by fuel_category
+                sector_macs = mac_queryset.filter(fuel__fuel_category__name=objective.fuel_category.name)
+                objective_energy_basis = ObjectiveService.calculate_energy_basis(sector_macs, year=year)
+                if objective_energy_basis:
+                    balance[key]["energy_basis"] = objective_energy_basis
+            else:
+                # Use global energy basis
+                objective_energy_basis = energy_basis
+
+            if not objective_energy_basis:
+                continue
+
+            # Calculate target and penalty using appropriate energy basis
+            target = ObjectiveService._calculate_target_for_objective(objective.target, objective_energy_basis)
+            penalty_amount = ObjectiveService._calcule_penalty(
+                objective.penalty,
+                balance[key]["pending_teneur"] + balance[key]["declared_teneur"],
+                target,
+            )
+
+            balance[key]["objective"] = {
+                "target_mj": target,
+                "target_type": objective.target_type,
+                "penalty": penalty_amount,
+                "target_percent": objective.target,
+            }
 
         return list(balance.values())
 
@@ -194,7 +234,7 @@ class ObjectiveService:
         # Keys to sum in main
         main_sum_keys = ["available_balance", "target", "pending_teneur", "declared_teneur", "penalty", "energy_basis"]
         # Keys to sum in sectors/categories
-        balance_sum_keys = ["pending_teneur", "declared_teneur", "available_balance"]
+        balance_sum_keys = ["pending_teneur", "declared_teneur", "available_balance", "energy_basis"]
         objective_sum_keys = ["target_mj", "penalty"]
 
         for objectives in objectives_list:
