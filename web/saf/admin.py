@@ -34,11 +34,24 @@ class SafTicketSourceAdmin(admin.ModelAdmin):
         "carbure_id",
         "added_by__name",
     ]
-    autocomplete_fields = [
+    raw_id_fields = [
         "parent_lot",
         "parent_ticket",
+        "origin_lot",
+    ]
+    autocomplete_fields = [
         "carbure_producer",
         "carbure_production_site",
+        "added_by",
+        "origin_lot_site",
+    ]
+
+    # Optimize queries for list view
+    list_select_related = [
+        "added_by",
+        "feedstock",
+        "biofuel",
+        "country_of_origin",
     ]
 
 
@@ -67,6 +80,10 @@ class SafTicketAdmin(admin.ModelAdmin):
         "supplier__name",
         "client__name",
     ]
+    raw_id_fields = [
+        "origin_lot",
+        "parent_ticket_source",
+    ]
     autocomplete_fields = [
         "biofuel",
         "feedstock",
@@ -76,10 +93,17 @@ class SafTicketAdmin(admin.ModelAdmin):
         "carbure_producer",
         "carbure_production_site",
         "production_country",
-        "parent_ticket_source",
         "reception_airport",
-        "origin_lot",
         "origin_lot_site",
+    ]
+
+    # Optimize queries for list view
+    list_select_related = [
+        "supplier",
+        "feedstock",
+        "biofuel",
+        "country_of_origin",
+        "client",
     ]
 
 

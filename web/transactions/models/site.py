@@ -3,7 +3,7 @@ from django.db import models
 
 class SiteManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("entitysite_set__entity")
+        return super().get_queryset().select_related("created_by", "country").prefetch_related("entitysite_set__entity")
 
 
 class Site(models.Model):
