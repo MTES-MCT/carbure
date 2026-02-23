@@ -1,6 +1,7 @@
 from django.db import models
 
 
+# See migration 0062_elec_meter_reading_virtual.py for the definition of this view.
 class ElecMeterReadingVirtual(models.Model):
     reading_id = models.IntegerField(primary_key=True)
     application = models.ForeignKey(
@@ -36,6 +37,7 @@ class ElecMeterReadingVirtual(models.Model):
     current_index = models.FloatField()
     prev_index = models.FloatField()
     enr_ratio = models.FloatField()
+    operating_unit = models.CharField(max_length=64)
 
     class Meta:
         managed = False
