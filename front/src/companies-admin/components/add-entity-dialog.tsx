@@ -1,32 +1,50 @@
 import { AxiosError } from "axios"
-import useEntity from "common/hooks/entity"
-import { EntityType } from "common/types"
+import useEntity, { EntityManager } from "common/hooks/entity"
+import { EntityType, ExternalAdminPages } from "common/types"
 import * as norm from "common/utils/normalizers"
-import Autocomplete from "common/components/autocomplete"
-import Button from "common/components/button"
-import Checkbox from "common/components/checkbox"
-import Dialog from "common/components/dialog"
-import Form, { useForm } from "common/components/form"
-import { Return, Send } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { Autocomplete } from "common/components/autocomplete2"
+import { Button } from "common/components/button2"
+import { Dialog } from "common/components/dialog2"
+import { Form, useForm } from "common/components/form2"
+import { TextInput, Checkbox } from "common/components/inputs2"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import * as api from "../api"
+import { useMemo } from "react"
+import { SiretPicker } from "common/molecules/siret-picker"
+import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 
 export interface AddEntityDialogProps {
   onClose: () => void
   onEntityAdded: (entityName: string) => void
 }
+
+const ADMIN_TO_ENTITIES: Partial<Record<ExternalAdminPages, EntityType[]>> = {
+  [ExternalAdminPages.DREAL]: [EntityType.Producteur_de_biom_thane],
+}
+
+const getCompanyTypesForAdmin = (entity: EntityManager) => {
+  return Object.entries(ADMIN_TO_ENTITIES).reduce((acc, [admin, entities]) => {
+    if (entity.hasAdminRight(admin as ExternalAdminPages)) {
+      return [...acc, ...entities]
+    }
+    return acc
+  }, [] as EntityType[])
+}
+
 export const AddEntityDialog = ({
   onClose,
   onEntityAdded,
 }: AddEntityDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const hasAirlineOnly = entity.isExternal && entity.hasAdminRight("AIRLINE")
-
-  const { value, bind } = useForm<AddForm>(defaultEntity)
+  const companyTypes = useMemo(() => getCompanyTypesForAdmin(entity), [entity])
+  const { value, bind, setField } = useForm<AddForm>({
+    ...defaultEntity,
+    entity_type:
+      companyTypes.length === 1 ? companyTypes[0] : defaultEntity.entity_type,
+  })
 
   const addEntityRequest = useMutation(api.addCompany, {
     invalidates: ["entities"],
@@ -44,79 +62,105 @@ export const AddEntityDialog = ({
       value.name!,
       value.entity_type!,
       value.has_saf,
-      value.has_elec
+      value.has_elec,
+      value.company_address!,
+      value.postal_code!,
+      value.city!,
+      value.department!,
+      value.insee_code!
     )
     onEntityAdded(value.name!)
     onClose()
   }
+  const canAddCompany =
+    (entity.hasAdminRight(ExternalAdminPages.DREAL) && value.company_address) ||
+    !entity.hasAdminRight(ExternalAdminPages.DREAL)
 
   return (
     <Portal onClose={onClose}>
-      <Dialog onClose={onClose}>
-        <header>
-          <h1>{t("Ajouter une société")}</h1>
-        </header>
-
-        <main>
-          <section>
-            <Form id="add-entity" onSubmit={addEntity}>
-              <TextInput required label={t("Nom")} {...bind("name")} />
-
-              <Autocomplete
-                required
-                label={t("Type de société")}
-                normalize={norm.normalizeEntityType}
-                options={
-                  hasAirlineOnly
-                    ? [EntityType.Airline, EntityType.SAF_Trader]
-                    : [
-                        EntityType.Operator,
-                        EntityType.Producer,
-                        EntityType.Trader,
-                        EntityType.Auditor,
-                        EntityType.Airline,
-                        EntityType.ExternalAdmin,
-                        EntityType.CPO,
-                        EntityType.PowerOrHeatProducer,
-                        EntityType.SAF_Trader,
-                      ]
-                }
-                {...bind("entity_type")}
-              />
-
-              {value.entity_type === EntityType.Operator && (
-                <Checkbox
-                  label={t(
-                    "Ajouter la gestion du Carburant Durable d'Aviation"
-                  )}
-                  {...bind("has_saf")}
-                />
-              )}
-
-              {value.entity_type === EntityType.Operator && (
-                <Checkbox
-                  label={t(
-                    "Ajouter la gestion de la cession d'Energie Electrique"
-                  )}
-                  {...bind("has_elec")}
-                />
-              )}
-            </Form>
-          </section>
-        </main>
-
-        <footer>
+      <Dialog
+        onClose={onClose}
+        header={<Dialog.Title>{t("Ajouter une société")}</Dialog.Title>}
+        footer={
           <Button
-            icon={Send}
-            label={t("Ajouter")}
-            variant="primary"
-            submit="add-entity"
+            iconId="ri-send-plane-line"
+            nativeButtonProps={{
+              form: "add-entity",
+            }}
             loading={addEntityRequest.loading}
-            disabled={addEntityRequest.loading}
+            disabled={!canAddCompany || addEntityRequest.loading}
+            type="submit"
+          >
+            {t("Ajouter")}
+          </Button>
+        }
+      >
+        <Form id="add-entity" onSubmit={addEntity}>
+          <TextInput required label={t("Nom")} {...bind("name")} />
+          <Autocomplete
+            required
+            label={t("Type de société")}
+            normalize={norm.normalizeEntityType}
+            options={companyTypes}
+            {...bind("entity_type")}
           />
+          <SiretPicker
+            {...bind("siret")}
+            required
+            label={t("Siret de la société")}
+            onSelect={(company) => {
+              if (company) {
+                setField("company_address", company?.registered_address)
+                setField("postal_code", company?.registered_zipcode)
+                setField("city", company?.registered_city)
+                setField("department", company?.department_code)
+                setField("insee_code", company?.insee_code)
+              }
+            }}
+          />
+          {value.company_address && (
+            <>
+              <TextInput
+                required
+                label={t("Adresse de la société (Numéro et rue)")}
+                {...bind("company_address")}
+              />
+              <TextInput
+                required
+                label={t("Code postal")}
+                {...bind("postal_code")}
+              />
+              <TextInput required label={t("Ville")} {...bind("city")} />
+              <AutoCompleteDepartments
+                required
+                label={t("Département")}
+                {...bind("department")}
+                onChange={(value) => {
+                  setField("department", value ?? undefined)
+                }}
+              />
+              <TextInput
+                required
+                label={t("Code INSEE")}
+                {...bind("insee_code")}
+              />
+            </>
+          )}
 
-          <Button icon={Return} label={t("Retour")} action={onClose} />
-        </footer>
+          {value.entity_type === EntityType.Operator && (
+            <Checkbox
+              label={t("Ajouter la gestion du Carburant Durable d'Aviation")}
+              {...bind("has_saf")}
+            />
+          )}
+
+          {value.entity_type === EntityType.Operator && (
+            <Checkbox
+              label={t("Ajouter la gestion de la cession d'Energie Electrique")}
+              {...bind("has_elec")}
+            />
+          )}
+        </Form>
       </Dialog>
     </Portal>
   )
@@ -129,6 +173,12 @@ const defaultEntity = {
   entity_type: EntityType.Unknown as EntityType | undefined,
   has_saf: false as boolean,
   has_elec: false as boolean,
+  siret: "" as string | undefined,
+  company_address: "" as string | undefined,
+  postal_code: "" as string | undefined,
+  city: "" as string | undefined,
+  department: "" as string | undefined,
+  insee_code: "" as string | undefined,
 }
 
 export type AddForm = typeof defaultEntity
