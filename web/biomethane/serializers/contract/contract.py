@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from web.core.utils import check_file_size_and_extension
 
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
@@ -7,6 +6,7 @@ from biomethane.serializers.contract.contract_amendment import BiomethaneContrac
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.services.contract import BiomethaneContractService
 from core.serializers import check_fields_required
+from core.utils import check_file_size_and_extension
 
 
 class BiomethaneContractSerializer(serializers.ModelSerializer):

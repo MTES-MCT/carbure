@@ -1,9 +1,9 @@
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from web.core.utils import check_file_size_and_extension
 
 from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
 from core.serializers import check_fields_required
+from core.utils import check_file_size_and_extension
 
 
 class BaseBiomethaneContractAmendmentSerializer(serializers.ModelSerializer):
