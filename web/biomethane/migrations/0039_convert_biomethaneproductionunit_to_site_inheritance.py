@@ -73,23 +73,47 @@ class Migration(migrations.Migration):
         ),
         # Step 2: Run data migration
         migrations.RunPython(migrate_data_forward, migrate_data_backward),
-        # Step 3: Remove the old id field FIRST (before making site_ptr primary key)
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="id",
-        ),
-        # Step 4: Make site_ptr non-nullable and primary key
-        migrations.AlterField(
-            model_name="biomethaneproductionunit",
-            name="site_ptr",
-            field=models.OneToOneField(
-                auto_created=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                parent_link=True,
-                primary_key=True,
-                serialize=False,
-                to="transactions.site",
-            ),
+        # Step 3 & 4: Change primary key atomically (DB + Django state)
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    # Forward: drop old PK, add new PK in one statement
+                    sql="""
+                        ALTER TABLE biomethane_production_unit
+                        DROP PRIMARY KEY,
+                        DROP COLUMN id,
+                        MODIFY COLUMN site_ptr_id INT NOT NULL,
+                        ADD PRIMARY KEY (site_ptr_id)
+                    """,
+                    # Reverse: recreate old id column and make it PK
+                    reverse_sql="""
+                        ALTER TABLE biomethane_production_unit
+                        DROP PRIMARY KEY,
+                        ADD COLUMN id INT AUTO_INCREMENT PRIMARY KEY FIRST,
+                        MODIFY COLUMN site_ptr_id INT NULL
+                    """,
+                ),
+            ],
+            state_operations=[
+                # Remove old id field from Django state
+                migrations.RemoveField(
+                    model_name="biomethaneproductionunit",
+                    name="id",
+                ),
+                # Update site_ptr to be primary key in Django state
+                migrations.AlterField(
+                    model_name="biomethaneproductionunit",
+                    name="site_ptr",
+                    field=models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="transactions.site",
+                    ),
+                ),
+            ],
         ),
         # Step 5: Remove old fields that are now in Site
         migrations.RemoveField(
