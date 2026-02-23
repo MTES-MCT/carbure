@@ -9,6 +9,7 @@ import { Grid } from "common/components/scaffold"
 import { usePortal } from "common/components/portal"
 import { AddContract } from "./add-contract"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { formatDate } from "common/utils/formatters"
 
 type ContractFile = {
   name: string
@@ -81,12 +82,20 @@ export const ContractFiles = ({
           <Grid cols={2} gap="lg">
             <DateInput
               readOnly
-              value={contract?.signature_date ?? ""}
+              value={
+                contract?.signature_date
+                  ? formatDate(contract.signature_date)
+                  : ""
+              }
               label={t("Date de signature")}
             />
             <DateInput
               readOnly
-              value={contract?.effective_date ?? ""}
+              value={
+                contract?.effective_date
+                  ? formatDate(contract.effective_date)
+                  : ""
+              }
               label={t("Date de prise d'effet")}
             />
           </Grid>

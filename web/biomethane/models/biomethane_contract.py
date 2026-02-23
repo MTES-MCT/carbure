@@ -56,7 +56,7 @@ class BiomethaneContract(models.Model):
 
     # List of amendment types that are tracked for the contract when some values are updated
     # (if cmax or pap is updated, we need to save CMAX_PAP_UPDATE to force the user to add an amendment)
-    tracked_amendment_types = models.JSONField(default=list)
+    tracked_amendment_types = models.JSONField(default=list, blank=True)
 
     # Aide complémentaire à l'investissement
     COMPLEMENTARY_AID_ORGANISM_ADEME = "ADEME"
