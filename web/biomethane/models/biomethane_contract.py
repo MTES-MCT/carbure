@@ -9,17 +9,13 @@ from core import private_storage
 from core.models import Entity
 
 
-def rename_general_conditions_file(instance, filename):
-    base_filename = f"{instance.pk}_CG_{slugify(instance.producer.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    return rename_file(instance, filename, base_filename)
+def rename_conditions_file(instance, filename):
+    base_filename = f"{instance.pk}_CF_{slugify(instance.producer.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    return rename_file(filename, base_filename)
 
 
-def rename_specific_conditions_file(instance, filename):
-    base_filename = f"{instance.pk}_CP_{slugify(instance.producer.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    return rename_file(instance, filename, base_filename)
-
-
-def rename_file(instance, filename, base_filename):
+def rename_file(filename, base_filename):
     ext = filename.split(".")[-1]
     return f"biomethane/contracts/{base_filename}.{ext}"
 
@@ -56,12 +52,7 @@ class BiomethaneContract(models.Model):
     pap_contracted = models.FloatField(null=True, blank=True)
     signature_date = models.DateField(null=True, blank=True)
     effective_date = models.DateField(null=True, blank=True)
-    general_conditions_file = models.FileField(
-        storage=private_storage, null=True, blank=True, upload_to=rename_general_conditions_file
-    )
-    specific_conditions_file = models.FileField(
-        storage=private_storage, null=True, blank=True, upload_to=rename_specific_conditions_file
-    )
+    conditions_file = models.FileField(storage=private_storage, null=True, blank=True, upload_to=rename_conditions_file)
 
     # List of amendment types that are tracked for the contract when some values are updated
     # (if cmax or pap is updated, we need to save CMAX_PAP_UPDATE to force the user to add an amendment)

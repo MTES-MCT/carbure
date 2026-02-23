@@ -15,7 +15,7 @@ def rename_amendment_file(instance, filename):
         entity_name = "unknown"
 
     base_filename = f"{instance.contract_id}_amendment_" f"{entity_name}_" f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    return rename_file(instance, filename, base_filename)
+    return rename_file(filename, base_filename)
 
 
 class BiomethaneContractAmendment(models.Model):

@@ -11987,11 +11987,7 @@ components:
           type: string
           format: date
           nullable: true
-        general_conditions_file:
-          type: string
-          format: uri
-          nullable: true
-        specific_conditions_file:
+        conditions_file:
           type: string
           format: uri
           nullable: true
@@ -12136,11 +12132,7 @@ components:
           type: string
           format: date
           nullable: true
-        general_conditions_file:
-          type: string
-          format: binary
-          nullable: true
-        specific_conditions_file:
+        conditions_file:
           type: string
           format: binary
           nullable: true
@@ -16255,6 +16247,10 @@ components:
           format: double
         unit:
           type: string
+        energy_basis:
+          type: number
+          format: double
+          default: 0
         objective:
           $ref: "#/components/schemas/Objective"
       required:

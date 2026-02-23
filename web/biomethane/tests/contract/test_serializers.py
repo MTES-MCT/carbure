@@ -152,8 +152,7 @@ class BiomethaneContractSerializerTests(TestCase):
                 "cmax_annualized": False,
                 "signature_date": valid_date,  # Valid date within range
                 "effective_date": "2022-06-20",
-                "general_conditions_file": self.test_file,
-                "specific_conditions_file": self.test_file,
+                "conditions_file": self.test_file,
             }
 
             serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
@@ -172,15 +171,14 @@ class BiomethaneContractSerializerTests(TestCase):
                 "pap_contracted": 50.0,
                 "signature_date": valid_date,  # Valid date within range
                 "effective_date": "2024-06-20",
-                "general_conditions_file": self.test_file,
-                "specific_conditions_file": self.test_file,
+                "conditions_file": self.test_file,
             }
 
         serializer = BiomethaneContractInputSerializer(data=data, context=self.context)
         self.assertTrue(serializer.is_valid())
 
-    def test_tracked_amendment_types_updated_when_general_conditions_file_updated(self):
-        """Test that tracked_amendment_types is updated when general_conditions_file is updated."""
+    def test_tracked_amendment_types_updated_when_conditions_file_updated(self):
+        """Test that tracked_amendment_types is updated when conditions_file is updated."""
         contract = BiomethaneSignedContractFactory(producer=self.producer_entity, tracked_amendment_types=[])
         data = {
             "tariff_reference": "2023",
@@ -192,8 +190,8 @@ class BiomethaneContractSerializerTests(TestCase):
 
         self.assertEqual(contract_updated.tracked_amendment_types, [BiomethaneContractAmendment.CMAX_PAP_UPDATE])
 
-    def test_tracked_amendment_types_not_updated_when_general_conditions_file_is_not_set(self):
-        """Test that tracked_amendment_types is not updated when general_conditions_file is not set."""
+    def test_tracked_amendment_types_not_updated_when_conditions_file_is_not_set(self):
+        """Test that tracked_amendment_types is not updated when conditions_file is not set."""
         contract = BiomethaneContractFactory(producer=self.producer_entity, tracked_amendment_types=[])
         data = {
             "tariff_reference": "2023",
