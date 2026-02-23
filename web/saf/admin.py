@@ -34,11 +34,24 @@ class SafTicketSourceAdmin(admin.ModelAdmin):
         "carbure_id",
         "added_by__name",
     ]
-    autocomplete_fields = [
+    raw_id_fields = [
         "parent_lot",
         "parent_ticket",
+        "origin_lot",
+    ]
+    autocomplete_fields = [
         "carbure_producer",
         "carbure_production_site",
+        "added_by",
+        "origin_lot_site",
+    ]
+
+    # Optimize queries for list view
+    list_select_related = [
+        "added_by",
+        "feedstock",
+        "biofuel",
+        "country_of_origin",
     ]
 
 
@@ -67,6 +80,9 @@ class SafTicketAdmin(admin.ModelAdmin):
         "supplier__name",
         "client__name",
     ]
+    raw_id_fields = [
+        "origin_lot",
+    ]
     autocomplete_fields = [
         "biofuel",
         "feedstock",
@@ -78,9 +94,62 @@ class SafTicketAdmin(admin.ModelAdmin):
         "production_country",
         "parent_ticket_source",
         "reception_airport",
-        "origin_lot",
         "origin_lot_site",
     ]
+
+    # Optimize queries for list view
+    list_select_related = [
+        "supplier",
+        "feedstock",
+        "biofuel",
+        "country_of_origin",
+        "client",
+    ]
+
+    # Optimize queries for detail/change view
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related(
+            "supplier",
+            "client",
+            "feedstock",
+            "biofuel",
+            "country_of_origin",
+            "carbure_producer",
+            "carbure_production_site",
+            "carbure_production_site__created_by",
+            "production_country",
+            "reception_airport",
+            "reception_airport__created_by",
+            # parent_ticket_source and its nested relations
+            "parent_ticket_source",
+            "parent_ticket_source__added_by",
+            "parent_ticket_source__feedstock",
+            "parent_ticket_source__biofuel",
+            "parent_ticket_source__country_of_origin",
+            "parent_ticket_source__carbure_producer",
+            "parent_ticket_source__carbure_production_site",
+            "parent_ticket_source__carbure_production_site__created_by",
+            "parent_ticket_source__production_country",
+            "parent_ticket_source__origin_lot_site",
+            "parent_ticket_source__origin_lot_site__created_by",
+            # origin_lot and its nested relations
+            "origin_lot",
+            "origin_lot__carbure_client",
+            "origin_lot__carbure_producer",
+            "origin_lot__carbure_supplier",
+            "origin_lot__carbure_production_site",
+            "origin_lot__carbure_production_site__created_by",
+            "origin_lot__carbure_dispatch_site",
+            "origin_lot__carbure_dispatch_site__created_by",
+            "origin_lot__carbure_delivery_site",
+            "origin_lot__carbure_delivery_site__created_by",
+            "origin_lot__feedstock",
+            "origin_lot__biofuel",
+            "origin_lot__country_of_origin",
+            "origin_lot_site",
+            "origin_lot_site__created_by",
+        )
 
 
 class SafLogisticsResource(resources.ModelResource):
