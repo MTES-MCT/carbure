@@ -73,12 +73,25 @@ class Migration(migrations.Migration):
         ),
         # Step 2: Run data migration
         migrations.RunPython(migrate_data_forward, migrate_data_backward),
-        # Step 3: Remove the old id field FIRST (before making site_ptr primary key)
-        migrations.RemoveField(
-            model_name="biomethaneproductionunit",
-            name="id",
+        # Step 3: Change primary key from id to site_ptr_id atomically
+        migrations.RunSQL(
+            # Forward: drop old PK, add new PK in one statement
+            sql="""
+                ALTER TABLE biomethane_biomethaneproductionunit
+                DROP PRIMARY KEY,
+                DROP COLUMN id,
+                MODIFY COLUMN site_ptr_id INT NOT NULL,
+                ADD PRIMARY KEY (site_ptr_id)
+            """,
+            # Reverse: recreate old id column and make it PK
+            reverse_sql="""
+                ALTER TABLE biomethane_biomethaneproductionunit
+                DROP PRIMARY KEY,
+                ADD COLUMN id INT AUTO_INCREMENT PRIMARY KEY FIRST,
+                MODIFY COLUMN site_ptr_id INT NULL
+            """,
         ),
-        # Step 4: Make site_ptr non-nullable and primary key
+        # Step 4: Update Django state to reflect the new primary key
         migrations.AlterField(
             model_name="biomethaneproductionunit",
             name="site_ptr",
