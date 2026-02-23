@@ -22,7 +22,17 @@ def save_data_to_temp_tables(apps, schema_editor):
     with connection.cursor() as cursor:
         # Temp table for Depot data
         cursor.execute("""
-            CREATE TEMPORARY TABLE _tmp_depot AS
+            CREATE TEMPORARY TABLE _tmp_depot (
+                id INT PRIMARY KEY,
+                customs_id VARCHAR(32),
+                accise VARCHAR(32),
+                electrical_efficiency DOUBLE,
+                thermal_efficiency DOUBLE,
+                useful_temperature DOUBLE
+            )
+        """)
+        cursor.execute("""
+            INSERT INTO _tmp_depot
             SELECT id, customs_id, accise, electrical_efficiency, thermal_efficiency, useful_temperature
             FROM sites
             WHERE site_type IN ('OTHER', 'EFS', 'EFPE', 'OIL DEPOT', 'BIOFUEL DEPOT', 'HEAT PLANT', 'POWER PLANT', 'COGENERATION PLANT', 'EFCA')
@@ -30,7 +40,20 @@ def save_data_to_temp_tables(apps, schema_editor):
 
         # Temp table for ProductionSite data
         cursor.execute("""
-            CREATE TEMPORARY TABLE _tmp_production_site AS
+            CREATE TEMPORARY TABLE _tmp_production_site (
+                id INT PRIMARY KEY,
+                date_mise_en_service DATE,
+                ges_option VARCHAR(12),
+                eligible_dc TINYINT(1),
+                dc_number VARCHAR(64),
+                dc_reference VARCHAR(64),
+                manager_name VARCHAR(64),
+                manager_phone VARCHAR(64),
+                manager_email VARCHAR(64)
+            )
+        """)
+        cursor.execute("""
+            INSERT INTO _tmp_production_site
             SELECT id, date_mise_en_service, ges_option, eligible_dc, dc_number, dc_reference,
                    manager_name, manager_phone, manager_email
             FROM sites
@@ -39,7 +62,14 @@ def save_data_to_temp_tables(apps, schema_editor):
 
         # Temp table for Airport data
         cursor.execute("""
-            CREATE TEMPORARY TABLE _tmp_airport AS
+            CREATE TEMPORARY TABLE _tmp_airport (
+                id INT PRIMARY KEY,
+                icao_code VARCHAR(32),
+                is_ue_airport TINYINT(1)
+            )
+        """)
+        cursor.execute("""
+            INSERT INTO _tmp_airport
             SELECT id, icao_code, is_ue_airport
             FROM sites
             WHERE site_type IN ('AIRPORT')
