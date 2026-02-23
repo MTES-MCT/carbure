@@ -26,12 +26,8 @@ export const ContractFiles = ({
 
   const files: ContractFile[] = [
     {
-      name: t("Conditions générales"),
-      url: contract?.general_conditions_file,
-    },
-    {
-      name: t("Conditions particulières"),
-      url: contract?.specific_conditions_file,
+      name: t("Conditions générales et particulières"),
+      url: contract?.conditions_file,
     },
   ].filter((file) => Boolean(file.url))
 
@@ -68,7 +64,7 @@ export const ContractFiles = ({
         !hasSelectedEntity && (
           <Button
             iconId="ri-add-line"
-            disabled={!contract || Boolean(contract.general_conditions_file)}
+            disabled={!contract || Boolean(contract.conditions_file)}
             onClick={openAddContractDialog}
           >
             {t("Charger un contrat")}

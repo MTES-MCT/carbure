@@ -204,4 +204,7 @@ export const CONVERSIONS = {
   hours: {
     yearsToHours: (value: number) => value * 8760,
   },
+  bytes: {
+    mbToBytes: (value: number) => value * 1000000,
+  },
 }
