@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from web.core.utils import check_file_size_and_extension
 
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
@@ -41,6 +42,14 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
     def validate(self, data):
         validated_data = super().validate(data)
         contract = self.instance
+
+        # Check file size and extension
+        if validated_data.get("conditions_file"):
+            check_file_size_and_extension(
+                validated_data["conditions_file"],
+                max_size_mb=10,
+                extensions=[".pdf", ".doc", ".docx", ".zip"],
+            )
 
         # Use the service to validate the contract data and get required fields
         errors, required_fields = BiomethaneContractService.validate_contract(contract, validated_data)

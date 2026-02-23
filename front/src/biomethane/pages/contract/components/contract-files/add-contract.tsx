@@ -89,7 +89,7 @@ const AddContractContent = ({
               required
               label={t("Conditions générales et particulières")}
               maxSize={CONTRACT_FILE_MAX_SIZE}
-              accept=".pdf,.doc,.docx"
+              accept=".pdf,.doc,.docx,.zip"
             />
           )}
         </Stepper.Form>
