@@ -61,6 +61,7 @@ export const AddDigestateStorage = ({ onClose }: AddDigestateStorageProps) => {
           <NumberInput
             required
             type="number"
+            min={0}
             label={t("Capacité de stockage (m3)")}
             {...bind("capacity")}
           />

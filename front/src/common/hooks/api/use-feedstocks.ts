@@ -1,15 +1,16 @@
 import { findFeedstocks } from "common/api"
 import useEntity from "../entity"
 import { useQuery } from "../async"
-import { EntityType, ExternalAdminPages } from "common/types"
+import { EntityType } from "common/types"
 
+/**
+ * Return a list of feedstocks with different possibilities :
+ * - When the entity is an admin, return all feedstocks
+ * - When the entity is a producer of biomethane, return all feedstocks that are methanogenic
+ * - Otherwise, return all feedstocks that are biofuel feedstocks
+ */
 export const useFeedstocksByEntity = () => {
   const entity = useEntity()
-
-  const displayMethanogenic =
-    entity.entity_type === EntityType.Producteur_de_biom_thane ||
-    entity.entity_type === EntityType.Fournisseur_de_biom_thane ||
-    (entity.isExternal && entity.hasAdminRight(ExternalAdminPages.DREAL))
 
   const feedstocks = useQuery(
     () =>
@@ -19,7 +20,7 @@ export const useFeedstocksByEntity = () => {
           : {
               is_biofuel_feedstock:
                 entity.entity_type !== EntityType.Producteur_de_biom_thane,
-              is_methanogenic: displayMethanogenic,
+              is_methanogenic: entity.isRelatedToBiomethane(),
             }
       ),
     {

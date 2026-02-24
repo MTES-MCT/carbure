@@ -143,6 +143,7 @@ export const ContractInfos = ({
             <Grid cols={2} gap="lg">
               <NumberInput
                 label={t("Cmax (Nm³/h)")}
+                min={0}
                 {...bind("cmax")}
                 required
                 readOnly={!isEditing}
@@ -164,6 +165,7 @@ export const ContractInfos = ({
             {value.cmax_annualized && (
               <NumberInput
                 label={t("Cmax annualisée (GWhPCS/an)")}
+                min={0}
                 required
                 {...bind("cmax_annualized_value")}
                 readOnly={!isEditing}
@@ -175,6 +177,7 @@ export const ContractInfos = ({
         {isTariffReference2021Or2023(value.tariff_reference) && (
           <NumberInput
             label={t("PAP contractualisée (GWhPCS/an)")}
+            min={0}
             {...bind("pap_contracted")}
             required
             readOnly={!isEditing}

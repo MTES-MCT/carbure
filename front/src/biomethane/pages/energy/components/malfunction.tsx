@@ -93,6 +93,7 @@ export const Malfunction = () => {
               <NumberInput
                 readOnly={!isEditing}
                 label={t("Durée cumulée du dysfonctionnement (en jours)")}
+                min={0}
                 required
                 {...bind("malfunction_cumulative_duration_days")}
               />
@@ -133,6 +134,7 @@ export const Malfunction = () => {
             <NumberInput
               readOnly={!isEditing}
               label={t("Nombre d’heures d’impossibilité d’injection (h)")}
+              min={0}
               required
               {...bind("injection_impossibility_hours")}
             />

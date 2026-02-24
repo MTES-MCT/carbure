@@ -48,6 +48,7 @@ export function Sale() {
               readOnly={!isEditing}
               label={t("Volume vendu (t)")}
               type="number"
+              min={0}
               {...bind("sold_volume")}
               required
             />

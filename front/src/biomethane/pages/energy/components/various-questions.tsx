@@ -58,6 +58,7 @@ export function VariousQuestions() {
               label={t(
                 "Nombre de jours de travail estimé pour l'activité de méthanisation sur l'année"
               )}
+              min={0}
               {...bind("estimated_work_days_acceptability")}
               required
             />

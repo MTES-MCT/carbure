@@ -55,6 +55,7 @@ export function IncinerationLandfill({
               readOnly={!isEditing}
               label={t("Volume annuel éliminé (t)")}
               type="number"
+              min={0}
               {...bind("annual_eliminated_volume")}
               required
             />
@@ -75,6 +76,7 @@ export function IncinerationLandfill({
                 "Quantité de matières totales traitées par la STEP allant en incinération (t)"
               )}
               type="number"
+              min={0}
               {...bind("wwtp_materials_to_incineration")}
               required
             />

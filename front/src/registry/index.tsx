@@ -24,7 +24,7 @@ const Registry = () => {
 
   const tabs = compact([
     ...(!isAirline && !hasAirline
-      ? compact([
+      ? [
           {
             path: "#companies",
             key: "companies",
@@ -55,7 +55,7 @@ const Registry = () => {
             key: "systeme-national",
             label: t("Système national"),
           },
-        ])
+        ]
       : []),
     (isAirline || isOperator || hasAirline || isAdmin) && {
       path: "#airports",
