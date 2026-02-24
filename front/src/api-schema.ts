@@ -3819,6 +3819,11 @@ export interface components {
             /** Format: date-time */
             checked_at: string;
         };
+        Classification: {
+            group: string;
+            category: string;
+            subcategory: string;
+        };
         CommentRequest: {
             comment?: string;
         };
@@ -4695,6 +4700,14 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
+        };
+        FeedStockClassification: {
+            name: string;
+            name_en: string;
+            code: string;
+            category?: components["schemas"]["MPCategoriesEnum"];
+            is_double_compte?: boolean;
+            classification: components["schemas"]["Classification"] | null;
         };
         FeedStockRequest: {
             name: string;
@@ -10902,7 +10915,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FeedStock"][];
+                    "application/json": components["schemas"]["FeedStockClassification"][];
                 };
             };
         };

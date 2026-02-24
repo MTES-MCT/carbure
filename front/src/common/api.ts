@@ -179,19 +179,17 @@ export const findFeedstocks = (
     is_methanogenic?: boolean
     query?: string
     double_count_only?: boolean
-  } = {}
-) => {
-  const defaultOptions = {
+  } = {
     is_biofuel_feedstock: true,
     is_methanogenic: false,
     query: "",
     double_count_only: false,
   }
-  const mergedOptions = { ...defaultOptions, ...options }
+) => {
   return apiFetch
     .GET("/resources/feedstocks", {
       params: {
-        query: mergedOptions,
+        query: options,
       },
     })
     .then((res) => res.data ?? [])

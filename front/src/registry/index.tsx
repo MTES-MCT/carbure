@@ -5,13 +5,13 @@ import { useTranslation } from "react-i18next"
 import Biofuels from "./components/biofuels"
 import Companies from "./components/companies"
 import Depots from "./components/depots"
-import Feedstocks from "./components/feedstocks"
 import DoubleCounting from "./components/double-counting"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { compact } from "common/utils/collection"
 import { Airports } from "./components/airports"
 import { SystemeNational } from "./components/systeme-national"
 import useEntity from "common/hooks/entity"
+import { Feedstocks } from "./components/feedstocks"
 
 const Registry = () => {
   const { t } = useTranslation()
@@ -24,7 +24,7 @@ const Registry = () => {
 
   const tabs = compact([
     ...(!isAirline && !hasAirline
-      ? [
+      ? compact([
           {
             path: "#companies",
             key: "companies",
@@ -55,7 +55,7 @@ const Registry = () => {
             key: "systeme-national",
             label: t("Système national"),
           },
-        ]
+        ])
       : []),
     (isAirline || isOperator || hasAirline || isAdmin) && {
       path: "#airports",

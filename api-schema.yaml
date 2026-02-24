@@ -7152,7 +7152,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/FeedStock"
+                  $ref: "#/components/schemas/FeedStockClassification"
           description: ""
   /api/resources/production-sites:
     get:
@@ -13529,6 +13529,22 @@ components:
       required:
         - checked_at
         - file
+    Classification:
+      type: object
+      properties:
+        group:
+          type: string
+          maxLength: 128
+        category:
+          type: string
+          maxLength: 128
+        subcategory:
+          type: string
+          maxLength: 128
+      required:
+        - category
+        - group
+        - subcategory
     CommentRequest:
       type: object
       properties:
@@ -15734,6 +15750,31 @@ components:
         is_double_compte:
           type: boolean
       required:
+        - code
+        - name
+        - name_en
+    FeedStockClassification:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 256
+        name_en:
+          type: string
+          maxLength: 256
+        code:
+          type: string
+          maxLength: 64
+        category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        is_double_compte:
+          type: boolean
+        classification:
+          allOf:
+            - $ref: "#/components/schemas/Classification"
+          nullable: true
+      required:
+        - classification
         - code
         - name
         - name_en
