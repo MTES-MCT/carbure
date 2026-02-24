@@ -18,18 +18,18 @@ class BiomethaneProductionUnitAnonymizer(Anonymizer):
 
     def get_updated_fields(self):
         return [
-            "unit_name",
-            "siret_number",
-            "company_address",
+            "name",
+            "site_siret",
+            "address",
             "city",
             "postal_code",
         ]
 
     def process(self, production_unit):
         fields_to_anonymize = {
-            "unit_name": f"Unité de Production {production_unit.id}",
-            "siret_number": self.fake.bothify(text="##############"),
-            "company_address": self.fake.address(),
+            "name": f"Unité de Production {production_unit.id}",
+            "site_siret": self.fake.bothify(text="##############"),
+            "address": self.fake.address(),
             "city": self.fake.city(),
             "postal_code": self.fake.postcode(),
         }

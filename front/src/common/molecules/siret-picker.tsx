@@ -44,7 +44,7 @@ export const SiretPicker = ({ onSelect, ...props }: SiretPickerProps) => {
 
   const checkSiretFormat = (siret: string) => {
     const siretInput = searchSiretRef.current
-    if (!siretInput || siret.length < 3) return false
+    if (!siretInput) return false
 
     if (siret.match(/^\d{14}$/) === null) {
       siretInput.setCustomValidity(
@@ -65,6 +65,15 @@ export const SiretPicker = ({ onSelect, ...props }: SiretPickerProps) => {
     companyResponse.execute(siret)
   }
 
+  const onPasteSiret = (
+    value: string | undefined,
+    event: React.ClipboardEvent<HTMLInputElement>
+  ) => {
+    const formattedSiret = value?.replaceAll(" ", "") || ""
+    typeSiret(formattedSiret)
+    event.preventDefault()
+  }
+
   return (
     <TextInput
       {...props}
@@ -74,6 +83,7 @@ export const SiretPicker = ({ onSelect, ...props }: SiretPickerProps) => {
       type="siret"
       label={props.label ?? t("SIRET de votre entreprise")}
       onChange={typeSiret}
+      onPaste={onPasteSiret}
       inputRef={searchSiretRef}
     />
   )

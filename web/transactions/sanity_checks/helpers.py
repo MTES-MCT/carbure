@@ -143,7 +143,7 @@ def get_prefetched_data(entity=None):
 
     data["countries"] = {p.code_pays: p for p in Pays.objects.all()}
     data["biofuels"] = {b.code: b for b in Biocarburant.objects.all()}
-    data["feedstocks"] = {m.code: m for m in MatierePremiere.objects.all()}
+    data["feedstocks"] = {m.code: m for m in MatierePremiere.biofuel.all()}
     data["depots"] = {d.depot_id: d for d in Depot.objects.all()}
     data["depotsbyname"] = {d.name.upper(): d for d in data["depots"].values()}
     data["locked_years"] = [locked_year.year for locked_year in YearConfig.objects.filter(locked=True)]
@@ -162,12 +162,13 @@ def get_prefetched_data(entity=None):
     # MAPPING OF ENTITIES AND DELIVERY SITES
     # dict {'entity1': [depot1, depot2], 'entity2': [depot42]}
     depotsbyentities = {}
-    associated_depots = EntitySite.objects.select_related("entity", "site").filter(site__in=Depot.objects.all())
+    associated_depots = EntitySite.objects.select_related("entity", "site__depot").filter(site__in=Depot.objects.all())
     for entitydepot in associated_depots:
+        depot = entitydepot.site.depot
         if entitydepot.entity.pk in depotsbyentities:
-            depotsbyentities[entitydepot.entity.pk].append(entitydepot.site.depot_id)
+            depotsbyentities[entitydepot.entity.pk].append(depot.depot_id)
         else:
-            depotsbyentities[entitydepot.entity.pk] = [entitydepot.site.depot_id]
+            depotsbyentities[entitydepot.entity.pk] = [depot.depot_id]
     data["depotsbyentity"] = depotsbyentities
 
     # MAPPING OF ENTITIES AND THEIR CERTIFICATES

@@ -151,8 +151,8 @@ class GeneralSanityChecksTest(TestCase):
     def x_test_mp_not_configured(self):
         error = CarbureSanityCheckErrors.MP_NOT_CONFIGURED
 
-        feedstock = MatierePremiere.objects.first()
-        other_feedstock = MatierePremiere.objects.last()
+        feedstock = MatierePremiere.biofuel.first()
+        other_feedstock = MatierePremiere.biofuel.last()
         production_site = ProductionSiteFactory.create(producer=self.producer)
 
         ProductionSiteInput.objects.create(production_site=production_site, matiere_premiere=feedstock)

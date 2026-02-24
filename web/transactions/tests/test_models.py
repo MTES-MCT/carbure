@@ -56,7 +56,7 @@ class TestDepotModels(TestCase):
         with self.assertRaises(ValidationError) as context:
             depot2.clean()
 
-        self.assertIn("site_name", context.exception.error_dict)
+        self.assertIn("name", context.exception.error_dict)
 
 
 class TestProductionSiteModels(TestCase):

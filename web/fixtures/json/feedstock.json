@@ -14,7 +14,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "CONV",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -32,7 +34,9 @@
       "is_huile_vegetale": true,
       "is_displayed": true,
       "category": "CONV",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": true
     }
   },
   {
@@ -50,7 +54,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -68,7 +74,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -86,7 +94,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -104,7 +114,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
 
@@ -123,7 +135,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -141,7 +155,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -159,7 +175,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -177,7 +195,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-B",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -195,7 +215,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-A",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -213,7 +235,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "CONV",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -231,7 +255,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "ANN-IX-B",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   },
   {
@@ -249,7 +275,9 @@
       "is_huile_vegetale": false,
       "is_displayed": true,
       "category": "OTHER",
-      "dgddi_category": null
+      "dgddi_category": null,
+      "is_biofuel_feedstock": true,
+      "is_methanogenic": false
     }
   }
 ]

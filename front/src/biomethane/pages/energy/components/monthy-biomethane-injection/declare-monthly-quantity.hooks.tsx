@@ -39,6 +39,7 @@ export const useDeclareMonthlyQuantityColumns = ({
           onChange={(value) =>
             updateCellValue(item.month, "injected_volume_nm3", value)
           }
+          min={0}
           readOnly={isReadOnly}
           required
         />
@@ -56,6 +57,7 @@ export const useDeclareMonthlyQuantityColumns = ({
               value
             )
           }
+          min={0}
           readOnly={isReadOnly}
           required
         />

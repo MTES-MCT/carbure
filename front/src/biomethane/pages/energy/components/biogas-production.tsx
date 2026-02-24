@@ -49,6 +49,7 @@ export function BiogasProduction() {
               readOnly={!isEditing}
               label={t("Quantité de biogaz produit (Nm3/an)")}
               type="number"
+              min={0}
               {...bind("produced_biogas_nm3_per_year")}
               required
             />
@@ -56,6 +57,7 @@ export function BiogasProduction() {
               readOnly={!isEditing}
               label={t("Quantité de biogaz torché (Nm3/an)")}
               type="number"
+              min={0}
               {...bind("flared_biogas_nm3_per_year")}
               required
             />
@@ -65,6 +67,7 @@ export function BiogasProduction() {
             readOnly={!isEditing}
             label={t("Nombre d'heures de fonctionnement de la torchère (h)")}
             type="number"
+            min={0}
             {...bind("flaring_operating_hours")}
             required
           />

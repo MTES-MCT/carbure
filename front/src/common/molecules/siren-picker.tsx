@@ -72,6 +72,15 @@ export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
     companyResponse.execute(siren)
   }
 
+  const onPasteSiren = (
+    value: string | undefined,
+    event: React.ClipboardEvent<HTMLInputElement>
+  ) => {
+    const formattedSiren = value?.replaceAll(" ", "") || ""
+    typeSiren(formattedSiren)
+    event.preventDefault()
+  }
+
   return (
     <section>
       <TextInput
@@ -84,6 +93,7 @@ export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
         label={t("SIREN de votre entreprise")}
         onChange={typeSiren}
         inputRef={searchSirentRef}
+        onPaste={onPasteSiren}
       />
     </section>
   )

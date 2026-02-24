@@ -49,3 +49,21 @@ class QuantityConverter(BaseConverter):
 
         (attribute, conversion_function) = self.conversion_mapping.get(unit)
         return {attribute: conversion_function(quantity)}
+
+
+class StatusConverter(BaseConverter):
+    _default_conversion_mapping = {
+        "CREATED": "DRAFT",
+        "PROVISIONAL": "DRAFT",
+        "PENDING": "PENDING",
+        "IN_TRANSIT": "PENDING",
+        "ACCEPTED": "ACCEPTED",
+        "REJECTED": "REJECTED",
+        "CANCELLED": "DELETED",
+    }
+
+    def from_udb(self, udb_status):
+        if udb_status not in self.conversion_mapping:
+            raise UDBConversionError(f"Unknown UDB Status: {udb_status}")
+
+        return self.conversion_mapping[udb_status]

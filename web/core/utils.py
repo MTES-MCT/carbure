@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import connection, models, transaction
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.serializers import ValidationError
 
 from core.models import Entity, UserRights
 from core.xlsx_v3 import make_carbure_lots_sheet
@@ -242,3 +243,32 @@ def is_bool_or_none(column):
 
 def extract_enum(Model: Type[models.Model], field: str) -> list:
     return [value for value, _ in Model._meta.get_field(field).choices]
+
+
+ASSOCIATED_MIME_TYPES = {
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".xls": "application/vnd.ms-excel",
+    ".pdf": "application/pdf",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".zip": "application/zip",
+}
+
+
+def check_file_size_and_extension(file, max_size_mb: int | None = None, extensions: list[str] | None = None):
+    if max_size_mb is not None and file.size > max_size_mb * 1024 * 1024:
+        raise ValidationError(f"Le fichier est trop volumineux (maximum {max_size_mb} MB)")
+
+    if extensions is not None:
+        ext = os.path.splitext(file.name)[1].lower()
+
+        if ext not in extensions:
+            raise ValidationError(f"Le fichier doit avoir une extension parmi les suivantes: {', '.join(extensions)}")
+
+        if hasattr(file, "content_type") and file.content_type:
+            mime_type = ASSOCIATED_MIME_TYPES.get(ext)
+
+            if mime_type and file.content_type != mime_type:
+                raise ValidationError(f"Ce type de fichier n'est pas supporté. Utilisez un fichier {mime_type}.")
+
+    return file

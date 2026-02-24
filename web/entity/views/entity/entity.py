@@ -44,6 +44,7 @@ class EntityViewSet(ViewSet, EntityActionMixin):
                         ExternalAdminRights.AIRLINE,
                         ExternalAdminRights.ELEC,
                         ExternalAdminRights.DOUBLE_COUNTING,
+                        ExternalAdminRights.DREAL,
                     ],
                 )
             ]

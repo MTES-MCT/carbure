@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
-from transactions.models import Site
+from transactions.models import Depot, ProductionSite, Site
 
 
 class ResourcesTest(TestCase):
@@ -37,6 +37,48 @@ class ResourcesTest(TestCase):
         # and returns filtered data
         data = response.json()
         assert len(data) == 1
+
+    def test_get_feedstocks_is_methanogenic(self):
+        # create matieres premieres with is_methanogenic flag
+        MatierePremiere.objects.update_or_create(name="Lisier bovin", code="LISIER", defaults={"is_methanogenic": True})
+        MatierePremiere.objects.update_or_create(name="Colza", code="COLZA", defaults={"is_methanogenic": False})
+        MatierePremiere.objects.update_or_create(name="Fumier", code="FUMIER", defaults={"is_methanogenic": True})
+
+        url = "resources-feedstocks"
+        # test filtering by is_methanogenic=true
+        response = self.client.get(reverse(url) + "?is_methanogenic=true")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 2
+        assert all(item["code"] in ["LISIER", "FUMIER"] for item in data)
+
+        # test filtering by is_methanogenic=false
+        response = self.client.get(reverse(url) + "?is_methanogenic=false")
+        assert response.status_code == 200
+        data = response.json()
+        assert any(item["code"] == "COLZA" for item in data)
+
+    def test_get_feedstocks_is_biofuel_feedstock(self):
+        # create matieres premieres with is_biofuel_feedstock flag
+        MatierePremiere.objects.update_or_create(name="Betterave", code="BETTERAVE", defaults={"is_biofuel_feedstock": True})
+        MatierePremiere.objects.update_or_create(
+            name="Dechets organiques", code="DECHETS", defaults={"is_biofuel_feedstock": False}
+        )
+        MatierePremiere.objects.update_or_create(name="Tournesol", code="TOURNESOL", defaults={"is_biofuel_feedstock": True})
+
+        url = "resources-feedstocks"
+        # test filtering by is_biofuel_feedstock=true
+        response = self.client.get(reverse(url) + "?is_biofuel_feedstock=true")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 2
+        assert all(item["code"] in ["BETTERAVE", "TOURNESOL"] for item in data)
+
+        # test filtering by is_biofuel_feedstock=false
+        response = self.client.get(reverse(url) + "?is_biofuel_feedstock=false")
+        assert response.status_code == 200
+        data = response.json()
+        assert any(item["code"] == "DECHETS" for item in data)
 
     def test_get_bcs(self):
         # create biocarburants
@@ -174,10 +216,10 @@ class ResourcesTest(TestCase):
     def test_get_delivery_sites(self):
         # create delivery sites
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Depot1", customs_id="007", country=fr)
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers", customs_id="042", country=fr)
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers 2", customs_id="043", country=fr)
-        Site.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Carcassonne", customs_id="044", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Depot1", customs_id="007", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers", customs_id="042", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Gennevilliers 2", customs_id="043", country=fr)
+        Depot.objects.update_or_create(site_type=Site.BIOFUELDEPOT, name="Carcassonne", customs_id="044", country=fr)
 
         url = "resources-depots"
         response = self.client.get(reverse(url))
@@ -198,28 +240,28 @@ class ResourcesTest(TestCase):
         other_producer, _ = Entity.objects.update_or_create(name="tata", entity_type="Producteur")
         fr, _ = Pays.objects.update_or_create(name="France", code_pays="FR")
         today = datetime.date.today()
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine1",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine2",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine3",
             created_by_id=producer.id,
             country=fr,
             date_mise_en_service=today,
         )
-        Site.objects.update_or_create(
+        ProductionSite.objects.update_or_create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             name="Usine4",
             created_by_id=other_producer.id,

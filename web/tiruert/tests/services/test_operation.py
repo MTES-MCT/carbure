@@ -28,8 +28,8 @@ class OperationServiceTestCase(TestCase):
         # Get references from fixtures
         cls.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
         cls.depot = Depot.objects.first()
-        cls.feedstock_conv = MatierePremiere.objects.filter(category="CONV").first()
-        cls.feedstock_ann_ix_a = MatierePremiere.objects.filter(category="ANN-IX-A").first()
+        cls.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
+        cls.feedstock_ann_ix_a = MatierePremiere.biofuel.filter(category="ANN-IX-A").first()
         cls.biofuel_eth = Biocarburant.objects.get(code="ETH")
         cls.biofuel_emag = Biocarburant.objects.get(code="EMAG")
 
@@ -484,7 +484,7 @@ class OperationServiceProcessEP2LotsTest(TestCase):
 
     def test_process_ep2_lots_splits_ep2_correctly(self):
         """Should split EP2 lot into 40% CONV + 60% EP2AM."""
-        feedstock_ep2 = MatierePremiere.objects.get(code="EP2")
+        feedstock_ep2 = MatierePremiere.biofuel.get(code="EP2")
         biofuel_eth = Biocarburant.objects.get(code="ETH")
 
         lot_ep2 = Mock()
@@ -509,7 +509,7 @@ class OperationServiceProcessEP2LotsTest(TestCase):
 
     def test_process_ep2_lots_keeps_non_ep2_unchanged(self):
         """Should keep non-EP2 lots unchanged."""
-        feedstock_conv = MatierePremiere.objects.filter(category="CONV").first()
+        feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
         biofuel_eth = Biocarburant.objects.get(code="ETH")
 
         lot_conv = Mock()
@@ -526,8 +526,8 @@ class OperationServiceProcessEP2LotsTest(TestCase):
 
     def test_process_ep2_lots_handles_mixed_lots(self):
         """Should correctly process mix of EP2 and non-EP2 lots."""
-        feedstock_ep2 = MatierePremiere.objects.get(code="EP2")
-        feedstock_conv = MatierePremiere.objects.filter(category="CONV").first()
+        feedstock_ep2 = MatierePremiere.biofuel.get(code="EP2")
+        feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
 
         lot_ep2 = Mock()
         lot_ep2.feedstock = feedstock_ep2

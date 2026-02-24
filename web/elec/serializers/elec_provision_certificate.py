@@ -15,7 +15,6 @@ class ElecProvisionCertificateSerializer(serializers.ModelSerializer):
             "year",
             "operating_unit",
             "energy_amount",
-            "remaining_energy_amount",
             "created_at",
         ]
 

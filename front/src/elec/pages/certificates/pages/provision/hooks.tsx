@@ -15,7 +15,7 @@ import { getSourceLabel } from "../../utils"
 
 export function useStatus() {
   const params = useParams<"status">()
-  return (params.status ?? "available") as ProvisionCertificateStatus
+  return (params.status ?? "history") as ProvisionCertificateStatus
 }
 
 export function useTabs(
@@ -24,20 +24,12 @@ export function useTabs(
   const { t } = useTranslation()
   return [
     {
-      key: "available",
-      label: t("Disponible"),
-      icon: "fr-icon-time-line",
-      iconActive: "fr-icon-time-fill",
-      path: "../provision/available",
-      count: snapshot?.provision_certificates_available,
-    },
-    {
       key: "history",
       label: t("Historique"),
-      icon: "fr-icon-booklet-line",
-      iconActive: "fr-icon-booklet-fill",
+      icon: "fr-icon-time-line",
+      iconActive: "fr-icon-time-fill",
       path: "../provision/history",
-      count: snapshot?.provision_certificates_history,
+      count: snapshot?.provision_certificates,
     },
   ]
 }
@@ -60,7 +52,7 @@ export function useFilters() {
   return filters
 }
 
-export function useColumns(status: ProvisionCertificateStatus) {
+export function useColumns() {
   const { t } = useTranslation()
   const entity = useEntity()
 
@@ -86,14 +78,9 @@ export function useColumns(status: ProvisionCertificateStatus) {
       header: t("Source"),
       cell: (p) => getSourceLabel(p.source),
     },
-    status == "available" && {
-      key: "remaining_energy_amount",
-      header: t("Quantité disponible (MWh)"),
-      cell: (p) => `${formatNumber(p.remaining_energy_amount)}`,
-    },
-    status == "history" && {
+    {
       key: "energy_amount",
-      header: t("Quantité fournie (MWh)"),
+      header: t("Quantité initiale (MWh)"),
       cell: (p) => `${formatNumber(p.energy_amount)}`,
     },
   ]) satisfies Column<ProvisionCertificate>[]

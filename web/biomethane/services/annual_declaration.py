@@ -82,24 +82,34 @@ class BiomethaneAnnualDeclarationService:
         digestate = BiomethaneDigestate.objects.filter(producer=declaration.producer, year=declaration.year).first()
         energy = BiomethaneEnergy.objects.filter(producer=declaration.producer, year=declaration.year).first()
         supply_plan = BiomethaneSupplyPlan.objects.filter(producer=declaration.producer, year=declaration.year).first()
+        is_current_declaration = declaration.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
+        digestate_missing_fields = (
+            BiomethaneAnnualDeclarationService._get_missing_fields(digestate, is_current_declaration) if digestate else None
+        )
         return {
-            "digestate_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(digestate)
-            if digestate
+            # If the declaration is not the current year, there is no fields to fill for digestate
+            "digestate_missing_fields": digestate_missing_fields if is_current_declaration else [],
+            "energy_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(energy, is_current_declaration)
+            if energy
             else None,
-            "energy_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(energy) if energy else None,
             "supply_plan_valid": supply_plan and supply_plan.supply_inputs.exists(),
         }
 
     @staticmethod
-    def _get_missing_fields(instance):
+    def _get_missing_fields(instance, is_current_declaration=False):
         """
         Return all missing fields for an instance.
         Takes into account optional fields defined by business rules.
+        When the declaration is not the current year, all optional fields are not required
         """
         all_fields = BiomethaneAnnualDeclarationService.get_all_fields(model=type(instance))
 
         optional_fields = instance.optional_fields if hasattr(instance, "optional_fields") else []
+
+        if not is_current_declaration:
+            optional_fields = instance.all_optional_fields if hasattr(instance, "all_optional_fields") else []
+
         required_fields = list(set(all_fields) - set(optional_fields))
 
         missing_fields = []

@@ -644,3 +644,90 @@ class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
         # Second call for sector
         second_call = mock_balance.call_args_list[1]
         self.assertEqual(second_call[0][2], "sector")
+
+
+class ObjectiveServiceCalculateEnergyBasisTest(TestCase):
+    """Unit tests for ObjectiveService.calculate_energy_basis() method."""
+
+    def setUp(self):
+        """Set up test data for energy basis calculations."""
+        from core.models import Entity
+        from tiruert.models import FossilFuel, FossilFuelCategory, FossilFuelCategoryConsiderationRate
+
+        # Create entity
+        self.entity = Entity.objects.create(name="Test Entity")
+
+        # Create fossil fuel categories
+        self.category_essence = FossilFuelCategory.objects.create(name="Essence", pci_litre=32.0)  # MJ/L
+        self.category_gazole = FossilFuelCategory.objects.create(name="Gazole", pci_litre=36.0)  # MJ/L
+
+        # Create fossil fuels
+        self.fuel_essence = FossilFuel.objects.create(
+            label="Essence SP95", nomenclature="ES95", fuel_category=self.category_essence, pci_litre=32.0
+        )
+        self.fuel_gazole = FossilFuel.objects.create(
+            label="Gazole B7", nomenclature="GO", fuel_category=self.category_gazole, pci_litre=36.0
+        )
+
+        # Create consideration rates for 2025
+        FossilFuelCategoryConsiderationRate.objects.create(
+            category_fuel=self.category_essence,
+            consideration_rate=0.9,
+            year=2025,  # 90%
+        )
+        FossilFuelCategoryConsiderationRate.objects.create(
+            category_fuel=self.category_gazole,
+            consideration_rate=0.95,
+            year=2025,  # 95%
+        )
+
+    def test_calculate_energy_basis_with_single_mac(self):
+        """Test calculate_energy_basis with a single MAC entry."""
+        from tiruert.models import MacFossilFuel
+
+        # Create MAC: 1000 L * 32 MJ/L * 1 (no consideration rate for 2024) = 32000 MJ
+        MacFossilFuel.objects.create(
+            fuel=self.fuel_essence,
+            operator=self.entity,
+            volume=1000,  # L
+            period=1,
+            year=2024,
+            start_date="2024-01-01",
+            end_date="2024-01-31",
+        )
+
+        queryset = MacFossilFuel.objects.filter(year=2024)
+        result = ObjectiveService.calculate_energy_basis(queryset, year=2024)
+
+        # 1000 L * 32 MJ/L * 1 (default) = 32000 MJ
+        self.assertEqual(result, 32000)
+
+    def test_calculate_energy_basis_with_consideration_rate(self):
+        """Test calculate_energy_basis applies consideration rate correctly."""
+        from tiruert.models import MacFossilFuel
+
+        # Create MAC: 1000 L * 32 MJ/L * 0.9 = 28800 MJ
+        MacFossilFuel.objects.create(
+            fuel=self.fuel_essence,
+            operator=self.entity,
+            volume=1000,
+            period=1,
+            year=2025,
+            start_date="2025-01-01",
+            end_date="2025-01-31",
+        )
+
+        queryset = MacFossilFuel.objects.filter(year=2025)
+        result = ObjectiveService.calculate_energy_basis(queryset, year=2025)
+
+        # 1000 L * 32 MJ/L * 0.9 = 28800 MJ
+        self.assertEqual(result, 28800)
+
+    def test_calculate_energy_basis_with_empty_queryset(self):
+        """Test calculate_energy_basis returns None for empty queryset."""
+        from tiruert.models import MacFossilFuel
+
+        queryset = MacFossilFuel.objects.filter(year=9999)  # No data
+        result = ObjectiveService.calculate_energy_basis(queryset, year=9999)
+
+        self.assertIsNone(result)

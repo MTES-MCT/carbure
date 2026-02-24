@@ -1,4 +1,5 @@
 from django.db.models import Sum
+from django.db.models.functions import Round
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
@@ -15,7 +16,7 @@ from .mixins import ActionMixin
 
 class ProvisionCertificatePagination(MetadataPageNumberPagination):
     aggregate_fields = {
-        "available_energy": Sum("remaining_energy_amount"),
+        "provisioned_energy": Round(Sum("energy_amount"), 2),
     }
 
 

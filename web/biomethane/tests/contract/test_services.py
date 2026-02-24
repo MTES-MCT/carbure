@@ -160,7 +160,7 @@ class ContractValidationContextTests(TestCase):
         self.assertTrue(context.has_contract_document)
 
         validated_data_with_file = {
-            "general_conditions_file": "some_file.pdf",
+            "conditions_file": "some_file.pdf",
         }
 
         context = ContractValidationContext.from_contract_and_data(None, validated_data_with_file)

@@ -85,12 +85,14 @@ export const AddSpreadingDepartment = ({
           <NumberInput
             label={t("Quantité épandue (t)")}
             placeholder={t("Quantité épandue (t)")}
+            min={0}
             {...bind("spread_quantity")}
             required
           />
           <NumberInput
             label={t("Superficie des parcelles épandues (ha)")}
             placeholder={t("Superficie des parcelles épandues (ha)")}
+            min={0}
             {...bind("spread_parcels_area")}
             required
           />

@@ -3,7 +3,7 @@ import random
 import factory
 
 from biomethane.models import BiomethaneDigestateStorage, BiomethaneProductionUnit
-from core.models import Entity
+from core.models import Entity, Pays
 from entity.factories.entity import EntityFactory
 
 
@@ -12,9 +12,15 @@ class BiomethaneProductionUnitFactory(factory.django.DjangoModelFactory):
         model = BiomethaneProductionUnit
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
-    unit_name = factory.Faker("company")
-    siret_number = "12345678901234"
-    company_address = factory.Faker("address")
+    # Site fields
+    name = factory.Faker("company")
+    site_siret = "12345678901234"
+    address = factory.Faker("address")
+    city = factory.Faker("city")
+    postal_code = factory.Faker("postcode")
+    country = factory.LazyFunction(lambda: Pays.objects.filter(code_pays="FR").first())
+    site_type = "PRODUCTION BIOGAZ"
+    # BiomethaneProductionUnit specific fields
     unit_type = BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS
     icpe_regime = BiomethaneProductionUnit.AUTHORIZATION
     process_type = BiomethaneProductionUnit.LIQUID_PROCESS

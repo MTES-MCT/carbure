@@ -10,7 +10,10 @@ import {
   BiomethaneEnergyInputRequest,
   EnergyType,
 } from "../../types"
-import { useSaveEnergy } from "../../energy.hooks"
+import {
+  useDisplayConditionalSectionsEnergy,
+  useSaveEnergy,
+} from "../../energy.hooks"
 import {
   BiomethaneContract,
   TariffReference,
@@ -60,6 +63,7 @@ export function EnergyEfficiency({
   const { bind, value } = useFormContext<EnergyEfficiencyForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
+  const displayConditionalSections = useDisplayConditionalSectionsEnergy()
 
   const handleSubmit = async () => saveEnergy.execute(extractValues(value))
 
@@ -92,59 +96,70 @@ export function EnergyEfficiency({
       {({ isEditing }) => (
         <ManagedEditableCard.Form onSubmit={handleSubmit}>
           <Grid cols={1} gap="lg">
-            {energyTypesIncludesBiogazOrBiomethane(energy?.energy_types) && (
-              <NumberInput
-                readOnly={!isEditing}
-                label={biogazOrBiomethaneAutoconsumptionLabel}
-                {...bind("self_consumed_biogas_or_biomethane_kwh")}
-                required
-                step={0.01}
-              />
-            )}
-            {!isTariffReference2023 && (
+            {displayConditionalSections && (
               <>
-                <NumberInput
-                  readOnly={!isEditing}
-                  label={t(
-                    "Quantité totale de biogaz traitée par le système d'épuration sur l'année (Nm3)"
-                  )}
-                  {...bind("purified_biogas_quantity_nm3")}
-                  required
-                />
-                <NumberInput
-                  readOnly={!isEditing}
-                  label={t(
-                    "Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)"
-                  )}
-                  hintText={t(
-                    "Le système d'épuration comprend les unités fonctionnelles de désulfuration, décarbonation et séchage du biogaz, qu'elles soient séparées au cours du processus d'épuration ou non."
-                  )}
-                  {...bind("purification_electric_consumption_kwe")}
-                  required
-                />
-              </>
-            )}
-            {isTariffReference2023 && (
-              <>
-                <NumberInput
-                  readOnly={!isEditing}
-                  label={t(
-                    "Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)"
-                  )}
-                  {...bind("self_consumed_biogas_nm3")}
-                  required
-                />
-                <NumberInput
-                  readOnly={!isEditing}
-                  label={t(
-                    "Consommation électrique soutirée pour l'ensemble de l'unité (kWe)"
-                  )}
-                  hintText={t(
-                    "Consommation d’électricité soutirée sur le réseau public d’électricité d’une installation de production de biométhane, cumulée le cas échéant avec la consommation de l’installation d’injection associée"
-                  )}
-                  {...bind("total_unit_electric_consumption_kwe")}
-                  required
-                />
+                {energyTypesIncludesBiogazOrBiomethane(
+                  energy?.energy_types
+                ) && (
+                  <NumberInput
+                    readOnly={!isEditing}
+                    label={biogazOrBiomethaneAutoconsumptionLabel}
+                    min={0}
+                    {...bind("self_consumed_biogas_or_biomethane_kwh")}
+                    required
+                    step={0.01}
+                  />
+                )}
+                {!isTariffReference2023 && (
+                  <>
+                    <NumberInput
+                      readOnly={!isEditing}
+                      label={t(
+                        "Quantité totale de biogaz traitée par le système d'épuration sur l'année (Nm3)"
+                      )}
+                      min={0}
+                      {...bind("purified_biogas_quantity_nm3")}
+                      required
+                    />
+                    <NumberInput
+                      readOnly={!isEditing}
+                      label={t(
+                        "Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)"
+                      )}
+                      hintText={t(
+                        "Le système d'épuration comprend les unités fonctionnelles de désulfuration, décarbonation et séchage du biogaz, qu'elles soient séparées au cours du processus d'épuration ou non."
+                      )}
+                      min={0}
+                      {...bind("purification_electric_consumption_kwe")}
+                      required
+                    />
+                  </>
+                )}
+                {isTariffReference2023 && (
+                  <>
+                    <NumberInput
+                      readOnly={!isEditing}
+                      label={t(
+                        "Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)"
+                      )}
+                      min={0}
+                      {...bind("self_consumed_biogas_nm3")}
+                      required
+                    />
+                    <NumberInput
+                      readOnly={!isEditing}
+                      label={t(
+                        "Consommation électrique soutirée pour l'ensemble de l'unité (kWe)"
+                      )}
+                      hintText={t(
+                        "Consommation d’électricité soutirée sur le réseau public d’électricité d’une installation de production de biométhane, cumulée le cas échéant avec la consommation de l’installation d’injection associée"
+                      )}
+                      min={0}
+                      {...bind("total_unit_electric_consumption_kwe")}
+                      required
+                    />
+                  </>
+                )}
               </>
             )}
 
@@ -162,21 +177,24 @@ export function EnergyEfficiency({
               <NumberInput
                 readOnly={!isEditing}
                 label={t("Quantité de combustible fossile consommé (kWh)")}
+                min={0}
                 {...bind("fossil_fuel_consumed_kwh")}
                 required
               />
             </Grid>
 
-            <TextInput
-              label={t("Coefficient d'efficacité énergétique")}
-              readOnly={!isEditing}
-              disabled
-              value={energyEfficiencyCoefficient.label}
-              state={energyEfficiencyCoefficient.error ? "info" : "default"}
-              stateRelatedMessage={energyEfficiencyCoefficient.error}
-              hasTooltip
-              title={energyEfficiencyCoefficient.tooltip}
-            />
+            {displayConditionalSections && (
+              <TextInput
+                label={t("Coefficient d'efficacité énergétique")}
+                readOnly={!isEditing}
+                disabled
+                value={energyEfficiencyCoefficient.label}
+                state={energyEfficiencyCoefficient.error ? "info" : "default"}
+                stateRelatedMessage={energyEfficiencyCoefficient.error}
+                hasTooltip
+                title={energyEfficiencyCoefficient.tooltip}
+              />
+            )}
           </Grid>
 
           {isEditing && (

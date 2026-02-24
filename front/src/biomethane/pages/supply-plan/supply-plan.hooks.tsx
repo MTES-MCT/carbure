@@ -2,18 +2,13 @@ import { Cell, Column } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import {
   BiomethaneSupplyInput,
-  BiomethaneSupplyInputCategory,
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputQuery,
   BiomethaneSupplyInputSource,
 } from "./types"
 import Tag from "@codegouvfr/react-dsfr/Tag"
-import {
-  convertSupplyPlanInputVolume,
-  getSupplyPlanInputCategory,
-  getSupplyPlanInputSource,
-} from "./utils"
+import { convertSupplyPlanInputVolume, getSupplyPlanInputSource } from "./utils"
 import { getDepartmentName } from "common/utils/geography"
 import { getSupplyPlanInputFilters } from "./api"
 import { defaultNormalizer } from "common/utils/normalize"
@@ -29,12 +24,8 @@ export const useSupplyPlanColumns = () => {
       cell: (input) => <Tag>{getSupplyPlanInputSource(input.source)}</Tag>,
     },
     {
-      header: t("Catégorie"),
-      cell: (input) => <Cell text={input.input_category} />,
-    },
-    {
       header: t("Intrant"),
-      cell: (input) => <Cell text={input.input_type} />,
+      cell: (input) => <Cell text={input.input_name?.name} />,
     },
     {
       header: t("Département"),
@@ -67,8 +58,7 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
 
   const filterLabels = {
     [BiomethaneSupplyInputFilter.source]: t("Provenance"),
-    [BiomethaneSupplyInputFilter.category]: t("Catégorie"),
-    [BiomethaneSupplyInputFilter.type]: t("Intrant"),
+    [BiomethaneSupplyInputFilter.input_name]: t("Intrant"),
   }
 
   const normalizers = {
@@ -76,11 +66,7 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
       value,
       label: getSupplyPlanInputSource(value as BiomethaneSupplyInputSource),
     }),
-    [BiomethaneSupplyInputFilter.category]: (value: string) => ({
-      value,
-      label: getSupplyPlanInputCategory(value as BiomethaneSupplyInputCategory),
-    }),
-    [BiomethaneSupplyInputFilter.type]: (value: string) =>
+    [BiomethaneSupplyInputFilter.input_name]: (value: string) =>
       defaultNormalizer(value),
   }
 

@@ -3,22 +3,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from core.models import Department, Entity
+from transactions.models import Site
 
 
-class BiomethaneProductionUnit(models.Model):
+class BiomethaneProductionUnit(Site):
     # Propriétaire de l'unité de production
     producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_production_unit")
 
-    # Nom de l'unité
-    unit_name = models.CharField(max_length=128, null=True, blank=True)
-
-    # SIRET
-    siret_number = models.CharField(max_length=16, null=True, blank=True)
-
-    # Adresse de la société
-    company_address = models.CharField(max_length=256, null=True, blank=True)
-    postal_code = models.CharField(max_length=10, null=True, blank=True)
-    city = models.CharField(max_length=128, null=True, blank=True)
+    # Département
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
     insee_code = models.CharField(max_length=5, null=True, blank=True)
 
@@ -28,6 +20,7 @@ class BiomethaneProductionUnit(models.Model):
     INDUSTRIAL_TERRITORIAL = "INDUSTRIAL_TERRITORIAL"
     HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE"
     ISDND = "ISDND"
+    STEP = "STEP"
 
     unit_type = models.CharField(
         max_length=32,
@@ -36,6 +29,7 @@ class BiomethaneProductionUnit(models.Model):
             (AGRICULTURAL_TERRITORIAL, "Agricole territorial"),
             (INDUSTRIAL_TERRITORIAL, "Industriel territorial"),
             (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
+            (STEP, "STEP"),
             (ISDND, "ISDND"),
         ],
         null=True,
@@ -203,9 +197,16 @@ class BiomethaneProductionUnit(models.Model):
     digestate_sale_types = models.JSONField(default=list, blank=True)
 
     class Meta:
-        db_table = "biomethane_production_unit"
+        db_table = "sites_biomethaneproductionunits"
         verbose_name = "Unité de Production"
         verbose_name_plural = "Unités de Production"
+
+    def save(self, *args, **kwargs):
+        if self.site_type != Site.PRODUCTION_BIOGAZ:
+            self.site_type = Site.PRODUCTION_BIOGAZ
+        if not self.created_by_id:
+            self.created_by_id = self.producer_id
+        super().save(*args, **kwargs)
 
     @property
     def watched_fields(self):

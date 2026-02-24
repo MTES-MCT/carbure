@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.test import TestCase
 
@@ -234,6 +234,18 @@ class EnergyRulesConfigurationTests(TestCase):
         ]
         self.assertFalse(no_fossil_rule.condition(mock_ctx))
 
+    @patch("biomethane.services.energy._build_energy_rules")
+    def test_get_all_optional_fields_returns_all_optional_fields_defined_in_rules(self, mock_build_energy_rules):
+        """Test that get_all_optional_fields returns all the fields from the rules."""
+        mock_build_energy_rules.return_value = [
+            Mock(fields=["field1", "field2"], condition=lambda ctx: True),
+            Mock(fields=["field3", "field4"], condition=lambda ctx: False),
+        ]
+
+        fields = BiomethaneEnergyService.get_all_optional_fields()
+
+        self.assertEqual(fields, ["field1", "field2", "field3", "field4"] + BiomethaneEnergyService.EXTRA_OPTIONAL_FIELDS)
+
 
 class BiomethaneEnergyServiceIntegrationTests(TestCase):
     """Integration tests for BiomethaneEnergyService with real Django models."""
@@ -307,3 +319,19 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
 
         self.assertIsInstance(optional_fields, list)
         self.assertEqual(optional_fields, fields_to_clear)
+
+    def test_get_all_optional_fields_returns_correct_fields(self):
+        """Test that get_all_optional_fields returns the correct fields."""
+        fields = sorted(BiomethaneEnergyService.get_all_optional_fields())
+        expected_fields = sorted(
+            BiomethaneEnergyService.OLD_TARIFF_FIELDS
+            + BiomethaneEnergyService.NEW_TARIFF_FIELDS
+            + BiomethaneEnergyService.MALFUNCTION_FIELDS
+            + BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD
+            + BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS
+            + BiomethaneEnergyService.ENERGY_TYPE_CONDITIONAL_FIELDS
+            + BiomethaneEnergyService.ENERGY_DETAILS_FIELD
+            + BiomethaneEnergyService.EXTRA_OPTIONAL_FIELDS,
+        )
+
+        self.assertEqual(fields, expected_fields)

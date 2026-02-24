@@ -6,7 +6,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
-from core.models import Entity
+from core.models import Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 
 
@@ -25,6 +25,14 @@ class ExcelImportActionMixinTests(APITestCase):
             "Tester",
             "password123",
             [(self.producer_entity, "RW")],
+        )
+
+        # Create MatierePremiere for testing
+        MatierePremiere.objects.create(
+            name="Lisiers bovins",
+            name_en="Cattle slurry",
+            code="LISIERS_BOVINS",
+            is_methanogenic=True,
         )
 
         self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
@@ -74,8 +82,7 @@ class ExcelImportActionMixinTests(APITestCase):
                 {
                     "source": "Externe",
                     "crop_type": "Principale",
-                    "input_category": "EFFLUENTS D'ÉLEVAGE",
-                    "input_type": "Lisiers bovins",
+                    "input_name": "Lisiers bovins",
                     "material_unit": "Brute",
                     "volume": 100,
                     "origin_department": "44 - Loire-Atlantique",
@@ -86,8 +93,7 @@ class ExcelImportActionMixinTests(APITestCase):
                 {
                     "source": "Interne",
                     "crop_type": "Intermédiaire",
-                    "input_category": "EFFLUENTS D'ÉLEVAGE",
-                    "input_type": "Lisiers bovins",
+                    "input_name": "Lisiers bovins",
                     "material_unit": "Sèche",
                     "dry_matter_ratio_percent": "13,00",
                     "volume": 100,

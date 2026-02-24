@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 storage=storages.backends.s3.S3Storage(default_acl="private", file_overwrite=True, querystring_auth=True),
-                upload_to=biomethane.models.biomethane_contract.rename_general_conditions_file,
+                upload_to=biomethane.models.biomethane_contract.rename_conditions_file,
             ),
         ),
         migrations.AlterField(
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 storage=storages.backends.s3.S3Storage(default_acl="private", file_overwrite=True, querystring_auth=True),
-                upload_to=biomethane.models.biomethane_contract.rename_specific_conditions_file,
+                upload_to=biomethane.models.biomethane_contract.rename_conditions_file,
             ),
         ),
     ]
