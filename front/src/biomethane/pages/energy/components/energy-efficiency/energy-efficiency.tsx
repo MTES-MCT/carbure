@@ -104,6 +104,7 @@ export function EnergyEfficiency({
                   <NumberInput
                     readOnly={!isEditing}
                     label={biogazOrBiomethaneAutoconsumptionLabel}
+                    min={0}
                     {...bind("self_consumed_biogas_or_biomethane_kwh")}
                     required
                     step={0.01}
@@ -116,6 +117,7 @@ export function EnergyEfficiency({
                       label={t(
                         "Quantité totale de biogaz traitée par le système d'épuration sur l'année (Nm3)"
                       )}
+                      min={0}
                       {...bind("purified_biogas_quantity_nm3")}
                       required
                     />
@@ -127,6 +129,7 @@ export function EnergyEfficiency({
                       hintText={t(
                         "Le système d'épuration comprend les unités fonctionnelles de désulfuration, décarbonation et séchage du biogaz, qu'elles soient séparées au cours du processus d'épuration ou non."
                       )}
+                      min={0}
                       {...bind("purification_electric_consumption_kwe")}
                       required
                     />
@@ -139,6 +142,7 @@ export function EnergyEfficiency({
                       label={t(
                         "Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)"
                       )}
+                      min={0}
                       {...bind("self_consumed_biogas_nm3")}
                       required
                     />
@@ -150,6 +154,7 @@ export function EnergyEfficiency({
                       hintText={t(
                         "Consommation d’électricité soutirée sur le réseau public d’électricité d’une installation de production de biométhane, cumulée le cas échéant avec la consommation de l’installation d’injection associée"
                       )}
+                      min={0}
                       {...bind("total_unit_electric_consumption_kwe")}
                       required
                     />
@@ -172,6 +177,7 @@ export function EnergyEfficiency({
               <NumberInput
                 readOnly={!isEditing}
                 label={t("Quantité de combustible fossile consommé (kWh)")}
+                min={0}
                 {...bind("fossil_fuel_consumed_kwh")}
                 required
               />

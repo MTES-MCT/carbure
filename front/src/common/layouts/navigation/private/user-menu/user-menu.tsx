@@ -29,8 +29,16 @@ export const UserMenu = () => {
     isAirline,
     isExternal,
     isAdmin,
+    isRelatedToBiomethane,
   } = useEntity()
   const hasAirline = isExternal && entity.hasAdminRight("AIRLINE")
+  const displayRegistry =
+    isIndustry ||
+    isPowerOrHeatProducer ||
+    isAirline ||
+    hasAirline ||
+    isAdmin ||
+    isRelatedToBiomethane()
   const routes = useRoutes()
   const items = useMemo(() => {
     const compactedItems = compact([
@@ -49,11 +57,7 @@ export const UserMenu = () => {
         path: routes.PUBLIC_STATS,
         icon: BarChartLine,
       },
-      (isIndustry ||
-        isPowerOrHeatProducer ||
-        isAirline ||
-        hasAirline ||
-        isAdmin) && {
+      displayRegistry && {
         label: t("Annuaire"),
         path: routes.REGISTRY,
         icon: BookLine,

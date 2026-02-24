@@ -86,6 +86,7 @@ export const SupplyInputForm = ({
               />
               <NumberInput
                 label={t("Tonnage (tMS)")}
+                min={0}
                 required
                 {...bind("volume")}
                 readOnly={readOnly}
@@ -95,6 +96,7 @@ export const SupplyInputForm = ({
           {value?.material_unit === BiomethaneSupplyInputMaterialUnit.WET && (
             <NumberInput
               label={t("Tonnage (tMB)")}
+              min={0}
               required
               {...bind("volume")}
               readOnly={readOnly}
@@ -118,11 +120,13 @@ export const SupplyInputForm = ({
           )}
           <NumberInput
             label={t("Distance moyenne pondérée d'approvisionnement (Km)")}
+            min={0}
             {...bind("average_weighted_distance_km")}
             readOnly={readOnly}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
+            min={0}
             {...bind("maximum_distance_km")}
             readOnly={readOnly}
           />

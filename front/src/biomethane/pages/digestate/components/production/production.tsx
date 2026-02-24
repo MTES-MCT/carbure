@@ -55,6 +55,7 @@ export function Production({
                   readOnly={!isEditing}
                   label={t("Tonnage digestat brut produit (t)")}
                   type="number"
+                  min={0}
                   {...bind("raw_digestate_tonnage_produced")}
                   required
                 />
@@ -75,6 +76,7 @@ export function Production({
                   readOnly={!isEditing}
                   label={t("Tonnage de digestat solide (t)")}
                   type="number"
+                  min={0}
                   {...bind("solid_digestate_tonnage")}
                   required
                 />
@@ -82,6 +84,7 @@ export function Production({
                   readOnly={!isEditing}
                   label={t("Quantité digestat liquide (t)")}
                   type="number"
+                  min={0}
                   {...bind("liquid_digestate_quantity")}
                   required
                 />
@@ -92,6 +95,7 @@ export function Production({
                     "Quantité éventuelle de digestat brut n'ayant pas subi de séparation de phase"
                   )}
                   type="number"
+                  min={0}
                   {...bind("raw_digestate_tonnage_produced")}
                   required
                 />

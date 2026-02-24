@@ -305,7 +305,9 @@ export const ProductionSiteForm = ({
           readOnly={readOnly}
           placeholder={t("Ajouter matières premières...")}
           defaultOptions={value.matieres_premieres}
-          getOptions={(query) => common.findFeedstocks({ query })}
+          getOptions={(query) =>
+            common.findFeedstocks({ query, is_biofuel_feedstock: true })
+          }
           normalize={normalizeFeedstock}
           {...bind("matieres_premieres")}
           required
