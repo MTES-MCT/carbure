@@ -117,7 +117,7 @@ class Command(BaseCommand):
                 production_unit_data.append(
                     {
                         "name": name,
-                        "site_siret": siret,
+                        # "site_siret": siret, # not wanted anymore
                         "department": departments.get(department_code),
                     }
                 )
@@ -134,7 +134,7 @@ class Command(BaseCommand):
                     # Can't bulk_create because BiomethaneProductionUnit is an inherited model
                     BiomethaneProductionUnit.objects.create(
                         name=data["name"],
-                        site_siret=data["site_siret"],
+                        # site_siret=data["site_siret"],
                         department=data["department"],
                         producer=entity_by_name[data["name"]],
                     )
