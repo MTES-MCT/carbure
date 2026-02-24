@@ -45,6 +45,11 @@ class ProductionSite(Site):
             "certificates": [c.natural_key() for c in self.productionsitecertificate_set.all()],
         }
 
+    def save(self, *args, **kwargs):
+        if self.site_type != Site.PRODUCTION_BIOLIQUID:
+            self.site_type = Site.PRODUCTION_BIOLIQUID
+        super().save(*args, **kwargs)
+
     def clean(self):
         if not self.date_mise_en_service:
             raise ValidationError({"date_mise_en_service": ["Ce champ est obligatoire pour les sites de production."]})

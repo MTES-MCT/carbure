@@ -24,3 +24,8 @@ class Airport(Site):
             "postal_code": self.postal_code,
             "is_ue_airport": self.is_ue_airport,
         }
+
+    def save(self, *args, **kwargs):
+        if self.site_type != Site.AIRPORT:
+            self.site_type = Site.AIRPORT
+        super().save(*args, **kwargs)
