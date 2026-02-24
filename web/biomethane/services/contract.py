@@ -55,8 +55,7 @@ class BiomethaneContractService:
     CONTRACT_DOCUMENT_FIELDS = [
         "signature_date",
         "effective_date",
-        "general_conditions_file",
-        "specific_conditions_file",
+        "conditions_file",
     ]
 
     # Tariff date ranges for signature validation: (start_date, end_date, error_message)

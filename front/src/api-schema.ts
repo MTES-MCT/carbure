@@ -3229,9 +3229,7 @@ export interface components {
             /** Format: date */
             effective_date?: string | null;
             /** Format: uri */
-            general_conditions_file?: string | null;
-            /** Format: uri */
-            specific_conditions_file?: string | null;
+            conditions_file?: string | null;
             has_complementary_investment_aid?: boolean | null;
             complementary_aid_other_organism_name?: string | null;
             buyer?: number | null;
@@ -3287,9 +3285,7 @@ export interface components {
             /** Format: date */
             effective_date?: string | null;
             /** Format: binary */
-            general_conditions_file?: File | null;
-            /** Format: binary */
-            specific_conditions_file?: File | null;
+            conditions_file?: File | null;
             tracked_amendment_types?: unknown;
             has_complementary_investment_aid?: boolean | null;
             complementary_aid_other_organism_name?: string | null;
@@ -4929,6 +4925,11 @@ export interface components {
             /** Format: double */
             available_balance: number;
             unit: string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            energy_basis: number;
             objective: components["schemas"]["Objective"];
         };
         /**

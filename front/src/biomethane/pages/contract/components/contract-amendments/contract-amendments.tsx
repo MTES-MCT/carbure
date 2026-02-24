@@ -63,9 +63,7 @@ export const ContractAmendments = ({
         !hasSelectedEntity && (
           <Button
             iconId="ri-add-line"
-            disabled={
-              !contract || (contract && !contract.general_conditions_file)
-            }
+            disabled={!contract || (contract && !contract.conditions_file)}
             onClick={openAddAmendmentDialog}
           >
             {t("Charger un avenant")}

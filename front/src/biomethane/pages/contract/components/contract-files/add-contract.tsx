@@ -12,14 +12,12 @@ import {
   BiomethaneContractPatchRequest,
 } from "biomethane/pages/contract/types"
 import { getSignatureDateConstraints } from "./add-contract.utils"
+import { CONTRACT_FILE_MAX_SIZE } from "biomethane/config"
 
 type AddContractForm = ReplaceNullWithUndefined<
   Pick<
     BiomethaneContractPatchRequest,
-    | "effective_date"
-    | "signature_date"
-    | "general_conditions_file"
-    | "specific_conditions_file"
+    "effective_date" | "signature_date" | "conditions_file"
   >
 >
 
@@ -38,14 +36,7 @@ const AddContractContent = ({
   contract,
 }: AddContractContentProps) => {
   const { t } = useTranslation()
-  const { currentStep } = useStepper()
-  const addContractFiles = useAddContract({
-    onSuccess: onClose,
-  })
-
-  const handleSubmit = () => {
-    addContractFiles.execute(form.value)
-  }
+  const { currentStep, mutation: addContractFiles } = useStepper()
 
   const signatureDateConstraints = getSignatureDateConstraints(
     contract?.tariff_reference
@@ -58,11 +49,12 @@ const AddContractContent = ({
         <>
           <Stepper.Previous />
           <Stepper.Next nativeButtonProps={{ form: "add-contract-form" }} />
-          {currentStep?.key === "specific" && (
+          {currentStep?.key === "conditions_file" && (
             <Button
-              onClick={handleSubmit}
               loading={addContractFiles.loading}
               iconId="ri-send-plane-line"
+              type="submit"
+              nativeButtonProps={{ form: "add-contract-form" }}
             >
               {t("Transmettre le contrat")}
             </Button>
@@ -91,22 +83,13 @@ const AddContractContent = ({
               />
             </Grid>
           )}
-          {currentStep?.key === "general" && (
+          {currentStep?.key === "conditions_file" && (
             <FileInput
-              {...form.bind("general_conditions_file")}
+              {...form.bind("conditions_file")}
               required
-              label={t("Conditions générales")}
-              state="info"
-              stateRelatedMessage={t(
-                "Vos conditions générales et particulières doivent être déposées en 2 fichiers distincts"
-              )}
-            />
-          )}
-          {currentStep?.key === "specific" && (
-            <FileInput
-              required
-              label={t("Conditions particulières")}
-              {...form.bind("specific_conditions_file")}
+              label={t("Conditions générales et particulières")}
+              maxSize={CONTRACT_FILE_MAX_SIZE}
+              accept=".pdf,.doc,.docx,.zip"
             />
           )}
         </Stepper.Form>
@@ -118,18 +101,21 @@ const AddContractContent = ({
 export const AddContract = (props: AddContractProps) => {
   const { t } = useTranslation()
   const form = useForm<AddContractForm>({})
+  const addContractFiles = useAddContract({
+    onSuccess: props.onClose,
+  })
+  const handleSubmit = () => addContractFiles.execute(form.value)
+
   const steps = [
     {
       key: "dates",
       title: t("Dates"),
     },
     {
-      key: "general",
-      title: t("Conditions générales"),
-    },
-    {
-      key: "specific",
-      title: t("Conditions particulières"),
+      key: "conditions_file",
+      title: t("Conditions générales et particulières"),
+      // Pass the onSubmit to the stepper, to run the function after the form is submitted and valid
+      onSubmit: handleSubmit,
     },
   ]
   return (

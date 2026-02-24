@@ -44,7 +44,7 @@ export const DeclarationValidatedModalStep1 = ({
         Régions (sur demande via la DREAL), ainsi que votre acheteur de
         biométhane.
       </Text>
-      Objectif : simplifier et mutualiser les démarches
+      <b>Objectif : simplifier et mutualiser les démarches</b>
       <Text>
         Si vous êtes sollicités par une autre entité pour des données déjà
         transmises via CarbuRe, nous vous invitons à en informer votre

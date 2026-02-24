@@ -60,20 +60,14 @@ class BiomethaneContractFactory(factory.django.DjangoModelFactory):
     effective_date = None
 
     # Fichiers optionnels
-    general_conditions_file = None
-    specific_conditions_file = None
+    conditions_file = None
 
 
 class BiomethaneSignedContractFactory(BiomethaneContractFactory):
     signature_date = factory.LazyFunction(lambda: date.today() - timedelta(days=random.randint(1, 365)))
     effective_date = factory.LazyAttribute(lambda obj: obj.signature_date + timedelta(days=random.randint(1, 30)))
 
-    general_conditions_file = factory.LazyFunction(
-        lambda: ContentFile("conditions generales content".encode(), name="conditions_generales.pdf")
-    )
-    specific_conditions_file = factory.LazyFunction(
-        lambda: ContentFile("conditions particulieres content".encode(), name="conditions_particulieres.pdf")
-    )
+    conditions_file = factory.LazyFunction(lambda: ContentFile("conditions content".encode(), name="conditions.pdf"))
 
 
 class BiomethaneEntityConfigAmendmentFactory(factory.django.DjangoModelFactory):

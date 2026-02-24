@@ -8,11 +8,16 @@ import i18next from "i18next"
 import { fr } from "@codegouvfr/react-dsfr"
 import { Icon } from "common/components/icon"
 import { Ellipsis } from "common/components/scaffold"
+import { CONVERSIONS } from "common/utils/formatters"
 
 export type BaseFileInputProps = Omit<FieldProps, "children"> & {
   value?: File | FileList
   onChange?: (e?: React.ChangeEvent<HTMLInputElement>) => void
   multiple?: boolean
+
+  // Max size in MB
+  maxSize?: number
+  accept?: string
 }
 
 export const BaseFileInput = ({
@@ -27,6 +32,8 @@ export const BaseFileInput = ({
   hasTooltip,
   title,
   label,
+  maxSize = 5,
+  accept = "",
   ...props
 }: BaseFileInputProps) => {
   const { t } = useTranslation()
@@ -39,10 +46,10 @@ export const BaseFileInput = ({
     if (files === null) return
 
     for (const file of files) {
-      if (file.size > 5000000) {
+      if (file.size > CONVERSIONS.bytes.mbToBytes(maxSize)) {
         const message = t(
-          'La taille du fichier "{{fileName}}" est trop importante pour être analysée (5mo maximum).',
-          { fileName: file.name }
+          'La taille du fichier "{{fileName}}" est trop importante pour être analysée ({{maxSize}} maximum).',
+          { fileName: file.name, maxSize: `${maxSize} MB` }
         )
         inputRef.current.setCustomValidity(message)
         inputRef.current.reportValidity()
@@ -77,6 +84,7 @@ export const BaseFileInput = ({
           style={{ opacity: 0, position: "absolute" }}
           type="file"
           onChange={handleChange}
+          accept={accept}
         />
         <Ellipsis maxWidth="100%">{placeholder}</Ellipsis>
         <Icon
