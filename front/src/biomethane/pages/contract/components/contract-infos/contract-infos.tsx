@@ -146,6 +146,10 @@ export const ContractInfos = ({
                 {...bind("cmax")}
                 required
                 readOnly={!isEditing}
+                hasTooltip
+                title={t(
+                  "Dernière capacité maximale de production contractualisée en vigueur"
+                )}
               />
               <RadioGroup
                 label={t("Annualisation du contrôle de la Cmax")}
@@ -174,6 +178,10 @@ export const ContractInfos = ({
             {...bind("pap_contracted")}
             required
             readOnly={!isEditing}
+            hasTooltip
+            title={t(
+              "Dernière capacité maximale de production contractualisée en vigueur"
+            )}
           />
         )}
         {isEditing && (
