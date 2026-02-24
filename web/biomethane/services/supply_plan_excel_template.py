@@ -96,11 +96,11 @@ def _add_country_formulas(sheet, countries):
     france = next((c for c in countries if c.code_pays == "FR"), None)
     france_name = france.name if france else "France"
 
-    # Add formula in column K (Pays d'origine) for rows 3 to 1000
-    # If department (column H) is filled, force France, otherwise leave empty
+    # Add formula in column J (Pays d'origine) for rows 3 to 1000
+    # If department (column G) is filled, force France, otherwise leave empty
     for row in range(2, 1000):
-        formula = f'=IF(H{row+1}<>"","{france_name}","")'
-        sheet.write_formula(row, 10, formula)  # column K (0-indexed = 10)
+        formula = f'=IF(G{row+1}<>"","{france_name}","")'
+        sheet.write_formula(row, 9, formula)  # column J (0-indexed = 9)
 
 
 def _add_dropdown_validations(sheet, countries, departments, inputs):
