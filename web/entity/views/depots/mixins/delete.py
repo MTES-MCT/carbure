@@ -64,7 +64,7 @@ class DeleteDepotActionMixin:
         delivery_site_id = serializer.validated_data.get("delivery_site_id")
 
         try:
-            EntitySite.objects.filter(entity=entity, site__customs_id=delivery_site_id).delete()
+            EntitySite.objects.filter(entity=entity, site__depot__customs_id=delivery_site_id).delete()
             lots = CarbureLot.objects.filter(
                 carbure_client=entity,
                 carbure_delivery_site__customs_id=delivery_site_id,
