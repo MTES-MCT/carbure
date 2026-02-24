@@ -20,6 +20,7 @@ class BiomethaneProductionUnit(Site):
     INDUSTRIAL_TERRITORIAL = "INDUSTRIAL_TERRITORIAL"
     HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE"
     ISDND = "ISDND"
+    STEP = "STEP"
 
     unit_type = models.CharField(
         max_length=32,
@@ -28,6 +29,7 @@ class BiomethaneProductionUnit(Site):
             (AGRICULTURAL_TERRITORIAL, "Agricole territorial"),
             (INDUSTRIAL_TERRITORIAL, "Industriel territorial"),
             (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
+            (STEP, "STEP"),
             (ISDND, "ISDND"),
         ],
         null=True,
