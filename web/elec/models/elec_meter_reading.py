@@ -18,10 +18,11 @@ class ExtendedMeterReadingManager(models.Manager):
             super()
             .get_queryset()
             .select_related("meter", "meter__charge_point")
-            .annotate(reading_id=F("id"), charge_point_id=F("meter__charge_point__pk"))
+            .annotate(reading_id=F("id"), charge_point_id=F("meter__charge_point_id"))
             .annotate(current_index=F("extracted_energy"), current_index_date=F("reading_date"))
             .annotate(prev_index=Coalesce(prev_index, F("meter__initial_index")))
             .annotate(prev_index_date=Coalesce(prev_index_date, F("meter__initial_index_date")))
+            .annotate(renewable_energy=(F("current_index") - F("prev_index")) * F("enr_ratio"))
             .filter(meter__charge_point__is_deleted=False, meter__charge_point__is_article_2=False)
             .order_by("meter", "reading_date")
         )
@@ -51,7 +52,3 @@ class ElecMeterReading(models.Model):
     @property
     def charge_point(self):
         return self.meter.charge_point if self.meter else None
-
-    @property
-    def charge_point_id(self):
-        return self.charge_point.id if self.charge_point else None

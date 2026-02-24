@@ -1,29 +1,39 @@
-from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum
-from django.db.models.fields import FloatField
+from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery, Sum, Value
+from django.db.models.fields import FloatField, IntegerField
 from django.db.models.functions import Coalesce
 
 from core.models import Entity
 from elec.models import ElecMeterReadingApplication
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.models.elec_meter_reading import ElecMeterReading
-from elec.models.elec_meter_reading_virtual import ElecMeterReadingVirtual
 from transactions.models.year_config import YearConfig
 
 
 class MeterReadingRepository:
     @staticmethod
     def get_annotated_applications():
-        return (
-            ElecMeterReadingApplication.objects.prefetch_related("elec_meter_reading_virtual_set")
+        readings_by_application = (
+            ElecMeterReading.extended_objects.filter(application_id=OuterRef("pk"))
+            .order_by()
+            .values("application_id")
             .annotate(
-                energy_total=Sum(
-                    (F("elec_meter_reading_virtual_set__current_index") - F("elec_meter_reading_virtual_set__prev_index"))
-                    * F("elec_meter_reading_virtual_set__enr_ratio")
-                ),
-                charge_point_count=Count("elec_meter_reading_virtual_set"),
+                energy_total=Sum("renewable_energy"),
+                charge_point_count=Count("pk"),
             )
-            .all()
         )
+
+        return ElecMeterReadingApplication.objects.annotate(
+            energy_total=Coalesce(
+                Subquery(readings_by_application.values("energy_total")[:1]),
+                Value(0.0),
+                output_field=FloatField(),
+            ),
+            charge_point_count=Coalesce(
+                Subquery(readings_by_application.values("charge_point_count")[:1]),
+                Value(0),
+                output_field=IntegerField(),
+            ),
+        ).all()
 
     @staticmethod
     def get_annotated_applications_details():
@@ -48,7 +58,7 @@ class MeterReadingRepository:
 
     @staticmethod
     def get_application_meter_readings(cpo: Entity, application: ElecMeterReadingApplication):
-        return ElecMeterReadingVirtual.objects.filter(cpo=cpo, application=application).select_related("charge_point")
+        return ElecMeterReading.extended_objects.filter(cpo=cpo, application=application)
 
     @staticmethod
     def get_application_charge_points(cpo: Entity, application: ElecMeterReadingApplication):
@@ -83,7 +93,7 @@ class MeterReadingRepository:
 
         Falls back to current_meter.initial_index/initial_index_date if no reading exists.
         """
-        latest_reading_subquery = ElecMeterReadingVirtual.objects.filter(charge_point_id=OuterRef("pk")).order_by(
+        latest_reading_subquery = ElecMeterReading.extended_objects.filter(charge_point_id=OuterRef("pk")).order_by(
             "-current_index_date"
         )
         return charge_points.select_related("current_meter").annotate(

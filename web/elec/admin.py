@@ -125,7 +125,7 @@ class ElecMeterReadingAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "cpo",
-        "charge_point_id",
+        "meter__charge_point__charge_point_id",
         "extracted_energy",
     ]
     list_filter = [
