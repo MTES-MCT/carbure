@@ -3926,11 +3926,17 @@ export interface components {
             country?: number | null;
             created_by?: number | null;
         };
+        /** @description Optional fields for entity creation (DREAL only). */
         CreateEntityRequest: {
             name: string;
             entity_type?: components["schemas"]["EntityTypeEnum"];
             has_saf?: boolean;
             has_elec?: boolean;
+            company_address?: string;
+            postal_code?: string;
+            city?: string;
+            department?: string;
+            insee_code?: string;
         };
         /**
          * @description * `MAIN` - Principale
@@ -5917,6 +5923,7 @@ export interface components {
          *     * `AGRICULTURAL_TERRITORIAL` - Agricole territorial
          *     * `INDUSTRIAL_TERRITORIAL` - Industriel territorial
          *     * `HOUSEHOLD_WASTE_BIOWASTE` - Déchets ménagers et biodéchets
+         *     * `STEP` - STEP
          *     * `ISDND` - ISDND
          * @enum {string}
          */
@@ -13733,6 +13740,7 @@ export enum UnitTypeEnum {
     AGRICULTURAL_TERRITORIAL = "AGRICULTURAL_TERRITORIAL",
     INDUSTRIAL_TERRITORIAL = "INDUSTRIAL_TERRITORIAL",
     HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE",
+    STEP = "STEP",
     ISDND = "ISDND"
 }
 export enum UserRightsRequestsStatusEnum {

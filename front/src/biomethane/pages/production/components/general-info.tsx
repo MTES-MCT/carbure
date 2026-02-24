@@ -67,6 +67,10 @@ export function GeneralInfo({
       value: UnitType.HOUSEHOLD_WASTE_BIOWASTE,
     },
     {
+      label: t("STEP"),
+      value: UnitType.STEP,
+    },
+    {
       label: t("ISDND"),
       value: UnitType.ISDND,
     },

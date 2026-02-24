@@ -13770,6 +13770,7 @@ components:
         - ownership_type
     CreateEntityRequest:
       type: object
+      description: Optional fields for entity creation (DREAL only).
       properties:
         name:
           type: string
@@ -13781,6 +13782,21 @@ components:
           type: boolean
         has_elec:
           type: boolean
+        company_address:
+          type: string
+          maxLength: 256
+        postal_code:
+          type: string
+          maxLength: 32
+        city:
+          type: string
+          maxLength: 128
+        department:
+          type: string
+          maxLength: 3
+        insee_code:
+          type: string
+          maxLength: 5
       required:
         - name
     CropTypeEnum:
@@ -18484,6 +18500,7 @@ components:
         - AGRICULTURAL_TERRITORIAL
         - INDUSTRIAL_TERRITORIAL
         - HOUSEHOLD_WASTE_BIOWASTE
+        - STEP
         - ISDND
       type: string
       description: |-
@@ -18491,6 +18508,7 @@ components:
         * `AGRICULTURAL_TERRITORIAL` - Agricole territorial
         * `INDUSTRIAL_TERRITORIAL` - Industriel territorial
         * `HOUSEHOLD_WASTE_BIOWASTE` - Déchets ménagers et biodéchets
+        * `STEP` - STEP
         * `ISDND` - ISDND
     UpdateCertificateRequest:
       type: object

@@ -1,4 +1,5 @@
 import django_filters
+from django import forms
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -120,11 +121,24 @@ def FiltersActionFactory():
     return FiltersActionMixin
 
 
+class TypedMultipleChoiceFieldWithNullLabel(forms.TypedMultipleChoiceField):
+    """
+    TypedMultipleChoiceField with null_label for drf-spectacular compatibility.
+    drf-spectacular introduces regression in https://github.com/tfranzel/drf-spectacular/pull/1450,
+    and fixed in https://github.com/tfranzel/drf-spectacular/pull/1469 but not released yet.
+    This field is a workaround to fix the issue.
+    """
+
+    null_label = None
+
+
 class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
     """
     Use this filter for boolean filtering, it will automatically give you True/False checks
     and allows you to have both selected at the same time.
     """
+
+    field_class = TypedMultipleChoiceFieldWithNullLabel
 
     def __init__(self, field_name, **kwargs):
         super().__init__(

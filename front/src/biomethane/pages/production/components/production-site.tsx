@@ -131,9 +131,6 @@ export function ProductionSite({
             min={0}
             max={100}
             label={t("Rendement moyen de l'épurateur de l'installation (%)")}
-            hintText={t(
-              "Rendement global de l'installation (comprenant notamment le rendement de l'épurateur)"
-            )}
             step={0.1}
             {...bind("production_efficiency")}
           />

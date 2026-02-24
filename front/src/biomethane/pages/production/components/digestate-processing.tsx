@@ -166,7 +166,7 @@ export function DigestateProcessing({
                 <CheckboxGroup
                   required
                   readOnly={!isEditing}
-                  label={t("Sous quel(s) statut(s) est valorisé le digestat")}
+                  label={t("Sous quel(s) statut(s) est valorisé le digestat ?")}
                   options={digestateSaleTypesOptions}
                   {...bind("digestate_sale_types")}
                 />
