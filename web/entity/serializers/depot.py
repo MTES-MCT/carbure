@@ -140,7 +140,7 @@ class EntitySiteSerializer(serializers.Serializer):
             return EntityDepotSerializer(instance).data
 
         if hasattr(instance, "site") and instance.site.is_depot():
-            return EntityDepotSerializer(instance.site).data
+            return EntityDepotSerializer(instance.site.depot).data
 
         return None
 
