@@ -3,6 +3,7 @@ from django.test import TestCase
 from biomethane.models import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateSerializer
 from core.models import MatierePremiere
+from feedstocks.models import Classification
 
 
 class BiomethaneSupplyInputSerializerTests(TestCase):
@@ -15,22 +16,37 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             code="MAIS",
             is_methanogenic=True,
         )
+        # Type de CIVE: required when classification.category == "Biomasse agricole - Cultures intermédiaires"
+        self.classification_cive = Classification.objects.create(
+            group="Biomasse",
+            category="Biomasse agricole - Cultures intermédiaires",
+            subcategory="CIVE",
+        )
         self.seigle_cive = MatierePremiere.objects.create(
             name="Seigle - CIVE",
             name_en="Rye - CIVE",
-            code="Seigle - CIVE",
+            code="SEIGLE_CIVE",
             is_methanogenic=True,
+            classification=self.classification_cive,
         )
+        # Précisez la culture: required when code is AUTRES_CULTURES or AUTRES_CULTURES_CIVE
         self.autres_cultures = MatierePremiere.objects.create(
             name="Autres cultures",
             name_en="Other crops",
-            code="Autres cultures",
+            code="AUTRES_CULTURES",
             is_methanogenic=True,
         )
-        self.dechets = MatierePremiere.objects.create(
-            name="Déchets",
-            name_en="Waste",
-            code="Déchets",
+        self.autres_cultures_cive = MatierePremiere.objects.create(
+            name="Autres cultures CIVE",
+            name_en="Other crops CIVE",
+            code="AUTRES_CULTURES_CIVE",
+            is_methanogenic=True,
+        )
+        # Type de collecte: required when name is in COLLECTION_TYPE_INPUT_NAMES
+        self.huiles_animale = MatierePremiere.objects.create(
+            name="Huiles alimentaires usagées d'origine animale",
+            name_en="Used cooking oil of animal origin",
+            code="HUILES_ANIMALE",
             is_methanogenic=True,
         )
 
@@ -87,8 +103,8 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
                 self.assertIn(field, serializer.errors)
                 self.assertIn("Ce champ est requis pour la France", str(serializer.errors[field]))
 
-    def test_validate_seigle_cive_requires_type_cive(self):
-        """Test input_name 'Seigle - CIVE' requires type_cive (SUMMER or WINTER)."""
+    def test_validate_type_cive_required_when_classification_category_cive(self):
+        """Test type_cive required when input_name has classification.category CIVE."""
         data = {
             **self.valid_data,
             "input_name": "Seigle - CIVE",
@@ -98,8 +114,8 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("type_cive", serializer.errors)
 
-    def test_validate_seigle_cive_valid_with_type_cive(self):
-        """Test input_name 'Seigle - CIVE' is valid with type_cive SUMMER or WINTER."""
+    def test_validate_type_cive_valid_when_classification_category_cive(self):
+        """Test valid with type_cive when classification.category is CIVE."""
         for type_cive in (BiomethaneSupplyInput.SUMMER, BiomethaneSupplyInput.WINTER):
             with self.subTest(type_cive=type_cive):
                 data = {
@@ -111,7 +127,7 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
                 self.assertTrue(serializer.is_valid(), serializer.errors)
 
     def test_validate_other_input_clears_type_cive(self):
-        """Test when input_name is not Seigle - CIVE, type_cive is set to None."""
+        """Test when input_name has no CIVE classification category, type_cive is set to None."""
         data = {
             **self.valid_data,
             "input_name": "Maïs",
@@ -121,19 +137,21 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         self.assertTrue(serializer.is_valid())
         self.assertIsNone(serializer.validated_data["type_cive"])
 
-    def test_validate_autres_cultures_requires_culture_details(self):
-        """Test input_name 'Autres cultures' requires culture_details."""
-        data = {
-            **self.valid_data,
-            "input_name": "Autres cultures",
-            "culture_details": None,
-        }
-        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("culture_details", serializer.errors)
+    def test_validate_culture_details_required_when_code_autres_cultures(self):
+        """Test culture_details required when input_name.code is AUTRES_CULTURES or AUTRES_CULTURES_CIVE."""
+        for name in ("Autres cultures", "Autres cultures CIVE"):
+            with self.subTest(name=name):
+                data = {
+                    **self.valid_data,
+                    "input_name": name,
+                    "culture_details": None,
+                }
+                serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+                self.assertFalse(serializer.is_valid())
+                self.assertIn("culture_details", serializer.errors)
 
-    def test_validate_autres_cultures_valid_with_culture_details(self):
-        """Test input_name 'Autres cultures' is valid with culture_details filled."""
+    def test_validate_culture_details_valid_when_code_autres_cultures(self):
+        """Test valid with culture_details when code is AUTRES_CULTURES."""
         data = {
             **self.valid_data,
             "input_name": "Autres cultures",
@@ -144,7 +162,7 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         self.assertEqual(serializer.validated_data["culture_details"], "Mélange céréales")
 
     def test_validate_other_input_clears_culture_details(self):
-        """Test when input_name is not Autres cultures, culture_details is set to None."""
+        """Test when input_name.code is not AUTRES_CULTURES/AUTRES_CULTURES_CIVE, culture_details is None."""
         data = {
             **self.valid_data,
             "input_name": "Maïs",
@@ -154,19 +172,19 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         self.assertTrue(serializer.is_valid())
         self.assertIsNone(serializer.validated_data["culture_details"])
 
-    def test_validate_dechets_requires_collection_type(self):
-        """Test input_name 'Déchets' requires collection_type."""
+    def test_validate_collection_type_required_when_name_in_list(self):
+        """Test collection_type required when input_name.name is in COLLECTION_TYPE_INPUT_NAMES."""
         data = {
             **self.valid_data,
-            "input_name": "Déchets",
+            "input_name": "Huiles alimentaires usagées d'origine animale",
             "collection_type": None,
         }
         serializer = BiomethaneSupplyInputCreateSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("collection_type", serializer.errors)
 
-    def test_validate_dechets_valid_with_collection_type(self):
-        """Test input_name 'Déchets' is valid with collection_type PRIVATE, LOCAL or BOTH."""
+    def test_validate_collection_type_valid_when_name_in_list(self):
+        """Test valid with collection_type when input name is in the waste list."""
         for collection_type in (
             BiomethaneSupplyInput.PRIVATE,
             BiomethaneSupplyInput.LOCAL,
@@ -175,14 +193,14 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             with self.subTest(collection_type=collection_type):
                 data = {
                     **self.valid_data,
-                    "input_name": "Déchets",
+                    "input_name": "Huiles alimentaires usagées d'origine animale",
                     "collection_type": collection_type,
                 }
                 serializer = BiomethaneSupplyInputCreateSerializer(data=data)
                 self.assertTrue(serializer.is_valid(), serializer.errors)
 
     def test_validate_other_input_clears_collection_type(self):
-        """Test when input_name is not Déchets, collection_type is set to None."""
+        """Test when input_name.name is not in waste list, collection_type is set to None."""
         data = {
             **self.valid_data,
             "input_name": "Maïs",

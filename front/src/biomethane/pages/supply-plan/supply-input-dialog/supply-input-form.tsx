@@ -8,6 +8,7 @@ import {
   getSupplyPlanInputSourceOptions,
   getSupplyPlanInputTypeCiveOptions,
   getSupplyPlanInputCollectionTypeOptions,
+  SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE,
 } from "../utils"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
@@ -71,7 +72,8 @@ export const SupplyInputForm = ({
             {...bind("input_name")}
             readOnly={readOnly}
           />
-          {value?.input_name?.name === "Seigle - CIVE" && (
+          {value?.input_name?.classification?.category ===
+            "Biomasse agricole - Cultures intermédiaires" && (
             <RadioGroup
               options={typeCiveOptions}
               label={t("Type de cive")}
@@ -81,7 +83,8 @@ export const SupplyInputForm = ({
               readOnly={readOnly}
             />
           )}
-          {value?.input_name?.code === "Autres cultures" && (
+          {(value?.input_name?.code === "AUTRES_CULTURES" ||
+            value?.input_name?.code === "AUTRES_CULTURES_CIVE") && (
             <TextInput
               label={t("Précisez la culture")}
               required
@@ -89,7 +92,9 @@ export const SupplyInputForm = ({
               readOnly={readOnly}
             />
           )}
-          {value?.input_name?.code === "Déchets" && (
+          {(
+            SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE as readonly string[]
+          ).includes(value?.input_name?.name ?? "") && (
             <RadioGroup
               options={collectionTypeOptions}
               label={t("Type de collecte")}

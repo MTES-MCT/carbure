@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
+from biomethane.services.supply_plan import apply_input_name_field_rules
 from core.models import MatierePremiere, Pays
 from core.serializers import CountrySerializer
 from feedstocks.serializers.feedstock_classification import FeedStockClassificationSerializer
@@ -69,26 +70,10 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
                 if not validated_data.get(field):
                     raise serializers.ValidationError({field: "Ce champ est requis pour la France"})
 
-        self._validate_input_name_dependent_fields(validated_data)
+        errors = apply_input_name_field_rules(validated_data)
+        if errors:
+            raise serializers.ValidationError(errors)
         return validated_data
-
-    def _validate_input_name_dependent_fields(self, validated_data):
-        """Validate and clear fields that depend on input_name.code."""
-        input_name = validated_data.get("input_name")
-        input_code = input_name.code if input_name else None
-
-        # (input_name.code, field_name, error_message)
-        rules = [
-            ("Seigle - CIVE", "type_cive", "Le type de CIVE est requis pour l'intrant 'Seigle - CIVE'"),
-            ("Autres cultures", "culture_details", "Précisez la culture pour l'intrant 'Autres cultures'"),
-            ("Déchets", "collection_type", "Le type de collecte est requis pour l'intrant 'Déchets'"),
-        ]
-        for code, field, message in rules:
-            if input_code == code:
-                if not validated_data.get(field):
-                    raise serializers.ValidationError({field: message})
-            else:
-                validated_data[field] = None
 
     def create(self, validated_data):
         entity = self.context.get("entity")
