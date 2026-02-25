@@ -3597,7 +3597,7 @@ export interface components {
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
-            material_unit: components["schemas"]["MaterialUnitEnum"];
+            material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
@@ -3611,7 +3611,7 @@ export interface components {
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
-            material_unit: components["schemas"]["MaterialUnitEnum"];
+            material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
@@ -3628,7 +3628,7 @@ export interface components {
             origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
-            material_unit: components["schemas"]["MaterialUnitEnum"];
+            material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
@@ -3651,7 +3651,7 @@ export interface components {
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
-            material_unit: components["schemas"]["MaterialUnitEnum"];
+            material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
@@ -5348,7 +5348,7 @@ export interface components {
             has_biogas_recovery?: boolean;
         };
         PatchedBiomethaneSupplyInputCreateRequest: {
-            material_unit?: components["schemas"]["MaterialUnitEnum"];
+            material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;

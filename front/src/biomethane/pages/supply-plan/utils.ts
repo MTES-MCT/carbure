@@ -7,14 +7,14 @@ import i18next from "i18next"
 
 /** Input names (intrant) that require "Type de collecte" to be filled */
 export const SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE = [
-  "Huiles alimentaires usagées d'origine animale",
-  "Huiles alimentaires usagées d'origine végétale",
-  "Huiles alimentaires usagées d'origine non-spécifiée",
-  "Graisses de bacs à graisse de restauration",
-  "Autre déchets graisseux",
-  "Huiles et matières grasses (avec produits animaux) (Cat 1)",
-  "Huiles et matières grasses (avec produits animaux) (Cat 2)",
-  "Huiles et matières grasses (avec produits animaux) (Cat 3)",
+  "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
+  "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-VEGETALE",
+  "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-NON-SPECIFIEE",
+  "GRAISSES-DE-BACS-A-GRAISSE-DE-RESTAURATION",
+  "AUTRE-DECHETS-GRAISSEUX",
+  "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-1",
+  "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-2",
+  "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-3",
 ]
 
 export const getSupplyPlanInputMaterialUnitOptions = () => {

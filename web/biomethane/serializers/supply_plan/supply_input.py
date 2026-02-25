@@ -46,10 +46,6 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         validated_data = super().validate(data)
         origin_country = validated_data.get("origin_country")
 
-        # material_unit = validated_data.get("material_unit")
-        # dry_matter_ratio_percent = validated_data.get("dry_matter_ratio_percent")
-
-        # Check consistency between material_unit and dry_matter_ratio_percent
         if origin_country and origin_country.code_pays == "FR":
             required_fields = [
                 "average_weighted_distance_km",
@@ -63,6 +59,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         errors = apply_feedstock_field_rules(validated_data)
         if errors:
             raise serializers.ValidationError(errors)
+
         return validated_data
 
     def create(self, validated_data):

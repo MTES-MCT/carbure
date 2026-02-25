@@ -64,8 +64,8 @@ export const SupplyInputForm = ({
               readOnly={readOnly}
             />
           )}
-          {(value?.feedstock?.code === "AUTRES_CULTURES" ||
-            value?.feedstock?.code === "AUTRES_CULTURES_CIVE") && (
+          {(value?.feedstock?.code === "AUTRES-CULTURES" ||
+            value?.feedstock?.code === "AUTRES-CULTURES-CIVE") && (
             <TextInput
               label={t("Précisez la culture")}
               required
@@ -74,7 +74,7 @@ export const SupplyInputForm = ({
             />
           )}
           {SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE.includes(
-            value?.feedstock?.name ?? ""
+            value?.feedstock?.code ?? ""
           ) && (
             <RadioGroup
               options={collectionTypeOptions}
@@ -104,49 +104,47 @@ export const SupplyInputForm = ({
               />
             </>
           )}
-          <RadioGroup
-            options={materialUnitOptions}
-            label={t("Unité matière")}
-            required={!isBiogazIsdnd}
-            orientation="horizontal"
-            {...bind("material_unit")}
-            readOnly={readOnly}
-          />
-          {value?.material_unit === BiomethaneSupplyInputMaterialUnit.DRY && (
+          {!isBiogazIsdnd && (
             <>
-              <NumberInput
-                label={t("Ratio de matière sèche")}
-                min={0}
-                max={100}
+              <RadioGroup
+                options={materialUnitOptions}
+                label={t("Unité matière")}
                 required={!isBiogazIsdnd}
-                {...bind("dry_matter_ratio_percent")}
+                orientation="horizontal"
+                {...bind("material_unit")}
                 readOnly={readOnly}
               />
-              <NumberInput
-                label={t("Tonnage (tMS)")}
-                min={0}
-                required={!isBiogazIsdnd}
-                {...bind("volume")}
-                readOnly={readOnly}
-              />
+              {value?.material_unit ===
+                BiomethaneSupplyInputMaterialUnit.DRY && (
+                <>
+                  <NumberInput
+                    label={t("Ratio de matière sèche")}
+                    min={0}
+                    max={100}
+                    required={!isBiogazIsdnd}
+                    {...bind("dry_matter_ratio_percent")}
+                    readOnly={readOnly}
+                  />
+                  <NumberInput
+                    label={t("Tonnage (tMS)")}
+                    min={0}
+                    required={!isBiogazIsdnd}
+                    {...bind("volume")}
+                    readOnly={readOnly}
+                  />
+                </>
+              )}
+              {value?.material_unit ===
+                BiomethaneSupplyInputMaterialUnit.WET && (
+                <NumberInput
+                  label={t("Tonnage (tMB)")}
+                  min={0}
+                  required={!isBiogazIsdnd}
+                  {...bind("volume")}
+                  readOnly={readOnly}
+                />
+              )}
             </>
-          )}
-          {value?.material_unit === BiomethaneSupplyInputMaterialUnit.WET && (
-            <NumberInput
-              label={t("Tonnage (tMB)")}
-              min={0}
-              required={!isBiogazIsdnd}
-              {...bind("volume")}
-              readOnly={readOnly}
-            />
-          )}
-          {isBiogazIsdnd && !value?.material_unit && (
-            <NumberInput
-              label={t("Tonnage (tMB ou tMS)")}
-              min={0}
-              {...bind("volume")}
-              readOnly={readOnly}
-            />
           )}
         </Dialog.Section>
         <Dialog.Section label="Réception" gap="lg">
