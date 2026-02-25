@@ -77,6 +77,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input has CIVE classification category, type_cive is required."""
         data = {
             "feedstock": self.input_seigle_cive,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
@@ -91,6 +92,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input has CIVE category and type_cive is set, no error."""
         data = {
             "feedstock": self.input_seigle_cive,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": BiomethaneSupplyInput.WINTER,
             "culture_details": None,
             "collection_type": None,
@@ -104,6 +106,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input has no CIVE category, type_cive is cleared to None."""
         data = {
             "feedstock": self.input_mais,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": None,
             "collection_type": None,
@@ -117,6 +120,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input has no classification, type_cive rule does not match."""
         data = {
             "feedstock": self.input_mais,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": None,
             "collection_type": None,
@@ -130,6 +134,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input code is AUTRES_CULTURES, culture_details is required."""
         data = {
             "feedstock": self.input_autres_cultures,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
@@ -142,6 +147,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input code matches and culture_details is set, no error."""
         data = {
             "feedstock": self.input_autres_cultures,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": "Mélange céréales",
             "collection_type": None,
@@ -155,6 +161,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input code is not in rule, culture_details is cleared."""
         data = {
             "feedstock": self.input_mais,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": "Some",
             "collection_type": None,
@@ -168,6 +175,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input name is in collection_type list, field is required."""
         data = {
             "feedstock": self.input_huiles_animale,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
@@ -180,6 +188,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input name matches and collection_type is set, no error."""
         data = {
             "feedstock": self.input_huiles_animale,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": None,
             "collection_type": BiomethaneSupplyInput.LOCAL,
@@ -193,6 +202,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input name is not in list, collection_type is cleared."""
         data = {
             "feedstock": self.input_mais,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": None,
             "collection_type": BiomethaneSupplyInput.PRIVATE,
@@ -206,6 +216,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input matches no rule (e.g. Maïs), all conditional fields are cleared."""
         data = {
             "feedstock": self.input_mais,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": "Detail",
             "collection_type": BiomethaneSupplyInput.BOTH,
@@ -224,6 +235,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """When input matches several rules and fields are empty, all errors are returned."""
         data = {
             "feedstock": self.input_autres_cive,
+            "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
@@ -254,6 +266,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "culture_details": None,
             "collection_type": None,
             "volume": 100.0,
+            "material_unit": BiomethaneSupplyInput.WET,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -277,3 +290,22 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
         self.assertIsNone(data["volume"])
+
+    def test_material_unit_and_dry_matter_cleared_when_feedstock_is_biogaz_isdnd(self):
+        """When feedstock code is BIOGAZ-CAPTE-DUNE-ISDND, material_unit and dry_matter_ratio are cleared."""
+        input_biogaz = MatierePremiere.objects.create(
+            name="Biogaz capté d'une ISDND",
+            name_en="Biogaz from landfill",
+            code="BIOGAZ-CAPTE-DUNE-ISDND",
+            is_methanogenic=True,
+        )
+        data = {
+            "feedstock": input_biogaz,
+            "material_unit": BiomethaneSupplyInput.DRY,
+            "dry_matter_ratio_percent": 15.0,
+            "volume": None,
+        }
+        errors = apply_feedstock_field_rules(data)
+        self.assertEqual(errors, {})
+        self.assertIsNone(data["material_unit"])
+        self.assertIsNone(data["dry_matter_ratio_percent"])

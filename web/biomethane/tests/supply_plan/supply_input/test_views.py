@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
+from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity, MatierePremiere
 from core.tests_utils import setup_current_user
@@ -42,7 +43,9 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             producer=self.producer_entity, year=BiomethaneAnnualDeclarationService.get_current_declaration_year()
         )
 
-        self.supply_input = BiomethaneSupplyInputFactory.create(supply_plan=self.supply_plan)
+        self.supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan, feedstock=self.matiere_mais, material_unit=BiomethaneSupplyInput.WET
+        )
 
         self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.url_base = reverse("biomethane-supply-input-list")
@@ -91,6 +94,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         """Test successful update of a supply input."""
         update_data = {
             "volume": 750.0,
+            "material_unit": BiomethaneSupplyInput.WET,
             "feedstock": "Résidus",
         }
 

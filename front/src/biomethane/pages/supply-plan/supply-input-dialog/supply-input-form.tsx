@@ -36,6 +36,7 @@ export const SupplyInputForm = ({
   const form = useForm<SupplyInputFormValue>(supplyInput ?? {})
   const { value, bind } = form
   const isFranceOriginCountry = value.origin_country?.code_pays == "FR"
+  const isBiogazIsdnd = value?.feedstock?.code === "BIOGAZ-CAPTE-DUNE-ISDND"
 
   return (
     <Form
@@ -106,7 +107,7 @@ export const SupplyInputForm = ({
           <RadioGroup
             options={materialUnitOptions}
             label={t("Unité matière")}
-            required
+            required={!isBiogazIsdnd}
             orientation="horizontal"
             {...bind("material_unit")}
             readOnly={readOnly}
@@ -117,14 +118,14 @@ export const SupplyInputForm = ({
                 label={t("Ratio de matière sèche")}
                 min={0}
                 max={100}
-                required
+                required={!isBiogazIsdnd}
                 {...bind("dry_matter_ratio_percent")}
                 readOnly={readOnly}
               />
               <NumberInput
                 label={t("Tonnage (tMS)")}
                 min={0}
-                required
+                required={!isBiogazIsdnd}
                 {...bind("volume")}
                 readOnly={readOnly}
               />
@@ -134,7 +135,15 @@ export const SupplyInputForm = ({
             <NumberInput
               label={t("Tonnage (tMB)")}
               min={0}
-              required
+              required={!isBiogazIsdnd}
+              {...bind("volume")}
+              readOnly={readOnly}
+            />
+          )}
+          {isBiogazIsdnd && !value?.material_unit && (
+            <NumberInput
+              label={t("Tonnage (tMB ou tMS)")}
+              min={0}
               {...bind("volume")}
               readOnly={readOnly}
             />

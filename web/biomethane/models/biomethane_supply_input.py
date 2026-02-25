@@ -45,7 +45,7 @@ class BiomethaneSupplyInput(models.Model):
         (WET, "Brute"),
     ]
 
-    material_unit = models.CharField(max_length=5, choices=MATERIAL_UNIT_CHOICES)
+    material_unit = models.CharField(max_length=5, choices=MATERIAL_UNIT_CHOICES, null=True, blank=True)
 
     # Ratio de matière sèche (%) - Que si matière sèche
     dry_matter_ratio_percent = models.FloatField(null=True, blank=True)

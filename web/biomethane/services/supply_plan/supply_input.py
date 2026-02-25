@@ -8,6 +8,11 @@ Each rule is a dict with:
 - error_message: message shown when the rule applies but the field is empty.
 """
 
+# Code of feedstock for which volume, material_unit and dry_matter_ratio_percent are optional.
+from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
+
+BIOGAZ_CAPTE_ISDND_FEEDSTOCK_CODE = "BIOGAZ-CAPTE-DUNE-ISDND"
+
 # Codes of feedstocks that require the "collection_type" field (used in Excel template for rules text).
 COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES = frozenset(
     {
@@ -21,6 +26,12 @@ COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES = frozenset(
         "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-3",
     }
 )
+
+
+def _feedstock_is_not_biogaz_capte_isdnd(feedstock, data):
+    """True if feedstock is set and its code is not BIOGAZ-CAPTE-DUNE-ISDND (signature for rule condition)."""
+    return getattr(feedstock, "code", None) != BIOGAZ_CAPTE_ISDND_FEEDSTOCK_CODE
+
 
 # When condition(feedstock, data) is True, the field is required; otherwise it is set to None.
 FEEDSTOCK_FIELD_RULES = (
@@ -48,8 +59,19 @@ FEEDSTOCK_FIELD_RULES = (
     },
     {
         "field": "volume",
-        "condition": lambda feedstock, data: getattr(feedstock, "code", None) != "BIOGAZ-CAPTE-DUNE-ISDND",
+        "condition": _feedstock_is_not_biogaz_capte_isdnd,
         "error_message": "Le champ volume est requis.",
+    },
+    {
+        "field": "material_unit",
+        "condition": _feedstock_is_not_biogaz_capte_isdnd,
+        "error_message": "Le champ unité matière est requis.",
+    },
+    {
+        "field": "dry_matter_ratio_percent",
+        "condition": lambda feedstock, data: _feedstock_is_not_biogaz_capte_isdnd(feedstock, data)
+        and data.get("material_unit", None) == BiomethaneSupplyInput.DRY,
+        "error_message": "Le champ ratio de matière sèche est requis.",
     },
 )
 

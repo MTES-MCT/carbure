@@ -139,7 +139,10 @@ def _write_rules_block(sheet, num_cols, title_fmt, section_fmt, cell_fmt, inputs
             'le champ "Précisez la culture" est obligatoire.'
         ),
         _build_collection_type_rule_text(inputs),
-        "• Si l'intrant est « Biogaz capté d'une ISDND », le champ Volume est optionnel.",
+        (
+            "• Si l'intrant est « Biogaz capté d'une ISDND », les champs Unité, "
+            "Ratio de matière sèche (%) et Volume sont optionnels."
+        ),
     ]
     for rule in intrant_rules:
         sheet.merge_range(row, 0, row, num_cols - 1, rule, cell_fmt)

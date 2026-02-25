@@ -19,7 +19,7 @@ class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
 
 class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     # Use custom choice fields that accept both values and labels
-    material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
+    material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES, required=False, allow_null=True)
     type_cive = LabelChoiceField(choices=BiomethaneSupplyInput.TYPE_CIVE_CHOICES, required=False, allow_null=True)
     culture_details = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
     collection_type = LabelChoiceField(
@@ -46,18 +46,10 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         validated_data = super().validate(data)
         origin_country = validated_data.get("origin_country")
 
-        material_unit = validated_data.get("material_unit")
-        dry_matter_ratio_percent = validated_data.get("dry_matter_ratio_percent")
+        # material_unit = validated_data.get("material_unit")
+        # dry_matter_ratio_percent = validated_data.get("dry_matter_ratio_percent")
 
         # Check consistency between material_unit and dry_matter_ratio_percent
-        if material_unit == BiomethaneSupplyInput.DRY and dry_matter_ratio_percent is None:
-            raise serializers.ValidationError(
-                {"dry_matter_ratio_percent": "Le ratio de matière sèche est requis pour l'unité 'Sèche'"}
-            )
-
-        if material_unit == BiomethaneSupplyInput.WET:
-            validated_data["dry_matter_ratio_percent"] = None
-
         if origin_country and origin_country.code_pays == "FR":
             required_fields = [
                 "average_weighted_distance_km",

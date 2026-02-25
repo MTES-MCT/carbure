@@ -49,6 +49,12 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             code="HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
             is_methanogenic=True,
         )
+        self.biogaz_isdnd = MatierePremiere.objects.create(
+            name="Biogaz capté d'une ISDND",
+            name_en="Biogas from landfill",
+            code="BIOGAZ-CAPTE-DUNE-ISDND",
+            is_methanogenic=True,
+        )
 
         self.valid_data = {
             "material_unit": BiomethaneSupplyInput.WET,
@@ -133,6 +139,20 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         serializer = BiomethaneSupplyInputCreateSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         self.assertIsNone(serializer.validated_data["type_cive"])
+
+    def test_validate_biogaz_isdnd_allows_null_material_unit_and_ratio(self):
+        """Test when feedstock is Biogaz capté ISDND, material_unit and dry_matter_ratio are optional."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Biogaz capté d'une ISDND",
+            "material_unit": None,
+            "dry_matter_ratio_percent": None,
+            "volume": None,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertIsNone(serializer.validated_data["material_unit"])
+        self.assertIsNone(serializer.validated_data["dry_matter_ratio_percent"])
 
     def test_validate_culture_details_required_when_code_autres_cultures(self):
         """Test culture_details required when feedstock.code is AUTRES_CULTURES or AUTRES_CULTURES_CIVE."""
