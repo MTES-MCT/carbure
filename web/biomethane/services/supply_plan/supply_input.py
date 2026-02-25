@@ -8,6 +8,20 @@ Each rule is a dict with:
 - error_message: message shown when the rule applies but the field is empty.
 """
 
+# Codes of feedstocks that require the "collection_type" field (used in Excel template for rules text).
+COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES = frozenset(
+    {
+        "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
+        "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-VEGETALE",
+        "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-NON-SPECIFIEE",
+        "GRAISSES-DE-BACS-A-GRAISSE-DE-RESTAURATION",
+        "AUTRE-DECHETS-GRAISSEUX",
+        "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-1",
+        "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-2",
+        "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-3",
+    }
+)
+
 # When condition(feedstock, data) is True, the field is required; otherwise it is set to None.
 FEEDSTOCK_FIELD_RULES = (
     {
@@ -29,17 +43,7 @@ FEEDSTOCK_FIELD_RULES = (
     },
     {
         "field": "collection_type",
-        "condition": lambda feedstock, data: getattr(feedstock, "code", None)
-        in (
-            "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
-            "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-VEGETALE",
-            "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-NON-SPECIFIEE",
-            "GRAISSES-DE-BACS-A-GRAISSE-DE-RESTAURATION",
-            "AUTRE-DECHETS-GRAISSEUX",
-            "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-1",
-            "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-2",
-            "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-3",
-        ),
+        "condition": lambda feedstock, data: getattr(feedstock, "code", None) in COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES,
         "error_message": "Le champ type de collecte est requis pour cette matière première.",
     },
     {

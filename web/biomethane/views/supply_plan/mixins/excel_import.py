@@ -65,8 +65,9 @@ class ExcelImportActionMixin:
 
         file = file_serializer.validated_data["file"]
 
+        # Template has rules at top (sections), then header row 12, key row 13, data from row 14
         config = {
-            "header_row": 1,
+            "header_row": 12,  # 0-based: row of keys (feedstock, type_cive, ...) used as column names
             "sheet_name": "Plan d'approvisionnement",
         }
 
