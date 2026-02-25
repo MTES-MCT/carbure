@@ -2,7 +2,8 @@ import os
 
 import pandas as pd
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import IntegrityError
+from django.utils.text import slugify
 
 from core.models import MatierePremiere
 from feedstocks.models import Classification
@@ -58,7 +59,7 @@ class Command(BaseCommand):
             return
 
         # Check required columns
-        required_columns = ["Groupe", "Catégorie", "Sous-catégorie", "Intrant", "Code affichage"]
+        required_columns = ["Groupe", "Catégorie", "Sous-catégorie", "Intrant", "is_methanizable"]
         missing_columns = [col for col in required_columns if col not in df.columns]
         if missing_columns:
             self.stderr.write(self.style.ERROR(f"Missing required columns: {', '.join(missing_columns)}"))
@@ -73,79 +74,106 @@ class Command(BaseCommand):
             "errors": 0,
         }
 
-        with transaction.atomic():
-            for index, row in df.iterrows():
+        for index, row in df.iterrows():
+            try:
+                stats["processed"] += 1
+
+                # Extract data from row (handle pandas NaN values)
+                groupe = str(row.get("Groupe", "")).strip() if pd.notna(row.get("Groupe")) else ""
+                categorie = str(row.get("Catégorie", "")).strip() if pd.notna(row.get("Catégorie")) else ""
+                sous_categorie = str(row.get("Sous-catégorie", "")).strip() if pd.notna(row.get("Sous-catégorie")) else ""
+                intrant = str(row.get("Intrant", "")).strip() if pd.notna(row.get("Intrant")) else ""
+                is_methanizable = str(row.get("is_methanizable", "")).strip().lower() == "true"
+
+                if not is_methanizable:
+                    self.stdout.write(
+                        self.style.WARNING(f"Row {index + 1}: Intrant '{intrant}' is not methanizable, skipping")
+                    )
+                    stats["skipped"] += 1
+                    continue
+
+                if not intrant:
+                    self.stdout.write(self.style.WARNING(f"Row {index + 1}: Missing 'Intrant', skipping"))
+                    stats["skipped"] += 1
+                    continue
+
+                self.stdout.write(f"\nProcessing row {index + 1}: {intrant}")
+
+                # 1. Get or create Classification
+                classification, classification_created = Classification.objects.get_or_create(
+                    group=groupe,
+                    category=categorie,
+                    subcategory=sous_categorie,
+                )
+
+                if classification_created:
+                    self.stdout.write(
+                        self.style.SUCCESS(f"  - Created Classification: {groupe} / {categorie} / {sous_categorie}")
+                    )
+                    stats["classification_created"] += 1
+                else:
+                    self.stdout.write(f"  - Found existing Classification: {groupe} / {categorie} / {sous_categorie}")
+
+                # 2. Update or create MatierePremiere, and update is_methanogenic and classification
                 try:
-                    stats["processed"] += 1
+                    matiere_premiere = MatierePremiere.objects.get(name=intrant)
+                    updated = False
 
-                    # Extract data from row (handle pandas NaN values)
-                    groupe = str(row.get("Groupe", "")).strip() if pd.notna(row.get("Groupe")) else ""
-                    categorie = str(row.get("Catégorie", "")).strip() if pd.notna(row.get("Catégorie")) else ""
-                    sous_categorie = (
-                        str(row.get("Sous-catégorie", "")).strip() if pd.notna(row.get("Sous-catégorie")) else ""
-                    )
-                    intrant = str(row.get("Intrant", "")).strip() if pd.notna(row.get("Intrant")) else ""
-                    code_affichage = (
-                        str(row.get("Code affichage", "")).strip() if pd.notna(row.get("Code affichage")) else ""
-                    )
-
-                    if code_affichage:
-                        intrant = code_affichage  # Override intrant with code_affichage if provided
-
-                    if not intrant:
-                        self.stdout.write(self.style.WARNING(f"Row {index + 1}: Missing 'Intrant', skipping"))
-                        stats["skipped"] += 1
-                        continue
-
-                    self.stdout.write(f"\nProcessing row {index + 1}: {intrant}")
-
-                    # 1. Get or create Classification
-                    classification, class_created = Classification.objects.get_or_create(
-                        group=groupe,
-                        category=categorie,
-                        subcategory=sous_categorie,
-                    )
-
-                    if class_created:
+                    # Update is_methanogenic if not already set
+                    if not matiere_premiere.is_methanogenic:
+                        matiere_premiere.is_methanogenic = True
+                        updated = True
                         self.stdout.write(
-                            self.style.SUCCESS(f"  - Created Classification: {groupe} / {categorie} / {sous_categorie}")
-                        )
-                        stats["classification_created"] += 1
-                    else:
-                        self.stdout.write(f"  - Found existing Classification: {groupe} / {categorie} / {sous_categorie}")
-
-                    # 2. Update or create MatierePremiere and update is_methanogenic
-                    try:
-                        matiere_premiere = MatierePremiere.objects.get(name=intrant, classification=classification)
-                        # Update is_methanogenic if not already set
-                        if not matiere_premiere.is_methanogenic:
-                            matiere_premiere.is_methanogenic = True
-                            matiere_premiere.save()
-                            self.stdout.write(
-                                self.style.SUCCESS(
-                                    f"  - Updated MatierePremiere: {matiere_premiere.name} " f"(is_methanogenic=True)"
-                                )
+                            self.style.SUCCESS(
+                                f"  - Updated MatierePremiere: {matiere_premiere.name} " f"(is_methanogenic=True)"
                             )
-                            stats["matiere_premiere_updated"] += 1
-                        else:
-                            self.stdout.write(f"  - Found existing MatierePremiere: {matiere_premiere.name}")
-                    except MatierePremiere.DoesNotExist:
-                        # Create new MatierePremiere
+                        )
+                        stats["matiere_premiere_updated"] += 1
+
+                    if not matiere_premiere.classification:
+                        matiere_premiere.classification = classification
+                        updated = True
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f"  - Updated MatierePremiere: {matiere_premiere.name} " f"(classification set)"
+                            )
+                        )
+                        stats["matiere_premiere_updated"] += 1
+
+                    if updated:
+                        matiere_premiere.save()
+                    else:
+                        self.stdout.write(f"  - Found existing MatierePremiere: {matiere_premiere.name}")
+
+                except MatierePremiere.DoesNotExist:
+                    # Create new MatierePremiere
+
+                    try:
                         matiere_premiere = MatierePremiere.biofuel.create(
                             name=intrant[:256],
                             name_en=intrant[:256],
-                            code=f"{intrant.upper().replace(' ', '_')[:60]}_{index}",
+                            code=f"{slugify(intrant[:64]).upper()}",
                             is_methanogenic=True,
                             classification=classification,
                             description="",
                         )
-                        self.stdout.write(self.style.SUCCESS(f"  - Created MatierePremiere: {matiere_premiere.name}"))
-                        stats["matiere_premiere_created"] += 1
+                    except IntegrityError:
+                        matiere_premiere = MatierePremiere.biofuel.create(
+                            name=intrant[:256],
+                            name_en=intrant[:256],
+                            code=f"{slugify(intrant[:60]).upper()}_{index}",
+                            is_methanogenic=True,
+                            classification=classification,
+                            description="",
+                        )
 
-                except Exception as e:
-                    self.stderr.write(self.style.ERROR(f"Row {index + 1}: Error processing row: {e}"))
-                    stats["errors"] += 1
-                    continue
+                    self.stdout.write(self.style.SUCCESS(f"  - Created MatierePremiere: {matiere_premiere.name}"))
+                    stats["matiere_premiere_created"] += 1
+
+            except Exception as e:
+                self.stderr.write(self.style.ERROR(f"Row {index + 1}: Error processing row: {e}"))
+                stats["errors"] += 1
+                continue
 
         # Print summary
         self.stdout.write("\n" + "=" * 50)
