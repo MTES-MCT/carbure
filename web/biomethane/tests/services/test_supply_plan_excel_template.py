@@ -43,6 +43,9 @@ class SupplyPlanExcelTemplateTests(TestCase):
         expected_columns = [
             "Provenance",
             "Intrant",
+            "Type de CIVE",
+            "Précisez la culture",
+            "Type de collecte",
             "Type de culture",
             "Unité",
             "Ratio de matière sèche (%)",

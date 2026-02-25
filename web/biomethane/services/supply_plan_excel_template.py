@@ -59,6 +59,9 @@ def _create_main_sheet(workbook, header_format, countries, departments, inputs):
     headers = [
         ("Provenance", "source"),
         ("Intrant", "input_name"),
+        ("Type de CIVE", "type_cive"),
+        ("Précisez la culture", "culture_details"),
+        ("Type de collecte", "collection_type"),
         ("Type de culture", "crop_type"),
         ("Unité", "material_unit"),
         ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
@@ -96,11 +99,11 @@ def _add_country_formulas(sheet, countries):
     france = next((c for c in countries if c.code_pays == "FR"), None)
     france_name = france.name if france else "France"
 
-    # Add formula in column J (Pays d'origine) for rows 3 to 1000
-    # If department (column G) is filled, force France, otherwise leave empty
+    # Add formula in column N (Pays d'origine) for rows 3 to 1000
+    # If department (column K) is filled, force France, otherwise leave empty
     for row in range(2, 1000):
-        formula = f'=IF(G{row+1}<>"","{france_name}","")'
-        sheet.write_formula(row, 9, formula)  # column J (0-indexed = 9)
+        formula = f'=IF(K{row+1}<>"","{france_name}","")'
+        sheet.write_formula(row, 12, formula)  # column N (0-indexed = 12)
 
 
 def _add_dropdown_validations(sheet, countries, departments, inputs):
@@ -119,40 +122,56 @@ def _add_dropdown_validations(sheet, countries, departments, inputs):
         {"validate": "list", "source": f"=Intrants!$A$2:$A${inputs_count + 1}"},
     )
 
-    # Type de culture (column C)
-    crop_type_labels = [label for _, label in BiomethaneSupplyInput.CROP_TYPE_CHOICES]
+    # Type de CIVE (column C)
+    type_cive_labels = [label for _, label in BiomethaneSupplyInput.TYPE_CIVE_CHOICES]
     sheet.data_validation(
         "C3:C1000",
+        {"validate": "list", "source": type_cive_labels},
+    )
+
+    # Précisez la culture (column D) - free text, no validation
+
+    # Type de collecte (column E)
+    collection_type_labels = [label for _, label in BiomethaneSupplyInput.COLLECTION_TYPE_CHOICES]
+    sheet.data_validation(
+        "E3:E1000",
+        {"validate": "list", "source": collection_type_labels},
+    )
+
+    # Type de culture (column F)
+    crop_type_labels = [label for _, label in BiomethaneSupplyInput.CROP_TYPE_CHOICES]
+    sheet.data_validation(
+        "F3:F1000",
         {"validate": "list", "source": crop_type_labels},
     )
 
-    # Unité (column D)
+    # Unité (column G)
     unit_labels = [label for _, label in BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES]
     sheet.data_validation(
-        "D3:D1000",
+        "G3:G1000",
         {"validate": "list", "source": unit_labels},
     )
 
-    # Département (column G) - using reference sheet
+    # Département (column K) - using reference sheet
     dept_count = len(departments)
     sheet.data_validation(
-        "G3:G1000",
+        "K3:K1000",
         {"validate": "list", "source": f"=Departements!$B$2:$B${dept_count + 1}"},
     )
 
-    # Pays d'origine (column J) - using reference sheet
+    # Pays d'origine (column N) - using reference sheet
     countries_count = len(countries)
     sheet.data_validation(
-        "J2:J1000",
+        "N2:N1000",
         {"validate": "list", "source": f"=Pays!$B$2:$B${countries_count + 1}"},
     )
 
 
 def _add_numeric_validations(sheet):
     """Add numeric validations with error messages to the main sheet."""
-    # Ratio de matière sèche (column E) - must be a number between 0 and 100
+    # Ratio de matière sèche (column H) - must be a number between 0 and 100
     sheet.data_validation(
-        "E3:E1000",
+        "H3:H1000",
         {
             "validate": "decimal",
             "criteria": "between",
@@ -163,9 +182,9 @@ def _add_numeric_validations(sheet):
         },
     )
 
-    # Volume (column F) - must be a positive number
+    # Volume (column I) - must be a positive number
     sheet.data_validation(
-        "F3:F1000",
+        "I3:I1000",
         {
             "validate": "decimal",
             "criteria": ">=",
@@ -175,9 +194,9 @@ def _add_numeric_validations(sheet):
         },
     )
 
-    # Distance moyenne pondérée (column H) - must be a positive number
+    # Distance moyenne pondérée (column L) - must be a positive number
     sheet.data_validation(
-        "H3:H1000",
+        "L3:L1000",
         {
             "validate": "decimal",
             "criteria": ">=",
@@ -187,9 +206,9 @@ def _add_numeric_validations(sheet):
         },
     )
 
-    # Distance maximale (column I) - must be a positive number
+    # Distance maximale (column M) - must be a positive number
     sheet.data_validation(
-        "I3:I1000",
+        "M3:M1000",
         {
             "validate": "decimal",
             "criteria": ">=",
@@ -224,15 +243,15 @@ def _protect_and_format_sheet(workbook, sheet):
     unlocked_decimal_number = workbook.add_format({"locked": False, "num_format": "0.0"})
     unlocked_number = workbook.add_format({"locked": False, "num_format": "0"})
 
-    # Apply formats to columns
-    for col in range(11):  # 11 columns (A to K)
-        if col == 4:  # Column E: Ratio de matière sèche (%)
+    # Apply formats to columns (14 columns A to N)
+    for col in range(14):
+        if col == 7:  # Column H: Ratio de matière sèche (%)
             sheet.set_column(col, col, 25, unlocked_decimal_number)
-        elif col == 5:  # Column F: Volume (tMB ou tMS)
+        elif col == 8:  # Column I: Volume (tMB ou tMS)
             sheet.set_column(col, col, 25, unlocked_decimal_number)
-        elif col == 7:  # Column H: Distance moyenne pondérée (km)
+        elif col == 11:  # Column L: Distance moyenne pondérée (km)
             sheet.set_column(col, col, 25, unlocked_number)
-        elif col == 8:  # Column I: Distance maximale (km)
+        elif col == 12:  # Column M: Distance maximale (km)
             sheet.set_column(col, col, 25, unlocked_number)
         else:
             sheet.set_column(col, col, 25, unlocked)
