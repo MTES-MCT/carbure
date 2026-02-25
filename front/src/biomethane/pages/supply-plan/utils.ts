@@ -17,7 +17,7 @@ export const SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE = [
   "Huiles et matières grasses (avec produits animaux) (Cat 1)",
   "Huiles et matières grasses (avec produits animaux) (Cat 2)",
   "Huiles et matières grasses (avec produits animaux) (Cat 3)",
-] as const
+]
 
 export const getSupplyPlanInputSource = (
   source: BiomethaneSupplyInputSource

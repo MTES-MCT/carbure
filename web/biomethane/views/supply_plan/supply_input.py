@@ -70,7 +70,7 @@ class BiomethaneSupplyInputViewSet(
 ):
     queryset = BiomethaneSupplyInput.objects.all()
     filterset_class = BiomethaneSupplyInputFilter
-    search_fields = ["input_name"]
+    search_fields = ["feedstock"]
     pagination_class = BiomethaneSupplyInputPagination
 
     def get_permissions(self):

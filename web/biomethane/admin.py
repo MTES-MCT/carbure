@@ -88,9 +88,9 @@ class BiomethaneSupplyPlanAdmin(admin.ModelAdmin):
 
 @admin.register(BiomethaneSupplyInput)
 class BiomethaneSupplyInputAdmin(admin.ModelAdmin):
-    list_display = ("id", "supply_plan__producer__name", "supply_plan__year", "input_name", "volume")
+    list_display = ("id", "supply_plan__producer__name", "supply_plan__year", "feedstock", "volume")
     list_filter = ("supply_plan__year", "source", "crop_type")
-    search_fields = ("supply_plan__producer__name", "input_name", "supply_plan__producer__pk")
+    search_fields = ("supply_plan__producer__name", "feedstock", "supply_plan__producer__pk")
 
 
 @admin.register(BiomethaneAnnualDeclaration)

@@ -3593,7 +3593,7 @@ export interface components {
         BiomethaneSupplyInput: {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
-            input_name: components["schemas"]["FeedStockClassification"];
+            feedstock: components["schemas"]["FeedStockClassification"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
@@ -3619,7 +3619,7 @@ export interface components {
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
-            input_name: string;
+            feedstock: string;
             origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3638,7 +3638,7 @@ export interface components {
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
-            input_name: string;
+            feedstock: string;
             origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3653,7 +3653,7 @@ export interface components {
         BiomethaneSupplyInputExport: {
             readonly year: number;
             readonly origin_country: string;
-            readonly input_name: string;
+            readonly feedstock: string;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
@@ -5383,7 +5383,7 @@ export interface components {
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
-            input_name?: string;
+            feedstock?: string;
             origin_country?: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -7538,7 +7538,7 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                input_name?: string[];
+                feedstock?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -7727,9 +7727,9 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
-                input_name?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
@@ -13153,7 +13153,7 @@ export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
     INTERNAL = "INTERNAL"
 }
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
-    input_name = "input_name",
+    feedstock = "feedstock",
     producer_id = "producer_id",
     source = "source",
     year = "year"

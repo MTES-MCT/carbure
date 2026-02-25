@@ -69,10 +69,10 @@ export const SupplyInputForm = ({
             isMethanogenic
             label={t("Intrants")}
             required
-            {...bind("input_name")}
+            {...bind("feedstock")}
             readOnly={readOnly}
           />
-          {value?.input_name?.classification?.category ===
+          {value?.feedstock?.classification?.category ===
             "Biomasse agricole - Cultures intermédiaires" && (
             <RadioGroup
               options={typeCiveOptions}
@@ -83,8 +83,8 @@ export const SupplyInputForm = ({
               readOnly={readOnly}
             />
           )}
-          {(value?.input_name?.code === "AUTRES_CULTURES" ||
-            value?.input_name?.code === "AUTRES_CULTURES_CIVE") && (
+          {(value?.feedstock?.code === "AUTRES_CULTURES" ||
+            value?.feedstock?.code === "AUTRES_CULTURES_CIVE") && (
             <TextInput
               label={t("Précisez la culture")}
               required
@@ -92,9 +92,9 @@ export const SupplyInputForm = ({
               readOnly={readOnly}
             />
           )}
-          {(
-            SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE as readonly string[]
-          ).includes(value?.input_name?.name ?? "") && (
+          {SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE.includes(
+            value?.feedstock?.name ?? ""
+          ) && (
             <RadioGroup
               options={collectionTypeOptions}
               label={t("Type de collecte")}
@@ -104,21 +104,21 @@ export const SupplyInputForm = ({
               readOnly={readOnly}
             />
           )}
-          {value?.input_name?.classification && (
+          {value?.feedstock?.classification && (
             <>
               <TextInput
                 label={t("Sous-catégorie d'intrants")}
-                value={value.input_name.classification.subcategory ?? ""}
+                value={value.feedstock.classification.subcategory ?? ""}
                 readOnly
               />
               <TextInput
                 label={t("Catégorie d'intrants")}
-                value={value.input_name.classification.category ?? ""}
+                value={value.feedstock.classification.category ?? ""}
                 readOnly
               />
               <TextInput
                 label={t("Type")}
-                value={value.input_name.classification.group ?? ""}
+                value={value.feedstock.classification.group ?? ""}
                 readOnly
               />
             </>

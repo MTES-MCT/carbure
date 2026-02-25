@@ -28,7 +28,7 @@ class ExcelExportActionMixin:
                     "columns": [
                         {"label": "Provenance", "value": "source"},
                         {"label": "Type de culture", "value": "crop_type"},
-                        {"label": "Intrant", "value": "input_name"},
+                        {"label": "Intrant", "value": "feedstock"},
                         {"label": "Type de CIVE", "value": "type_cive"},
                         {"label": "Précisez la culture", "value": "culture_details"},
                         {"label": "Type de collecte", "value": "collection_type"},

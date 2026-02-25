@@ -82,7 +82,7 @@ class ExcelImportActionMixinTests(APITestCase):
                 {
                     "source": "Externe",
                     "crop_type": "Principale",
-                    "input_name": "Lisiers bovins",
+                    "feedstock": "Lisiers bovins",
                     "material_unit": "Brute",
                     "volume": 100,
                     "origin_department": "44 - Loire-Atlantique",
@@ -93,7 +93,7 @@ class ExcelImportActionMixinTests(APITestCase):
                 {
                     "source": "Interne",
                     "crop_type": "Intermédiaire",
-                    "input_name": "Lisiers bovins",
+                    "feedstock": "Lisiers bovins",
                     "material_unit": "Sèche",
                     "dry_matter_ratio_percent": "13,00",
                     "volume": 100,

@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
-from biomethane.services.supply_plan import apply_input_name_field_rules
+from biomethane.services.supply_plan import apply_feedstock_field_rules
 from core.models import MatierePremiere, Pays
 from core.serializers import CountrySerializer
 from feedstocks.serializers.feedstock_classification import FeedStockClassificationSerializer
@@ -10,7 +10,7 @@ from feedstocks.serializers.feedstock_classification import FeedStockClassificat
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
-    input_name = FeedStockClassificationSerializer()
+    feedstock = FeedStockClassificationSerializer()
 
     class Meta:
         model = BiomethaneSupplyInput
@@ -28,7 +28,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         choices=BiomethaneSupplyInput.COLLECTION_TYPE_CHOICES, required=False, allow_null=True
     )
 
-    input_name = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.biomethane.all())
+    feedstock = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.biomethane.all())
     origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
 
     # Use European float fields for numeric values
@@ -45,8 +45,8 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         return BiomethaneSupplyInputSerializer(instance).data
 
     def validate(self, data):
-        origin_country = data.get("origin_country")
         validated_data = super().validate(data)
+        origin_country = validated_data.get("origin_country")
 
         material_unit = validated_data.get("material_unit")
         dry_matter_ratio_percent = validated_data.get("dry_matter_ratio_percent")
@@ -60,7 +60,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         if material_unit == BiomethaneSupplyInput.WET:
             validated_data["dry_matter_ratio_percent"] = None
 
-        if origin_country.code_pays == "FR":
+        if origin_country and origin_country.code_pays == "FR":
             required_fields = [
                 "average_weighted_distance_km",
                 "maximum_distance_km",
@@ -70,7 +70,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
                 if not validated_data.get(field):
                     raise serializers.ValidationError({field: "Ce champ est requis pour la France"})
 
-        errors = apply_input_name_field_rules(validated_data)
+        errors = apply_feedstock_field_rules(validated_data)
         if errors:
             raise serializers.ValidationError(errors)
         return validated_data
@@ -110,7 +110,7 @@ class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreate
 class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField(source="supply_plan.year", read_only=True)
     origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
-    input_name = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    feedstock = serializers.SlugRelatedField(slug_field="name", read_only=True)
 
     class Meta:
         model = BiomethaneSupplyInput

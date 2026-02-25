@@ -30,7 +30,8 @@ import { Title } from "common/components/title"
 const DigestatePage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const { selectedYear, isDeclarationInCurrentPeriod } = useAnnualDeclaration()
+  const { selectedYear, isDeclarationInCurrentPeriod, annualDeclaration } =
+    useAnnualDeclaration()
   const form = useForm<BiomethaneDigestate | undefined | object>(undefined)
   const { selectedEntityId } = useSelectedEntity()
 
@@ -91,7 +92,7 @@ const DigestatePage = () => {
           ) && <Sale />}
         </>
       )}
-      {!isDeclarationInCurrentPeriod && !digestate ? (
+      {annualDeclaration && !isDeclarationInCurrentPeriod && !digestate ? (
         <ContainerFluid>
           <Title is="h2" as="h5">
             {t(

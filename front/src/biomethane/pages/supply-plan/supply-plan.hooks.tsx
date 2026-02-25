@@ -25,7 +25,7 @@ export const useSupplyPlanColumns = () => {
     },
     {
       header: t("Intrant"),
-      cell: (input) => <Cell text={input.input_name?.name} />,
+      cell: (input) => <Cell text={input.feedstock?.name} />,
     },
     {
       header: t("Département"),
@@ -58,7 +58,7 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
 
   const filterLabels = {
     [BiomethaneSupplyInputFilter.source]: t("Provenance"),
-    [BiomethaneSupplyInputFilter.input_name]: t("Intrant"),
+    [BiomethaneSupplyInputFilter.feedstock]: t("Intrant"),
   }
 
   const normalizers = {
@@ -66,7 +66,7 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
       value,
       label: getSupplyPlanInputSource(value as BiomethaneSupplyInputSource),
     }),
-    [BiomethaneSupplyInputFilter.input_name]: (value: string) =>
+    [BiomethaneSupplyInputFilter.feedstock]: (value: string) =>
       defaultNormalizer(value),
   }
 

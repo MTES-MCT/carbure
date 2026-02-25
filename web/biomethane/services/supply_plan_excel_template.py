@@ -58,7 +58,7 @@ def _create_main_sheet(workbook, header_format, countries, departments, inputs):
     # Column headers
     headers = [
         ("Provenance", "source"),
-        ("Intrant", "input_name"),
+        ("Intrant", "feedstock"),
         ("Type de CIVE", "type_cive"),
         ("Précisez la culture", "culture_details"),
         ("Type de collecte", "collection_type"),

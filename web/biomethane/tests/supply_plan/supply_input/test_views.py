@@ -72,9 +72,11 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             "source": "INTERNAL",
             "origin_country": "FR",
             "origin_department": "75",
+            "average_weighted_distance_km": 50.0,
+            "maximum_distance_km": 100.0,
             "crop_type": "MAIN",
             "volume": 500.0,
-            "input_name": "Maïs",
+            "feedstock": "Maïs",
             "material_unit": "WET",
         }
 
@@ -83,7 +85,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["input_name"]["name"], "Maïs")
+        self.assertEqual(response.data["feedstock"]["name"], "Maïs")
         self.assertEqual(response.data["origin_country"]["code_pays"], "FR")
         self.assertEqual(response.data["volume"], 500.0)
 
@@ -91,7 +93,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         """Test successful update of a supply input."""
         update_data = {
             "volume": 750.0,
-            "input_name": "Résidus",
+            "feedstock": "Résidus",
         }
 
         response = self.client.patch(
@@ -103,7 +105,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["volume"], 750.0)
-        self.assertEqual(response.data["input_name"]["name"], "Résidus")
+        self.assertEqual(response.data["feedstock"]["name"], "Résidus")
 
     def test_create_supply_input_invalid_data(self):
         """Test creation of a supply input with invalid data."""

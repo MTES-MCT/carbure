@@ -1,3 +1,3 @@
-from .supply_input import INPUT_NAME_FIELD_RULES, apply_input_name_field_rules
+from .supply_input import FEEDSTOCK_FIELD_RULES, apply_feedstock_field_rules
 
-__all__ = ["INPUT_NAME_FIELD_RULES", "apply_input_name_field_rules"]
+__all__ = ["FEEDSTOCK_FIELD_RULES", "apply_feedstock_field_rules"]

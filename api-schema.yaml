@@ -1973,7 +1973,7 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
-          name: input_name
+          name: feedstock
           schema:
             type: array
             items:
@@ -2309,24 +2309,24 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
-          name: filter
-          schema:
-            type: string
-            enum:
-              - input_name
-              - producer_id
-              - source
-              - year
-          description: Filter string to apply
-          required: true
-        - in: query
-          name: input_name
+          name: feedstock
           schema:
             type: array
             items:
               type: string
           explode: true
           style: form
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - feedstock
+              - producer_id
+              - source
+              - year
+          description: Filter string to apply
+          required: true
         - name: ordering
           required: false
           in: query
@@ -2381,7 +2381,7 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - input_name
+                    - feedstock
                     - producer_id
                     - source
                     - year
@@ -2509,7 +2509,7 @@ paths:
                             - This field is required.
                       - row: 5
                         errors:
-                          input_name:
+                          feedstock:
                             - Invalid input type.
                     total_errors: 2
                     total_rows_processed: 10
@@ -12974,7 +12974,7 @@ components:
           readOnly: true
         origin_country:
           $ref: "#/components/schemas/Country"
-        input_name:
+        feedstock:
           $ref: "#/components/schemas/FeedStockClassification"
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
@@ -13017,8 +13017,8 @@ components:
           type: integer
       required:
         - crop_type
+        - feedstock
         - id
-        - input_name
         - material_unit
         - origin_country
         - source
@@ -13048,7 +13048,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/CollectionTypeEnum"
           nullable: true
-        input_name:
+        feedstock:
           type: string
         origin_country:
           type: string
@@ -13073,8 +13073,8 @@ components:
           maxLength: 3
       required:
         - crop_type
+        - feedstock
         - id
-        - input_name
         - material_unit
         - origin_country
         - source
@@ -13100,7 +13100,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/CollectionTypeEnum"
           nullable: true
-        input_name:
+        feedstock:
           type: string
           minLength: 1
         origin_country:
@@ -13127,7 +13127,7 @@ components:
           maxLength: 3
       required:
         - crop_type
-        - input_name
+        - feedstock
         - material_unit
         - origin_country
         - source
@@ -13141,7 +13141,7 @@ components:
         origin_country:
           type: string
           readOnly: true
-        input_name:
+        feedstock:
           type: string
           readOnly: true
         source:
@@ -13183,7 +13183,7 @@ components:
           nullable: true
       required:
         - crop_type
-        - input_name
+        - feedstock
         - material_unit
         - origin_country
         - source
@@ -17184,7 +17184,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/CollectionTypeEnum"
           nullable: true
-        input_name:
+        feedstock:
           type: string
           minLength: 1
         origin_country:
