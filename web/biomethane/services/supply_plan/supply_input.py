@@ -16,36 +16,36 @@ FEEDSTOCK_FIELD_RULES = (
             getattr(getattr(feedstock, "classification", None), "category", None)
             == "Biomasse agricole - Cultures intermédiaires"
         ),
-        "error_message": "CIVE type is required for this feedstock.",
+        "error_message": "Le champ type de CIVE est requis pour cette matière première.",
     },
     {
         "field": "culture_details",
         "condition": lambda feedstock, data: getattr(feedstock, "code", None)
         in (
-            "AUTRES_CULTURES",
-            "AUTRES_CULTURES_CIVE",
+            "AUTRES-CULTURES",
+            "AUTRES-CULTURES-CIVE",
         ),
-        "error_message": "Please specify the crop for this feedstock.",
+        "error_message": "Le champ précisez la culture est requis pour cette matière première.",
     },
     {
         "field": "collection_type",
-        "condition": lambda feedstock, data: getattr(feedstock, "name", None)
+        "condition": lambda feedstock, data: getattr(feedstock, "code", None)
         in (
-            "Huiles alimentaires usagées d'origine animale",
-            "Huiles alimentaires usagées d'origine végétale",
-            "Huiles alimentaires usagées d'origine non-spécifiée",
-            "Graisses de bacs à graisse de restauration",
-            "Autre déchets graisseux",
-            "Huiles et matières grasses (avec produits animaux) (Cat 1)",
-            "Huiles et matières grasses (avec produits animaux) (Cat 2)",
-            "Huiles et matières grasses (avec produits animaux) (Cat 3)",
+            "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
+            "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-VEGETALE",
+            "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-NON-SPECIFIEE",
+            "GRAISSES-DE-BACS-A-GRAISSE-DE-RESTAURATION",
+            "AUTRE-DECHETS-GRAISSEUX",
+            "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-1",
+            "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-2",
+            "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-3",
         ),
-        "error_message": "Collection type is required for this feedstock.",
+        "error_message": "Le champ type de collecte est requis pour cette matière première.",
     },
     {
         "field": "volume",
-        "condition": lambda feedstock, data: getattr(feedstock, "name", None) != "X",
-        "error_message": "Volume is required for this feedstock.",
+        "condition": lambda feedstock, data: getattr(feedstock, "code", None) != "BIOGAZ-CAPTE-DUNE-ISDND",
+        "error_message": "Le champ volume est requis.",
     },
 )
 

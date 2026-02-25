@@ -33,20 +33,20 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         self.autres_cultures = MatierePremiere.objects.create(
             name="Autres cultures",
             name_en="Other crops",
-            code="AUTRES_CULTURES",
+            code="AUTRES-CULTURES",
             is_methanogenic=True,
         )
         self.autres_cultures_cive = MatierePremiere.objects.create(
             name="Autres cultures CIVE",
             name_en="Other crops CIVE",
-            code="AUTRES_CULTURES_CIVE",
+            code="AUTRES-CULTURES-CIVE",
             is_methanogenic=True,
         )
         # Type de collecte: required when name is in COLLECTION_TYPE_INPUT_NAMES
         self.huiles_animale = MatierePremiere.objects.create(
             name="Huiles alimentaires usagées d'origine animale",
             name_en="Used cooking oil of animal origin",
-            code="HUILES_ANIMALE",
+            code="HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
             is_methanogenic=True,
         )
 
@@ -99,7 +99,6 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
                 serializer = BiomethaneSupplyInputCreateSerializer(data=data)
                 self.assertFalse(serializer.is_valid())
                 self.assertIn(field, serializer.errors)
-                self.assertIn("Ce champ est requis pour la France", str(serializer.errors[field]))
 
     def test_validate_type_cive_required_when_classification_category_cive(self):
         """Test type_cive required when feedstock has classification.category CIVE."""

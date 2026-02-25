@@ -26,27 +26,27 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         self.input_seigle_cive = MatierePremiere.objects.create(
             name="Seigle - CIVE",
             name_en="Rye - CIVE",
-            code="SEIGLE_CIVE",
+            code="SEIGLE-CIVE",
             is_methanogenic=True,
             classification=classification_cive,
         )
         self.input_autres_cultures = MatierePremiere.objects.create(
             name="Autres cultures",
             name_en="Other crops",
-            code="AUTRES_CULTURES",
+            code="AUTRES-CULTURES",
             is_methanogenic=True,
         )
         self.input_huiles_animale = MatierePremiere.objects.create(
             name="Huiles alimentaires usagées d'origine animale",
             name_en="Used cooking oil animal",
-            code="HUILES_ANIMALE",
+            code="HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
             is_methanogenic=True,
         )
-        # Input matching both CIVE and culture_details (AUTRES_CULTURES_CIVE)
+        # Input matching both CIVE and culture_details (AUTRES-CULTURES-CIVE)
         self.input_autres_cive = MatierePremiere.objects.create(
             name="Autres cultures CIVE",
             name_en="Other crops CIVE",
-            code="AUTRES_CULTURES_CIVE",
+            code="AUTRES-CULTURES-CIVE",
             is_methanogenic=True,
             classification=classification_cive,
         )
@@ -211,12 +211,13 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "collection_type": BiomethaneSupplyInput.BOTH,
             "volume": 100.0,
         }
+
         errors = apply_feedstock_field_rules(data)
+
         self.assertEqual(errors, {})
         self.assertIsNone(data["type_cive"])
         self.assertIsNone(data["culture_details"])
         self.assertIsNone(data["collection_type"])
-        # volume reste requis quand le nom n'est pas "X", donc on ne le vide pas
         self.assertEqual(data["volume"], 100.0)
 
     def test_multiple_rules_match_returns_multiple_errors(self):
@@ -233,8 +234,8 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         self.assertIn("culture_details", errors)
         self.assertEqual(len(errors), 2)
 
-    def test_volume_required_when_feedstock_name_is_not_x(self):
-        """When feedstock name is not 'X', volume is required."""
+    def test_volume_required_when_feedstock_code_is_not_biogaz_capte_dune_isdnd(self):
+        """When feedstock code is not 'BIOGAZ-CAPTE-DUNE-ISDND', volume is required."""
         data = {
             "feedstock": self.input_mais,
             "type_cive": None,
@@ -245,8 +246,8 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         errors = apply_feedstock_field_rules(data)
         self.assertIn("volume", errors)
 
-    def test_volume_valid_when_feedstock_name_is_not_x(self):
-        """When feedstock name is not 'X' and volume is set, no error."""
+    def test_volume_valid_when_feedstock_code_is_not_biogaz_capte_dune_isdnd(self):
+        """When feedstock code is not 'BIOGAZ-CAPTE-DUNE-ISDND' and volume is set, no error."""
         data = {
             "feedstock": self.input_mais,
             "type_cive": None,
@@ -258,16 +259,16 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         self.assertEqual(errors, {})
         self.assertEqual(data["volume"], 100.0)
 
-    def test_volume_cleared_when_feedstock_name_is_x(self):
-        """When feedstock name is 'X', volume is not required and is cleared."""
-        input_x = MatierePremiere.objects.create(
-            name="X",
-            name_en="X",
-            code="X",
+    def test_volume_cleared_when_feedstock_name_is_biogaz_capte_dune_isdnd(self):
+        """When feedstock code is 'BIOGAZ-CAPTE-DUNE-ISDND', volume is not required and is cleared."""
+        input_biogaz_capte_dune_isdnd = MatierePremiere.objects.create(
+            name="Biogaz capte d'une ISDN",
+            name_en="Biogaz capte d'une ISDN",
+            code="BIOGAZ-CAPTE-DUNE-ISDND",
             is_methanogenic=True,
         )
         data = {
-            "feedstock": input_x,
+            "feedstock": input_biogaz_capte_dune_isdnd,
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,

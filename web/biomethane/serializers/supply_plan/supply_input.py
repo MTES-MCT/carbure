@@ -66,7 +66,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
             ]
             for field in required_fields:
                 if not validated_data.get(field):
-                    raise serializers.ValidationError({field: "Ce champ est requis pour la France"})
+                    raise serializers.ValidationError({field: "Ce champ est requis si le pays d'origine est France"})
 
         errors = apply_feedstock_field_rules(validated_data)
         if errors:
