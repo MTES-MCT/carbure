@@ -89,6 +89,8 @@ class MatierePremiereAdmin(admin.ModelAdmin):
         "compatible_graisse",
         "is_double_compte",
         "is_huile_vegetale",
+        "is_biofuel_feedstock",
+        "is_methanogenic",
         "is_displayed",
     )
     search_fields = ("name",)
@@ -98,6 +100,8 @@ class MatierePremiereAdmin(admin.ModelAdmin):
         "is_double_compte",
         "is_huile_vegetale",
         "is_displayed",
+        "is_biofuel_feedstock",
+        "is_methanogenic",
     )
 
 
