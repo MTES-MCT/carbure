@@ -57,10 +57,8 @@ def create_supply_plan_template() -> BufferedReader:
     eu_countries = list(Pays.objects.filter(is_in_europe=True).order_by("name"))
     # Get departments from database
     departments = list(Department.objects.all().order_by("code_dept"))
-    # Get intrants from database
-    inputs = list(
-        MatierePremiere.biomethane.all().order_by("name").filter(code__in=COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES)
-    )
+    # Get intrants from database (full list for dropdown; filtering for rule text is done in _create_main_sheet)
+    inputs = list(MatierePremiere.biomethane.all().order_by("name"))
 
     # Create main sheet (with rules at top, then table)
     _create_main_sheet(
@@ -84,10 +82,90 @@ def create_supply_plan_template() -> BufferedReader:
 
 
 # Main sheet layout: rules block at top (with sections), then table (header, key row, data rows)
+MAIN_SHEET_NUM_COLS = 11  # A to K
 HEADER_ROW = 11  # 0-based
 KEY_ROW = 12  # 0-based
 FIRST_DATA_ROW = 13  # 0-based
 LAST_DATA_ROW = 1012  # 0-based (1000 data rows)
+
+# Table columns: (label, key). Type de CIVE, Précisez la culture, Type de collecte at the end.
+TABLE_HEADERS = [
+    ("Intrant", "feedstock"),
+    ("Unité", "material_unit"),
+    ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
+    ("Volume (tMB ou tMS)", "volume"),
+    ("Département", "origin_department"),
+    ("Distance moyenne pondérée (km)", "average_weighted_distance_km"),
+    ("Distance maximale (km)", "maximum_distance_km"),
+    ("Pays d'origine", "origin_country"),
+    ("Type de CIVE", "type_cive"),
+    ("Précisez la culture", "culture_details"),
+    ("Type de collecte", "collection_type"),
+]
+
+
+def _build_collection_type_rule_text(inputs):
+    """Build the rule text listing feedstocks that require 'Type de collecte' (with line breaks)."""
+    names = [inp.name for inp in inputs if getattr(inp, "code", None) in COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES]
+    if not names:
+        return (
+            "• Si l'intrant est l'un des suivants (voir liste en base), "
+            'le champ "Type de collecte" est obligatoire : (aucun dans la base).'
+        )
+    list_text = "\n".join(f"  • « {n} »" for n in sorted(names))
+    return "• Si l'intrant est l'un des suivants, le champ \"Type de collecte\" est obligatoire :\n" f"{list_text}"
+
+
+def _write_rules_block(sheet, num_cols, title_fmt, section_fmt, cell_fmt, inputs):
+    """Write the rules block at top of sheet: title, two sections with bullet rules."""
+    row = 0
+    sheet.merge_range(row, 0, row, num_cols - 1, "Règles métier", title_fmt)
+    sheet.set_row(row, 24)
+    row += 1
+
+    sheet.merge_range(
+        row,
+        0,
+        row,
+        num_cols - 1,
+        "Selon l'intrant sélectionné, certains champs peuvent être obligatoires.",
+        section_fmt,
+    )
+    row += 1
+    intrant_rules = [
+        "• Si l'intrant est une culture intermédiaire (CIVE) le champ Type de CIVE est obligatoire.",
+        (
+            "• Si l'intrant est « Autres cultures » ou « Autres cultures CIVE », "
+            'le champ "Précisez la culture" est obligatoire.'
+        ),
+        _build_collection_type_rule_text(inputs),
+        "• Si l'intrant est « Biogaz capté d'une ISDND », le champ Volume est optionnel.",
+    ]
+    for rule in intrant_rules:
+        sheet.merge_range(row, 0, row, num_cols - 1, rule, cell_fmt)
+        row += 1
+    row += 1
+
+    sheet.merge_range(row, 0, row, num_cols - 1, "Autres conditions :", section_fmt)
+    row += 1
+    other_rules = [
+        (
+            "• Si le pays d'origine est France, les champs « Distance moyenne pondérée », "
+            "« Distance maximale » et « Département d'origine » sont obligatoires."
+        ),
+        "• Si l'unité de matière est « Sèche », le champ « Ratio de matière sèche (%) » est obligatoire.",
+    ]
+    for rule in other_rules:
+        sheet.merge_range(row, 0, row, num_cols - 1, rule, cell_fmt)
+        row += 1
+
+
+def _write_table_header_and_key_row(sheet, header_fmt):
+    """Write the table header row (labels) and the hidden key row (column keys for import)."""
+    sheet.set_row(HEADER_ROW, 30)
+    for col, (label, key) in enumerate(TABLE_HEADERS):
+        sheet.write(HEADER_ROW, col, label, header_fmt)
+        sheet.write(KEY_ROW, col, key)
 
 
 def _create_main_sheet(
@@ -102,99 +180,22 @@ def _create_main_sheet(
 ):
     """Create the main sheet with rules at top and data table below."""
     sheet = workbook.add_worksheet("Plan d'approvisionnement")
-    num_cols = 11  # A to K
-
-    # --- Rules block at top: title, sections with grouped rules, empty row before table ---
+    num_cols = MAIN_SHEET_NUM_COLS
     sheet.set_column(0, num_cols - 1, 25)
-    row = 0
 
-    # Titre principal
-    sheet.merge_range(row, 0, row, num_cols - 1, "Règles métier", rules_title_format)
-    sheet.set_row(row, 24)
-    row += 1
-
-    # Section "Selon l'intrant"
-    sheet.merge_range(
-        row,
-        0,
-        row,
-        num_cols - 1,
-        "Selon l'intrant sélectionné, certains champs peuvent être obligatoires.",
+    _write_rules_block(
+        sheet,
+        num_cols,
+        rules_title_format,
         rules_section_format,
+        rules_cell_format,
+        inputs,
     )
-    row += 1
-    # Intrants qui rendent le champ "Type de collecte" obligatoire (liste dynamique depuis la base)
-    collection_type_feedstock_names = [
-        inp.name for inp in inputs if getattr(inp, "code", None) in COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES
-    ]
-    if collection_type_feedstock_names:
-        collection_type_list_text = "\n".join(f"  • « {n} »" for n in sorted(collection_type_feedstock_names))
-        type_collecte_rule = (
-            "• Si l'intrant est l'un des suivants, le champ \"Type de collecte\" est obligatoire :\n"
-            f"{collection_type_list_text}"
-        )
-    else:
-        type_collecte_rule = (
-            "• Si l'intrant est l'un des suivants (voir liste en base), "
-            'le champ "Type de collecte" est obligatoire : (aucun dans la base).'
-        )
+    _write_table_header_and_key_row(sheet, header_format)
 
-    intrant_rules = [
-        "• Si l'intrant est une culture intermédiaire (CIVE) le champ Type de CIVE est obligatoire.",
-        (
-            "• Si l'intrant est « Autres cultures » ou « Autres cultures CIVE », "
-            'le champ "Précisez la culture" est obligatoire.'
-        ),
-        type_collecte_rule,
-        "• Si l'intrant est « Biogaz capté d'une ISDND », le champ Volume est optionnel.",
-    ]
-    for rule in intrant_rules:
-        sheet.merge_range(row, 0, row, num_cols - 1, rule, rules_cell_format)
-        row += 1
-    row += 1  # Ligne vide entre sections
-
-    # Section "Autres conditions"
-    sheet.merge_range(row, 0, row, num_cols - 1, "Autres conditions :", rules_section_format)
-    row += 1
-    other_rules = [
-        (
-            "• Si le pays d'origine est France, les champs « Distance moyenne pondérée », "
-            "« Distance maximale » et « Département d'origine » sont obligatoires."
-        ),
-        "• Si l'unité de matière est « Sèche », le champ « Ratio de matière sèche (%) » est obligatoire.",
-    ]
-    for rule in other_rules:
-        sheet.merge_range(row, 0, row, num_cols - 1, rule, rules_cell_format)
-        row += 1
-    # row pointe maintenant sur la première ligne vide après les règles ; le tableau commence à HEADER_ROW
-
-    # --- Table: headers and key row (Type de CIVE, Précisez la culture, Type de collecte en fin) ---
-    headers = [
-        ("Intrant", "feedstock"),
-        ("Unité", "material_unit"),
-        ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
-        ("Volume (tMB ou tMS)", "volume"),
-        ("Département", "origin_department"),
-        ("Distance moyenne pondérée (km)", "average_weighted_distance_km"),
-        ("Distance maximale (km)", "maximum_distance_km"),
-        ("Pays d'origine", "origin_country"),
-        ("Type de CIVE", "type_cive"),
-        ("Précisez la culture", "culture_details"),
-        ("Type de collecte", "collection_type"),
-    ]
-    sheet.set_row(HEADER_ROW, 30)
-    for col, (header, key) in enumerate(headers):
-        sheet.write(HEADER_ROW, col, header, header_format)
-        sheet.write(KEY_ROW, col, key)
-
-    # Add formulas for automatic France country when department is selected
     _add_country_formulas(sheet, countries)
-
-    # Add all data validations
     _add_dropdown_validations(sheet, countries, departments, inputs)
     _add_numeric_validations(sheet)
-
-    # Protect sheet and format columns
     _protect_and_format_sheet(workbook, sheet)
 
 
