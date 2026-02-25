@@ -15,6 +15,12 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             code="MAIS",
             is_methanogenic=True,
         )
+        self.seigle_cive = MatierePremiere.objects.create(
+            name="Seigle - CIVE",
+            name_en="Rye - CIVE",
+            code="Seigle - CIVE",
+            is_methanogenic=True,
+        )
 
         self.valid_data = {
             "material_unit": BiomethaneSupplyInput.WET,
@@ -68,3 +74,37 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
                 self.assertFalse(serializer.is_valid())
                 self.assertIn(field, serializer.errors)
                 self.assertIn("Ce champ est requis pour la France", str(serializer.errors[field]))
+
+    def test_validate_seigle_cive_requires_type_cive(self):
+        """Test input_name 'Seigle - CIVE' requires type_cive (SUMMER or WINTER)."""
+        data = {
+            **self.valid_data,
+            "input_name": "Seigle - CIVE",
+            "type_cive": None,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("type_cive", serializer.errors)
+
+    def test_validate_seigle_cive_valid_with_type_cive(self):
+        """Test input_name 'Seigle - CIVE' is valid with type_cive SUMMER or WINTER."""
+        for type_cive in (BiomethaneSupplyInput.SUMMER, BiomethaneSupplyInput.WINTER):
+            with self.subTest(type_cive=type_cive):
+                data = {
+                    **self.valid_data,
+                    "input_name": "Seigle - CIVE",
+                    "type_cive": type_cive,
+                }
+                serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_validate_other_input_clears_type_cive(self):
+        """Test when input_name is not Seigle - CIVE, type_cive is set to None."""
+        data = {
+            **self.valid_data,
+            "input_name": "Maïs",
+            "type_cive": BiomethaneSupplyInput.SUMMER,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["type_cive"])

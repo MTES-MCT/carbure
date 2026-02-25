@@ -21,6 +21,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     source = LabelChoiceField(choices=BiomethaneSupplyInput.SOURCE_CHOICES)
     crop_type = LabelChoiceField(choices=BiomethaneSupplyInput.CROP_TYPE_CHOICES)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
+    type_cive = LabelChoiceField(choices=BiomethaneSupplyInput.TYPE_CIVE_CHOICES, required=False, allow_null=True)
 
     input_name = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.biomethane.all())
     origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
@@ -63,6 +64,13 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
             for field in required_fields:
                 if not validated_data.get(field):
                     raise serializers.ValidationError({field: "Ce champ est requis pour la France"})
+
+        input_name = validated_data.get("input_name")
+        if input_name and input_name.code == "Seigle - CIVE":
+            if not validated_data.get("type_cive"):
+                raise serializers.ValidationError({"type_cive": "Le type de CIVE est requis pour l'intrant 'Seigle - CIVE'"})
+        else:
+            validated_data["type_cive"] = None
 
         return validated_data
 

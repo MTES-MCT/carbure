@@ -6,6 +6,7 @@ import {
   getSupplyPlanInputCropTypeOptions,
   getSupplyPlanInputMaterialUnitOptions,
   getSupplyPlanInputSourceOptions,
+  getSupplyPlanInputTypeCiveOptions,
 } from "../utils"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
@@ -31,6 +32,7 @@ export const SupplyInputForm = ({
   const sourceOptions = getSupplyPlanInputSourceOptions()
   const cropTypeOptions = getSupplyPlanInputCropTypeOptions()
   const materialUnitOptions = getSupplyPlanInputMaterialUnitOptions()
+  const typeCiveOptions = getSupplyPlanInputTypeCiveOptions()
 
   const form = useForm<SupplyInputFormValue>(supplyInput ?? {})
   const { value, bind } = form
@@ -67,6 +69,16 @@ export const SupplyInputForm = ({
             {...bind("input_name")}
             readOnly={readOnly}
           />
+          {value?.input_name?.code === "Seigle - CIVE" && (
+            <RadioGroup
+              options={typeCiveOptions}
+              label={t("Type de cive")}
+              required
+              orientation="horizontal"
+              {...bind("type_cive")}
+              readOnly={readOnly}
+            />
+          )}
           {value?.input_name?.classification && (
             <>
               <TextInput

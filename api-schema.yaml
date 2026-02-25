@@ -12980,6 +12980,10 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13024,6 +13028,10 @@ components:
           $ref: "#/components/schemas/CropTypeEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
         input_name:
           type: string
         origin_country:
@@ -13064,6 +13072,10 @@ components:
           $ref: "#/components/schemas/CropTypeEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
         input_name:
           type: string
           minLength: 1
@@ -13112,6 +13124,10 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -17114,6 +17130,10 @@ components:
           $ref: "#/components/schemas/CropTypeEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
         input_name:
           type: string
           minLength: 1
@@ -18528,6 +18548,14 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    TypeCiveEnum:
+      enum:
+        - SUMMER
+        - WINTER
+      type: string
+      description: |-
+        * `SUMMER` - Été
+        * `WINTER` - Hiver
     UnitRequest:
       type: object
       properties:

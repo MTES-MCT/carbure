@@ -4,6 +4,7 @@ import {
   PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter as BiomethaneSupplyInputFilter,
   CropTypeEnum as BiomethaneSupplyInputCropType,
   MaterialUnitEnum as BiomethaneSupplyInputMaterialUnit,
+  TypeCiveEnum as BiomethaneSupplyInputTypeCive,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -20,4 +21,5 @@ export {
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputCropType,
   BiomethaneSupplyInputMaterialUnit,
+  BiomethaneSupplyInputTypeCive,
 }

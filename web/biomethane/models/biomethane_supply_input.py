@@ -34,6 +34,15 @@ class BiomethaneSupplyInput(models.Model):
     # Intrants
     input_name = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.PROTECT)
 
+    # Type de CIVE (obligatoire si input_name.code == "Seigle - CIVE")
+    SUMMER = "SUMMER"
+    WINTER = "WINTER"
+    TYPE_CIVE_CHOICES = [
+        (SUMMER, "Été"),
+        (WINTER, "Hiver"),
+    ]
+    type_cive = models.CharField(max_length=10, choices=TYPE_CIVE_CHOICES, null=True, blank=True)
+
     # Unité matière
     DRY = "DRY"
     WET = "WET"

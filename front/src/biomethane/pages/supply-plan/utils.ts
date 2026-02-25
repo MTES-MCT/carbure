@@ -2,6 +2,7 @@ import {
   BiomethaneSupplyInputCropType,
   BiomethaneSupplyInputSource,
   BiomethaneSupplyInputMaterialUnit,
+  BiomethaneSupplyInputTypeCive,
 } from "./types"
 import i18next from "i18next"
 
@@ -46,6 +47,13 @@ export const getSupplyPlanInputMaterialUnitOptions = () => {
   return [
     { value: BiomethaneSupplyInputMaterialUnit.DRY, label: i18next.t("Sèche") },
     { value: BiomethaneSupplyInputMaterialUnit.WET, label: i18next.t("Brute") },
+  ]
+}
+
+export const getSupplyPlanInputTypeCiveOptions = () => {
+  return [
+    { value: BiomethaneSupplyInputTypeCive.SUMMER, label: i18next.t("Été") },
+    { value: BiomethaneSupplyInputTypeCive.WINTER, label: i18next.t("Hiver") },
   ]
 }
 

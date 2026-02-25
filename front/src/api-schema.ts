@@ -3596,6 +3596,7 @@ export interface components {
             input_name: components["schemas"]["FeedStockClassification"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
+            type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3613,6 +3614,7 @@ export interface components {
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             input_name: string;
             origin_country: string;
             /** Format: double */
@@ -3629,6 +3631,7 @@ export interface components {
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             input_name: string;
             origin_country: string;
             /** Format: double */
@@ -3647,6 +3650,7 @@ export interface components {
             readonly input_name: string;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
+            type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -5361,6 +5365,7 @@ export interface components {
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type?: components["schemas"]["CropTypeEnum"];
             material_unit?: components["schemas"]["MaterialUnitEnum"];
+            type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             input_name?: string;
             origin_country?: string;
             /** Format: double */
@@ -5927,6 +5932,12 @@ export interface components {
          * @enum {string}
          */
         TransportDocumentTypeEnum: TransportDocumentTypeEnum;
+        /**
+         * @description * `SUMMER` - Été
+         *     * `WINTER` - Hiver
+         * @enum {string}
+         */
+        TypeCiveEnum: TypeCiveEnum;
         UnitRequest: {
             /** @default l */
             unit: components["schemas"]["PreferredUnitEnum"];
@@ -13747,6 +13758,10 @@ export enum TransportDocumentTypeEnum {
     DSAC = "DSAC",
     DSP = "DSP",
     OTHER = "OTHER"
+}
+export enum TypeCiveEnum {
+    SUMMER = "SUMMER",
+    WINTER = "WINTER"
 }
 export enum UnitTypeEnum {
     AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS",
