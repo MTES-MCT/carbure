@@ -1,5 +1,5 @@
 import { Dialog } from "common/components/dialog2"
-import { NumberInput, RadioGroup } from "common/components/inputs2"
+import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
 import {
@@ -67,6 +67,25 @@ export const SupplyInputForm = ({
             {...bind("input_name")}
             readOnly={readOnly}
           />
+          {value?.input_name?.classification && (
+            <>
+              <TextInput
+                label={t("Sous-catégorie d'intrants")}
+                value={value.input_name.classification.subcategory ?? ""}
+                readOnly
+              />
+              <TextInput
+                label={t("Catégorie d'intrants")}
+                value={value.input_name.classification.category ?? ""}
+                readOnly
+              />
+              <TextInput
+                label={t("Type")}
+                value={value.input_name.classification.group ?? ""}
+                readOnly
+              />
+            </>
+          )}
           <RadioGroup
             options={materialUnitOptions}
             label={t("Unité matière")}

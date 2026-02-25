@@ -3,12 +3,13 @@ from rest_framework import serializers
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
 from core.models import MatierePremiere, Pays
-from core.serializers import CountrySerializer, FeedStockSerializer
+from core.serializers import CountrySerializer
+from feedstocks.serializers.feedstock_classification import FeedStockClassificationSerializer
 
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
-    input_name = FeedStockSerializer()
+    input_name = FeedStockClassificationSerializer()
 
     class Meta:
         model = BiomethaneSupplyInput

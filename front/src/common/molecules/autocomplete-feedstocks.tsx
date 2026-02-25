@@ -3,13 +3,14 @@ import {
   Autocomplete,
   AutocompleteProps,
 } from "common/components/autocomplete2"
-import { Feedstock } from "common/types"
+import { FeedStockClassification } from "common/types"
 import { useTranslation } from "react-i18next"
 
-type AutoCompleteFeedstocksProps = AutocompleteProps<Feedstock> & {
-  isBiofuelFeedstock?: boolean
-  isMethanogenic?: boolean
-}
+type AutoCompleteFeedstocksProps =
+  AutocompleteProps<FeedStockClassification> & {
+    isBiofuelFeedstock?: boolean
+    isMethanogenic?: boolean
+  }
 
 export const AutoCompleteFeedstocks = ({
   isBiofuelFeedstock,

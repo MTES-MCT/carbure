@@ -12975,7 +12975,7 @@ components:
         origin_country:
           $ref: "#/components/schemas/Country"
         input_name:
-          $ref: "#/components/schemas/FeedStock"
+          $ref: "#/components/schemas/FeedStockClassification"
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
