@@ -69,12 +69,10 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         """Test successful creation of a supply input."""
         new_supply_data = {
             "supply_plan": self.supply_plan.id,
-            "source": "INTERNAL",
             "origin_country": "FR",
             "origin_department": "75",
             "average_weighted_distance_km": 50.0,
             "maximum_distance_km": 100.0,
-            "crop_type": "MAIN",
             "volume": 500.0,
             "feedstock": "Maïs",
             "material_unit": "WET",

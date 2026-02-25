@@ -26,8 +26,6 @@ class ExcelExportActionMixin:
                     "label": "Plan d'approvisionnement",
                     "rows": self.get_serializer(queryset, many=True).data,
                     "columns": [
-                        {"label": "Provenance", "value": "source"},
-                        {"label": "Type de culture", "value": "crop_type"},
                         {"label": "Intrant", "value": "feedstock"},
                         {"label": "Type de CIVE", "value": "type_cive"},
                         {"label": "Précisez la culture", "value": "culture_details"},

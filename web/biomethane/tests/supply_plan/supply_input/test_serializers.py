@@ -53,8 +53,6 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         self.valid_data = {
             "material_unit": BiomethaneSupplyInput.WET,
             "dry_matter_ratio_percent": None,
-            "source": BiomethaneSupplyInput.INTERNAL,
-            "crop_type": BiomethaneSupplyInput.MAIN,
             "feedstock": "Maïs",
             "volume": 1000.0,
             "origin_country": "FR",

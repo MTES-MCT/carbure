@@ -80,8 +80,6 @@ class ExcelImportActionMixinTests(APITestCase):
         excel_file = self.create_test_excel_file(
             data=[
                 {
-                    "source": "Externe",
-                    "crop_type": "Principale",
                     "feedstock": "Lisiers bovins",
                     "material_unit": "Brute",
                     "volume": 100,
@@ -91,8 +89,6 @@ class ExcelImportActionMixinTests(APITestCase):
                     "origin_country": "France",
                 },
                 {
-                    "source": "Interne",
-                    "crop_type": "Intermédiaire",
                     "feedstock": "Lisiers bovins",
                     "material_unit": "Sèche",
                     "dry_matter_ratio_percent": "13,00",

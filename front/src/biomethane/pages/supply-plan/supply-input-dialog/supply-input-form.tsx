@@ -3,9 +3,7 @@ import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
 import {
-  getSupplyPlanInputCropTypeOptions,
   getSupplyPlanInputMaterialUnitOptions,
-  getSupplyPlanInputSourceOptions,
   getSupplyPlanInputTypeCiveOptions,
   getSupplyPlanInputCollectionTypeOptions,
   SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE,
@@ -31,8 +29,6 @@ export const SupplyInputForm = ({
   readOnly?: boolean
 }) => {
   const { t } = useTranslation()
-  const sourceOptions = getSupplyPlanInputSourceOptions()
-  const cropTypeOptions = getSupplyPlanInputCropTypeOptions()
   const materialUnitOptions = getSupplyPlanInputMaterialUnitOptions()
   const typeCiveOptions = getSupplyPlanInputTypeCiveOptions()
   const collectionTypeOptions = getSupplyPlanInputCollectionTypeOptions()
@@ -49,22 +45,6 @@ export const SupplyInputForm = ({
     >
       <Grid gap="lg" cols={2}>
         <Dialog.Section label="Intrant" gap="lg">
-          <RadioGroup
-            options={sourceOptions}
-            label={t("Provenance")}
-            required
-            orientation="horizontal"
-            {...bind("source")}
-            readOnly={readOnly}
-          />
-          <RadioGroup
-            options={cropTypeOptions}
-            label={t("Type de culture")}
-            required
-            orientation="horizontal"
-            {...bind("crop_type")}
-            readOnly={readOnly}
-          />
           <AutoCompleteFeedstocks
             isMethanogenic
             label={t("Intrants")}

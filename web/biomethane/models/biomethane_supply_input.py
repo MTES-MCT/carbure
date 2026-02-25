@@ -10,27 +10,6 @@ class BiomethaneSupplyInput(models.Model):
 
     ## Section Intrant
 
-    INTERNAL = "INTERNAL"
-    EXTERNAL = "EXTERNAL"
-
-    SOURCE_CHOICES = [
-        (INTERNAL, "Interne"),
-        (EXTERNAL, "Externe"),
-    ]
-
-    source = models.CharField(max_length=10, choices=SOURCE_CHOICES)
-
-    # Type de culture
-    MAIN = "MAIN"
-    INTERMEDIATE = "INTERMEDIATE"
-
-    CROP_TYPE_CHOICES = [
-        (MAIN, "Principale"),
-        (INTERMEDIATE, "Intermédiaire"),
-    ]
-
-    crop_type = models.CharField(max_length=15, choices=CROP_TYPE_CHOICES)
-
     # Intrant (matière première)
     feedstock = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.PROTECT)
 

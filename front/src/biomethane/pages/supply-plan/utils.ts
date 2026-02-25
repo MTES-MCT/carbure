@@ -1,6 +1,4 @@
 import {
-  BiomethaneSupplyInputCropType,
-  BiomethaneSupplyInputSource,
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputTypeCive,
   BiomethaneSupplyInputCollectionType,
@@ -18,43 +16,6 @@ export const SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE = [
   "Huiles et matières grasses (avec produits animaux) (Cat 2)",
   "Huiles et matières grasses (avec produits animaux) (Cat 3)",
 ]
-
-export const getSupplyPlanInputSource = (
-  source: BiomethaneSupplyInputSource
-) => {
-  switch (source) {
-    case BiomethaneSupplyInputSource.INTERNAL:
-      return i18next.t("Interne")
-    case BiomethaneSupplyInputSource.EXTERNAL:
-      return i18next.t("Externe")
-  }
-}
-
-export const getSupplyPlanInputSourceOptions = () => {
-  return [
-    {
-      value: BiomethaneSupplyInputSource.INTERNAL,
-      label: i18next.t("Interne"),
-    },
-    {
-      value: BiomethaneSupplyInputSource.EXTERNAL,
-      label: i18next.t("Externe"),
-    },
-  ]
-}
-
-export const getSupplyPlanInputCropTypeOptions = () => {
-  return [
-    {
-      value: BiomethaneSupplyInputCropType.MAIN,
-      label: i18next.t("Principale"),
-    },
-    {
-      value: BiomethaneSupplyInputCropType.INTERMEDIATE,
-      label: i18next.t("Intermédiaire"),
-    },
-  ]
-}
 
 export const getSupplyPlanInputMaterialUnitOptions = () => {
   return [

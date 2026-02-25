@@ -26,8 +26,6 @@ class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
     supply_plan = factory.SubFactory(BiomethaneSupplyPlanFactory)
 
     # Section Intrant
-    source = fuzzy.FuzzyChoice(BiomethaneSupplyInput.SOURCE_CHOICES, getter=lambda x: x[0])
-    crop_type = fuzzy.FuzzyChoice(BiomethaneSupplyInput.CROP_TYPE_CHOICES, getter=lambda x: x[0])
     feedstock = factory.LazyFunction(lambda: MatierePremiere.biomethane.order_by("?").first())
     material_unit = fuzzy.FuzzyChoice(BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES, getter=lambda x: x[0])
 

@@ -19,8 +19,6 @@ class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
 
 class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     # Use custom choice fields that accept both values and labels
-    source = LabelChoiceField(choices=BiomethaneSupplyInput.SOURCE_CHOICES)
-    crop_type = LabelChoiceField(choices=BiomethaneSupplyInput.CROP_TYPE_CHOICES)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
     type_cive = LabelChoiceField(choices=BiomethaneSupplyInput.TYPE_CIVE_CHOICES, required=False, allow_null=True)
     culture_details = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
@@ -33,7 +31,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
 
     # Use European float fields for numeric values
     dry_matter_ratio_percent = EuropeanFloatField(required=False, allow_null=True)
-    volume = EuropeanFloatField()
+    volume = EuropeanFloatField(required=False, allow_null=True)
     average_weighted_distance_km = EuropeanFloatField(required=False, allow_null=True)
     maximum_distance_km = EuropeanFloatField(required=False, allow_null=True)
 

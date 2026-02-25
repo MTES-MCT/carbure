@@ -3594,8 +3594,6 @@ export interface components {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
             feedstock: components["schemas"]["FeedStockClassification"];
-            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
-            crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
@@ -3603,7 +3601,7 @@ export interface components {
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
-            volume: number;
+            volume?: number | null;
             origin_department?: string | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
@@ -3613,8 +3611,6 @@ export interface components {
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
-            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
-            crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
@@ -3624,7 +3620,7 @@ export interface components {
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
-            volume: number;
+            volume?: number | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
@@ -3632,8 +3628,6 @@ export interface components {
             origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
-            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
-            crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
@@ -3643,7 +3637,7 @@ export interface components {
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
-            volume: number;
+            volume?: number | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
@@ -3654,8 +3648,6 @@ export interface components {
             readonly year: number;
             readonly origin_country: string;
             readonly feedstock: string;
-            source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
-            crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
@@ -3663,19 +3655,13 @@ export interface components {
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
-            volume: number;
+            volume?: number | null;
             origin_department?: string | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
         };
-        /**
-         * @description * `INTERNAL` - Interne
-         *     * `EXTERNAL` - Externe
-         * @enum {string}
-         */
-        BiomethaneSupplyInputSourceEnum: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
         BiomethaneUploadExcelRequest: {
             /** Format: binary */
             file: File;
@@ -3962,12 +3948,6 @@ export interface components {
             department?: string;
             insee_code?: string;
         };
-        /**
-         * @description * `MAIN` - Principale
-         *     * `INTERMEDIATE` - Intermédiaire
-         * @enum {string}
-         */
-        CropTypeEnum: CropTypeEnum;
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -4346,7 +4326,7 @@ export interface components {
         ElecProvisionCertificate: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
-            source: components["schemas"]["ElecProvisionCertificateSourceEnum"];
+            source: components["schemas"]["SourceEnum"];
             quarter: components["schemas"]["QuarterEnum"];
             year: number;
             operating_unit: string;
@@ -4392,15 +4372,6 @@ export interface components {
             renewable_energy: number;
         };
         ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
-        /**
-         * @description * `MANUAL` - MANUAL
-         *     * `METER_READINGS` - METER_READINGS
-         *     * `QUALICHARGE` - QUALICHARGE
-         *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
-         *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
-         * @enum {string}
-         */
-        ElecProvisionCertificateSourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
         /**
          * @description * `NO_ONE` - NO_ONE
          *     * `DGEC` - DGEC
@@ -5377,8 +5348,6 @@ export interface components {
             has_biogas_recovery?: boolean;
         };
         PatchedBiomethaneSupplyInputCreateRequest: {
-            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
-            crop_type?: components["schemas"]["CropTypeEnum"];
             material_unit?: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
@@ -5388,7 +5357,7 @@ export interface components {
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
-            volume?: number;
+            volume?: number | null;
             /** Format: double */
             average_weighted_distance_km?: number | null;
             /** Format: double */
@@ -5877,6 +5846,15 @@ export interface components {
          * @enum {string}
          */
         SiteTypeEnum: SiteTypeEnum;
+        /**
+         * @description * `MANUAL` - MANUAL
+         *     * `METER_READINGS` - METER_READINGS
+         *     * `QUALICHARGE` - QUALICHARGE
+         *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+         *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
+         * @enum {string}
+         */
+        SourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
         /**
          * @description * `DIRECT_SPREADING` - Épandage direct
          *     * `SPREADING_VIA_PROVIDER` - Épandage via un prestataire
@@ -7549,9 +7527,6 @@ export interface operations {
                 producer_id?: number;
                 /** @description A search term. */
                 search?: string;
-                /** @description * `INTERNAL` - Interne
-                 *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -7736,9 +7711,6 @@ export interface operations {
                 producer_id?: number;
                 /** @description A search term. */
                 search?: string;
-                /** @description * `INTERNAL` - Interne
-                 *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -13148,14 +13120,9 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFi
     status = "status",
     tariff_reference = "tariff_reference"
 }
-export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
-    EXTERNAL = "EXTERNAL",
-    INTERNAL = "INTERNAL"
-}
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
     feedstock = "feedstock",
     producer_id = "producer_id",
-    source = "source",
     year = "year"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
@@ -13565,10 +13532,6 @@ export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",
     IN_CORRECTION = "IN_CORRECTION",
     FIXED = "FIXED"
-}
-export enum CropTypeEnum {
-    MAIN = "MAIN",
-    INTERMEDIATE = "INTERMEDIATE"
 }
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",
