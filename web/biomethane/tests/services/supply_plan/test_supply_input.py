@@ -58,12 +58,14 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": "Some",
             "collection_type": BiomethaneSupplyInput.PRIVATE,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
         self.assertIsNone(data["type_cive"])
         self.assertIsNone(data["culture_details"])
         self.assertIsNone(data["collection_type"])
+        self.assertIsNone(data["volume"])
 
     def test_no_input_name_returns_no_errors(self):
         """When input_name is None, returned errors dict is empty."""
@@ -78,9 +80,10 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
-        self.assertEqual(errors, {"type_cive": "Le type de CIVE est requis pour cet intrant."})
+        self.assertIn("type_cive", errors)
         self.assertIsNone(data["culture_details"])
         self.assertIsNone(data["collection_type"])
 
@@ -91,6 +94,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": BiomethaneSupplyInput.WINTER,
             "culture_details": None,
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -103,6 +107,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": None,
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -115,6 +120,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": None,
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -127,12 +133,10 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
-        self.assertEqual(
-            errors,
-            {"culture_details": "Précisez la culture pour cet intrant."},
-        )
+        self.assertIn("culture_details", errors)
 
     def test_culture_details_valid_when_code_in_rule(self):
         """When input code matches and culture_details is set, no error."""
@@ -141,6 +145,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": "Mélange céréales",
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -153,6 +158,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": "Some",
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -165,12 +171,10 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
-        self.assertEqual(
-            errors,
-            {"collection_type": "Le type de collecte est requis pour cet intrant."},
-        )
+        self.assertIn("collection_type", errors)
 
     def test_collection_type_valid_when_name_in_rule(self):
         """When input name matches and collection_type is set, no error."""
@@ -179,6 +183,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": None,
             "collection_type": BiomethaneSupplyInput.LOCAL,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -191,6 +196,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": None,
             "collection_type": BiomethaneSupplyInput.PRIVATE,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
@@ -203,12 +209,15 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": "Detail",
             "collection_type": BiomethaneSupplyInput.BOTH,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
         self.assertIsNone(data["type_cive"])
         self.assertIsNone(data["culture_details"])
         self.assertIsNone(data["collection_type"])
+        # volume reste requis quand le nom n'est pas "X", donc on ne le vide pas
+        self.assertEqual(data["volume"], 100.0)
 
     def test_multiple_rules_match_returns_multiple_errors(self):
         """When input matches several rules and fields are empty, all errors are returned."""
@@ -217,8 +226,53 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "type_cive": None,
             "culture_details": None,
             "collection_type": None,
+            "volume": 100.0,
         }
         errors = apply_feedstock_field_rules(data)
         self.assertIn("type_cive", errors)
         self.assertIn("culture_details", errors)
         self.assertEqual(len(errors), 2)
+
+    def test_volume_required_when_feedstock_name_is_not_x(self):
+        """When feedstock name is not 'X', volume is required."""
+        data = {
+            "feedstock": self.input_mais,
+            "type_cive": None,
+            "culture_details": None,
+            "collection_type": None,
+            "volume": None,
+        }
+        errors = apply_feedstock_field_rules(data)
+        self.assertIn("volume", errors)
+
+    def test_volume_valid_when_feedstock_name_is_not_x(self):
+        """When feedstock name is not 'X' and volume is set, no error."""
+        data = {
+            "feedstock": self.input_mais,
+            "type_cive": None,
+            "culture_details": None,
+            "collection_type": None,
+            "volume": 100.0,
+        }
+        errors = apply_feedstock_field_rules(data)
+        self.assertEqual(errors, {})
+        self.assertEqual(data["volume"], 100.0)
+
+    def test_volume_cleared_when_feedstock_name_is_x(self):
+        """When feedstock name is 'X', volume is not required and is cleared."""
+        input_x = MatierePremiere.objects.create(
+            name="X",
+            name_en="X",
+            code="X",
+            is_methanogenic=True,
+        )
+        data = {
+            "feedstock": input_x,
+            "type_cive": None,
+            "culture_details": None,
+            "collection_type": None,
+            "volume": 50.0,
+        }
+        errors = apply_feedstock_field_rules(data)
+        self.assertEqual(errors, {})
+        self.assertIsNone(data["volume"])

@@ -72,7 +72,7 @@ class BiomethaneSupplyInput(models.Model):
     dry_matter_ratio_percent = models.FloatField(null=True, blank=True)
 
     # Volume (tMB ou tMS en fonction du choix)
-    volume = models.FloatField()
+    volume = models.FloatField(null=True, blank=True)
 
     ##  Section Réception
 
