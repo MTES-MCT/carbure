@@ -34,6 +34,7 @@ export const SupplyInputForm = ({
 
   const form = useForm<SupplyInputFormValue>(supplyInput ?? {})
   const { value, bind } = form
+  const isFranceOriginCountry = value.origin_country?.code_pays == "FR"
 
   return (
     <Form
@@ -110,7 +111,7 @@ export const SupplyInputForm = ({
             {...bind("origin_country")}
             readOnly={readOnly}
           />
-          {value.origin_country?.code_pays == "FR" && (
+          {isFranceOriginCountry && (
             <AutoCompleteDepartments
               label={t("Département d'origine")}
               required
@@ -123,12 +124,14 @@ export const SupplyInputForm = ({
             min={0}
             {...bind("average_weighted_distance_km")}
             readOnly={readOnly}
+            required={isFranceOriginCountry}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
             min={0}
             {...bind("maximum_distance_km")}
             readOnly={readOnly}
+            required={isFranceOriginCountry}
           />
         </Dialog.Section>
       </Grid>

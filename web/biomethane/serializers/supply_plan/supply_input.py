@@ -38,6 +38,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         return BiomethaneSupplyInputSerializer(instance).data
 
     def validate(self, data):
+        origin_country = data.get("origin_country")
         validated_data = super().validate(data)
 
         material_unit = validated_data.get("material_unit")
@@ -51,6 +52,16 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
 
         if material_unit == BiomethaneSupplyInput.WET:
             validated_data["dry_matter_ratio_percent"] = None
+
+        if origin_country.code_pays == "FR":
+            required_fields = [
+                "average_weighted_distance_km",
+                "maximum_distance_km",
+                "origin_department",
+            ]
+            for field in required_fields:
+                if not validated_data.get(field):
+                    raise serializers.ValidationError({field: "Ce champ est requis pour la France"})
 
         return validated_data
 
