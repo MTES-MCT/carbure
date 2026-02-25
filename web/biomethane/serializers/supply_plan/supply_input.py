@@ -22,6 +22,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     crop_type = LabelChoiceField(choices=BiomethaneSupplyInput.CROP_TYPE_CHOICES)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
     type_cive = LabelChoiceField(choices=BiomethaneSupplyInput.TYPE_CIVE_CHOICES, required=False, allow_null=True)
+    culture_details = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
 
     input_name = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.biomethane.all())
     origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
@@ -65,21 +66,32 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
                 if not validated_data.get(field):
                     raise serializers.ValidationError({field: "Ce champ est requis pour la France"})
 
-        input_name = validated_data.get("input_name")
-        if input_name and input_name.code == "Seigle - CIVE":
-            if not validated_data.get("type_cive"):
-                raise serializers.ValidationError({"type_cive": "Le type de CIVE est requis pour l'intrant 'Seigle - CIVE'"})
-        else:
-            validated_data["type_cive"] = None
-
+        self._validate_input_name_dependent_fields(validated_data)
         return validated_data
+
+    def _validate_input_name_dependent_fields(self, validated_data):
+        """Validate and clear fields that depend on input_name.code."""
+        input_name = validated_data.get("input_name")
+        input_code = input_name.code if input_name else None
+
+        # (input_name.code, field_name, error_message)
+        rules = [
+            ("Seigle - CIVE", "type_cive", "Le type de CIVE est requis pour l'intrant 'Seigle - CIVE'"),
+            ("Autres cultures", "culture_details", "Précisez la culture pour l'intrant 'Autres cultures'"),
+        ]
+        for code, field, message in rules:
+            if input_code == code:
+                if not validated_data.get(field):
+                    raise serializers.ValidationError({field: message})
+            else:
+                validated_data[field] = None
 
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")
 
         # Get or create the supply plan for the entity and year
-        supply_plan, created = BiomethaneSupplyPlan.objects.get_or_create(
+        supply_plan, _ = BiomethaneSupplyPlan.objects.get_or_create(
             producer=entity,
             year=year,
             defaults={},

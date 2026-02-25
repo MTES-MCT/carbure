@@ -43,6 +43,9 @@ class BiomethaneSupplyInput(models.Model):
     ]
     type_cive = models.CharField(max_length=10, choices=TYPE_CIVE_CHOICES, null=True, blank=True)
 
+    # Détails culture (obligatoire si input_name.code == "Autres cultures")
+    culture_details = models.CharField(max_length=255, null=True, blank=True)
+
     # Unité matière
     DRY = "DRY"
     WET = "WET"

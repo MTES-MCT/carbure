@@ -21,6 +21,12 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             code="Seigle - CIVE",
             is_methanogenic=True,
         )
+        self.autres_cultures = MatierePremiere.objects.create(
+            name="Autres cultures",
+            name_en="Other crops",
+            code="Autres cultures",
+            is_methanogenic=True,
+        )
 
         self.valid_data = {
             "material_unit": BiomethaneSupplyInput.WET,
@@ -108,3 +114,36 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         serializer = BiomethaneSupplyInputCreateSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         self.assertIsNone(serializer.validated_data["type_cive"])
+
+    def test_validate_autres_cultures_requires_culture_details(self):
+        """Test input_name 'Autres cultures' requires culture_details."""
+        data = {
+            **self.valid_data,
+            "input_name": "Autres cultures",
+            "culture_details": None,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("culture_details", serializer.errors)
+
+    def test_validate_autres_cultures_valid_with_culture_details(self):
+        """Test input_name 'Autres cultures' is valid with culture_details filled."""
+        data = {
+            **self.valid_data,
+            "input_name": "Autres cultures",
+            "culture_details": "Mélange céréales",
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["culture_details"], "Mélange céréales")
+
+    def test_validate_other_input_clears_culture_details(self):
+        """Test when input_name is not Autres cultures, culture_details is set to None."""
+        data = {
+            **self.valid_data,
+            "input_name": "Maïs",
+            "culture_details": "Some details",
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["culture_details"])

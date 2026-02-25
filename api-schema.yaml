@@ -12984,6 +12984,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
           nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13032,6 +13036,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
           nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
         input_name:
           type: string
         origin_country:
@@ -13076,6 +13084,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
           nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
         input_name:
           type: string
           minLength: 1
@@ -13128,6 +13140,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
           nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -17134,6 +17150,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
           nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
         input_name:
           type: string
           minLength: 1

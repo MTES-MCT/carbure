@@ -3597,6 +3597,7 @@ export interface components {
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            culture_details?: string | null;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3615,6 +3616,7 @@ export interface components {
             crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            culture_details?: string | null;
             input_name: string;
             origin_country: string;
             /** Format: double */
@@ -3632,6 +3634,7 @@ export interface components {
             crop_type: components["schemas"]["CropTypeEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            culture_details?: string | null;
             input_name: string;
             origin_country: string;
             /** Format: double */
@@ -3651,6 +3654,7 @@ export interface components {
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            culture_details?: string | null;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -5366,6 +5370,7 @@ export interface components {
             crop_type?: components["schemas"]["CropTypeEnum"];
             material_unit?: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            culture_details?: string | null;
             input_name?: string;
             origin_country?: string;
             /** Format: double */

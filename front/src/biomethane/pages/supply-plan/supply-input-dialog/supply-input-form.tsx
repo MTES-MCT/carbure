@@ -79,6 +79,14 @@ export const SupplyInputForm = ({
               readOnly={readOnly}
             />
           )}
+          {value?.input_name?.code === "Autres cultures" && (
+            <TextInput
+              label={t("Précisez la culture")}
+              required
+              {...bind("culture_details")}
+              readOnly={readOnly}
+            />
+          )}
           {value?.input_name?.classification && (
             <>
               <TextInput
