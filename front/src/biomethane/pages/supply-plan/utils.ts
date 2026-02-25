@@ -3,6 +3,7 @@ import {
   BiomethaneSupplyInputSource,
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputTypeCive,
+  BiomethaneSupplyInputCollectionType,
 } from "./types"
 import i18next from "i18next"
 
@@ -54,6 +55,23 @@ export const getSupplyPlanInputTypeCiveOptions = () => {
   return [
     { value: BiomethaneSupplyInputTypeCive.SUMMER, label: i18next.t("Été") },
     { value: BiomethaneSupplyInputTypeCive.WINTER, label: i18next.t("Hiver") },
+  ]
+}
+
+export const getSupplyPlanInputCollectionTypeOptions = () => {
+  return [
+    {
+      value: BiomethaneSupplyInputCollectionType.PRIVATE,
+      label: i18next.t("Issus de collecteurs privés"),
+    },
+    {
+      value: BiomethaneSupplyInputCollectionType.LOCAL,
+      label: i18next.t("Issus de collectivités locales"),
+    },
+    {
+      value: BiomethaneSupplyInputCollectionType.BOTH,
+      label: i18next.t("Issus des collectivités locales et collecteurs privés"),
+    },
   ]
 }
 

@@ -5,6 +5,7 @@ import {
   CropTypeEnum as BiomethaneSupplyInputCropType,
   MaterialUnitEnum as BiomethaneSupplyInputMaterialUnit,
   TypeCiveEnum as BiomethaneSupplyInputTypeCive,
+  CollectionTypeEnum as BiomethaneSupplyInputCollectionType,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -22,4 +23,5 @@ export {
   BiomethaneSupplyInputCropType,
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputTypeCive,
+  BiomethaneSupplyInputCollectionType,
 }

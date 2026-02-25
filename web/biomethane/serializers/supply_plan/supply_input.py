@@ -23,6 +23,9 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES)
     type_cive = LabelChoiceField(choices=BiomethaneSupplyInput.TYPE_CIVE_CHOICES, required=False, allow_null=True)
     culture_details = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
+    collection_type = LabelChoiceField(
+        choices=BiomethaneSupplyInput.COLLECTION_TYPE_CHOICES, required=False, allow_null=True
+    )
 
     input_name = serializers.SlugRelatedField(slug_field="name", queryset=MatierePremiere.biomethane.all())
     origin_country = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all())
@@ -78,6 +81,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
         rules = [
             ("Seigle - CIVE", "type_cive", "Le type de CIVE est requis pour l'intrant 'Seigle - CIVE'"),
             ("Autres cultures", "culture_details", "Précisez la culture pour l'intrant 'Autres cultures'"),
+            ("Déchets", "collection_type", "Le type de collecte est requis pour l'intrant 'Déchets'"),
         ]
         for code, field, message in rules:
             if input_code == code:

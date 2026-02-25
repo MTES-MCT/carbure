@@ -27,6 +27,12 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             code="Autres cultures",
             is_methanogenic=True,
         )
+        self.dechets = MatierePremiere.objects.create(
+            name="Déchets",
+            name_en="Waste",
+            code="Déchets",
+            is_methanogenic=True,
+        )
 
         self.valid_data = {
             "material_unit": BiomethaneSupplyInput.WET,
@@ -147,3 +153,41 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         serializer = BiomethaneSupplyInputCreateSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         self.assertIsNone(serializer.validated_data["culture_details"])
+
+    def test_validate_dechets_requires_collection_type(self):
+        """Test input_name 'Déchets' requires collection_type."""
+        data = {
+            **self.valid_data,
+            "input_name": "Déchets",
+            "collection_type": None,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("collection_type", serializer.errors)
+
+    def test_validate_dechets_valid_with_collection_type(self):
+        """Test input_name 'Déchets' is valid with collection_type PRIVATE, LOCAL or BOTH."""
+        for collection_type in (
+            BiomethaneSupplyInput.PRIVATE,
+            BiomethaneSupplyInput.LOCAL,
+            BiomethaneSupplyInput.BOTH,
+        ):
+            with self.subTest(collection_type=collection_type):
+                data = {
+                    **self.valid_data,
+                    "input_name": "Déchets",
+                    "collection_type": collection_type,
+                }
+                serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_validate_other_input_clears_collection_type(self):
+        """Test when input_name is not Déchets, collection_type is set to None."""
+        data = {
+            **self.valid_data,
+            "input_name": "Maïs",
+            "collection_type": BiomethaneSupplyInput.PRIVATE,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["collection_type"])

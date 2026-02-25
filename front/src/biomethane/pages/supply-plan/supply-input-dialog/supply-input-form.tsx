@@ -7,6 +7,7 @@ import {
   getSupplyPlanInputMaterialUnitOptions,
   getSupplyPlanInputSourceOptions,
   getSupplyPlanInputTypeCiveOptions,
+  getSupplyPlanInputCollectionTypeOptions,
 } from "../utils"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
@@ -33,6 +34,7 @@ export const SupplyInputForm = ({
   const cropTypeOptions = getSupplyPlanInputCropTypeOptions()
   const materialUnitOptions = getSupplyPlanInputMaterialUnitOptions()
   const typeCiveOptions = getSupplyPlanInputTypeCiveOptions()
+  const collectionTypeOptions = getSupplyPlanInputCollectionTypeOptions()
 
   const form = useForm<SupplyInputFormValue>(supplyInput ?? {})
   const { value, bind } = form
@@ -69,7 +71,7 @@ export const SupplyInputForm = ({
             {...bind("input_name")}
             readOnly={readOnly}
           />
-          {value?.input_name?.code === "Seigle - CIVE" && (
+          {value?.input_name?.name === "Seigle - CIVE" && (
             <RadioGroup
               options={typeCiveOptions}
               label={t("Type de cive")}
@@ -84,6 +86,16 @@ export const SupplyInputForm = ({
               label={t("Précisez la culture")}
               required
               {...bind("culture_details")}
+              readOnly={readOnly}
+            />
+          )}
+          {value?.input_name?.code === "Déchets" && (
+            <RadioGroup
+              options={collectionTypeOptions}
+              label={t("Type de collecte")}
+              required
+              orientation="vertical"
+              {...bind("collection_type")}
               readOnly={readOnly}
             />
           )}

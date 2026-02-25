@@ -3598,6 +3598,7 @@ export interface components {
             crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
+            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3617,6 +3618,7 @@ export interface components {
             material_unit: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
+            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
             input_name: string;
             origin_country: string;
             /** Format: double */
@@ -3635,6 +3637,7 @@ export interface components {
             material_unit: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
+            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
             input_name: string;
             origin_country: string;
             /** Format: double */
@@ -3655,6 +3658,7 @@ export interface components {
             crop_type: components["schemas"]["CropTypeEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
+            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3832,6 +3836,13 @@ export interface components {
             category: string;
             subcategory: string;
         };
+        /**
+         * @description * `PRIVATE` - Issus de collecteurs privés
+         *     * `LOCAL` - Issus de collectivités locales
+         *     * `BOTH` - Issus des collectivités locales et collecteurs privés
+         * @enum {string}
+         */
+        CollectionTypeEnum: CollectionTypeEnum;
         CommentRequest: {
             comment?: string;
         };
@@ -5371,6 +5382,7 @@ export interface components {
             material_unit?: components["schemas"]["MaterialUnitEnum"];
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
+            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
             input_name?: string;
             origin_country?: string;
             /** Format: double */
@@ -13534,6 +13546,11 @@ export enum CertificateTypeEnum {
     REDCERT = "REDCERT",
     Value2BS = "2BS",
     KZR_INIG = "KZR_INIG"
+}
+export enum CollectionTypeEnum {
+    PRIVATE = "PRIVATE",
+    LOCAL = "LOCAL",
+    BOTH = "BOTH"
 }
 export enum ComplementaryAidOrganismsEnum {
     ADEME = "ADEME",

@@ -46,6 +46,17 @@ class BiomethaneSupplyInput(models.Model):
     # Détails culture (obligatoire si input_name.code == "Autres cultures")
     culture_details = models.CharField(max_length=255, null=True, blank=True)
 
+    # Type de collecte (obligatoire si input_name.code == "Déchets")
+    PRIVATE = "PRIVATE"
+    LOCAL = "LOCAL"
+    BOTH = "BOTH"
+    COLLECTION_TYPE_CHOICES = [
+        (PRIVATE, "Issus de collecteurs privés"),
+        (LOCAL, "Issus de collectivités locales"),
+        (BOTH, "Issus des collectivités locales et collecteurs privés"),
+    ]
+    collection_type = models.CharField(max_length=10, choices=COLLECTION_TYPE_CHOICES, null=True, blank=True)
+
     # Unité matière
     DRY = "DRY"
     WET = "WET"

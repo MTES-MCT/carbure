@@ -12988,6 +12988,10 @@ components:
           type: string
           nullable: true
           maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13040,6 +13044,10 @@ components:
           type: string
           nullable: true
           maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         input_name:
           type: string
         origin_country:
@@ -13088,6 +13096,10 @@ components:
           type: string
           nullable: true
           maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         input_name:
           type: string
           minLength: 1
@@ -13144,6 +13156,10 @@ components:
           type: string
           nullable: true
           maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13577,6 +13593,16 @@ components:
         - category
         - group
         - subcategory
+    CollectionTypeEnum:
+      enum:
+        - PRIVATE
+        - LOCAL
+        - BOTH
+      type: string
+      description: |-
+        * `PRIVATE` - Issus de collecteurs privés
+        * `LOCAL` - Issus de collectivités locales
+        * `BOTH` - Issus des collectivités locales et collecteurs privés
     CommentRequest:
       type: object
       properties:
@@ -17154,6 +17180,10 @@ components:
           type: string
           nullable: true
           maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         input_name:
           type: string
           minLength: 1
