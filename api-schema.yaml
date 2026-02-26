@@ -1973,7 +1973,7 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
-          name: input_name
+          name: feedstock
           schema:
             type: array
             items:
@@ -2010,20 +2010,6 @@ paths:
           description: A search term.
           schema:
             type: string
-        - in: query
-          name: source
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - EXTERNAL
-                - INTERNAL
-          description: |-
-            * `INTERNAL` - Interne
-            * `EXTERNAL` - Externe
-          explode: true
-          style: form
         - in: query
           name: year
           schema:
@@ -2309,24 +2295,23 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
-          name: filter
-          schema:
-            type: string
-            enum:
-              - input_name
-              - producer_id
-              - source
-              - year
-          description: Filter string to apply
-          required: true
-        - in: query
-          name: input_name
+          name: feedstock
           schema:
             type: array
             items:
               type: string
           explode: true
           style: form
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - feedstock
+              - producer_id
+              - year
+          description: Filter string to apply
+          required: true
         - name: ordering
           required: false
           in: query
@@ -2345,20 +2330,6 @@ paths:
           description: A search term.
           schema:
             type: string
-        - in: query
-          name: source
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - EXTERNAL
-                - INTERNAL
-          description: |-
-            * `INTERNAL` - Interne
-            * `EXTERNAL` - Externe
-          explode: true
-          style: form
         - in: query
           name: year
           schema:
@@ -2381,9 +2352,8 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - input_name
+                    - feedstock
                     - producer_id
-                    - source
                     - year
                   summary: Example of filters response.
           description: ""
@@ -2509,7 +2479,7 @@ paths:
                             - This field is required.
                       - row: 5
                         errors:
-                          input_name:
+                          feedstock:
                             - Invalid input type.
                     total_errors: 2
                     total_rows_processed: 10
@@ -12974,12 +12944,20 @@ components:
           readOnly: true
         origin_country:
           $ref: "#/components/schemas/Country"
-        input_name:
-          $ref: "#/components/schemas/FeedStock"
-        source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
+        feedstock:
+          $ref: "#/components/schemas/FeedStockClassification"
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -12989,6 +12967,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         origin_department:
           type: string
           nullable: true
@@ -13004,27 +12983,32 @@ components:
         supply_plan:
           type: integer
       required:
-        - crop_type
+        - feedstock
         - id
-        - input_name
         - material_unit
         - origin_country
-        - source
         - supply_plan
-        - volume
     BiomethaneSupplyInputCreate:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
-        input_name:
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
+        feedstock:
           type: string
         origin_country:
           type: string
@@ -13035,6 +13019,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         average_weighted_distance_km:
           type: number
           format: double
@@ -13048,23 +13033,28 @@ components:
           nullable: true
           maxLength: 3
       required:
-        - crop_type
+        - feedstock
         - id
-        - input_name
         - material_unit
         - origin_country
-        - source
-        - volume
     BiomethaneSupplyInputCreateRequest:
       type: object
       properties:
-        source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
-        input_name:
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
+        feedstock:
           type: string
           minLength: 1
         origin_country:
@@ -13077,6 +13067,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         average_weighted_distance_km:
           type: number
           format: double
@@ -13090,12 +13081,9 @@ components:
           nullable: true
           maxLength: 3
       required:
-        - crop_type
-        - input_name
+        - feedstock
         - material_unit
         - origin_country
-        - source
-        - volume
     BiomethaneSupplyInputExport:
       type: object
       properties:
@@ -13105,13 +13093,21 @@ components:
         origin_country:
           type: string
           readOnly: true
-        input_name:
+        feedstock:
           type: string
           readOnly: true
-        source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13121,6 +13117,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         origin_department:
           type: string
           nullable: true
@@ -13134,21 +13131,10 @@ components:
           format: double
           nullable: true
       required:
-        - crop_type
-        - input_name
+        - feedstock
         - material_unit
         - origin_country
-        - source
-        - volume
         - year
-    BiomethaneSupplyInputSourceEnum:
-      enum:
-        - INTERNAL
-        - EXTERNAL
-      type: string
-      description: |-
-        * `INTERNAL` - Interne
-        * `EXTERNAL` - Externe
     BiomethaneUploadExcelRequest:
       type: object
       properties:
@@ -13545,6 +13531,16 @@ components:
         - category
         - group
         - subcategory
+    CollectionTypeEnum:
+      enum:
+        - PRIVATE
+        - LOCAL
+        - BOTH
+      type: string
+      description: |-
+        * `PRIVATE` - Issus de collecteurs privés
+        * `LOCAL` - Issus de collectivités locales
+        * `BOTH` - Issus des collectivités locales et collecteurs privés
     CommentRequest:
       type: object
       properties:
@@ -13815,14 +13811,6 @@ components:
           maxLength: 5
       required:
         - name
-    CropTypeEnum:
-      enum:
-        - MAIN
-        - INTERMEDIATE
-      type: string
-      description: |-
-        * `MAIN` - Principale
-        * `INTERMEDIATE` - Intermédiaire
     DeleteCertificateRequest:
       type: object
       properties:
@@ -14805,7 +14793,7 @@ components:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
         source:
-          $ref: "#/components/schemas/ElecProvisionCertificateSourceEnum"
+          $ref: "#/components/schemas/SourceEnum"
         quarter:
           allOf:
             - $ref: "#/components/schemas/QuarterEnum"
@@ -14930,20 +14918,6 @@ components:
       oneOf:
         - $ref: "#/components/schemas/ElecProvisionCertificateQualichargeGrouped"
         - $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
-    ElecProvisionCertificateSourceEnum:
-      enum:
-        - MANUAL
-        - METER_READINGS
-        - QUALICHARGE
-        - ENR_RATIO_COMPENSATION
-        - ADMIN_ERROR_COMPENSATION
-      type: string
-      description: |-
-        * `MANUAL` - MANUAL
-        * `METER_READINGS` - METER_READINGS
-        * `QUALICHARGE` - QUALICHARGE
-        * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
-        * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
     ElecQualichargeStatusEnum:
       enum:
         - NO_ONE
@@ -17108,13 +17082,21 @@ components:
     PatchedBiomethaneSupplyInputCreateRequest:
       type: object
       properties:
-        source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
-        input_name:
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
+        feedstock:
           type: string
           minLength: 1
         origin_country:
@@ -17127,6 +17109,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         average_weighted_distance_km:
           type: number
           format: double
@@ -18388,6 +18371,20 @@ components:
         * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
+    SourceEnum:
+      enum:
+        - MANUAL
+        - METER_READINGS
+        - QUALICHARGE
+        - ENR_RATIO_COMPENSATION
+        - ADMIN_ERROR_COMPENSATION
+      type: string
+      description: |-
+        * `MANUAL` - MANUAL
+        * `METER_READINGS` - METER_READINGS
+        * `QUALICHARGE` - QUALICHARGE
+        * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+        * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
     SpreadingManagementMethodsEnum:
       enum:
         - DIRECT_SPREADING
@@ -18528,6 +18525,14 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    TypeCiveEnum:
+      enum:
+        - SUMMER
+        - WINTER
+      type: string
+      description: |-
+        * `SUMMER` - Été
+        * `WINTER` - Hiver
     UnitRequest:
       type: object
       properties:

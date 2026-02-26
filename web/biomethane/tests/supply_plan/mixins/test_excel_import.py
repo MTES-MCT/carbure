@@ -46,8 +46,8 @@ class ExcelImportActionMixinTests(APITestCase):
         df = pd.DataFrame(data)
         excel_buffer = io.BytesIO()
         with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
-            # Use mixin-specific sheet name and header row
-            df.to_excel(writer, sheet_name="Plan d'approvisionnement", index=False, startrow=1)
+            # Use mixin-specific sheet name; header at row 12 (0-based) to match template (rules at top, then table)
+            df.to_excel(writer, sheet_name="Plan d'approvisionnement", index=False, startrow=12)
 
         excel_buffer.seek(0)
         return SimpleUploadedFile(
@@ -80,9 +80,7 @@ class ExcelImportActionMixinTests(APITestCase):
         excel_file = self.create_test_excel_file(
             data=[
                 {
-                    "source": "Externe",
-                    "crop_type": "Principale",
-                    "input_name": "Lisiers bovins",
+                    "feedstock": "Lisiers bovins",
                     "material_unit": "Brute",
                     "volume": 100,
                     "origin_department": "44 - Loire-Atlantique",
@@ -91,9 +89,7 @@ class ExcelImportActionMixinTests(APITestCase):
                     "origin_country": "France",
                 },
                 {
-                    "source": "Interne",
-                    "crop_type": "Intermédiaire",
-                    "input_name": "Lisiers bovins",
+                    "feedstock": "Lisiers bovins",
                     "material_unit": "Sèche",
                     "dry_matter_ratio_percent": "13,00",
                     "volume": 100,

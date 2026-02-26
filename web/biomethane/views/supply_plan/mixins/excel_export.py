@@ -26,9 +26,7 @@ class ExcelExportActionMixin:
                     "label": "Plan d'approvisionnement",
                     "rows": self.get_serializer(queryset, many=True).data,
                     "columns": [
-                        {"label": "Provenance", "value": "source"},
-                        {"label": "Type de culture", "value": "crop_type"},
-                        {"label": "Intrant", "value": "input_name"},
+                        {"label": "Intrant", "value": "feedstock"},
                         {"label": "Unité", "value": "material_unit"},
                         {"label": "Ratio de matière sèche (%)", "value": "dry_matter_ratio_percent"},
                         {"label": "Volume (t)", "value": "volume"},
@@ -36,6 +34,9 @@ class ExcelExportActionMixin:
                         {"label": "Distance moyenne pondérée (km)", "value": "average_weighted_distance_km"},
                         {"label": "Distance maximale (km)", "value": "maximum_distance_km"},
                         {"label": "Pays d'origine", "value": "origin_country"},
+                        {"label": "Type de CIVE", "value": "type_cive"},
+                        {"label": "Précisez la culture", "value": "culture_details"},
+                        {"label": "Type de collecte", "value": "collection_type"},
                         {"label": "Année", "value": "year"},
                     ],
                 }

@@ -5,10 +5,9 @@ import {
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputQuery,
-  BiomethaneSupplyInputSource,
 } from "./types"
 import Tag from "@codegouvfr/react-dsfr/Tag"
-import { convertSupplyPlanInputVolume, getSupplyPlanInputSource } from "./utils"
+import { convertSupplyPlanInputVolume } from "./utils"
 import { getDepartmentName } from "common/utils/geography"
 import { getSupplyPlanInputFilters } from "./api"
 import { defaultNormalizer } from "common/utils/normalize"
@@ -20,12 +19,8 @@ export const useSupplyPlanColumns = () => {
 
   const columns: Column<BiomethaneSupplyInput>[] = [
     {
-      header: t("Provenance"),
-      cell: (input) => <Tag>{getSupplyPlanInputSource(input.source)}</Tag>,
-    },
-    {
       header: t("Intrant"),
-      cell: (input) => <Cell text={input.input_name?.name} />,
+      cell: (input) => <Cell text={input.feedstock?.name} />,
     },
     {
       header: t("Département"),
@@ -37,6 +32,8 @@ export const useSupplyPlanColumns = () => {
     {
       header: t("Tonnage (tMB)"),
       cell: (input) => {
+        if (!input.volume) return <Cell text={t("N/A")} />
+
         const volume =
           input.material_unit === BiomethaneSupplyInputMaterialUnit.DRY
             ? convertSupplyPlanInputVolume(
@@ -57,16 +54,11 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
   const { selectedEntityId } = useSelectedEntity()
 
   const filterLabels = {
-    [BiomethaneSupplyInputFilter.source]: t("Provenance"),
-    [BiomethaneSupplyInputFilter.input_name]: t("Intrant"),
+    [BiomethaneSupplyInputFilter.feedstock]: t("Intrant"),
   }
 
   const normalizers = {
-    [BiomethaneSupplyInputFilter.source]: (value: string) => ({
-      value,
-      label: getSupplyPlanInputSource(value as BiomethaneSupplyInputSource),
-    }),
-    [BiomethaneSupplyInputFilter.input_name]: (value: string) =>
+    [BiomethaneSupplyInputFilter.feedstock]: (value: string) =>
       defaultNormalizer(value),
   }
 
