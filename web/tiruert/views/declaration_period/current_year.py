@@ -24,18 +24,14 @@ from tiruert.services.declaration_period import DeclarationPeriodService
     },
 )
 @api_view(["GET"])
-def cuurent_declaration_period(request):
+def curent_declaration_period(request):
     """Check if there is a current declaration period and return the year if there is one"""
-    try:
-        year = DeclarationPeriodService.get_current_declaration_year()
+    year = DeclarationPeriodService.get_current_declaration_year()
+
+    if year is None:
         return Response(
-            {
-                "year": year,
-            },
-            status=status.HTTP_200_OK,
-        )
-    except Exception as e:
-        return Response(
-            {"error": "DECLARATION_PERIOD_ERROR", "message": str(e)},
+            {"error": "DECLARATION_PERIOD_NOT_FOUND", "message": "No declaration period found for the current date."},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
+
+    return Response({"year": year}, status=status.HTTP_200_OK)

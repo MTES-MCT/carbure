@@ -1,2 +1,2 @@
-from .current_year import cuurent_declaration_period
+from .current_year import curent_declaration_period
 from .years import declaration_period_years

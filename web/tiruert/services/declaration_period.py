@@ -1,7 +1,5 @@
 from datetime import date
 
-from rest_framework import serializers
-
 from tiruert.models.declaration_period import TiruertDeclarationPeriod
 
 
@@ -12,20 +10,10 @@ class DeclarationPeriodService:
         Determines the current declaration period based on the current date.
 
         Returns:
-            TiruertDeclarationPeriod: The current declaration period for the year.
-
-        Raises:
-            serializers.ValidationError: If no declaration period exists for the current year.
+            TiruertDeclarationPeriod | None: The current declaration period, or None if not found.
         """
         today = date.today()
-        period = (
-            TiruertDeclarationPeriod.objects.filter(start_date__lte=today, end_date__gte=today).order_by("-year").first()
-        )
-
-        if not period:
-            raise serializers.ValidationError("No declaration period found for the current year.")
-
-        return period
+        return TiruertDeclarationPeriod.objects.filter(start_date__lte=today, end_date__gte=today).order_by("-year").first()
 
     @staticmethod
     def get_current_declaration_year():
@@ -33,24 +21,7 @@ class DeclarationPeriodService:
         Determines the current declaration year based on the current date.
 
         Returns:
-            int: The current declaration year.
-
-        Raises:
-            serializers.ValidationError: If no declaration period exists for the current year.
+            int | None: The current declaration year, or None if no period is configured.
         """
         period = DeclarationPeriodService._get_current_declaration_period()
-        return period.year
-
-    @staticmethod
-    def is_declaration_period_open():
-        """
-        Check if we are currently in the declaration period.
-
-        Returns:
-            bool: True if current date is within the declaration period, False otherwise.
-
-        Raises:
-            serializers.ValidationError: If no declaration period exists for the current year.
-        """
-        period = DeclarationPeriodService._get_current_declaration_period()
-        return period.is_open
+        return period.year if period else None
