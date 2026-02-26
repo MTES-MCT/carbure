@@ -1,5 +1,4 @@
 from django.http import Http404
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -52,7 +51,6 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
     queryset = Objective.objects.all()
     filterset_class = ObjectiveFilter
     serializer_class = ObjectiveOutputSerializer
-    filter_backends = [DjangoFilterBackend]
     http_method_names = ["get"]
     pagination_class = None
 
