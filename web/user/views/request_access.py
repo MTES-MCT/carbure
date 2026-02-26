@@ -60,9 +60,7 @@ def request_entity_access(request, *args, **kwargs):
                 entity, request.user.email, comment
             )
         else:
-            recipient_list, email_subject, message = get_request_access_email_default(
-                entity, request.user.email, comment
-            )
+            recipient_list, email_subject, message = get_request_access_email_default(entity, request.user.email, comment)
 
         send_mail(
             request=request,

@@ -9,8 +9,8 @@ from entity.factories.entity import EntityFactory
 from entity.models import EntityScope
 
 
-def create_dreal_entity_with_department(department):
-    dreal = EntityFactory.create(entity_type=Entity.EXTERNAL_ADMIN)
+def create_dreal_entity_with_department(department, name="DREAL"):
+    dreal = EntityFactory.create(entity_type=Entity.EXTERNAL_ADMIN, name=name)
     dept_ct = ContentType.objects.get_for_model(Department)
     EntityScope.objects.create(entity=dreal, content_type=dept_ct, object_id=department.id)
     ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
@@ -27,8 +27,8 @@ class EntityTest(TestCase):
         self.production_unit = BiomethaneProductionUnit.objects.create(
             producer=self.entity, name="Test Production Unit", department=self.dept_02
         )
-        self.dreal = create_dreal_entity_with_department(self.dept_01)
-        self.dreal_other = create_dreal_entity_with_department(self.dept_02)
+        self.dreal = create_dreal_entity_with_department(self.dept_01, name="DREAL 01")
+        self.dreal_other = create_dreal_entity_with_department(self.dept_02, name="DREAL 02")
 
     def tearDown(self):
         patch.stopall()
@@ -63,8 +63,8 @@ class EntityTest(TestCase):
 
     def test_get_managing_external_admins_returns_both_dreals_when_same_department(self):
         """Deux DREALs reliées au même département : on récupère bien les deux."""
-        dreal_a = create_dreal_entity_with_department(self.dept_03)
-        dreal_b = create_dreal_entity_with_department(self.dept_03)
+        dreal_a = create_dreal_entity_with_department(self.dept_03, name="DREAL A")
+        dreal_b = create_dreal_entity_with_department(self.dept_03, name="DREAL B")
         producer = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER)
         BiomethaneProductionUnit.objects.create(producer=producer, name="Unit", department=self.dept_03)
 
