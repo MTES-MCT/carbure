@@ -3,16 +3,35 @@ import { Dialog } from "common/components/dialog2"
 import { CustomStepper } from "./custom-stepper"
 import { Text } from "common/components/text"
 import { usePortal } from "common/components/portal"
-import { DeclarationValidatedModalStep2 } from "./declaration-validated-modal-step2"
+import {
+  DeclarationValidatedModalStep2,
+  useAlreadyParticipatedYears,
+} from "./declaration-validated-modal-step2"
+import { useTranslation } from "react-i18next"
 
 export const DeclarationValidatedModalStep1 = ({
   onClose,
+  declarationYear,
 }: {
   onClose: () => void
+  declarationYear: number
 }) => {
+  const { t } = useTranslation()
   const portal = usePortal()
+  const { isAlreadyParticipated } = useAlreadyParticipatedYears()
+  const isAlreadyParticipatedForThisYear =
+    isAlreadyParticipated(declarationYear) ?? false
+
   const goToStep2 = () => {
-    portal((close) => <DeclarationValidatedModalStep2 onClose={close} />)
+    if (!isAlreadyParticipatedForThisYear) {
+      portal((close) => (
+        <DeclarationValidatedModalStep2
+          onClose={close}
+          declarationYear={declarationYear}
+        />
+      ))
+    }
+
     onClose()
   }
 
@@ -26,7 +45,7 @@ export const DeclarationValidatedModalStep1 = ({
       }
       footer={
         <Button priority="primary" onClick={goToStep2}>
-          Suivant
+          {isAlreadyParticipatedForThisYear ? t("J'ai compris") : t("Suivant")}
         </Button>
       }
       size="medium"
@@ -51,7 +70,9 @@ export const DeclarationValidatedModalStep1 = ({
         correspondant DREAL afin d’envisager un partage direct des informations
         par le biais de l’outil.
       </Text>
-      <CustomStepper currentStep={1} totalSteps={2} />
+      {!isAlreadyParticipatedForThisYear && (
+        <CustomStepper currentStep={1} totalSteps={2} />
+      )}
     </Dialog>
   )
 }

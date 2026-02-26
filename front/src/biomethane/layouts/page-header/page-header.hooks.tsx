@@ -38,7 +38,12 @@ export const usePageHeaderActions = () => {
         notify(t("Votre déclaration a bien été transmise."), {
           variant: "success",
         })
-        portal((close) => <DeclarationValidatedModalStep1 onClose={close} />)
+        portal((close) => (
+          <DeclarationValidatedModalStep1
+            onClose={close}
+            declarationYear={selectedYear}
+          />
+        ))
       },
       onError: (err) => {
         const errorCode = (err as HttpError).status

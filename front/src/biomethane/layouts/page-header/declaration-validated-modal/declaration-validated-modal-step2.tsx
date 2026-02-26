@@ -6,18 +6,50 @@ import { useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
 import { addQueryParams } from "common/utils/routes"
 import useEntity from "common/hooks/entity"
+import useLocalStorage from "common/hooks/storage"
 
+export const useAlreadyParticipatedYears = () => {
+  const [alreadyParticipatedYears, setAlreadyParticipatedYears] =
+    useLocalStorage<number[] | undefined>(
+      "carbure:alreadyParticipatedBiomethaneCustomerSatisfactionYears",
+      new Array<number>()
+    )
+
+  const addYear = (year: number) => {
+    if (alreadyParticipatedYears?.includes(year)) {
+      return
+    }
+    alreadyParticipatedYears?.push(year)
+    setAlreadyParticipatedYears(alreadyParticipatedYears)
+  }
+
+  const isAlreadyParticipated = (year: number) => {
+    return alreadyParticipatedYears?.includes(year)
+  }
+
+  return {
+    years: Array.from(alreadyParticipatedYears ?? []),
+    addYear,
+    isAlreadyParticipated,
+  }
+}
 export const DeclarationValidatedModalStep2 = ({
   onClose,
+  declarationYear,
 }: {
   onClose: () => void
+  declarationYear: number
 }) => {
   const navigate = useNavigate()
   const routes = useRoutes()
   const entity = useEntity()
+  const { addYear } = useAlreadyParticipatedYears()
 
   const goToCustomerSatisfaction = () => {
     onClose()
+
+    addYear(declarationYear)
+
     const url = addQueryParams(
       routes.BIOMETHANE().PRODUCER.CUSTOMER_SATISFACTION,
       {
