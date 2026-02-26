@@ -47,7 +47,6 @@ export const SupplyInputForm = ({
       <Grid gap="lg" cols={2}>
         <Dialog.Section label="Intrant" gap="lg">
           <AutoCompleteFeedstocks
-            isMethanogenic
             label={t("Intrants")}
             required
             {...bind("feedstock")}
