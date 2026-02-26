@@ -1,5 +1,3 @@
-from os import environ
-
 from django.conf import settings
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework.decorators import api_view, permission_classes
@@ -8,8 +6,12 @@ from rest_framework.response import Response
 
 from core.decorators import otp_or_403
 from core.helpers import send_mail
-from core.models import UserRights, UserRightsRequests
+from core.models import Entity, UserRights, UserRightsRequests
 from user.serializers import RequestAccessSerializer, ResponseSuccessSerializer
+from user.services.emails import (
+    get_request_access_email_biomethane_producer,
+    get_request_access_email_default,
+)
 
 
 @extend_schema(
@@ -53,27 +55,14 @@ def request_entity_access(request, *args, **kwargs):
             defaults={"comment": comment, "role": role, "status": "PENDING"},
         )
 
-        validation_url = f"{environ.get('BASE_URL')}/org/{entity.id}/settings/users"
-        email_subject = "Carbure - Demande d'accès"
-        message = """
-        Bonjour,
-        Un utilisateur vient de faire une demande d'accès à CarbuRe.
-        Vous pouvez valider ou refuser cette demande depuis la page d'administration de votre société : %s.
-
-        Utilisateur: %s
-        Société: %s
-        Commentaire: %s
-        """ % (
-            validation_url,
-            request.user.email,
-            entity.name,
-            comment,
-        )
-
-        # get all user admins for tthe entity
-        admins = entity.get_admin_users_emails()
-        recipient_list = list(admins)
-        recipient_list.append("carbure@beta.gouv.fr")
+        if entity.entity_type == Entity.BIOMETHANE_PRODUCER:
+            recipient_list, email_subject, message = get_request_access_email_biomethane_producer(
+                entity, request.user.email, comment
+            )
+        else:
+            recipient_list, email_subject, message = get_request_access_email_default(
+                entity, request.user.email, comment
+            )
 
         send_mail(
             request=request,
