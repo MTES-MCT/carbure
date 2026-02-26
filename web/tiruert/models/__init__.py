@@ -7,3 +7,4 @@ from .objective import Objective
 from .mac_fossil_fuel import MacFossilFuel
 from .elec_operation import ElecOperation
 from .declaration_period import TiruertDeclarationPeriod
+from .objective_snapshot import ObjectiveSnapshot

@@ -51,8 +51,6 @@ class ObjectiveOutputSerializer(serializers.Serializer):
 class ObjectiveInputSerializer(serializers.Serializer):
     entity_id = serializers.IntegerField(required=True)
     year = serializers.IntegerField(required=True)
-    date_from = serializers.DateField(required=True)
-    date_to = serializers.DateField(required=False)
 
 
 class ObjectiveAdminInputSerializer(ObjectiveInputSerializer):
