@@ -10,6 +10,7 @@ class Command(BaseCommand):
     help = """
     The next day of a declaration period's last day, update 'status' to CANCELED
     for all PENDING teneur operations of this closed period.
+    This command should be run every day.
 
     Usage:
         python web/manage.py cancel_teneur_operations
@@ -20,7 +21,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         yesterday = date.today() - timedelta(days=1)
-        period_closed_yesterday = TiruertDeclarationPeriod.object.filter(end_date=yesterday).first()
+        period_closed_yesterday = TiruertDeclarationPeriod.objects.filter(end_date=yesterday).first()
 
         if period_closed_yesterday:
             pending_teneur_operations = Operation.objects.filter(
@@ -36,3 +37,5 @@ class Command(BaseCommand):
                     f"{count} teneur operations have been canceled for declaration year {period_closed_yesterday.year}."
                 )
             )
+        else:
+            self.stdout.write(self.style.SUCCESS("No declaration period closed yesterday. No operations canceled."))
