@@ -360,7 +360,6 @@ def _create_departments_sheet(workbook, bold, departments):
         sheet.write(row, 0, dept.code_dept)
         sheet.write(row, 1, f"{dept.code_dept} - {dept.name}")
 
-    sheet.hide()
     sheet.protect()
 
 
@@ -374,7 +373,6 @@ def _create_countries_sheet(workbook, bold, countries):
         sheet.write(row, 0, country.code_pays)
         sheet.write(row, 1, country.name)
 
-    sheet.hide()
     sheet.protect()
 
 
@@ -386,5 +384,4 @@ def _create_inputs_sheet(workbook, bold, feedstocks):
     for row, input in enumerate(feedstocks, start=1):
         sheet.write(row, 0, input.name)
 
-    sheet.hide()
     sheet.protect()
