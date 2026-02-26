@@ -222,7 +222,7 @@ export const entityRight: UserRight = {
 
 export const entityRequest: UserRightRequest = {
   id: 1,
-  user: ["user@company.com"],
+  user: { email: "user@company.com" },
   entity: producer,
   date_requested: "2020-12-22T16:18:27.233Z",
   status: UserRightStatus.Accepted,
@@ -253,6 +253,7 @@ export const entities = {
 }
 
 type PartialUserParam = DeepPartial<{
+  name: User["name"]
   email: User["email"]
   request: User["requests"][0]
   right: User["rights"][0]
@@ -272,6 +273,7 @@ export const generateUser = (
 
   const res = {
     email: partialUser?.email ?? "user@company.com",
+    name: partialUser?.name ?? "User Test",
     requests: [
       mergeDeepRight(
         {

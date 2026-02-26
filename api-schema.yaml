@@ -11766,6 +11766,15 @@ components:
         - $ref: "#/components/schemas/Balance"
         - $ref: "#/components/schemas/BalanceByDepot"
         - $ref: "#/components/schemas/BalanceBySector"
+    BaseUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          readOnly: true
+      required:
+        - email
     Biofuel:
       type: object
       properties:
@@ -12959,7 +12968,9 @@ components:
             - $ref: "#/components/schemas/CollectionTypeEnum"
           nullable: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -12985,7 +12996,6 @@ components:
       required:
         - feedstock
         - id
-        - material_unit
         - origin_country
         - supply_plan
     BiomethaneSupplyInputCreate:
@@ -12995,7 +13005,9 @@ components:
           type: integer
           readOnly: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
         type_cive:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
@@ -13035,13 +13047,14 @@ components:
       required:
         - feedstock
         - id
-        - material_unit
         - origin_country
     BiomethaneSupplyInputCreateRequest:
       type: object
       properties:
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
         type_cive:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
@@ -13082,7 +13095,6 @@ components:
           maxLength: 3
       required:
         - feedstock
-        - material_unit
         - origin_country
     BiomethaneSupplyInputExport:
       type: object
@@ -13109,7 +13121,9 @@ components:
             - $ref: "#/components/schemas/CollectionTypeEnum"
           nullable: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -13132,7 +13146,6 @@ components:
           nullable: true
       required:
         - feedstock
-        - material_unit
         - origin_country
         - year
     BiomethaneUploadExcelRequest:
@@ -17083,7 +17096,9 @@ components:
       type: object
       properties:
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
         type_cive:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
@@ -18861,10 +18876,7 @@ components:
           type: integer
           readOnly: true
         user:
-          type: array
-          items:
-            type: string
-          readOnly: true
+          $ref: "#/components/schemas/BaseUser"
         entity:
           $ref: "#/components/schemas/EntitySummary"
         date_requested:
@@ -18930,6 +18942,8 @@ components:
         email:
           type: string
           format: email
+        name:
+          type: string
         rights:
           type: array
           items:
@@ -18940,6 +18954,7 @@ components:
             $ref: "#/components/schemas/UserRightsRequests"
       required:
         - email
+        - name
         - requests
         - rights
     VerifyOTPRequest:
