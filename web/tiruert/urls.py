@@ -6,7 +6,7 @@ from .views import (
     MacFossilFuelExportViewSet,
     ObjectiveViewSet,
     OperationViewSet,
-    cuurent_declaration_period,
+    curent_declaration_period,
     declaration_period_years,
 )
 
@@ -23,6 +23,6 @@ urlpatterns = router.urls + [
     path("objectives/", objectives, name="get-objectives"),
     path("admin-objectives/", agregated_objectives_admin_view, name="get-admin-objectives"),
     path("admin-objectives-entity/", objectives_admin_view, name="get-admin-objectives-entity"),
-    path("declaration-period/", cuurent_declaration_period, name="declaration-period-is-open"),
+    path("declaration-period/", curent_declaration_period, name="declaration-period-is-open"),
     path("declaration-period/years/", declaration_period_years, name="declaration-period-years"),
 ]
