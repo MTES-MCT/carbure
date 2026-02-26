@@ -28,6 +28,14 @@ class TransactionTest(TestCase):
         transaction = Transaction.from_xml(xml_data)
         self.assertEqual("TRN-0000000000001-1234567890", transaction.udb_transaction_id())
 
+    def test_knows_its_loading_date_in_ISO_format(self):
+        xml_data = transaction_data(loading_date="2026-02-22T00:00:00.000Z")
+        transaction = Transaction.from_xml(xml_data)
+        self.assertEqual("2026-02-22", transaction.iso_format_loading_date())
+
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertEqual("2026-02-22", lot_attributes["dispatch_date"])
+
     def test_knows_its_delivery_date_in_ISO_format(self):
         xml_data = transaction_data(delivery_date="2025-12-22T00:00:00.000Z")
         transaction = Transaction.from_xml(xml_data)
@@ -43,6 +51,13 @@ class TransactionTest(TestCase):
 
         lot_attributes = transaction.to_lot_attributes()
         self.assertEqual(202512, lot_attributes["period"])
+
+    def test_uses_dispatch_month_period_when_delivery_date_not_set(self):
+        xml_data = transaction_data(delivery_date=None, loading_date="2026-02-22T00:00:00.000Z")
+        transaction = Transaction.from_xml(xml_data)
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertTrue("delivery_date" not in lot_attributes)
+        self.assertEqual(202602, lot_attributes["period"])
 
     def test_knows_its_year(self):
         xml_data = transaction_data(delivery_date="2025-12-22T00:00:00.000Z")
