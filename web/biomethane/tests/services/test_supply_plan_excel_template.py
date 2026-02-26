@@ -41,9 +41,7 @@ class SupplyPlanExcelTemplateTests(TestCase):
         main_sheet = self.workbook["Plan d'approvisionnement"]
 
         expected_columns = [
-            "Provenance",
             "Intrant",
-            "Type de culture",
             "Unité",
             "Ratio de matière sèche (%)",
             "Volume (tMB ou tMS)",
@@ -51,10 +49,14 @@ class SupplyPlanExcelTemplateTests(TestCase):
             "Distance moyenne pondérée (km)",
             "Distance maximale (km)",
             "Pays d'origine",
+            "Type de CIVE",
+            "Précisez la culture",
+            "Type de collecte",
         ]
 
-        # Read the first row (headers) and filter out None values
-        actual_columns = [cell.value for cell in main_sheet[1] if cell.value is not None]
+        # Read the header row (table starts after rules block at top)
+        header_row = 12  # Excel 1-based; rules block rows 1-10, then header row 12
+        actual_columns = [cell.value for cell in main_sheet[header_row] if cell.value is not None]
 
         self.assertEqual(actual_columns, expected_columns)
 

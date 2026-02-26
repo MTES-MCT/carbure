@@ -1,51 +1,50 @@
 import {
-  BiomethaneSupplyInputCropType,
-  BiomethaneSupplyInputSource,
   BiomethaneSupplyInputMaterialUnit,
+  BiomethaneSupplyInputTypeCive,
+  BiomethaneSupplyInputCollectionType,
 } from "./types"
 import i18next from "i18next"
 
-export const getSupplyPlanInputSource = (
-  source: BiomethaneSupplyInputSource
-) => {
-  switch (source) {
-    case BiomethaneSupplyInputSource.INTERNAL:
-      return i18next.t("Interne")
-    case BiomethaneSupplyInputSource.EXTERNAL:
-      return i18next.t("Externe")
-  }
-}
-
-export const getSupplyPlanInputSourceOptions = () => {
-  return [
-    {
-      value: BiomethaneSupplyInputSource.INTERNAL,
-      label: i18next.t("Interne"),
-    },
-    {
-      value: BiomethaneSupplyInputSource.EXTERNAL,
-      label: i18next.t("Externe"),
-    },
-  ]
-}
-
-export const getSupplyPlanInputCropTypeOptions = () => {
-  return [
-    {
-      value: BiomethaneSupplyInputCropType.MAIN,
-      label: i18next.t("Principale"),
-    },
-    {
-      value: BiomethaneSupplyInputCropType.INTERMEDIATE,
-      label: i18next.t("Intermédiaire"),
-    },
-  ]
-}
+/** Input names (intrant) that require "Type de collecte" to be filled */
+export const SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE = [
+  "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
+  "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-VEGETALE",
+  "HUILES-ALIMENTAIRES-USAGEES-DORIGINE-NON-SPECIFIEE",
+  "GRAISSES-DE-BACS-A-GRAISSE-DE-RESTAURATION",
+  "AUTRE-DECHETS-GRAISSEUX",
+  "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-1",
+  "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-2",
+  "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-3",
+]
 
 export const getSupplyPlanInputMaterialUnitOptions = () => {
   return [
     { value: BiomethaneSupplyInputMaterialUnit.DRY, label: i18next.t("Sèche") },
     { value: BiomethaneSupplyInputMaterialUnit.WET, label: i18next.t("Brute") },
+  ]
+}
+
+export const getSupplyPlanInputTypeCiveOptions = () => {
+  return [
+    { value: BiomethaneSupplyInputTypeCive.SUMMER, label: i18next.t("Été") },
+    { value: BiomethaneSupplyInputTypeCive.WINTER, label: i18next.t("Hiver") },
+  ]
+}
+
+export const getSupplyPlanInputCollectionTypeOptions = () => {
+  return [
+    {
+      value: BiomethaneSupplyInputCollectionType.PRIVATE,
+      label: i18next.t("Issus de collecteurs privés"),
+    },
+    {
+      value: BiomethaneSupplyInputCollectionType.LOCAL,
+      label: i18next.t("Issus de collectivités locales"),
+    },
+    {
+      value: BiomethaneSupplyInputCollectionType.BOTH,
+      label: i18next.t("Issus des collectivités locales et collecteurs privés"),
+    },
   ]
 }
 

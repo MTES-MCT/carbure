@@ -28,6 +28,7 @@ import { useMutation } from "common/hooks/async"
 import * as api from "../../api/production-sites"
 import useEntity from "common/hooks/entity"
 import { Button } from "common/components/button2"
+import { useFeedstockParams } from "common/hooks/api/use-feedstocks"
 
 interface ProductionSiteFormValue {
   displayInDialog?: boolean
@@ -101,7 +102,7 @@ export const ProductionSiteForm = ({
   const notify = useNotify()
   const entity = useEntity()
   const notifyError = useNotifyError()
-
+  const feedstockParams = useFeedstockParams()
   const addProdSite = useMutation(addProductionSite, {
     invalidates: ["production-sites"],
 
@@ -306,7 +307,7 @@ export const ProductionSiteForm = ({
           placeholder={t("Ajouter matières premières...")}
           defaultOptions={value.matieres_premieres}
           getOptions={(query) =>
-            common.findFeedstocks({ query, is_biofuel_feedstock: true })
+            common.findFeedstocks({ query, ...feedstockParams })
           }
           normalize={normalizeFeedstock}
           {...bind("matieres_premieres")}

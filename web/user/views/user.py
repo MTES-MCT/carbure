@@ -27,6 +27,7 @@ def get_settings(request, *args, **kwargs):
     serializer = UserSettingsResponseSerializer(
         {
             "email": request.user.email,
+            "name": request.user.name,
             "rights": rights,
             "requests": requests,
         }

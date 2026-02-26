@@ -41,8 +41,7 @@ export function useUserManager(): UserManager {
   }
 
   function getName() {
-    const firstRight = rights[0]
-    return firstRight?.name ?? ""
+    return res?.name ?? ""
   }
 
   function hasEntity(entityID: number) {

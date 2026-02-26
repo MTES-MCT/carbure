@@ -5,6 +5,7 @@ from core.serializers import UserRightsRequestsSerializer, UserRightsSerializer
 
 class UserSettingsResponseSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    name = serializers.CharField()
     rights = UserRightsSerializer(many=True)
     requests = UserRightsRequestsSerializer(many=True)
 

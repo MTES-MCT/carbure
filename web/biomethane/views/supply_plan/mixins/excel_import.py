@@ -35,7 +35,7 @@ class ExcelImportActionMixin:
                 value={
                     "validation_errors": [
                         {"row": 3, "errors": {"volume": ["This field is required."]}},
-                        {"row": 5, "errors": {"input_name": ["Invalid input type."]}},
+                        {"row": 5, "errors": {"feedstock": ["Invalid input type."]}},
                     ],
                     "total_errors": 2,
                     "total_rows_processed": 10,
@@ -65,8 +65,9 @@ class ExcelImportActionMixin:
 
         file = file_serializer.validated_data["file"]
 
+        # Template has rules at top (sections), then header row 12, key row 13, data from row 14
         config = {
-            "header_row": 1,
+            "header_row": 12,  # 0-based: row of keys (feedstock, type_cive, ...) used as column names
             "sheet_name": "Plan d'approvisionnement",
         }
 

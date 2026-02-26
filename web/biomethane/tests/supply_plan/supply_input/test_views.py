@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
+from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity, MatierePremiere
 from core.tests_utils import setup_current_user
@@ -42,7 +43,9 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
             producer=self.producer_entity, year=BiomethaneAnnualDeclarationService.get_current_declaration_year()
         )
 
-        self.supply_input = BiomethaneSupplyInputFactory.create(supply_plan=self.supply_plan)
+        self.supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan, feedstock=self.matiere_mais, material_unit=BiomethaneSupplyInput.WET
+        )
 
         self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         self.url_base = reverse("biomethane-supply-input-list")
@@ -69,12 +72,12 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         """Test successful creation of a supply input."""
         new_supply_data = {
             "supply_plan": self.supply_plan.id,
-            "source": "INTERNAL",
             "origin_country": "FR",
             "origin_department": "75",
-            "crop_type": "MAIN",
+            "average_weighted_distance_km": 50.0,
+            "maximum_distance_km": 100.0,
             "volume": 500.0,
-            "input_name": "Maïs",
+            "feedstock": "Maïs",
             "material_unit": "WET",
         }
 
@@ -83,7 +86,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["input_name"]["name"], "Maïs")
+        self.assertEqual(response.data["feedstock"]["name"], "Maïs")
         self.assertEqual(response.data["origin_country"]["code_pays"], "FR")
         self.assertEqual(response.data["volume"], 500.0)
 
@@ -91,7 +94,8 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         """Test successful update of a supply input."""
         update_data = {
             "volume": 750.0,
-            "input_name": "Résidus",
+            "material_unit": BiomethaneSupplyInput.WET,
+            "feedstock": "Résidus",
         }
 
         response = self.client.patch(
@@ -103,7 +107,7 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["volume"], 750.0)
-        self.assertEqual(response.data["input_name"]["name"], "Résidus")
+        self.assertEqual(response.data["feedstock"]["name"], "Résidus")
 
     def test_create_supply_input_invalid_data(self):
         """Test creation of a supply input with invalid data."""

@@ -767,9 +767,17 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
         ]
 
 
+class BaseUserSerializer(serializers.Serializer):
+    email = serializers.SerializerMethodField()
+
+    @extend_schema_field(serializers.EmailField)
+    def get_email(self, obj):
+        return obj.email
+
+
 class UserRightsRequestsSerializer(serializers.ModelSerializer):
     entity = EntitySummarySerializer()
-    user = serializers.SerializerMethodField()
+    user = BaseUserSerializer()
 
     class Meta:
         model = UserRightsRequests
@@ -785,28 +793,15 @@ class UserRightsRequestsSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["role", "status"]
 
-    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
-    def get_user(self, obj):
-        return [obj.user.email]
-
 
 class UserRightsSerializer(serializers.ModelSerializer):
     entity = UserEntitySerializer()
-    name = serializers.SerializerMethodField()
-    email = serializers.SerializerMethodField()
+    user = BaseUserSerializer()
 
     class Meta:
         model = UserRights
-        fields = ["name", "email", "entity", "role", "expiration_date"]
+        fields = ["user", "entity", "role", "expiration_date"]
         read_only_fields = ["role"]
-
-    @extend_schema_field(serializers.CharField)
-    def get_name(self, obj):
-        return obj.user.name
-
-    @extend_schema_field(serializers.EmailField)
-    def get_email(self, obj):
-        return obj.user.email
 
 
 # Check if the fields are defined in the attrs and raise a validation error if they are not

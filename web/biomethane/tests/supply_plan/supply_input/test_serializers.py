@@ -3,6 +3,7 @@ from django.test import TestCase
 from biomethane.models import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateSerializer
 from core.models import MatierePremiere
+from feedstocks.models import Classification
 
 
 class BiomethaneSupplyInputSerializerTests(TestCase):
@@ -15,16 +16,55 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
             code="MAIS",
             is_methanogenic=True,
         )
+        # Type de CIVE: required when classification.category == "Biomasse agricole - Cultures intermédiaires"
+        self.classification_cive = Classification.objects.create(
+            group="Biomasse",
+            category="Biomasse agricole - Cultures intermédiaires",
+            subcategory="CIVE",
+        )
+        self.seigle_cive = MatierePremiere.objects.create(
+            name="Seigle - CIVE",
+            name_en="Rye - CIVE",
+            code="SEIGLE_CIVE",
+            is_methanogenic=True,
+            classification=self.classification_cive,
+        )
+        # Précisez la culture: required when code is AUTRES_CULTURES or AUTRES_CULTURES_CIVE
+        self.autres_cultures = MatierePremiere.objects.create(
+            name="Autres cultures",
+            name_en="Other crops",
+            code="AUTRES-CULTURES",
+            is_methanogenic=True,
+        )
+        self.autres_cultures_cive = MatierePremiere.objects.create(
+            name="Autres cultures CIVE",
+            name_en="Other crops CIVE",
+            code="AUTRES-CULTURES-CIVE",
+            is_methanogenic=True,
+        )
+        # Type de collecte: required when name is in COLLECTION_TYPE_INPUT_NAMES
+        self.huiles_animale = MatierePremiere.objects.create(
+            name="Huiles alimentaires usagées d'origine animale",
+            name_en="Used cooking oil of animal origin",
+            code="HUILES-ALIMENTAIRES-USAGEES-DORIGINE-ANIMALE",
+            is_methanogenic=True,
+        )
+        self.biogaz_isdnd = MatierePremiere.objects.create(
+            name="Biogaz capté d'une ISDND",
+            name_en="Biogas from landfill",
+            code="BIOGAZ-CAPTE-DUNE-ISDND",
+            is_methanogenic=True,
+        )
 
         self.valid_data = {
             "material_unit": BiomethaneSupplyInput.WET,
             "dry_matter_ratio_percent": None,
-            "source": BiomethaneSupplyInput.INTERNAL,
-            "crop_type": BiomethaneSupplyInput.MAIN,
-            "input_name": "Maïs",
+            "feedstock": "Maïs",
             "volume": 1000.0,
             "origin_country": "FR",
             "origin_department": "75",
+            "average_weighted_distance_km": 50.0,
+            "maximum_distance_km": 100.0,
         }
 
     def test_validate_dry_material_requires_ratio(self):
@@ -51,3 +91,138 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
 
         self.assertTrue(serializer.is_valid())
         self.assertIsNone(serializer.validated_data["dry_matter_ratio_percent"])
+
+    def test_validate_france_requires_fields(self):
+        """Test origin_country=FR requires average_weighted_distance_km, maximum_distance_km and origin_department."""
+        required_fields = [
+            "average_weighted_distance_km",
+            "maximum_distance_km",
+            "origin_department",
+        ]
+        for field in required_fields:
+            with self.subTest(field=field):
+                data = {**self.valid_data, field: None}
+                serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+                self.assertFalse(serializer.is_valid())
+                self.assertIn(field, serializer.errors)
+
+    def test_validate_type_cive_required_when_classification_category_cive(self):
+        """Test type_cive required when feedstock has classification.category CIVE."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Seigle - CIVE",
+            "type_cive": None,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("type_cive", serializer.errors)
+
+    def test_validate_type_cive_valid_when_classification_category_cive(self):
+        """Test valid with type_cive when classification.category is CIVE."""
+        for type_cive in (BiomethaneSupplyInput.SUMMER, BiomethaneSupplyInput.WINTER):
+            with self.subTest(type_cive=type_cive):
+                data = {
+                    **self.valid_data,
+                    "feedstock": "Seigle - CIVE",
+                    "type_cive": type_cive,
+                }
+                serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_validate_other_input_clears_type_cive(self):
+        """Test when feedstock has no CIVE classification category, type_cive is set to None."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Maïs",
+            "type_cive": BiomethaneSupplyInput.SUMMER,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["type_cive"])
+
+    def test_validate_biogaz_isdnd_allows_null_material_unit_and_ratio(self):
+        """Test when feedstock is Biogaz capté ISDND, material_unit and dry_matter_ratio are optional."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Biogaz capté d'une ISDND",
+            "material_unit": None,
+            "dry_matter_ratio_percent": None,
+            "volume": None,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertIsNone(serializer.validated_data["material_unit"])
+        self.assertIsNone(serializer.validated_data["dry_matter_ratio_percent"])
+
+    def test_validate_culture_details_required_when_code_autres_cultures(self):
+        """Test culture_details required when feedstock.code is AUTRES_CULTURES or AUTRES_CULTURES_CIVE."""
+        for name in ("Autres cultures", "Autres cultures CIVE"):
+            with self.subTest(name=name):
+                data = {
+                    **self.valid_data,
+                    "feedstock": name,
+                    "culture_details": None,
+                }
+                serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+                self.assertFalse(serializer.is_valid())
+                self.assertIn("culture_details", serializer.errors)
+
+    def test_validate_culture_details_valid_when_code_autres_cultures(self):
+        """Test valid with culture_details when code is AUTRES_CULTURES."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Autres cultures",
+            "culture_details": "Mélange céréales",
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["culture_details"], "Mélange céréales")
+
+    def test_validate_other_input_clears_culture_details(self):
+        """Test when feedstock.code is not AUTRES_CULTURES/AUTRES_CULTURES_CIVE, culture_details is None."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Maïs",
+            "culture_details": "Some details",
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["culture_details"])
+
+    def test_validate_collection_type_required_when_name_in_list(self):
+        """Test collection_type required when feedstock.name is in COLLECTION_TYPE_INPUT_NAMES."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Huiles alimentaires usagées d'origine animale",
+            "collection_type": None,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("collection_type", serializer.errors)
+
+    def test_validate_collection_type_valid_when_name_in_list(self):
+        """Test valid with collection_type when input name is in the waste list."""
+        for collection_type in (
+            BiomethaneSupplyInput.PRIVATE,
+            BiomethaneSupplyInput.LOCAL,
+            BiomethaneSupplyInput.BOTH,
+        ):
+            with self.subTest(collection_type=collection_type):
+                data = {
+                    **self.valid_data,
+                    "feedstock": "Huiles alimentaires usagées d'origine animale",
+                    "collection_type": collection_type,
+                }
+                serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_validate_other_input_clears_collection_type(self):
+        """Test when feedstock.name is not in waste list, collection_type is set to None."""
+        data = {
+            **self.valid_data,
+            "feedstock": "Maïs",
+            "collection_type": BiomethaneSupplyInput.PRIVATE,
+        }
+        serializer = BiomethaneSupplyInputCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["collection_type"])

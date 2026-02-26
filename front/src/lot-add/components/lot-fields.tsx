@@ -13,6 +13,7 @@ import * as norm from "common/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { Biofuel, Country, Feedstock, Unit } from "common/types"
 import { Option } from "common/utils/normalize"
+import { useFeedstockParams } from "common/hooks/api/use-feedstocks"
 
 interface LotFieldsProps {
   readOnly?: boolean
@@ -115,6 +116,7 @@ export const FeedstockField = (props: AutocompleteProps<Feedstock>) => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
   const bound = bind("feedstock")
+  const feedstockParams = useFeedstockParams()
 
   const icon = bound.value ? (
     <span className="icon" style={{ fontSize: "0.9em" }}>
@@ -128,9 +130,7 @@ export const FeedstockField = (props: AutocompleteProps<Feedstock>) => {
       icon={icon}
       label={t("Matière première")}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={(query) =>
-        api.findFeedstocks({ query, is_biofuel_feedstock: true })
-      }
+      getOptions={(query) => api.findFeedstocks({ query, ...feedstockParams })}
       normalize={norm.normalizeFeedstock}
       {...bound}
       {...props}
