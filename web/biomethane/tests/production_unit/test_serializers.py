@@ -15,7 +15,7 @@ class BiomethaneProductionUnitSerializerTests(TestCase):
     def test_json_field_validation_with_valid_data(self):
         """Test validation of JSON fields with valid choices."""
         valid_data = {
-            "unit_name": "Test Unit",
+            "name": "Test Unit",
             "installed_meters": [
                 BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER,
                 BiomethaneProductionUnit.GLOBAL_ELECTRICAL_METER,
@@ -32,7 +32,7 @@ class BiomethaneProductionUnitSerializerTests(TestCase):
     def test_json_field_validation_invalid_installed_meters(self):
         """Test validation rejects invalid installed_meters."""
         invalid_data = {
-            "unit_name": "Test Unit",
+            "name": "Test Unit",
             "installed_meters": ["INVALID_METER_TYPE"],
             "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
             "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
@@ -45,7 +45,7 @@ class BiomethaneProductionUnitSerializerTests(TestCase):
     def test_json_field_validation_invalid_digestate_valorization_methods(self):
         """Test validation rejects invalid digestate valorization methods."""
         invalid_data = {
-            "unit_name": "Test Unit",
+            "name": "Test Unit",
             "installed_meters": [BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER],
             "digestate_valorization_methods": ["INVALID_VALORIZATION_METHOD"],
             "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
@@ -58,7 +58,7 @@ class BiomethaneProductionUnitSerializerTests(TestCase):
     def test_json_field_validation_invalid_spreading_management_methods(self):
         """Test validation rejects invalid spreading management methods."""
         invalid_data = {
-            "unit_name": "Test Unit",
+            "name": "Test Unit",
             "installed_meters": [BiomethaneProductionUnit.BIOGAS_PRODUCTION_FLOWMETER],
             "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
             "spreading_management_methods": ["INVALID_SPREADING_METHOD"],
@@ -71,7 +71,7 @@ class BiomethaneProductionUnitSerializerTests(TestCase):
     def test_json_field_validation_invalid_digestate_sale_types(self):
         """Test validation rejects invalid digestate sale types."""
         invalid_data = {
-            "unit_name": "Test Unit",
+            "name": "Test Unit",
             "digestate_valorization_methods": [BiomethaneProductionUnit.SPREADING],
             "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
             "digestate_sale_types": ["INVALID_SALE_TYPE"],

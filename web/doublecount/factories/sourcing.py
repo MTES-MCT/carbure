@@ -12,7 +12,7 @@ class DoubleCountingSourcingFactory(factory.django.DjangoModelFactory):
 
     dca = factory.Iterator(DoubleCountingApplication.objects.all())
     year = datetime.today().year
-    feedstock = factory.Iterator(MatierePremiere.objects.filter(is_double_compte=True))
+    feedstock = factory.Iterator(MatierePremiere.biofuel.filter(is_double_compte=True))
     origin_country = factory.Iterator(Pays.objects.all())
     supply_country = factory.Iterator(Pays.objects.all())
     transit_country = factory.Iterator(Pays.objects.all())

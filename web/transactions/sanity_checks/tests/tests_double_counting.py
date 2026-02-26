@@ -25,8 +25,8 @@ class DoubleCountingSanityChecksTest(TestCase):
     ]
 
     def setUp(self):
-        self.dc_feedstock = MatierePremiere.objects.filter(is_double_compte=True).first()
-        self.other_feedstock = MatierePremiere.objects.exclude(is_double_compte=True).first()
+        self.dc_feedstock = MatierePremiere.biofuel.filter(is_double_compte=True).first()
+        self.other_feedstock = MatierePremiere.biofuel.exclude(is_double_compte=True).first()
 
         self.dc_biofuel = Biocarburant.objects.get(code="ETH")
         self.saf_biofuel = Biocarburant.objects.filter(code__in=SAF_BIOFUEL_TYPES).first()

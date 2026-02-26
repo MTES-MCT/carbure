@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneContract, BiomethaneContractAmendment
 from core.serializers import check_fields_required
+from core.utils import check_file_size_and_extension
 
 
 class BaseBiomethaneContractAmendmentSerializer(serializers.ModelSerializer):
@@ -30,6 +31,14 @@ class BiomethaneContractAmendmentSerializer(BaseBiomethaneContractAmendmentSeria
 class BiomethaneContractAmendmentAddSerializer(BaseBiomethaneContractAmendmentSerializer):
     def validate(self, data):
         validated_data = super().validate(data)
+
+        # Check file size and extension
+        if validated_data.get("amendment_file"):
+            check_file_size_and_extension(
+                validated_data["amendment_file"],
+                max_size_mb=10,
+                extensions=[".pdf", ".doc", ".docx", ".zip"],
+            )
 
         if BiomethaneContractAmendment.OTHER in validated_data.get("amendment_object"):
             check_fields_required(validated_data, ["amendment_details"])

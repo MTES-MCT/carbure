@@ -19,7 +19,7 @@ class SafTicketsTest(TestCase):
             assignment_period=202201,
             status=SafTicket.PENDING,
             volume=30000,
-            feedstock=MatierePremiere.objects.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
+            feedstock=MatierePremiere.biofuel.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
             biofuel=Biocarburant.objects.get(code="HCC"),
             country_of_origin=Pays.objects.get(name="Espagne"),
             supplier=self.entity,

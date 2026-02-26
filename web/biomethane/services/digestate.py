@@ -40,6 +40,8 @@ class BiomethaneDigestateService:
     WWTP_FIELDS = ["wwtp_materials_to_incineration"]
     SALE_FIELDS = ["sold_volume", "acquiring_companies"]
 
+    COMPOSTING_LOCATIONS_FIELD = ["composting_locations"]
+
     @staticmethod
     def _extract_data(instance) -> DigestateContext:
         """Extract data from a digestate instance and return structured context."""
@@ -94,6 +96,15 @@ class BiomethaneDigestateService:
         return BiomethaneDigestateService._get_fields_to_clear(instance)
 
     @staticmethod
+    def get_all_optional_fields():
+        """
+        Return the list of all optional fields for digestate instances.
+        """
+        rules = _build_digestate_rules()
+
+        return [field for rule in rules for field in rule.fields]
+
+    @staticmethod
     def get_fields_to_clear(instance):
         """
         Return the list of fields to clear for a given instance.
@@ -141,7 +152,7 @@ def _build_digestate_rules() -> list[FieldClearingRule]:
             BiomethaneProductionUnit.COMPOSTING,
             BiomethaneDigestateService.EXTERNAL_PLATFORM_FIELDS
             + BiomethaneDigestateService.ON_SITE_FIELDS
-            + ["composting_locations"],
+            + BiomethaneDigestateService.COMPOSTING_LOCATIONS_FIELD,
             "composting_disabled",
         ),
         # Child rule 1: external platform not selected

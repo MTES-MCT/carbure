@@ -1,5 +1,5 @@
 from datetime import date
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 
@@ -356,3 +356,113 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.OVERDUE)
+
+
+class GetMissingFieldsTests(TestCase):
+    """Tests for BiomethaneAnnualDeclarationService._get_missing_fields."""
+
+    fixtures = ["json/countries.json"]
+
+    def setUp(self):
+        self.producer_entity = Entity.objects.create(
+            name="Test Producer",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+
+    @patch("biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_all_fields")
+    def test_uses_optional_fields_when_current_declaration(self, mock_get_all_fields):
+        """When is_current_declaration=True, optional_fields is used to compute required fields."""
+        mock_get_all_fields.return_value = ["a", "b", "c"]
+        instance = MagicMock()
+        instance.optional_fields = ["c"]
+        instance.all_optional_fields = ["b", "c"]
+        instance.a = None
+        instance.b = None
+        instance.c = None
+
+        missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance, is_current_declaration=True)
+
+        # Required = {a, b}; a and b are missing
+        self.assertEqual(set(missing), {"a", "b"})
+
+    @patch("biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_all_fields")
+    def test_uses_all_optional_fields_when_past_declaration(self, mock_get_all_fields):
+        """When is_current_declaration=False, all_optional_fields is used."""
+        mock_get_all_fields.return_value = ["a", "b", "c"]
+        instance = MagicMock()
+        instance.optional_fields = ["c"]
+        instance.all_optional_fields = ["b", "c"]
+        instance.a = None
+        instance.b = None
+        instance.c = None
+
+        missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance, is_current_declaration=False)
+
+        # Required = {a} only; only a is missing
+        self.assertEqual(set(missing), {"a"})
+
+    @patch("biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_all_fields")
+    def test_field_with_empty_string_is_missing(self, mock_get_all_fields):
+        """A required field with value '' is in missing_fields."""
+        mock_get_all_fields.return_value = ["x"]
+        instance = MagicMock(spec=["optional_fields"])
+        instance.optional_fields = []
+        instance.x = ""
+
+        missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance)
+
+        self.assertEqual(missing, ["x"])
+
+    @patch("biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_all_fields")
+    def test_field_with_empty_list_is_missing(self, mock_get_all_fields):
+        """A required field with value [] is in missing_fields."""
+        mock_get_all_fields.return_value = ["x"]
+        instance = MagicMock(spec=["optional_fields"])
+        instance.optional_fields = []
+        instance.x = []
+
+        missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance)
+
+        self.assertEqual(missing, ["x"])
+
+    @patch("biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_all_fields")
+    def test_field_with_value_is_not_missing(self, mock_get_all_fields):
+        """A required field with a non-empty value is not in missing_fields."""
+        mock_get_all_fields.return_value = ["x", "y"]
+        instance = MagicMock(spec=["optional_fields"])
+        instance.optional_fields = []
+        instance.x = "filled"
+        instance.y = 0
+
+        missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance)
+
+        self.assertEqual(missing, [])
+
+    @patch("biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_all_fields")
+    def test_instance_without_optional_fields_fallback_to_empty_list(self, mock_get_all_fields):
+        """If instance has no optional_fields, treat as [] (all fields required)."""
+        mock_get_all_fields.return_value = ["f"]
+
+        class InstanceWithoutOptionalFields:
+            f = None
+
+        instance = InstanceWithoutOptionalFields()
+
+        missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance, is_current_declaration=True)
+
+        self.assertEqual(missing, ["f"])
+
+    @patch("biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_all_fields")
+    def test_instance_without_all_optional_fields_past_year_fallback_to_empty_list(self, mock_get_all_fields):
+        """If instance has no all_optional_fields when is_current_declaration=False, treat as []."""
+        mock_get_all_fields.return_value = ["f"]
+
+        class InstanceWithOptionalOnly:
+            optional_fields = []
+            f = None
+
+        instance = InstanceWithOptionalOnly()
+
+        missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance, is_current_declaration=False)
+
+        self.assertEqual(missing, ["f"])

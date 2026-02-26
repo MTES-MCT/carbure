@@ -75,7 +75,6 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             operating_unit="FRBLA",
             source=ElecProvisionCertificate.METER_READINGS,
             energy_amount=certificate_energy,
-            remaining_energy_amount=certificate_energy,
         )
 
         return meter_reading
@@ -216,7 +215,6 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             quarter=1,
             year=2023,
             energy_amount=10000 * ENR_RATIO / 1000,
-            remaining_energy_amount=10000 * ENR_RATIO / 1000,
             source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION,
         )
 

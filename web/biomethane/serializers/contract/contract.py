@@ -6,6 +6,7 @@ from biomethane.serializers.contract.contract_amendment import BiomethaneContrac
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.services.contract import BiomethaneContractService
 from core.serializers import check_fields_required
+from core.utils import check_file_size_and_extension
 
 
 class BiomethaneContractSerializer(serializers.ModelSerializer):
@@ -42,6 +43,14 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
         validated_data = super().validate(data)
         contract = self.instance
 
+        # Check file size and extension
+        if validated_data.get("conditions_file"):
+            check_file_size_and_extension(
+                validated_data["conditions_file"],
+                max_size_mb=10,
+                extensions=[".pdf", ".doc", ".docx", ".zip"],
+            )
+
         # Use the service to validate the contract data and get required fields
         errors, required_fields = BiomethaneContractService.validate_contract(contract, validated_data)
 
@@ -63,7 +72,7 @@ class BiomethaneContractInputSerializer(serializers.ModelSerializer):
         BiomethaneContractService.handle_is_red_ii(validated_data, instance.producer)
 
         # If the user has updated the general conditions file, we need to track the amendment types
-        if instance.general_conditions_file:
+        if instance.conditions_file:
             # Determine if contract amendment needs to be updated
             tracked_types = BiomethaneContractService.get_tracked_amendment_types(instance, validated_data)
             validated_data["tracked_amendment_types"] = tracked_types

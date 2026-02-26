@@ -112,7 +112,7 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
     sourcing_errors = []
 
     # preload data
-    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.biofuel.all()}
 
     for row in sourcing_rows:
         line = row["line"]
@@ -189,7 +189,7 @@ def load_dc_production_data(
     production_errors = []
 
     # preload data
-    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.biofuel.all()}
     biofuels = {biofuel.code: biofuel for biofuel in Biocarburant.objects.all()}
 
     # check rows integrity
@@ -316,7 +316,7 @@ def load_dc_production_history_data(
     production_errors = []
 
     # preload data
-    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.biofuel.all()}
     biofuels = {biofuel.code: biofuel for biofuel in Biocarburant.objects.all()}
 
     # check rows integrity
@@ -572,7 +572,7 @@ def get_quotas(year: int, producer_id: int = None):
     )
     double_counting_certificates = [d.certificate_id for d in double_counting_certificates_queryset]
     biofuels = {p.id: p for p in Biocarburant.objects.all()}
-    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
+    feedstocks = {m.id: m for m in MatierePremiere.biofuel.filter(is_double_compte=True)}
 
     # tous les couples BC / MP pour sur une année
     detailed_quotas = DoubleCountingProduction.objects.values(
@@ -647,7 +647,7 @@ def get_agreement_quotas(agreement: DoubleCountingRegistration):
         return None
 
     biofuels = {p.id: p for p in Biocarburant.objects.all()}
-    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
+    feedstocks = {m.id: m for m in MatierePremiere.biofuel.filter(is_double_compte=True)}
 
     # tous les couples BC / MP pour le site de production sur une année
     detailed_quotas = (
@@ -704,7 +704,7 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
     sourcing_errors = []
 
     # preload data
-    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.objects.all()}
+    feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.biofuel.all()}
 
     for row in sourcing_history_rows:
         errors = check_sourcing_row(row)

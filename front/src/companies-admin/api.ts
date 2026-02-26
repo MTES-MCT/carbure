@@ -12,7 +12,12 @@ export function addCompany(
   name: string,
   entity_type: EntityType,
   has_saf: boolean,
-  has_elec: boolean
+  has_elec: boolean,
+  company_address: string,
+  postal_code: string,
+  city: string,
+  department: string,
+  insee_code: string
 ) {
   return apiFetch.POST("/entities/", {
     params: { query: { entity_id } },
@@ -21,6 +26,11 @@ export function addCompany(
       has_saf,
       has_elec,
       entity_type,
+      company_address,
+      postal_code,
+      city,
+      department,
+      insee_code,
     },
   })
 }

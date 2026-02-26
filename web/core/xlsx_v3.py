@@ -138,7 +138,7 @@ def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(created_by=entity)
     clients = Entity.objects.filter(entity_type__in=["Opérateur", "Trader"]).exclude(id=entity.id)
-    mps = MatierePremiere.objects.all()
+    mps = MatierePremiere.biofuel.all()
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
@@ -278,7 +278,7 @@ def make_producers_lots_sheet_simple(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(created_by=entity)
     clients = Entity.objects.filter(entity_type__in=["Opérateur", "Trader"])
-    mps = MatierePremiere.objects.all()
+    mps = MatierePremiere.biofuel.all()
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
@@ -378,7 +378,7 @@ def make_producers_lots_sheet_simple(workbook, entity):
 
 def make_operators_lots_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
-    mps = MatierePremiere.objects.all()
+    mps = MatierePremiere.biofuel.all()
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
@@ -470,7 +470,7 @@ def make_operators_lots_sheet(workbook, entity):
 
 def make_mps_sheet(workbook):
     worksheet_mps = workbook.add_worksheet("MatieresPremieres")
-    mps = MatierePremiere.objects.all()
+    mps = MatierePremiere.biofuel.all()
     # header
     bold = workbook.add_format({"bold": True})
     worksheet_mps.write("A1", "code", bold)
@@ -949,7 +949,7 @@ def make_dc_production_sheet(workbook):
 
 def make_dc_mps_sheet(workbook):
     worksheet_mps = workbook.add_worksheet("MatieresPremieres")
-    mps = MatierePremiere.objects.filter(is_double_compte=True)
+    mps = MatierePremiere.biofuel.filter(is_double_compte=True)
     # header
     bold = workbook.add_format({"bold": True})
     worksheet_mps.write("A1", "code", bold)

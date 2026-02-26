@@ -9,6 +9,7 @@ import { Grid } from "common/components/scaffold"
 import { usePortal } from "common/components/portal"
 import { AddContract } from "./add-contract"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { formatDate } from "common/utils/formatters"
 
 type ContractFile = {
   name: string
@@ -26,12 +27,8 @@ export const ContractFiles = ({
 
   const files: ContractFile[] = [
     {
-      name: t("Conditions générales"),
-      url: contract?.general_conditions_file,
-    },
-    {
-      name: t("Conditions particulières"),
-      url: contract?.specific_conditions_file,
+      name: t("Conditions générales et particulières"),
+      url: contract?.conditions_file,
     },
   ].filter((file) => Boolean(file.url))
 
@@ -68,7 +65,7 @@ export const ContractFiles = ({
         !hasSelectedEntity && (
           <Button
             iconId="ri-add-line"
-            disabled={!contract || Boolean(contract.general_conditions_file)}
+            disabled={!contract || Boolean(contract.conditions_file)}
             onClick={openAddContractDialog}
           >
             {t("Charger un contrat")}
@@ -85,12 +82,20 @@ export const ContractFiles = ({
           <Grid cols={2} gap="lg">
             <DateInput
               readOnly
-              value={contract?.signature_date ?? ""}
+              value={
+                contract?.signature_date
+                  ? formatDate(contract.signature_date)
+                  : ""
+              }
               label={t("Date de signature")}
             />
             <DateInput
               readOnly
-              value={contract?.effective_date ?? ""}
+              value={
+                contract?.effective_date
+                  ? formatDate(contract.effective_date)
+                  : ""
+              }
               label={t("Date de prise d'effet")}
             />
           </Grid>

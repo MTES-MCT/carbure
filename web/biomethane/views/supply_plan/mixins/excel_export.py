@@ -28,8 +28,7 @@ class ExcelExportActionMixin:
                     "columns": [
                         {"label": "Provenance", "value": "source"},
                         {"label": "Type de culture", "value": "crop_type"},
-                        {"label": "Catégorie", "value": "input_category"},
-                        {"label": "Intrant", "value": "input_type"},
+                        {"label": "Intrant", "value": "input_name"},
                         {"label": "Unité", "value": "material_unit"},
                         {"label": "Ratio de matière sèche (%)", "value": "dry_matter_ratio_percent"},
                         {"label": "Volume (t)", "value": "volume"},

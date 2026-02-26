@@ -10,8 +10,6 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { NoResult } from "common/components/no-result2"
 import { Pagination } from "common/components/pagination2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
-import { formatUnit } from "common/utils/formatters"
-import { ExtendedUnit } from "common/types"
 import { useQuery } from "common/hooks/async"
 import {
   ElecCertificateSnapshot,
@@ -28,6 +26,8 @@ import { useColumns, useFilters, useStatus, useTabs } from "./hooks"
 import { normalizeSource } from "../../utils"
 import { ExportButton } from "common/components/export"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { formatUnit } from "common/utils/formatters"
+import { ExtendedUnit } from "common/types"
 
 export interface ProvisionCertificatesProps {
   year: number
@@ -56,7 +56,7 @@ export const ProvisionCertificates = ({
 
   const tabs = useTabs(snapshot)
   const filters = useFilters()
-  const columns = useColumns(status)
+  const columns = useColumns()
 
   const provisionCerts = useQuery(getProvisionCertificates, {
     key: "elec-provision-certificates",
@@ -66,6 +66,7 @@ export const ProvisionCertificates = ({
   const loading = provisionCerts.loading
   const data = provisionCerts.result?.data
   const isEmpty = !data?.results.length
+  const total = data?.provisioned_energy ?? 0
 
   const showProvisionCertificateDetail = (p: ProvisionCertificate) => {
     return {
@@ -120,15 +121,12 @@ export const ProvisionCertificates = ({
             <RecapQuantity
               text={
                 <Trans
-                  defaults="{{count}} certificats et {{total}} d'énergie (<b>total disponible pour cession {{total_available_energy}}</b>)"
+                  defaults="{{count}} certificats de fourniture pour <b>un total de {{total}}</b>, et <b>{{available}} disponibles pour cession</b>"
                   components={{ b: <b /> }}
                   values={{
                     count: data.count,
-                    total: formatUnit(
-                      data!.available_energy ?? 0,
-                      ExtendedUnit.MWh
-                    ),
-                    total_available_energy: formattedBalance,
+                    total: formatUnit(total, ExtendedUnit.MWh),
+                    available: formattedBalance,
                   }}
                 />
               }

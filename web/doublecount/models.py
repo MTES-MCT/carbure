@@ -4,7 +4,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from core.models import Biocarburant, Entity, GenericCertificate, MatierePremiere, Pays
-from transactions.models import Site
+from transactions.models.production_site import ProductionSite
 
 usermodel = get_user_model()
 
@@ -25,7 +25,7 @@ class DoubleCountingApplication(models.Model):
     )
 
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, null=True, blank=True)
-    production_site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+    production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE, null=True, blank=True)
     producer_user = models.ForeignKey(
         usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name="producer_user"
     )

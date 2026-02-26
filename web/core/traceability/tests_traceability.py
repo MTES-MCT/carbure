@@ -16,7 +16,7 @@ from transactions.factories import (
     CarbureStockFactory,
     CarbureStockTransformFactory,
 )
-from transactions.models.site import Site
+from transactions.models.depot import Depot
 
 
 class TraceabilityTest(TestCase):
@@ -37,6 +37,9 @@ class TraceabilityTest(TestCase):
         self.entity = entities[0]
         self.entity2 = entities[1]
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
+
+        self.depot = Depot.objects.first()
+        self.depot2 = Depot.objects.last()
 
         CarbureLot.objects.all().delete()
         CarbureStock.objects.all().delete()
@@ -168,10 +171,10 @@ class TraceabilityTest(TestCase):
         assert dest_stock_node.get_depth() == 3
         assert child_node.get_depth() == 4
 
-        root_node.update({"transport_document_reference": "ABCD", "carbure_delivery_site_id": 13, "esca": 2.0})
+        root_node.update({"transport_document_reference": "ABCD", "carbure_delivery_site_id": self.depot.id, "esca": 2.0})
         assert root_node.data.transport_document_reference == "ABCD"
         assert root_node.data.biofuel_id == self.eth
-        assert root_node.data.carbure_delivery_site_id == 13
+        assert root_node.data.carbure_delivery_site_id == self.depot.id
         assert root_node.data.esca == 2.0
 
         original_child_lot_transport_document_reference = child_node.data.transport_document_reference
@@ -179,11 +182,11 @@ class TraceabilityTest(TestCase):
 
         root_node.propagate()
 
-        assert source_stock_node.data.depot_id == 13
+        assert source_stock_node.data.depot_id == self.depot.id
         assert source_stock_node.data.biofuel_id == self.eth
 
         assert dest_stock_node.data.carbure_supplier_id == self.entity.id
-        assert dest_stock_node.data.depot_id == 13
+        assert dest_stock_node.data.depot_id == self.depot.id
         assert dest_stock_node.data.biofuel_id == self.etbe
 
         assert child_node.data.transport_document_reference == original_child_lot_transport_document_reference
@@ -262,9 +265,9 @@ class TraceabilityTest(TestCase):
 
     def test_traceability_stock_to_parent_lot(self):
         root_lot = CarbureLotFactory.create(
-            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, carbure_delivery_site_id=91
+            lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity, carbure_delivery_site=self.depot
         )
-        child_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity, depot_id=10)
+        child_stock = CarbureStockFactory.create(parent_lot=root_lot, carbure_client=self.entity, depot=self.depot2)
         child_lot = CarbureLotFactory.create(lot_status="ACCEPTED", parent_stock=child_stock, added_by=self.entity)
 
         child_node = LotNode(child_lot)
@@ -292,7 +295,7 @@ class TraceabilityTest(TestCase):
 
         assert root_node.data.biofuel_id == 12
         assert root_node.data.transport_document_reference == original_parent_dae
-        assert root_node.data.carbure_delivery_site_id == original_parent_depot_id
+        assert root_node.data.carbure_delivery_site_id == self.depot2.id
         assert root_node.data.esca == 2.0
 
     def test_traceability_different_owners(self):
@@ -354,7 +357,7 @@ class TraceabilityTest(TestCase):
         pass
 
     def test_traceability_saf_ticket_origin(self):
-        site = Site.objects.first()
+        depot = self.depot
 
         random_lot = CarbureLotFactory.create(
             lot_status="ACCEPTED",
@@ -367,7 +370,7 @@ class TraceabilityTest(TestCase):
             lot_status="ACCEPTED",
             added_by=self.entity2,
             carbure_client=self.entity,
-            carbure_delivery_site=site,
+            carbure_delivery_site=depot,
             esca=10,
         )
 
@@ -406,13 +409,13 @@ class TraceabilityTest(TestCase):
         assert ticket_source_2_node.type == Node.TICKET_SOURCE
         assert ticket_2_node.type == Node.TICKET
 
-        assert root_node.data.carbure_delivery_site == site
+        assert root_node.data.carbure_delivery_site == depot
         assert ticket_source_1_node.data.origin_lot == lot
-        assert ticket_source_1_node.data.origin_lot_site == site
+        assert ticket_source_1_node.data.origin_lot_site == depot
         assert ticket_1_node.data.origin_lot == lot
-        assert ticket_1_node.data.origin_lot_site == site
+        assert ticket_1_node.data.origin_lot_site == depot
         assert ticket_source_2_node.data.origin_lot == lot
-        assert ticket_source_2_node.data.origin_lot_site == site
+        assert ticket_source_2_node.data.origin_lot_site == depot
         assert ticket_2_node.data.origin_lot != random_lot
         assert ticket_2_node.data.origin_lot == lot
-        assert ticket_2_node.data.origin_lot_site == site
+        assert ticket_2_node.data.origin_lot_site == depot

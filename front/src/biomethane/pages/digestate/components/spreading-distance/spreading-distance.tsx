@@ -42,6 +42,7 @@ export function SpreadingDistance() {
           <NumberInput
             readOnly={!isEditing}
             label={t("Distance moyenne de valorisation d'épandage (km)")}
+            min={0}
             {...bind("average_spreading_valorization_distance")}
             required
           />

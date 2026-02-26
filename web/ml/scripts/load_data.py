@@ -124,7 +124,7 @@ def load_etd_data():
         "HUILES_OU_GRAISSES_ANIMALES_CAT3": 1.5,
     }
     for k, v in data.items():
-        feedstock = MatierePremiere.objects.get(code=k)
+        feedstock = MatierePremiere.biofuel.get(code=k)
         ETDStats.objects.update_or_create(feedstock=feedstock, default_value=v)
 
 

@@ -39,9 +39,9 @@ class BiomethaneInjectionSiteAdmin(admin.ModelAdmin):
 
 @admin.register(BiomethaneProductionUnit)
 class BiomethaneProductionUnitAdmin(admin.ModelAdmin):
-    list_display = ("id", "producer", "department", "unit_name", "siret_number", "unit_type")
+    list_display = ("id", "producer", "department", "name", "site_siret", "unit_type")
     list_filter = ("unit_type", "department")
-    search_fields = ("unit_name", "siret_number", "producer__name", "producer__pk")
+    search_fields = ("name", "site_siret", "producer__name", "producer__pk")
 
 
 @admin.register(BiomethaneDigestateStorage)
@@ -88,9 +88,9 @@ class BiomethaneSupplyPlanAdmin(admin.ModelAdmin):
 
 @admin.register(BiomethaneSupplyInput)
 class BiomethaneSupplyInputAdmin(admin.ModelAdmin):
-    list_display = ("id", "supply_plan__producer__name", "supply_plan__year", "input_type", "input_category", "volume")
+    list_display = ("id", "supply_plan__producer__name", "supply_plan__year", "input_name", "volume")
     list_filter = ("supply_plan__year", "source", "crop_type")
-    search_fields = ("supply_plan__producer__name", "input_type", "supply_plan__producer__pk")
+    search_fields = ("supply_plan__producer__name", "input_name", "supply_plan__producer__pk")
 
 
 @admin.register(BiomethaneAnnualDeclaration)

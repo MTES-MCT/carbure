@@ -26,7 +26,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             key={sector.code}
             title={formatSector(sector.code)}
             description={t(
-              "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
+              "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total pour cette catégorie)",
               {
                 date: "2025",
                 objective: formatUnit(sector.target, ExtendedUnit.GJ, {

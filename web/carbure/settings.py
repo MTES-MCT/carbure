@@ -125,6 +125,7 @@ INSTALLED_APPS = [
     "biomethane",
     "edelivery",
     "anonymization",
+    "feedstocks",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -388,7 +389,7 @@ CSP_EXCLUDE_URL_PREFIXES = "/admin"
 METABASE_SECRET_KEY = env("METABASE_SECRET_KEY")
 
 # Max upload size
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(env("DATA_UPLOAD_MAX_MEMORY_SIZE_MB", default=10)) * 1024 * 1024
 
 # Silky profiler config
 SILKY_PYTHON_PROFILER = True

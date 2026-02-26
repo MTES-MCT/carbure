@@ -248,7 +248,7 @@ class AdminDoubleCountApplicationsTest(TestCase):
         assert full_text.count("Article 3") == 1
 
         # Export with di
-        feedstock = MatierePremiere.objects.get(code="DECHETS_INDUSTRIELS")
+        feedstock = MatierePremiere.biofuel.get(code="DECHETS_INDUSTRIELS")
         assert production1.feedstock.code != "DECHETS_INDUSTRIELS"
         production1.feedstock = feedstock
         production1.save()

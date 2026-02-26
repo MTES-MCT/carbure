@@ -62,7 +62,7 @@ class MandatorySanityChecksTest(TestCase):
     def test_missing_feedstock(self):
         error = CarbureSanityCheckErrors.MISSING_FEEDSTOCK
 
-        lot = self.create_lot(feedstock=MatierePremiere.objects.first())
+        lot = self.create_lot(feedstock=MatierePremiere.biofuel.first())
 
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)

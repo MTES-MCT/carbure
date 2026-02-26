@@ -6,7 +6,7 @@ from entity.factories.entity import EntityFactory
 from entity.serializers.production_sites import EntityProductionSiteSerializer, EntityProductionSiteWriteSerializer
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.factories.certificate import EntityCertificateFactory, GenericCertificateFactory
-from transactions.factories.site import SiteFactory
+from transactions.factories.production_site import ProductionSiteFactory
 
 PRODUCTION_SITE_DATA = {
     "country_code": "FR",
@@ -38,7 +38,7 @@ class ProductionSiteSerializerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.country = Pays.objects.get(code_pays="FR")
-        cls.feedstock = MatierePremiere.objects.get(code="BLE")
+        cls.feedstock = MatierePremiere.biofuel.get(code="BLE")
         cls.biofuel = Biocarburant.objects.get(code="ETH")
 
         cls.producer = EntityFactory.create(name="Producer")
@@ -46,7 +46,7 @@ class ProductionSiteSerializerTest(TestCase):
         cls.entity_cert = EntityCertificateFactory.create(entity=cls.producer, certificate=cls.cert)
 
     def test_serialize_production_site(self):
-        production_site = SiteFactory.create(name="Test Production Site", created_by=self.producer)
+        production_site = ProductionSiteFactory.create(name="Test Production Site", created_by=self.producer)
         ProductionSiteInput.objects.create(production_site=production_site, matiere_premiere=self.feedstock)
         ProductionSiteOutput.objects.create(production_site=production_site, biocarburant=self.biofuel)
         ProductionSiteCertificate.objects.create(
@@ -98,7 +98,7 @@ class ProductionSiteSerializerTest(TestCase):
         self.assertEqual(certificates.first().certificate.certificate.certificate_id, "FR_123")
 
     def test_update_existing_production_site_from_serializer(self):
-        production_site = SiteFactory.create(name="Old Production Site", created_by=self.producer)
+        production_site = ProductionSiteFactory.create(name="Old Production Site", created_by=self.producer)
 
         serializer = EntityProductionSiteWriteSerializer(
             production_site,

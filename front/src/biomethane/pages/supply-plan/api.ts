@@ -58,7 +58,11 @@ export const createSupplyInput = async (
   api
     .POST("/biomethane/supply-input/", {
       params: { query: { entity_id, year } },
-      body: { ...data, origin_country: data.origin_country?.code_pays },
+      body: {
+        ...data,
+        origin_country: data.origin_country?.code_pays,
+        input_name: data.input_name?.name ?? "",
+      },
     })
     .then((res) => res.data)
 
@@ -74,7 +78,11 @@ export const saveSupplyInput = async (
         path: { id: supply_input_id },
         query: { entity_id, year },
       },
-      body: { ...data, origin_country: data.origin_country?.code_pays },
+      body: {
+        ...data,
+        origin_country: data.origin_country?.code_pays,
+        input_name: data.input_name?.name ?? "",
+      },
     })
     .then((res) => res.data)
 

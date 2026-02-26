@@ -65,7 +65,7 @@ class EntityProductionSiteWriteSerializer(serializers.ModelSerializer):
     inputs = serializers.SlugRelatedField(
         many=True,
         slug_field="code",
-        queryset=MatierePremiere.objects.all(),
+        queryset=MatierePremiere.biofuel.all(),
         allow_empty=False,
     )
 
@@ -119,7 +119,7 @@ class EntityProductionSiteWriteSerializer(serializers.ModelSerializer):
 
         feedstocks, biofuels, certificates = self.extract_relations(validated_data)
 
-        production_site = Site.objects.create(
+        production_site = ProductionSite.objects.create(
             **validated_data,
             site_type=Site.PRODUCTION_BIOLIQUID,
             created_by_id=entity_id,

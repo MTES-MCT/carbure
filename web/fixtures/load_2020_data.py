@@ -19,7 +19,7 @@ operators["TEREOS Origny"] = Entity.objects.get(name="TEREOS Origny")
 operators["SAIPOL"] = Entity.objects.get(name="SAIPOL")
 operators["RAISINOR"] = Entity.objects.get(name="RAISINOR")
 
-mps = {mp.code: mp for mp in MatierePremiere.objects.all()}
+mps = {mp.code: mp for mp in MatierePremiere.biofuel.all()}
 bcs = {bc.code: bc for bc in Biocarburant.objects.all()}
 countries = {c.code_pays: c for c in Pays.objects.all()}
 today = datetime.date.today()

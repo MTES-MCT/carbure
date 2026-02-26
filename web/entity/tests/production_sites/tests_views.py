@@ -12,10 +12,10 @@ from transactions.factories.carbure_lot import CarbureLotFactory
 from transactions.factories.certificate import EntityCertificateFactory
 from transactions.factories.production_site import (
     ProductionSiteCertificateFactory,
+    ProductionSiteFactory,
     ProductionSiteInputFactory,
     ProductionSiteOutputFactory,
 )
-from transactions.factories.site import SiteFactory
 from transactions.models import ProductionSite
 from transactions.models.site import Site
 
@@ -39,7 +39,7 @@ class EntityProductionSiteTest(TestCase):
         cls.admin: Entity = EntityFactory.create(entity_type=Entity.ADMIN)
         cls.producer: Entity = EntityFactory.create(entity_type=Entity.PRODUCER)
 
-        cls.production_site: ProductionSite = SiteFactory.create(
+        cls.production_site: ProductionSite = ProductionSiteFactory.create(
             site_type=Site.PRODUCTION_BIOLIQUID, created_by=cls.producer
         )
 

@@ -1913,6 +1913,7 @@ paths:
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/BiomethaneProductionUnitUpsertRequest"
+        required: true
       security:
         - cookieAuth: []
         - basicAuth: []
@@ -1966,27 +1967,19 @@ paths:
       description: List objects with object-level permission check on the first result.
       parameters:
         - in: query
-          name: category
-          schema:
-            type: string
-            enum:
-              - CIVE
-              - IAA_WASTE_RESIDUES
-              - INTERMEDIATE_CROPS
-              - LIVESTOCK_EFFLUENTS
-              - PRIMARY_CROPS
-          description: |-
-            * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-            * `PRIMARY_CROPS` - Culture principale
-            * `INTERMEDIATE_CROPS` - Culture intermédiaire
-            * `CIVE` - CIVE
-            * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
-        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: input_name
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: ordering
           required: false
           in: query
@@ -2020,21 +2013,22 @@ paths:
         - in: query
           name: source
           schema:
-            type: string
-            enum:
-              - EXTERNAL
-              - INTERNAL
+            type: array
+            items:
+              type: string
+              enum:
+                - EXTERNAL
+                - INTERNAL
           description: |-
             * `INTERNAL` - Interne
             * `EXTERNAL` - Externe
-        - in: query
-          name: type
-          schema:
-            type: string
+          explode: true
+          style: form
         - in: query
           name: year
           schema:
             type: integer
+          description: Year of the supply plan.
           required: true
       tags:
         - biomethane
@@ -2072,6 +2066,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       requestBody:
@@ -2271,6 +2271,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       security:
@@ -2297,22 +2303,6 @@ paths:
         queryset.
       parameters:
         - in: query
-          name: category
-          schema:
-            type: string
-            enum:
-              - CIVE
-              - IAA_WASTE_RESIDUES
-              - INTERMEDIATE_CROPS
-              - LIVESTOCK_EFFLUENTS
-              - PRIMARY_CROPS
-          description: |-
-            * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-            * `PRIMARY_CROPS` - Culture principale
-            * `INTERMEDIATE_CROPS` - Culture intermédiaire
-            * `CIVE` - CIVE
-            * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -2323,13 +2313,20 @@ paths:
           schema:
             type: string
             enum:
-              - category
+              - input_name
               - producer_id
               - source
-              - type
               - year
           description: Filter string to apply
           required: true
+        - in: query
+          name: input_name
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: ordering
           required: false
           in: query
@@ -2351,17 +2348,23 @@ paths:
         - in: query
           name: source
           schema:
-            type: string
-            enum:
-              - EXTERNAL
-              - INTERNAL
+            type: array
+            items:
+              type: string
+              enum:
+                - EXTERNAL
+                - INTERNAL
           description: |-
             * `INTERNAL` - Interne
             * `EXTERNAL` - Externe
+          explode: true
+          style: form
         - in: query
-          name: type
+          name: year
           schema:
-            type: string
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       security:
@@ -2378,10 +2381,9 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - category
+                    - input_name
                     - producer_id
                     - source
-                    - type
                     - year
                   summary: Example of filters response.
           description: ""
@@ -2428,6 +2430,12 @@ paths:
             type: integer
           description: Producer entity ID (optional, used by DREAL to filter specific
             producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
       tags:
         - biomethane
       security:
@@ -2501,7 +2509,7 @@ paths:
                             - This field is required.
                       - row: 5
                         errors:
-                          input_type:
+                          input_name:
                             - Invalid input type.
                     total_errors: 2
                     total_rows_processed: 10
@@ -3726,9 +3734,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  provision_certificates_available:
-                    type: integer
-                  provision_certificates_history:
+                  provision_certificates:
                     type: integer
                   transfer_certificates_pending:
                     type: integer
@@ -3737,8 +3743,7 @@ paths:
                   transfer_certificates_rejected:
                     type: integer
                 required:
-                  - provision_certificates_available
-                  - provision_certificates_history
+                  - provision_certificates
                   - transfer_certificates_pending
                   - transfer_certificates_accepted
                   - transfer_certificates_rejected
@@ -3820,13 +3825,11 @@ paths:
                 - -energy_amount
                 - -operating_unit
                 - -quarter
-                - -remaining_energy_amount
                 - -source
                 - cpo
                 - energy_amount
                 - operating_unit
                 - quarter
-                - remaining_energy_amount
                 - source
           description: |-
             Ordre
@@ -3835,8 +3838,6 @@ paths:
             * `-quarter` - Quarter (décroissant)
             * `energy_amount` - Energy amount
             * `-energy_amount` - Energy amount (décroissant)
-            * `remaining_energy_amount` - Remaining energy amount
-            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
             * `-cpo` - Cpo (décroissant)
             * `operating_unit` - Operating unit
@@ -3907,10 +3908,6 @@ paths:
             * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
-        - in: query
-          name: status
-          schema:
-            type: string
         - in: query
           name: year
           schema:
@@ -4403,13 +4400,11 @@ paths:
                 - -energy_amount
                 - -operating_unit
                 - -quarter
-                - -remaining_energy_amount
                 - -source
                 - cpo
                 - energy_amount
                 - operating_unit
                 - quarter
-                - remaining_energy_amount
                 - source
           description: |-
             Ordre
@@ -4418,8 +4413,6 @@ paths:
             * `-quarter` - Quarter (décroissant)
             * `energy_amount` - Energy amount
             * `-energy_amount` - Energy amount (décroissant)
-            * `remaining_energy_amount` - Remaining energy amount
-            * `-remaining_energy_amount` - Remaining energy amount (décroissant)
             * `cpo` - Cpo
             * `-cpo` - Cpo (décroissant)
             * `operating_unit` - Operating unit
@@ -4478,10 +4471,6 @@ paths:
             * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
           explode: true
           style: form
-        - in: query
-          name: status
-          schema:
-            type: string
         - in: query
           name: year
           schema:
@@ -6112,8 +6101,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de stockage de
-            carburant.
+          description: A unique integer value identifying this Site de Production.
           required: true
       tags:
         - entities
@@ -6145,8 +6133,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de stockage de
-            carburant.
+          description: A unique integer value identifying this Site de Production.
           required: true
       tags:
         - entities
@@ -6190,8 +6177,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de stockage de
-            carburant.
+          description: A unique integer value identifying this Site de Production.
           required: true
       tags:
         - entities
@@ -6234,8 +6220,7 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Site de stockage de
-            carburant.
+          description: A unique integer value identifying this Site de Production.
           required: true
       tags:
         - entities
@@ -7167,7 +7152,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/FeedStock"
+                  $ref: "#/components/schemas/FeedStockClassification"
           description: ""
   /api/resources/production-sites:
     get:
@@ -12002,11 +11987,7 @@ components:
           type: string
           format: date
           nullable: true
-        general_conditions_file:
-          type: string
-          format: uri
-          nullable: true
-        specific_conditions_file:
+        conditions_file:
           type: string
           format: uri
           nullable: true
@@ -12151,11 +12132,7 @@ components:
           type: string
           format: date
           nullable: true
-        general_conditions_file:
-          type: string
-          format: binary
-          nullable: true
-        specific_conditions_file:
+        conditions_file:
           type: string
           format: binary
           nullable: true
@@ -12780,26 +12757,31 @@ components:
             $ref: "#/components/schemas/DigestateSaleTypesEnum"
         department:
           type: string
-        unit_name:
+        name:
           type: string
-          nullable: true
           maxLength: 128
-        siret_number:
+        site_siret:
           type: string
-          nullable: true
-          maxLength: 16
-        company_address:
+          maxLength: 64
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
           type: string
-          nullable: true
           maxLength: 256
         postal_code:
           type: string
-          nullable: true
-          maxLength: 10
+          maxLength: 32
         city:
           type: string
-          nullable: true
           maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        private:
+          type: boolean
+        is_enabled:
+          type: boolean
         insee_code:
           type: string
           nullable: true
@@ -12858,10 +12840,17 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        country:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          nullable: true
         producer:
           type: integer
       required:
         - id
+        - name
         - producer
     BiomethaneProductionUnitUpsertRequest:
       type: object
@@ -12885,26 +12874,32 @@ components:
         department:
           type: string
           minLength: 1
-        unit_name:
+        name:
           type: string
-          nullable: true
+          minLength: 1
           maxLength: 128
-        siret_number:
+        site_siret:
           type: string
-          nullable: true
-          maxLength: 16
-        company_address:
+          maxLength: 64
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
           type: string
-          nullable: true
           maxLength: 256
         postal_code:
           type: string
-          nullable: true
-          maxLength: 10
+          maxLength: 32
         city:
           type: string
-          nullable: true
           maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          maxLength: 64
+        private:
+          type: boolean
+        is_enabled:
+          type: boolean
         insee_code:
           type: string
           nullable: true
@@ -12963,6 +12958,14 @@ components:
           type: string
           nullable: true
           maxLength: 128
+        country:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          nullable: true
+      required:
+        - name
     BiomethaneSupplyInput:
       type: object
       properties:
@@ -12971,15 +12974,12 @@ components:
           readOnly: true
         origin_country:
           $ref: "#/components/schemas/Country"
+        input_name:
+          $ref: "#/components/schemas/FeedStock"
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
-        input_type:
-          type: string
-          maxLength: 100
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13006,8 +13006,7 @@ components:
       required:
         - crop_type
         - id
-        - input_category
-        - input_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -13023,10 +13022,10 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        input_name:
+          type: string
         origin_country:
           type: string
         dry_matter_ratio_percent:
@@ -13044,9 +13043,6 @@ components:
           type: number
           format: double
           nullable: true
-        input_type:
-          type: string
-          maxLength: 100
         origin_department:
           type: string
           nullable: true
@@ -13054,8 +13050,7 @@ components:
       required:
         - crop_type
         - id
-        - input_category
-        - input_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -13067,10 +13062,11 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        input_name:
+          type: string
+          minLength: 1
         origin_country:
           type: string
           minLength: 1
@@ -13089,18 +13085,13 @@ components:
           type: number
           format: double
           nullable: true
-        input_type:
-          type: string
-          minLength: 1
-          maxLength: 100
         origin_department:
           type: string
           nullable: true
           maxLength: 3
       required:
         - crop_type
-        - input_category
-        - input_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -13114,15 +13105,13 @@ components:
         origin_country:
           type: string
           readOnly: true
+        input_name:
+          type: string
+          readOnly: true
         source:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
-        input_type:
-          type: string
-          maxLength: 100
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
         dry_matter_ratio_percent:
@@ -13146,8 +13135,7 @@ components:
           nullable: true
       required:
         - crop_type
-        - input_category
-        - input_type
+        - input_name
         - material_unit
         - origin_country
         - source
@@ -13541,6 +13529,22 @@ components:
       required:
         - checked_at
         - file
+    Classification:
+      type: object
+      properties:
+        group:
+          type: string
+          maxLength: 128
+        category:
+          type: string
+          maxLength: 128
+        subcategory:
+          type: string
+          maxLength: 128
+      required:
+        - category
+        - group
+        - subcategory
     CommentRequest:
       type: object
       properties:
@@ -13723,12 +13727,6 @@ components:
         site_siret:
           type: string
           maxLength: 64
-        customs_id:
-          type: string
-          maxLength: 32
-        icao_code:
-          type: string
-          maxLength: 32
         site_type:
           $ref: "#/components/schemas/SiteTypeEnum"
         address:
@@ -13744,6 +13742,13 @@ components:
           type: string
           nullable: true
           maxLength: 64
+        private:
+          type: boolean
+        is_enabled:
+          type: boolean
+        customs_id:
+          type: string
+          maxLength: 32
         accise:
           type: string
           maxLength: 32
@@ -13766,35 +13771,6 @@ components:
           format: double
           nullable: true
           description: En degrés Celsius
-        ges_option:
-          $ref: "#/components/schemas/GesOptionEnum"
-        eligible_dc:
-          type: boolean
-        dc_number:
-          type: string
-          maxLength: 64
-        dc_reference:
-          type: string
-          maxLength: 64
-        manager_name:
-          type: string
-          maxLength: 64
-        manager_phone:
-          type: string
-          maxLength: 64
-        manager_email:
-          type: string
-          maxLength: 64
-        private:
-          type: boolean
-        is_enabled:
-          type: boolean
-        date_mise_en_service:
-          type: string
-          format: date
-          nullable: true
-        is_ue_airport:
-          type: boolean
         country:
           type: integer
           nullable: true
@@ -13810,6 +13786,7 @@ components:
         - ownership_type
     CreateEntityRequest:
       type: object
+      description: Optional fields for entity creation (DREAL only).
       properties:
         name:
           type: string
@@ -13821,6 +13798,21 @@ components:
           type: boolean
         has_elec:
           type: boolean
+        company_address:
+          type: string
+          maxLength: 256
+        postal_code:
+          type: string
+          maxLength: 32
+        city:
+          type: string
+          maxLength: 128
+        department:
+          type: string
+          maxLength: 3
+        insee_code:
+          type: string
+          maxLength: 5
       required:
         - name
     CropTypeEnum:
@@ -14829,9 +14821,6 @@ components:
         energy_amount:
           type: number
           format: double
-        remaining_energy_amount:
-          type: number
-          format: double
         created_at:
           type: string
           format: date-time
@@ -14844,7 +14833,6 @@ components:
         - id
         - operating_unit
         - quarter
-        - remaining_energy_amount
         - source
         - year
     ElecProvisionCertificateQualicharge:
@@ -15750,10 +15738,10 @@ components:
       properties:
         name:
           type: string
-          maxLength: 128
+          maxLength: 256
         name_en:
           type: string
-          maxLength: 128
+          maxLength: 256
         code:
           type: string
           maxLength: 64
@@ -15765,17 +15753,42 @@ components:
         - code
         - name
         - name_en
+    FeedStockClassification:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 256
+        name_en:
+          type: string
+          maxLength: 256
+        code:
+          type: string
+          maxLength: 64
+        category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        is_double_compte:
+          type: boolean
+        classification:
+          allOf:
+            - $ref: "#/components/schemas/Classification"
+          nullable: true
+      required:
+        - classification
+        - code
+        - name
+        - name_en
     FeedStockRequest:
       type: object
       properties:
         name:
           type: string
           minLength: 1
-          maxLength: 128
+          maxLength: 256
         name_en:
           type: string
           minLength: 1
-          maxLength: 128
+          maxLength: 256
         code:
           type: string
           minLength: 1
@@ -15999,20 +16012,6 @@ components:
 
         * `DECLARATION_PERIODIC_CONTROLS` - Déclaration (avec contrôles
         périodiques)
-    InputCategoryEnum:
-      enum:
-        - LIVESTOCK_EFFLUENTS
-        - PRIMARY_CROPS
-        - INTERMEDIATE_CROPS
-        - CIVE
-        - IAA_WASTE_RESIDUES
-      type: string
-      description: |-
-        * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-        * `PRIMARY_CROPS` - Culture principale
-        * `INTERMEDIATE_CROPS` - Culture intermédiaire
-        * `CIVE` - CIVE
-        * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
     InstallationCategoryEnum:
       enum:
         - INSTALLATION_CATEGORY_1
@@ -16305,6 +16304,10 @@ components:
           format: double
         unit:
           type: string
+        energy_basis:
+          type: number
+          format: double
+          default: 0
         objective:
           $ref: "#/components/schemas/Objective"
       required:
@@ -16900,7 +16903,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ElecProvisionCertificate"
-        available_energy:
+        provisioned_energy:
           type: number
     PaginatedElecProvisionCertificateQualichargeResponseList:
       type: object
@@ -17109,10 +17112,11 @@ components:
           $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
         crop_type:
           $ref: "#/components/schemas/CropTypeEnum"
-        input_category:
-          $ref: "#/components/schemas/InputCategoryEnum"
         material_unit:
           $ref: "#/components/schemas/MaterialUnitEnum"
+        input_name:
+          type: string
+          minLength: 1
         origin_country:
           type: string
           minLength: 1
@@ -17131,10 +17135,6 @@ components:
           type: number
           format: double
           nullable: true
-        input_type:
-          type: string
-          minLength: 1
-          maxLength: 100
         origin_department:
           type: string
           nullable: true
@@ -18371,6 +18371,7 @@ components:
         - POWER PLANT
         - COGENERATION PLANT
         - PRODUCTION BIOLIQUID
+        - PRODUCTION BIOGAZ
         - EFCA
         - AIRPORT
       type: string
@@ -18384,6 +18385,7 @@ components:
         * `POWER PLANT` - POWER PLANT
         * `COGENERATION PLANT` - COGENERATION PLANT
         * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
+        * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
     SpreadingManagementMethodsEnum:
@@ -18539,6 +18541,7 @@ components:
         - AGRICULTURAL_TERRITORIAL
         - INDUSTRIAL_TERRITORIAL
         - HOUSEHOLD_WASTE_BIOWASTE
+        - STEP
         - ISDND
       type: string
       description: |-
@@ -18546,6 +18549,7 @@ components:
         * `AGRICULTURAL_TERRITORIAL` - Agricole territorial
         * `INDUSTRIAL_TERRITORIAL` - Industriel territorial
         * `HOUSEHOLD_WASTE_BIOWASTE` - Déchets ménagers et biodéchets
+        * `STEP` - STEP
         * `ISDND` - ISDND
     UpdateCertificateRequest:
       type: object

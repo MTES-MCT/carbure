@@ -27,6 +27,7 @@ export interface EntityManager extends Entity {
   hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) => boolean
   hasRights: (...roles: UserRole[]) => boolean
   canWrite: () => boolean
+  isRelatedToBiomethane: () => boolean
 }
 
 export function useEntityManager(
@@ -98,6 +99,8 @@ export function useEntityManager(
       entityRights?.role
         ? [UserRole.ReadWrite, UserRole.Admin].includes(entityRights.role)
         : false,
+
+    isRelatedToBiomethane: () => isRelatedToBiomethane(entity),
   }
 }
 
@@ -113,6 +116,19 @@ const INDUSTRY = [EntityType.Producer, EntityType.Operator, EntityType.Trader]
 export function isIndustry(type: EntityType | undefined) {
   if (type === undefined) return false
   else return INDUSTRY.includes(type)
+}
+
+export function isRelatedToBiomethane(entity?: Entity) {
+  if (entity?.entity_type === undefined) return false
+  else
+    return (
+      [
+        EntityType.Producteur_de_biom_thane,
+        EntityType.Fournisseur_de_biom_thane,
+      ].includes(entity.entity_type) ||
+      (entity.entity_type === EntityType.ExternalAdmin &&
+        entity.ext_admin_pages?.includes(ExternalAdminPages.DREAL))
+    )
 }
 
 export function useRights() {

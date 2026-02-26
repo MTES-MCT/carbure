@@ -1,14 +1,12 @@
 import { Dialog } from "common/components/dialog2"
-import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
+import { NumberInput, RadioGroup } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
 import {
-  getSupplyPlanInputCategoryOptions,
   getSupplyPlanInputCropTypeOptions,
   getSupplyPlanInputMaterialUnitOptions,
   getSupplyPlanInputSourceOptions,
 } from "../utils"
-import { SelectDsfr } from "common/components/selects2"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { Form, useForm } from "common/components/form2"
@@ -16,6 +14,7 @@ import {
   BiomethaneSupplyInput,
   BiomethaneSupplyInputMaterialUnit,
 } from "../types"
+import { AutoCompleteFeedstocks } from "common/molecules/autocomplete-feedstocks"
 
 type SupplyInputFormValue = Partial<BiomethaneSupplyInput>
 
@@ -31,7 +30,6 @@ export const SupplyInputForm = ({
   const { t } = useTranslation()
   const sourceOptions = getSupplyPlanInputSourceOptions()
   const cropTypeOptions = getSupplyPlanInputCropTypeOptions()
-  const categoryOptions = getSupplyPlanInputCategoryOptions()
   const materialUnitOptions = getSupplyPlanInputMaterialUnitOptions()
 
   const form = useForm<SupplyInputFormValue>(supplyInput ?? {})
@@ -61,17 +59,11 @@ export const SupplyInputForm = ({
             {...bind("crop_type")}
             readOnly={readOnly}
           />
-          <SelectDsfr
-            options={categoryOptions}
-            label={t("Catégorie intrants")}
+          <AutoCompleteFeedstocks
+            isMethanogenic
+            label={t("Intrants")}
             required
-            {...bind("input_category")}
-            readOnly={readOnly}
-          />
-          <TextInput
-            label={t("Intrants")} //
-            required
-            {...bind("input_type")}
+            {...bind("input_name")}
             readOnly={readOnly}
           />
           <RadioGroup
@@ -94,6 +86,7 @@ export const SupplyInputForm = ({
               />
               <NumberInput
                 label={t("Tonnage (tMS)")}
+                min={0}
                 required
                 {...bind("volume")}
                 readOnly={readOnly}
@@ -103,6 +96,7 @@ export const SupplyInputForm = ({
           {value?.material_unit === BiomethaneSupplyInputMaterialUnit.WET && (
             <NumberInput
               label={t("Tonnage (tMB)")}
+              min={0}
               required
               {...bind("volume")}
               readOnly={readOnly}
@@ -126,11 +120,13 @@ export const SupplyInputForm = ({
           )}
           <NumberInput
             label={t("Distance moyenne pondérée d'approvisionnement (Km)")}
+            min={0}
             {...bind("average_weighted_distance_km")}
             readOnly={readOnly}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
+            min={0}
             {...bind("maximum_distance_km")}
             readOnly={readOnly}
           />

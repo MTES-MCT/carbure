@@ -68,6 +68,7 @@ export const ROUTE_URLS = {
         SUPPLY_PLAN_ADD_INPUT: `${baseUrlWithYear}/supply-plan#create`,
         DIGESTATE: `${baseUrlWithYear}/digestate`,
         ENERGY: `${baseUrlWithYear}/energy`,
+        CUSTOMER_SATISFACTION: `${baseUrl}/customer-satisfaction`,
       },
       ADMIN: {
         DASHBOARD: `${baseUrl}/admin/dashboard`,

@@ -99,6 +99,7 @@ export function Composting() {
                   "Volume de digestat composté sur la plateforme externe (t)"
                 )}
                 type="number"
+                min={0}
                 {...bind("external_platform_digestate_volume")}
                 required
               />
@@ -121,6 +122,7 @@ export function Composting() {
             <NumberInput
               readOnly={!isEditing}
               label={t("Volume de digestat composté sur site (t)")}
+              min={0}
               {...bind("on_site_composted_digestate_volume")}
               required
             />

@@ -135,7 +135,14 @@ export const SupplyPlan = () => {
       <HashRoute path="/supply-input/:id" element={<SupplyInputDialog />} />
       <HashRoute
         path="/import"
-        element={<ExcelImportDialog onClose={onClose} />}
+        element={
+          <ExcelImportDialog
+            onClose={() => {
+              actions.setFilters({})
+              onClose()
+            }}
+          />
+        }
       />
       <HashRoute
         path="/create"

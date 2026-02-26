@@ -24,6 +24,7 @@ class UserPermissionTest(TestCase, PermissionTestMixin):
                                 ExternalAdminRights.AIRLINE,
                                 ExternalAdminRights.ELEC,
                                 ExternalAdminRights.DOUBLE_COUNTING,
+                                ExternalAdminRights.DREAL,
                             ],
                         )
                     ],
@@ -37,6 +38,7 @@ class UserPermissionTest(TestCase, PermissionTestMixin):
                                 ExternalAdminRights.ELEC,
                                 ExternalAdminRights.TRANSFERRED_ELEC,
                                 ExternalAdminRights.DOUBLE_COUNTING,
+                                ExternalAdminRights.DREAL,
                             ]
                         )
                     ],

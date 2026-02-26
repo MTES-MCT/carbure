@@ -18,16 +18,14 @@ class BiomethaneContractAnonymizer(Anonymizer):
 
     def get_updated_fields(self):
         return [
-            "general_conditions_file",
-            "specific_conditions_file",
+            "conditions_file",
         ]
 
     def process(self, contract):
         return anonymize_fields_and_collect_modifications(
             contract,
             {
-                "general_conditions_file": "fake-file.txt",
-                "specific_conditions_file": "fake-file.txt",
+                "conditions_file": "fake-file.txt",
             },
         )
 

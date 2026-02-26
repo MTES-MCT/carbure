@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from core.models import CarbureLot, Entity, Pays
 from core.tests_utils import setup_current_user
+from transactions.models import Depot, ProductionSite
 from transactions.models.entity_site import EntitySite
 from transactions.models.site import Site
 
@@ -25,14 +26,14 @@ class LotsExcelImportTest(TestCase):
             name="Owner",
             default_certificate="OWNER_CERTIFICATE",
         )
-        self.owner_production_site = Site.objects.create(
+        self.owner_production_site = ProductionSite.objects.create(
             site_type=Site.PRODUCTION_BIOLIQUID,
             is_enabled=True,
             name="Owner Production Site",
             country=self.FR,
             created_by=self.owner,
         )
-        self.owner_depot = Site.objects.create(
+        self.owner_depot = Depot.objects.create(
             site_type=Site.EFPE,
             is_enabled=True,
             name="Owner Depot",
@@ -49,7 +50,7 @@ class LotsExcelImportTest(TestCase):
             default_certificate="OTHER_CERTIFICATE",
             has_trading=True,
         )
-        self.other_depot = Site.objects.create(
+        self.other_depot = Depot.objects.create(
             site_type=Site.EFPE,
             is_enabled=True,
             name="Other Depot",

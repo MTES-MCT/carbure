@@ -485,7 +485,7 @@ def get_lots_filters_data(lots, query, entity, field):
 
     if field == "feedstocks":
         lot_feedstocks = lots.values("feedstock__id").distinct()
-        feedstocks = MatierePremiere.objects.filter(id__in=lot_feedstocks)
+        feedstocks = MatierePremiere.biofuel.filter(id__in=lot_feedstocks)
         return prepare_filters(feedstocks.values_list("code", flat=True))
 
     if field == "biofuels":
@@ -593,7 +593,7 @@ def get_stock_filters_data(stock, query, field):
 
     if field == "feedstocks":
         stock_feedstocks = stock.values("feedstock__id").distinct()
-        feedstocks = MatierePremiere.objects.filter(id__in=stock_feedstocks).values_list("code", flat=True)
+        feedstocks = MatierePremiere.biofuel.filter(id__in=stock_feedstocks).values_list("code", flat=True)
         return prepare_filters(feedstocks)
 
     if field == "biofuels":

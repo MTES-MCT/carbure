@@ -42,7 +42,6 @@ class SupplyPlanExcelTemplateTests(TestCase):
 
         expected_columns = [
             "Provenance",
-            "Catégorie",
             "Intrant",
             "Type de culture",
             "Unité",
@@ -54,8 +53,8 @@ class SupplyPlanExcelTemplateTests(TestCase):
             "Pays d'origine",
         ]
 
-        # Read the first row (headers)
-        actual_columns = [cell.value for cell in main_sheet[1]]
+        # Read the first row (headers) and filter out None values
+        actual_columns = [cell.value for cell in main_sheet[1] if cell.value is not None]
 
         self.assertEqual(actual_columns, expected_columns)
 

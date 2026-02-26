@@ -3229,9 +3229,7 @@ export interface components {
             /** Format: date */
             effective_date?: string | null;
             /** Format: uri */
-            general_conditions_file?: string | null;
-            /** Format: uri */
-            specific_conditions_file?: string | null;
+            conditions_file?: string | null;
             has_complementary_investment_aid?: boolean | null;
             complementary_aid_other_organism_name?: string | null;
             buyer?: number | null;
@@ -3287,9 +3285,7 @@ export interface components {
             /** Format: date */
             effective_date?: string | null;
             /** Format: binary */
-            general_conditions_file?: File | null;
-            /** Format: binary */
-            specific_conditions_file?: File | null;
+            conditions_file?: File | null;
             tracked_amendment_types?: unknown;
             has_complementary_investment_aid?: boolean | null;
             complementary_aid_other_organism_name?: string | null;
@@ -3527,11 +3523,15 @@ export interface components {
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
-            unit_name?: string | null;
-            siret_number?: string | null;
-            company_address?: string | null;
-            postal_code?: string | null;
-            city?: string | null;
+            name: string;
+            site_siret?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            address?: string;
+            postal_code?: string;
+            city?: string;
+            gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
             insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
@@ -3550,6 +3550,8 @@ export interface components {
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
+            country?: number | null;
+            created_by?: number | null;
             producer: number;
         };
         BiomethaneProductionUnitUpsertRequest: {
@@ -3558,11 +3560,15 @@ export interface components {
             spreading_management_methods?: components["schemas"]["SpreadingManagementMethodsEnum"][];
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
-            unit_name?: string | null;
-            siret_number?: string | null;
-            company_address?: string | null;
-            postal_code?: string | null;
-            city?: string | null;
+            name: string;
+            site_siret?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            address?: string;
+            postal_code?: string;
+            city?: string;
+            gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
             insee_code?: string | null;
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
             has_sanitary_approval?: boolean;
@@ -3581,14 +3587,15 @@ export interface components {
             raw_digestate_treatment_steps?: string | null;
             liquid_phase_treatment_steps?: string | null;
             solid_phase_treatment_steps?: string | null;
+            country?: number | null;
+            created_by?: number | null;
         };
         BiomethaneSupplyInput: {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
+            input_name: components["schemas"]["FeedStock"];
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
-            input_type: string;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3605,8 +3612,8 @@ export interface components {
             readonly id: number;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            input_name: string;
             origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3616,14 +3623,13 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            input_type: string;
             origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
             material_unit: components["schemas"]["MaterialUnitEnum"];
+            input_name: string;
             origin_country: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3633,16 +3639,14 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            input_type: string;
             origin_department?: string | null;
         };
         BiomethaneSupplyInputExport: {
             readonly year: number;
             readonly origin_country: string;
+            readonly input_name: string;
             source: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type: components["schemas"]["CropTypeEnum"];
-            input_category: components["schemas"]["InputCategoryEnum"];
-            input_type: string;
             material_unit: components["schemas"]["MaterialUnitEnum"];
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -3815,6 +3819,11 @@ export interface components {
             /** Format: date-time */
             checked_at: string;
         };
+        Classification: {
+            group: string;
+            category: string;
+            subcategory: string;
+        };
         CommentRequest: {
             comment?: string;
         };
@@ -3895,13 +3904,14 @@ export interface components {
             blending_entity_id?: number;
             name: string;
             site_siret?: string;
-            customs_id?: string;
-            icao_code?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
             address?: string;
             postal_code?: string;
             city?: string;
             gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
+            customs_id?: string;
             accise?: string;
             /**
              * Format: double
@@ -3918,26 +3928,20 @@ export interface components {
              * @description En degrés Celsius
              */
             useful_temperature?: number | null;
-            ges_option?: components["schemas"]["GesOptionEnum"];
-            eligible_dc?: boolean;
-            dc_number?: string;
-            dc_reference?: string;
-            manager_name?: string;
-            manager_phone?: string;
-            manager_email?: string;
-            private?: boolean;
-            is_enabled?: boolean;
-            /** Format: date */
-            date_mise_en_service?: string | null;
-            is_ue_airport?: boolean;
             country?: number | null;
             created_by?: number | null;
         };
+        /** @description Optional fields for entity creation (DREAL only). */
         CreateEntityRequest: {
             name: string;
             entity_type?: components["schemas"]["EntityTypeEnum"];
             has_saf?: boolean;
             has_elec?: boolean;
+            company_address?: string;
+            postal_code?: string;
+            city?: string;
+            department?: string;
+            insee_code?: string;
         };
         /**
          * @description * `MAIN` - Principale
@@ -4329,8 +4333,6 @@ export interface components {
             operating_unit: string;
             /** Format: double */
             energy_amount: number;
-            /** Format: double */
-            remaining_energy_amount: number;
             /** Format: date-time */
             readonly created_at: string | null;
         };
@@ -4699,6 +4701,14 @@ export interface components {
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
         };
+        FeedStockClassification: {
+            name: string;
+            name_en: string;
+            code: string;
+            category?: components["schemas"]["MPCategoriesEnum"];
+            is_double_compte?: boolean;
+            classification: components["schemas"]["Classification"] | null;
+        };
         FeedStockRequest: {
             name: string;
             name_en: string;
@@ -4791,15 +4801,6 @@ export interface components {
          * @enum {string}
          */
         IcpeRegimeEnum: IcpeRegimeEnum;
-        /**
-         * @description * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-         *     * `PRIMARY_CROPS` - Culture principale
-         *     * `INTERMEDIATE_CROPS` - Culture intermédiaire
-         *     * `CIVE` - CIVE
-         *     * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA
-         * @enum {string}
-         */
-        InputCategoryEnum: PathsApiBiomethaneSupplyInputGetParametersQueryCategory;
         /**
          * @description * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
          *     * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
@@ -4943,6 +4944,11 @@ export interface components {
             /** Format: double */
             available_balance: number;
             unit: string;
+            /**
+             * Format: double
+             * @default 0
+             */
+            energy_basis: number;
             objective: components["schemas"]["Objective"];
         };
         /**
@@ -5225,7 +5231,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["ElecProvisionCertificate"][];
-            available_energy?: number;
+            provisioned_energy?: number;
         };
         PaginatedElecProvisionCertificateQualichargeResponseList: {
             /** @example 123 */
@@ -5354,8 +5360,8 @@ export interface components {
         PatchedBiomethaneSupplyInputCreateRequest: {
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"];
             crop_type?: components["schemas"]["CropTypeEnum"];
-            input_category?: components["schemas"]["InputCategoryEnum"];
             material_unit?: components["schemas"]["MaterialUnitEnum"];
+            input_name?: string;
             origin_country?: string;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
@@ -5365,7 +5371,6 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
-            input_type?: string;
             origin_department?: string | null;
         };
         /** @description Serializer for updating the status of a DoubleCountingApplication. */
@@ -5844,6 +5849,7 @@ export interface components {
          *     * `POWER PLANT` - POWER PLANT
          *     * `COGENERATION PLANT` - COGENERATION PLANT
          *     * `PRODUCTION BIOLIQUID` - PRODUCTION BIOLIQUID
+         *     * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
          *     * `EFCA` - EFCA
          *     * `AIRPORT` - AIRPORT
          * @enum {string}
@@ -5930,6 +5936,7 @@ export interface components {
          *     * `AGRICULTURAL_TERRITORIAL` - Agricole territorial
          *     * `INDUSTRIAL_TERRITORIAL` - Industriel territorial
          *     * `HOUSEHOLD_WASTE_BIOWASTE` - Déchets ménagers et biodéchets
+         *     * `STEP` - STEP
          *     * `ISDND` - ISDND
          * @enum {string}
          */
@@ -7447,7 +7454,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["BiomethaneProductionUnitUpsertRequest"];
@@ -7501,14 +7508,9 @@ export interface operations {
     biomethane_supply_input_list: {
         parameters: {
             query: {
-                /** @description * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-                 *     * `PRIMARY_CROPS` - Culture principale
-                 *     * `INTERMEDIATE_CROPS` - Culture intermédiaire
-                 *     * `CIVE` - CIVE
-                 *     * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA */
-                category?: PathsApiBiomethaneSupplyInputGetParametersQueryCategory;
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                input_name?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -7521,8 +7523,8 @@ export interface operations {
                 search?: string;
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
-                type?: string;
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /** @description Year of the supply plan. */
                 year: number;
             };
             header?: never;
@@ -7548,6 +7550,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7671,6 +7675,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7691,16 +7697,11 @@ export interface operations {
     biomethane_supply_input_filters_retrieve: {
         parameters: {
             query: {
-                /** @description * `LIVESTOCK_EFFLUENTS` - Effluents d'élevage
-                 *     * `PRIMARY_CROPS` - Culture principale
-                 *     * `INTERMEDIATE_CROPS` - Culture intermédiaire
-                 *     * `CIVE` - CIVE
-                 *     * `IAA_WASTE_RESIDUES` - Déchets/Résidus d'IAA */
-                category?: PathsApiBiomethaneSupplyInputGetParametersQueryCategory;
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter;
+                input_name?: string[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
@@ -7709,8 +7710,9 @@ export interface operations {
                 search?: string;
                 /** @description * `INTERNAL` - Interne
                  *     * `EXTERNAL` - Externe */
-                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
-                type?: string;
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7755,6 +7757,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -8591,8 +8595,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        provision_certificates_available: number;
-                        provision_certificates_history: number;
+                        provision_certificates: number;
                         transfer_certificates_pending: number;
                         transfer_certificates_accepted: number;
                         transfer_certificates_rejected: number;
@@ -8636,8 +8639,6 @@ export interface operations {
                  *     * `-quarter` - Quarter (décroissant)
                  *     * `energy_amount` - Energy amount
                  *     * `-energy_amount` - Energy amount (décroissant)
-                 *     * `remaining_energy_amount` - Remaining energy amount
-                 *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
                  *     * `-cpo` - Cpo (décroissant)
                  *     * `operating_unit` - Operating unit
@@ -8664,7 +8665,6 @@ export interface operations {
                  *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
                  *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
                 source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
-                status?: string;
                 year?: number;
             };
             header?: never;
@@ -8937,8 +8937,6 @@ export interface operations {
                  *     * `-quarter` - Quarter (décroissant)
                  *     * `energy_amount` - Energy amount
                  *     * `-energy_amount` - Energy amount (décroissant)
-                 *     * `remaining_energy_amount` - Remaining energy amount
-                 *     * `-remaining_energy_amount` - Remaining energy amount (décroissant)
                  *     * `cpo` - Cpo
                  *     * `-cpo` - Cpo (décroissant)
                  *     * `operating_unit` - Operating unit
@@ -8961,7 +8959,6 @@ export interface operations {
                  *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
                  *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
                 source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
-                status?: string;
                 year?: number;
             };
             header?: never;
@@ -10096,7 +10093,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -10123,7 +10120,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -10156,7 +10153,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -10182,7 +10179,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description A unique integer value identifying this Site de stockage de carburant. */
+                /** @description A unique integer value identifying this Site de Production. */
                 id: number;
             };
             cookie?: never;
@@ -10918,7 +10915,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FeedStock"][];
+                    "application/json": components["schemas"]["FeedStockClassification"][];
                 };
             };
         };
@@ -13123,22 +13120,14 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFi
     status = "status",
     tariff_reference = "tariff_reference"
 }
-export enum PathsApiBiomethaneSupplyInputGetParametersQueryCategory {
-    CIVE = "CIVE",
-    IAA_WASTE_RESIDUES = "IAA_WASTE_RESIDUES",
-    INTERMEDIATE_CROPS = "INTERMEDIATE_CROPS",
-    LIVESTOCK_EFFLUENTS = "LIVESTOCK_EFFLUENTS",
-    PRIMARY_CROPS = "PRIMARY_CROPS"
-}
 export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
     EXTERNAL = "EXTERNAL",
     INTERNAL = "INTERNAL"
 }
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
-    category = "category",
+    input_name = "input_name",
     producer_id = "producer_id",
     source = "source",
-    type = "type",
     year = "year"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
@@ -13175,13 +13164,11 @@ export enum PathsApiElecProvisionCertificatesGetParametersQueryOrder_by {
     ValueMinusenergy_amount = "-energy_amount",
     ValueMinusoperating_unit = "-operating_unit",
     ValueMinusquarter = "-quarter",
-    ValueMinusremaining_energy_amount = "-remaining_energy_amount",
     ValueMinussource = "-source",
     cpo = "cpo",
     energy_amount = "energy_amount",
     operating_unit = "operating_unit",
     quarter = "quarter",
-    remaining_energy_amount = "remaining_energy_amount",
     source = "source"
 }
 export enum PathsApiElecProvisionCertificatesGetParametersQueryQuarter {
@@ -13738,6 +13725,7 @@ export enum SiteTypeEnum {
     POWER_PLANT = "POWER PLANT",
     COGENERATION_PLANT = "COGENERATION PLANT",
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
+    PRODUCTION_BIOGAZ = "PRODUCTION BIOGAZ",
     EFCA = "EFCA",
     AIRPORT = "AIRPORT"
 }
@@ -13765,6 +13753,7 @@ export enum UnitTypeEnum {
     AGRICULTURAL_TERRITORIAL = "AGRICULTURAL_TERRITORIAL",
     INDUSTRIAL_TERRITORIAL = "INDUSTRIAL_TERRITORIAL",
     HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE",
+    STEP = "STEP",
     ISDND = "ISDND"
 }
 export enum UserRightsRequestsStatusEnum {

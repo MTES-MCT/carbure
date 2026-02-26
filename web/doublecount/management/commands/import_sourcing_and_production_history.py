@@ -28,7 +28,7 @@ class Command(BaseCommand):
         self.create_tmp_folder()
 
         if options["id"]:
-            self.process_dc_application(f"{TMP_FOLDER}{options["id"]}.xlsx", f"{options["id"]}.xlsx")
+            self.process_dc_application(f"{TMP_FOLDER}{options['id']}.xlsx", f"{options['id']}.xlsx")
             return
 
         self.download_files_from_S3(S3_FOLDER)

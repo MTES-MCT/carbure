@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import MatierePremiere
-from core.serializers import FeedStockSerializer
+from feedstocks.serializers.feedstock_classification import FeedStockClassificationSerializer
 
 
 @extend_schema(
@@ -23,19 +23,25 @@ from core.serializers import FeedStockSerializer
             type=bool,
         ),
     ],
-    responses=FeedStockSerializer(many=True),
+    responses=FeedStockClassificationSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_feedstocks(request, *args, **kwargs):
     query = request.query_params.get("query")
     double_count_only = request.query_params.get("double_count_only", False)
+    is_methanogenic = request.query_params.get("is_methanogenic")
+    is_biofuel_feedstock = request.query_params.get("is_biofuel_feedstock")
 
-    mps = MatierePremiere.objects.filter(is_displayed=True).order_by("name")
+    mps = MatierePremiere.objects.filter(is_displayed=True).select_related("classification").order_by("name")
     if double_count_only == "true":
         mps = mps.filter(is_double_compte=True)
     if query:
         mps = mps.filter(Q(name__icontains=query) | Q(name_en__icontains=query) | Q(code__icontains=query))
+    if is_methanogenic == "true":
+        mps = mps.filter(is_methanogenic=True)
+    if is_biofuel_feedstock == "true":
+        mps = mps.filter(is_biofuel_feedstock=True)
 
-    serializer = FeedStockSerializer(mps, many=True)
+    serializer = FeedStockClassificationSerializer(mps, many=True)
     return Response(serializer.data)
