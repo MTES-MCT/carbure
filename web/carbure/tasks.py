@@ -117,6 +117,11 @@ if env.get("IMAGE_TAG") == "prod":
     def close_biomethane_declaration_status() -> None:
         call_command("set_biomethane_declarations_open", "--open=false")
 
+    # Tiruert update operations
+    @periodic_task(crontab(hour=0, minute=1))
+    def cancel_teneur_operations() -> None:
+        call_command("cancel_teneur_operations")
+
 
 if env.get("IMAGE_TAG") == "staging":
 
