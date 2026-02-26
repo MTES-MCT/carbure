@@ -3160,6 +3160,10 @@ export interface components {
             debit: number;
         };
         BalanceResponse: components["schemas"]["Balance"] | components["schemas"]["BalanceByDepot"] | components["schemas"]["BalanceBySector"];
+        BaseUser: {
+            /** Format: email */
+            readonly email: string;
+        };
         Biofuel: {
             name: string;
             name_en: string;
@@ -6056,7 +6060,7 @@ export interface components {
         };
         UserRightsRequests: {
             readonly id: number;
-            readonly user: string[];
+            user: components["schemas"]["BaseUser"];
             entity: components["schemas"]["EntitySummary"];
             /** Format: date-time */
             readonly date_requested: string;
@@ -6081,6 +6085,7 @@ export interface components {
         UserSettingsResponse: {
             /** Format: email */
             email: string;
+            name: string;
             rights: components["schemas"]["UserRights"][];
             requests: components["schemas"]["UserRightsRequests"][];
         };
