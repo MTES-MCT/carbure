@@ -109,6 +109,10 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
     def get_agregated_objectives_admin_view(self, request):
         """Get agregated objectives for all entities - admin view"""
 
+        data = ObjectiveInputSerializer(data=request.GET)
+        if not data.is_valid():
+            return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
+
         # Retrieve all entities that are liable for Tiruert
         tiruert_liable_entities = Entity.objects.filter(is_tiruert_liable=True)
         if not tiruert_liable_entities.exists():
@@ -121,8 +125,9 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
                 entity_objectives = self._get_objectives(request, entity.id)
                 if entity_objectives:
                     objectives_list.append(entity_objectives)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Http404:
+                # Case where no objectives are found for the entity, we simply skip it
+                continue
 
         if not objectives_list:
             return Response({}, status=status.HTTP_200_OK)
