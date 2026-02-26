@@ -122,6 +122,10 @@ if env.get("IMAGE_TAG") == "prod":
     def cancel_teneur_operations() -> None:
         call_command("cancel_teneur_operations")
 
+    @periodic_task(crontab(hour=0, minute=1))
+    def set_operations_expired() -> None:
+        call_command("set_operations_expired")
+
 
 if env.get("IMAGE_TAG") == "staging":
 
