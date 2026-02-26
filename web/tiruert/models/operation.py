@@ -9,6 +9,7 @@ class OperationManager(models.Manager):
         return (
             super()
             .get_queryset()
+            .exclude(status=Operation.EXPIRED)
             .select_related("biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
             .prefetch_related("details")
             .only(
@@ -52,6 +53,8 @@ class Operation(models.Model):
     CORRECTED = "CORRECTED"  # By customs
     VALIDATED = "VALIDATED"  # By customs
     DRAFT = "DRAFT"  # For transfert operations
+    EXPIRED = "EXPIRED"  # For incorporation operations that are too old and should not be used anymore
+
     OPERATION_STATUSES = (
         (PENDING, PENDING),
         (ACCEPTED, ACCEPTED),
@@ -61,6 +64,7 @@ class Operation(models.Model):
         (CORRECTED, CORRECTED),
         (VALIDATED, VALIDATED),
         (DRAFT, DRAFT),
+        (EXPIRED, EXPIRED),
     )
 
     INCORPORATION = "INCORPORATION"
