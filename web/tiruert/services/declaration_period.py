@@ -25,3 +25,10 @@ class DeclarationPeriodService:
         """
         period = DeclarationPeriodService._get_current_declaration_period()
         return period.year if period else None
+
+    @staticmethod
+    def get_period_by_year(year):
+        """
+        Returns the TiruertDeclarationPeriod for a given year, or None if not found.
+        """
+        return TiruertDeclarationPeriod.objects.filter(year=year).first()
