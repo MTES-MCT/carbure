@@ -24,6 +24,10 @@ from tiruert.services.declaration_period import DeclarationPeriodService
 def declaration_period_years(request):
     """Return the list of past years until the current one"""
     current_period_year = DeclarationPeriodService.get_current_declaration_year()
+
+    if current_period_year is None:
+        return Response({"years": []}, status=status.HTTP_200_OK)
+
     years = (
         TiruertDeclarationPeriod.objects.filter(year__lte=current_period_year)
         .order_by("year")

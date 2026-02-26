@@ -1,5 +1,4 @@
 from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -57,7 +56,6 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
     queryset = Operation.objects.all()
     serializer_class = OperationListSerializer
     filterset_class = OperationFilter
-    filter_backends = [DjangoFilterBackend]
     http_method_names = ["get", "post", "patch", "delete"]
     pagination_class = OperationPagination
 
@@ -82,7 +80,8 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["details"] = self.request.GET.get("details", "0") == "1"  # For debugging purposes
-        context["declaration_year"] = DeclarationPeriodService.get_current_declaration_year()
+        if self.action in ["create", "update", "partial_update"]:
+            context["declaration_year"] = DeclarationPeriodService.get_current_declaration_year()
         return context
 
     def get_serializer_class(self):

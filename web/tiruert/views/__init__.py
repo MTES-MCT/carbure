@@ -1,4 +1,4 @@
-from tiruert.views.declaration_period import cuurent_declaration_period, declaration_period_years
+from tiruert.views.declaration_period import curent_declaration_period, declaration_period_years
 from tiruert.views.elec_operation import ElecOperationViewSet
 from tiruert.views.mac_fossil_fuel import MacFossilFuelExportViewSet
 from tiruert.views.objective import ObjectiveViewSet
