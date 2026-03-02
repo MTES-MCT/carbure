@@ -11,6 +11,8 @@ export const ExcelImportErrors = ({
   const { t } = useTranslation()
   const fieldLabels = {
     feedstock: t("Intrant"),
+    material_unit: t("Unité matière"),
+    dry_matter_ratio_percent: t("Ratio de matière sèche"),
     type_cive: t("Type de CIVE"),
     culture_details: t("Précisez la culture"),
     collection_type: t("Type de collecte"),
