@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.services.supply_plan_excel_template import KEY_ROW, MAIN_SHEET_NAME
 from core.models import Entity, MatierePremiere
@@ -111,3 +112,26 @@ class ExcelImportActionMixinTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertIn("rows_imported", response.data)
         self.assertEqual(response.data["rows_imported"], 2)
+
+    def test_export_excel_success(self):
+        """Test successful export returns 200 and an xlsx file with Content-Disposition."""
+        supply_plan = BiomethaneSupplyPlanFactory.create(producer=self.producer_entity, year=self.current_year)
+        BiomethaneSupplyInputFactory.create(supply_plan=supply_plan)
+
+        url = reverse("biomethane-supply-plan-export-excel")
+        response = self.client.get(
+            url,
+            {"entity_id": self.producer_entity.id, "year": self.current_year},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Content-Disposition", response)
+        self.assertTrue(
+            response["Content-Disposition"].endswith('.xlsx"') or ".xlsx" in response["Content-Disposition"],
+            msg="Content-Disposition should mention .xlsx file",
+        )
+        # xlsx files are ZIP-based: first bytes are PK
+        self.assertTrue(
+            response.content.startswith(b"PK"),
+            msg="Response content should be a valid xlsx (ZIP signature)",
+        )

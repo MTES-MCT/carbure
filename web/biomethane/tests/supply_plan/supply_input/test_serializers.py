@@ -1,8 +1,10 @@
 from django.test import TestCase
 
+from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateSerializer
-from core.models import MatierePremiere
+from biomethane.serializers.supply_plan.supply_input import BiomethaneSupplyInputExportSerializer
+from core.models import Entity, MatierePremiere
 from feedstocks.models import Classification
 
 
@@ -225,3 +227,58 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         serializer = BiomethaneSupplyInputCreateSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         self.assertIsNone(serializer.validated_data["collection_type"])
+
+
+class BiomethaneSupplyInputExportSerializerTests(TestCase):
+    """Tests for export serializer: choice fields must output display labels, not raw values."""
+
+    fixtures = ["json/countries.json"]
+
+    def setUp(self):
+        self.producer = Entity.objects.create(
+            name="Test Producer",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+        self.supply_plan = BiomethaneSupplyPlanFactory.create(producer=self.producer, year=2024)
+        self.feedstock = MatierePremiere.objects.create(
+            name="Maïs",
+            name_en="Corn",
+            code="MAIS",
+            is_methanogenic=True,
+        )
+
+    def test_export_serializer_outputs_display_labels_for_choice_fields(self):
+        """Choice fields (material_unit, type_cive, collection_type, source) must be serialized as labels."""
+        supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock,
+            material_unit=BiomethaneSupplyInput.DRY,
+            type_cive=BiomethaneSupplyInput.SUMMER,
+            collection_type=BiomethaneSupplyInput.PRIVATE,
+            source=BiomethaneSupplyInput.INTERNAL,
+        )
+        serializer = BiomethaneSupplyInputExportSerializer(supply_input)
+        data = serializer.data
+
+        self.assertEqual(data["material_unit"], "Sèche")
+        self.assertEqual(data["type_cive"], "Été")
+        self.assertEqual(data["collection_type"], "Issus de collecteurs privés")
+        self.assertEqual(data["source"], "Interne")
+
+    def test_export_serializer_outputs_empty_string_for_null_choice_fields(self):
+        """Null choice fields must be serialized as empty string for Excel export."""
+        supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock,
+            material_unit=None,
+            type_cive=None,
+            collection_type=None,
+            source=None,
+        )
+        serializer = BiomethaneSupplyInputExportSerializer(supply_input)
+        data = serializer.data
+
+        self.assertEqual(data["material_unit"], "")
+        self.assertEqual(data["type_cive"], "")
+        self.assertEqual(data["collection_type"], "")
+        self.assertEqual(data["source"], "")

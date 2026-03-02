@@ -103,10 +103,28 @@ class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreate
 
 
 class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
+    """Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche)."""
+
     year = serializers.IntegerField(source="supply_plan.year", read_only=True)
     origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
     feedstock = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    source = serializers.SerializerMethodField()
+    material_unit = serializers.SerializerMethodField()
+    type_cive = serializers.SerializerMethodField()
+    collection_type = serializers.SerializerMethodField()
 
     class Meta:
         model = BiomethaneSupplyInput
         exclude = ["id", "supply_plan"]
+
+    def get_source(self, obj):
+        return obj.get_source_display() or ""
+
+    def get_material_unit(self, obj):
+        return obj.get_material_unit_display() or ""
+
+    def get_type_cive(self, obj):
+        return obj.get_type_cive_display() or ""
+
+    def get_collection_type(self, obj):
+        return obj.get_collection_type_display() or ""
