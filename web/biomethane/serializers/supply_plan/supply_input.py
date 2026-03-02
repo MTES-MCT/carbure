@@ -57,6 +57,13 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
                 if not validated_data.get(field):
                     raise serializers.ValidationError({field: "Ce champ est requis si le pays d'origine est France"})
 
+        avg_dist = validated_data.get("average_weighted_distance_km")
+        max_dist = validated_data.get("maximum_distance_km")
+        if avg_dist is not None and max_dist is not None and avg_dist > max_dist:
+            raise serializers.ValidationError(
+                {"average_weighted_distance_km": "La distance moyenne doit être inférieure ou égale à la distance maximale."}
+            )
+
         errors = apply_feedstock_field_rules(validated_data)
         if errors:
             raise serializers.ValidationError(errors)

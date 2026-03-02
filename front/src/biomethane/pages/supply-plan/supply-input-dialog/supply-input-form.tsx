@@ -126,7 +126,7 @@ export const SupplyInputForm = ({
                 BiomethaneSupplyInputMaterialUnit.DRY && (
                 <>
                   <NumberInput
-                    label={t("Ratio de matière sèche")}
+                    label={t("Ratio de matière sèche - tMS/tMS (%)")}
                     min={0}
                     max={100}
                     required={!isBiogazIsdnd}
@@ -176,6 +176,8 @@ export const SupplyInputForm = ({
             {...bind("average_weighted_distance_km")}
             readOnly={readOnly}
             required={isFranceOriginCountry}
+            max={value?.maximum_distance_km ?? undefined}
+            step={0.1}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
@@ -183,6 +185,7 @@ export const SupplyInputForm = ({
             {...bind("maximum_distance_km")}
             readOnly={readOnly}
             required={isFranceOriginCountry}
+            step={0.1}
           />
         </Dialog.Section>
       </Grid>

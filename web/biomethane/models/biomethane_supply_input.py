@@ -34,11 +34,9 @@ class BiomethaneSupplyInput(models.Model):
     # Type de collecte (obligatoire pour certains intrants déchets)
     PRIVATE = "PRIVATE"
     LOCAL = "LOCAL"
-    BOTH = "BOTH"
     COLLECTION_TYPE_CHOICES = [
         (PRIVATE, "Issus de collecteurs privés"),
         (LOCAL, "Issus de collectivités locales"),
-        (BOTH, "Issus des collectivités locales et collecteurs privés"),
     ]
     collection_type = models.CharField(max_length=10, choices=COLLECTION_TYPE_CHOICES, null=True, blank=True)
 

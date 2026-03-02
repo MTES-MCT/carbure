@@ -13572,12 +13572,10 @@ components:
       enum:
         - PRIVATE
         - LOCAL
-        - BOTH
       type: string
       description: |-
         * `PRIVATE` - Issus de collecteurs privés
         * `LOCAL` - Issus de collectivités locales
-        * `BOTH` - Issus des collectivités locales et collecteurs privés
     CommentRequest:
       type: object
       properties:

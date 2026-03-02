@@ -55,18 +55,10 @@ export const getSupplyPlanInputCollectionTypeOptions = () => {
       value: BiomethaneSupplyInputCollectionType.LOCAL,
       label: i18next.t("Issus de collectivités locales"),
     },
-    {
-      value: BiomethaneSupplyInputCollectionType.BOTH,
-      label: i18next.t("Issus des collectivités locales et collecteurs privés"),
-    },
   ]
 }
 
 export const convertSupplyPlanInputVolume = (
   volumeTonsMS: number,
   ratioTonsMS: number
-) => {
-  const ratioTonsMB = 100 - ratioTonsMS
-
-  return volumeTonsMS / ratioTonsMS / ratioTonsMB
-}
+) => volumeTonsMS / ratioTonsMS
