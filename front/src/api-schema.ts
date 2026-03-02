@@ -3960,6 +3960,7 @@ export interface components {
             city?: string;
             department?: string;
             insee_code?: string;
+            site_siret?: string;
         };
         DeleteCertificateRequest: {
             certificate_id: string;

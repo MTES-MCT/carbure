@@ -6,6 +6,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from biomethane.services.supply_plan_excel_template import KEY_ROW, MAIN_SHEET_NAME
 from core.models import Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 
@@ -46,8 +47,8 @@ class ExcelImportActionMixinTests(APITestCase):
         df = pd.DataFrame(data)
         excel_buffer = io.BytesIO()
         with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
-            # Use mixin-specific sheet name; header at row 12 (0-based) to match template (rules at top, then table)
-            df.to_excel(writer, sheet_name="Plan d'approvisionnement", index=False, startrow=12)
+            # Same sheet name and header row as template (keys on KEY_ROW)
+            df.to_excel(writer, sheet_name=MAIN_SHEET_NAME, index=False, startrow=KEY_ROW)
 
         excel_buffer.seek(0)
         return SimpleUploadedFile(
@@ -107,7 +108,6 @@ class ExcelImportActionMixinTests(APITestCase):
             query_params={"entity_id": self.producer_entity.id, "year": self.current_year},
             format="multipart",
         )
-
         self.assertEqual(response.status_code, 201)
         self.assertIn("rows_imported", response.data)
         self.assertEqual(response.data["rows_imported"], 2)

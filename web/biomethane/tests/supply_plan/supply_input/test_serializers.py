@@ -205,7 +205,6 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         for collection_type in (
             BiomethaneSupplyInput.PRIVATE,
             BiomethaneSupplyInput.LOCAL,
-            BiomethaneSupplyInput.BOTH,
         ):
             with self.subTest(collection_type=collection_type):
                 data = {

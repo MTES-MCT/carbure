@@ -13844,6 +13844,9 @@ components:
         insee_code:
           type: string
           maxLength: 5
+        site_siret:
+          type: string
+          maxLength: 14
       required:
         - name
     DeleteCertificateRequest:
