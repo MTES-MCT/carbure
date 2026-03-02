@@ -12955,6 +12955,10 @@ components:
           $ref: "#/components/schemas/Country"
         feedstock:
           $ref: "#/components/schemas/FeedStockClassification"
+        source:
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         type_cive:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
@@ -13004,6 +13008,10 @@ components:
         id:
           type: integer
           readOnly: true
+        source:
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         material_unit:
           allOf:
             - $ref: "#/components/schemas/MaterialUnitEnum"
@@ -13051,6 +13059,10 @@ components:
     BiomethaneSupplyInputCreateRequest:
       type: object
       properties:
+        source:
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         material_unit:
           allOf:
             - $ref: "#/components/schemas/MaterialUnitEnum"
@@ -13108,6 +13120,10 @@ components:
         feedstock:
           type: string
           readOnly: true
+        source:
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         type_cive:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
@@ -13148,6 +13164,14 @@ components:
         - feedstock
         - origin_country
         - year
+    BiomethaneSupplyInputSourceEnum:
+      enum:
+        - INTERNAL
+        - EXTERNAL
+      type: string
+      description: |-
+        * `INTERNAL` - Interne
+        * `EXTERNAL` - Externe
     BiomethaneUploadExcelRequest:
       type: object
       properties:
@@ -14806,7 +14830,7 @@ components:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
         source:
-          $ref: "#/components/schemas/SourceEnum"
+          $ref: "#/components/schemas/ElecProvisionCertificateSourceEnum"
         quarter:
           allOf:
             - $ref: "#/components/schemas/QuarterEnum"
@@ -14931,6 +14955,20 @@ components:
       oneOf:
         - $ref: "#/components/schemas/ElecProvisionCertificateQualichargeGrouped"
         - $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+    ElecProvisionCertificateSourceEnum:
+      enum:
+        - MANUAL
+        - METER_READINGS
+        - QUALICHARGE
+        - ENR_RATIO_COMPENSATION
+        - ADMIN_ERROR_COMPENSATION
+      type: string
+      description: |-
+        * `MANUAL` - MANUAL
+        * `METER_READINGS` - METER_READINGS
+        * `QUALICHARGE` - QUALICHARGE
+        * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+        * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
     ElecQualichargeStatusEnum:
       enum:
         - NO_ONE
@@ -17095,6 +17133,10 @@ components:
     PatchedBiomethaneSupplyInputCreateRequest:
       type: object
       properties:
+        source:
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         material_unit:
           allOf:
             - $ref: "#/components/schemas/MaterialUnitEnum"
@@ -18386,20 +18428,6 @@ components:
         * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
-    SourceEnum:
-      enum:
-        - MANUAL
-        - METER_READINGS
-        - QUALICHARGE
-        - ENR_RATIO_COMPENSATION
-        - ADMIN_ERROR_COMPENSATION
-      type: string
-      description: |-
-        * `MANUAL` - MANUAL
-        * `METER_READINGS` - METER_READINGS
-        * `QUALICHARGE` - QUALICHARGE
-        * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
-        * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
     SpreadingManagementMethodsEnum:
       enum:
         - DIRECT_SPREADING

@@ -19,6 +19,7 @@ class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
 
 class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     # Use custom choice fields that accept both values and labels
+    source = LabelChoiceField(choices=BiomethaneSupplyInput.SOURCE_CHOICES, required=False, allow_null=True)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES, required=False, allow_null=True)
     type_cive = LabelChoiceField(choices=BiomethaneSupplyInput.TYPE_CIVE_CHOICES, required=False, allow_null=True)
     culture_details = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
