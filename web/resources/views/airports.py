@@ -41,7 +41,7 @@ def get_airports(request, *args, **kwargs):
     if public_only:
         sites = sites.filter(private=False)
     if query:
-        sites = sites.filter(Q(name__icontains=query) | Q(customs_id__icontains=query) | Q(city__icontains=query))
+        sites = sites.filter(Q(name__icontains=query) | Q(icao_code__icontains=query) | Q(city__icontains=query))
 
     if settings.ENABLE_SAF_LOGISTICS:
         should_filter = origin_depot_id or shipping_method or has_intermediary_depot is not None
