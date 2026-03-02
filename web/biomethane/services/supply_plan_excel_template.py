@@ -11,13 +11,54 @@ from biomethane.models import BiomethaneSupplyInput
 from biomethane.services.supply_plan.supply_input import COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES
 from core.models import Department, MatierePremiere, Pays
 
+# Main sheet layout: rules block at top (with sections), then table (header, key row, data rows)
+MAIN_SHEET_NUM_COLS = 11  # A to K
+HEADER_ROW = 11  # 0-based
+KEY_ROW = 12  # 0-based
+FIRST_DATA_ROW = 13  # 0-based
+LAST_DATA_ROW = 1012  # 0-based (1000 data rows)
+MAIN_SHEET_NAME = "Approvisionnement"
+
+# Table columns: (label, key). CIVE type, culture details, collection type at the end.
+TABLE_HEADERS = [
+    ("Intrant", "feedstock"),
+    ("Unité", "material_unit"),
+    ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
+    ("Volume (tMB ou tMS)", "volume"),
+    ("Département", "origin_department"),
+    ("Distance moyenne pondérée (km)", "average_weighted_distance_km"),
+    ("Distance maximale (km)", "maximum_distance_km"),
+    ("Pays d'origine", "origin_country"),
+    ("Type de CIVE", "type_cive"),
+    ("Précisez la culture", "culture_details"),
+    ("Type de collecte", "collection_type"),
+]
+
+# Excel column letter (A..K) for each field, used in business rules
+COLUMN_BY_KEY = {key: chr(65 + i) for i, (_, key) in enumerate(TABLE_HEADERS)}
+
+# Row height for wrapped text: Excel doesn't auto-expand; use this to size rows by line count
+DEFAULT_POINTS_PER_LINE = 15
+DEFAULT_MIN_ROW_HEIGHT = 24
+
+
+def set_row_height_for_wrapped_text(
+    sheet, row, text, *, min_height=DEFAULT_MIN_ROW_HEIGHT, points_per_line=DEFAULT_POINTS_PER_LINE
+):
+    """
+    Set row height so that wrapped text (with newlines) is fully visible in Excel.
+    Use before writing the cell. Reusable for any xlsxwriter sheet.
+    """
+    line_count = 1 + (text.count("\n") if text else 0)
+    sheet.set_row(row, max(min_height, points_per_line * line_count))
+
 
 def create_supply_plan_template() -> BufferedReader:
     """
     Creates an Excel template for the biomethane supply plan with data validation.
 
     The template contains:
-    - A main sheet "Plan d'approvisionnement" with a rules block at top (required fields
+    - A main sheet "Approvisionnement" with a rules block at top (required fields
       depending on feedstock), then the table with columns to fill and dropdown lists
     - Reference sheets for dropdown lists:
         - Departments (from model)
@@ -81,32 +122,6 @@ def create_supply_plan_template() -> BufferedReader:
     return open(location, "rb")
 
 
-# Main sheet layout: rules block at top (with sections), then table (header, key row, data rows)
-MAIN_SHEET_NUM_COLS = 11  # A to K
-HEADER_ROW = 11  # 0-based
-KEY_ROW = 12  # 0-based
-FIRST_DATA_ROW = 13  # 0-based
-LAST_DATA_ROW = 1012  # 0-based (1000 data rows)
-
-# Table columns: (label, key). CIVE type, culture details, collection type at the end.
-TABLE_HEADERS = [
-    ("Intrant", "feedstock"),
-    ("Unité", "material_unit"),
-    ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
-    ("Volume (tMB ou tMS)", "volume"),
-    ("Département", "origin_department"),
-    ("Distance moyenne pondérée (km)", "average_weighted_distance_km"),
-    ("Distance maximale (km)", "maximum_distance_km"),
-    ("Pays d'origine", "origin_country"),
-    ("Type de CIVE", "type_cive"),
-    ("Précisez la culture", "culture_details"),
-    ("Type de collecte", "collection_type"),
-]
-
-# Excel column letter (A..K) for each field, used in business rules
-COLUMN_BY_KEY = {key: chr(65 + i) for i, (_, key) in enumerate(TABLE_HEADERS)}
-
-
 def _build_collection_type_rule_text(inputs):
     """Build the rule text listing feedstocks that require 'Type de collecte' (collection type) with line breaks."""
     names = [inp.name for inp in inputs if getattr(inp, "code", None) in COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES]
@@ -157,6 +172,7 @@ def _write_rules_block(sheet, num_cols, title_fmt, section_fmt, cell_fmt, inputs
         ),
     ]
     for rule in intrant_rules:
+        set_row_height_for_wrapped_text(sheet, row, rule)
         sheet.merge_range(row, 0, row, num_cols - 1, rule, cell_fmt)
         row += 1
     row += 1
@@ -177,6 +193,7 @@ def _write_rules_block(sheet, num_cols, title_fmt, section_fmt, cell_fmt, inputs
         ),
     ]
     for rule in other_rules:
+        set_row_height_for_wrapped_text(sheet, row, rule)
         sheet.merge_range(row, 0, row, num_cols - 1, rule, cell_fmt)
         row += 1
 
@@ -200,7 +217,7 @@ def _create_main_sheet(
     inputs,
 ):
     """Create the main sheet with rules at top and data table below."""
-    sheet = workbook.add_worksheet("Plan d'approvisionnement")
+    sheet = workbook.add_worksheet(MAIN_SHEET_NAME)
     num_cols = MAIN_SHEET_NUM_COLS
     sheet.set_column(0, num_cols - 1, 25)
 

@@ -50,7 +50,7 @@ export const SupplyInputForm = ({
         <Dialog.Section label="Intrant" gap="lg">
           <RadioGroup
             options={sourceOptions}
-            label={t("Source")}
+            label={t("Provenance")}
             orientation="horizontal"
             {...bind("source")}
             readOnly={readOnly}
