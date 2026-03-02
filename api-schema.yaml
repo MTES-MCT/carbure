@@ -13572,12 +13572,10 @@ components:
       enum:
         - PRIVATE
         - LOCAL
-        - BOTH
       type: string
       description: |-
         * `PRIVATE` - Issus de collecteurs privés
         * `LOCAL` - Issus de collectivités locales
-        * `BOTH` - Issus des collectivités locales et collecteurs privés
     CommentRequest:
       type: object
       properties:
@@ -13846,6 +13844,9 @@ components:
         insee_code:
           type: string
           maxLength: 5
+        site_siret:
+          type: string
+          maxLength: 14
       required:
         - name
     DeleteCertificateRequest:

@@ -3839,7 +3839,6 @@ export interface components {
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
-         *     * `BOTH` - Issus des collectivités locales et collecteurs privés
          * @enum {string}
          */
         CollectionTypeEnum: CollectionTypeEnum;
@@ -3961,6 +3960,7 @@ export interface components {
             city?: string;
             department?: string;
             insee_code?: string;
+            site_siret?: string;
         };
         DeleteCertificateRequest: {
             certificate_id: string;
@@ -13536,8 +13536,7 @@ export enum CertificateTypeEnum {
 }
 export enum CollectionTypeEnum {
     PRIVATE = "PRIVATE",
-    LOCAL = "LOCAL",
-    BOTH = "BOTH"
+    LOCAL = "LOCAL"
 }
 export enum ComplementaryAidOrganismsEnum {
     ADEME = "ADEME",

@@ -54,7 +54,8 @@ export const AddEntityDialog = ({
       value.postal_code!,
       value.city!,
       value.department!,
-      value.insee_code!
+      value.insee_code!,
+      value.siret!
     )
     onEntityAdded(value.name!)
     onClose()

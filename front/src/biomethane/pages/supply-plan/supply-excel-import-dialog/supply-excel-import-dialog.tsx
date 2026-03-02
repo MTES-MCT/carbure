@@ -12,6 +12,7 @@ import { Notice } from "common/components/notice"
 import { Box } from "common/components/scaffold"
 import { ExcelImportErrors } from "./excel-import-errors"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { Text } from "common/components/text"
 
 interface ImportFormData {
   supplyPlanFile: File | null
@@ -112,6 +113,11 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
             .
           </Trans>
         </p>
+        <Text fontWeight="bold">
+          {t(
+            "Pensez à retélécharger le template afin d'avoir les dernières modifications du fichier."
+          )}
+        </Text>
 
         <Form id="supply-plan-import-form" onSubmit={handleSubmit}>
           <FileInput

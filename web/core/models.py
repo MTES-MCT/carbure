@@ -218,6 +218,25 @@ class Entity(models.Model):
         depot_ids = EntityScopeDepot.objects.filter(entity=self).values_list("object_id", flat=True)
         return Depot.objects.filter(id__in=depot_ids)
 
+    def get_managing_external_admins(self):
+        """
+        For a biomethane producer, returns a list of the EXTERNAL_ADMIN entities (e.g. DREAL)
+        that manages the department of the production unit, or None.
+        For other entity types, returns None.
+        """
+        if self.entity_type != Entity.BIOMETHANE_PRODUCER:
+            return None
+        from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
+        from entity.models import EntityScopeDepartment
+
+        production_unit = BiomethaneProductionUnit.objects.filter(producer=self).first()
+        if not production_unit or not production_unit.department:
+            return None
+        department = production_unit.department
+        entity_ids = EntityScopeDepartment.objects.filter(object_id=department.id).values_list("entity_id", flat=True)
+
+        return list(Entity.objects.filter(id__in=entity_ids, entity_type=Entity.EXTERNAL_ADMIN))
+
     def get_users_emails(self, **filters):
         filter_result = UserRights.objects.filter(entity=self, user__is_active=True, **filters)
         return filter_result.values_list("user__email", flat=True)

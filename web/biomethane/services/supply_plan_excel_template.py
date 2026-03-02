@@ -11,18 +11,59 @@ from biomethane.models import BiomethaneSupplyInput
 from biomethane.services.supply_plan.supply_input import COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES
 from core.models import Department, MatierePremiere, Pays
 
+# Main sheet layout: rules block at top (with sections), then table (header, key row, data rows)
+MAIN_SHEET_NUM_COLS = 11  # A to K
+HEADER_ROW = 11  # 0-based
+KEY_ROW = 12  # 0-based
+FIRST_DATA_ROW = 13  # 0-based
+LAST_DATA_ROW = 1012  # 0-based (1000 data rows)
+MAIN_SHEET_NAME = "Approvisionnement"
+
+# Table columns: (label, key). CIVE type, culture details, collection type at the end.
+TABLE_HEADERS = [
+    ("Intrant", "feedstock"),
+    ("Unité", "material_unit"),
+    ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
+    ("Volume (tMB ou tMS)", "volume"),
+    ("Département", "origin_department"),
+    ("Distance moyenne pondérée (km)", "average_weighted_distance_km"),
+    ("Distance maximale (km)", "maximum_distance_km"),
+    ("Pays d'origine", "origin_country"),
+    ("Type de CIVE", "type_cive"),
+    ("Précisez la culture", "culture_details"),
+    ("Type de collecte", "collection_type"),
+]
+
+# Excel column letter (A..K) for each field, used in business rules
+COLUMN_BY_KEY = {key: chr(65 + i) for i, (_, key) in enumerate(TABLE_HEADERS)}
+
+# Row height for wrapped text: Excel doesn't auto-expand; use this to size rows by line count
+DEFAULT_POINTS_PER_LINE = 15
+DEFAULT_MIN_ROW_HEIGHT = 24
+
+
+def set_row_height_for_wrapped_text(
+    sheet, row, text, *, min_height=DEFAULT_MIN_ROW_HEIGHT, points_per_line=DEFAULT_POINTS_PER_LINE
+):
+    """
+    Set row height so that wrapped text (with newlines) is fully visible in Excel.
+    Use before writing the cell. Reusable for any xlsxwriter sheet.
+    """
+    line_count = 1 + (text.count("\n") if text else 0)
+    sheet.set_row(row, max(min_height, points_per_line * line_count))
+
 
 def create_supply_plan_template() -> BufferedReader:
     """
     Creates an Excel template for the biomethane supply plan with data validation.
 
     The template contains:
-    - A main sheet "Plan d'approvisionnement" with a rules block at top (champs obligatoires
-      selon l'intrant), then the table with columns to fill and dropdown lists
+    - A main sheet "Approvisionnement" with a rules block at top (required fields
+      depending on feedstock), then the table with columns to fill and dropdown lists
     - Reference sheets for dropdown lists:
-        - Departements (from model)
-        - Pays (from model)
-        - Intrants (from model)
+        - Departments (from model)
+        - Countries (from model)
+        - Feedstocks (from model)
 
     Returns:
         BufferedReader: Excel file ready to be downloaded
@@ -30,7 +71,7 @@ def create_supply_plan_template() -> BufferedReader:
     location = "/tmp/plan_approvisionnement_template.xlsx"
     workbook = xlsxwriter.Workbook(location)
 
-    # Formats
+    # Cell formats
     bold = workbook.add_format({"bold": True, "text_wrap": True})
     header_format = workbook.add_format({"bold": True, "text_wrap": True, "valign": "vcenter"})
     rules_title_format = workbook.add_format(
@@ -57,7 +98,7 @@ def create_supply_plan_template() -> BufferedReader:
     eu_countries = list(Pays.objects.filter(is_in_europe=True).order_by("name"))
     # Get departments from database
     departments = list(Department.objects.all().order_by("code_dept"))
-    # Get intrants from database (full list for dropdown; filtering for rule text is done in _create_main_sheet)
+    # Get feedstocks from database (full list for dropdown; filtering for rule text is done in _create_main_sheet)
     inputs = list(MatierePremiere.biomethane.all().order_by("name"))
 
     # Create main sheet (with rules at top, then table)
@@ -81,39 +122,20 @@ def create_supply_plan_template() -> BufferedReader:
     return open(location, "rb")
 
 
-# Main sheet layout: rules block at top (with sections), then table (header, key row, data rows)
-MAIN_SHEET_NUM_COLS = 11  # A to K
-HEADER_ROW = 11  # 0-based
-KEY_ROW = 12  # 0-based
-FIRST_DATA_ROW = 13  # 0-based
-LAST_DATA_ROW = 1012  # 0-based (1000 data rows)
-
-# Table columns: (label, key). Type de CIVE, Précisez la culture, Type de collecte at the end.
-TABLE_HEADERS = [
-    ("Intrant", "feedstock"),
-    ("Unité", "material_unit"),
-    ("Ratio de matière sèche (%)", "dry_matter_ratio_percent"),
-    ("Volume (tMB ou tMS)", "volume"),
-    ("Département", "origin_department"),
-    ("Distance moyenne pondérée (km)", "average_weighted_distance_km"),
-    ("Distance maximale (km)", "maximum_distance_km"),
-    ("Pays d'origine", "origin_country"),
-    ("Type de CIVE", "type_cive"),
-    ("Précisez la culture", "culture_details"),
-    ("Type de collecte", "collection_type"),
-]
-
-
 def _build_collection_type_rule_text(inputs):
-    """Build the rule text listing feedstocks that require 'Type de collecte' (with line breaks)."""
+    """Build the rule text listing feedstocks that require 'Type de collecte' (collection type) with line breaks."""
     names = [inp.name for inp in inputs if getattr(inp, "code", None) in COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES]
+    col = COLUMN_BY_KEY["collection_type"]
     if not names:
         return (
             "• Si l'intrant est l'un des suivants (voir liste en base), "
-            'le champ "Type de collecte" est obligatoire : (aucun dans la base).'
+            f'le champ "Type de collecte" (colonne {col}) est obligatoire : (aucun dans la base).'
         )
     list_text = "\n".join(f"  • « {n} »" for n in sorted(names))
-    return "• Si l'intrant est l'un des suivants, le champ \"Type de collecte\" est obligatoire :\n" f"{list_text}"
+    return (
+        f"• Si l'intrant est l'un des suivants, le champ \"Type de collecte\" (colonne {col}) "
+        f"est obligatoire :\n{list_text}"
+    )
 
 
 def _write_rules_block(sheet, num_cols, title_fmt, section_fmt, cell_fmt, inputs):
@@ -132,33 +154,46 @@ def _write_rules_block(sheet, num_cols, title_fmt, section_fmt, cell_fmt, inputs
         section_fmt,
     )
     row += 1
+    c = COLUMN_BY_KEY
     intrant_rules = [
-        "• Si l'intrant est une culture intermédiaire (CIVE) le champ Type de CIVE est obligatoire.",
         (
-            "• Si l'intrant est « Autres cultures » ou « Autres cultures CIVE », "
-            'le champ "Précisez la culture" est obligatoire.'
+            f"• Si l'intrant est une culture intermédiaire (CIVE) le champ Type de CIVE "
+            f"(colonne {c['type_cive']}) est obligatoire."
+        ),
+        (
+            f"• Si l'intrant est « Autres cultures » ou « Autres cultures CIVE », "
+            f'le champ "Précisez la culture" (colonne {c["culture_details"]}) est obligatoire.'
         ),
         _build_collection_type_rule_text(inputs),
         (
-            "• Si l'intrant est « Biogaz capté d'une ISDND », les champs Unité, "
-            "Ratio de matière sèche (%) et Volume sont optionnels."
+            f"• Si l'intrant est « Biogaz capté d'une ISDND », les champs Unité (colonne {c['material_unit']}), "
+            f"Ratio de matière sèche (%) (colonne {c['dry_matter_ratio_percent']}) et Volume "
+            f"(colonne {c['volume']}) sont optionnels."
         ),
     ]
     for rule in intrant_rules:
+        set_row_height_for_wrapped_text(sheet, row, rule)
         sheet.merge_range(row, 0, row, num_cols - 1, rule, cell_fmt)
         row += 1
     row += 1
 
     sheet.merge_range(row, 0, row, num_cols - 1, "Autres conditions :", section_fmt)
     row += 1
+    c = COLUMN_BY_KEY
     other_rules = [
         (
-            "• Si le pays d'origine est France, les champs « Distance moyenne pondérée », "
-            "« Distance maximale » et « Département d'origine » sont obligatoires."
+            f"• Si le pays d'origine est France, les champs « Distance moyenne pondérée » "
+            f"(colonne {c['average_weighted_distance_km']}), « Distance maximale » "
+            f"(colonne {c['maximum_distance_km']}) et « Département d'origine » "
+            f"(colonne {c['origin_department']}) sont obligatoires."
         ),
-        "• Si l'unité de matière est « Sèche », le champ « Ratio de matière sèche (%) » est obligatoire.",
+        (
+            f"• Si l'unité de matière est « Sèche », le champ « Ratio de matière sèche (%) » "
+            f"(colonne {c['dry_matter_ratio_percent']}) est obligatoire."
+        ),
     ]
     for rule in other_rules:
+        set_row_height_for_wrapped_text(sheet, row, rule)
         sheet.merge_range(row, 0, row, num_cols - 1, rule, cell_fmt)
         row += 1
 
@@ -182,7 +217,7 @@ def _create_main_sheet(
     inputs,
 ):
     """Create the main sheet with rules at top and data table below."""
-    sheet = workbook.add_worksheet("Plan d'approvisionnement")
+    sheet = workbook.add_worksheet(MAIN_SHEET_NAME)
     num_cols = MAIN_SHEET_NUM_COLS
     sheet.set_column(0, num_cols - 1, 25)
 
@@ -213,7 +248,7 @@ def _add_country_formulas(sheet, countries):
     for row in range(FIRST_DATA_ROW, LAST_DATA_ROW + 1):
         excel_row = row + 1
         formula = f'=IF(E{excel_row}<>"","{france_name}","")'
-        sheet.write_formula(row, 7, formula)  # column H = Pays (0-indexed 7)
+        sheet.write_formula(row, 7, formula)  # column H = Country (0-indexed 7)
 
 
 def _add_dropdown_validations(sheet, countries, departments, inputs):
@@ -252,7 +287,7 @@ def _add_dropdown_validations(sheet, countries, departments, inputs):
         {"validate": "list", "source": type_cive_labels},
     )
 
-    # J = Précisez la culture : free text, no validation
+    # J = Culture details: free text, no validation
 
     collection_type_labels = [label for _, label in BiomethaneSupplyInput.COLLECTION_TYPE_CHOICES]
     sheet.data_validation(
@@ -262,7 +297,7 @@ def _add_dropdown_validations(sheet, countries, departments, inputs):
 
 
 def _add_numeric_validations(sheet):
-    """Add numeric validations. C=Ratio, D=Volume, F=Dist moy, G=Dist max."""
+    """Add numeric validations. C=Dry matter ratio, D=Volume, F=Avg distance, G=Max distance."""
     start_row = FIRST_DATA_ROW + 1
     end_row = LAST_DATA_ROW + 1
 
@@ -336,7 +371,7 @@ def _protect_and_format_sheet(workbook, sheet):
     unlocked_decimal_number = workbook.add_format({"locked": False, "num_format": "0.0"})
     unlocked_number = workbook.add_format({"locked": False, "num_format": "0"})
 
-    # Apply formats: C=Ratio (decimal), D=Volume (decimal), F=Dist moy (int), G=Dist max (int)
+    # Apply formats: C=Dry matter ratio (decimal), D=Volume (decimal), F=Avg distance (int), G=Max distance (int)
     for col in range(11):
         if col == 2:  # C: Ratio de matière sèche (%)
             sheet.set_column(col, col, 25, unlocked_decimal_number)
@@ -377,7 +412,7 @@ def _create_countries_sheet(workbook, bold, countries):
 
 
 def _create_inputs_sheet(workbook, bold, feedstocks):
-    """Create the Intrants reference sheet."""
+    """Create the Feedstocks (Intrants) reference sheet."""
     sheet = workbook.add_worksheet("Intrants")
     sheet.write(0, 0, "Nom", bold)
 

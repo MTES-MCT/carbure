@@ -25,7 +25,7 @@ class SupplyPlanExcelTemplateTests(TestCase):
     def test_template_has_all_required_sheets(self):
         """Test that all required sheets are present."""
         expected_sheets = [
-            "Plan d'approvisionnement",
+            "Approvisionnement",
             "Departements",
             "Pays",
         ]
@@ -38,7 +38,7 @@ class SupplyPlanExcelTemplateTests(TestCase):
 
     def test_main_sheet_has_correct_columns(self):
         """Test that the main sheet has the correct columns."""
-        main_sheet = self.workbook["Plan d'approvisionnement"]
+        main_sheet = self.workbook["Approvisionnement"]
 
         expected_columns = [
             "Intrant",
