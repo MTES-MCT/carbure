@@ -3598,6 +3598,7 @@ export interface components {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
             feedstock: components["schemas"]["FeedStockClassification"];
+            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
@@ -3615,6 +3616,7 @@ export interface components {
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
+            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
@@ -3632,6 +3634,7 @@ export interface components {
             origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
+            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
@@ -3652,6 +3655,7 @@ export interface components {
             readonly year: number;
             readonly origin_country: string;
             readonly feedstock: string;
+            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
@@ -3666,6 +3670,12 @@ export interface components {
             /** Format: double */
             maximum_distance_km?: number | null;
         };
+        /**
+         * @description * `INTERNAL` - Interne
+         *     * `EXTERNAL` - Externe
+         * @enum {string}
+         */
+        BiomethaneSupplyInputSourceEnum: BiomethaneSupplyInputSourceEnum;
         BiomethaneUploadExcelRequest: {
             /** Format: binary */
             file: File;
@@ -4330,7 +4340,7 @@ export interface components {
         ElecProvisionCertificate: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
-            source: components["schemas"]["SourceEnum"];
+            source: components["schemas"]["ElecProvisionCertificateSourceEnum"];
             quarter: components["schemas"]["QuarterEnum"];
             year: number;
             operating_unit: string;
@@ -4376,6 +4386,15 @@ export interface components {
             renewable_energy: number;
         };
         ElecProvisionCertificateQualichargeResponse: components["schemas"]["ElecProvisionCertificateQualichargeGrouped"] | components["schemas"]["ElecProvisionCertificateQualicharge"];
+        /**
+         * @description * `MANUAL` - MANUAL
+         *     * `METER_READINGS` - METER_READINGS
+         *     * `QUALICHARGE` - QUALICHARGE
+         *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
+         *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
+         * @enum {string}
+         */
+        ElecProvisionCertificateSourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
         /**
          * @description * `NO_ONE` - NO_ONE
          *     * `DGEC` - DGEC
@@ -5352,6 +5371,7 @@ export interface components {
             has_biogas_recovery?: boolean;
         };
         PatchedBiomethaneSupplyInputCreateRequest: {
+            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
@@ -5850,15 +5870,6 @@ export interface components {
          * @enum {string}
          */
         SiteTypeEnum: SiteTypeEnum;
-        /**
-         * @description * `MANUAL` - MANUAL
-         *     * `METER_READINGS` - METER_READINGS
-         *     * `QUALICHARGE` - QUALICHARGE
-         *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
-         *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
-         * @enum {string}
-         */
-        SourceEnum: PathsApiElecProvisionCertificatesGetParametersQuerySource;
         /**
          * @description * `DIRECT_SPREADING` - Épandage direct
          *     * `SPREADING_VIA_PROVIDER` - Épandage via un prestataire
@@ -13491,6 +13502,10 @@ export enum BiomethaneAnnualDeclarationStatusEnum {
     IN_PROGRESS = "IN_PROGRESS",
     DECLARED = "DECLARED",
     OVERDUE = "OVERDUE"
+}
+export enum BiomethaneSupplyInputSourceEnum {
+    INTERNAL = "INTERNAL",
+    EXTERNAL = "EXTERNAL"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

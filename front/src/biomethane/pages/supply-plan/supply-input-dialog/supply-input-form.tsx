@@ -6,6 +6,7 @@ import {
   getSupplyPlanInputMaterialUnitOptions,
   getSupplyPlanInputTypeCiveOptions,
   getSupplyPlanInputCollectionTypeOptions,
+  getSupplyPlanInputSourceOptions,
   SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE,
 } from "../utils"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
@@ -29,6 +30,7 @@ export const SupplyInputForm = ({
   readOnly?: boolean
 }) => {
   const { t } = useTranslation()
+  const sourceOptions = getSupplyPlanInputSourceOptions()
   const materialUnitOptions = getSupplyPlanInputMaterialUnitOptions()
   const typeCiveOptions = getSupplyPlanInputTypeCiveOptions()
   const collectionTypeOptions = getSupplyPlanInputCollectionTypeOptions()
@@ -46,6 +48,13 @@ export const SupplyInputForm = ({
     >
       <Grid gap="lg" cols={2}>
         <Dialog.Section label="Intrant" gap="lg">
+          <RadioGroup
+            options={sourceOptions}
+            label={t("Source")}
+            orientation="horizontal"
+            {...bind("source")}
+            readOnly={readOnly}
+          />
           <AutoCompleteFeedstocks
             label={t("Intrants")}
             required

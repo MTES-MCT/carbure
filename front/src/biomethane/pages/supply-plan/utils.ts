@@ -2,6 +2,7 @@ import {
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputTypeCive,
   BiomethaneSupplyInputCollectionType,
+  BiomethaneSupplyInputSource,
 } from "./types"
 import i18next from "i18next"
 
@@ -16,6 +17,19 @@ export const SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE = [
   "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-2",
   "HUILES-ET-MATIERES-GRASSES-AVEC-PRODUITS-ANIMAUX-CAT-3",
 ]
+
+export const getSupplyPlanInputSourceOptions = () => {
+  return [
+    {
+      value: BiomethaneSupplyInputSource.INTERNAL,
+      label: i18next.t("Interne"),
+    },
+    {
+      value: BiomethaneSupplyInputSource.EXTERNAL,
+      label: i18next.t("Externe"),
+    },
+  ]
+}
 
 export const getSupplyPlanInputMaterialUnitOptions = () => {
   return [
