@@ -29,6 +29,7 @@ class ExcelExportActionMixin:
                     "label": "Plan d'approvisionnement",
                     "rows": self.get_serializer(queryset, many=True).data,
                     "columns": [
+                        {"label": "Provenance", "value": "source"},
                         {"label": "Intrant", "value": "feedstock"},
                         {"label": "Unité", "value": "material_unit"},
                         {"label": "Ratio de matière sèche (%)", "value": "dry_matter_ratio_percent"},
