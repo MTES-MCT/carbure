@@ -1,7 +1,13 @@
 from django.db.models import Sum
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
-from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+)
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import (
@@ -57,11 +63,13 @@ class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
     retrieve=extend_schema(parameters=[OpenApiParameter(name="year", exclude=True)]),
     update=extend_schema(parameters=[OpenApiParameter(name="year", exclude=True)]),
     partial_update=extend_schema(parameters=[OpenApiParameter(name="year", exclude=True)]),
+    destroy=extend_schema(parameters=[OpenApiParameter(name="year", exclude=True)]),
 )
 class BiomethaneSupplyInputViewSet(
     ListWithObjectPermissionsMixin,
     GenericViewSet,
     CreateModelMixin,
+    DestroyModelMixin,
     UpdateModelMixin,
     ListModelMixin,
     RetrieveModelMixin,
@@ -74,7 +82,7 @@ class BiomethaneSupplyInputViewSet(
     pagination_class = BiomethaneSupplyInputPagination
 
     def get_permissions(self):
-        return get_biomethane_permissions(["create", "update", "partial_update"], self.action)
+        return get_biomethane_permissions(["create", "destroy", "update", "partial_update"], self.action)
 
     def get_permission_object(self, first_obj):
         """Check permissions on the supply plan of the supply inputs."""
@@ -102,7 +110,7 @@ class BiomethaneSupplyInputViewSet(
         return context
 
     def get_filterset_class(self):
-        if self.action in ["retrieve", "update", "partial_update"]:
+        if self.action in ["destroy", "retrieve", "update", "partial_update"]:
             return BaseBiomethaneSupplyInputFilter
         elif self.action in ["create"]:
             return BiomethaneSupplyInputCreateFilter
