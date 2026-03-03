@@ -6,7 +6,8 @@ from django.db.models import CharField, Sum
 from django.db.models.expressions import F, Value
 from django.db.models.functions import Cast, Concat, Round
 
-from elec.models import ElecMeterReadingVirtual, ElecProvisionCertificate
+from elec.models import ElecProvisionCertificate
+from elec.models.elec_meter_reading import ElecMeterReading
 from transactions.models import YearConfig
 
 
@@ -43,7 +44,7 @@ class Command(BaseCommand):
         new_enr_ratio = enr_ratio / 100  # 25 -> 0.25
 
         meter_readings = (
-            ElecMeterReadingVirtual.objects.prefetch_related("application", "cpo")
+            ElecMeterReading.extended_objects.prefetch_related("application", "cpo")
             .filter(application__year=last_year)
             .values(
                 "cpo__id",

@@ -13,8 +13,8 @@ from core.helpers import send_mail
 from core.models import ExternalAdminRights, UserRights
 from elec.models.elec_audit_sample import ElecAuditSample
 from elec.models.elec_charge_point_application import ElecChargePointApplication
+from elec.models.elec_meter_reading import ElecMeterReading
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
-from elec.models.elec_meter_reading_virtual import ElecMeterReadingVirtual
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 
 
@@ -50,7 +50,7 @@ def accept_application(request: HttpRequest):
     # creer un ElecProvisionCertificate groupant tous les meter readings par charge_poing.operating_unit
 
     ## recuperer tous les MeterReadings de la demande, sauf ceux liés à des PDC de stations DC (gérés par qualicharge)
-    meter_readings = ElecMeterReadingVirtual.objects.filter(application=application).select_related("charge_point")
+    meter_readings = ElecMeterReading.extended_objects.filter(application=application)
     data = [
         {
             "renewable_energy": meter_reading.renewable_energy,
@@ -93,7 +93,7 @@ def accept_application(request: HttpRequest):
 
 def send_email_to_cpo(application: ElecMeterReadingApplication, request: HttpRequest):
     quarter = f"T{application.quarter} {application.year}"
-    meter_readings = ElecMeterReadingVirtual.objects.filter(application=application)
+    meter_readings = ElecMeterReading.extended_objects.filter(application=application)
     total_energy = round(sum(mr.renewable_energy or 0 for mr in meter_readings), 2)
     meter_reading_count = application.elec_meter_readings.count()
     meter_reading_link = (

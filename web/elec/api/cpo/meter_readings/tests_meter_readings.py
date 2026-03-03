@@ -176,6 +176,20 @@ class ElecMeterReadingsTest(TestCase):
             charge_point=None,
         )
 
+        self.meter5 = ElecMeter.objects.create(
+            mid_certificate="MID_QRST",
+            initial_index=1000,
+            initial_index_date=datetime.date(2024, 3, 28),
+            charge_point=None,
+        )
+
+        self.meter6 = ElecMeter.objects.create(
+            mid_certificate="MID_UVWX",
+            initial_index=500,
+            initial_index_date=datetime.date(2024, 7, 28),
+            charge_point=None,
+        )
+
         self.charge_point_1 = ElecChargePoint.objects.create(
             application=self.charge_point_application,
             cpo=self.cpo,
@@ -280,7 +294,7 @@ class ElecMeterReadingsTest(TestCase):
             charge_point_id="FR00UVWX",
             current_type="AC",
             installation_date=datetime.date(2021, 6, 2),
-            current_meter=self.meter4,
+            current_meter=self.meter6,
             measure_reference_point_id="PRM_UVWX",
             station_name="Station",
             station_id="FR00",
@@ -290,6 +304,11 @@ class ElecMeterReadingsTest(TestCase):
             latitude=Decimal(12.0),
             longitude=Decimal(5.0),
         )
+
+        self.meter5.charge_point = self.charge_point_6
+        self.meter5.save()
+        self.meter6.charge_point = self.charge_point_6
+        self.meter6.save()
 
         self.charge_point_7 = ElecChargePoint.objects.create(
             application=self.charge_point_application,
@@ -374,6 +393,15 @@ class ElecMeterReadingsTest(TestCase):
             enr_ratio=0.2492,
         )
 
+        self.meter_reading_4 = ElecMeterReading.objects.create(
+            extracted_energy=3000,
+            reading_date=datetime.date(2024, 6, 29),
+            meter=self.meter5,
+            cpo=self.cpo,
+            application=self.meter_reading_application,
+            enr_ratio=0.2492,
+        )
+
     def test_application_template(self):
         response = self.client.get(
             reverse("elec-cpo-meter-readings-get-application-template"),
@@ -402,7 +430,13 @@ class ElecMeterReadingsTest(TestCase):
         assert sheet["D4"].value is None
 
         assert sheet["A5"].value == self.charge_point_5.charge_point_id
+        assert sheet["B5"].value is None  # no meter associated
+
         assert sheet["A6"].value == self.charge_point_6.charge_point_id
+        assert sheet["B6"].value == self.meter6.initial_index  # newer meter index instead of previous meter last reading
+        assert sheet["C6"].value is None
+        assert sheet["D6"].value is None
+
         assert sheet["A7"].value == self.charge_point_7.charge_point_id
         assert sheet["A8"].value == self.charge_point_8.charge_point_id
         assert sheet["A9"].value == self.charge_point_9.charge_point_id
@@ -430,7 +464,7 @@ class ElecMeterReadingsTest(TestCase):
         data = response.json()
         assert response.status_code == 400
 
-        assert data == {
+        expected = {
             "status": "error",
             "error": "VALIDATION_FAILED",
             "data": {
@@ -489,7 +523,7 @@ class ElecMeterReadingsTest(TestCase):
                         "line": 9,
                         "meta": {
                             "reading_date": [
-                                "Un relevé plus récent est déjà enregistré pour ce point de recharge: 500kWh, 28/03/2024",
+                                "Un relevé plus récent est déjà enregistré pour ce point de recharge: 500kWh, 28/07/2024",
                                 "La date du relevé ne correspond pas au trimestre traité actuellement.",
                             ],
                         },
@@ -524,6 +558,10 @@ class ElecMeterReadingsTest(TestCase):
                 ],
             },
         }
+
+        self.maxDiff = None
+        self.assertEqual(data, expected)
+        # assert data == expected
 
     def test_check_application_ok(self):
         excel_file = create_meter_readings_excel(
@@ -646,14 +684,14 @@ class ElecMeterReadingsTest(TestCase):
                 "applications": [
                     {
                         "application_date": mock.ANY,
-                        "charge_point_count": 1,
+                        "charge_point_count": 2,
                         "cpo": {
                             "entity_type": "Charge Point Operator",
                             "id": self.cpo.id,
                             "name": "CPO",
                             "registration_id": self.cpo.registration_id,
                         },
-                        "energy_total": 24.92,
+                        "energy_total": 523.32,
                         "id": mock.ANY,
                         "quarter": 2,
                         "status": "ACCEPTED",
@@ -748,6 +786,7 @@ class ElecMeterReadingsTest(TestCase):
         assert response.status_code == 200
         # Note: Only charge_point_2 (FR00EFGH) is returned because charge_point_3 (FR00IJKL)
         # has is_article_2=True and is filtered out by the SQL view
+
         assert data == {
             "status": "success",
             "data": [
@@ -756,6 +795,12 @@ class ElecMeterReadingsTest(TestCase):
                     "previous_reading": 700.0,
                     "current_reading": 800.0,
                     "reading_date": "2024-06-21",
+                },
+                {
+                    "charge_point_id": "FR00UVWX",
+                    "previous_reading": 1000.0,
+                    "current_reading": 3000.0,
+                    "reading_date": "2024-06-29",
                 },
             ],
         }
