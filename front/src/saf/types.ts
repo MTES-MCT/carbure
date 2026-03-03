@@ -15,6 +15,7 @@ import {
   PathsApiResourcesAirportsGetParametersQueryShipping_method as SafShippingMethod,
   PathsApiSafTicketsFiltersGetParametersQueryFilter as SafTicketFilter,
   PathsApiSafTicketSourcesFiltersGetParametersQueryFilter as SafTicketSourceFilter,
+  PathsApiSafTicketsGetParametersQueryEts_status as EtsStatus,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -27,6 +28,7 @@ export {
   SafShippingMethod,
   SafTicketFilter,
   SafTicketSourceFilter,
+  EtsStatus,
 }
 
 export enum SafFilter {

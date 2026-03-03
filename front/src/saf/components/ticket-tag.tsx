@@ -1,11 +1,10 @@
-import { EtsStatusEnum } from "api-schema"
 import { Certificate } from "common/components/icons"
 import { useTranslation } from "react-i18next"
-import { SafTicketStatus } from "saf/types"
+import { EtsStatus, SafTicketStatus } from "saf/types"
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 export interface TicketTagProps {
   status?: SafTicketStatus
-  ets?: EtsStatusEnum | null
+  ets?: EtsStatus | null
   small?: boolean
 }
 
@@ -39,7 +38,7 @@ export const TicketTag = ({ status, ets, small = false }: TicketTagProps) => {
   }
 
   switch (ets) {
-    case EtsStatusEnum.ETS_VALUATION:
+    case EtsStatus.ETS_VALUATION:
       declared = true
       label = t("ETS")
       break

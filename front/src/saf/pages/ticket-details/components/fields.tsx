@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 // TODO: change import
 import DurabilityFields from "../../../components/durability-fields"
-import { SafTicketDetails } from "../../../types"
-import { EtsStatusEnum } from "api-schema"
+import { EtsStatus, SafTicketDetails } from "../../../types"
+
 import { Dialog } from "common/components/dialog2"
 
 interface TicketFieldsProps {
@@ -19,9 +19,9 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
   if (!ticket) return null
 
   const etsStatusMap = {
-    [EtsStatusEnum.ETS_VALUATION]: t("Valorisation ETS"),
-    [EtsStatusEnum.OUTSIDE_ETS]: t("Hors ETS (volontaire)"),
-    [EtsStatusEnum.NOT_CONCERNED]: t("Non concerné"),
+    [EtsStatus.ETS_VALUATION]: t("Valorisation ETS"),
+    [EtsStatus.OUTSIDE_ETS]: t("Hors ETS (volontaire)"),
+    [EtsStatus.NOT_CONCERNED]: t("Non concerné"),
   }
 
   return (
