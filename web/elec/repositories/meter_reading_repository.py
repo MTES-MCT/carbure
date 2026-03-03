@@ -22,7 +22,9 @@ class MeterReadingRepository:
             )
         )
 
-        return ElecMeterReadingApplication.objects.annotate(
+        applications = ElecMeterReadingApplication.objects.order_by("year", "quarter")
+
+        return applications.annotate(
             energy_total=Coalesce(
                 Subquery(readings_by_application.values("energy_total")[:1]),
                 Value(0.0),
@@ -33,7 +35,7 @@ class MeterReadingRepository:
                 Value(0),
                 output_field=IntegerField(),
             ),
-        ).all()
+        )
 
     @staticmethod
     def get_annotated_applications_details():
@@ -93,7 +95,7 @@ class MeterReadingRepository:
 
         Falls back to current_meter.initial_index/initial_index_date if no reading exists.
         """
-        latest_reading_subquery = ElecMeterReading.extended_objects.filter(charge_point_id=OuterRef("pk")).order_by(
+        latest_reading_subquery = ElecMeterReading.extended_objects.filter(meter=OuterRef("current_meter")).order_by(
             "-current_index_date"
         )
         return charge_points.select_related("current_meter").annotate(
