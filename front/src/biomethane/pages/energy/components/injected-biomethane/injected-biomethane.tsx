@@ -75,6 +75,7 @@ export function InjectedBiomethane({
             hintText={t("Valeur moyenne de l'année de déclaration")}
             type="number"
             min={0}
+            step={0.01}
             {...bind("injected_biomethane_pcs_kwh_per_nm3")}
             required
           />
@@ -85,7 +86,7 @@ export function InjectedBiomethane({
             min={0}
             hasTooltip
             title={t(
-              "Quantité de biométhane injecté (Nm3/an) = Quantité de biométhane injecté (GWhPCS/an) * PCS du biométhane injecté (kWh/Nm3) * 10^-6"
+              "Quantité de biométhane injecté (Nm3/an) = Quantité de biométhane injecté (GWhPCS/an) / (PCS du biométhane injecté (kWh/Nm3) * 10^-6)"
             )}
             type="number"
             value={injectedBiomethaneNm3PerYear}

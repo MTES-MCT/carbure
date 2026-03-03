@@ -1,6 +1,8 @@
+import { BIOMETHANE_HELP_URL } from "biomethane/config"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { Button } from "common/components/button2"
+import { Row } from "common/components/scaffold"
 import { Text } from "common/components/text"
 import { Title } from "common/components/title"
 import { useRoutes } from "common/hooks/routes"
@@ -55,12 +57,20 @@ export const SettingsNotFilled = ({
             "Veuillez remplir les informations de votre installation dans les paramètres de votre société."
           )}
         </Text>
-        <Button
-          linkProps={{ to: routeMissingObject }}
-          iconId="ri-arrow-right-line"
-        >
-          {t("Accéder aux paramètres")}
-        </Button>
+        <Row gap="md">
+          <Button
+            linkProps={{ to: routeMissingObject }}
+            iconId="ri-arrow-right-line"
+          >
+            {t("Accéder aux paramètres")}
+          </Button>
+          <Button
+            priority="secondary"
+            linkProps={{ href: BIOMETHANE_HELP_URL, target: "_blank" }}
+          >
+            {t("Besoin d'aide ?")}
+          </Button>
+        </Row>
       </div>
     </div>
   )

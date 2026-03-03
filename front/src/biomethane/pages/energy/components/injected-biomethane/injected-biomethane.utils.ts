@@ -31,5 +31,6 @@ export const getInjectedBiomethaneNm3PerYear = (
   gwhPcsPerYear: number,
   pcsKwhPerNm3: number
 ) => {
-  return roundNumber(gwhPcsPerYear * pcsKwhPerNm3 * Math.pow(10, -6), 2)
+  if (pcsKwhPerNm3 === 0) return 0
+  return roundNumber(gwhPcsPerYear / (pcsKwhPerNm3 * Math.pow(10, -6)), 2)
 }
