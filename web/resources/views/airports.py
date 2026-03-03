@@ -7,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.serializers import AirportSerializer
-from core.utils import extract_enum
 from saf.models.saf_logistics import SafLogistics
 from transactions.models.airport import Airport
 
@@ -16,7 +15,7 @@ class AirportQueryParamsSerializer(serializers.Serializer):
     query = serializers.CharField(required=False, allow_blank=True)
     public_only = serializers.BooleanField(required=False, default=False)
     origin_depot_id = serializers.IntegerField(required=False)
-    shipping_method = serializers.ChoiceField(required=False, choices=extract_enum(SafLogistics, "shipping_method"))
+    shipping_method = serializers.ChoiceField(required=False, choices=SafLogistics.SHIPPING_METHODS)
     has_intermediary_depot = serializers.BooleanField(required=False, allow_null=True)
 
 
