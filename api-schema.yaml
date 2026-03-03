@@ -2232,6 +2232,44 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneSupplyInputCreate"
           description: ""
+    delete:
+      operationId: biomethane_supply_input_destroy
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Intrant d'approvisionnement.
+          required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
   /api/biomethane/supply-input/export/:
     get:
       operationId: biomethane_supply_input_export_retrieve
@@ -13110,6 +13148,8 @@ components:
         - origin_country
     BiomethaneSupplyInputExport:
       type: object
+      description: "Serializer for Excel export: choice fields are serialized as
+        display labels (e.g. DRY → Sèche)."
       properties:
         year:
           type: integer
@@ -13121,25 +13161,21 @@ components:
           type: string
           readOnly: true
         source:
-          allOf:
-            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-          nullable: true
+          type: string
+          readOnly: true
+        material_unit:
+          type: string
+          readOnly: true
         type_cive:
-          allOf:
-            - $ref: "#/components/schemas/TypeCiveEnum"
-          nullable: true
+          type: string
+          readOnly: true
+        collection_type:
+          type: string
+          readOnly: true
         culture_details:
           type: string
           nullable: true
           maxLength: 255
-        collection_type:
-          allOf:
-            - $ref: "#/components/schemas/CollectionTypeEnum"
-          nullable: true
-        material_unit:
-          allOf:
-            - $ref: "#/components/schemas/MaterialUnitEnum"
-          nullable: true
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -13161,8 +13197,12 @@ components:
           format: double
           nullable: true
       required:
+        - collection_type
         - feedstock
+        - material_unit
         - origin_country
+        - source
+        - type_cive
         - year
     BiomethaneSupplyInputSourceEnum:
       enum:

@@ -657,7 +657,11 @@ export interface paths {
          *     By default, checks permissions on the first object in the filtered queryset. */
         put: operations["biomethane_supply_input_update"];
         post?: never;
-        delete?: never;
+        /** @description Mixin for list() actions that need to check object-level permissions.
+         *
+         *     Override get_permission_object() to specify which object to check permissions on.
+         *     By default, checks permissions on the first object in the filtered queryset. */
+        delete: operations["biomethane_supply_input_destroy"];
         options?: never;
         head?: never;
         /** @description Mixin for list() actions that need to check object-level permissions.
@@ -3651,15 +3655,16 @@ export interface components {
             maximum_distance_km?: number | null;
             origin_department?: string | null;
         };
+        /** @description Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche). */
         BiomethaneSupplyInputExport: {
             readonly year: number;
             readonly origin_country: string;
             readonly feedstock: string;
-            source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
-            type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            readonly source: string;
+            readonly material_unit: string;
+            readonly type_cive: string;
+            readonly collection_type: string;
             culture_details?: string | null;
-            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
-            material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /** Format: double */
             dry_matter_ratio_percent?: number | null;
             /** Format: double */
@@ -7651,6 +7656,32 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BiomethaneSupplyInputCreate"];
                 };
+            };
+        };
+    };
+    biomethane_supply_input_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Intrant d'approvisionnement. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

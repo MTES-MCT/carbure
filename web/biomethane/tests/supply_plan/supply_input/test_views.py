@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
@@ -108,6 +109,17 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["volume"], 750.0)
         self.assertEqual(response.data["feedstock"]["name"], "Résidus")
+
+    def test_destroy_supply_input_success(self):
+        """Test successful deletion of a supply input."""
+        supply_input_id = self.supply_input.id
+        url = reverse("biomethane-supply-input-detail", args=[supply_input_id])
+        response = self.client.delete(
+            url,
+            query_params={"entity_id": self.producer_entity.id},
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(BiomethaneSupplyInput.objects.filter(id=supply_input_id).exists())
 
     def test_create_supply_input_invalid_data(self):
         """Test creation of a supply input with invalid data."""
