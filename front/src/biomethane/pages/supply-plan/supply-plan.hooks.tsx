@@ -22,7 +22,7 @@ import useEntity from "common/hooks/entity"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { compact } from "common/utils/collection"
 
-export const useSupplyPlanColumns = () => {
+const useDeleteSupplyInput = () => {
   const { t } = useTranslation()
   const portal = usePortal()
   const entity = useEntity()
@@ -59,6 +59,13 @@ export const useSupplyPlanColumns = () => {
       />
     ))
   }
+
+  return { openDeleteConfirm, canEditDeclaration }
+}
+
+export const useSupplyPlanColumns = () => {
+  const { t } = useTranslation()
+  const { openDeleteConfirm, canEditDeclaration } = useDeleteSupplyInput()
 
   const columns: Column<BiomethaneSupplyInput>[] = compact([
     {
