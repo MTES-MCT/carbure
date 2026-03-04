@@ -39,10 +39,12 @@ def get_application_details(request):
         queryset=ElecAuditSample.objects.prefetch_related(audited_charge_points_prefetch),
     )
 
-    application = ElecMeterReadingApplication.objects.prefetch_related(audit_sample_prefetch).get(id=application_id)
-
     # Append annotated data to the application
-    application = MeterReadingRepository.get_annotated_applications_details(application)
+    application = (
+        MeterReadingRepository.get_annotated_applications_details()
+        .prefetch_related(audit_sample_prefetch)
+        .get(pk=application_id)
+    )
 
     charge_point_application = ElecMeterReadingApplicationDetailsSerializer(application).data
     return SuccessResponse(charge_point_application)
