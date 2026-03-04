@@ -3,7 +3,7 @@
 from django.test import TestCase
 from openpyxl import load_workbook
 
-from biomethane.services.supply_plan_excel_template import create_supply_plan_template
+from biomethane.services.supply_plan_excel_template import HEADER_ROW, TABLE_HEADERS, create_supply_plan_template
 
 
 class SupplyPlanExcelTemplateTests(TestCase):
@@ -25,7 +25,7 @@ class SupplyPlanExcelTemplateTests(TestCase):
     def test_template_has_all_required_sheets(self):
         """Test that all required sheets are present."""
         expected_sheets = [
-            "Plan d'approvisionnement",
+            "Approvisionnement",
             "Departements",
             "Pays",
         ]
@@ -38,24 +38,11 @@ class SupplyPlanExcelTemplateTests(TestCase):
 
     def test_main_sheet_has_correct_columns(self):
         """Test that the main sheet has the correct columns."""
-        main_sheet = self.workbook["Plan d'approvisionnement"]
+        main_sheet = self.workbook["Approvisionnement"]
 
-        expected_columns = [
-            "Provenance",
-            "Intrant",
-            "Type de culture",
-            "Unité",
-            "Ratio de matière sèche (%)",
-            "Volume (tMB ou tMS)",
-            "Département",
-            "Distance moyenne pondérée (km)",
-            "Distance maximale (km)",
-            "Pays d'origine",
-        ]
-
-        # Read the first row (headers) and filter out None values
-        actual_columns = [cell.value for cell in main_sheet[1] if cell.value is not None]
-
+        expected_columns = [label for label, _ in TABLE_HEADERS]
+        # Header row: 0-based HEADER_ROW in code = 1-based (HEADER_ROW + 1) in Excel/openpyxl
+        actual_columns = [cell.value for cell in main_sheet[HEADER_ROW + 1] if cell.value is not None]
         self.assertEqual(actual_columns, expected_columns)
 
     def test_departments_sheet_has_data(self):

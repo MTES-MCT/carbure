@@ -21,7 +21,7 @@ class CreateEntityError:
 
 
 ENTITY_CREATE_FIELDS = ["name", "entity_type", "has_saf", "has_elec"]
-SITE_CREATE_FIELDS = ["company_address", "postal_code", "city", "department", "insee_code"]
+SITE_CREATE_FIELDS = ["company_address", "postal_code", "city", "department", "insee_code", "site_siret"]
 
 
 class CreateEntitySerializer(ModelSerializer):
@@ -32,6 +32,7 @@ class CreateEntitySerializer(ModelSerializer):
     city = serializers.CharField(required=False, allow_blank=True, max_length=128)
     department = serializers.CharField(required=False, allow_blank=True, max_length=3)
     insee_code = serializers.CharField(required=False, allow_blank=True, max_length=5)
+    site_siret = serializers.CharField(required=False, allow_blank=True, max_length=14)
 
     class Meta:
         model = Entity
@@ -60,11 +61,13 @@ def _create_production_unit_for_entity(entity, validated_data):
     BiomethaneProductionUnit.objects.create(
         producer=entity,
         site_type=Site.PRODUCTION_BIOGAZ,
+        name=validated_data.get("name") or "",
         address=validated_data.get("company_address") or "",
         postal_code=validated_data.get("postal_code") or "",
         city=validated_data.get("city") or "",
         department=department,
         insee_code=validated_data.get("insee_code") or "",
+        site_siret=validated_data.get("site_siret") or "",
     )
 
 

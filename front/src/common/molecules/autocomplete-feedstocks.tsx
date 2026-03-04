@@ -3,28 +3,23 @@ import {
   Autocomplete,
   AutocompleteProps,
 } from "common/components/autocomplete2"
-import { Feedstock } from "common/types"
+import { useFeedstockParams } from "common/hooks/api/use-feedstocks"
+import { FeedStockClassification } from "common/types"
 import { useTranslation } from "react-i18next"
 
-type AutoCompleteFeedstocksProps = AutocompleteProps<Feedstock> & {
-  isBiofuelFeedstock?: boolean
-  isMethanogenic?: boolean
-}
+type AutoCompleteFeedstocksProps = AutocompleteProps<FeedStockClassification>
 
-export const AutoCompleteFeedstocks = ({
-  isBiofuelFeedstock,
-  isMethanogenic,
-  ...props
-}: AutoCompleteFeedstocksProps) => {
+export const AutoCompleteFeedstocks = (props: AutoCompleteFeedstocksProps) => {
   const { t } = useTranslation()
+  const feedstockParams = useFeedstockParams()
+
   return (
     <Autocomplete
       placeholder={t("Rechercher une matière première...")}
       getOptions={(query) =>
         findFeedstocks({
           query,
-          is_biofuel_feedstock: isBiofuelFeedstock,
-          is_methanogenic: isMethanogenic,
+          ...feedstockParams,
         })
       }
       normalize={(feedstock) => {

@@ -17,7 +17,8 @@ export function addCompany(
   postal_code: string,
   city: string,
   department: string,
-  insee_code: string
+  insee_code: string,
+  site_siret: string
 ) {
   return apiFetch.POST("/entities/", {
     params: { query: { entity_id } },
@@ -31,6 +32,7 @@ export function addCompany(
       city,
       department,
       insee_code,
+      site_siret,
     },
   })
 }

@@ -7,3 +7,6 @@ export const ENERGY_EFFICIENCY_COEFFICIENT_THRESHOLD_MWHE_MWHPCS = 0.15
 
 export const CONTRACT_FILE_MAX_SIZE = 10 // MB
 export const AMENDMENT_FILE_MAX_SIZE = 10 // MB
+
+export const BIOMETHANE_HELP_URL =
+  "https://carbure-1.gitbook.io/faq/biomethane/introduction"

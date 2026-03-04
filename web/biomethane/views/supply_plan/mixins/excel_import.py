@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateFromExcelSerializer, BiomethaneUploadExcelSerializer
+from biomethane.services.supply_plan_excel_template import KEY_ROW, MAIN_SHEET_NAME
 from core.excel_importer import ExcelImporter, ExcelValidationError
 
 
@@ -35,7 +36,7 @@ class ExcelImportActionMixin:
                 value={
                     "validation_errors": [
                         {"row": 3, "errors": {"volume": ["This field is required."]}},
-                        {"row": 5, "errors": {"input_name": ["Invalid input type."]}},
+                        {"row": 5, "errors": {"feedstock": ["Invalid input type."]}},
                     ],
                     "total_errors": 2,
                     "total_rows_processed": 10,
@@ -65,9 +66,10 @@ class ExcelImportActionMixin:
 
         file = file_serializer.validated_data["file"]
 
+        # Template has rules at top, then key row (column names for import), then data rows
         config = {
-            "header_row": 1,
-            "sheet_name": "Plan d'approvisionnement",
+            "header_row": KEY_ROW,  # 0-based: row of keys (feedstock, type_cive, ...) used as column names
+            "sheet_name": MAIN_SHEET_NAME,
         }
 
         try:

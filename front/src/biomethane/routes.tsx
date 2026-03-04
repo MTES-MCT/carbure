@@ -2,10 +2,7 @@ import useEntity from "common/hooks/entity"
 import { lazy } from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { AnnualDeclarationLayout } from "./layouts/annual-declaration-layout"
-import {
-  ContractProductionUnitProvider,
-  useContractProductionUnit,
-} from "./providers/contract-production-unit"
+import { ContractProductionUnitProvider } from "./providers/contract-production-unit"
 import {
   AnnualDeclarationProvider,
   useAnnualDeclaration,
@@ -15,7 +12,6 @@ import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
 import { ExternalAdminPages } from "common/types"
 import { Contact } from "./pages/admin/declaration-detail/pages/contact"
-import { LoaderOverlay } from "common/components/scaffold"
 
 const currentYear = new Date().getFullYear()
 
@@ -72,28 +68,6 @@ const RedirectToCurrentYearRoute = ({ path }: { path: REDIRECTED_ROUTES }) => (
   </AnnualDeclarationProvider>
 )
 
-const RedirectToDefaultRoute = () => {
-  const { contractInfos, productionUnit, loading } = useContractProductionUnit()
-  const settingsRoutes = useRoutes().SETTINGS
-
-  if (loading) {
-    return <LoaderOverlay />
-  }
-
-  if (contractInfos === undefined) {
-    return <Navigate to={`${settingsRoutes.BIOMETHANE.CONTRACT}`} />
-  }
-  if (productionUnit === undefined) {
-    return <Navigate to={`${settingsRoutes.BIOMETHANE.PRODUCTION}`} />
-  }
-
-  return (
-    <AnnualDeclarationProvider>
-      <RedirectToCurrentYear path="digestate" />
-    </AnnualDeclarationProvider>
-  )
-}
-
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer, hasAdminRight } = useEntity()
 
@@ -136,9 +110,9 @@ export const BiomethaneRoutes = () => {
       <Route
         path=""
         element={
-          <ContractProductionUnitProvider allowEmpty>
-            <RedirectToDefaultRoute />
-          </ContractProductionUnitProvider>
+          <AnnualDeclarationProvider>
+            <RedirectToCurrentYear path="digestate" />
+          </AnnualDeclarationProvider>
         }
       />
     </Routes>

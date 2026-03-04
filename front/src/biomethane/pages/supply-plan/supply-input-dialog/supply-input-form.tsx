@@ -1,11 +1,13 @@
 import { Dialog } from "common/components/dialog2"
-import { NumberInput, RadioGroup } from "common/components/inputs2"
+import { NumberInput, RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
 import {
-  getSupplyPlanInputCropTypeOptions,
   getSupplyPlanInputMaterialUnitOptions,
+  getSupplyPlanInputTypeCiveOptions,
+  getSupplyPlanInputCollectionTypeOptions,
   getSupplyPlanInputSourceOptions,
+  SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE,
 } from "../utils"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
@@ -29,11 +31,14 @@ export const SupplyInputForm = ({
 }) => {
   const { t } = useTranslation()
   const sourceOptions = getSupplyPlanInputSourceOptions()
-  const cropTypeOptions = getSupplyPlanInputCropTypeOptions()
   const materialUnitOptions = getSupplyPlanInputMaterialUnitOptions()
+  const typeCiveOptions = getSupplyPlanInputTypeCiveOptions()
+  const collectionTypeOptions = getSupplyPlanInputCollectionTypeOptions()
 
   const form = useForm<SupplyInputFormValue>(supplyInput ?? {})
   const { value, bind } = form
+  const isFranceOriginCountry = value.origin_country?.code_pays == "FR"
+  const isBiogazIsdnd = value?.feedstock?.code === "BIOGAZ-CAPTE-DUNE-ISDND"
 
   return (
     <Form
@@ -46,61 +51,108 @@ export const SupplyInputForm = ({
           <RadioGroup
             options={sourceOptions}
             label={t("Provenance")}
-            required
             orientation="horizontal"
             {...bind("source")}
             readOnly={readOnly}
           />
-          <RadioGroup
-            options={cropTypeOptions}
-            label={t("Type de culture")}
-            required
-            orientation="horizontal"
-            {...bind("crop_type")}
-            readOnly={readOnly}
-          />
           <AutoCompleteFeedstocks
-            isMethanogenic
             label={t("Intrants")}
             required
-            {...bind("input_name")}
+            {...bind("feedstock")}
             readOnly={readOnly}
           />
-          <RadioGroup
-            options={materialUnitOptions}
-            label={t("Unité matière")}
-            required
-            orientation="horizontal"
-            {...bind("material_unit")}
-            readOnly={readOnly}
-          />
-          {value?.material_unit === BiomethaneSupplyInputMaterialUnit.DRY && (
+          {value?.feedstock?.classification?.category ===
+            "Biomasse agricole - Cultures intermédiaires" && (
+            <RadioGroup
+              options={typeCiveOptions}
+              label={t("Type de cive")}
+              required
+              orientation="horizontal"
+              {...bind("type_cive")}
+              readOnly={readOnly}
+            />
+          )}
+          {(value?.feedstock?.code === "AUTRES-CULTURES" ||
+            value?.feedstock?.code === "AUTRES-CULTURES-CIVE") && (
+            <TextInput
+              label={t("Précisez la culture")}
+              required
+              {...bind("culture_details")}
+              readOnly={readOnly}
+            />
+          )}
+          {SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE.includes(
+            value?.feedstock?.code ?? ""
+          ) && (
+            <RadioGroup
+              options={collectionTypeOptions}
+              label={t("Type de collecte")}
+              required
+              orientation="vertical"
+              {...bind("collection_type")}
+              readOnly={readOnly}
+            />
+          )}
+          {value?.feedstock?.classification && (
             <>
-              <NumberInput
-                label={t("Ratio de matière sèche")}
-                min={0}
-                max={100}
-                required
-                {...bind("dry_matter_ratio_percent")}
-                readOnly={readOnly}
+              <TextInput
+                label={t("Sous-catégorie d'intrants")}
+                value={value.feedstock.classification.subcategory ?? ""}
+                readOnly
               />
-              <NumberInput
-                label={t("Tonnage (tMS)")}
-                min={0}
-                required
-                {...bind("volume")}
-                readOnly={readOnly}
+              <TextInput
+                label={t("Catégorie d'intrants")}
+                value={value.feedstock.classification.category ?? ""}
+                readOnly
+              />
+              <TextInput
+                label={t("Type")}
+                value={value.feedstock.classification.group ?? ""}
+                readOnly
               />
             </>
           )}
-          {value?.material_unit === BiomethaneSupplyInputMaterialUnit.WET && (
-            <NumberInput
-              label={t("Tonnage (tMB)")}
-              min={0}
-              required
-              {...bind("volume")}
-              readOnly={readOnly}
-            />
+          {!isBiogazIsdnd && (
+            <>
+              <RadioGroup
+                options={materialUnitOptions}
+                label={t("Unité matière")}
+                required={!isBiogazIsdnd}
+                orientation="horizontal"
+                {...bind("material_unit")}
+                readOnly={readOnly}
+              />
+              {value?.material_unit ===
+                BiomethaneSupplyInputMaterialUnit.DRY && (
+                <>
+                  <NumberInput
+                    label={t("Ratio de matière sèche - tMS/tMS (%)")}
+                    min={0}
+                    max={100}
+                    required={!isBiogazIsdnd}
+                    {...bind("dry_matter_ratio_percent")}
+                    readOnly={readOnly}
+                  />
+                  <NumberInput
+                    label={t("Tonnage (tMS)")}
+                    min={0}
+                    required={!isBiogazIsdnd}
+                    {...bind("volume")}
+                    readOnly={readOnly}
+                  />
+                </>
+              )}
+              {value?.material_unit ===
+                BiomethaneSupplyInputMaterialUnit.WET && (
+                <NumberInput
+                  label={t("Tonnage (tMB)")}
+                  min={0}
+                  required={!isBiogazIsdnd}
+                  {...bind("volume")}
+                  readOnly={readOnly}
+                />
+              )}
+            </>
           )}
         </Dialog.Section>
         <Dialog.Section label="Réception" gap="lg">
@@ -110,7 +162,7 @@ export const SupplyInputForm = ({
             {...bind("origin_country")}
             readOnly={readOnly}
           />
-          {value.origin_country?.code_pays == "FR" && (
+          {isFranceOriginCountry && (
             <AutoCompleteDepartments
               label={t("Département d'origine")}
               required
@@ -123,12 +175,17 @@ export const SupplyInputForm = ({
             min={0}
             {...bind("average_weighted_distance_km")}
             readOnly={readOnly}
+            required={isFranceOriginCountry}
+            max={value?.maximum_distance_km ?? undefined}
+            step={0.1}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
             min={0}
             {...bind("maximum_distance_km")}
             readOnly={readOnly}
+            required={isFranceOriginCountry}
+            step={0.1}
           />
         </Dialog.Section>
       </Grid>

@@ -61,7 +61,7 @@ export const createSupplyInput = async (
       body: {
         ...data,
         origin_country: data.origin_country?.code_pays,
-        input_name: data.input_name?.name ?? "",
+        feedstock: data.feedstock?.name ?? "",
       },
     })
     .then((res) => res.data)
@@ -81,10 +81,21 @@ export const saveSupplyInput = async (
       body: {
         ...data,
         origin_country: data.origin_country?.code_pays,
-        input_name: data.input_name?.name ?? "",
+        feedstock: data.feedstock?.name ?? "",
       },
     })
     .then((res) => res.data)
+
+export const deleteSupplyInput = async (
+  entity_id: number,
+  supply_input_id: number
+) =>
+  api.DELETE("/biomethane/supply-input/{id}/", {
+    params: {
+      path: { id: supply_input_id },
+      query: { entity_id },
+    },
+  })
 
 export function downloadSupplyPlan(
   query: BiomethaneSupplyInputQuery,

@@ -15,7 +15,7 @@ export const RevokeUserButton = ({
   const { t } = useTranslation()
   const portal = usePortal()
 
-  const user = request.user[0]
+  const user = request.user.email
 
   return (
     <Button

@@ -1,3 +1,5 @@
+import os
+import tempfile
 from datetime import datetime
 
 from django.utils.text import slugify
@@ -17,18 +19,18 @@ class ExcelExportActionMixin:
 
         year = request.query_params.get("year")
         name = "biomethane_plan_approvisionnement"
-        file = f"{name}_{year}_{slugify(request.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        filename = f"{name}_{year}_{slugify(request.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        file_path = os.path.join(tempfile.gettempdir(), filename)
 
         excel_file = export_to_excel(
-            file,
+            file_path,
             [
                 {
                     "label": "Plan d'approvisionnement",
                     "rows": self.get_serializer(queryset, many=True).data,
                     "columns": [
                         {"label": "Provenance", "value": "source"},
-                        {"label": "Type de culture", "value": "crop_type"},
-                        {"label": "Intrant", "value": "input_name"},
+                        {"label": "Intrant", "value": "feedstock"},
                         {"label": "Unité", "value": "material_unit"},
                         {"label": "Ratio de matière sèche (%)", "value": "dry_matter_ratio_percent"},
                         {"label": "Volume (t)", "value": "volume"},
@@ -36,11 +38,20 @@ class ExcelExportActionMixin:
                         {"label": "Distance moyenne pondérée (km)", "value": "average_weighted_distance_km"},
                         {"label": "Distance maximale (km)", "value": "maximum_distance_km"},
                         {"label": "Pays d'origine", "value": "origin_country"},
+                        {"label": "Type de CIVE", "value": "type_cive"},
+                        {"label": "Précisez la culture", "value": "culture_details"},
+                        {"label": "Type de collecte", "value": "collection_type"},
                         {"label": "Année", "value": "year"},
                     ],
                 }
             ],
             column_width=15,
         )
-
-        return ExcelResponse(excel_file)
+        try:
+            return ExcelResponse(excel_file)
+        finally:
+            excel_file.close()
+            try:
+                os.unlink(file_path)
+            except OSError:
+                pass

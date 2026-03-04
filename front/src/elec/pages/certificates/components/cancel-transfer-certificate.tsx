@@ -53,6 +53,7 @@ const CancelTransferCertificateDialog = ({
       "elec-transfer-certificates",
       "elec-certificates-snapshot",
       "transfer-certificate-details",
+      "elec-provision-certificate-balance",
       "years",
     ],
     onSuccess() {

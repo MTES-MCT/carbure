@@ -34,6 +34,7 @@ export const TransferCertificateDetails = () => {
   const transferCert = transferResponse.result?.data
   const isPending = transferCert?.status === TransferCertificateStatus.PENDING
   const isAccepted = transferCert?.status === TransferCertificateStatus.ACCEPTED
+  const isRejected = transferCert?.status === TransferCertificateStatus.REJECTED
   const isDeclared = transferCert?.used_in_tiruert ?? false
 
   function closeDialog() {
@@ -53,7 +54,7 @@ export const TransferCertificateDetails = () => {
         }
         footer={
           <>
-            {entity.isCPO && isPending && (
+            {entity.isCPO && (isPending || isRejected) && (
               <CancelTransferCertificate id={transferID} />
             )}
 

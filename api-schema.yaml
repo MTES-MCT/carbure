@@ -1973,7 +1973,7 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
-          name: input_name
+          name: feedstock
           schema:
             type: array
             items:
@@ -2010,20 +2010,6 @@ paths:
           description: A search term.
           schema:
             type: string
-        - in: query
-          name: source
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - EXTERNAL
-                - INTERNAL
-          description: |-
-            * `INTERNAL` - Interne
-            * `EXTERNAL` - Externe
-          explode: true
-          style: form
         - in: query
           name: year
           schema:
@@ -2246,6 +2232,44 @@ paths:
               schema:
                 $ref: "#/components/schemas/BiomethaneSupplyInputCreate"
           description: ""
+    delete:
+      operationId: biomethane_supply_input_destroy
+      description: >-
+        Mixin for list() actions that need to check object-level permissions.
+
+
+        Override get_permission_object() to specify which object to check
+        permissions on.
+
+        By default, checks permissions on the first object in the filtered
+        queryset.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Intrant d'approvisionnement.
+          required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
   /api/biomethane/supply-input/export/:
     get:
       operationId: biomethane_supply_input_export_retrieve
@@ -2309,24 +2333,23 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
-          name: filter
-          schema:
-            type: string
-            enum:
-              - input_name
-              - producer_id
-              - source
-              - year
-          description: Filter string to apply
-          required: true
-        - in: query
-          name: input_name
+          name: feedstock
           schema:
             type: array
             items:
               type: string
           explode: true
           style: form
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - feedstock
+              - producer_id
+              - year
+          description: Filter string to apply
+          required: true
         - name: ordering
           required: false
           in: query
@@ -2345,20 +2368,6 @@ paths:
           description: A search term.
           schema:
             type: string
-        - in: query
-          name: source
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - EXTERNAL
-                - INTERNAL
-          description: |-
-            * `INTERNAL` - Interne
-            * `EXTERNAL` - Externe
-          explode: true
-          style: form
         - in: query
           name: year
           schema:
@@ -2381,9 +2390,8 @@ paths:
               examples:
                 ExampleOfFiltersResponse.:
                   value:
-                    - input_name
+                    - feedstock
                     - producer_id
-                    - source
                     - year
                   summary: Example of filters response.
           description: ""
@@ -2509,7 +2517,7 @@ paths:
                             - This field is required.
                       - row: 5
                         errors:
-                          input_name:
+                          feedstock:
                             - Invalid input type.
                     total_errors: 2
                     total_rows_processed: 10
@@ -11796,6 +11804,15 @@ components:
         - $ref: "#/components/schemas/Balance"
         - $ref: "#/components/schemas/BalanceByDepot"
         - $ref: "#/components/schemas/BalanceBySector"
+    BaseUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          readOnly: true
+      required:
+        - email
     Biofuel:
       type: object
       properties:
@@ -12974,14 +12991,28 @@ components:
           readOnly: true
         origin_country:
           $ref: "#/components/schemas/Country"
-        input_name:
-          $ref: "#/components/schemas/FeedStock"
+        feedstock:
+          $ref: "#/components/schemas/FeedStockClassification"
         source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -12989,6 +13020,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         origin_department:
           type: string
           nullable: true
@@ -13004,14 +13036,10 @@ components:
         supply_plan:
           type: integer
       required:
-        - crop_type
+        - feedstock
         - id
-        - input_name
-        - material_unit
         - origin_country
-        - source
         - supply_plan
-        - volume
     BiomethaneSupplyInputCreate:
       type: object
       properties:
@@ -13019,12 +13047,26 @@ components:
           type: integer
           readOnly: true
         source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
-        input_name:
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
+        feedstock:
           type: string
         origin_country:
           type: string
@@ -13035,6 +13077,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         average_weighted_distance_km:
           type: number
           format: double
@@ -13048,23 +13091,33 @@ components:
           nullable: true
           maxLength: 3
       required:
-        - crop_type
+        - feedstock
         - id
-        - input_name
-        - material_unit
         - origin_country
-        - source
-        - volume
     BiomethaneSupplyInputCreateRequest:
       type: object
       properties:
         source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
-        input_name:
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
+        feedstock:
           type: string
           minLength: 1
         origin_country:
@@ -13077,6 +13130,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         average_weighted_distance_km:
           type: number
           format: double
@@ -13090,14 +13144,12 @@ components:
           nullable: true
           maxLength: 3
       required:
-        - crop_type
-        - input_name
-        - material_unit
+        - feedstock
         - origin_country
-        - source
-        - volume
     BiomethaneSupplyInputExport:
       type: object
+      description: "Serializer for Excel export: choice fields are serialized as
+        display labels (e.g. DRY → Sèche)."
       properties:
         year:
           type: integer
@@ -13105,15 +13157,25 @@ components:
         origin_country:
           type: string
           readOnly: true
-        input_name:
+        feedstock:
           type: string
           readOnly: true
         source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
+          type: string
+          readOnly: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
+          type: string
+          readOnly: true
+        type_cive:
+          type: string
+          readOnly: true
+        collection_type:
+          type: string
+          readOnly: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
         dry_matter_ratio_percent:
           type: number
           format: double
@@ -13121,6 +13183,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         origin_department:
           type: string
           nullable: true
@@ -13134,12 +13197,12 @@ components:
           format: double
           nullable: true
       required:
-        - crop_type
-        - input_name
+        - collection_type
+        - feedstock
         - material_unit
         - origin_country
         - source
-        - volume
+        - type_cive
         - year
     BiomethaneSupplyInputSourceEnum:
       enum:
@@ -13545,6 +13608,14 @@ components:
         - category
         - group
         - subcategory
+    CollectionTypeEnum:
+      enum:
+        - PRIVATE
+        - LOCAL
+      type: string
+      description: |-
+        * `PRIVATE` - Issus de collecteurs privés
+        * `LOCAL` - Issus de collectivités locales
     CommentRequest:
       type: object
       properties:
@@ -13813,16 +13884,11 @@ components:
         insee_code:
           type: string
           maxLength: 5
+        site_siret:
+          type: string
+          maxLength: 14
       required:
         - name
-    CropTypeEnum:
-      enum:
-        - MAIN
-        - INTERMEDIATE
-      type: string
-      description: |-
-        * `MAIN` - Principale
-        * `INTERMEDIATE` - Intermédiaire
     DeleteCertificateRequest:
       type: object
       properties:
@@ -17109,12 +17175,26 @@ components:
       type: object
       properties:
         source:
-          $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
-        crop_type:
-          $ref: "#/components/schemas/CropTypeEnum"
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
+          nullable: true
         material_unit:
-          $ref: "#/components/schemas/MaterialUnitEnum"
-        input_name:
+          allOf:
+            - $ref: "#/components/schemas/MaterialUnitEnum"
+          nullable: true
+        type_cive:
+          allOf:
+            - $ref: "#/components/schemas/TypeCiveEnum"
+          nullable: true
+        culture_details:
+          type: string
+          nullable: true
+          maxLength: 255
+        collection_type:
+          allOf:
+            - $ref: "#/components/schemas/CollectionTypeEnum"
+          nullable: true
+        feedstock:
           type: string
           minLength: 1
         origin_country:
@@ -17127,6 +17207,7 @@ components:
         volume:
           type: number
           format: double
+          nullable: true
         average_weighted_distance_km:
           type: number
           format: double
@@ -18528,6 +18609,14 @@ components:
         * `DSAC` - DSAC
         * `DSP` - DSP
         * `OTHER` - OTHER
+    TypeCiveEnum:
+      enum:
+        - SUMMER
+        - WINTER
+      type: string
+      description: |-
+        * `SUMMER` - Été
+        * `WINTER` - Hiver
     UnitRequest:
       type: object
       properties:
@@ -18856,10 +18945,7 @@ components:
           type: integer
           readOnly: true
         user:
-          type: array
-          items:
-            type: string
-          readOnly: true
+          $ref: "#/components/schemas/BaseUser"
         entity:
           $ref: "#/components/schemas/EntitySummary"
         date_requested:
@@ -18925,6 +19011,8 @@ components:
         email:
           type: string
           format: email
+        name:
+          type: string
         rights:
           type: array
           items:
@@ -18935,6 +19023,7 @@ components:
             $ref: "#/components/schemas/UserRightsRequests"
       required:
         - email
+        - name
         - requests
         - rights
     VerifyOTPRequest:
