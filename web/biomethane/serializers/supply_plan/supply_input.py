@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
@@ -118,14 +120,18 @@ class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
         model = BiomethaneSupplyInput
         exclude = ["id", "supply_plan"]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_source(self, obj):
         return obj.get_source_display() or ""
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_material_unit(self, obj):
         return obj.get_material_unit_display() or ""
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_type_cive(self, obj):
         return obj.get_type_cive_display() or ""
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_collection_type(self, obj):
         return obj.get_collection_type_display() or ""
