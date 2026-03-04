@@ -41,7 +41,7 @@ class MeterReadingRepository:
     def get_annotated_applications_details(application):
         # Annotate to the application the energy total, charge point count and power total
         stats = (
-            ElecMeterReadingVirtual.objects.values("application_id")
+            ElecMeterReading.extended_objects.values("application_id")
             .annotate(
                 energy_total=Sum((F("current_index") - F("prev_index")) * F("enr_ratio")),
                 charge_point_count=Count("reading_id"),
