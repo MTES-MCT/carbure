@@ -7,7 +7,7 @@ from saf.models import SafTicket
 class TicketFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(choices=SafTicket.ticket_statuses)
     year = django_filters.NumberFilter(field_name="year")
-
+    entity_id = django_filters.NumberFilter(field_name="entity_id", method="filter_type", required=True)
     supplier = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
     client = django_filters.AllValuesMultipleFilter(field_name="client__name")
     client_type = django_filters.AllValuesMultipleFilter(field_name="client__entity_type")
