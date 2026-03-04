@@ -16,6 +16,8 @@ export const Saf = () => {
   const { t } = useTranslation()
 
   const entity = useEntity()
+  const isSafAdmin = entity.isExternal && entity.hasAdminRight("AIRLINE")
+
   const years = useYears("saf", getYears)
 
   const snapshot = useQuery(getSnapshot, {
@@ -89,7 +91,7 @@ export const Saf = () => {
         />
       </Routes>
 
-      {entity.isAdmin && (
+      {(entity.isAdmin || isSafAdmin) && (
         <HashRoute
           path="lot/:id"
           element={<AdminLotDetails neighbors={[]} />}

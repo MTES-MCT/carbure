@@ -8,9 +8,9 @@ import {
   SafFilter,
   SafTicketFilter,
   SafTicketSourceFilter,
+  EtsStatus,
 } from "./types"
 import { QUERY_RESET } from "common/hooks/query-builder-2"
-import { EtsStatusEnum } from "api-schema"
 
 export function getYears(entity_id: number) {
   return api.GET("/saf/years/", {
@@ -49,9 +49,7 @@ export function getTicketFilters(field: SafFilter, query: SafTicketQuery) {
 
 export function getTickets(query: SafTicketQuery) {
   return api.GET("/saf/tickets/", {
-    params: {
-      query,
-    },
+    params: { query },
   })
 }
 
@@ -97,7 +95,7 @@ export function rejectTicket(
 export function acceptTicket(
   entity_id: number,
   ticket_id: number,
-  ets_status: EtsStatusEnum
+  ets_status: EtsStatus
 ) {
   return api.POST("/saf/tickets/{id}/accept/", {
     params: {

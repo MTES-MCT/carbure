@@ -7032,16 +7032,16 @@ paths:
             type: string
             minLength: 1
           description: |-
-            * `TRUCK` - TRUCK
-            * `BARGE` - BARGE
-            * `TRAIN` - TRAIN
-            * `SHIP` - SHIP
-            * `PIPELINE` - PIPELINE
-            * `PIPELINE_DMM` - PIPELINE_DMM
-            * `PIPELINE_LHP` - PIPELINE_LHP
-            * `PIPELINE_ODC` - PIPELINE_ODC
-            * `PIPELINE_SPMR` - PIPELINE_SPMR
-            * `PIPELINE_SPSE` - PIPELINE_SPSE
+            * `TRUCK` - Routier
+            * `BARGE` - Barge
+            * `TRAIN` - Train
+            * `SHIP` - Bateau
+            * `PIPELINE` - Oléoduc
+            * `PIPELINE_DMM` - Oléoduc DMM
+            * `PIPELINE_LHP` - Oléoduc LHP
+            * `PIPELINE_ODC` - Oléoduc ODC
+            * `PIPELINE_SPMR` - Oléoduc SPMR
+            * `PIPELINE_SPSE` - Oléoduc SPSE
       tags:
         - resources
       security:
@@ -8089,6 +8089,23 @@ paths:
           description: Entity ID
           required: true
         - in: query
+          name: ets_status
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - ETS_VALUATION
+                - NOT_CONCERNED
+                - OUTSIDE_ETS
+          description: |-
+            * `ETS_VALUATION` - Valorisation ETS
+            * `OUTSIDE_ETS` - Hors ETS (volontaire)
+            * `NOT_CONCERNED` - Non concerné
+          explode: true
+          style: form
+        - in: query
           name: feedstock
           schema:
             type: array
@@ -8510,6 +8527,23 @@ paths:
           description: Entity ID
           required: true
         - in: query
+          name: ets_status
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - ETS_VALUATION
+                - NOT_CONCERNED
+                - OUTSIDE_ETS
+          description: |-
+            * `ETS_VALUATION` - Valorisation ETS
+            * `OUTSIDE_ETS` - Hors ETS (volontaire)
+            * `NOT_CONCERNED` - Non concerné
+          explode: true
+          style: form
+        - in: query
           name: feedstock
           schema:
             type: array
@@ -8729,6 +8763,23 @@ paths:
           description: Entity ID
           required: true
         - in: query
+          name: ets_status
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              enum:
+                - ETS_VALUATION
+                - NOT_CONCERNED
+                - OUTSIDE_ETS
+          description: |-
+            * `ETS_VALUATION` - Valorisation ETS
+            * `OUTSIDE_ETS` - Hors ETS (volontaire)
+            * `NOT_CONCERNED` - Non concerné
+          explode: true
+          style: form
+        - in: query
           name: feedstock
           schema:
             type: array
@@ -8745,6 +8796,7 @@ paths:
               - client_type
               - consumption_type
               - country_of_origin
+              - ets_status
               - feedstock
               - order_by
               - origin_depot
@@ -8894,7 +8946,7 @@ paths:
                     - client_type
                     - consumption_type
                     - country_of_origin
-                    - feedstock
+                    - ets_status
                   summary: Example of filters response.
           description: ""
   /api/saf/years/:
@@ -18164,6 +18216,7 @@ components:
         volume:
           type: number
           format: double
+          minimum: 1
         agreement_reference:
           type: string
         agreement_date:
@@ -18177,10 +18230,12 @@ components:
           type: integer
           nullable: true
         consumption_type:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
           nullable: true
         shipping_method:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ShippingMethodEnum"
           nullable: true
         has_intermediary_depot:
           type: boolean
@@ -18199,9 +18254,9 @@ components:
         volume:
           type: number
           format: double
+          minimum: 1
         agreement_reference:
           type: string
-          minLength: 1
         agreement_date:
           type: string
           minLength: 1
@@ -18214,17 +18269,18 @@ components:
           type: integer
           nullable: true
         consumption_type:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
           nullable: true
         shipping_method:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ShippingMethodEnum"
           nullable: true
         has_intermediary_depot:
           type: boolean
           default: false
         pos_number:
           type: string
-          minLength: 1
       required:
         - assignment_period
         - client_id
@@ -18237,9 +18293,9 @@ components:
         volume:
           type: number
           format: double
+          minimum: 1
         agreement_reference:
           type: string
-          minLength: 1
         agreement_date:
           type: string
           minLength: 1
@@ -18252,17 +18308,18 @@ components:
           type: integer
           nullable: true
         consumption_type:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ConsumptionTypeEnum"
           nullable: true
         shipping_method:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ShippingMethodEnum"
           nullable: true
         has_intermediary_depot:
           type: boolean
           default: false
         pos_number:
           type: string
-          minLength: 1
         ticket_sources_ids:
           type: array
           items:

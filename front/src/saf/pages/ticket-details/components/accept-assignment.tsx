@@ -6,9 +6,8 @@ import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 import { useMutation } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
-import { SafTicket } from "saf/types"
+import { EtsStatus, SafTicket } from "saf/types"
 import TicketTag from "saf/components/ticket-tag"
-import { EtsStatusEnum } from "api-schema"
 import { RadioGroup } from "common/components/inputs2"
 import { acceptTicket as acceptTicketApi } from "saf/api"
 
@@ -18,7 +17,7 @@ interface AcceptAssignmentProps {
 }
 
 type AcceptFormValue = {
-  ets_status: EtsStatusEnum | undefined
+  ets_status: EtsStatus | undefined
 }
 
 const defaultAcceptFormValue: AcceptFormValue = {
@@ -93,19 +92,19 @@ export const AcceptAssignment = ({
               label={t("Statut ETS")}
               options={[
                 {
-                  value: EtsStatusEnum.ETS_VALUATION,
+                  value: EtsStatus.ETS_VALUATION,
                   label: t("Valorisation ETS"),
                   hasTooltip: true,
                   title: t("RED SAF"),
                 },
                 {
-                  value: EtsStatusEnum.NOT_CONCERNED,
+                  value: EtsStatus.NOT_CONCERNED,
                   label: t("Non concerné"),
                   hasTooltip: true,
                   title: t("ICAO CEF"),
                 },
                 {
-                  value: EtsStatusEnum.OUTSIDE_ETS,
+                  value: EtsStatus.OUTSIDE_ETS,
                   label: t("Volontaire"),
                   hasTooltip: true,
                   title: t("Hors obligation ETS"),

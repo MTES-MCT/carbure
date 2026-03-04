@@ -3,7 +3,10 @@ import { Normalizer } from "common/utils/normalize"
 import { useTranslation } from "react-i18next"
 import { SafFilter, SafFilterSelection } from "../types"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { normalizeConsumptionType } from "saf/utils/normalizers"
+import {
+  normalizeConsumptionType,
+  normalizeEtsStatus,
+} from "saf/utils/normalizers"
 
 export interface FiltersProps {
   filters: SafFilter[]
@@ -28,10 +31,11 @@ export function SafFilters({
     [SafFilter.added_by]: t("Ajouté par"),
     [SafFilter.country_of_origin]: t("Pays d'origine"),
     [SafFilter.production_site]: t("Sites de production"),
-    [SafFilter.origin_depot]: t("Dépôt d'incorporation"),
+    [SafFilter.origin_depot]: t("Dépôt d'origine"),
     [SafFilter.consumption_type]: t("Types de consommation"),
     [SafFilter.reception_airport]: t("Aéroport"),
     [SafFilter.client_type]: t("Type de client"),
+    [SafFilter.ets_status]: t("ETS"),
   }
 
   const computedFilters = filters.reduce(
@@ -65,6 +69,7 @@ const filterNormalizers: FilterNormalizers = {
   [SafFilter.production_site]: norm.normalizeUnknownFilter,
   [SafFilter.origin_depot]: norm.normalizeUnknownFilter,
   [SafFilter.consumption_type]: normalizeConsumptionType,
+  [SafFilter.ets_status]: normalizeEtsStatus,
   [SafFilter.reception_airport]: norm.normalizeUnknownFilter,
   [SafFilter.client_type]: norm.normalizeEntityType,
 }
