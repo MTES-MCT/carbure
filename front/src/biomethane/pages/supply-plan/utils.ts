@@ -62,3 +62,14 @@ export const convertSupplyPlanInputVolume = (
   volumeTonsMS: number,
   ratioTonsMS: number
 ) => volumeTonsMS / ratioTonsMS
+
+export const getSupplyPlanInputSource = (
+  source: BiomethaneSupplyInputSource
+) => {
+  switch (source) {
+    case BiomethaneSupplyInputSource.INTERNAL:
+      return i18next.t("Interne")
+    case BiomethaneSupplyInputSource.EXTERNAL:
+      return i18next.t("Externe")
+  }
+}

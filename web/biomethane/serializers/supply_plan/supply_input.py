@@ -108,6 +108,7 @@ class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreate
 class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
     """Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche)."""
 
+    producer = EntityPreviewSerializer(source="supply_plan.producer")
     year = serializers.IntegerField(source="supply_plan.year", read_only=True)
     origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
     feedstock = serializers.SlugRelatedField(slug_field="name", read_only=True)

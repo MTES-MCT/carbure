@@ -4,7 +4,7 @@ import {
   MaterialUnitEnum as BiomethaneSupplyInputMaterialUnit,
   TypeCiveEnum as BiomethaneSupplyInputTypeCive,
   CollectionTypeEnum as BiomethaneSupplyInputCollectionType,
-  BiomethaneSupplyInputSourceEnum as BiomethaneSupplyInputSource,
+  PathsApiBiomethaneSupplyInputGetParametersQuerySource as BiomethaneSupplyInputSource,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 

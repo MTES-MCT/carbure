@@ -5,9 +5,10 @@ import {
   BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputQuery,
   BiomethaneSupplyInputQueryBuilder,
+  BiomethaneSupplyInputSource,
 } from "./types"
 import Tag from "@codegouvfr/react-dsfr/Tag"
-import { convertSupplyPlanInputVolume } from "./utils"
+import { convertSupplyPlanInputVolume, getSupplyPlanInputSource } from "./utils"
 import { getDepartmentName } from "common/utils/geography"
 import {
   deleteSupplyInput,
@@ -135,8 +136,10 @@ export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
   const normalizers = {
     [BiomethaneSupplyInputFilter.feedstock]: (value: string) =>
       defaultNormalizer(value),
-    [BiomethaneSupplyInputFilter.source]: (value: string) =>
-      defaultNormalizer(value),
+    [BiomethaneSupplyInputFilter.source]: (value: string) => ({
+      value,
+      label: getSupplyPlanInputSource(value as BiomethaneSupplyInputSource),
+    }),
     [BiomethaneSupplyInputFilter.department]: (value: string) => {
       const { label, value: normalizedValue } = normalizeDepartment(value)
       return { label, value: normalizedValue }
