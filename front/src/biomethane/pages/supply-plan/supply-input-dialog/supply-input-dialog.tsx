@@ -11,10 +11,16 @@ import { Notice } from "common/components/notice"
 import { SupplyInputForm } from "./supply-input-form"
 import { Button } from "common/components/button2"
 import { useNotify, useNotifyError } from "common/components/notifications"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useAnnualDeclarationYear } from "biomethane/providers/annual-declaration"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
-export const SupplyInputDialog = () => {
+type SupplyInputDialogProps = {
+  // If true, the dialog will not show the save button
+  isReadOnly?: boolean
+}
+export const SupplyInputDialog = ({
+  isReadOnly = false,
+}: SupplyInputDialogProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const match = useHashMatch("supply-input/:id")
@@ -23,7 +29,8 @@ export const SupplyInputDialog = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const notifyError = useNotifyError()
-  const { canEditDeclaration, selectedYear } = useAnnualDeclaration()
+  const selectedYear = useAnnualDeclarationYear()
+
   const supplyInputId = Number(match?.params.id)
 
   const { result: supplyInput, loading } = useQuery(getSupplyInput, {
@@ -59,7 +66,7 @@ export const SupplyInputDialog = () => {
         </Dialog.Title>
       }
       footer={
-        canEditDeclaration && (
+        !isReadOnly && (
           <Button
             type="submit"
             loading={saveSupplyInputMutation.loading}
@@ -82,10 +89,10 @@ export const SupplyInputDialog = () => {
           onSubmit={(form) =>
             form &&
             saveSupplyInputMutation
-              .execute(entity.id, selectedYear, supplyInputId, form)
+              .execute(entity.id, selectedYear!, supplyInputId, form)
               .then(onClose)
           }
-          readOnly={!canEditDeclaration}
+          readOnly={isReadOnly}
         />
       )}
     </Dialog>

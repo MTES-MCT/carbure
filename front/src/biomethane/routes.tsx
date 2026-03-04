@@ -12,6 +12,8 @@ import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
 import { ExternalAdminPages } from "common/types"
 import { Contact } from "./pages/admin/declaration-detail/pages/contact"
+import { lastAnnualDeclarationYearAdmin } from "./pages/admin/hooks/use-annual-declaration-years-admin"
+import SupplyInputsAdminPage from "./pages/admin/supply-inputs"
 
 const currentYear = new Date().getFullYear()
 
@@ -165,6 +167,12 @@ export const BiomethaneAdminRoutes = () => {
           element={<Navigate replace to={`${currentYear}`} />}
         />
         <Route path="dashboard" element={<BiomethaneAdminDashboardPage />} />
+
+        <Route
+          path="supply-plan"
+          element={<Navigate to={`${lastAnnualDeclarationYearAdmin}`} />}
+        />
+        <Route path="supply-plan/:year" element={<SupplyInputsAdminPage />} />
       </Route>
       <Route path="*" element={<Navigate replace to="admin/dashboard" />} />
     </Routes>
