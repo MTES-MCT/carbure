@@ -4,8 +4,8 @@ from datetime import datetime
 
 from django.utils.text import slugify
 from rest_framework.decorators import action
-from web.biomethane.permissions import HasDrealRights
 
+from biomethane.permissions import HasDrealRights
 from core.excel import ExcelResponse, export_to_excel
 
 
