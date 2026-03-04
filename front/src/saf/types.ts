@@ -43,6 +43,7 @@ export enum SafFilter {
   reception_airport = SafTicketFilter.reception_airport,
   supplier = SafTicketFilter.supplier,
   client_type = SafTicketFilter.client_type,
+  ets_status = SafTicketFilter.ets_status,
 }
 
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator

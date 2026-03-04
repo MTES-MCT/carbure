@@ -75,12 +75,17 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
     return response.data?.results ?? []
   }
 
-  const isAdmin = entity.isAdmin || entity.isExternal
+  const isAdmin = entity.isAdmin || entity.hasAdminRight("AIRLINE")
+  const isAirline = entity.isAirline
 
   let filters: SafFilter[] = []
   if (isAdmin) filters = ADMIN_FILTERS
   else if (type === "received") filters = RECEIVED_FILTERS
   else if (type === "assigned") filters = ASSIGNED_FILTERS
+
+  if (isAdmin || isAirline) {
+    filters = [...filters, SafFilter.ets_status]
+  }
 
   return (
     <>

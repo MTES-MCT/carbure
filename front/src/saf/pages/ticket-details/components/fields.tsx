@@ -6,9 +6,10 @@ import { useTranslation } from "react-i18next"
 import css from "common/components/form.module.css"
 // TODO: change import
 import DurabilityFields from "../../../components/durability-fields"
-import { EtsStatus, SafTicketDetails } from "../../../types"
+import { SafTicketDetails } from "../../../types"
 
 import { Dialog } from "common/components/dialog2"
+import { formatEtsStatus } from "saf/utils/formatters"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
@@ -17,12 +18,6 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
   const { t } = useTranslation()
 
   if (!ticket) return null
-
-  const etsStatusMap = {
-    [EtsStatus.ETS_VALUATION]: t("Valorisation ETS"),
-    [EtsStatus.OUTSIDE_ETS]: t("Hors ETS (volontaire)"),
-    [EtsStatus.NOT_CONCERNED]: t("Non concerné"),
-  }
 
   return (
     <div className={cl(css.form, css.columns)}>
@@ -134,7 +129,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         {"ets_status" in ticket && ticket.ets_status && (
           <TextInput
             label={t("Déclaration ETS")}
-            value={etsStatusMap[ticket.ets_status]}
+            value={formatEtsStatus(ticket.ets_status)}
             readOnly
           />
         )}
