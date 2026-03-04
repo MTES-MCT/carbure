@@ -8,7 +8,13 @@ class BiomethaneSupplyInput(models.Model):
     # Plan d'approvisionnement associé
     supply_plan = models.ForeignKey(BiomethaneSupplyPlan, on_delete=models.CASCADE, related_name="supply_inputs")
 
-    ## Section Intrant
+    INTERNAL = "INTERNAL"
+    EXTERNAL = "EXTERNAL"
+    SOURCE_CHOICES = [
+        (INTERNAL, "Interne"),
+        (EXTERNAL, "Externe"),
+    ]
+    source = models.CharField(max_length=10, choices=SOURCE_CHOICES, null=True, blank=True)
 
     # Intrant (matière première)
     feedstock = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.PROTECT)
@@ -28,11 +34,9 @@ class BiomethaneSupplyInput(models.Model):
     # Type de collecte (obligatoire pour certains intrants déchets)
     PRIVATE = "PRIVATE"
     LOCAL = "LOCAL"
-    BOTH = "BOTH"
     COLLECTION_TYPE_CHOICES = [
         (PRIVATE, "Issus de collecteurs privés"),
         (LOCAL, "Issus de collectivités locales"),
-        (BOTH, "Issus des collectivités locales et collecteurs privés"),
     ]
     collection_type = models.CharField(max_length=10, choices=COLLECTION_TYPE_CHOICES, null=True, blank=True)
 

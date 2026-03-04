@@ -19,6 +19,7 @@ class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
 
 class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
     # Use custom choice fields that accept both values and labels
+    source = LabelChoiceField(choices=BiomethaneSupplyInput.SOURCE_CHOICES, required=False, allow_null=True)
     material_unit = LabelChoiceField(choices=BiomethaneSupplyInput.MATERIAL_UNIT_CHOICES, required=False, allow_null=True)
     type_cive = LabelChoiceField(choices=BiomethaneSupplyInput.TYPE_CIVE_CHOICES, required=False, allow_null=True)
     culture_details = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
@@ -55,6 +56,13 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
             for field in required_fields:
                 if not validated_data.get(field):
                     raise serializers.ValidationError({field: "Ce champ est requis si le pays d'origine est France"})
+
+        avg_dist = validated_data.get("average_weighted_distance_km")
+        max_dist = validated_data.get("maximum_distance_km")
+        if avg_dist is not None and max_dist is not None and avg_dist > max_dist:
+            raise serializers.ValidationError(
+                {"average_weighted_distance_km": "La distance moyenne doit être inférieure ou égale à la distance maximale."}
+            )
 
         errors = apply_feedstock_field_rules(validated_data)
         if errors:
@@ -95,10 +103,28 @@ class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreate
 
 
 class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
+    """Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche)."""
+
     year = serializers.IntegerField(source="supply_plan.year", read_only=True)
     origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
     feedstock = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    source = serializers.SerializerMethodField()
+    material_unit = serializers.SerializerMethodField()
+    type_cive = serializers.SerializerMethodField()
+    collection_type = serializers.SerializerMethodField()
 
     class Meta:
         model = BiomethaneSupplyInput
         exclude = ["id", "supply_plan"]
+
+    def get_source(self, obj):
+        return obj.get_source_display() or ""
+
+    def get_material_unit(self, obj):
+        return obj.get_material_unit_display() or ""
+
+    def get_type_cive(self, obj):
+        return obj.get_type_cive_display() or ""
+
+    def get_collection_type(self, obj):
+        return obj.get_collection_type_display() or ""

@@ -17,12 +17,8 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   const entity = useEntity()
   const years = useAnnualDeclarationYears()
 
-  const {
-    selectedYear,
-    annualDeclaration,
-    hasAnnualDeclarationMissingObjects,
-    isDeclarationInCurrentPeriod,
-  } = useAnnualDeclaration()
+  const { selectedYear, annualDeclaration, isDeclarationInCurrentPeriod } =
+    useAnnualDeclaration()
 
   const {
     openValidateDeclarationDialog,
@@ -74,7 +70,6 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
               }
               iconId="ri-file-text-line"
               asideX
-              disabled={hasAnnualDeclarationMissingObjects}
             >
               {t("Transmettre mes informations annuelles")}
             </Button>

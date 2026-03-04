@@ -136,7 +136,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             BiomethaneSupplyInputViewSet,
             [
                 (["retrieve", "list", "export_supply_plan_to_excel", "filters"], [HasDrealOrProducerRights()]),
-                (["create", "update"], [HasBiomethaneProducerWriteRights()]),
+                (["create", "destroy", "update"], [HasBiomethaneProducerWriteRights()]),
                 (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
             ],
         )

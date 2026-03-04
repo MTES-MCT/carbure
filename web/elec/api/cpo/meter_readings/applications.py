@@ -48,7 +48,8 @@ def get_applications(request, entity):
     year, quarter = quarters.get_application_quarter(current_date)
     deadline, urgency_status = quarters.get_application_deadline(current_date, year, quarter)
 
-    current_application = MeterReadingRepository.get_cpo_application_for_quarter(entity, year, quarter)
+    # Retrieve the current application for the quarter and year without any annotations
+    current_application = ElecMeterReadingApplication.objects.filter(cpo=entity, year=year, quarter=quarter).first()
     applications = MeterReadingRepository.get_annotated_applications_by_cpo(entity)
     applications = filter_meter_readings_applications(applications, **applications_filter_form.cleaned_data)
 
@@ -65,7 +66,7 @@ def get_applications(request, entity):
         object_list = applications
     serialized_applications = ElecMeterReadingApplicationSerializer(object_list, many=True).data
     serialized_current_application = (
-        ElecMeterReadingApplicationSerializer(current_application).data if current_application else None
+        ElecMeterReadingApplicationSerializer(current_application, partial=True).data if current_application else None
     )
 
     return SuccessResponse(

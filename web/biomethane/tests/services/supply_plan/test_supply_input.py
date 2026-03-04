@@ -219,7 +219,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
             "material_unit": BiomethaneSupplyInput.WET,
             "type_cive": BiomethaneSupplyInput.SUMMER,
             "culture_details": "Detail",
-            "collection_type": BiomethaneSupplyInput.BOTH,
+            "collection_type": BiomethaneSupplyInput.LOCAL,
             "volume": 100.0,
         }
 

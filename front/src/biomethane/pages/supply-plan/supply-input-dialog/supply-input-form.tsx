@@ -6,6 +6,7 @@ import {
   getSupplyPlanInputMaterialUnitOptions,
   getSupplyPlanInputTypeCiveOptions,
   getSupplyPlanInputCollectionTypeOptions,
+  getSupplyPlanInputSourceOptions,
   SUPPLY_PLAN_INPUT_NAMES_REQUIRING_COLLECTION_TYPE,
 } from "../utils"
 import { AutoCompleteCountries } from "common/molecules/autocomplete-countries"
@@ -29,6 +30,7 @@ export const SupplyInputForm = ({
   readOnly?: boolean
 }) => {
   const { t } = useTranslation()
+  const sourceOptions = getSupplyPlanInputSourceOptions()
   const materialUnitOptions = getSupplyPlanInputMaterialUnitOptions()
   const typeCiveOptions = getSupplyPlanInputTypeCiveOptions()
   const collectionTypeOptions = getSupplyPlanInputCollectionTypeOptions()
@@ -46,6 +48,13 @@ export const SupplyInputForm = ({
     >
       <Grid gap="lg" cols={2}>
         <Dialog.Section label="Intrant" gap="lg">
+          <RadioGroup
+            options={sourceOptions}
+            label={t("Provenance")}
+            orientation="horizontal"
+            {...bind("source")}
+            readOnly={readOnly}
+          />
           <AutoCompleteFeedstocks
             label={t("Intrants")}
             required
@@ -117,7 +126,7 @@ export const SupplyInputForm = ({
                 BiomethaneSupplyInputMaterialUnit.DRY && (
                 <>
                   <NumberInput
-                    label={t("Ratio de matière sèche")}
+                    label={t("Ratio de matière sèche - tMS/tMS (%)")}
                     min={0}
                     max={100}
                     required={!isBiogazIsdnd}
@@ -167,6 +176,8 @@ export const SupplyInputForm = ({
             {...bind("average_weighted_distance_km")}
             readOnly={readOnly}
             required={isFranceOriginCountry}
+            max={value?.maximum_distance_km ?? undefined}
+            step={0.1}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
@@ -174,6 +185,7 @@ export const SupplyInputForm = ({
             {...bind("maximum_distance_km")}
             readOnly={readOnly}
             required={isFranceOriginCountry}
+            step={0.1}
           />
         </Dialog.Section>
       </Grid>

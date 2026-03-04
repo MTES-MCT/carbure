@@ -441,6 +441,7 @@ SPECTACULAR_SETTINGS = {
         "ElecOperationStatusEnum": "tiruert.models.ElecOperation.OPERATION_STATUSES",
         "ElecOperationTypeEnum": "tiruert.models.ElecOperation.OPERATION_TYPES",
         "BiomethaneAnnualDeclarationStatusEnum": "biomethane.models.BiomethaneAnnualDeclaration.DECLARATION_STATUS_CHOICES",
+        "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
         "ElecQualichargeStatusEnum": "elec.models.ElecProvisionCertificateQualicharge.VALIDATION_CHOICES",
     },
     "COMPONENT_SPLIT_REQUEST": True,

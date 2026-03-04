@@ -66,6 +66,13 @@ class Command(BaseCommand):
                 if customs_id == "FR000000521":
                     customs_id = "FR00000000521"
 
+                # Other very specific case
+                WRONG_CUSTOMS_ID = {
+                    "FR001265W2102": "FR00000001265",
+                    "FR001229W2102": "FR00000001229",
+                    "FR001346W2102": "FR00000001346",
+                }
+
                 if not customs_id:
                     self.stdout.write(f"Depot ID {depot.id}: no customs_id, skipping")
                     stats["skipped"] += 1
@@ -75,6 +82,10 @@ class Command(BaseCommand):
 
                 # Normalize customs_id
                 original_customs_id = customs_id
+
+                if customs_id in WRONG_CUSTOMS_ID:
+                    customs_id = WRONG_CUSTOMS_ID[customs_id]
+
                 if not customs_id.startswith("FR"):
                     customs_id = "FR" + customs_id.zfill(11)
                 elif not customs_id.startswith("FR0") and len(customs_id) != 13:
@@ -98,6 +109,10 @@ class Command(BaseCommand):
 
                 if len(found_depot) > 0:
                     accise = found_depot[0][0]
+
+                    if original_customs_id in WRONG_CUSTOMS_ID:
+                        accise = original_customs_id
+
                 elif "W" in customs_id:
                     found_depot = df_dgddi.loc[
                         df_dgddi["NUMERO AGREMENT DU TITULAIRE DU DEPOT"] == customs_id,

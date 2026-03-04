@@ -165,3 +165,25 @@ export const DisplayNothingWhenTheDeclarationIsComplete: Story = {
   },
   play: NoMissingFields.play,
 }
+
+export const DisplaySpecificMessageWhenDigestateOrEnergyObjectsAreMissing: Story =
+  {
+    parameters: {
+      docs: {
+        description:
+          "Displays a specific message when digestate or energy objects are missing.",
+      },
+      msw: {
+        handlers: [
+          buildAnnualDeclarationHandler({
+            missing_fields: {
+              digestate_missing_fields: null,
+              energy_missing_fields: null,
+            },
+            is_complete: false,
+          }),
+          ...MOCKS,
+        ],
+      },
+    },
+  }

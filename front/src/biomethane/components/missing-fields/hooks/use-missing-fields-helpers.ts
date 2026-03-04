@@ -18,7 +18,14 @@ export const useMissingFieldCounts = () => {
   const energyCount =
     annualDeclaration?.missing_fields?.energy_missing_fields?.length ?? 0
 
-  return { digestateCount, energyCount }
+  return {
+    digestateCount,
+    energyCount,
+    hasDigestateObject:
+      annualDeclaration?.missing_fields?.digestate_missing_fields !== null,
+    hasEnergyObject:
+      annualDeclaration?.missing_fields?.energy_missing_fields !== null,
+  }
 }
 
 export const useNavigateToMissingFields = () => {

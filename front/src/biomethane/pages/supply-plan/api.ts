@@ -86,6 +86,17 @@ export const saveSupplyInput = async (
     })
     .then((res) => res.data)
 
+export const deleteSupplyInput = async (
+  entity_id: number,
+  supply_input_id: number
+) =>
+  api.DELETE("/biomethane/supply-input/{id}/", {
+    params: {
+      path: { id: supply_input_id },
+      query: { entity_id },
+    },
+  })
+
 export function downloadSupplyPlan(
   query: BiomethaneSupplyInputQuery,
   selectedEntityId?: number
