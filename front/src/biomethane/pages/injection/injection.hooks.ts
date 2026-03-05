@@ -4,6 +4,7 @@ import { saveInjectionSite, getInjectionSite } from "./api"
 import { QueryOptions, useMutation, useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { useNotify, useNotifyError } from "common/components/notifications"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const useGetInjectionNetworkTypesOption = () => {
   const { t } = useTranslation()
@@ -27,10 +28,12 @@ export const useGetInjectionSite = (
   >
 ) => {
   const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
+
   const query = useQuery(getInjectionSite, {
     ...params,
     key: "injection-site",
-    params: [entity.id],
+    params: [entity.id, selectedEntityId],
   })
 
   return query

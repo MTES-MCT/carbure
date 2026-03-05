@@ -23,6 +23,7 @@ export function DigestateStorage() {
   return (
     <EditableCard
       title={t("Stockage de digestat")}
+      readOnly={hasSelectedEntity}
       headerActions={
         !hasSelectedEntity && (
           <Button

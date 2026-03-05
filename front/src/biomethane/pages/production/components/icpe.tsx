@@ -10,6 +10,7 @@ import {
   BiomethaneProductionUnitPatchRequest,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 type ICPEForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 
@@ -19,6 +20,7 @@ export function ICPE({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const { hasSelectedEntity } = useSelectedEntity()
 
   const { bind, value } = useForm<ICPEForm>({
     icpe_number: productionUnit?.icpe_number,
@@ -44,7 +46,7 @@ export function ICPE({
   ]
 
   return (
-    <EditableCard title={t("ICPE")}>
+    <EditableCard title={t("ICPE")} readOnly={hasSelectedEntity}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <TextInput

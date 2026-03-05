@@ -1,11 +1,15 @@
 import { api } from "common/services/api-fetch"
 import { BiomethaneInjectionSiteAddRequest } from "./types"
 
-export const getInjectionSite = async (entity_id: number) => {
+export const getInjectionSite = async (
+  entity_id: number,
+  producer_id?: number
+) => {
   const response = await api.GET("/biomethane/injection-site/", {
     params: {
       query: {
         entity_id,
+        producer_id,
       },
     },
   })
