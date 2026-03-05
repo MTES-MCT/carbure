@@ -25,3 +25,22 @@ export const Default: Story = {
     objective: overallObjective,
   },
 }
+
+export const PreviousYearDeclaration: Story = {
+  args: {
+    objective: overallObjective,
+  },
+  decorators: [
+    (Story) => (
+      <MockAnnualDeclarationTiruertProvider
+        value={{
+          selectedYear: 2023,
+          isDeclarationInCurrentPeriod: false,
+          currentDeclarationYear: 2025,
+        }}
+      >
+        <Story />
+      </MockAnnualDeclarationTiruertProvider>
+    ),
+  ],
+}
