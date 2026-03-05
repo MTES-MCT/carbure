@@ -15,7 +15,8 @@ type SectorProgressProps = {
 
 export const SectorProgress = ({ sectors }: SectorProgressProps) => {
   const { t } = useTranslation()
-  const { selectedYear } = useAnnualDeclarationTiruert()
+  const { selectedYear, isDeclarationInCurrentPeriod } =
+    useAnnualDeclarationTiruert()
 
   return (
     <ObjectiveSection
@@ -55,30 +56,32 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             }
             penalty={sector.penalty}
           >
-            <ul>
-              <li>
-                <RecapData.TeneurDeclaredMonth
-                  value={formatUnit(
-                    sector.teneur_declared_month,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-              <li>
-                <RecapData.QuantityAvailable
-                  value={formatUnit(
-                    sector.quantity_available,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-            </ul>
+            {isDeclarationInCurrentPeriod && (
+              <ul>
+                <li>
+                  <RecapData.TeneurDeclaredMonth
+                    value={formatUnit(
+                      sector.teneur_declared_month,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+                <li>
+                  <RecapData.QuantityAvailable
+                    value={formatUnit(
+                      sector.quantity_available,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+              </ul>
+            )}
           </CardProgress>
         ))}
       </CardGrid>
