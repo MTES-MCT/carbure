@@ -3,7 +3,10 @@ import { SearchInput } from "common/components/inputs2"
 import { ActionBar } from "common/components/scaffold"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { useSupplyPlanQuery } from "./supply-plan.hooks"
+import {
+  useSupplyPlanProducerColumns,
+  useSupplyPlanQuery,
+} from "./supply-plan.hooks"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import HashRoute from "common/components/hash-route"
 import {
@@ -31,6 +34,8 @@ export const SupplyPlan = () => {
 
   const { queryBuilder, filterOptions, supplyPlan } =
     useSupplyPlanQuery(selectedYear)
+
+  const columns = useSupplyPlanProducerColumns()
 
   const onClose = () => {
     navigate({ search: location.search, hash: "#" })
@@ -85,7 +90,11 @@ export const SupplyPlan = () => {
         getFilterOptions={filterOptions.getFilterOptions}
         normalizers={filterOptions.normalizers}
       />
-      <SupplyPlanTable supplyPlan={supplyPlan} queryBuilder={queryBuilder} />
+      <SupplyPlanTable
+        supplyPlan={supplyPlan}
+        queryBuilder={queryBuilder}
+        columns={columns}
+      />
       <HashRoute
         path="/supply-input/:id"
         element={<SupplyInputDialog isReadOnly={!canEditDeclaration} />}
