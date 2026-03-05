@@ -21,6 +21,7 @@ export const UnconstrainedCategoriesProgress = ({
 }: UnconstrainedCategoriesProgressProps) => {
   const { t } = useTranslation()
   const { formatCategory } = useFormatters()
+
   return (
     <ObjectiveSection title={t("Autres catégories")} size="small">
       <CardGrid>

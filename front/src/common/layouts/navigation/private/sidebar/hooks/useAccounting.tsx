@@ -33,7 +33,7 @@ export const useAccounting = () => {
       {
         path: isAdmin
           ? routes.ACCOUNTING.ADMIN.OBJECTIVES
-          : routes.ACCOUNTING.TENEUR,
+          : routes.ACCOUNTING.TENEUR.ROOT,
         title: t("Objectifs annuels"),
         icon: "ri-flashlight-line",
         iconActive: "ri-flashlight-fill",

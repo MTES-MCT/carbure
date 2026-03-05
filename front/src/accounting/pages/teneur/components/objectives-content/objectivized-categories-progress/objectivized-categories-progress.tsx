@@ -7,6 +7,7 @@ import { CardGrid } from "../../card-grid"
 import { computeObjectiveEnergy } from "../../../utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -20,7 +21,7 @@ export const ObjectivizedCategoriesProgress = ({
   readOnly,
 }: ObjectivizedCategoriesProgressProps) => {
   const { t } = useTranslation()
-
+  const { selectedYear } = useAnnualDeclarationTiruert()
   return (
     <ObjectiveSection
       title={t("Catégories objectivées")}
@@ -42,7 +43,7 @@ export const ObjectivizedCategoriesProgress = ({
             description={t(
               "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
               {
-                date: "2025",
+                date: selectedYear,
                 objective: formatUnit(category.target, ExtendedUnit.GJ, {
                   fractionDigits: 0,
                 }),

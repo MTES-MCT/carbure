@@ -18,16 +18,18 @@ import {
 } from "./types"
 import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
 import { ObjectivesContent } from "./components/objectives-content"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 const Teneur = () => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
+  const { selectedYear } = useAnnualDeclarationTiruert()
   usePrivateNavigation(<BetaPage title={t("Objectifs annuels")} />, "teneur")
 
   const { result: objectivesData, loading } = useQuery(getObjectives, {
     key: "teneur-objectives",
-    params: [entity.id, 2025],
+    params: [entity.id, selectedYear],
   })
 
   if (loading) {

@@ -9,6 +9,11 @@ import { TeneurLayout } from "./layouts/teneur-layout"
 import { useLastSectorVisited } from "./hooks/last-sector-visited"
 import { ObjectivesLayout } from "./pages/admin/objectives/objectives-layout"
 import { Objectives } from "./pages/admin/objectives/objectives"
+import {
+  AnnualDeclarationTiruertProvider,
+  useAnnualDeclarationTiruert,
+} from "./providers/annual-declaration-tiruert.provider"
+import { useRoutes } from "common/hooks/routes"
 
 const MaterialAccounting = () => {
   const entity = useEntity()
@@ -34,8 +39,17 @@ const MaterialAccounting = () => {
           />
         </Route>
         {entity.is_tiruert_liable && (
-          <Route element={<TeneurLayout />}>
-            <Route path="teneur" element={<Navigate replace to="2025" />} />
+          <Route
+            element={
+              <AnnualDeclarationTiruertProvider>
+                <TeneurLayout />
+              </AnnualDeclarationTiruertProvider>
+            }
+          >
+            <Route
+              path="teneur"
+              element={<RedirectToCurrentDeclarationYearRoute />}
+            />
             <Route path="teneur/:year" element={<Teneur />} />
           </Route>
         )}
@@ -51,4 +65,16 @@ const MaterialAccounting = () => {
   )
 }
 
+const RedirectToCurrentDeclarationYearRoute = () => {
+  const { currentDeclarationYear } = useAnnualDeclarationTiruert()
+  const routes = useRoutes().ACCOUNTING
+  const year = currentDeclarationYear ?? new Date().getFullYear()
+
+  // This case can't happen, but we log an error to be sure
+  if (!currentDeclarationYear) {
+    console.error("No current declaration year found")
+  }
+
+  return <Navigate to={routes.TENEUR.YEAR(year)} />
+}
 export default MaterialAccounting

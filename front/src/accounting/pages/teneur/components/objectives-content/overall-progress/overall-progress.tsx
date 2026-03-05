@@ -3,10 +3,11 @@ import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
 import { RecapData } from "../../recap-data"
-import { floorNumber, formatNumber } from "common/utils/formatters"
+import { floorNumber, formatDate, formatNumber } from "common/utils/formatters"
 import useEntity from "common/hooks/entity"
 import { downloadMacFossilFuel } from "../../../api"
 import { Download } from "common/components/download"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -17,6 +18,8 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const entity = useEntity()
   const { isAdmin } = entity
   const isAdminOrExternal = isAdmin || entity.isExternal
+  const { selectedYear } = useAnnualDeclarationTiruert()
+
   return (
     <ObjectiveSection
       title={t("Avancement global")}
@@ -56,12 +59,12 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
       {objective && (
         <CardProgress
           title={t("Total annuel à la date du {{date}}", {
-            date: "15/03/2025",
+            date: formatDate(new Date(), "dd/MM/yyyy"),
           })}
           description={t(
             "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",
             {
-              date: "2025",
+              date: selectedYear,
               objective: formatNumber(objective.target, {
                 fractionDigits: 0,
                 mode: "ceil",

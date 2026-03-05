@@ -7,6 +7,7 @@ import { SectorObjective } from "../../../types"
 import { CardGrid } from "../../card-grid"
 import { ExtendedUnit } from "common/types"
 import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -14,6 +15,7 @@ type SectorProgressProps = {
 
 export const SectorProgress = ({ sectors }: SectorProgressProps) => {
   const { t } = useTranslation()
+  const { selectedYear } = useAnnualDeclarationTiruert()
 
   return (
     <ObjectiveSection
@@ -28,7 +30,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             description={t(
               "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total pour cette catégorie)",
               {
-                date: "2025",
+                date: selectedYear,
                 objective: formatUnit(sector.target, ExtendedUnit.GJ, {
                   fractionDigits: 0,
                 }),
