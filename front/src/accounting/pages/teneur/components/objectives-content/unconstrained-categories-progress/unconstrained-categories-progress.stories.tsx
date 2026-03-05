@@ -27,3 +27,24 @@ export const Default: Story = {
     readOnly: false,
   },
 }
+
+export const PreviousYearDeclaration: Story = {
+  args: {
+    categories: unconstrainedCategories,
+    onCategoryClick: () => {},
+    readOnly: false,
+  },
+  decorators: [
+    (Story) => (
+      <MockAnnualDeclarationTiruertProvider
+        value={{
+          selectedYear: 2023,
+          isDeclarationInCurrentPeriod: false,
+          currentDeclarationYear: 2025,
+        }}
+      >
+        <Story />
+      </MockAnnualDeclarationTiruertProvider>
+    ),
+  ],
+}
