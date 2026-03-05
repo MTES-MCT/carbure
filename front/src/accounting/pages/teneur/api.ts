@@ -219,13 +219,3 @@ export const validateTeneurElec = async (entity_id: number) => {
 
 export const downloadMacFossilFuel = (entity_id: number) =>
   getDownloadUrl("/tiruert/mac-fossil-fuel/export/", { entity_id })
-
-export const getCurrentDeclarationPeriod = async () => {
-  // return api.GET("/tiruert/teneur/current-declaration-period/")
-  return Promise.resolve({
-    data: {
-      is_open: true,
-      year: 2025,
-    },
-  })
-}

@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -7,6 +7,15 @@ from tiruert.services.declaration_period import DeclarationPeriodService
 
 
 @extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ],
     responses={
         200: {
             "type": "object",

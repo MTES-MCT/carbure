@@ -2531,6 +2531,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/declaration-period/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Check if there is a current declaration period and return the year if there is one */
+        get: operations["tiruert_declaration_period_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tiruert/declaration-period/years/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Return the list of past years until the current one */
+        get: operations["tiruert_declaration_period_years_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/elec-operations/": {
         parameters: {
             query?: never;
@@ -11793,10 +11827,6 @@ export interface operations {
     tiruert_admin_objectives_retrieve: {
         parameters: {
             query: {
-                /** @description Date from which to calculate balance for teneur */
-                date_from: string;
-                /** @description Date to which to calculate balance for teneur */
-                date_to: string;
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Year of the objectives */
@@ -11821,10 +11851,6 @@ export interface operations {
     tiruert_admin_objectives_entity_retrieve: {
         parameters: {
             query: {
-                /** @description Date from which to calculate balance for teneur */
-                date_from: string;
-                /** @description Date to which to calculate balance for teneur */
-                date_to: string;
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Entity's objectives. */
@@ -11844,6 +11870,65 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ObjectiveOutput"];
+                };
+            };
+        };
+    };
+    tiruert_declaration_period_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        year?: number;
+                    };
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
+                        message?: string;
+                    };
+                };
+            };
+        };
+    };
+    tiruert_declaration_period_years_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        years?: number[];
+                    };
                 };
             };
         };
@@ -12262,10 +12347,6 @@ export interface operations {
     tiruert_objectives_retrieve: {
         parameters: {
             query: {
-                /** @description Date from which to calculate balance for teneur */
-                date_from: string;
-                /** @description Date to which to calculate balance for teneur */
-                date_to: string;
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Year of the objectives */
@@ -12343,11 +12424,15 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
@@ -12686,11 +12771,15 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
@@ -12784,7 +12873,11 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
@@ -12902,7 +12995,11 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */

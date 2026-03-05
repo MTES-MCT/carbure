@@ -8873,20 +8873,6 @@ paths:
       description: Get agregated objectives for all entities - admin view
       parameters:
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-          description: Date from which to calculate balance for teneur
-          required: true
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-          description: Date to which to calculate balance for teneur
-          required: true
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -8916,20 +8902,6 @@ paths:
       description: Get objectives for a specific entity - admin view
       parameters:
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-          description: Date from which to calculate balance for teneur
-          required: true
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-          description: Date to which to calculate balance for teneur
-          required: true
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -8958,6 +8930,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
+          description: ""
+  /api/tiruert/declaration-period/:
+    get:
+      operationId: tiruert_declaration_period_retrieve
+      description: Check if there is a current declaration period and return the year
+        if there is one
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  year:
+                    type: integer
+          description: ""
+        "503":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+          description: ""
+  /api/tiruert/declaration-period/years/:
+    get:
+      operationId: tiruert_declaration_period_years_retrieve
+      description: Return the list of past years until the current one
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  years:
+                    type: array
+                    items:
+                      type: integer
           description: ""
   /api/tiruert/elec-operations/:
     get:
@@ -9685,20 +9725,6 @@ paths:
       description: Get all objectives
       parameters:
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-          description: Date from which to calculate balance for teneur
-          required: true
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-          description: Date to which to calculate balance for teneur
-          required: true
-        - in: query
           name: entity_id
           schema:
             type: integer
@@ -9892,6 +9918,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - name: page
           required: false
           in: query
@@ -9911,6 +9943,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
@@ -10539,6 +10577,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - name: page
           required: false
           in: query
@@ -10558,6 +10602,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
@@ -10799,6 +10849,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - in: query
           name: period
           schema:
@@ -10806,6 +10862,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
@@ -11112,6 +11174,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - in: query
           name: period
           schema:
@@ -11119,6 +11187,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
