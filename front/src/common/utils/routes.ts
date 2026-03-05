@@ -83,6 +83,9 @@ export const ROUTE_URLS = {
             ENERGY: `${declarationDetailUrl}/energy`,
             SUPPLY_PLAN: `${declarationDetailUrl}/supply-plan`,
             CONTRACT: `${declarationDetailUrl}/contract`,
+            PRODUCTION: `${declarationDetailUrl}/production`,
+            INJECTION: `${declarationDetailUrl}/injection`,
+            USERS: `${declarationDetailUrl}/users`,
             CONTACTS: `${declarationDetailUrl}/contacts`,
           }
         },

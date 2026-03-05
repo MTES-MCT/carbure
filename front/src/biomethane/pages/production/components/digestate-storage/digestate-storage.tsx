@@ -4,18 +4,16 @@ import { Notice } from "common/components/notice"
 import { usePortal } from "common/components/portal"
 import { Table } from "common/components/table2"
 import { EditableCard } from "common/molecules/editable-card"
-import { Confirm } from "common/components/dialog2"
 import { AddDigestateStorage } from "./add-digestate-storage"
-import {
-  useDigestateStorages,
-  useDeleteDigestateStorage,
-} from "../../production.hooks"
-import { formatNumber } from "common/utils/formatters"
+import { useDigestateStorages } from "../../production.hooks"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useDigestateStorageColumns } from "./digestate-storage.hooks"
 
 export function DigestateStorage() {
   const { t } = useTranslation()
   const { result: storages } = useDigestateStorages()
-  const { execute: deleteStorage } = useDeleteDigestateStorage()
+  const columns = useDigestateStorageColumns()
+  const { hasSelectedEntity } = useSelectedEntity()
 
   const portal = usePortal()
 
@@ -26,64 +24,20 @@ export function DigestateStorage() {
     <EditableCard
       title={t("Stockage de digestat")}
       headerActions={
-        <Button
-          iconId="ri-add-line"
-          onClick={() =>
-            portal((close) => <AddDigestateStorage onClose={close} />)
-          }
-        >
-          {t("Ajouter un type de stockage")}
-        </Button>
+        !hasSelectedEntity && (
+          <Button
+            iconId="ri-add-line"
+            onClick={() =>
+              portal((close) => <AddDigestateStorage onClose={close} />)
+            }
+          >
+            {t("Ajouter un type de stockage")}
+          </Button>
+        )
       }
     >
       {Boolean(storages?.length) && (
-        <Table
-          rows={storages!}
-          columns={[
-            { header: t("Dispositif"), cell: (storage) => storage.type },
-            {
-              header: t("Capacité de stockage (m3)"),
-              cell: (storage) => formatNumber(storage.capacity) || "-",
-            },
-            {
-              header: t("Couverture du stockage"),
-              cell: (storage) => (storage.has_cover ? t("Oui") : t("Non")),
-            },
-            {
-              header: t("Récupération du biogaz"),
-              cell: (storage) =>
-                storage.has_biogas_recovery ? t("Oui") : t("Non"),
-            },
-            {
-              header: t("Actions"),
-              cell: (storage) => (
-                <Button
-                  iconId="fr-icon-delete-fill"
-                  size="small"
-                  priority="secondary"
-                  title={t("Supprimer")}
-                  onClick={() =>
-                    portal((close) => (
-                      <Confirm
-                        title={t("Supprimer le fichier")}
-                        description={t(
-                          "Êtes-vous sûr de vouloir supprimer ce stockage de digestat ?"
-                        )}
-                        confirm={t("Supprimer")}
-                        customVariant="danger"
-                        onClose={close}
-                        onConfirm={async () => {
-                          await deleteStorage(storage.id)
-                          close()
-                        }}
-                      />
-                    ))
-                  }
-                />
-              ),
-            },
-          ]}
-        />
+        <Table rows={storages!} columns={columns} />
       )}
 
       <Notice>

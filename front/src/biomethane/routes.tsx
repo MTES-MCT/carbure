@@ -160,6 +160,9 @@ export const BiomethaneAdminRoutes = () => {
           <Route path="energy" element={<Energy />} />
           <Route path="supply-plan" element={<SupplyPlan />} />
           <Route path="contract" element={<BiomethaneContractPage />} />
+          <Route path="production" element={<BiomethaneProductionPage />} />
+          <Route path="injection" element={<BiomethaneInjectionPage />} />
+          {/* <Route path="users" element={<Users />} /> */}
           <Route path="contacts" element={<Contact />} />
         </Route>
         <Route

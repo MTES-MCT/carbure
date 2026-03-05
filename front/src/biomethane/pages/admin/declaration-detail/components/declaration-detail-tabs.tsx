@@ -30,6 +30,21 @@ export const DeclarationDetailTabs = () => {
           path: declarationDetailRoutes.CONTRACT,
         },
         {
+          key: "production",
+          label: t("Production"),
+          path: declarationDetailRoutes.PRODUCTION,
+        },
+        {
+          key: "injection",
+          label: t("Site d'injection"),
+          path: declarationDetailRoutes.INJECTION,
+        },
+        {
+          key: "users",
+          label: t("Utilisateurs"),
+          path: declarationDetailRoutes.USERS,
+        },
+        {
           key: "contacts",
           label: t("Contacts"),
           path: declarationDetailRoutes.CONTACTS,
