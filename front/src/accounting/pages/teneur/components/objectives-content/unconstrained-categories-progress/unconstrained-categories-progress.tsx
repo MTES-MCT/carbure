@@ -7,6 +7,7 @@ import { CardGrid } from "../../card-grid"
 import { ExtendedUnit } from "common/types"
 import { floorNumber, formatUnit } from "common/utils/formatters"
 import { useFormatters } from "accounting/hooks/formatters"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
@@ -21,6 +22,7 @@ export const UnconstrainedCategoriesProgress = ({
 }: UnconstrainedCategoriesProgressProps) => {
   const { t } = useTranslation()
   const { formatCategory } = useFormatters()
+  const { isDeclarationInCurrentPeriod } = useAnnualDeclarationTiruert()
 
   return (
     <ObjectiveSection title={t("Autres catégories")} size="small">
@@ -36,30 +38,32 @@ export const UnconstrainedCategoriesProgress = ({
             )}
             mainText={t("GJ")}
           >
-            <ul>
-              <li>
-                <RecapData.TeneurDeclaredMonth
-                  value={formatUnit(
-                    category.teneur_declared_month,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-              <li>
-                <RecapData.QuantityAvailable
-                  value={formatUnit(
-                    category.quantity_available,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-            </ul>
+            {isDeclarationInCurrentPeriod && (
+              <ul>
+                <li>
+                  <RecapData.TeneurDeclaredMonth
+                    value={formatUnit(
+                      category.teneur_declared_month,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+                <li>
+                  <RecapData.QuantityAvailable
+                    value={formatUnit(
+                      category.quantity_available,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+              </ul>
+            )}
           </CardProgress>
         ))}
       </CardGrid>

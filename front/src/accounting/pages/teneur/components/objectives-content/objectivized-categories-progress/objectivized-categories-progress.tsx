@@ -21,7 +21,9 @@ export const ObjectivizedCategoriesProgress = ({
   readOnly,
 }: ObjectivizedCategoriesProgressProps) => {
   const { t } = useTranslation()
-  const { selectedYear } = useAnnualDeclarationTiruert()
+  const { selectedYear, isDeclarationInCurrentPeriod } =
+    useAnnualDeclarationTiruert()
+
   return (
     <ObjectiveSection
       title={t("Catégories objectivées")}
@@ -69,41 +71,43 @@ export const ObjectivizedCategoriesProgress = ({
                 : () => onCategoryClick(category, TargetType.REACH)
             }
           >
-            <ul>
-              <li>
-                <RecapData.TeneurDeclaredMonth
-                  value={formatUnit(
-                    category.teneur_declared_month,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-              <li>
-                <RecapData.RemainingQuantityBeforeObjective
-                  value={formatUnit(
-                    computeObjectiveEnergy(category),
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-              <li>
-                <RecapData.QuantityAvailable
-                  value={formatUnit(
-                    category.quantity_available,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-            </ul>
+            {isDeclarationInCurrentPeriod && (
+              <ul>
+                <li>
+                  <RecapData.TeneurDeclaredMonth
+                    value={formatUnit(
+                      category.teneur_declared_month,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+                <li>
+                  <RecapData.RemainingQuantityBeforeObjective
+                    value={formatUnit(
+                      computeObjectiveEnergy(category),
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+                <li>
+                  <RecapData.QuantityAvailable
+                    value={formatUnit(
+                      category.quantity_available,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+              </ul>
+            )}
           </CardProgress>
         ))}
       </CardGrid>

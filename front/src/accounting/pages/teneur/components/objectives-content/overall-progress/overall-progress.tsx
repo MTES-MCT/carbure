@@ -18,14 +18,21 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const entity = useEntity()
   const { isAdmin } = entity
   const isAdminOrExternal = isAdmin || entity.isExternal
-  const { selectedYear } = useAnnualDeclarationTiruert()
+  const { selectedYear, isDeclarationInCurrentPeriod } =
+    useAnnualDeclarationTiruert()
+
+  // If the declaration is in the current period, the total annual date is the current date
+  // If the declaration is not in the current period, the total annual date is the end of the previous year
+  const totalAnnualDate = isDeclarationInCurrentPeriod
+    ? new Date()
+    : new Date(selectedYear, 2, 31)
 
   return (
     <ObjectiveSection
       title={t("Avancement global")}
       description={
         <>
-          {!isAdminOrExternal && (
+          {isDeclarationInCurrentPeriod && !isAdminOrExternal && (
             <>
               <Trans
                 i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d'un PCI théorique."
@@ -59,7 +66,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
       {objective && (
         <CardProgress
           title={t("Total annuel à la date du {{date}}", {
-            date: formatDate(new Date(), "dd/MM/yyyy"),
+            date: formatDate(totalAnnualDate, "dd/MM/yyyy"),
           })}
           description={t(
             "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",
@@ -92,26 +99,28 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           }
           penalty={objective.penalty}
         >
-          <ul>
-            <li>
-              <RecapData.TeneurDeclaredMonth
-                value={t("{{value}} tCO2 évitées", {
-                  value: formatNumber(objective.teneur_declared_month, {
-                    fractionDigits: 0,
-                  }),
-                })}
-              />
-            </li>
-            <li>
-              <RecapData.QuantityAvailable
-                value={t("{{value}} tCO2 évitées", {
-                  value: formatNumber(objective.quantity_available, {
-                    fractionDigits: 0,
-                  }),
-                })}
-              />
-            </li>
-          </ul>
+          {isDeclarationInCurrentPeriod && (
+            <ul>
+              <li>
+                <RecapData.TeneurDeclaredMonth
+                  value={t("{{value}} tCO2 évitées", {
+                    value: formatNumber(objective.teneur_declared_month, {
+                      fractionDigits: 0,
+                    }),
+                  })}
+                />
+              </li>
+              <li>
+                <RecapData.QuantityAvailable
+                  value={t("{{value}} tCO2 évitées", {
+                    value: formatNumber(objective.quantity_available, {
+                      fractionDigits: 0,
+                    }),
+                  })}
+                />
+              </li>
+            </ul>
+          )}
         </CardProgress>
       )}
     </ObjectiveSection>

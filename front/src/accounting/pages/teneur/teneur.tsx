@@ -24,7 +24,8 @@ const Teneur = () => {
   const entity = useEntity()
   const { t } = useTranslation()
   const portal = usePortal()
-  const { selectedYear } = useAnnualDeclarationTiruert()
+  const { selectedYear, isDeclarationInCurrentPeriod } =
+    useAnnualDeclarationTiruert()
   usePrivateNavigation(<BetaPage title={t("Objectifs annuels")} />, "teneur")
 
   const { result: objectivesData, loading } = useQuery(getObjectives, {
@@ -72,25 +73,28 @@ const Teneur = () => {
           "Bienvenue dans votre espace de teneur et objectifs annuels. Vous pouvez simuler des conversions quantités et tCO2 eq. évitées, ainsi qu'y rentrer vos quantités de teneur mensuelle afin de clôturer votre comptabilité mensuelle."
         )}
       </Notice>
-      <Notice noColor variant="info">
-        <Row style={{ alignItems: "center", width: "100%" }}>
-          <Col spread>
-            <p>
-              <Trans
-                t={t}
-                components={{ strong: <strong /> }}
-                defaults="Toutes vos déclarations enregistrées ne sont pas validées, <strong>pensez à valider votre teneur mensuelle</strong> pour que vos déclarations soient prises en comptes."
-              />
-            </p>
-          </Col>
-          <Button priority="primary" onClick={onValidatePendingTeneurClick}>
-            {t("Valider ma teneur mensuelle")}
-          </Button>
-        </Row>
-      </Notice>
+      {isDeclarationInCurrentPeriod && (
+        <Notice noColor variant="info">
+          <Row style={{ alignItems: "center", width: "100%" }}>
+            <Col spread>
+              <p>
+                <Trans
+                  t={t}
+                  components={{ strong: <strong /> }}
+                  defaults="Toutes vos déclarations enregistrées ne sont pas validées, <strong>pensez à valider votre teneur mensuelle</strong> pour que vos déclarations soient prises en comptes."
+                />
+              </p>
+            </Col>
+            <Button priority="primary" onClick={onValidatePendingTeneurClick}>
+              {t("Valider ma teneur mensuelle")}
+            </Button>
+          </Row>
+        </Notice>
+      )}
+
       <ObjectivesContent
         objectivesData={objectivesData}
-        readOnly={false}
+        readOnly={!isDeclarationInCurrentPeriod}
         onCategoryClick={onCategoryClick}
       />
     </>
