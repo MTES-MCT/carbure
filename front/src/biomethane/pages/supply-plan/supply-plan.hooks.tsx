@@ -4,14 +4,29 @@ import {
   BiomethaneSupplyInputQuery,
   BiomethaneSupplyInputQueryBuilder,
   BiomethaneSupplyInputSource,
+  BiomethaneSupplyInput,
 } from "./types"
 import { getSupplyPlanInputSource } from "./utils"
-import { getSupplyPlanInputFilters, getSupplyPlanInputs } from "./api"
+import {
+  getSupplyPlanInputFilters,
+  getSupplyPlanInputs,
+  deleteSupplyInput,
+} from "./api"
 import { defaultNormalizer } from "common/utils/normalize"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
-import { useQuery } from "common/hooks/async"
+import { useQuery, useMutation } from "common/hooks/async"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { normalizeDepartment } from "common/utils/normalizers"
+import { Button } from "common/components/button2"
+import { usePortal } from "common/components/portal"
+import useEntity from "common/hooks/entity"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useNotify, useNotifyError } from "common/components/notifications"
+
+import { Confirm } from "common/components/dialog2"
+import { Column } from "common/components/table2"
+import { compact } from "common/utils/collection"
+import { useSupplyPlanColumns } from "./components/supply-plan-table/supply-plan-table.hooks"
 
 export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
   const { t } = useTranslation()
@@ -65,4 +80,72 @@ export const useSupplyPlanQuery = (year: number) => {
     filterOptions: { getFilterOptions, filterLabels, normalizers },
     supplyPlan: { supplyInputs, loading },
   }
+}
+
+const useDeleteSupplyInput = () => {
+  const { t } = useTranslation()
+  const portal = usePortal()
+  const entity = useEntity()
+  const { selectedEntityId } = useSelectedEntity()
+  const { canEditDeclaration, annualDeclarationKey } = useAnnualDeclaration()
+  const notify = useNotify()
+  const notifyError = useNotifyError()
+
+  const producerEntityId = selectedEntityId ?? entity.id
+
+  const deleteSupplyInputMutation = useMutation(deleteSupplyInput, {
+    invalidates: ["supply-plan-inputs", annualDeclarationKey],
+    onSuccess: () => {
+      notify(t("L'intrant a bien été supprimé."), { variant: "success" })
+    },
+    onError: (e) => {
+      notifyError(e)
+    },
+  })
+
+  const openDeleteConfirm = (input: BiomethaneSupplyInput) => {
+    portal((close) => (
+      <Confirm
+        title={t("Supprimer l'intrant")}
+        description={t("Voulez-vous vraiment supprimer cet intrant ?")}
+        confirm={t("Supprimer")}
+        icon="ri-close-line"
+        customVariant="danger"
+        onClose={close}
+        onConfirm={() =>
+          deleteSupplyInputMutation.execute(producerEntityId, input.id)
+        }
+        hideCancel
+      />
+    ))
+  }
+
+  return { openDeleteConfirm, canEditDeclaration }
+}
+
+export const useSupplyPlanProducerColumns = () => {
+  const { t } = useTranslation()
+  const { openDeleteConfirm, canEditDeclaration } = useDeleteSupplyInput()
+  const _columns = useSupplyPlanColumns()
+
+  const columns: Column<BiomethaneSupplyInput>[] = compact([
+    canEditDeclaration && {
+      header: t("Action"),
+      cell: (input) => (
+        <Button
+          iconId="ri-close-line"
+          priority="tertiary no outline"
+          title={t("Supprimer")}
+          style={{ color: "var(--text-default-grey)" }}
+          size="medium"
+          captive
+          onClick={() => {
+            openDeleteConfirm(input)
+          }}
+        />
+      ),
+    },
+  ])
+
+  return [..._columns, ...columns]
 }
