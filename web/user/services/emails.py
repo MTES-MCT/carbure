@@ -47,7 +47,7 @@ def get_request_access_email_biomethane_producer(entity: Entity, user_email: str
     Vous pouvez valider ou refuser cette demande depuis la page Sociétés de votre DREAL :.
 
     1 - Allez sur la page 'Sociétés'.
-    2 - Selectionnez la société %s.
+    2 - Selectionnez la société {entity.name}.
     3 - Vérifiez que l'utilisateur est bien autorisé à accéder à la société'.
     4 - Dans la liste des utilisateurs, cliquez sur l'icone de validation pour valider la demande.
 

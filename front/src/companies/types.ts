@@ -3,6 +3,7 @@ import { apiTypes } from "common/services/api-fetch.types"
 
 export type SearchCompanyPreview = apiTypes["CompanyPreview"]
 export type SearchCompanyResult = apiTypes["ResponseData"]
+export type SearchCompanyMeta = apiTypes["Meta"]
 
 export interface CompanyFormValue {
   activity_description: string | undefined

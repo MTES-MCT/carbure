@@ -74,6 +74,19 @@ def search_company_view(request):
             },
         }
 
+        biomethane_entities = Entity.objects.filter(
+            registration_id=registration_id, entity_type=Entity.BIOMETHANE_PRODUCER
+        ).order_by("date_added")
+
+        if biomethane_entities.exists():
+            response_data["warning"]["meta"]["entities"] = [
+                {
+                    "name": current_entity.name,
+                    "entity_type": current_entity.entity_type,
+                }
+                for current_entity in biomethane_entities
+            ]
+
     return Response(response_data, status=status.HTTP_200_OK)
 
 
