@@ -3,7 +3,7 @@ import { Dialog } from "common/components/dialog2"
 import { useNotify } from "common/components/notifications"
 import Portal from "common/components/portal"
 
-import { SearchCompanyPreview } from "companies/types"
+import { SearchCompanyMeta, SearchCompanyPreview } from "companies/types"
 import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
@@ -23,6 +23,9 @@ export const CompanyRegistrationDialog = () => {
   const [prefetchedCompanyWarning, setPrefetchedCompanyWarning] = useState<
     string | undefined
   >(undefined)
+  const [prefetchedCompanyError, setPrefetchedCompanyError] = useState<
+    React.ReactNode | undefined
+  >(undefined)
 
   const closeDialog = () => {
     navigate(ROUTE_URLS.MY_ACCOUNT.COMPANIES)
@@ -34,8 +37,49 @@ export const CompanyRegistrationDialog = () => {
 
   const fillFormWithFoundCompany = (
     company?: SearchCompanyPreview,
-    warning?: string
+    warning?: string,
+    meta?: SearchCompanyMeta
   ) => {
+    setPrefetchedCompanyError(undefined)
+    if (meta?.entities && meta?.entities.length > 0) {
+      const hasOnlyOneEntity = meta?.entities.length === 1
+      const message = (
+        <div>
+          {hasOnlyOneEntity ? (
+            <p>
+              {t(
+                "Ce SIREN est déjà utilisé par l'entité suivante : {{entityName}}",
+                { entityName: meta?.company_name }
+              )}
+            </p>
+          ) : (
+            <>
+              {t("Ce SIREN est déjà utilisé par les entités suivantes :")}
+              <ul>
+                {meta?.entities.map((entity) => (
+                  <li key={entity.name}>{entity.name}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          <Trans
+            defaults="Vous pouvez rechercher et demander à rejoindre la société en cliquant <Link>sur ce lien</Link>. Votre DREAL sera informée de l'inscription et validera votre demande."
+            components={{
+              Link: (
+                // @ts-ignore children is propagated to the button by i18next
+                <Button
+                  customPriority="link"
+                  linkProps={{ to: ROUTE_URLS.MY_ACCOUNT.ADD_COMPANY }}
+                />
+              ),
+            }}
+          ></Trans>
+        </div>
+      )
+      setPrefetchedCompanyError(message)
+      return
+    }
     if (company) {
       setPrefetchedCompanyWarning(undefined)
       notify(
@@ -86,6 +130,11 @@ export const CompanyRegistrationDialog = () => {
       >
         {!prefetchedCompany && (
           <SirenPicker onSelect={fillFormWithFoundCompany} />
+        )}
+        {prefetchedCompanyError && (
+          <Notice variant="warning" icon="ri-error-warning-line">
+            {prefetchedCompanyError}
+          </Notice>
         )}
         {prefetchedCompanyWarning && (
           <Notice variant="warning" icon="ri-error-warning-line">
