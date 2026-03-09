@@ -15,13 +15,6 @@ class BaseBiomethaneContractAmendmentSerializer(serializers.ModelSerializer):
         model = BiomethaneContractAmendment
         exclude = ["contract"]
 
-    def to_internal_value(self, data):
-        if hasattr(data, "getlist"):
-            data = data.copy()
-            amendment_objects = data.getlist("amendment_object")
-            data.setlist("amendment_object", amendment_objects)
-        return super().to_internal_value(data)
-
 
 class BiomethaneContractAmendmentSerializer(BaseBiomethaneContractAmendmentSerializer):
     class Meta(BaseBiomethaneContractAmendmentSerializer.Meta):
