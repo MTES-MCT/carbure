@@ -1,13 +1,9 @@
-from django.db import transaction
 from django.utils.translation import gettext as _
 
-from carbure.tasks import background_bulk_scoring
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
-from core.models import CarbureLotEvent, UserRights
-from core.serializers import CarbureLotPublicSerializer
-from transactions.helpers import bulk_insert_lots, construct_carbure_lot
-from transactions.sanity_checks.helpers import get_prefetched_data
+from core.models import UserRights
+from transactions.services.lots import LotCreationFailure, create_lot
 
 
 class AddLotError:
@@ -16,29 +12,11 @@ class AddLotError:
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
 def add_lot(request, entity):
-    d = get_prefetched_data(entity)
     lot_data = request.POST.dict()
+    user = request.user
 
-    lot, errors = construct_carbure_lot(d, entity, lot_data)
-    if not lot:
+    try:
+        created_lot_data = create_lot(user, entity, "MANUAL", lot_data)
+        return SuccessResponse(created_lot_data)
+    except LotCreationFailure:
         return ErrorResponse(400, AddLotError.LOT_CREATION_FAILED)
-
-    # run sanity checks, insert lot and errors
-    with transaction.atomic():
-        lots_created = bulk_insert_lots(entity, [lot], [errors], d)
-
-        if len(lots_created) == 0:
-            return ErrorResponse(400, AddLotError.LOT_CREATION_FAILED)
-
-        background_bulk_scoring(lots_created)
-
-        CarbureLotEvent.objects.create(
-            event_type=CarbureLotEvent.CREATED,
-            lot_id=lots_created[0].id,
-            user=request.user,
-            metadata={"source": "MANUAL"},
-            entity=entity,
-        )
-
-    data = CarbureLotPublicSerializer(lots_created[0]).data
-    return SuccessResponse(data)
