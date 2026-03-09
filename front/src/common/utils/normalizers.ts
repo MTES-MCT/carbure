@@ -235,7 +235,7 @@ export function getEntityTypeLabel(type: EntityType) {
     case EntityType.Administration:
       return i18next.t("Administration")
     case EntityType.Operator:
-      return i18next.t("Opérateur de biocarburant")
+      return i18next.t("Opérateur pétrolier")
     case EntityType.Producer:
       return i18next.t("Producteur de biocarburant")
     case EntityType.Auditor:
