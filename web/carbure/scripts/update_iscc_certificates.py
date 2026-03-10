@@ -2,6 +2,7 @@
 # coding: utf-8
 
 # Extraction des certificats ISCC https://www.iscc-system.org/certificates/all-certificates/
+from math import ceil
 import os
 
 import django
@@ -260,7 +261,7 @@ def fetch_certificate_data(nonce: str, recordsTotal: int, test: bool, latest: bo
     if test:
         recordsTotal = PAGELENGTH
     page = 1
-    pages_total = round(recordsTotal / PAGELENGTH)
+    pages_total = ceil(recordsTotal / PAGELENGTH)
     print(f"> Loading {pages_total} pages of {PAGELENGTH} items")
     while start < recordsTotal:
         print(f"> From page {page} at index {start}")
