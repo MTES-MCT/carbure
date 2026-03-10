@@ -29,9 +29,9 @@ TABLE_HEADERS = [
 
 # Main sheet layout: rules block at top (with sections), then table (header, key row, data rows)
 MAIN_SHEET_NUM_COLS = len(TABLE_HEADERS)
-HEADER_ROW = 11  # 0-based
-KEY_ROW = 12  # 0-based
-FIRST_DATA_ROW = 13  # 0-based
+HEADER_ROW = 12  # 0-based
+KEY_ROW = 13  # 0-based
+FIRST_DATA_ROW = 14  # 0-based
 LAST_DATA_ROW = 1012  # 0-based (1000 data rows)
 MAIN_SHEET_NAME = "Approvisionnement"
 
@@ -169,6 +169,10 @@ def _write_rules_block(sheet, num_cols, title_fmt, section_fmt, cell_fmt, inputs
         (
             f"• Si l'intrant est une culture intermédiaire (CIVE) le champ Type de CIVE "
             f"(colonne {c['type_cive']}) est obligatoire."
+        ),
+        (
+            "• Si l'intrant avec une nomenclature de type « XX - CIVE » n'est pas sélectionné, "
+            "la culture est considérée par défaut comme une culture principale."
         ),
         (
             f"• Si l'intrant est « Autres cultures » ou « Autres cultures CIVE », "
