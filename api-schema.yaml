@@ -11811,8 +11811,12 @@ components:
           type: string
           format: email
           readOnly: true
+        name:
+          type: string
+          readOnly: true
       required:
         - email
+        - name
     Biofuel:
       type: object
       properties:
