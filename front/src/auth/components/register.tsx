@@ -5,14 +5,14 @@ import Form, { useForm } from "common/components/form"
 import { Mail, Lock, Return, UserAdd, User } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { Container, Switcher } from "./login"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
-import { HttpError } from "common/services/api-fetch"
 import * as api from "../api"
 
 export const Register = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const notifyError = useNotifyError()
   const navigate = useNavigate()
 
   const { value, bind } = useForm({
@@ -29,28 +29,7 @@ export const Register = () => {
     },
 
     onError: (error) => {
-      const errors = []
-      const errorData = (error as HttpError)?.data
-
-      for (const field in errorData) {
-        const fieldErrors = errorData[field]
-        errors.push(...fieldErrors)
-      }
-
-      const content = (
-        <>
-          <div style={{ marginBottom: 8 }}>
-            {t("Le compte n'a pas pu être créé !")}
-          </div>
-          <ul>
-            {errors.map((err, i) => (
-              <li key={i}>{err}</li>
-            ))}
-          </ul>
-        </>
-      )
-
-      notify(content, { variant: "danger" })
+      notifyError(error)
     },
   })
 
@@ -81,6 +60,7 @@ export const Register = () => {
             type="email"
             label={t("Adresse email")}
             {...bind("email")}
+            required
           />
           <TextInput
             variant="solid"
@@ -88,6 +68,7 @@ export const Register = () => {
             icon={User}
             label={t("Nom")}
             {...bind("name")}
+            required
           />
           <TextInput
             variant="solid"
@@ -95,6 +76,7 @@ export const Register = () => {
             type="password"
             label={t("Mot de passe")}
             {...bind("password")}
+            required
           />
           <TextInput
             variant="solid"
@@ -102,6 +84,7 @@ export const Register = () => {
             type="password"
             label={t("Répéter le mot de passe")}
             {...bind("repeatPassword")}
+            required
             error={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
           />
           <Button
@@ -119,6 +102,7 @@ export const Register = () => {
           disabled={
             !isPassOk ||
             !value.email ||
+            !value.name ||
             !value.password ||
             !value.repeatPassword
           }
