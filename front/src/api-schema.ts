@@ -3167,6 +3167,7 @@ export interface components {
         BaseUser: {
             /** Format: email */
             readonly email: string;
+            readonly name: string;
         };
         Biofuel: {
             name: string;

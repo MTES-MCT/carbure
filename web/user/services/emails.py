@@ -1,10 +1,12 @@
 from os import environ
 
+from django.contrib.auth.models import User
+
 from core.models import Entity, UserRights
 
 
 # Email sent to all admins of the entity when a user requests access to the entity
-def get_request_access_email_default(entity: Entity, user_email: str, comment: str):
+def get_request_access_email_default(entity: Entity, user: User, comment: str):
     validation_url = f"{environ.get('BASE_URL')}/org/{entity.id}/settings/users"
     email_subject = "Carbure - Demande d'accès"
     message = """
@@ -12,12 +14,14 @@ def get_request_access_email_default(entity: Entity, user_email: str, comment: s
     Un utilisateur vient de faire une demande d'accès à CarbuRe.
     Vous pouvez valider ou refuser cette demande depuis la page d'administration de votre société : %s.
 
-    Utilisateur: %s
+    Nom : %s
+    Email: %s
     Société: %s
     Commentaire: %s
     """ % (
         validation_url,
-        user_email,
+        user.name,
+        user.email,
         entity.name,
         comment,
     )
@@ -31,14 +35,14 @@ def get_request_access_email_default(entity: Entity, user_email: str, comment: s
 
 
 # When a user requests access to a biomethane producer, send an email to the DREAL du département du producteur
-def get_request_access_email_biomethane_producer(entity: Entity, user_email: str, comment: str):
+def get_request_access_email_biomethane_producer(entity: Entity, user: User, comment: str):
     """
     Returns (recipient_list, email_subject, message) to notify the DREAL of the department.
     If no EXTERNAL_ADMIN entity manages this department, falls back to the default behavior.
     """
     external_admins = entity.get_managing_external_admins()
     if not external_admins:
-        return get_request_access_email_default(entity, user_email, comment)
+        return get_request_access_email_default(entity, user, comment)
 
     email_subject = "Carbure - Demande d'accès"
     message = f"""
@@ -51,7 +55,8 @@ def get_request_access_email_biomethane_producer(entity: Entity, user_email: str
     3 - Vérifiez que l'utilisateur est bien autorisé à accéder à la société'.
     4 - Dans la liste des utilisateurs, cliquez sur l'icone de validation pour valider la demande.
 
-    Utilisateur: {user_email}
+    Nom: {user.name}
+    Email: {user.email}
     Société: {entity.name}
     Commentaire: {comment}
     """
