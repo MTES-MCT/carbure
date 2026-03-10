@@ -198,7 +198,6 @@ def save_iscc_certificates(email: bool, batch: int, status: str) -> Tuple[int, l
                 "download_link": row["certificate_report"],
                 "input": {"raw_material": row["raw_material"]},
                 "output": "",
-                "suspended_dates": row["suspended"] or None,
                 "status": status
             }
         )
@@ -333,7 +332,6 @@ def clean_certificate_data(data: list, soup: BeautifulSoup) -> pd.DataFrame:
     allData["map"] = allData["map"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
     allData["certificate_report"] = allData["certificate_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
     allData["audit_report"] = allData["audit_report"].str.replace('.*href="(.*)">.*', "\\1", regex=True)
-    allData["suspended"] = allData["suspended"].apply(parse_suspended_dates)
 
     return cast(pd.DataFrame, allData)
 
@@ -386,25 +384,6 @@ def get_scope_abbreviations(soup: BeautifulSoup) -> dict:
 
     return dic
 
-def parse_suspended_dates(suspended_html: str):
-    if not isinstance(suspended_html, str) or not suspended_html.strip():
-        return None
-    
-    soup = BeautifulSoup(suspended_html, "html.parser")
-
-    from_dates = [s.get_text(strip=True) for s in soup.select(".cert_suspended_from")]
-    until_dates = [
-        s.get_text(strip=True).replace("until", "").strip()
-        for s in soup.select(".cert_suspended_until")
-    ]
-
-    if len(from_dates) == 0:
-        return None
-
-    return [
-        {"from": f, "until": u}
-        for f, u in zip(from_dates, until_dates)
-    ]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load ISCC certificates in database")

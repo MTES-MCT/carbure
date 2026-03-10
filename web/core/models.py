@@ -1334,7 +1334,6 @@ class GenericCertificate(models.Model):
     )
 
     last_status_update = models.DateField()
-    suspended_dates = models.JSONField(null=True)
 
     @staticmethod
     def bulk_create_or_update(certificates: list[dict], status: str) -> Tuple[list, list]:
