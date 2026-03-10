@@ -81,6 +81,7 @@ export const Register = () => {
             type="email"
             label={t("Adresse email")}
             {...bind("email")}
+            required
           />
           <TextInput
             variant="solid"
@@ -88,6 +89,7 @@ export const Register = () => {
             icon={User}
             label={t("Nom")}
             {...bind("name")}
+            required
           />
           <TextInput
             variant="solid"
@@ -95,6 +97,7 @@ export const Register = () => {
             type="password"
             label={t("Mot de passe")}
             {...bind("password")}
+            required
           />
           <TextInput
             variant="solid"
@@ -102,6 +105,7 @@ export const Register = () => {
             type="password"
             label={t("Répéter le mot de passe")}
             {...bind("repeatPassword")}
+            required
             error={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
           />
           <Button
