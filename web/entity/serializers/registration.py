@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from core.serializers import EntityPreviewSerializer
+
 
 class SeachCompanySerializer(serializers.Serializer):
     registration_id = serializers.CharField(required=True)  # SIREN or SIRET
@@ -24,9 +26,14 @@ class CompanyPreviewSerializer(serializers.Serializer):
     insee_code = serializers.CharField(max_length=5)
 
 
+class MetaSerializer(serializers.Serializer):
+    entities = serializers.ListField(child=EntityPreviewSerializer())
+    company_name = serializers.CharField(max_length=255)
+
+
 class WarningSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=50)
-    meta = serializers.DictField()
+    meta = MetaSerializer()
 
 
 class ResponseDataSerializer(serializers.Serializer):

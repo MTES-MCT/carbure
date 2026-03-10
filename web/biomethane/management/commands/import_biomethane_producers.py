@@ -68,9 +68,11 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(f"Missing required columns: {', '.join(missing_columns)}"))
             return
 
-        stats = {"processed": 0, "created": 0, "skipped": 0}
+        stats = {"processed": 0, "created": 0, "skipped": 0, "updated": 0}
 
         producers_to_create = []
+        # name -> registration_id for existing entities to update
+        producers_to_update_by_name = {}
         production_unit_data = []
 
         departments = {d.code_dept: d for d in Department.objects.all()}
@@ -91,10 +93,22 @@ class Command(BaseCommand):
                     continue
 
                 if Entity.all_objects.filter(entity_type=Entity.BIOMETHANE_PRODUCER, name=name).exists():
-                    stats["skipped"] += 1
-                    self.stdout.write(
-                        self.style.WARNING(f"Row {stats['processed']}: Producer with name '{name}' already exists, skipping")
-                    )
+                    extracted_siren = siret[:9]
+
+                    if Entity.all_objects.filter(
+                        entity_type=Entity.BIOMETHANE_PRODUCER, name=name, registration_id=extracted_siren
+                    ).exists():
+                        stats["skipped"] += 1
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Row {stats['processed']}: Producer with name '{name}' and SIRET '{extracted_siren}'"
+                                "already exists, skipping",
+                            )
+                        )
+                        continue
+
+                    producers_to_update_by_name[name] = extracted_siren
+                    stats["updated"] += 1
                     continue
 
                 if BiomethaneProductionUnit.objects.filter(Q(site_siret=siret) | Q(name=name)).exists():
@@ -139,10 +153,20 @@ class Command(BaseCommand):
                         producer=entity_by_name[data["name"]],
                     )
 
+                if producers_to_update_by_name:
+                    names_to_update = list(producers_to_update_by_name.keys())
+                    entities_to_update = list(
+                        Entity.all_objects.filter(entity_type=Entity.BIOMETHANE_PRODUCER, name__in=names_to_update)
+                    )
+                    for entity in entities_to_update:
+                        entity.registration_id = producers_to_update_by_name[entity.name]
+                    Entity.objects.bulk_update(entities_to_update, ["registration_id"])
+
         # Print summary
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write(self.style.SUCCESS(f"Processed: {stats['processed']} rows"))
         self.stdout.write(self.style.SUCCESS(f"Created: {stats['created']} producers"))
+        self.stdout.write(self.style.SUCCESS(f"Updated: {stats['updated']} producers"))
         self.stdout.write(self.style.WARNING(f"Skipped: {stats['skipped']} rows"))
         if dry_run:
             self.stdout.write(self.style.NOTICE("DRY RUN - No changes saved to database"))

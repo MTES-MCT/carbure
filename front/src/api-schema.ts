@@ -4896,6 +4896,10 @@ export interface components {
          * @enum {string}
          */
         MaterialUnitEnum: MaterialUnitEnum;
+        Meta: {
+            entities: components["schemas"]["EntityPreview"][];
+            company_name: string;
+        };
         /**
          * @description * `CONTINUOUS_INFINITELY_MIXED` - Continu (infiniment mélangé)
          *     * `PLUG_FLOW_SEMI_CONTINUOUS` - En piston (semi-continu)
@@ -6113,9 +6117,7 @@ export interface components {
         };
         Warning: {
             code: string;
-            meta: {
-                [key: string]: unknown;
-            };
+            meta: components["schemas"]["Meta"];
         };
         /**
          * @description * `PENDING` - En attente

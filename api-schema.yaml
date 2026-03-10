@@ -16353,6 +16353,19 @@ components:
       description: |-
         * `DRY` - Sèche
         * `WET` - Brute
+    Meta:
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/EntityPreview"
+        company_name:
+          type: string
+          maxLength: 255
+      required:
+        - company_name
+        - entities
     MethanizationProcessEnum:
       enum:
         - CONTINUOUS_INFINITELY_MIXED
@@ -19175,8 +19188,7 @@ components:
           type: string
           maxLength: 50
         meta:
-          type: object
-          additionalProperties: {}
+          $ref: "#/components/schemas/Meta"
       required:
         - code
         - meta

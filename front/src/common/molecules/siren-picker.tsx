@@ -3,12 +3,16 @@ import { useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import { HttpError } from "common/services/api-fetch"
 import { searchCompanyData } from "common/api"
-import { SearchCompanyPreview } from "companies/types"
+import { SearchCompanyMeta, SearchCompanyPreview } from "companies/types"
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 interface SirenPickerProps {
-  onSelect: (company?: SearchCompanyPreview, warning?: string) => void
+  onSelect: (
+    company?: SearchCompanyPreview,
+    warning?: string,
+    meta?: SearchCompanyMeta
+  ) => void
 }
 
 export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
@@ -29,7 +33,11 @@ export const SirenPicker = ({ onSelect }: SirenPickerProps) => {
           { companyName: companyResult.warning.meta.company_name }
         )
       }
-      onSelect(companyResult.company_preview, warning)
+      onSelect(
+        companyResult.company_preview,
+        warning,
+        companyResult.warning?.meta
+      )
       setError(undefined)
     },
     onError: (err) => {

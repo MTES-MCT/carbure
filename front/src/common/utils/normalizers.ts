@@ -244,13 +244,13 @@ export function getEntityTypeLabel(type: EntityType) {
     case EntityType.Administration:
       return i18next.t("Administration")
     case EntityType.Operator:
-      return i18next.t("Opérateur")
+      return i18next.t("Opérateur pétrolier")
     case EntityType.Producer:
-      return i18next.t("Producteur")
+      return i18next.t("Producteur de biocarburant")
     case EntityType.Auditor:
       return i18next.t("Auditeur")
     case EntityType.Trader:
-      return i18next.t("Trader")
+      return i18next.t("Trader de biocarburant")
     case EntityType.ExternalAdmin:
       return i18next.t("Administration Externe")
     case EntityType.Airline:
