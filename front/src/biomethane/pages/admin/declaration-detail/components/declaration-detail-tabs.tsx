@@ -8,6 +8,7 @@ export const DeclarationDetailTabs = () => {
 
   return (
     <Tabs
+      scrollable
       tabs={[
         {
           key: "digestate",
