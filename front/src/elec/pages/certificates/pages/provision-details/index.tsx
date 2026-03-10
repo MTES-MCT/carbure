@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { getProvisionCertificateDetails } from "../../api"
 import { TextInput } from "common/components/inputs2"
-import { formatUnit } from "common/utils/formatters"
+import { formatUnit, formatDate } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { getSourceLabel } from "../../utils"
 
@@ -75,6 +75,11 @@ export const ProvisionCertificateDetails = () => {
               provisionCert?.energy_amount ?? 0,
               ExtendedUnit.MWh
             )}
+          />
+          <TextInput
+            readOnly
+            label={t("Date d'émission")}
+            value={formatDate(provisionCert?.created_at ?? null)}
           />
         </Box>
 
