@@ -769,10 +769,15 @@ class CarbureNotificationSerializer(serializers.ModelSerializer):
 
 class BaseUserSerializer(serializers.Serializer):
     email = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
     @extend_schema_field(serializers.EmailField)
     def get_email(self, obj):
         return obj.email
+
+    @extend_schema_field(serializers.CharField)
+    def get_name(self, obj):
+        return obj.name
 
 
 class UserRightsRequestsSerializer(serializers.ModelSerializer):
