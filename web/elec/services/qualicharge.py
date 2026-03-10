@@ -91,9 +91,12 @@ def process_certificates_batch(validated_data, double_validated):
         double_validated: Set of (station_id, date_from, date_to) already double-validated
 
     Returns:
-        list: List of error dictionaries for certificates that failed to process
+        tuple: (errors, stats)
+            - errors: List of error dictionaries for certificates that failed to process
+            - stats: Dict keyed by SIREN with {"created": n, "updated": n} counts
     """
     errors = []
+    stats = {}
     certificates_to_create = []
     certificates_to_update = []
 
@@ -121,12 +124,19 @@ def process_certificates_batch(validated_data, double_validated):
     for item in validated_data:
         siren = item["siren"]
         cpo, unknown_siren = resolve_cpo(siren)
+        stats.setdefault(siren, {"created": 0, "updated": 0})
 
         for unit in item["operational_units"]:
+            before_create = len(certificates_to_create)
+            before_update = len(certificates_to_update)
+
             unit_errors = _prepare_certificates_bulk(
                 unit, cpo, unknown_siren, double_validated, existing_certs, certificates_to_create, certificates_to_update
             )
             errors.extend(unit_errors)
+
+            stats[siren]["created"] += len(certificates_to_create) - before_create
+            stats[siren]["updated"] += len(certificates_to_update) - before_update
 
     # Execute bulk operations
     if certificates_to_create:
@@ -139,7 +149,7 @@ def process_certificates_batch(validated_data, double_validated):
             batch_size=100,
         )
 
-    return errors
+    return errors, stats
 
 
 def _prepare_certificates_bulk(unit, cpo, unknown_siren, double_validated, existing_certs, to_create, to_update):
