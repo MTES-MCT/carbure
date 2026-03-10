@@ -33,7 +33,7 @@ class BiomethaneDigestateService:
         "external_platform_municipality",
     ]
     ON_SITE_FIELDS = ["on_site_composted_digestate_volume"]
-    RAW_DIGESTATE_FIELDS = ["raw_digestate_tonnage_produced", "raw_digestate_dry_matter_rate"]
+    RAW_DIGESTATE_FIELDS = ["raw_digestate_dry_matter_rate"]
     SEPARATED_DIGESTATE_FIELDS = ["solid_digestate_tonnage", "liquid_digestate_quantity"]
     SPREADING_FIELDS = ["average_spreading_valorization_distance"]
     INCINERATION_FIELDS = ["annual_eliminated_volume", "incinerator_landfill_center_name"]

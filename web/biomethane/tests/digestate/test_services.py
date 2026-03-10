@@ -292,7 +292,6 @@ class BiomethaneDigestateServiceIntegrationTests(TestCase):
         fields_to_clear = BiomethaneDigestateService.get_fields_to_clear(digestate)
 
         self.assertIsInstance(fields_to_clear, list)
-        self.assertIn("raw_digestate_tonnage_produced", fields_to_clear)
         self.assertIn("raw_digestate_dry_matter_rate", fields_to_clear)
 
     def test_get_fields_to_clear_without_phase_separation(self):
