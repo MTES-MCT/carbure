@@ -4218,6 +4218,28 @@ paths:
                 status: success
                 errors: []
           description: Success message
+  /api/elec/provision-certificates-qualicharge/export/:
+    get:
+      operationId: elec_provision_certificates_qualicharge_export_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElecProvisionCertificateQualicharge"
+          description: ""
   /api/elec/provision-certificates-qualicharge/filters/:
     get:
       operationId: filter_provision_certificates_qualicharge
@@ -13275,6 +13297,8 @@ components:
       description: "Serializer for Excel export: choice fields are serialized as
         display labels (e.g. DRY → Sèche)."
       properties:
+        producer:
+          $ref: "#/components/schemas/EntityPreview"
         year:
           type: integer
           readOnly: true
@@ -13325,6 +13349,7 @@ components:
         - feedstock
         - material_unit
         - origin_country
+        - producer
         - source
         - type_cive
         - year

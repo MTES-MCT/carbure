@@ -1232,6 +1232,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/elec/provision-certificates-qualicharge/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["elec_provision_certificates_qualicharge_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/elec/provision-certificates-qualicharge/filters/": {
         parameters: {
             query?: never;
@@ -3658,6 +3674,7 @@ export interface components {
         };
         /** @description Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche). */
         BiomethaneSupplyInputExport: {
+            producer: components["schemas"]["EntityPreview"];
             readonly year: number;
             readonly origin_country: string;
             readonly feedstock: string;
@@ -8865,6 +8882,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    elec_provision_certificates_qualicharge_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElecProvisionCertificateQualicharge"];
                 };
             };
         };
