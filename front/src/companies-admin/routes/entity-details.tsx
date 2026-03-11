@@ -19,7 +19,6 @@ import useEntity from "common/hooks/entity"
 import CompanyInfo from "settings/pages/company-info"
 import { AuthorizeEntityBanner } from "companies-admin/components/authorize-entity-banner"
 import { usePrivateNavigation } from "common/layouts/navigation"
-import { ExtAdminPagesEnum } from "api-schema"
 import { ApplicationDetailsDialog } from "double-counting-admin/components/applications/application-details-dialog"
 import { AgreementDetailsDialog } from "double-counting-admin/components/agreements/agreement-details-dialog"
 import { getCompanyDetails } from "common/api"
@@ -52,10 +51,19 @@ const EntityDetails = () => {
   const isSAFTrader = entityData?.entity_type === EntityType.SAF_Trader
   const isSAFEntity = isAirline || isSAFTrader
 
+  // web/entity/views/enable_entity.py:41
+  const canEnable =
+    entity.isAdmin ||
+    entity.hasAdminRight("ELEC") ||
+    entity.hasAdminRight("AIRLINE")
+
+  // web/entity/views/users/users.py:48
   const canApprove =
     entity.isAdmin ||
     entity.hasAdminRight("ELEC") ||
-    entity.hasAdminRight(ExtAdminPagesEnum.DREAL)
+    entity.hasAdminRight("AIRLINE") ||
+    entity.hasAdminRight("DCA") ||
+    entity.hasAdminRight("DREAL")
 
   return (
     <Main>
@@ -110,7 +118,7 @@ const EntityDetails = () => {
       />
 
       <section>
-        {!isEnabled && entityData && canApprove && (
+        {!isEnabled && entityData && canEnable && (
           <AuthorizeEntityBanner company={entityData} />
         )}
 
