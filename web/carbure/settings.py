@@ -49,6 +49,7 @@ env = environ.Env(
     ENABLE_SAF_LOGISTICS=(bool, True),
     FILE_UPLOAD_MAX_MEMORY_SIZE_MB=(int, 10),
     DATA_UPLOAD_MAX_MEMORY_SIZE_MB=(int, 10),
+    QUALICHARGE_INVALID_STATIONS_URL=(str, ""),
 )
 
 # ensure a `BASE_URL` env var is present before starting

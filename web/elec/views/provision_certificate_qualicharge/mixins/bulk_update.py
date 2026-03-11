@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ProvisionCertificateUpdateBulkSerializer
-from elec.services.qualicharge import create_provision_certificates_from_qualicharge
+from elec.services.qualicharge import create_provision_certificates_from_qualicharge, fetch_invalid_stations
 
 
 class BulkUpdateMixin:
@@ -51,6 +51,17 @@ class BulkUpdateMixin:
         if not qualicharge_certificates.exists():
             return Response(
                 {"status": "error", "errors": ["No valid certificates found"]}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check that all station_ids to be updated are valid according to Qualicharge
+        operating_units = set(qualicharge_certificates.values_list("operating_unit", flat=True))
+        station_ids = set(qualicharge_certificates.values_list("station_id", flat=True))
+        invalid_stations = fetch_invalid_stations(operating_units, station_ids)
+
+        if invalid_stations:
+            return Response(
+                {"status": "error", "errors": invalid_stations},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # Check if any of the certificates are already double validated

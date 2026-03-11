@@ -1,3 +1,5 @@
+import requests
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from rest_framework import serializers
@@ -249,3 +251,26 @@ def create_provision_certificates_from_qualicharge(qualicharge_certificates):
         )
 
     ElecProvisionCertificate.objects.bulk_create(provision_certificates_to_create)
+
+
+def fetch_invalid_stations(operating_units, station_ids_to_check):
+    """
+    Call the Qualicharge API to retrieve invalid stations for the given operating units,
+    then filter the results to only return station_ids present in station_ids_to_check.
+
+    Args:
+        operating_units: Iterable of operating unit codes to query
+        station_ids_to_check: Set of station_ids from the current batch
+
+    Returns:
+        list: Invalid station objects (dicts) whose station_id is in station_ids_to_check
+
+    Raises:
+        requests.RequestException: If the API call fails
+    """
+    url = settings.QUALICHARGE_INVALID_STATIONS_URL
+    response = requests.get(url, params=[("operating_unit", unit) for unit in operating_units])
+    response.raise_for_status()
+
+    invalid_stations = response.json()
+    return [s for s in invalid_stations if s["station_id"] in station_ids_to_check]
