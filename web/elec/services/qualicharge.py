@@ -243,6 +243,8 @@ def create_provision_certificates_from_qualicharge(qualicharge_certificates):
                 energy_amount=q_certificate["total_renewable_energy"],
                 quarter=(q_certificate["date_from"].month - 1) // 3 + 1,
                 year=q_certificate["year"],
+                date_from=q_certificate["date_from"],
+                date_to=q_certificate["date_to"],
                 compensation=False,
                 source=ElecProvisionCertificate.QUALICHARGE,
             )

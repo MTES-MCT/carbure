@@ -29,6 +29,8 @@ class ElecProvisionCertificate(models.Model):
 
     cpo = models.ForeignKey("core.Entity", on_delete=models.CASCADE)
     quarter = models.IntegerField(choices=QUARTERS)
+    date_from = models.DateField(null=True, blank=True)  # for qualicharge volumes, to not lose info
+    date_to = models.DateField(null=True, blank=True)  # for qualicharge volumes, to not lose info
     year = models.IntegerField()
     operating_unit = models.CharField(max_length=64)
     source = models.CharField(max_length=32, choices=SOURCES)
