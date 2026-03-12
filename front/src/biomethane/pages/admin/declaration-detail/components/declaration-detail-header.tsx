@@ -6,9 +6,9 @@ import { useNavigate } from "react-router-dom"
 import { BiomethaneProducer } from "../../types"
 import { useAnnualDeclarationYearsAdmin } from "../hooks/use-annual-declaration-years-admin"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { AnnualDeclarationIsOpenBadge } from "./annual-declaration-is-open-badge"
 import { ToggleDeclarationButton } from "./toggle-declaration-button"
 import useEntity from "common/hooks/entity"
+import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -45,10 +45,8 @@ export const DeclarationDetailHeader = ({
 
       <SelectYears key={selectedEntityId} />
       {/* Only display the open badge if the declaration exists */}
-      {annualDeclaration && (
-        <AnnualDeclarationIsOpenBadge
-          isDeclarationOpen={annualDeclaration?.is_open ?? false}
-        />
+      {annualDeclaration?.status && (
+        <AnnualDeclarationStatusBadge status={annualDeclaration.status} />
       )}
       {entity.canWrite() && <ToggleDeclarationButton />}
     </Row>
