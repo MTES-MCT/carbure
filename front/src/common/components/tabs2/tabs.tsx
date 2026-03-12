@@ -26,6 +26,8 @@ export interface TabsProps<T extends string> extends Layout {
   focus?: T
   onFocus?: (tab: T) => void
   sticky?: boolean
+  /** When there are many tabs, enables horizontal scrolling instead of shrinking them. */
+  scrollable?: boolean
   // children?: (tab: string) => React.ReactNode
 }
 export const Tabs = <T extends string>({
@@ -36,6 +38,7 @@ export const Tabs = <T extends string>({
   focus: controlledFocus,
   onFocus,
   sticky,
+  scrollable,
   ...props
 }: TabsProps<T>) => {
   const matcher = useMatcher()
@@ -51,7 +54,12 @@ export const Tabs = <T extends string>({
   return (
     <nav
       {...layout(props)}
-      className={cl(css.tabs, className, sticky && css.sticky)}
+      className={cl(
+        css.tabs,
+        className,
+        sticky && css.sticky,
+        scrollable && css.scrollable
+      )}
       style={style}
     >
       {tabs.map((tab) => {

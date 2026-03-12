@@ -2,8 +2,9 @@ from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, viewsets
 
+from biomethane.permissions import HasDrealOrAdminRights
 from core.models import ExternalAdminRights, UserRights
-from core.permissions import HasAdminRights, HasUserRights
+from core.permissions import HasAdminRights
 from entity.views.users.mixins import UserActionMixin
 
 User = get_user_model()
@@ -30,7 +31,7 @@ class UserViewSet(UserActionMixin, viewsets.GenericViewSet):
 
     def get_permissions(self):
         if self.action in ["change_role", "accept_user", "invite_user", "revoke_access", "entity_rights_requests"]:
-            return [HasUserRights(role=[UserRights.ADMIN])]
+            return [HasDrealOrAdminRights()]
 
         if self.action in ["rights_requests"]:
             return [

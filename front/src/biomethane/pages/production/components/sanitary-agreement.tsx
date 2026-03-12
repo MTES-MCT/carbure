@@ -12,6 +12,7 @@ import {
   HygienizationExemptionType,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 type SanitaryAgreementForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 
@@ -21,6 +22,7 @@ export function SanitaryAgreement({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const { hasSelectedEntity } = useSelectedEntity()
 
   const { bind, value } = useForm<SanitaryAgreementForm>({
     has_sanitary_approval: productionUnit?.has_sanitary_approval,
@@ -44,7 +46,7 @@ export function SanitaryAgreement({
   ]
 
   return (
-    <EditableCard title={t("Agrément sanitaire")}>
+    <EditableCard title={t("Agrément sanitaire")} readOnly={hasSelectedEntity}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">

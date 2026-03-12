@@ -53,6 +53,9 @@ HasBiomethaneProducerWriteRights = UserRightsFactory(
 
 # Combined permission for DREAL (READ access)
 HasDrealOrProducerRights = HasBiomethaneProducerRights | HasDrealRights
+HasDrealOrAdminRights = HasDrealRights | UserRightsFactory(
+    role=[UserRights.ADMIN],
+)
 
 
 def get_biomethane_permissions(write_actions, action):
