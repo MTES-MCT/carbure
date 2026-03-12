@@ -21,6 +21,10 @@ export const ToggleDeclarationButton = () => {
     }
   }, [annualDeclaration, toggleDeclaration, createDeclaration])
 
+  if (annualDeclaration?.is_open) {
+    return null
+  }
+
   return (
     <Button
       onClick={handleToggleDeclaration}
