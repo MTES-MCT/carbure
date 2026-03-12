@@ -276,7 +276,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
         )
 
     def test_create_provision_certificates_with_aggregation(self):
-        """Test that certificates are grouped and energy amounts are summed"""
+        """Test that certificates are grouped and renewable energy amounts are summed"""
         # Create two double-validated certificates with same CPO, unit, and period
         ElecProvisionCertificateQualichargeFactory(
             double_validated=True,
@@ -286,6 +286,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
             date_to=datetime.date(2023, 3, 31),
             year=2023,
             energy_amount=1000.0,
+            enr_ratio=0.25,
         )
         ElecProvisionCertificateQualichargeFactory(
             double_validated=True,
@@ -295,6 +296,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
             date_to=datetime.date(2023, 3, 31),
             year=2023,
             energy_amount=2000.0,
+            enr_ratio=0.25,
         )
 
         queryset = ElecProvisionCertificateQualicharge.objects.all()
@@ -305,10 +307,14 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
         cert = ElecProvisionCertificate.objects.first()
         self.assertEqual(cert.cpo, self.cpo)
         self.assertEqual(cert.operating_unit, "FR001")
-        self.assertEqual(cert.energy_amount, 3000.0)
+        # energy_amount = sum(energy_amount * enr_ratio) = (1000 + 2000) * 0.25 = 750
+        self.assertEqual(cert.energy_amount, 750.0)
         self.assertEqual(cert.quarter, 1)
         self.assertEqual(cert.year, 2023)
         self.assertEqual(cert.source, ElecProvisionCertificate.QUALICHARGE)
+        # Verify date_from and date_to are stored on the provision certificate
+        self.assertEqual(cert.date_from, datetime.date(2023, 1, 1))
+        self.assertEqual(cert.date_to, datetime.date(2023, 3, 31))
 
     def test_create_multiple_groups(self):
         """Test that different groups create separate provision certificates"""
@@ -320,6 +326,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
             date_to=datetime.date(2023, 3, 31),
             year=2023,
             energy_amount=1000.0,
+            enr_ratio=0.25,
         )
         ElecProvisionCertificateQualichargeFactory(
             double_validated=True,
@@ -329,6 +336,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
             date_to=datetime.date(2023, 3, 31),
             year=2023,
             energy_amount=2000.0,
+            enr_ratio=0.25,
         )
 
         queryset = ElecProvisionCertificateQualicharge.objects.all()
@@ -347,6 +355,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
             date_to=datetime.date(2023, 3, 31),
             year=2023,
             energy_amount=1000.0,
+            enr_ratio=0.25,
         )
         ElecProvisionCertificateQualichargeFactory(
             double_validated=True,
@@ -356,6 +365,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
             date_to=datetime.date(2023, 3, 31),
             year=2023,
             energy_amount=2000.0,
+            enr_ratio=0.25,
         )
 
         queryset = ElecProvisionCertificateQualicharge.objects.all()
@@ -364,7 +374,10 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
         # Should create only one certificate with energy from the BOTH validated one
         self.assertEqual(ElecProvisionCertificate.objects.count(), 1)
         cert = ElecProvisionCertificate.objects.first()
-        self.assertEqual(cert.energy_amount, 2000.0)
+        # energy_amount = sum(energy_amount * enr_ratio) = 2000 * 0.25 = 500
+        self.assertEqual(cert.energy_amount, 500.0)
+        self.assertEqual(cert.date_from, datetime.date(2023, 1, 1))
+        self.assertEqual(cert.date_to, datetime.date(2023, 3, 31))
 
     def test_calculate_quarter_from_date(self):
         """Test that quarter is correctly calculated from date_from"""
@@ -388,6 +401,7 @@ class CreateProvisionCertificatesFromQualichargeTest(TestCase):
                     date_to=date_from,
                     year=2023,
                     energy_amount=1000.0,
+                    enr_ratio=0.25,
                 )
 
                 queryset = ElecProvisionCertificateQualicharge.objects.all()
