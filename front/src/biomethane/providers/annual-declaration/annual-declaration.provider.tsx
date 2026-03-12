@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 import { getAnnualDeclaration } from "biomethane/api"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
@@ -69,8 +69,6 @@ export function AnnualDeclarationProvider({
       params: [entity.id, parsedYear, selectedEntityId],
     })
 
-  if (loadingAnnualDeclaration && !annualDeclaration) return <LoaderOverlay />
-
   // Use year from url if provided, otherwise selected year is current year
   const year = parsedYear ?? currentYear
 
@@ -105,16 +103,30 @@ export function AnnualDeclarationProvider({
   const hasAtLeastOneSupplyInput =
     annualDeclaration?.missing_fields?.supply_plan_valid ?? false
 
-  const value: AnnualDeclarationContextValue = {
-    selectedYear: year,
-    annualDeclaration,
-    isDeclarationInCurrentPeriod,
-    isDeclarationValidated,
-    canEditDeclaration,
-    hasAnnualDeclarationMissingObjects,
-    hasAtLeastOneSupplyInput,
-    annualDeclarationKey: key,
-  }
+  const value: AnnualDeclarationContextValue = useMemo(
+    () => ({
+      selectedYear: year,
+      annualDeclaration,
+      isDeclarationInCurrentPeriod,
+      isDeclarationValidated,
+      canEditDeclaration,
+      hasAnnualDeclarationMissingObjects,
+      hasAtLeastOneSupplyInput,
+      annualDeclarationKey: key,
+    }),
+    [
+      year,
+      annualDeclaration,
+      isDeclarationInCurrentPeriod,
+      isDeclarationValidated,
+      canEditDeclaration,
+      hasAnnualDeclarationMissingObjects,
+      hasAtLeastOneSupplyInput,
+      key,
+    ]
+  )
+
+  if (loadingAnnualDeclaration && !annualDeclaration) return <LoaderOverlay />
 
   return (
     <AnnualDeclarationContext.Provider value={value}>
