@@ -1,48 +1,60 @@
-# Use the official Ubuntu image as the base image
-FROM ubuntu:latest
+# -----------------------------------------------------------------------------
+# Stage 1: build front (React/Vite) → seul front/build est conservé
+# -----------------------------------------------------------------------------
+FROM node:20-alpine AS front-builder
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV PIPENV_VENV_IN_PROJECT=1
-
-# Run updates and install necessary system packages
-RUN apt-get update -y && apt-get install -y \
-  python3 \
-  python3-pip \
-  python3-venv \
-  python3-dev \
-  git \
-  build-essential \
-  pkg-config \
-  default-libmysqlclient-dev \
-  mysql-client \
-  nodejs \
-  npm
-
-# Set up working directory
 WORKDIR /app
 
-# Create a virtual environment and activate it
-RUN python3 -m venv /venv
-ENV PATH="/venv/bin:$PATH"
+COPY front/package.json front/package-lock.json* ./
+RUN npm ci
 
-# Install Pipenv using pip
-RUN pip install pipenv
+COPY front/ ./
+RUN npm run build
 
-# Copy Pipfile and Pipfile.lock
-COPY Pipfile Pipfile.lock /app/
+# -----------------------------------------------------------------------------
+# Stage 2: build des wheels Python (deps compilées, pas de Node)
+# -----------------------------------------------------------------------------
+FROM python:3.12-slim-bookworm AS py-builder
 
-# Install dependencies using Pipenv
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    pkg-config \
+    default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir pipenv
+
+COPY Pipfile Pipfile.lock ./
 RUN pipenv install --deploy --system
 
-COPY front front
-RUN (cd front; npm install; npm run build)
+RUN pip freeze > /requirements.txt
+RUN pip wheel --no-cache-dir --wheel-dir /wheels -r /requirements.txt
 
-# Copy the rest of your application code
-COPY pyproject.toml pyproject.toml
+# -----------------------------------------------------------------------------
+# Stage 3: image finale (runtime uniquement, < 1.5 Go)
+# -----------------------------------------------------------------------------
+FROM python:3.12-slim-bookworm AS runtime
+
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    default-libmysqlclient-dev \
+    default-mysql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=py-builder /wheels /wheels
+COPY --from=py-builder /requirements.txt /requirements.txt
+RUN pip install --no-cache-dir --no-index --find-links /wheels -r /requirements.txt \
+    && rm -rf /wheels /requirements.txt
+
+COPY pyproject.toml ./
 COPY web web
 COPY scripts scripts
 COPY bin bin
+COPY --from=front-builder /app/build ./front/build
 
-# Set the default command to execute the application
 CMD ["sh", "./web/entrypoint.prod.sh"]

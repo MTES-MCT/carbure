@@ -1,20 +1,11 @@
-# Dépendances front (réinstallées au build)
 front/node_modules
 front/dist
 front/.parcel-cache
-
-# Git
 .git
-
-# Python
-**/__pycache__
 .venv
 venv
 env
 .pytest_cache
 .mypy_cache
-
-# Divers
 .cursor
 .vscode
-*.log
