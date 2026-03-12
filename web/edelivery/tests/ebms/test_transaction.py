@@ -28,6 +28,9 @@ class TransactionTest(TestCase):
         transaction = Transaction.from_xml(xml_data)
         self.assertEqual("TRN-0000000000001-1234567890", transaction.udb_transaction_id())
 
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertEqual("TRN-0000000000001-1234567890", lot_attributes["udb_transaction_id"])
+
     def test_knows_its_loading_date_in_ISO_format(self):
         xml_data = transaction_data(loading_date="2026-02-22T00:00:00.000Z")
         transaction = Transaction.from_xml(xml_data)

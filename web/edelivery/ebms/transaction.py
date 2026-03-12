@@ -72,6 +72,7 @@ class Transaction:
             "feedstock": feedstock,
             "period": self.period(),
             "lot_status": lot_status,
+            "udb_transaction_id": self.udb_transaction_id(),
             "year": self.year(),
             **computed_quantity_data,
         }

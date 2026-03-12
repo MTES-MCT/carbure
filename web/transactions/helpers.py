@@ -562,6 +562,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
     else:
         lot = CarbureLot()
     lot.free_field = data.get("free_field", None)
+    lot.udb_transaction_id = data.get("udb_transaction_id", "")
     lot.added_by = entity
     carbure_stock_id = data.get("carbure_stock_id", False)
 
