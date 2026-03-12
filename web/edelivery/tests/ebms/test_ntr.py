@@ -13,8 +13,8 @@ class FromNationalTradeRegisterTest(TestCase):
     def tearDown(self):
         patch.stopall()
 
-    def test_fetches_entity_in_database(self):
-        entity = Entity(name="Some Entity")
+    def test_fetches_entity_in_database_and_returns_entity_id(self):
+        entity = Entity(id=12345)
         patched_filter = self.patched_Entity.objects.filter
         patched_last = patched_filter.return_value.last
         patched_last.return_value = entity
@@ -25,4 +25,4 @@ class FromNationalTradeRegisterTest(TestCase):
         result = from_national_trade_register("FR_SIREN_CD123456789")
         patched_filter.assert_called_with(registered_country__code_pays="FR", registration_id="123456789")
         patched_last.assert_called()
-        self.assertEqual("Some Entity", result.name)
+        self.assertEqual(12345, result)

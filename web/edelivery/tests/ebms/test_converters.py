@@ -1,44 +1,18 @@
 from unittest import TestCase
-from unittest.mock import patch
 
-from core.models import Biocarburant, MatierePremiere
 from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter, UDBConversionError
 
 
 class MaterialConverterTest(TestCase):
-    def setUp(self):
-        self.patched_Biocarburant = patch("edelivery.ebms.converters.Biocarburant").start()
-        self.patched_Biocarburant.objects.get.return_value = Biocarburant()
-
-        self.patched_MatierePremiere = patch("edelivery.ebms.converters.MatierePremiere").start()
-        self.patched_MatierePremiere.objects.get.return_value = MatierePremiere()
-
-    def tearDown(self):
-        patch.stopall()
-
     def test_converts_udb_fame_to_carbure_biofuel(self):
-        found_biofuel = Biocarburant(code="EMAG")
-        get = self.patched_Biocarburant.objects.get
-        get.return_value = found_biofuel
-
         converter = MaterialConverter({"FBM0003": "EMAG"})
-        get.assert_not_called()
-
-        carbure_biofuel = converter.from_udb_biofuel_code("FBM0003")
-        get.assert_called_with(code="EMAG")
-        self.assertEqual(found_biofuel, carbure_biofuel)
+        carbure_biofuel_code = converter.from_udb_biofuel_code("FBM0003")
+        self.assertEqual("EMAG", carbure_biofuel_code)
 
     def test_converts_udb_rapeseed_to_carbure_feedstock(self):
-        found_feedstock = MatierePremiere(code="COLZA")
-        get = self.patched_MatierePremiere.objects.get
-        get.return_value = found_feedstock
-
         converter = MaterialConverter({"URWR001": "COLZA"})
-        get.assert_not_called()
-
-        carbure_feedstock = converter.from_udb_feedstock_code("URWR001")
-        get.assert_called_with(code="COLZA")
-        self.assertEqual(found_feedstock, carbure_feedstock)
+        carbure_feedstock_code = converter.from_udb_feedstock_code("URWR001")
+        self.assertEqual("COLZA", carbure_feedstock_code)
 
     def test_raises_error_if_udb_code_unknown(self):
         converter = MaterialConverter({})
