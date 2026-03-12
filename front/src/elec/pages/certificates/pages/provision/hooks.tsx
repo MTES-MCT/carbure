@@ -63,6 +63,11 @@ export function useColumns() {
       cell: (p) =>
         t("T{{quarter}} {{year}}", { quarter: p.quarter, year: p.year }),
     },
+    {
+      key: "month",
+      header: t("Mois"),
+      cell: (p) => t("{{month}}", { month: p.month ?? t("-") }),
+    },
     (entity.isAdmin || entity.isExternal) && {
       key: "cpo",
       header: t("Aménageur"),

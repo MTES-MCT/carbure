@@ -4366,6 +4366,11 @@ export interface components {
             source: components["schemas"]["ElecProvisionCertificateSourceEnum"];
             quarter: components["schemas"]["QuarterEnum"];
             year: number;
+            /** Format: date */
+            date_from?: string | null;
+            /** Format: date */
+            date_to?: string | null;
+            readonly month: string;
             operating_unit: string;
             /** Format: double */
             energy_amount: number;

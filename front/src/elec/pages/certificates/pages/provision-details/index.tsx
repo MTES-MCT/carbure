@@ -58,6 +58,16 @@ export const ProvisionCertificateDetails = () => {
               year: provisionCert?.year,
             })}
           />
+          {provisionCert?.month && (
+            <TextInput
+              readOnly
+              label={t("Période")}
+              value={t("Du {{date_from}} au {{date_to}}", {
+                date_from: formatDate(provisionCert?.date_from ?? null),
+                date_to: formatDate(provisionCert?.date_to ?? null),
+              })}
+            />
+          )}
           <TextInput
             readOnly
             label={t("Unité d'exploitation")}
