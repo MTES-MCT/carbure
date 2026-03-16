@@ -67,12 +67,6 @@ const RedirectToCurrentYear = ({ path }: { path: REDIRECTED_ROUTES }) => {
   )
 }
 
-const RedirectToCurrentYearRoute = ({ path }: { path: REDIRECTED_ROUTES }) => (
-  <AnnualDeclarationProvider>
-    <RedirectToCurrentYear path={path} />
-  </AnnualDeclarationProvider>
-)
-
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer, hasAdminRight } = useEntity()
 
@@ -82,44 +76,49 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      {/* Routes sans année qui redirigent vers l'année de déclaration courante */}
-      <Route
-        path="digestate"
-        element={<RedirectToCurrentYearRoute path="digestate" />}
-      />
-      <Route
-        path="energy"
-        element={<RedirectToCurrentYearRoute path="energy" />}
-      />
-      <Route
-        path="supply-plan"
-        element={<RedirectToCurrentYearRoute path="supply-plan" />}
-      />
-
-      <Route
-        path=":year"
-        element={
-          <ContractProductionUnitProvider>
-            <AnnualDeclarationLayout />
-          </ContractProductionUnitProvider>
-        }
-      >
-        <Route index element={<Navigate replace to="digestate" />} />
-        <Route path="digestate" element={<Digestate />} />
-        <Route path="energy" element={<Energy />} />
-        <Route path="supply-plan" element={<SupplyPlan />} />
-      </Route>
-
-      <Route path="closed-declaration" element={<ClosedDeclaration />} />
-      <Route path="customer-satisfaction" element={<CustomerSatisfaction />} />
       <Route
         path=""
         element={
           <AnnualDeclarationProvider>
-            <RedirectToCurrentYear path="digestate" />
+            <Outlet />
           </AnnualDeclarationProvider>
         }
-      />
+      >
+        {/* Routes sans année qui redirigent vers l'année de déclaration courante */}
+        <Route
+          path="digestate"
+          element={<RedirectToCurrentYear path="digestate" />}
+        />
+        <Route
+          path="energy"
+          element={<RedirectToCurrentYear path="energy" />}
+        />
+        <Route
+          path="supply-plan"
+          element={<RedirectToCurrentYear path="supply-plan" />}
+        />
+
+        <Route
+          path=":year"
+          element={
+            <ContractProductionUnitProvider>
+              <AnnualDeclarationLayout />
+            </ContractProductionUnitProvider>
+          }
+        >
+          <Route index element={<Navigate replace to="digestate" />} />
+          <Route path="digestate" element={<Digestate />} />
+          <Route path="energy" element={<Energy />} />
+          <Route path="supply-plan" element={<SupplyPlan />} />
+        </Route>
+
+        <Route path="closed-declaration" element={<ClosedDeclaration />} />
+        <Route
+          path="customer-satisfaction"
+          element={<CustomerSatisfaction />}
+        />
+        <Route path="" element={<RedirectToCurrentYear path="digestate" />} />
+      </Route>
     </Routes>
   )
 }

@@ -3202,6 +3202,8 @@ export interface components {
                 energy_missing_fields?: string[] | null;
                 /** @description Whether the supply plan is valid */
                 supply_plan_valid?: boolean;
+                /** @description List of missing fields for contract */
+                contract_missing_fields?: string[] | null;
             };
             readonly is_complete: boolean;
             is_open?: boolean;

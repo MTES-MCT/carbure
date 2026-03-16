@@ -23,11 +23,11 @@ export interface AnnualDeclarationContextValue {
   /** Whether the annual declaration can be edited */
   canEditDeclaration: boolean
 
-  /** Whether the annual declaration has missing objects (digestate or energy) */
-  hasAnnualDeclarationMissingObjects: boolean
-
-  /** Whether at least one supply plan input (intrant) has been filled */
-  hasAtLeastOneSupplyInput: boolean
+  /** Missing fields data for the annual declaration */
+  annualDeclarationMissingFieldsData: {
+    hasAnnualDeclarationMissingObjects: boolean
+    hasBiomethaneSettingsMissingObjects: boolean
+  }
 
   /** Key for the current annual declaration */
   annualDeclarationKey: string
@@ -95,13 +95,8 @@ export function AnnualDeclarationProvider({
     ? canEditDeclarationBiomethaneProducer
     : canEditDeclarationAdmin
 
-  const hasAnnualDeclarationMissingObjects =
-    annualDeclaration?.missing_fields?.digestate_missing_fields === null ||
-    annualDeclaration?.missing_fields?.energy_missing_fields === null
-
-  // Check if at least one supply plan input has been filled
-  const hasAtLeastOneSupplyInput =
-    annualDeclaration?.missing_fields?.supply_plan_valid ?? false
+  const annualDeclarationMissingFieldsData =
+    getAnnualDeclarationMissingFields(annualDeclaration)
 
   const value: AnnualDeclarationContextValue = useMemo(
     () => ({
@@ -110,8 +105,7 @@ export function AnnualDeclarationProvider({
       isDeclarationInCurrentPeriod,
       isDeclarationValidated,
       canEditDeclaration,
-      hasAnnualDeclarationMissingObjects,
-      hasAtLeastOneSupplyInput,
+      annualDeclarationMissingFieldsData,
       annualDeclarationKey: key,
     }),
     [
@@ -120,8 +114,7 @@ export function AnnualDeclarationProvider({
       isDeclarationInCurrentPeriod,
       isDeclarationValidated,
       canEditDeclaration,
-      hasAnnualDeclarationMissingObjects,
-      hasAtLeastOneSupplyInput,
+      annualDeclarationMissingFieldsData,
       key,
     ]
   )
@@ -149,4 +142,23 @@ export function useAnnualDeclarationYear(): number | undefined {
   const { year: _year } = useParams<{ year: string }>()
   const parsedYear = _year ? parseInt(_year) : undefined
   return parsedYear
+}
+
+const getAnnualDeclarationMissingFields = (
+  annualDeclaration?: AnnualDeclaration
+) => {
+  const hasAnnualDeclarationMissingObjects =
+    annualDeclaration?.missing_fields?.digestate_missing_fields === null ||
+    annualDeclaration?.missing_fields?.energy_missing_fields === null ||
+    annualDeclaration?.missing_fields?.supply_plan_valid === false
+
+  const hasBiomethaneSettingsMissingObjects =
+    annualDeclaration?.missing_fields?.contract_missing_fields === null ||
+    (annualDeclaration?.missing_fields?.contract_missing_fields !== undefined &&
+      annualDeclaration.missing_fields.contract_missing_fields.length > 0)
+
+  return {
+    hasAnnualDeclarationMissingObjects,
+    hasBiomethaneSettingsMissingObjects,
+  }
 }
