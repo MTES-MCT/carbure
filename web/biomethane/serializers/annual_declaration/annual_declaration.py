@@ -57,6 +57,12 @@ class BiomethaneAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSer
                     "nullable": False,
                     "description": "Whether the supply plan is valid",
                 },
+                "contract_missing_fields": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "nullable": True,
+                    "description": "List of missing fields for contract",
+                },
             },
             "description": "Missing fields grouped by type",
         }

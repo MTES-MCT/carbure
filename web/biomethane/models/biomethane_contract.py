@@ -95,7 +95,14 @@ class BiomethaneContract(models.Model):
         from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 
         watched_fields = BiomethaneAnnualDeclarationService.get_watched_fields()
+
         return watched_fields["contract"]
+
+    @property
+    def optional_fields(self):
+        from biomethane.services.contract import BiomethaneContractService
+
+        return BiomethaneContractService.get_optional_fields(self)
 
 
 @receiver(post_save, sender=BiomethaneContract)

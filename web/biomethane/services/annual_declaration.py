@@ -82,6 +82,8 @@ class BiomethaneAnnualDeclarationService:
         digestate = BiomethaneDigestate.objects.filter(producer=declaration.producer, year=declaration.year).first()
         energy = BiomethaneEnergy.objects.filter(producer=declaration.producer, year=declaration.year).first()
         supply_plan = BiomethaneSupplyPlan.objects.filter(producer=declaration.producer, year=declaration.year).first()
+        contract = BiomethaneContract.objects.filter(producer=declaration.producer).first()
+
         is_current_declaration = declaration.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
         digestate_missing_fields = (
@@ -94,6 +96,9 @@ class BiomethaneAnnualDeclarationService:
             if energy
             else None,
             "supply_plan_valid": supply_plan and supply_plan.supply_inputs.exists(),
+            "contract_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(contract, True)
+            if contract
+            else None,
         }
 
     @staticmethod
@@ -154,6 +159,8 @@ class BiomethaneAnnualDeclarationService:
             and missing_fields.get("energy_missing_fields") is not None
             and len(missing_fields["energy_missing_fields"]) == 0
             and missing_fields.get("supply_plan_valid") is True
+            and missing_fields.get("contract_missing_fields") is not None
+            and len(missing_fields["contract_missing_fields"]) == 0
         )
 
     @staticmethod
