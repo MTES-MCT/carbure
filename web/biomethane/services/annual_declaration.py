@@ -9,6 +9,7 @@ from biomethane.models import (
     BiomethaneProductionUnit,
     BiomethaneSupplyPlan,
 )
+from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
 
 
 class BiomethaneAnnualDeclarationService:
@@ -83,6 +84,8 @@ class BiomethaneAnnualDeclarationService:
         energy = BiomethaneEnergy.objects.filter(producer=declaration.producer, year=declaration.year).first()
         supply_plan = BiomethaneSupplyPlan.objects.filter(producer=declaration.producer, year=declaration.year).first()
         contract = BiomethaneContract.objects.filter(producer=declaration.producer).first()
+        injection_site = BiomethaneInjectionSite.objects.filter(producer=declaration.producer).first()
+        production_unit = BiomethaneProductionUnit.objects.filter(producer=declaration.producer).first()
 
         is_current_declaration = declaration.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
@@ -98,6 +101,10 @@ class BiomethaneAnnualDeclarationService:
             "supply_plan_valid": supply_plan and supply_plan.supply_inputs.exists(),
             "contract_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(contract, True)
             if contract
+            else None,
+            "injection_missing_fields": [] if injection_site else None,
+            "production_unit_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(production_unit, True)
+            if production_unit
             else None,
         }
 
@@ -130,13 +137,14 @@ class BiomethaneAnnualDeclarationService:
     def get_all_fields(model):
         """
         Return all field names for a given model.
+        Excludes reverse relations (e.g. from ForeignKey pointing to this model from another model).
         """
+        from django.db.models.fields.related import ForeignObjectRel
+
         if model is None:
             return []
-        fields = []
-        for field in model._meta.get_fields():
-            fields.append(field.name)
-        return fields
+        extra_fields = getattr(model, "EXTRA_FIELDS", [])
+        return [field.name for field in model._meta.get_fields() if not isinstance(field, ForeignObjectRel)] + extra_fields
 
     @staticmethod
     def is_declaration_complete(declaration, missing_fields=None):
@@ -161,6 +169,10 @@ class BiomethaneAnnualDeclarationService:
             and missing_fields.get("supply_plan_valid") is True
             and missing_fields.get("contract_missing_fields") is not None
             and len(missing_fields["contract_missing_fields"]) == 0
+            and missing_fields.get("production_unit_missing_fields") is not None
+            and len(missing_fields["production_unit_missing_fields"]) == 0
+            and missing_fields.get("injection_missing_fields") is not None
+            and len(missing_fields["injection_missing_fields"]) == 0
         )
 
     @staticmethod

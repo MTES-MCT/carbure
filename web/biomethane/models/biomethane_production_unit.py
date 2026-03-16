@@ -208,6 +208,24 @@ class BiomethaneProductionUnit(Site):
             self.created_by_id = self.producer_id
         super().save(*args, **kwargs)
 
+    # Virtual fields to include alongside real model fields in completeness checks.
+    EXTRA_FIELDS = ["digestate_storage"]
+
+    @property
+    def digestate_storage(self):
+        """Returns True if at least one digestate storage exists, None otherwise."""
+        from biomethane.models.biomethane_digestate_storage import BiomethaneDigestateStorage
+
+        if BiomethaneDigestateStorage.objects.filter(producer=self.producer).exists():
+            return True
+        return None
+
+    @property
+    def optional_fields(self):
+        from biomethane.services.production_unit import BiomethaneProductionUnitService
+
+        return BiomethaneProductionUnitService.get_optional_fields(self)
+
     @property
     def watched_fields(self):
         from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
@@ -224,23 +242,9 @@ def clear_production_unit_fields_on_save(sender, instance, **kwargs):
     This signal is triggered when a BiomethaneProductionUnit is saved and clears
     fields that should be reset based on the configuration changes.
     """
-    fields_to_clear = []
+    from biomethane.services.production_unit import BiomethaneProductionUnitService
 
-    # Clear sanitary approval number if sanitary approval is not enabled
-    if not instance.has_sanitary_approval:
-        fields_to_clear.append("sanitary_approval_number")
-
-    # Clear hygienization exemption type if hygienization exemption is not enabled
-    if not instance.has_hygienization_exemption:
-        fields_to_clear.append("hygienization_exemption_type")
-
-    # Clear digestate treatment steps based on phase separation setting
-    if not instance.has_digestate_phase_separation:
-        # If phase separation is disabled, clear liquid and solid phase treatment steps
-        fields_to_clear.extend(["liquid_phase_treatment_steps", "solid_phase_treatment_steps"])
-
-    if BiomethaneProductionUnit.SPREADING not in instance.digestate_valorization_methods:
-        fields_to_clear.extend(["spreading_management_methods", "digestate_sale_types"])
+    fields_to_clear = BiomethaneProductionUnitService.get_fields_to_clear(instance)
 
     if fields_to_clear:
         update_data = {}
