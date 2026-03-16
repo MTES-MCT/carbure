@@ -6,8 +6,9 @@ from django.test import TestCase
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.energy import BiomethaneEnergyFactory
+from biomethane.factories.production_unit import BiomethaneDigestateStorageFactory
 from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
-from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate
+from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate, BiomethaneProductionUnit
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
 
@@ -100,6 +101,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIn("digestate_missing_fields", missing_fields)
         self.assertIn("energy_missing_fields", missing_fields)
         self.assertIn("supply_plan_valid", missing_fields)
+        self.assertIn("production_unit_missing_fields", missing_fields)
         self.assertIsInstance(missing_fields["digestate_missing_fields"], list)
         self.assertIsInstance(missing_fields["energy_missing_fields"], list)
         self.assertTrue(missing_fields["supply_plan_valid"])
@@ -117,6 +119,73 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIsNone(missing_fields["digestate_missing_fields"])
         self.assertIsNone(missing_fields["energy_missing_fields"])
         self.assertFalse(missing_fields["supply_plan_valid"])
+        self.assertIsNone(missing_fields["production_unit_missing_fields"])
+
+    def test_get_missing_fields_production_unit_no_digestate_storage(self):
+        """production_unit_missing_fields contains 'digestate_storage' when no storage exists."""
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        # No BiomethaneDigestateStorage created
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+
+        self.assertIsNotNone(missing_fields["production_unit_missing_fields"])
+        self.assertIn("digestate_storage", missing_fields["production_unit_missing_fields"])
+
+    def test_get_missing_fields_production_unit_with_digestate_storage(self):
+        """production_unit_missing_fields does not contain 'digestate_storage' when storage exists."""
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
+        BiomethaneDigestateStorageFactory.create(producer=self.producer_entity)
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+
+        self.assertIsNotNone(missing_fields["production_unit_missing_fields"])
+        self.assertNotIn("digestate_storage", missing_fields["production_unit_missing_fields"])
+
+    def test_is_declaration_complete_false_when_production_unit_missing(self):
+        """is_declaration_complete returns False when production_unit_missing_fields is None."""
+        missing_fields = {
+            "digestate_missing_fields": [],
+            "energy_missing_fields": [],
+            "supply_plan_valid": True,
+            "contract_missing_fields": [],
+            "injection_missing_fields": [],
+            "production_unit_missing_fields": None,  # no production unit
+        }
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+        self.assertFalse(BiomethaneAnnualDeclarationService.is_declaration_complete(declaration, missing_fields))
+
+    def test_is_declaration_complete_false_when_production_unit_has_missing_fields(self):
+        """is_declaration_complete returns False when production_unit_missing_fields is non-empty."""
+        missing_fields = {
+            "digestate_missing_fields": [],
+            "energy_missing_fields": [],
+            "supply_plan_valid": True,
+            "contract_missing_fields": [],
+            "injection_missing_fields": [],
+            "production_unit_missing_fields": ["digestate_storage"],
+        }
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+        self.assertFalse(BiomethaneAnnualDeclarationService.is_declaration_complete(declaration, missing_fields))
 
     def test_get_required_fields_with_valid_model(self):
         """Test get_required_fields returns all field names for a model"""
@@ -469,3 +538,45 @@ class GetMissingFieldsTests(TestCase):
         missing = BiomethaneAnnualDeclarationService._get_missing_fields(instance, is_current_declaration=False)
 
         self.assertEqual(missing, ["f"])
+
+
+class GetAllFieldsTests(TestCase):
+    """Tests for BiomethaneAnnualDeclarationService.get_all_fields."""
+
+    def test_excludes_reverse_relations(self):
+        """get_all_fields must not return reverse relation names (e.g. entitysite, safticketsource).
+
+        BiomethaneProductionUnit inherits from Site which is pointed to by many FK/OneToOne
+        relations in other models. _meta.get_fields() returns these as ForeignObjectRel instances.
+        """
+        fields = BiomethaneAnnualDeclarationService.get_all_fields(BiomethaneProductionUnit)
+        self.assertNotIn("entitysite", fields)
+        self.assertNotIn("safticketsource", fields)
+        self.assertNotIn("biomethane_production_unit", fields)  # reverse OneToOne from itself
+
+    def test_includes_extra_fields(self):
+        """get_all_fields includes virtual fields declared in model.EXTRA_FIELDS."""
+        fields = BiomethaneAnnualDeclarationService.get_all_fields(BiomethaneProductionUnit)
+        for extra_field in BiomethaneProductionUnit.EXTRA_FIELDS:
+            self.assertIn(extra_field, fields)
+
+    def test_includes_real_model_fields(self):
+        """get_all_fields includes real model fields for BiomethaneProductionUnit."""
+        fields = BiomethaneAnnualDeclarationService.get_all_fields(BiomethaneProductionUnit)
+        self.assertIn("unit_type", fields)
+        self.assertIn("process_type", fields)
+        self.assertIn("methanization_process", fields)
+
+    def test_model_without_extra_fields_returns_only_real_fields(self):
+        """Models without EXTRA_FIELDS class attribute behave normally."""
+        from biomethane.models import BiomethaneContract
+
+        fields = BiomethaneAnnualDeclarationService.get_all_fields(BiomethaneContract)
+        self.assertIn("producer", fields)
+        self.assertIn("tariff_reference", fields)
+        # No EXTRA_FIELDS defined on BiomethaneContract
+        self.assertFalse(hasattr(BiomethaneContract, "EXTRA_FIELDS"))
+
+    def test_returns_empty_list_for_none_model(self):
+        """get_all_fields returns [] when model is None."""
+        self.assertEqual(BiomethaneAnnualDeclarationService.get_all_fields(None), [])
