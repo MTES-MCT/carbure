@@ -85,6 +85,18 @@ class BiomethaneDigestate(models.Model):
 
         return BiomethaneDigestateService.get_all_optional_fields()
 
+    # Virtual fields to include alongside real model fields in completeness checks.
+    EXTRA_FIELDS = ["digestate_spreading"]
+
+    @property
+    def digestate_spreading(self):
+        """Returns True if at least one digestate spreadinf exists, None otherwise."""
+        from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
+
+        if BiomethaneDigestateSpreading.objects.filter(digestate=self).exists():
+            return True
+        return None
+
 
 @receiver(post_save, sender=BiomethaneDigestate)
 @receiver(post_save, sender=BiomethaneProductionUnit)

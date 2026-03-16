@@ -185,6 +185,18 @@ class BiomethaneEnergy(models.Model):
 
         return BiomethaneEnergyService.get_all_optional_fields()
 
+    # Virtual fields to include alongside real model fields in completeness checks.
+    EXTRA_FIELDS = ["energy_monthly_report"]
+
+    @property
+    def energy_monthly_report(self):
+        """Returns True if at least one digestate spreadinf exists, None otherwise."""
+        from biomethane.models.biomethane_energy_monthly_report import BiomethaneEnergyMonthlyReport
+
+        if BiomethaneEnergyMonthlyReport.objects.filter(energy=self).exists():
+            return True
+        return None
+
 
 @receiver(post_save, sender=BiomethaneEnergy)
 @receiver(post_save, sender=BiomethaneProductionUnit)
