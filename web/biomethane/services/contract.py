@@ -264,15 +264,13 @@ class BiomethaneContractService:
 
     @staticmethod
     def get_optional_fields(contract):
-        context = ContractValidationContext.from_contract_and_data(contract, contract.__dict__)
-
-        # Get all clearing rules
+        # Get all optional field rules
         rules = _build_contract_clearing_rules()
 
-        # Evaluate rules and collect fields to clear
-        fields_to_clear = get_fields_from_applied_rules(rules, context)
+        # Evaluate rules and collect optionale fields
+        optional_fields = get_fields_from_applied_rules(rules, contract)
 
-        return fields_to_clear + BiomethaneContractService.PRIVATE_FIELDS
+        return optional_fields + BiomethaneContractService.PRIVATE_FIELDS
 
 
 # Rule configuration: declarative definition of field clearing rules
