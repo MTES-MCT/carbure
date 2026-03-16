@@ -187,6 +187,9 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             "digestate_missing_fields": [],
             "energy_missing_fields": [],
             "supply_plan_valid": True,
+            "contract_missing_fields": [],
+            "injection_missing_fields": [],
+            "production_unit_missing_fields": [],
         }
 
         # Create declaration
