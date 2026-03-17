@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
+from biomethane.factories.digestate_spreading import BiomethaneDigestateSpreadingFactory
 from biomethane.models import BiomethaneContract, BiomethaneDigestate, BiomethaneProductionUnit
 from biomethane.services.digestate import BiomethaneDigestateService, DigestateContext, _build_digestate_rules
 from core.models import Entity
@@ -391,3 +392,59 @@ class BiomethaneDigestateServiceIntegrationTests(TestCase):
         )
 
         self.assertEqual(fields, expected_fields)
+
+
+class BiomethaneDigestateSpreadingPropertyTests(TestCase):
+    """Tests for BiomethaneDigestate.digestate_spreading virtual property.
+
+    Only required (returns None when absent) when production_unit.digestate_valorization_methods
+    contains SPREADING.
+    """
+
+    def setUp(self):
+        self.producer = Entity.objects.create(
+            name="Test Producer",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+        self.digestate = BiomethaneDigestateFactory.create(producer=self.producer)
+
+    def test_returns_none_when_spreading_selected_and_no_record(self):
+        """Returns None (missing) when SPREADING is in valorization methods and no spreading record exists."""
+        BiomethaneProductionUnitFactory.create(
+            producer=self.producer,
+            digestate_valorization_methods=[BiomethaneProductionUnit.SPREADING],
+        )
+        self.assertIsNone(self.digestate.digestate_spreading)
+
+    def test_returns_true_when_spreading_selected_and_record_exists(self):
+        """Returns True when SPREADING is selected and at least one spreading record exists."""
+        BiomethaneProductionUnitFactory.create(
+            producer=self.producer,
+            digestate_valorization_methods=[BiomethaneProductionUnit.SPREADING],
+        )
+        BiomethaneDigestateSpreadingFactory.create(digestate=self.digestate)
+        self.assertTrue(self.digestate.digestate_spreading)
+
+    def test_returns_true_when_spreading_not_selected(self):
+        """Returns True (not required) when SPREADING is not in valorization methods."""
+        BiomethaneProductionUnitFactory.create(
+            producer=self.producer,
+            digestate_valorization_methods=[BiomethaneProductionUnit.COMPOSTING],
+        )
+        self.assertTrue(self.digestate.digestate_spreading)
+
+    def test_returns_true_when_no_valorization_methods(self):
+        """Returns True (not required) when digestate_valorization_methods is empty."""
+        BiomethaneProductionUnitFactory.create(
+            producer=self.producer,
+            digestate_valorization_methods=[],
+        )
+        self.assertTrue(self.digestate.digestate_spreading)
+
+    def test_returns_true_when_no_production_unit(self):
+        """Returns True (not required) when no production unit exists for the producer."""
+        self.assertTrue(self.digestate.digestate_spreading)
+
+    def test_in_extra_fields(self):
+        """'digestate_spreading' must be listed in EXTRA_FIELDS so get_all_fields() picks it up."""
+        self.assertIn("digestate_spreading", BiomethaneDigestate.EXTRA_FIELDS)

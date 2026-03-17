@@ -56,6 +56,7 @@ class SafTicketFiltersTest(TestCase, FiltersActionTestMixin):
                 "consumption_type": [],
                 "reception_airport": [],
                 "origin_depot": [self.depot.name],
+                "ets_status": [],
             },
             entity=self.entity,
             ignore=["order_by"],

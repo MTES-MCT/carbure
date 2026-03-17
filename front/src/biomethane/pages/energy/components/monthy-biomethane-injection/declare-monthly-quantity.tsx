@@ -45,7 +45,7 @@ export const DeclareMonthlyQuantity = ({
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
-  const { selectedYear } = useAnnualDeclaration()
+  const { selectedYear, annualDeclarationKey } = useAnnualDeclaration()
   // État pour stocker toutes les valeurs du tableau
   const [tableData, setTableData] = useState<
     BiomethaneEnergyMonthlyReportForm[]
@@ -55,7 +55,7 @@ export const DeclareMonthlyQuantity = ({
     execute: saveMonthlyReportsMutation,
     loading: saveMonthlyReportsLoading,
   } = useMutation(saveMonthlyReports, {
-    invalidates: ["energy"],
+    invalidates: ["energy", annualDeclarationKey],
     onSuccess: () => {
       notify(t("Les données ont bien été mises à jour."), {
         variant: "success",

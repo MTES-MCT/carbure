@@ -56,12 +56,12 @@ export const useBiomethane = () => {
         icon: "ri-home-4-line",
         iconActive: "ri-home-4-fill",
       },
-      // {
-      //   path: routes.BIOMETHANE().ADMIN.SUPPLY_INPUTS,
-      //   title: t("Intrants"),
-      //   icon: "ri-leaf-line",
-      //   iconActive: "ri-leaf-fill",
-      // },
+      {
+        path: routes.BIOMETHANE().ADMIN.SUPPLY_INPUTS,
+        title: t("Intrants"),
+        icon: "ri-leaf-line",
+        iconActive: "ri-leaf-fill",
+      },
       {
         path: routes.BIOMETHANE().ADMIN.DECLARATIONS,
         title: t("Déclarations"),

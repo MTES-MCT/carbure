@@ -20,7 +20,7 @@ export interface TicketsTableProps {
   loading: boolean
   state: SafTicketQueryBuilder["state"]
   actions: SafTicketQueryBuilder["actions"]
-  status: SafTicketStatus
+  status: SafTicketStatus | undefined
   ticketsData?: SafTicketsResponse
   order: Order | undefined
   client?: boolean

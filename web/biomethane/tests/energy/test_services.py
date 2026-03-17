@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from biomethane.factories import BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
+from biomethane.factories.energy import BiomethaneEnergyMonthlyReportFactory
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.services.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 from core.models import Entity
@@ -335,3 +336,53 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
         )
 
         self.assertEqual(fields, expected_fields)
+
+
+class BiomethaneEnergyMonthlyReportPropertyTests(TestCase):
+    """Tests for BiomethaneEnergy.energy_monthly_report virtual property.
+
+    Only required (returns None when absent) for TARIFF_RULE_1 contracts ("2011", "2020").
+    """
+
+    def setUp(self):
+        self.producer = Entity.objects.create(
+            name="Test Producer",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+        self.energy = BiomethaneEnergyFactory.create(producer=self.producer)
+
+    def test_returns_none_when_tariff_rule_1_and_no_report(self):
+        """Returns None (missing) when contract is TARIFF_RULE_1 and no monthly report exists."""
+        BiomethaneContractFactory.create(producer=self.producer, tariff_reference="2011")
+        self.assertIsNone(self.energy.energy_monthly_report)
+
+    def test_returns_none_when_tariff_rule_1_2020_and_no_report(self):
+        """Returns None (missing) for the other TARIFF_RULE_1 value ("2020")."""
+        BiomethaneContractFactory.create(producer=self.producer, tariff_reference="2020")
+        self.assertIsNone(self.energy.energy_monthly_report)
+
+    def test_returns_true_when_tariff_rule_1_and_report_exists(self):
+        """Returns True when contract is TARIFF_RULE_1 and at least one monthly report exists."""
+        BiomethaneContractFactory.create(producer=self.producer, tariff_reference="2011")
+        BiomethaneEnergyMonthlyReportFactory.create(energy=self.energy)
+        self.assertTrue(self.energy.energy_monthly_report)
+
+    def test_returns_true_when_tariff_rule_2_no_report(self):
+        """Returns True (not required) when contract is TARIFF_RULE_2, even without monthly report."""
+        BiomethaneContractFactory.create(producer=self.producer, tariff_reference="2021")
+        self.assertTrue(self.energy.energy_monthly_report)
+
+    def test_returns_true_when_tariff_2023_no_report(self):
+        """Returns True (not required) for tariff 2023, even without monthly report."""
+        BiomethaneContractFactory.create(producer=self.producer, tariff_reference="2023")
+        self.assertTrue(self.energy.energy_monthly_report)
+
+    def test_returns_true_when_no_contract(self):
+        """Returns True (not required) when no contract exists for the producer."""
+        self.assertTrue(self.energy.energy_monthly_report)
+
+    def test_in_extra_fields(self):
+        """'energy_monthly_report' must be listed in EXTRA_FIELDS so get_all_fields() picks it up."""
+        from biomethane.models.biomethane_energy import BiomethaneEnergy as EnergyModel
+
+        self.assertIn("energy_monthly_report", EnergyModel.EXTRA_FIELDS)

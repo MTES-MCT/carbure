@@ -10,6 +10,7 @@ import { EditableCardProvider, useEditableCard } from "./editable-card.provider"
 import { Form, FormProps } from "common/components/form2"
 
 export interface EditableCardProps {
+  id?: string
   title: string
   description?: ReactNode
 
@@ -40,6 +41,7 @@ export interface EditableCardProps {
  * See more examples in the storybook.
  */
 const EditableCardContent = ({
+  id,
   title,
   description,
   children,
@@ -75,7 +77,7 @@ const EditableCardContent = ({
   }
 
   return (
-    <div className={cl(css["editable-card"], className)}>
+    <div className={cl(css["editable-card"], className)} id={id}>
       <div className={css["editable-card__header"]}>
         <div>
           <Title className={css["editable-card__title"]} is="p" as="h6">

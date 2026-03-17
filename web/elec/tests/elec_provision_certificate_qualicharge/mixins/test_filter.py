@@ -192,28 +192,28 @@ class FilterActionMixinTest(TestCase):
 
     def test_filter_invalid_filter_name(self):
         """Test with an invalid filter name"""
-        with self.assertRaises(Exception) as context:
-            self.client.get(
-                self.url,
-                {
-                    "entity_id": self.cpo1.id,
-                    "filter": "invalid_filter",
-                },
-            )
+        response = self.client.get(
+            self.url,
+            {
+                "entity_id": self.cpo1.id,
+                "filter": "invalid_filter",
+            },
+        )
 
-        self.assertIn("does not exist", str(context.exception))
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("does not exist", str(response.json()))
 
     def test_filter_missing_filter_param(self):
         """Test without filter parameter"""
-        with self.assertRaises(Exception) as context:
-            self.client.get(
-                self.url,
-                {
-                    "entity_id": self.cpo1.id,
-                },
-            )
+        response = self.client.get(
+            self.url,
+            {
+                "entity_id": self.cpo1.id,
+            },
+        )
 
-        self.assertIn("No filter was specified", str(context.exception))
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("No filter was specified", str(response.json()))
 
 
 class FilterActionMixinAdminTest(TestCase):

@@ -4,12 +4,13 @@ import {
   MaterialUnitEnum as BiomethaneSupplyInputMaterialUnit,
   TypeCiveEnum as BiomethaneSupplyInputTypeCive,
   CollectionTypeEnum as BiomethaneSupplyInputCollectionType,
-  BiomethaneSupplyInputSourceEnum as BiomethaneSupplyInputSource,
+  PathsApiBiomethaneSupplyInputGetParametersQuerySource as BiomethaneSupplyInputSource,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
 export type BiomethaneSupplyInput = apiTypes["BiomethaneSupplyInput"]
-
+export type BiomethaneSupplyInputResponse =
+  apiTypes["PaginatedBiomethaneSupplyInputList"]
 export type BiomethaneSupplyInputQueryBuilder = QueryBuilder<never, never>
 export type BiomethaneSupplyInputQuery =
   BiomethaneSupplyInputQueryBuilder["query"]

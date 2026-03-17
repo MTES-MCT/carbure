@@ -7,8 +7,9 @@ import css from "common/components/form.module.css"
 // TODO: change import
 import DurabilityFields from "../../../components/durability-fields"
 import { SafTicketDetails } from "../../../types"
-import { EtsStatusEnum } from "api-schema"
+
 import { Dialog } from "common/components/dialog2"
+import { formatEtsStatus } from "saf/utils/formatters"
 
 interface TicketFieldsProps {
   ticket: SafTicketDetails | undefined
@@ -18,15 +19,14 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
 
   if (!ticket) return null
 
-  const etsStatusMap = {
-    [EtsStatusEnum.ETS_VALUATION]: t("Valorisation ETS"),
-    [EtsStatusEnum.OUTSIDE_ETS]: t("Hors ETS (volontaire)"),
-    [EtsStatusEnum.NOT_CONCERNED]: t("Non concerné"),
-  }
-
   return (
     <div className={cl(css.form, css.columns)}>
       <Dialog.Section label={t("Lot")}>
+        <TextInput
+          label={t("Lot d'origine (Carbure)")}
+          value={ticket.origin_lot?.carbure_id ?? "N/A"}
+          readOnly
+        />
         <TextInput
           label={t("Volume")}
           value={`${formatNumber(ticket.volume)} L`}
@@ -50,15 +50,15 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         {ticket.origin_lot_site && (
           <TextInput
             readOnly
-            label={t("Dépôt d'incorporation")}
+            label={t("Dépôt du lot d'origine")}
             value={ticket.origin_lot_site.name}
           />
         )}
         {ticket.origin_lot?.pos_number && (
           <TextInput
-            label={t("Numéro de POS")}
-            value={ticket.origin_lot.pos_number}
             readOnly
+            label={t("N˚ de POS (hors Carbure)")}
+            value={ticket.origin_lot?.pos_number}
           />
         )}
       </Dialog.Section>
@@ -104,13 +104,7 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
           value={formatPeriod(ticket.assignment_period)}
           readOnly
         />
-        {ticket.free_field && (
-          <TextInput
-            label={t("Champ libre")}
-            value={ticket.free_field}
-            readOnly
-          />
-        )}
+
         {ticket.shipping_method && (
           <TextInput
             label={t("Mode de livraison")}
@@ -135,7 +129,14 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         {"ets_status" in ticket && ticket.ets_status && (
           <TextInput
             label={t("Déclaration ETS")}
-            value={etsStatusMap[ticket.ets_status]}
+            value={formatEtsStatus(ticket.ets_status)}
+            readOnly
+          />
+        )}
+        {ticket.free_field && (
+          <TextInput
+            label={t("Champ libre")}
+            value={ticket.free_field}
             readOnly
           />
         )}

@@ -29,5 +29,6 @@ export const assignSafTicket = http.post<
     assignment_period: body.assignment_period,
     client_id: body.client_id,
     volume: body.volume,
+    has_intermediary_depot: false,
   })
 })

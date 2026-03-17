@@ -115,7 +115,7 @@ class ProcessCertificatesBatchTest(TestCase):
 
     def test_process_valid_batch(self):
         """Test orchestration with valid data"""
-        errors = process_certificates_batch(self.validated_data, self.double_validated)
+        errors, stats = process_certificates_batch(self.validated_data, self.double_validated)
 
         self.assertEqual(len(errors), 0)
         self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 1)
@@ -142,7 +142,7 @@ class ProcessCertificatesBatchTest(TestCase):
             }
         )
 
-        errors = process_certificates_batch(self.validated_data, self.double_validated)
+        errors, stats = process_certificates_batch(self.validated_data, self.double_validated)
 
         self.assertEqual(len(errors), 0)
         # Should create certificates for both items

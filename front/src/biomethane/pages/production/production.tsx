@@ -8,9 +8,12 @@ import { useProductionUnit } from "./production.hooks"
 import { AnnualDeclarationAlert } from "biomethane/components/annual-declaration-alert"
 import { WatchedFieldsProvider } from "biomethane/providers/watched-fields"
 import { getProductionUnitWatchedFields } from "./api"
+import { LoaderOverlay } from "common/components/scaffold"
 
 export const BiomethaneProductionPage = () => {
-  const { result: productionUnit } = useProductionUnit()
+  const { result: productionUnit, loading } = useProductionUnit()
+
+  if (loading) return <LoaderOverlay />
 
   return (
     <WatchedFieldsProvider

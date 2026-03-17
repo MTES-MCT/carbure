@@ -66,6 +66,7 @@ export function InjectedBiomethane({
             label={t("Quantité de biométhane injecté (GWhPCS/an)")}
             type="number"
             min={0}
+            step={0.01}
             {...bind("injected_biomethane_gwh_pcs_per_year")}
             required
           />

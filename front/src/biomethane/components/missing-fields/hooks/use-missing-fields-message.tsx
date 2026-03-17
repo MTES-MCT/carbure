@@ -18,7 +18,7 @@ const generateNoObjectMessage = (
   onPageClick?: (page: string) => void
 ) => {
   return (
-    <span>
+    <span key={page}>
       <Trans
         defaults={message}
         components={{
@@ -46,7 +46,7 @@ const generateTranslatedMessage = (
   onPageClick?: (page: string) => void
 ) => {
   return (
-    <span>
+    <span key={page}>
       <Trans
         defaults={message}
         values={{ count, page }}
@@ -77,7 +77,7 @@ export const useMissingFieldsMessages = ({
 } = {}) => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { selectedYear, hasAtLeastOneSupplyInput } = useAnnualDeclaration()
+  const { selectedYear, annualDeclaration } = useAnnualDeclaration()
   const { digestateCount, energyCount, hasDigestateObject, hasEnergyObject } =
     useMissingFieldCounts()
 
@@ -98,6 +98,7 @@ export const useMissingFieldsMessages = ({
       )
 
     if (digestateCount === 0) return null
+
     return generateTranslatedMessage(
       t("Digestat"),
       digestateCount,
@@ -156,12 +157,12 @@ export const useMissingFieldsMessages = ({
 
   const supplyPlanErrorMessage = useMemo(() => {
     // Only show the error if there is no supply input filled
-    if (hasAtLeastOneSupplyInput) {
+    if (annualDeclaration?.missing_fields?.supply_plan_valid) {
       return null
     }
 
     return (
-      <span>
+      <span key="supply-plan-error-message">
         <Trans
           defaults="<CustomLink>Plan d'approvisionnement</CustomLink> : veuillez renseigner au moins un intrant pour valider votre déclaration annuelle"
           components={{
@@ -183,7 +184,7 @@ export const useMissingFieldsMessages = ({
     )
   }, [
     t,
-    hasAtLeastOneSupplyInput,
+    annualDeclaration?.missing_fields?.supply_plan_valid,
     biomethaneRoutes.PRODUCER.SUPPLY_PLAN,
     onPageClick,
   ])
@@ -198,5 +199,5 @@ export const useMissingFieldsMessages = ({
     return messages
   }, [digestateMessage, energyMessage, supplyPlanErrorMessage])
 
-  return { errorMessage, digestateCount, energyCount, hasAtLeastOneSupplyInput }
+  return { errorMessage, digestateCount, energyCount }
 }

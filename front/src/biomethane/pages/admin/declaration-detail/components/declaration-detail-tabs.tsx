@@ -8,6 +8,7 @@ export const DeclarationDetailTabs = () => {
 
   return (
     <Tabs
+      scrollable
       tabs={[
         {
           key: "digestate",
@@ -28,6 +29,21 @@ export const DeclarationDetailTabs = () => {
           key: "contract",
           label: t("Contrat"),
           path: declarationDetailRoutes.CONTRACT,
+        },
+        {
+          key: "production",
+          label: t("Production"),
+          path: declarationDetailRoutes.PRODUCTION,
+        },
+        {
+          key: "injection",
+          label: t("Site d'injection"),
+          path: declarationDetailRoutes.INJECTION,
+        },
+        {
+          key: "users",
+          label: t("Utilisateurs"),
+          path: declarationDetailRoutes.USERS,
         },
         {
           key: "contacts",

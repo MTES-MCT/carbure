@@ -24,17 +24,19 @@ export const AddSpreadingDepartment = ({
   onClose,
   spreadings,
   year,
+  annualDeclarationKey,
 }: {
   onClose: () => void
   spreadings: BiomethaneDigestateSpreading[]
   year: number
+  annualDeclarationKey: string
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const { bind, value } = useForm<AddSpreadingDepartmentForm>({})
 
   const mutate = useMutation(addSpreadingDepartment, {
-    invalidates: ["digestate"],
+    invalidates: ["digestate", annualDeclarationKey],
     onSuccess: () => {
       onClose()
     },
