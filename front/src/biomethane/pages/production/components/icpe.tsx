@@ -11,6 +11,7 @@ import {
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { IcpeNumberHelper } from "./icpe-number-helper"
 
 type ICPEForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 
@@ -55,9 +56,7 @@ export function ICPE({
             label={t("N° ICPE")}
             state="info"
             pattern="\d{10}"
-            hintText={t(
-              "Code à 10 chiffres correspondant au code unique AIOT utilisé sur les applications GUN et GEREP"
-            )}
+            hintText={<IcpeNumberHelper />}
             {...bind("icpe_number")}
           />
           <RadioGroup
