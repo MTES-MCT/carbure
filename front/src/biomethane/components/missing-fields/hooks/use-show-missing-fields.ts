@@ -34,7 +34,7 @@ export const useShowMissingFields = <FormType extends object | undefined>(
   const showMissingFields = useCallback(() => {
     if (!currentPage) {
       console.error(
-        "Missing fields can only be displayed on digestate or energy page"
+        "Missing fields can only be displayed on digestate, energy, contract, production or injection page"
       )
       return
     }

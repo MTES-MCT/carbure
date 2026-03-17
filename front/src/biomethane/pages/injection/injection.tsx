@@ -13,17 +13,21 @@ import {
 } from "./injection.hooks"
 import { Button } from "common/components/button2"
 import { UniqueIdentificationNumberHelper } from "./components/unique-identification-number-helper"
+import { useMissingFields } from "biomethane/components/missing-fields"
 
 type InjectionSiteForm = Partial<BiomethaneInjectionSiteAddRequest>
 export const BiomethaneInjectionPage = () => {
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { value, setValue, bind } = useForm<InjectionSiteForm>({
+  const form = useForm<InjectionSiteForm>({
     city: "",
     company_address: "",
     postal_code: "",
   })
+  const { value, setValue, bind } = form
+
+  useMissingFields(form)
   useGetInjectionSite({
     onSuccess: (data) => {
       if (data) {
