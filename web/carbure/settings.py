@@ -381,7 +381,11 @@ CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + (
 
 CSP_FRAME_SRC = CSP_DEFAULT_SRC
 
-CSP_IMG_SRC = CSP_DEFAULT_SRC + ("https://*.tile.openstreetmap.org/",)
+# data: autorise les SVG inline (ex. icônes checkbox/radio de @codegouvfr/react-dsfr)
+CSP_IMG_SRC = CSP_DEFAULT_SRC + (
+    "https://*.tile.openstreetmap.org/",
+    "data:",
+)
 
 CSP_STYLE_SRC = ("'self'",)
 

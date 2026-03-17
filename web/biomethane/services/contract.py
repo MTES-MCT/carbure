@@ -58,6 +58,9 @@ class BiomethaneContractService:
         "conditions_file",
     ]
 
+    # Fields that are not displayed to the user
+    PRIVATE_FIELDS = ["tracked_amendment_types"]
+
     # Tariff date ranges for signature validation: (start_date, end_date, error_message)
     TARIFF_DATE_RANGES = {
         "2011": (
@@ -258,6 +261,16 @@ class BiomethaneContractService:
         result.sort()
 
         return result
+
+    @staticmethod
+    def get_optional_fields(contract):
+        # Get all optional field rules
+        rules = _build_contract_clearing_rules()
+
+        # Evaluate rules and collect optionale fields
+        optional_fields = get_fields_from_applied_rules(rules, contract)
+
+        return optional_fields + BiomethaneContractService.PRIVATE_FIELDS
 
 
 # Rule configuration: declarative definition of field clearing rules

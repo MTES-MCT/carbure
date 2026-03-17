@@ -27,10 +27,8 @@ export const AddDigestateStorage = ({ onClose }: AddDigestateStorageProps) => {
   const { execute: addStorage, loading } = useAddDigestateStorage()
 
   const handleSubmit = async () => {
-    if (value.type && value.capacity) {
-      await addStorage(value)
-      onClose()
-    }
+    await addStorage(value)
+    onClose()
   }
 
   return (

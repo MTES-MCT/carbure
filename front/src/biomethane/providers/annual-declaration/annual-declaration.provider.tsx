@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 import { getAnnualDeclaration } from "biomethane/api"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
@@ -23,11 +23,11 @@ export interface AnnualDeclarationContextValue {
   /** Whether the annual declaration can be edited */
   canEditDeclaration: boolean
 
-  /** Whether the annual declaration has missing objects (digestate or energy) */
-  hasAnnualDeclarationMissingObjects: boolean
-
-  /** Whether at least one supply plan input (intrant) has been filled */
-  hasAtLeastOneSupplyInput: boolean
+  /** Missing fields data for the annual declaration */
+  annualDeclarationMissingFieldsData: {
+    hasAnnualDeclarationMissingObjects: boolean
+    hasBiomethaneSettingsMissingObjects: boolean
+  }
 
   /** Key for the current annual declaration */
   annualDeclarationKey: string
@@ -69,8 +69,6 @@ export function AnnualDeclarationProvider({
       params: [entity.id, parsedYear, selectedEntityId],
     })
 
-  if (loadingAnnualDeclaration && !annualDeclaration) return <LoaderOverlay />
-
   // Use year from url if provided, otherwise selected year is current year
   const year = parsedYear ?? currentYear
 
@@ -97,24 +95,31 @@ export function AnnualDeclarationProvider({
     ? canEditDeclarationBiomethaneProducer
     : canEditDeclarationAdmin
 
-  const hasAnnualDeclarationMissingObjects =
-    annualDeclaration?.missing_fields?.digestate_missing_fields === null ||
-    annualDeclaration?.missing_fields?.energy_missing_fields === null
+  const annualDeclarationMissingFieldsData =
+    getAnnualDeclarationMissingFields(annualDeclaration)
 
-  // Check if at least one supply plan input has been filled
-  const hasAtLeastOneSupplyInput =
-    annualDeclaration?.missing_fields?.supply_plan_valid ?? false
+  const value: AnnualDeclarationContextValue = useMemo(
+    () => ({
+      selectedYear: year,
+      annualDeclaration,
+      isDeclarationInCurrentPeriod,
+      isDeclarationValidated,
+      canEditDeclaration,
+      annualDeclarationMissingFieldsData,
+      annualDeclarationKey: key,
+    }),
+    [
+      year,
+      annualDeclaration,
+      isDeclarationInCurrentPeriod,
+      isDeclarationValidated,
+      canEditDeclaration,
+      annualDeclarationMissingFieldsData,
+      key,
+    ]
+  )
 
-  const value: AnnualDeclarationContextValue = {
-    selectedYear: year,
-    annualDeclaration,
-    isDeclarationInCurrentPeriod,
-    isDeclarationValidated,
-    canEditDeclaration,
-    hasAnnualDeclarationMissingObjects,
-    hasAtLeastOneSupplyInput,
-    annualDeclarationKey: key,
-  }
+  if (loadingAnnualDeclaration && !annualDeclaration) return <LoaderOverlay />
 
   return (
     <AnnualDeclarationContext.Provider value={value}>
@@ -137,4 +142,32 @@ export function useAnnualDeclarationYear(): number | undefined {
   const { year: _year } = useParams<{ year: string }>()
   const parsedYear = _year ? parseInt(_year) : undefined
   return parsedYear
+}
+
+const isDataNullOrHasErrors = (data: string[] | null | undefined) => {
+  return data === null || data === undefined || data.length > 0
+}
+const getAnnualDeclarationMissingFields = (
+  annualDeclaration?: AnnualDeclaration
+) => {
+  const hasAnnualDeclarationMissingObjects =
+    annualDeclaration?.missing_fields?.digestate_missing_fields === null ||
+    annualDeclaration?.missing_fields?.energy_missing_fields === null ||
+    annualDeclaration?.missing_fields?.supply_plan_valid === false
+
+  const hasBiomethaneSettingsMissingObjects =
+    isDataNullOrHasErrors(
+      annualDeclaration?.missing_fields?.contract_missing_fields
+    ) ||
+    isDataNullOrHasErrors(
+      annualDeclaration?.missing_fields?.production_unit_missing_fields
+    ) ||
+    isDataNullOrHasErrors(
+      annualDeclaration?.missing_fields?.injection_missing_fields
+    )
+
+  return {
+    hasAnnualDeclarationMissingObjects,
+    hasBiomethaneSettingsMissingObjects,
+  }
 }

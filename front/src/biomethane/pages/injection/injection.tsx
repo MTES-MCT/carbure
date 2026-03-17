@@ -12,6 +12,7 @@ import {
   useMutateInjectionSite,
 } from "./injection.hooks"
 import { Button } from "common/components/button2"
+import { UniqueIdentificationNumberHelper } from "./components/unique-identification-number-helper"
 
 type InjectionSiteForm = Partial<BiomethaneInjectionSiteAddRequest>
 export const BiomethaneInjectionPage = () => {
@@ -41,6 +42,7 @@ export const BiomethaneInjectionPage = () => {
         <EditableCard.Form onSubmit={() => updateInjectionSite(value)}>
           <TextInput
             label={t("Numéro d'identifiant unique du site d'injection")}
+            hintText={<UniqueIdentificationNumberHelper />}
             {...bind("unique_identification_number")}
             required
             readOnly={!isEditing}

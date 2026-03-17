@@ -57,10 +57,10 @@ def request_entity_access(request, *args, **kwargs):
 
         if entity.entity_type == Entity.BIOMETHANE_PRODUCER:
             recipient_list, email_subject, message = get_request_access_email_biomethane_producer(
-                entity, request.user.email, comment
+                entity, request.user, comment
             )
         else:
-            recipient_list, email_subject, message = get_request_access_email_default(entity, request.user.email, comment)
+            recipient_list, email_subject, message = get_request_access_email_default(entity, request.user, comment)
 
         send_mail(
             request=request,

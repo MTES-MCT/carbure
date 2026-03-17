@@ -5,6 +5,8 @@ import { DeclareMonthlyQuantity } from "./declare-monthly-quantity"
 import HashRoute from "common/components/hash-route"
 import { BiomethaneEnergy } from "../../types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { Notice } from "common/components/notice"
+import { useMemo } from "react"
 
 export const MonthlyBiomethaneInjection = ({
   energy,
@@ -13,6 +15,23 @@ export const MonthlyBiomethaneInjection = ({
 }) => {
   const { t } = useTranslation()
   const { canEditDeclaration } = useAnnualDeclaration()
+
+  const messages = useMemo(() => {
+    if (canEditDeclaration) {
+      return {
+        submit: t("Déclarer mes volumes mensuels"),
+        view: t(
+          "Déclarez ou modifiez les volumes mensuels de biométhane injecté"
+        ),
+      }
+    }
+
+    return {
+      submit: t("Visualiser mes volumes mensuels"),
+      view: t("Visualisez les volumes mensuels de biométhane injecté"),
+    }
+  }, [canEditDeclaration, t])
+
   return (
     <>
       <ManagedEditableCard
@@ -30,18 +49,18 @@ export const MonthlyBiomethaneInjection = ({
                 to: { hash: "monthly-reports" },
               }}
             >
-              {!canEditDeclaration
-                ? t("Visualiser mes volumes mensuels")
-                : t("Déclarer mes volumes mensuels")}
+              {messages.submit}
             </Button>
           )
         }
       >
-        {!canEditDeclaration
-          ? t("Visualisez les volumes mensuels de biométhane injecté")
-          : t(
-              "Déclarez ou modifiez les volumes mensuels de biométhane injecté"
-            )}
+        {energy?.monthly_reports?.length === 0 ? (
+          <Notice variant="warning" icon="ri-error-warning-line">
+            {t("Aucun volume mensuel de biométhane injecté déclaré")}
+          </Notice>
+        ) : (
+          messages.view
+        )}
       </ManagedEditableCard>
       <HashRoute
         path="monthly-reports"

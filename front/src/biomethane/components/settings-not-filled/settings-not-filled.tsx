@@ -1,32 +1,18 @@
 import { BIOMETHANE_HELP_URL } from "biomethane/config"
-import { BiomethaneContract } from "biomethane/pages/contract/types"
-import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { Button } from "common/components/button2"
+import { NavLink } from "common/components/nav-link"
 import { Row } from "common/components/scaffold"
 import { Text } from "common/components/text"
 import { Title } from "common/components/title"
-import { useRoutes } from "common/hooks/routes"
-import { useTranslation } from "react-i18next"
-/**
- * This component is used to display a message to the user that they have not filled in all the settings for their installation.
- */
-export const SettingsNotFilled = ({
-  contractInfos,
-  productionUnit,
-}: {
-  contractInfos?: BiomethaneContract
-  productionUnit?: BiomethaneProductionUnit
-}) => {
-  const { t } = useTranslation()
-  const routes = useRoutes()
+import { Trans, useTranslation } from "react-i18next"
+import { useSettingsNotFilled } from "./use-settings-not-filled"
 
-  const routeMissingObject =
-    contractInfos === undefined
-      ? routes.SETTINGS.BIOMETHANE.CONTRACT
-      : productionUnit === undefined
-        ? routes.SETTINGS.BIOMETHANE.PRODUCTION
-        : // Fallback
-          routes.SETTINGS.BIOMETHANE.CONTRACT
+/**
+ * Displays a message when the user has not filled in all the settings for their installation.
+ */
+export const SettingsNotFilled = () => {
+  const { t } = useTranslation()
+  const { routeMissingObject, errorsMapping } = useSettingsNotFilled()
 
   return (
     <div
@@ -49,14 +35,26 @@ export const SettingsNotFilled = ({
       >
         <Title is="h1" as="h5">
           {t(
-            "Vous n'avez pas encore rempli les informations de votre installation."
+            "Vous n'avez pas complété toutes les informations de votre installation."
           )}
         </Title>
         <Text size="lg">
           {t(
-            "Veuillez remplir les informations de votre installation dans les paramètres de votre société."
+            "Veuillez remplir les informations (Contrat, Production, Injection) dans les paramètres de votre société."
           )}
         </Text>
+        {errorsMapping.map((error) => (
+          <Text key={error.route} size="lg">
+            <Trans
+              defaults="<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>."
+              values={{ page: error.name, count: error.errors.length }}
+              components={{
+                CustomLink: <NavLink to={error.route} underline />,
+                strong: <strong />,
+              }}
+            />
+          </Text>
+        ))}
         <Row gap="md">
           <Button
             linkProps={{ to: routeMissingObject }}

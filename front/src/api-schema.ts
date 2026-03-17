@@ -3167,6 +3167,7 @@ export interface components {
         BaseUser: {
             /** Format: email */
             readonly email: string;
+            readonly name: string;
         };
         Biofuel: {
             name: string;
@@ -3201,6 +3202,12 @@ export interface components {
                 energy_missing_fields?: string[] | null;
                 /** @description Whether the supply plan is valid */
                 supply_plan_valid?: boolean;
+                /** @description List of missing fields for contract */
+                contract_missing_fields?: string[] | null;
+                /** @description List of missing fields for production unit */
+                production_unit_missing_fields?: string[] | null;
+                /** @description List of missing fields for injection */
+                injection_missing_fields?: string[] | null;
             };
             readonly is_complete: boolean;
             is_open?: boolean;

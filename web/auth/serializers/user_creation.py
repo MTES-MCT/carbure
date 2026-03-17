@@ -21,6 +21,7 @@ class UserCreationSerializer(serializers.ModelSerializer):
         fields = (User.USERNAME_FIELD,) + tuple(User.REQUIRED_FIELDS) + ("password1", "password2")
         extra_kwargs = {
             "email": {"validators": []},  # Disable default validators for email, to avoid enumeration of existing accounts
+            "name": {"required": True, "allow_blank": False},
         }
 
     def validate_email(self, value):
