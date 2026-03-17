@@ -41,9 +41,15 @@ export function DigestateStorage() {
         <Table rows={storages!} columns={columns} />
       )}
 
-      <Notice>
-        {t("Capacité totale de stockage")} : {totalCapacity} m3
-      </Notice>
+      {storages?.length === 0 ? (
+        <Notice variant="warning" icon="ri-error-warning-line">
+          {t("Aucun type de stockage déclaré")}
+        </Notice>
+      ) : (
+        <Notice>
+          {t("Capacité totale de stockage")} : {totalCapacity} m3
+        </Notice>
+      )}
     </EditableCard>
   )
 }
