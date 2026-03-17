@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from adapters.logger import log_info
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from core.models import UserRights
 
 
 class Command(BaseCommand):
@@ -34,18 +35,19 @@ class Command(BaseCommand):
 
         for declaration in declarations:
             producer_name = declaration.producer.name
-            year = declaration.year
+            admins = UserRights.objects.filter(entity=declaration.producer, role=UserRights.ADMIN).select_related("user")
+            emails = [admin.user.email for admin in admins]
 
             is_complete = BiomethaneAnnualDeclarationService.is_declaration_complete(declaration)
 
             if is_complete:
                 complete_count += 1
-                lines.append(f"[COMPLETE]   {producer_name} - {year}")
+                lines.append(f"[COMPLETE]   {producer_name} - {emails}")
                 self.stdout.write(self.style.SUCCESS(lines[-1]))
             else:
                 incomplete_count += 1
                 incomplete_ids.append(declaration.pk)
-                lines.append(f"[INCOMPLETE] {producer_name} - {year}")
+                lines.append(f"[INCOMPLETE] {producer_name} - {emails}")
                 self.stdout.write(self.style.WARNING(lines[-1]))
 
         summary = f"Summary: {total} checked — {complete_count} complete, {incomplete_count} incomplete."
