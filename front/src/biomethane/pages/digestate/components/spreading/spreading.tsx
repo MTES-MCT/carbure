@@ -18,7 +18,8 @@ export const Spreading = ({
   const { t } = useTranslation()
   const columns = useSpreadingColumns()
   const portal = usePortal()
-  const { canEditDeclaration, selectedYear } = useAnnualDeclaration()
+  const { canEditDeclaration, selectedYear, annualDeclarationKey } =
+    useAnnualDeclaration()
   const { hasSelectedEntity } = useSelectedEntity()
 
   const openAddSpreadingDepartmentDialog = () => {
@@ -27,6 +28,7 @@ export const Spreading = ({
         onClose={close}
         spreadings={digestate?.spreadings ?? []}
         year={selectedYear}
+        annualDeclarationKey={annualDeclarationKey}
       />
     ))
   }
