@@ -6,6 +6,8 @@ import {
   useManagedEditableCard,
 } from "./managed-editable-card.provider"
 import { Form, FormProps } from "common/components/form2"
+import clsx from "clsx"
+import css from "./managed-editable-card.module.css"
 
 type ManagedEditableCardProps = EditableCardProps & {
   sectionId: string
@@ -18,7 +20,7 @@ export const ManagedEditableCard = ({
   sectionId,
   ...props
 }: ManagedEditableCardProps) => {
-  const { isSectionExpanded, setSectionExpanded, registerSection } =
+  const { sections, isSectionExpanded, setSectionExpanded, registerSection } =
     useSectionsManager()
 
   // Register the section in the sections manager
@@ -26,12 +28,17 @@ export const ManagedEditableCard = ({
     registerSection(sectionId, isSectionExpanded(sectionId))
   }, [])
 
+  const sectionState = sections[sectionId]
+  const isError = sectionState?.isError ?? false
+
   return (
     <ManagedEditableCardContextProvider sectionId={sectionId}>
       <EditableCard
         {...props}
         isEditing={isSectionExpanded(sectionId)}
         onEdit={(editing) => setSectionExpanded(sectionId, editing)}
+        id={sectionId}
+        className={clsx(isError && css["managed-editable-card--error"])}
       />
     </ManagedEditableCardContextProvider>
   )
