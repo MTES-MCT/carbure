@@ -3204,6 +3204,10 @@ export interface components {
                 supply_plan_valid?: boolean;
                 /** @description List of missing fields for contract */
                 contract_missing_fields?: string[] | null;
+                /** @description List of missing fields for production unit */
+                production_unit_missing_fields?: string[] | null;
+                /** @description List of missing fields for injection */
+                injection_missing_fields?: string[] | null;
             };
             readonly is_complete: boolean;
             is_open?: boolean;

@@ -190,6 +190,7 @@ export const useMissingFieldsMessages = ({
   ])
 
   const errorMessage = useMemo(() => {
+    console.log({ supplyPlanErrorMessage, digestateMessage, energyMessage })
     // Filter out null values (when supplyPlanErrorMessage is null)
     const messages = [
       supplyPlanErrorMessage,

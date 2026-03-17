@@ -50,7 +50,7 @@ export const UniqueIdentificationNumberHelper = () => {
   }
 
   return (
-    <button onClick={handleClick} style={{ padding: 0 }}>
+    <button onClick={handleClick} style={{ padding: 0 }} type="button">
       {t("Où trouver mon numéro ?")}
     </button>
   )

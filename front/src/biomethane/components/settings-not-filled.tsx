@@ -23,17 +23,15 @@ export const SettingsNotFilled = () => {
   const routeMissingObject = useMemo(() => {
     const contractMissingFields =
       annualDeclaration?.missing_fields?.contract_missing_fields
-    const productionMissingFields = null
-    const injectionMissingFields = null
-    // const productionMissingFields =
-    //   annualDeclaration?.missing_fields?.production_missing_fields ?? null
-    // const injectionMissingFields =
-    //   annualDeclaration?.missing_fields?.injection_missing_fields ?? null
+    const productionUnitMissingFields =
+      annualDeclaration?.missing_fields?.production_unit_missing_fields ?? null
+    const injectionMissingFields =
+      annualDeclaration?.missing_fields?.injection_missing_fields ?? null
 
     if (dataIsNullOrHasErrors(contractMissingFields)) {
       return routes.SETTINGS.BIOMETHANE.CONTRACT
     }
-    if (dataIsNullOrHasErrors(productionMissingFields)) {
+    if (dataIsNullOrHasErrors(productionUnitMissingFields)) {
       return routes.SETTINGS.BIOMETHANE.PRODUCTION
     }
     if (dataIsNullOrHasErrors(injectionMissingFields)) {
@@ -52,6 +50,10 @@ export const SettingsNotFilled = () => {
     const errors = []
     const contractMissingFields =
       annualDeclaration?.missing_fields?.contract_missing_fields
+    const productionUnitMissingFields =
+      annualDeclaration?.missing_fields?.production_unit_missing_fields
+    const injectionMissingFields =
+      annualDeclaration?.missing_fields?.injection_missing_fields
 
     if (contractMissingFields && contractMissingFields.length > 0) {
       errors.push({
@@ -61,11 +63,31 @@ export const SettingsNotFilled = () => {
       })
     }
 
+    if (productionUnitMissingFields && productionUnitMissingFields.length > 0) {
+      errors.push({
+        route: routes.SETTINGS.BIOMETHANE.PRODUCTION,
+        errors: productionUnitMissingFields,
+        name: t("Site de production"),
+      })
+    }
+
+    if (injectionMissingFields && injectionMissingFields.length > 0) {
+      errors.push({
+        route: routes.SETTINGS.BIOMETHANE.INJECTION,
+        errors: injectionMissingFields,
+        name: t("Site d'injection"),
+      })
+    }
+
     return errors
   }, [
     annualDeclaration?.missing_fields?.contract_missing_fields,
+    annualDeclaration?.missing_fields?.production_unit_missing_fields,
+    annualDeclaration?.missing_fields?.injection_missing_fields,
     t,
     routes.SETTINGS.BIOMETHANE.CONTRACT,
+    routes.SETTINGS.BIOMETHANE.PRODUCTION,
+    routes.SETTINGS.BIOMETHANE.INJECTION,
   ])
 
   return (

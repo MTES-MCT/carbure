@@ -63,6 +63,18 @@ class BiomethaneAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSer
                     "nullable": True,
                     "description": "List of missing fields for contract",
                 },
+                "production_unit_missing_fields": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "nullable": True,
+                    "description": "List of missing fields for production unit",
+                },
+                "injection_missing_fields": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "nullable": True,
+                    "description": "List of missing fields for injection",
+                },
             },
             "description": "Missing fields grouped by type",
         }

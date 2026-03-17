@@ -144,6 +144,9 @@ export function useAnnualDeclarationYear(): number | undefined {
   return parsedYear
 }
 
+const isDataNullOrHasErrors = (data: string[] | null | undefined) => {
+  return data === null || data === undefined || data.length > 0
+}
 const getAnnualDeclarationMissingFields = (
   annualDeclaration?: AnnualDeclaration
 ) => {
@@ -153,9 +156,15 @@ const getAnnualDeclarationMissingFields = (
     annualDeclaration?.missing_fields?.supply_plan_valid === false
 
   const hasBiomethaneSettingsMissingObjects =
-    annualDeclaration?.missing_fields?.contract_missing_fields === null ||
-    (annualDeclaration?.missing_fields?.contract_missing_fields !== undefined &&
-      annualDeclaration.missing_fields.contract_missing_fields.length > 0)
+    isDataNullOrHasErrors(
+      annualDeclaration?.missing_fields?.contract_missing_fields
+    ) ||
+    isDataNullOrHasErrors(
+      annualDeclaration?.missing_fields?.production_unit_missing_fields
+    ) ||
+    isDataNullOrHasErrors(
+      annualDeclaration?.missing_fields?.injection_missing_fields
+    )
 
   return {
     hasAnnualDeclarationMissingObjects,
