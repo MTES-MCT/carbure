@@ -24,6 +24,7 @@ type AddContractForm = ReplaceNullWithUndefined<
 interface AddContractProps {
   onClose: () => void
   contract?: BiomethaneContract
+  annualDeclarationKey: string
 }
 
 interface AddContractContentProps extends AddContractProps {
@@ -103,6 +104,7 @@ export const AddContract = (props: AddContractProps) => {
   const form = useForm<AddContractForm>({})
   const addContractFiles = useAddContract({
     onSuccess: props.onClose,
+    annualDeclarationKey: props.annualDeclarationKey,
   })
   const handleSubmit = () => addContractFiles.execute(form.value)
 

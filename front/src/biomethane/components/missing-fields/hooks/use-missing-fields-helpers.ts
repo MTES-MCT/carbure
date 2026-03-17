@@ -38,7 +38,8 @@ export const useMissingFieldCounts = () => {
     hasContractObject:
       annualDeclaration?.missing_fields?.contract_missing_fields !== null,
     hasProductionUnitObject:
-      annualDeclaration?.missing_fields?.production_unit_missing_fields !== null,
+      annualDeclaration?.missing_fields?.production_unit_missing_fields !==
+      null,
     hasInjectionObject:
       annualDeclaration?.missing_fields?.injection_missing_fields !== null,
   }

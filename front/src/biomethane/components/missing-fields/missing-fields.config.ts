@@ -93,6 +93,29 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     },
     { name: "injection_impossibility_hours", type: "field" },
   ],
+
+  // Contract page
+  "contract-infos": [
+    { name: "tariff_reference", type: "field" },
+    { name: "buyer", type: "field" },
+    { name: "installation_category", type: "field" },
+    { name: "cmax", type: "field" },
+    { name: "pap_contracted", type: "field" },
+    { name: "cmax_annualized", type: "field" },
+    { name: "cmax_annualized_value", type: "field" },
+  ],
+  "contract-files": [
+    { name: "conditions_file", type: "section" },
+    { name: "effective_date", type: "section" },
+    { name: "signature_date", type: "section" },
+  ],
+  "contract-aid-organism": [
+    {
+      name: "has_complementary_investment_aid",
+      type: "field",
+    },
+    { name: "complementary_aid_organisms", type: "field" },
+  ],
 } as const
 
 // Index built once at module loading

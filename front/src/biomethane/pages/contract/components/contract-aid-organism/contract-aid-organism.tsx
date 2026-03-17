@@ -1,4 +1,3 @@
-import { EditableCard } from "common/molecules/editable-card"
 import {
   BiomethaneContract,
   BiomethaneContractPatchRequest,
@@ -7,11 +6,12 @@ import {
 import { useTranslation } from "react-i18next"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { CheckboxGroup, RadioGroup, TextInput } from "common/components/inputs2"
-import { useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { useContractAidOrganismOptions } from "./contract-aid-organism.hooks"
 import { Button } from "common/components/button2"
 import { useMutateContractInfos } from "../contract-infos/contract-infos.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
 type ContractAidOrganismForm = Pick<
   BiomethaneContractPatchRequest,
@@ -20,7 +20,7 @@ type ContractAidOrganismForm = Pick<
   | "complementary_aid_other_organism_name"
 >
 
-const extractValues = (contract?: BiomethaneContract) => {
+const extractValues = (contract?: ContractAidOrganismForm) => {
   return {
     has_complementary_investment_aid:
       contract?.has_complementary_investment_aid,
@@ -38,21 +38,24 @@ export const ContractAidOrganism = ({
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { bind, value } = useForm<ContractAidOrganismForm>(
-    extractValues(contract)
-  )
+  const { bind, value } = useFormContext<ContractAidOrganismForm>()
   const { execute: updateContractAidOrganism, loading } =
     useMutateContractInfos(contract)
 
   const complementaryAidOrganismOptions = useContractAidOrganismOptions()
 
+  const onSubmit = () => {
+    updateContractAidOrganism(extractValues(value))
+  }
+
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="contract-aid-organism"
       title={t("Aide complémentaire à l'investissement")}
       readOnly={!allowedToEdit}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => updateContractAidOrganism(value)}>
+        <ManagedEditableCard.Form onSubmit={onSubmit}>
           <RadioGroup
             readOnly={!isEditing}
             label={t(
@@ -96,8 +99,8 @@ export const ContractAidOrganism = ({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

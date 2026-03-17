@@ -7,10 +7,7 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useRoutes } from "common/hooks/routes"
 import { useMissingFieldCounts } from "./use-missing-fields-helpers"
-import {
-  generateNoObjectMessage,
-  generateTranslatedMessage,
-} from "../missing-fields-message.utils"
+import { generateTranslatedMessage } from "../missing-fields-message.utils"
 
 export const useSettingsMissingFieldsMessages = ({
   onPageClick,
@@ -30,17 +27,8 @@ export const useSettingsMissingFieldsMessages = ({
   } = useMissingFieldCounts()
 
   const contractMessage = useMemo(() => {
-    if (!hasContractObject)
-      return generateNoObjectMessage(
-        t("Contrat"),
-        settingsBiomethaneRoutes.CONTRACT,
-        t(
-          "<CustomLink>{{page}}</CustomLink> : veuillez renseigner les différents champs de la page.",
-          { page: t("Contrat") }
-        ),
-        onPageClick
-      )
-    if (contractCount === 0) return null
+    if (!hasContractObject || contractCount === 0) return null
+
     return generateTranslatedMessage(
       t("Contrat"),
       contractCount,
@@ -60,17 +48,7 @@ export const useSettingsMissingFieldsMessages = ({
   ])
 
   const productionMessage = useMemo(() => {
-    if (!hasProductionUnitObject)
-      return generateNoObjectMessage(
-        t("Site de production"),
-        settingsBiomethaneRoutes.PRODUCTION,
-        t(
-          "<CustomLink>{{page}}</CustomLink> : veuillez renseigner les différents champs de la page.",
-          { page: t("Site de production") }
-        ),
-        onPageClick
-      )
-    if (productionUnitCount === 0) return null
+    if (!hasProductionUnitObject || productionUnitCount === 0) return null
     return generateTranslatedMessage(
       t("Site de production"),
       productionUnitCount,
@@ -93,17 +71,7 @@ export const useSettingsMissingFieldsMessages = ({
   ])
 
   const injectionMessage = useMemo(() => {
-    if (!hasInjectionObject)
-      return generateNoObjectMessage(
-        t("Site d'injection"),
-        settingsBiomethaneRoutes.INJECTION,
-        t(
-          "<CustomLink>{{page}}</CustomLink> : veuillez renseigner les différents champs de la page.",
-          { page: t("Site d'injection") }
-        ),
-        onPageClick
-      )
-    if (injectionCount === 0) return null
+    if (!hasInjectionObject || injectionCount === 0) return null
     return generateTranslatedMessage(
       t("Site d'injection"),
       injectionCount,

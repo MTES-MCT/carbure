@@ -1,6 +1,5 @@
 import { Notice } from "common/components/notice"
 import { useSettingsMissingFieldsMessages } from "./hooks/use-settings-missing-fields-message"
-import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import css from "./missing-fields.module.css"
 
 export interface MissingFieldsSettingsProps {
@@ -8,8 +7,8 @@ export interface MissingFieldsSettingsProps {
 }
 
 /**
- * Bandeau d'erreurs pour les pages paramètres biométhane (contrat, site de production, site d'injection).
- * Affiche uniquement les champs manquants sur ces 3 pages.
+ * Error message for settings pages (contract, production unit, injection).
+ * Only shows missing fields on these 3 pages.
  */
 export const MissingFieldsSettings = ({
   onPageClick,
@@ -17,9 +16,8 @@ export const MissingFieldsSettings = ({
   const { errorMessage } = useSettingsMissingFieldsMessages({
     onPageClick,
   })
-  const { canEditDeclaration } = useAnnualDeclaration()
 
-  if (!canEditDeclaration || errorMessage.length === 0) return null
+  if (errorMessage.length === 0) return null
 
   return (
     <Notice

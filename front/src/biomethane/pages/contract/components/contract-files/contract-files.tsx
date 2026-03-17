@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next"
 import { Column, Table, Cell } from "common/components/table2"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
-import { EditableCard } from "common/molecules/editable-card"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { DateInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
@@ -10,6 +9,8 @@ import { usePortal } from "common/components/portal"
 import { AddContract } from "./add-contract"
 import { formatDate } from "common/utils/formatters"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 type ContractFile = {
   name: string
@@ -24,6 +25,7 @@ export const ContractFiles = ({
   const { t } = useTranslation()
   const portal = usePortal()
   const allowedToEdit = useAllowedToEdit()
+  const { annualDeclarationKey } = useAnnualDeclaration()
 
   const files: ContractFile[] = [
     {
@@ -55,11 +57,18 @@ export const ContractFiles = ({
   ]
 
   const openAddContractDialog = () => {
-    portal((close) => <AddContract onClose={close} contract={contract} />)
+    portal((close) => (
+      <AddContract
+        onClose={close}
+        contract={contract}
+        annualDeclarationKey={annualDeclarationKey}
+      />
+    ))
   }
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="contract-files"
       title={t("Conditions générales et particulières")}
       headerActions={
         allowedToEdit && (
@@ -103,6 +112,6 @@ export const ContractFiles = ({
           <Table rows={files} columns={columns} />
         </>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }
