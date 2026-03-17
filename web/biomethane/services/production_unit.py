@@ -29,6 +29,7 @@ class BiomethaneProductionUnitService:
         # Digestate valorization fields: optional regardless of has_digestate_phase_separation value.
         # Cleared (set to None) when phase separation is enabled, but never strictly required.
         "raw_digestate_treatment_steps",
+        "installed_meters",
     ]
 
     @staticmethod
