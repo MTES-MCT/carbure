@@ -1,11 +1,1 @@
 front/node_modules
-front/dist
-front/.parcel-cache
-.git
-.venv
-venv
-env
-.pytest_cache
-.mypy_cache
-.cursor
-.vscode
