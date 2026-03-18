@@ -13,6 +13,7 @@ import { EntityType } from "common/types"
 import { producer } from "common/__test__/data"
 
 const MOCKS = [
+  mockUser(EntityType.Producteur_de_biom_thane),
   ...GLOBAL_MOCKS,
   ...AnnualDeclarationStoryUtils.parameters.msw.handlers,
   updateContractOk,

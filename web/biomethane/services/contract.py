@@ -300,7 +300,8 @@ def _build_contract_clearing_rules() -> list[FieldClearingRule]:
         FieldClearingRule(
             name="complementary_aid_organisms_disabled",
             fields=["complementary_aid_organisms", "complementary_aid_other_organism_name"],
-            condition=lambda contract: contract.has_complementary_investment_aid is False,
+            condition=lambda contract: (contract.has_complementary_investment_aid is False)
+            or (contract.has_complementary_investment_aid is None),
         ),
         FieldClearingRule(
             name="complementary_aid_other_organism_name_not_selected",
