@@ -3,7 +3,9 @@ FROM ubuntu:latest
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PIPENV_VENV_IN_PROJECT=1
+ENV VIRTUAL_ENV=/venv
+ENV UV_PROJECT_ENVIRONMENT=/venv
+ENV PATH="/venv/bin:$PATH"
 
 # Run updates and install necessary system packages
 RUN apt-get update -y && apt-get install -y \
@@ -24,22 +26,20 @@ WORKDIR /app
 
 # Create a virtual environment and activate it
 RUN python3 -m venv /venv
-ENV PATH="/venv/bin:$PATH"
 
-# Install Pipenv using pip
-RUN pip install pipenv
+# Install uv
+RUN pip install uv
 
-# Copy Pipfile and Pipfile.lock
-COPY Pipfile Pipfile.lock /app/
+# Copy Python dependency metadata
+COPY pyproject.toml uv.lock /app/
 
-# Install dependencies using Pipenv
-RUN pipenv install --deploy --system
+# Install dependencies using uv
+RUN uv sync --frozen --no-install-project --no-dev
 
 COPY front front
 RUN (cd front; npm install; npm run build)
 
 # Copy the rest of your application code
-COPY pyproject.toml pyproject.toml
 COPY web web
 COPY scripts scripts
 COPY bin bin
