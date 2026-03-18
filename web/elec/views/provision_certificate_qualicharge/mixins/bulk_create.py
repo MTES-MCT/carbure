@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from adapters.logger import log_error, log_info
 from elec.models import ElecProvisionCertificateQualicharge
 from elec.serializers.elec_provision_certificate_qualicharge import ProvisionCertificateBulkSerializer
 from elec.services.qualicharge import handle_bulk_create_validation_errors, process_certificates_batch
@@ -29,18 +30,40 @@ class BulkCreateMixin:
         serializer = ProvisionCertificateBulkSerializer(data=request.data, many=True)
 
         if not serializer.is_valid():
+            log_error(
+                "Qualicharge bulk_create: serializer validation errors",
+                {
+                    "received_data": request.data,
+                    "errors": serializer.errors,
+                },
+            )
             handle_bulk_create_validation_errors(request, serializer)
 
         # Fetch already double-validated certificates to avoid duplicates
         double_validated = self._get_double_validated_certificates()
 
         with transaction.atomic():
-            errors = process_certificates_batch(serializer.validated_data, double_validated)
+            errors, stats = process_certificates_batch(serializer.validated_data, double_validated)
 
             # If business errors occurred, rollback the transaction
             if errors:
+                log_error(
+                    "Qualicharge bulk_create: business errors",
+                    {
+                        "received_data": request.data,
+                        "errors": errors,
+                    },
+                )
                 transaction.set_rollback(True)
                 return Response({"status": "error", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        log_info(
+            "Qualicharge bulk_create: success",
+            {
+                "received_data": request.data,
+                "cpo_report": stats,
+            },
+        )
 
         return Response(status=status.HTTP_201_CREATED)
 

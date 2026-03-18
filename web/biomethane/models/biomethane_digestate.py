@@ -85,6 +85,30 @@ class BiomethaneDigestate(models.Model):
 
         return BiomethaneDigestateService.get_all_optional_fields()
 
+    # Virtual fields to include alongside real model fields in completeness checks.
+    EXTRA_FIELDS = ["digestate_spreading"]
+
+    @property
+    def digestate_spreading(self):
+        """
+        Returns True if at least one digestate spreading record exists, None if missing (detected as required field).
+        Only required when production_unit.digestate_valorization_methods contains SPREADING.
+        Returns True (not required) otherwise.
+        """
+        from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
+
+        production_unit = self.production_unit
+        if not production_unit or BiomethaneProductionUnit.SPREADING not in (
+            production_unit.digestate_valorization_methods or []
+        ):
+            return True  # not required for this valorization configuration
+
+        from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestateSpreading
+
+        if BiomethaneDigestateSpreading.objects.filter(digestate=self).exists():
+            return True
+        return None
+
 
 @receiver(post_save, sender=BiomethaneDigestate)
 @receiver(post_save, sender=BiomethaneProductionUnit)

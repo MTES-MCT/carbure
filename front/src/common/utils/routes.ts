@@ -72,7 +72,7 @@ export const ROUTE_URLS = {
       },
       ADMIN: {
         DASHBOARD: `${baseUrl}/admin/dashboard`,
-        SUPPLY_INPUTS: `${baseUrl}/admin/supply-inputs`,
+        SUPPLY_INPUTS: `${baseUrl}/admin/supply-plan`,
         DECLARATIONS: `${baseUrl}/admin/declarations`,
         DECLARATION_DETAIL: (producer_id: number) => {
           const currentYear = year ?? new Date().getFullYear()
@@ -83,6 +83,9 @@ export const ROUTE_URLS = {
             ENERGY: `${declarationDetailUrl}/energy`,
             SUPPLY_PLAN: `${declarationDetailUrl}/supply-plan`,
             CONTRACT: `${declarationDetailUrl}/contract`,
+            PRODUCTION: `${declarationDetailUrl}/production`,
+            INJECTION: `${declarationDetailUrl}/injection`,
+            USERS: `${declarationDetailUrl}/users`,
             CONTACTS: `${declarationDetailUrl}/contacts`,
           }
         },

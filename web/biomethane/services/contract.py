@@ -58,6 +58,9 @@ class BiomethaneContractService:
         "conditions_file",
     ]
 
+    # Fields that are not displayed to the user
+    PRIVATE_FIELDS = ["tracked_amendment_types"]
+
     # Tariff date ranges for signature validation: (start_date, end_date, error_message)
     TARIFF_DATE_RANGES = {
         "2011": (
@@ -259,6 +262,16 @@ class BiomethaneContractService:
 
         return result
 
+    @staticmethod
+    def get_optional_fields(contract):
+        # Get all optional field rules
+        rules = _build_contract_clearing_rules()
+
+        # Evaluate rules and collect optionale fields
+        optional_fields = get_fields_from_applied_rules(rules, contract)
+
+        return optional_fields + BiomethaneContractService.PRIVATE_FIELDS
+
 
 # Rule configuration: declarative definition of field clearing rules
 def _build_contract_clearing_rules() -> list[FieldClearingRule]:
@@ -287,7 +300,8 @@ def _build_contract_clearing_rules() -> list[FieldClearingRule]:
         FieldClearingRule(
             name="complementary_aid_organisms_disabled",
             fields=["complementary_aid_organisms", "complementary_aid_other_organism_name"],
-            condition=lambda contract: contract.has_complementary_investment_aid is False,
+            condition=lambda contract: (contract.has_complementary_investment_aid is False)
+            or (contract.has_complementary_investment_aid is None),
         ),
         FieldClearingRule(
             name="complementary_aid_other_organism_name_not_selected",

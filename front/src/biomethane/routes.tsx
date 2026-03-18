@@ -12,6 +12,8 @@ import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
 import { ExternalAdminPages } from "common/types"
 import { Contact } from "./pages/admin/declaration-detail/pages/contact"
+import { lastAnnualDeclarationYearAdmin } from "./pages/admin/hooks/use-annual-declaration-years-admin"
+import SupplyInputsAdminPage from "./pages/admin/supply-inputs"
 
 const currentYear = new Date().getFullYear()
 
@@ -38,6 +40,9 @@ const CustomerSatisfaction = lazy(
 const BiomethaneAdminDashboardPage = lazy(
   () => import("biomethane/pages/admin/dashboard/dashboard")
 )
+const Users = lazy(
+  () => import("biomethane/pages/admin/declaration-detail/pages/users")
+)
 
 type REDIRECTED_ROUTES = "digestate" | "energy" | "supply-plan"
 
@@ -62,12 +67,6 @@ const RedirectToCurrentYear = ({ path }: { path: REDIRECTED_ROUTES }) => {
   )
 }
 
-const RedirectToCurrentYearRoute = ({ path }: { path: REDIRECTED_ROUTES }) => (
-  <AnnualDeclarationProvider>
-    <RedirectToCurrentYear path={path} />
-  </AnnualDeclarationProvider>
-)
-
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer, hasAdminRight } = useEntity()
 
@@ -77,44 +76,49 @@ export const BiomethaneRoutes = () => {
 
   return (
     <Routes>
-      {/* Routes sans année qui redirigent vers l'année de déclaration courante */}
-      <Route
-        path="digestate"
-        element={<RedirectToCurrentYearRoute path="digestate" />}
-      />
-      <Route
-        path="energy"
-        element={<RedirectToCurrentYearRoute path="energy" />}
-      />
-      <Route
-        path="supply-plan"
-        element={<RedirectToCurrentYearRoute path="supply-plan" />}
-      />
-
-      <Route
-        path=":year"
-        element={
-          <ContractProductionUnitProvider>
-            <AnnualDeclarationLayout />
-          </ContractProductionUnitProvider>
-        }
-      >
-        <Route index element={<Navigate replace to="digestate" />} />
-        <Route path="digestate" element={<Digestate />} />
-        <Route path="energy" element={<Energy />} />
-        <Route path="supply-plan" element={<SupplyPlan />} />
-      </Route>
-
-      <Route path="closed-declaration" element={<ClosedDeclaration />} />
-      <Route path="customer-satisfaction" element={<CustomerSatisfaction />} />
       <Route
         path=""
         element={
           <AnnualDeclarationProvider>
-            <RedirectToCurrentYear path="digestate" />
+            <Outlet />
           </AnnualDeclarationProvider>
         }
-      />
+      >
+        {/* Routes sans année qui redirigent vers l'année de déclaration courante */}
+        <Route
+          path="digestate"
+          element={<RedirectToCurrentYear path="digestate" />}
+        />
+        <Route
+          path="energy"
+          element={<RedirectToCurrentYear path="energy" />}
+        />
+        <Route
+          path="supply-plan"
+          element={<RedirectToCurrentYear path="supply-plan" />}
+        />
+
+        <Route
+          path=":year"
+          element={
+            <ContractProductionUnitProvider>
+              <AnnualDeclarationLayout />
+            </ContractProductionUnitProvider>
+          }
+        >
+          <Route index element={<Navigate replace to="digestate" />} />
+          <Route path="digestate" element={<Digestate />} />
+          <Route path="energy" element={<Energy />} />
+          <Route path="supply-plan" element={<SupplyPlan />} />
+        </Route>
+
+        <Route path="closed-declaration" element={<ClosedDeclaration />} />
+        <Route
+          path="customer-satisfaction"
+          element={<CustomerSatisfaction />}
+        />
+        <Route path="" element={<RedirectToCurrentYear path="digestate" />} />
+      </Route>
     </Routes>
   )
 }
@@ -158,6 +162,9 @@ export const BiomethaneAdminRoutes = () => {
           <Route path="energy" element={<Energy />} />
           <Route path="supply-plan" element={<SupplyPlan />} />
           <Route path="contract" element={<BiomethaneContractPage />} />
+          <Route path="production" element={<BiomethaneProductionPage />} />
+          <Route path="injection" element={<BiomethaneInjectionPage />} />
+          <Route path="users" element={<Users />} />
           <Route path="contacts" element={<Contact />} />
         </Route>
         <Route
@@ -165,6 +172,12 @@ export const BiomethaneAdminRoutes = () => {
           element={<Navigate replace to={`${currentYear}`} />}
         />
         <Route path="dashboard" element={<BiomethaneAdminDashboardPage />} />
+
+        <Route
+          path="supply-plan"
+          element={<Navigate to={`${lastAnnualDeclarationYearAdmin}`} />}
+        />
+        <Route path="supply-plan/:year" element={<SupplyInputsAdminPage />} />
       </Route>
       <Route path="*" element={<Navigate replace to="admin/dashboard" />} />
     </Routes>

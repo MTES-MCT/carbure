@@ -39,8 +39,9 @@ const TicketsGroupedAssignment = ({
   const originDepot = ticketSources[0]?.origin_lot_site ?? undefined
 
   const showPosNumber =
-    posNumber !== undefined &&
-    ticketSources.every((t) => t.parent_lot.pos_number === posNumber)
+    ticketSources.length === 1 ||
+    (posNumber !== undefined &&
+      ticketSources.every((t) => t.parent_lot.pos_number === posNumber))
 
   const showOriginDepot =
     originDepot !== undefined &&
@@ -52,7 +53,7 @@ const TicketsGroupedAssignment = ({
     onError: (e) => {
       notifyError(e, undefined, {
         SHIPPING_ROUTE_NOT_REGISTERED: t(
-          "Aucune route n'a été trouvée entre le dépôt d'incorporation et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
+          "Aucune route n'a été trouvée entre le dépôt d'origine et l'aéroport pour le mode de transport spécifié. Si vous souhaitez enregister cette route, merci de contacter la DGEC."
         ),
       })
     },

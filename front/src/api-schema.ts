@@ -3202,6 +3202,12 @@ export interface components {
                 energy_missing_fields?: string[] | null;
                 /** @description Whether the supply plan is valid */
                 supply_plan_valid?: boolean;
+                /** @description List of missing fields for contract */
+                contract_missing_fields?: string[] | null;
+                /** @description List of missing fields for production unit */
+                production_unit_missing_fields?: string[] | null;
+                /** @description List of missing fields for injection */
+                injection_missing_fields?: string[] | null;
             };
             readonly is_complete: boolean;
             is_open?: boolean;
@@ -3603,6 +3609,7 @@ export interface components {
             readonly id: number;
             origin_country: components["schemas"]["Country"];
             feedstock: components["schemas"]["FeedStockClassification"];
+            producer: components["schemas"]["EntityPreview"];
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             culture_details?: string | null;
@@ -3681,7 +3688,7 @@ export interface components {
          *     * `EXTERNAL` - Externe
          * @enum {string}
          */
-        BiomethaneSupplyInputSourceEnum: BiomethaneSupplyInputSourceEnum;
+        BiomethaneSupplyInputSourceEnum: PathsApiBiomethaneSupplyInputGetParametersQuerySource;
         BiomethaneUploadExcelRequest: {
             /** Format: binary */
             file: File;
@@ -4699,7 +4706,7 @@ export interface components {
          *     * `NOT_CONCERNED` - Non concerné
          * @enum {string}
          */
-        EtsStatusEnum: EtsStatusEnum;
+        EtsStatusEnum: PathsApiSafTicketsGetParametersQueryEts_status;
         /**
          * @description * `DCA` - DCA
          *     * `AGRIMER` - AGRIMER
@@ -5732,8 +5739,8 @@ export interface components {
             free_field?: string | null;
             assignment_period: number;
             reception_airport?: number | null;
-            consumption_type?: string | null;
-            shipping_method?: string | null;
+            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -5747,8 +5754,8 @@ export interface components {
             free_field?: string | null;
             assignment_period: number;
             reception_airport?: number | null;
-            consumption_type?: string | null;
-            shipping_method?: string | null;
+            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -5762,8 +5769,8 @@ export interface components {
             free_field?: string | null;
             assignment_period: number;
             reception_airport?: number | null;
-            consumption_type?: string | null;
-            shipping_method?: string | null;
+            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -7538,6 +7545,7 @@ export interface operations {
     biomethane_supply_input_list: {
         parameters: {
             query: {
+                department?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -7549,8 +7557,12 @@ export interface operations {
                 page_size?: number;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
+                /** @description * `INTERNAL` - Interne
+                 *     * `EXTERNAL` - Externe */
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -7750,6 +7762,7 @@ export interface operations {
     biomethane_supply_input_filters_retrieve: {
         parameters: {
             query: {
+                department?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -7759,8 +7772,12 @@ export interface operations {
                 ordering?: string;
                 /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
                 producer_id?: number;
+                producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
+                /** @description * `INTERNAL` - Interne
+                 *     * `EXTERNAL` - Externe */
+                source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -10796,16 +10813,16 @@ export interface operations {
                 origin_depot_id?: number;
                 public_only?: boolean;
                 query?: string;
-                /** @description * `TRUCK` - TRUCK
-                 *     * `BARGE` - BARGE
-                 *     * `TRAIN` - TRAIN
-                 *     * `SHIP` - SHIP
-                 *     * `PIPELINE` - PIPELINE
-                 *     * `PIPELINE_DMM` - PIPELINE_DMM
-                 *     * `PIPELINE_LHP` - PIPELINE_LHP
-                 *     * `PIPELINE_ODC` - PIPELINE_ODC
-                 *     * `PIPELINE_SPMR` - PIPELINE_SPMR
-                 *     * `PIPELINE_SPSE` - PIPELINE_SPSE */
+                /** @description * `TRUCK` - Routier
+                 *     * `BARGE` - Barge
+                 *     * `TRAIN` - Train
+                 *     * `SHIP` - Bateau
+                 *     * `PIPELINE` - Oléoduc
+                 *     * `PIPELINE_DMM` - Oléoduc DMM
+                 *     * `PIPELINE_LHP` - Oléoduc LHP
+                 *     * `PIPELINE_ODC` - Oléoduc ODC
+                 *     * `PIPELINE_SPMR` - Oléoduc SPMR
+                 *     * `PIPELINE_SPSE` - Oléoduc SPSE */
                 shipping_method?: PathsApiResourcesAirportsGetParametersQueryShipping_method;
             };
             header?: never;
@@ -11383,6 +11400,10 @@ export interface operations {
                 country_of_origin?: string[];
                 /** @description Entity ID */
                 entity_id: number;
+                /** @description * `ETS_VALUATION` - Valorisation ETS
+                 *     * `OUTSIDE_ETS` - Hors ETS (volontaire)
+                 *     * `NOT_CONCERNED` - Non concerné */
+                ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /** @description Ordre
                  *
@@ -11631,6 +11652,10 @@ export interface operations {
                 country_of_origin?: string[];
                 /** @description Entity ID */
                 entity_id: number;
+                /** @description * `ETS_VALUATION` - Valorisation ETS
+                 *     * `OUTSIDE_ETS` - Hors ETS (volontaire)
+                 *     * `NOT_CONCERNED` - Non concerné */
+                ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /** @description Ordre
                  *
@@ -11708,6 +11733,10 @@ export interface operations {
                 country_of_origin?: string[];
                 /** @description Entity ID */
                 entity_id: number;
+                /** @description * `ETS_VALUATION` - Valorisation ETS
+                 *     * `OUTSIDE_ETS` - Hors ETS (volontaire)
+                 *     * `NOT_CONCERNED` - Non concerné */
+                ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketsFiltersGetParametersQueryFilter;
@@ -13170,9 +13199,16 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFi
     status = "status",
     tariff_reference = "tariff_reference"
 }
+export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
+    EXTERNAL = "EXTERNAL",
+    INTERNAL = "INTERNAL"
+}
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
+    department = "department",
     feedstock = "feedstock",
     producer_id = "producer_id",
+    producer_name = "producer_name",
+    source = "source",
     year = "year"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
@@ -13356,6 +13392,11 @@ export enum PathsApiSafTicketsGetParametersQueryConsumption_type {
     MAC = "MAC",
     MAC_DECLASSEMENT = "MAC_DECLASSEMENT"
 }
+export enum PathsApiSafTicketsGetParametersQueryEts_status {
+    ETS_VALUATION = "ETS_VALUATION",
+    NOT_CONCERNED = "NOT_CONCERNED",
+    OUTSIDE_ETS = "OUTSIDE_ETS"
+}
 export enum PathsApiSafTicketsGetParametersQueryOrder_by {
     ValueMinusclient = "-client",
     ValueMinusconsumption_type = "-consumption_type",
@@ -13386,6 +13427,7 @@ export enum PathsApiSafTicketsFiltersGetParametersQueryFilter {
     client_type = "client_type",
     consumption_type = "consumption_type",
     country_of_origin = "country_of_origin",
+    ets_status = "ets_status",
     feedstock = "feedstock",
     order_by = "order_by",
     origin_depot = "origin_depot",
@@ -13537,10 +13579,6 @@ export enum BiomethaneAnnualDeclarationStatusEnum {
     DECLARED = "DECLARED",
     OVERDUE = "OVERDUE"
 }
-export enum BiomethaneSupplyInputSourceEnum {
-    INTERNAL = "INTERNAL",
-    EXTERNAL = "EXTERNAL"
-}
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",
     CORRECTION_DONE = "CORRECTION_DONE",
@@ -13657,11 +13695,6 @@ export enum EntityTypeEnum {
     SAF_Trader = "SAF Trader",
     Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
     Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane"
-}
-export enum EtsStatusEnum {
-    ETS_VALUATION = "ETS_VALUATION",
-    OUTSIDE_ETS = "OUTSIDE_ETS",
-    NOT_CONCERNED = "NOT_CONCERNED"
 }
 export enum ExtAdminPagesEnum {
     DCA = "DCA",

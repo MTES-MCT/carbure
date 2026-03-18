@@ -21,7 +21,11 @@ class Transaction:
         return self.xml_root_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text
 
     def delivery_date(self):
-        delivery_date_text = self.xml_root_element.find("./DELIVERY_DATE").text
+        delivery_date_element = self.xml_root_element.find("./DELIVERY_DATE")
+        if delivery_date_element is None:
+            return None
+
+        delivery_date_text = delivery_date_element.text
         return datetime.fromisoformat(delivery_date_text)
 
     def feedstock_code(self):
@@ -29,11 +33,21 @@ class Transaction:
         return self.xml_root_element.find(xpath).text
 
     def iso_format_delivery_date(self):
-        return self.delivery_date().date().isoformat()
+        return self.delivery_date() and self.delivery_date().date().isoformat()
+
+    def iso_format_loading_date(self):
+        return self.loading_date().date().isoformat()
+
+    def loading_date(self):
+        loading_date_text = self.xml_root_element.find("./LOADING_DATE").text
+        return datetime.fromisoformat(loading_date_text)
 
     def period(self):
-        delivery_date = self.delivery_date()
-        return delivery_date.year * 100 + delivery_date.month
+        period_date = self.period_date()
+        return period_date.year * 100 + period_date.month
+
+    def period_date(self):
+        return self.delivery_date() or self.loading_date()
 
     def status(self):
         return self.xml_root_element.find("./STATUS").text
@@ -50,17 +64,23 @@ class Transaction:
         computed_quantity_data = compute_lot_quantity(biofuel, quantity_data)
         supplier = from_national_trade_register(self.supplier_id())
 
-        return {
+        attributes = {
             "biofuel": biofuel,
             "carbure_client": client,
             "carbure_supplier": supplier,
-            "delivery_date": self.iso_format_delivery_date(),
+            "dispatch_date": self.iso_format_loading_date(),
             "feedstock": feedstock,
             "period": self.period(),
             "lot_status": lot_status,
             "year": self.year(),
             **computed_quantity_data,
         }
+
+        iso_format_delivery_date = self.iso_format_delivery_date()
+        if iso_format_delivery_date is not None:
+            attributes["delivery_date"] = iso_format_delivery_date
+
+        return attributes
 
     def quantity(self):
         quantity = self.xml_root_element.find("./EO_TRANS_DETAIL_MATERIALS/QUANTITY").text
@@ -73,4 +93,4 @@ class Transaction:
         return self.xml_root_element.find("./EO_TRANS_DETAIL_MATERIALS/MEASURE_UNIT").text
 
     def year(self):
-        return self.delivery_date().year
+        return self.period_date().year

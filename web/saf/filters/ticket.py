@@ -7,7 +7,7 @@ from saf.models import SafTicket
 class TicketFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(choices=SafTicket.ticket_statuses)
     year = django_filters.NumberFilter(field_name="year")
-
+    entity_id = django_filters.NumberFilter(field_name="entity_id", method="filter_type", required=True)
     supplier = django_filters.AllValuesMultipleFilter(field_name="supplier__name")
     client = django_filters.AllValuesMultipleFilter(field_name="client__name")
     client_type = django_filters.AllValuesMultipleFilter(field_name="client__entity_type")
@@ -18,6 +18,7 @@ class TicketFilter(django_filters.FilterSet):
     consumption_type = django_filters.MultipleChoiceFilter(
         field_name="consumption_type", choices=SafTicket.CONSUMPTION_TYPES
     )
+    ets_status = django_filters.MultipleChoiceFilter(field_name="ets_status", choices=SafTicket.ETS_STATUS)
     reception_airport = django_filters.AllValuesMultipleFilter(field_name="reception_airport__name")
     origin_depot = django_filters.AllValuesMultipleFilter(field_name="origin_lot_site__name")
 
@@ -58,6 +59,7 @@ class TicketFilter(django_filters.FilterSet):
             "country_of_origin",
             "production_site",
             "consumption_type",
+            "ets_status",
             "reception_airport",
             "origin_depot",
         ]

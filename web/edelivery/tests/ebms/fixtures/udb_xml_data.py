@@ -3,6 +3,7 @@ def transaction_data(
     client_id="FR_SIREN_CD222222222",
     delivery_date="2025-01-30T00:00:00.000Z",
     feedstock=None,
+    loading_date="2025-01-26T00:00:00.000Z",
     quantity=None,
     status="ACCEPTED",
     supplier_id="FR_SIREN_CD111111111",
@@ -15,15 +16,17 @@ def transaction_data(
     if quantity is None:
         quantity = {"unit": "MWh", "value": 2000}
 
+    delivery_date_xml_fragment = f"<DELIVERY_DATE>{delivery_date}</DELIVERY_DATE>" if delivery_date is not None else ""
+
     return f"""\
 <EO_TRANSACTION>
   <SELLER_ECONOMIC_OPERATOR_NUMBER>{supplier_id}</SELLER_ECONOMIC_OPERATOR_NUMBER>
   <SELLER_CERTIFICATE_NUMBER>EU-ISCC-Cert-Test-FR004</SELLER_CERTIFICATE_NUMBER>
   <BUYER_ECONOMIC_OPERATOR_NUMBER>{client_id}</BUYER_ECONOMIC_OPERATOR_NUMBER>
-  <LOADING_DATE>2025-12-26T00:00:00.000Z</LOADING_DATE>
+  <LOADING_DATE>{loading_date}</LOADING_DATE>
   <PLACE_OF_LOADING_NAME>TestSite004</PLACE_OF_LOADING_NAME>
   <PLACE_OF_LOADING_POSTCODE>1004</PLACE_OF_LOADING_POSTCODE>
-  <DELIVERY_DATE>{delivery_date}</DELIVERY_DATE>
+  {delivery_date_xml_fragment}
   <REFERENCE_NUMBER>SOME_REFERENCE</REFERENCE_NUMBER>
   <TRADE_DATE>2025-12-22T00:00:00.000Z</TRADE_DATE>
   <MATERIAL_CODE>{biofuel["code"]}</MATERIAL_CODE>

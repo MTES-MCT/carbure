@@ -40,3 +40,7 @@ def log_exception(e):
 
 def log_warning(message, additional_infos=None):
     _log("warning", message, additional_infos)
+
+
+def log_info(message, additional_infos=None):
+    _log("info", message, additional_infos)

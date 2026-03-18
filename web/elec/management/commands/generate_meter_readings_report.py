@@ -6,22 +6,17 @@ from django.db import connection
 from django.db.models.aggregates import Sum
 
 from elec.models import ElecCertificateReadjustment, ElecMeterReading, ElecProvisionCertificate
+from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
 def _get_real_total_energy_declared(cpo_id):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT SUM((current_index - prev_index) * enr_ratio)
-            FROM elec_meter_reading_virtual emrv
-            INNER JOIN elec_meter_reading_application emra
-            ON emra.id = emrv.application_id
-            WHERE emrv.cpo_id = %s AND emra.status = "ACCEPTED"
-        """,
-            [cpo_id],
-        )
-        result = cursor.fetchone()
-        return result[0] if result and result[0] is not None else 0
+    result = (
+        ElecMeterReading.extended_objects.select_related("application")
+        .filter(cpo_id=cpo_id, application__status=ElecMeterReadingApplication.ACCEPTED)
+        .aggregate(Sum("renewable_energy"))
+    )
+
+    return result["renewable_energy__sum"] or 0
 
 
 def _get_certificates_energy_amount(cpo_id):

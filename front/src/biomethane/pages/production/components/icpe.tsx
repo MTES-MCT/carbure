@@ -10,6 +10,8 @@ import {
   BiomethaneProductionUnitPatchRequest,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { IcpeNumberHelper } from "./icpe-number-helper"
 
 type ICPEForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
 
@@ -19,6 +21,7 @@ export function ICPE({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useForm<ICPEForm>({
     icpe_number: productionUnit?.icpe_number,
@@ -44,7 +47,7 @@ export function ICPE({
   ]
 
   return (
-    <EditableCard title={t("ICPE")}>
+    <EditableCard title={t("ICPE")} readOnly={!allowedToEdit}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <TextInput
@@ -53,9 +56,7 @@ export function ICPE({
             label={t("N° ICPE")}
             state="info"
             pattern="\d{10}"
-            hintText={t(
-              "Code à 10 chiffres correspondant au code unique AIOT utilisé sur les applications GUN et GEREP"
-            )}
+            hintText={<IcpeNumberHelper />}
             {...bind("icpe_number")}
           />
           <RadioGroup

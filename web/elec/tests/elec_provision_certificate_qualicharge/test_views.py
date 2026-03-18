@@ -272,38 +272,19 @@ class ElecProvisionCertificateQualichargeGroupByTest(TestCase):
         data = response.json()
 
         # Should have 2 groups (FR001 and FR002)
-        self.assertEqual(data["count"], 2)
+        self.assertEqual(len(data), 2)
 
         # Find FR001 group
-        fr001_group = next((item for item in data["results"] if item["operating_unit"] == "FR001"), None)
+        fr001_group = next((item for item in data if item["operating_unit"] == "FR001"), None)
         self.assertIsNotNone(fr001_group)
         self.assertEqual(fr001_group["energy_amount"], 3000.0)  # 1000 + 2000
         self.assertEqual(fr001_group["renewable_energy"], 750.0)  # 3000 * 0.25
 
         # Find FR002 group
-        fr002_group = next((item for item in data["results"] if item["operating_unit"] == "FR002"), None)
+        fr002_group = next((item for item in data if item["operating_unit"] == "FR002"), None)
         self.assertIsNotNone(fr002_group)
         self.assertEqual(fr002_group["energy_amount"], 500.0)
         self.assertEqual(fr002_group["renewable_energy"], 125.0)  # 500 * 0.25
-
-    def test_list_grouped_metadata(self):
-        """Test pagination metadata with grouped results"""
-        response = self.client.get(
-            reverse("elec-provision-certificate-qualicharge-list"),
-            {
-                "entity_id": self.cpo.id,
-                "group_by": "operating_unit",
-            },
-        )
-
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
-
-        # Total energy = (1000 + 2000 + 500) = 3500
-        self.assertIn("total_quantity", data)
-        self.assertEqual(data["total_quantity"], 3500.0)
-        self.assertIn("total_quantity_renewable", data)
-        self.assertEqual(data["total_quantity_renewable"], 875.0)  # 3500 * 0.25
 
     def test_list_grouped_serializer_fields(self):
         """Test that grouped results have correct fields"""
@@ -318,7 +299,7 @@ class ElecProvisionCertificateQualichargeGroupByTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        result = data["results"][0]
+        result = data[0]
         # Check expected fields for grouped serializer
         self.assertIn("cpo", result)
         self.assertIn("operating_unit", result)

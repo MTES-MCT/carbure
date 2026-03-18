@@ -1,0 +1,3 @@
+.managed-editable-card--error {
+  border-left: 2px solid var(--border-plain-error);
+}

@@ -5,6 +5,7 @@ from datetime import datetime
 from django.utils.text import slugify
 from rest_framework.decorators import action
 
+from biomethane.permissions import HasDrealRights
 from core.excel import ExcelResponse, export_to_excel
 
 
@@ -22,13 +23,25 @@ class ExcelExportActionMixin:
         filename = f"{name}_{year}_{slugify(request.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         file_path = os.path.join(tempfile.gettempdir(), filename)
 
+        permission = HasDrealRights()
+        is_dreal = permission.has_permission(request, self)
+
+        dreal_columns = (
+            [
+                {"label": "Producteur", "value": "producer.name"},
+            ]
+            if is_dreal
+            else []
+        )
+
         excel_file = export_to_excel(
             file_path,
             [
                 {
                     "label": "Plan d'approvisionnement",
                     "rows": self.get_serializer(queryset, many=True).data,
-                    "columns": [
+                    "columns": dreal_columns
+                    + [
                         {"label": "Provenance", "value": "source"},
                         {"label": "Intrant", "value": "feedstock"},
                         {"label": "Unité", "value": "material_unit"},

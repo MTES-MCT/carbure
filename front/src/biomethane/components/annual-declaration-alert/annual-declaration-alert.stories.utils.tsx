@@ -27,8 +27,12 @@ export const generateAnnualDeclarationContextProvider = (
     isDeclarationInCurrentPeriod: false,
     isDeclarationValidated: false,
     canEditDeclaration: false,
-    hasAnnualDeclarationMissingObjects: false,
-    hasAtLeastOneSupplyInput: false,
+    // hasAnnualDeclarationMissingObjects: false,
+    // hasAtLeastOneSupplyInput: false,
+    annualDeclarationMissingFieldsData: {
+      hasAnnualDeclarationMissingObjects: false,
+      hasBiomethaneSettingsMissingObjects: false,
+    },
     annualDeclarationKey: "current-annual-declaration-2024",
   }
   const mergedProps = { ...defaultProps, ...props }

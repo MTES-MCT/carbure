@@ -52,11 +52,19 @@ const DigestatePage = () => {
   const displayConditionalSections = useMemo(() => {
     if (!productionUnit) return false
 
+    // If the a DREAL is looking at the digestate, we display the conditional sections
+    if (selectedEntityId) return true
+
     // If the declaration year selected is not the current year and the declaration is not open, we don't display the conditional sections
     if (!isDeclarationInCurrentPeriod && !digestate) return false
 
     return true
-  }, [productionUnit, isDeclarationInCurrentPeriod, digestate])
+  }, [
+    productionUnit,
+    isDeclarationInCurrentPeriod,
+    digestate,
+    selectedEntityId,
+  ])
 
   usePrivateNavigation(t("Digestat"))
   useMissingFields(form)

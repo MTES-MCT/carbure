@@ -15,6 +15,7 @@ import {
   PathsApiResourcesAirportsGetParametersQueryShipping_method as SafShippingMethod,
   PathsApiSafTicketsFiltersGetParametersQueryFilter as SafTicketFilter,
   PathsApiSafTicketSourcesFiltersGetParametersQueryFilter as SafTicketSourceFilter,
+  PathsApiSafTicketsGetParametersQueryEts_status as EtsStatus,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -27,6 +28,7 @@ export {
   SafShippingMethod,
   SafTicketFilter,
   SafTicketSourceFilter,
+  EtsStatus,
 }
 
 export enum SafFilter {
@@ -41,6 +43,7 @@ export enum SafFilter {
   reception_airport = SafTicketFilter.reception_airport,
   supplier = SafTicketFilter.supplier,
   client_type = SafTicketFilter.client_type,
+  ets_status = SafTicketFilter.ets_status,
 }
 
 // SafSnapshot query returns two possible objects, one for airline entity, one for operator

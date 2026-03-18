@@ -23,6 +23,7 @@ import {
 } from "common/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { formatMonth, formatPeriod } from "common/utils/formatters"
+import { getDepartmentName } from "./geography"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
   value: biofuel,
@@ -229,6 +230,14 @@ export const normalizeBoolean: Normalizer<string> = (b) => ({
   value: b,
   label: String(b) === "true" ? i18next.t("Oui") : i18next.t("Non"),
 })
+
+export const normalizeDepartment: Normalizer<string> = (department) => {
+  const name = getDepartmentName(department)
+  return {
+    value: department,
+    label: name ? `${department} - ${name}` : department,
+  }
+}
 
 export function getEntityTypeLabel(type: EntityType) {
   switch (type) {

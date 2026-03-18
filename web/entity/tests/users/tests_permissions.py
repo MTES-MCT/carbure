@@ -1,9 +1,12 @@
 from django.test import TestCase
 
+from biomethane.permissions import HasDrealRights
 from core.models import ExternalAdminRights, UserRights
-from core.permissions import HasAdminRights, HasUserRights
+from core.permissions import HasAdminRights, UserRightsFactory
 from core.tests_utils import PermissionTestMixin
 from entity.views.users.users import UserViewSet
+
+IsAdmin = UserRightsFactory(role=[UserRights.ADMIN])
 
 
 class UserPermissionTest(TestCase, PermissionTestMixin):
@@ -13,7 +16,7 @@ class UserPermissionTest(TestCase, PermissionTestMixin):
             [
                 (
                     ["entity_rights_requests", "accept_user", "change_role", "invite_user", "revoke_access"],
-                    [HasUserRights(role=[UserRights.ADMIN])],
+                    [(HasDrealRights | IsAdmin)()],
                 ),
                 (
                     ["update_right_request", "update_user_role"],

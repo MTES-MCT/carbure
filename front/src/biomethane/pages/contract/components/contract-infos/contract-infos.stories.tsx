@@ -11,8 +11,10 @@ import { fireEvent, userEvent, waitFor, within } from "@storybook/test"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType } from "common/types"
 import { producer } from "common/__test__/data"
+import { buildAnnualDeclarationHandler } from "biomethane/tests/api"
 
 const MOCKS = [
+  mockUser(EntityType.Producteur_de_biom_thane),
   ...GLOBAL_MOCKS,
   ...AnnualDeclarationStoryUtils.parameters.msw.handlers,
   updateContractOk,
@@ -101,6 +103,18 @@ export const WatchedFieldsChanged: Story = {
       description:
         "When certain fields that conditionally control the display of other fields on the digestate/energy pages are modified, a modal is displayed after form submission to inform the user that there are new fields to fill out on those pages. This occurs when watched fields (such as tariff_reference or installation_category) change, which may reveal or hide additional fields in the digestate and energy declaration forms.",
     },
+    msw: {
+      handlers: [
+        buildAnnualDeclarationHandler({
+          missing_fields: {
+            contract_missing_fields: [],
+            injection_missing_fields: [],
+            production_unit_missing_fields: [],
+          },
+        }),
+        ...MOCKS,
+      ],
+    },
   },
   args: {
     contract: {
@@ -166,6 +180,20 @@ export const WatchedFieldsModalIsNotDisplayed: Story = {
   },
 
   decorators: [generateWatchedFieldsProvider(["tariff_reference"])],
+}
+
+export const WatchedFieldsModalIsNotDisplayedWithMissingFields: Story = {
+  ...WatchedFieldsChanged,
+  parameters: {
+    ...WatchedFieldsChanged.parameters,
+    docs: {
+      description:
+        "If the user change a field that is watched but the pages contract/production/injection have missing fields, the modal is not displayed",
+    },
+    msw: {
+      handlers: [...MOCKS],
+    },
+  },
 }
 
 export const ChooseRedIIEligibilityWithCMAXLowerThanThreshold: Story = {

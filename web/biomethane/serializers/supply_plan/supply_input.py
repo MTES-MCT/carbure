@@ -1,16 +1,19 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
 from biomethane.services.supply_plan import apply_feedstock_field_rules
 from core.models import MatierePremiere, Pays
-from core.serializers import CountrySerializer
+from core.serializers import CountrySerializer, EntityPreviewSerializer
 from feedstocks.serializers.feedstock_classification import FeedStockClassificationSerializer
 
 
 class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
     feedstock = FeedStockClassificationSerializer()
+    producer = EntityPreviewSerializer(source="supply_plan.producer")
 
     class Meta:
         model = BiomethaneSupplyInput
@@ -105,6 +108,7 @@ class BiomethaneSupplyInputCreateFromExcelSerializer(BiomethaneSupplyInputCreate
 class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
     """Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche)."""
 
+    producer = EntityPreviewSerializer(source="supply_plan.producer")
     year = serializers.IntegerField(source="supply_plan.year", read_only=True)
     origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
     feedstock = serializers.SlugRelatedField(slug_field="name", read_only=True)
@@ -117,14 +121,18 @@ class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
         model = BiomethaneSupplyInput
         exclude = ["id", "supply_plan"]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_source(self, obj):
         return obj.get_source_display() or ""
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_material_unit(self, obj):
         return obj.get_material_unit_display() or ""
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_type_cive(self, obj):
         return obj.get_type_cive_display() or ""
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_collection_type(self, obj):
         return obj.get_collection_type_display() or ""

@@ -18,6 +18,7 @@ import {
   InstalledMeters,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 
 type ProductionSiteForm = DeepPartial<BiomethaneProductionUnitPatchRequest> & {
   installed_meters?: InstalledMeters[]
@@ -29,6 +30,7 @@ export function ProductionSite({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useForm<ProductionSiteForm>({
     process_type: productionUnit?.process_type,
@@ -108,7 +110,10 @@ export function ProductionSite({
   ]
 
   return (
-    <EditableCard title={t("Caractéristiques du site de production")}>
+    <EditableCard
+      title={t("Caractéristiques du site de production")}
+      readOnly={!allowedToEdit}
+    >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <RadioGroup

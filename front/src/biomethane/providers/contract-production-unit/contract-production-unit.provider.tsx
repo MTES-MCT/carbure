@@ -1,9 +1,10 @@
-import { createContext, ReactNode, useContext } from "react"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 import { useGetContractInfos } from "biomethane/pages/contract/contract.hooks"
 import { useProductionUnit } from "biomethane/pages/production/production.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { SettingsNotFilled } from "biomethane/components/settings-not-filled"
+import { useAnnualDeclaration } from "../annual-declaration"
 
 export interface ContractProductionUnitContextValue {
   /** Contract information for the entity */
@@ -46,28 +47,33 @@ export function ContractProductionUnitProvider({
     useGetContractInfos()
   const { result: productionUnit, loading: loadingProductionUnit } =
     useProductionUnit()
+  const { annualDeclarationMissingFieldsData } = useAnnualDeclaration()
 
   const loading = loadingContract || loadingProductionUnit
 
-  const value: ContractProductionUnitContextValue = {
-    contractInfos,
-    productionUnit,
-    loadingContract,
-    loadingProductionUnit,
-    loading,
-  }
+  const value = useMemo(
+    () => ({
+      contractInfos,
+      productionUnit,
+      loadingContract,
+      loadingProductionUnit,
+      loading,
+    }),
+    [
+      contractInfos,
+      productionUnit,
+      loadingContract,
+      loadingProductionUnit,
+      loading,
+    ]
+  )
 
   if (
     !allowEmpty &&
     !loading &&
-    (contractInfos === undefined || productionUnit === undefined)
+    annualDeclarationMissingFieldsData.hasBiomethaneSettingsMissingObjects
   )
-    return (
-      <SettingsNotFilled
-        contractInfos={contractInfos}
-        productionUnit={productionUnit}
-      />
-    )
+    return <SettingsNotFilled />
 
   return (
     <ContractProductionUnitContext.Provider value={value}>

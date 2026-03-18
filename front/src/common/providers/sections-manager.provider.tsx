@@ -1,13 +1,23 @@
-import { ReactNode, createContext, useContext, useState } from "react"
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+} from "react"
 
 interface SectionState {
-  [sectionId: string]: boolean
+  [sectionId: string]: {
+    expanded: boolean
+    isError: boolean
+  }
 }
 
 interface SectionsManagerContextType {
   sections: SectionState
   toggleSection: (sectionId: string) => void
   setSectionExpanded: (sectionId: string, expanded: boolean) => void
+  setSectionError: (sectionId: string, isError: boolean) => void
   expandAll: () => void
   collapseAll: () => void
   isSectionExpanded: (sectionId: string) => boolean
@@ -42,14 +52,20 @@ export const SectionsManagerProvider = ({
   const toggleSection = (sectionId: string) => {
     setSections((prev) => ({
       ...prev,
-      [sectionId]: !prev[sectionId],
+      [sectionId]: {
+        expanded: !prev[sectionId]?.expanded,
+        isError: false,
+      },
     }))
   }
 
   const setSectionExpanded = (sectionId: string, expanded: boolean) => {
     setSections((prev) => ({
       ...prev,
-      [sectionId]: expanded,
+      [sectionId]: {
+        expanded,
+        isError: false,
+      },
     }))
   }
 
@@ -57,7 +73,12 @@ export const SectionsManagerProvider = ({
     setSections((prev) => {
       const newSections = { ...prev }
       Object.keys(newSections).forEach((key) => {
-        newSections[key] = true
+        if (prev[key]?.expanded) {
+          newSections[key] = {
+            expanded: true,
+            isError: false,
+          }
+        }
       })
       return newSections
     })
@@ -67,7 +88,12 @@ export const SectionsManagerProvider = ({
     setSections((prev) => {
       const newSections = { ...prev }
       Object.keys(newSections).forEach((key) => {
-        newSections[key] = false
+        if (prev[key]?.expanded) {
+          newSections[key] = {
+            expanded: false,
+            isError: false,
+          }
+        }
       })
       return newSections
     })
@@ -80,19 +106,36 @@ export const SectionsManagerProvider = ({
 
       return {
         ...prev,
-        [sectionId]: expanded,
+        [sectionId]: {
+          expanded,
+          isError: false,
+        },
       }
     })
   }
 
+  const setSectionError = useCallback((sectionId: string, isError: boolean) => {
+    setSections((prev) => {
+      if (!prev[sectionId]) return prev
+      return {
+        ...prev,
+        [sectionId]: {
+          ...prev[sectionId],
+          isError,
+        },
+      }
+    })
+  }, [])
+
   const isSectionExpanded = (sectionId: string) => {
-    return sections[sectionId] || false
+    return sections[sectionId]?.expanded || false
   }
 
   const contextValue: SectionsManagerContextType = {
     sections,
     toggleSection,
     setSectionExpanded,
+    setSectionError,
     expandAll,
     collapseAll,
     isSectionExpanded,

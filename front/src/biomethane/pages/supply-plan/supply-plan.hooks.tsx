@@ -1,26 +1,86 @@
-import { Cell, Column } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import {
-  BiomethaneSupplyInput,
   BiomethaneSupplyInputFilter,
-  BiomethaneSupplyInputMaterialUnit,
   BiomethaneSupplyInputQuery,
+  BiomethaneSupplyInputQueryBuilder,
+  BiomethaneSupplyInputSource,
+  BiomethaneSupplyInput,
 } from "./types"
-import Tag from "@codegouvfr/react-dsfr/Tag"
-import { convertSupplyPlanInputVolume } from "./utils"
-import { getDepartmentName } from "common/utils/geography"
-import { deleteSupplyInput, getSupplyPlanInputFilters } from "./api"
+import { getSupplyPlanInputSource } from "./utils"
+import {
+  getSupplyPlanInputFilters,
+  getSupplyPlanInputs,
+  deleteSupplyInput,
+} from "./api"
 import { defaultNormalizer } from "common/utils/normalize"
-import { formatNumber } from "common/utils/formatters"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useQuery, useMutation } from "common/hooks/async"
+import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { normalizeDepartment } from "common/utils/normalizers"
 import { Button } from "common/components/button2"
-import { Confirm } from "common/components/dialog2"
 import { usePortal } from "common/components/portal"
-import { useMutation } from "common/hooks/async"
-import { useNotify, useNotifyError } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useNotify, useNotifyError } from "common/components/notifications"
+
+import { Confirm } from "common/components/dialog2"
+import { Column } from "common/components/table2"
 import { compact } from "common/utils/collection"
+import { useSupplyPlanColumns } from "./components/supply-plan-table/supply-plan-table.hooks"
+
+export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
+  const { t } = useTranslation()
+  const { selectedEntityId } = useSelectedEntity()
+
+  const filterLabels = {
+    [BiomethaneSupplyInputFilter.source]: t("Provenance"),
+    [BiomethaneSupplyInputFilter.feedstock]: t("Intrant"),
+    [BiomethaneSupplyInputFilter.department]: t("Département"),
+  }
+
+  const normalizers = {
+    [BiomethaneSupplyInputFilter.feedstock]: (value: string) =>
+      defaultNormalizer(value),
+    [BiomethaneSupplyInputFilter.source]: (value: string) => ({
+      value,
+      label: getSupplyPlanInputSource(value as BiomethaneSupplyInputSource),
+    }),
+    [BiomethaneSupplyInputFilter.department]: (value: string) => {
+      const { label, value: normalizedValue } = normalizeDepartment(value)
+      return { label, value: normalizedValue }
+    },
+  }
+
+  return {
+    normalizers,
+    filterLabels,
+    getFilterOptions: (filter: BiomethaneSupplyInputFilter) =>
+      getSupplyPlanInputFilters(query, filter, selectedEntityId),
+  }
+}
+
+export const useSupplyPlanQuery = (year: number) => {
+  const { selectedEntityId } = useSelectedEntity()
+  const { state, actions, query } = useQueryBuilder<
+    BiomethaneSupplyInputQueryBuilder["config"]
+  >({
+    year,
+  })
+
+  const { getFilterOptions, filterLabels, normalizers } =
+    useGetFilterOptions(query)
+
+  const { result: supplyInputs, loading } = useQuery(getSupplyPlanInputs, {
+    key: `supply-plan-inputs`,
+    params: [query, selectedEntityId],
+  })
+
+  return {
+    queryBuilder: { state, actions, query },
+    filterOptions: { getFilterOptions, filterLabels, normalizers },
+    supplyPlan: { supplyInputs, loading },
+  }
+}
 
 const useDeleteSupplyInput = () => {
   const { t } = useTranslation()
@@ -63,37 +123,12 @@ const useDeleteSupplyInput = () => {
   return { openDeleteConfirm, canEditDeclaration }
 }
 
-export const useSupplyPlanColumns = () => {
+export const useSupplyPlanProducerColumns = () => {
   const { t } = useTranslation()
   const { openDeleteConfirm, canEditDeclaration } = useDeleteSupplyInput()
+  const _columns = useSupplyPlanColumns()
 
   const columns: Column<BiomethaneSupplyInput>[] = compact([
-    {
-      header: t("Intrant"),
-      cell: (input) => <Cell text={input.feedstock?.name} />,
-    },
-    {
-      header: t("Département"),
-      cell: (input) =>
-        input.origin_department && (
-          <Tag>{`${input.origin_department} - ${getDepartmentName(input.origin_department) ?? ""}`}</Tag>
-        ),
-    },
-    {
-      header: t("Tonnage (tMB)"),
-      cell: (input) => {
-        if (!input.volume) return <Cell text={t("N/A")} />
-
-        const volume =
-          input.material_unit === BiomethaneSupplyInputMaterialUnit.DRY
-            ? convertSupplyPlanInputVolume(
-                input.volume,
-                input.dry_matter_ratio_percent ?? 0
-              )
-            : input.volume
-        return <Cell text={`${formatNumber(volume)} tMB`} />
-      },
-    },
     canEditDeclaration && {
       header: t("Action"),
       cell: (input) => (
@@ -112,26 +147,5 @@ export const useSupplyPlanColumns = () => {
     },
   ])
 
-  return columns
-}
-
-export const useGetFilterOptions = (query: BiomethaneSupplyInputQuery) => {
-  const { t } = useTranslation()
-  const { selectedEntityId } = useSelectedEntity()
-
-  const filterLabels = {
-    [BiomethaneSupplyInputFilter.feedstock]: t("Intrant"),
-  }
-
-  const normalizers = {
-    [BiomethaneSupplyInputFilter.feedstock]: (value: string) =>
-      defaultNormalizer(value),
-  }
-
-  return {
-    normalizers,
-    filterLabels,
-    getFilterOptions: (filter: BiomethaneSupplyInputFilter) =>
-      getSupplyPlanInputFilters(query, filter, selectedEntityId),
-  }
+  return [..._columns, ...columns]
 }

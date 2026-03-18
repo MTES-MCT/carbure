@@ -185,6 +185,29 @@ class BiomethaneEnergy(models.Model):
 
         return BiomethaneEnergyService.get_all_optional_fields()
 
+    # Virtual fields to include alongside real model fields in completeness checks.
+    EXTRA_FIELDS = ["energy_monthly_report"]
+
+    @property
+    def energy_monthly_report(self):
+        """
+        Returns True if at least one monthly report exists for this energy instance,
+        None if missing (detected as required field).
+        Only required for TARIFF_RULE_1 contracts ("2011", "2020").
+        Returns True (not required) for other tariff references or when no contract exists.
+        """
+        from biomethane.models.biomethane_contract import BiomethaneContract
+
+        contract = getattr(self.producer, "biomethane_contract", None)
+        if not contract or contract.tariff_reference not in BiomethaneContract.TARIFF_RULE_1:
+            return True  # not required for this tariff
+
+        from biomethane.models.biomethane_energy_monthly_report import BiomethaneEnergyMonthlyReport
+
+        if BiomethaneEnergyMonthlyReport.objects.filter(energy=self).exists():
+            return True
+        return None
+
 
 @receiver(post_save, sender=BiomethaneEnergy)
 @receiver(post_save, sender=BiomethaneProductionUnit)

@@ -15,6 +15,7 @@ import {
 } from "../types"
 
 import { useSaveProductionUnit } from "../production.hooks"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 
 type DigestateProcessingForm =
   DeepPartial<BiomethaneProductionUnitPatchRequest> & {
@@ -29,6 +30,7 @@ export function DigestateProcessing({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useForm<DigestateProcessingForm>({
     has_digestate_phase_separation:
@@ -104,7 +106,10 @@ export function DigestateProcessing({
   ]
 
   return (
-    <EditableCard title={t("Traitement et valorisation du digestat")}>
+    <EditableCard
+      title={t("Traitement et valorisation du digestat")}
+      readOnly={!allowedToEdit}
+    >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <Grid cols={2} gap="lg">

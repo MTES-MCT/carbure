@@ -38,6 +38,7 @@ export const EntityUserRights = () => {
         revokeRight.execute(entity.id, request.user.email ?? "")
       }
       onAddNewUser={(email, role) => inviteUser.execute(entity.id, email, role)}
+      key={title}
     />
   ))
 }

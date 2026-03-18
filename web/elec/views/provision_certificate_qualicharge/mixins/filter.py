@@ -1,5 +1,6 @@
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 
@@ -48,7 +49,7 @@ class FilterActionMixin:
         filter = request.query_params.get("filter")
 
         if not filter:
-            raise Exception("No filter was specified")
+            raise ValidationError("No filter was specified")
 
         if filter in query_params:
             query_params.pop(filter)
@@ -67,7 +68,7 @@ class FilterActionMixin:
 
         column = filters.get(filter)
         if not column:
-            raise Exception(f"Filter '{filter}' does not exist for operations")
+            raise ValidationError(f"Filter '{filter}' does not exist for operations")
 
         values = queryset.values_list(column, flat=True).distinct()
         results = []
