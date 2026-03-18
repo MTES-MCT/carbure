@@ -1,12 +1,8 @@
-front/node_modules
-front/dist
-front/.parcel-cache
 .dockerignore
-front/.eslintcache
 
-# Git (évite d’envoyer ~100 Mo d’historique au build)
-.git
-.gitignore
+# frontend artifacts
+front/node_modules
+front/build
 
 # Python: cache et environnements virtuels
 **/__pycache__
@@ -16,16 +12,7 @@ front/.eslintcache
 venv
 env
 .pytest_cache
-.mypy_cache
-.coverage
-htmlcov
-.tox
-.nox
 
-# Divers (dev / tooling)
-.cursor
-.vscode
-*.log
-.DS_Store
-*.md
-!README.md
+# Git (évite d’envoyer ~100 Mo d’historique au build)
+.git
+.gitignore
