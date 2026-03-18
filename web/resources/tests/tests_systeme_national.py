@@ -25,6 +25,8 @@ class SystemeNationalTest(TestCase):
     def test_list_sn_certificates(self):
         today = date.today()
 
+        GenericCertificate.objects.all().delete()
+
         active_sn_cert: GenericCertificate = GenericCertificateFactory.create(
             certificate_type=GenericCertificate.SYSTEME_NATIONAL,
             valid_until=self.active_valid_until,
