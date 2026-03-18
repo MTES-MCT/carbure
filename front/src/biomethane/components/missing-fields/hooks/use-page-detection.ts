@@ -11,17 +11,15 @@ export const usePageDetection = () => {
   const isProductionPage = pathname.includes("biomethane/production")
   const isInjectionPage = pathname.includes("biomethane/injection")
 
-  const currentPage = isDigestatePage
-    ? Page.DIGESTATE
-    : isEnergyPage
-      ? Page.ENERGY
-      : isContractPage
-        ? Page.CONTRACT
-        : isProductionPage
-          ? Page.PRODUCTION
-          : isInjectionPage
-            ? Page.INJECTION
-            : undefined
+  const pageMap = [
+    { test: isDigestatePage, page: Page.DIGESTATE },
+    { test: isEnergyPage, page: Page.ENERGY },
+    { test: isContractPage, page: Page.CONTRACT },
+    { test: isProductionPage, page: Page.PRODUCTION },
+    { test: isInjectionPage, page: Page.INJECTION },
+  ]
+
+  const currentPage = pageMap.find((p) => p.test)?.page
 
   return {
     isDigestatePage,

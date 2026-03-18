@@ -73,6 +73,7 @@ export const ContractAidOrganism = ({
                 label={t("Aide complémentaire attribuée par")}
                 options={complementaryAidOrganismOptions}
                 {...bind("complementary_aid_organisms")}
+                value={value.complementary_aid_organisms ?? []}
                 required
               />
               {value.complementary_aid_organisms?.includes(

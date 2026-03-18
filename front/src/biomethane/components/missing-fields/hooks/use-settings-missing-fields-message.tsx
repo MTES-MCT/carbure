@@ -3,7 +3,7 @@
  * Contrat, Site de production, Site d'injection.
  * Used by MissingFieldsSettings on the settings layout.
  */
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useRoutes } from "common/hooks/routes"
 import { useMissingFieldCounts } from "./use-missing-fields-helpers"
@@ -26,68 +26,65 @@ export const useSettingsMissingFieldsMessages = ({
     hasInjectionObject,
   } = useMissingFieldCounts()
 
+  const buildMessage = useCallback(
+    (page: string, count: number, route: string) =>
+      generateTranslatedMessage(
+        page,
+        count,
+        route,
+        t(
+          "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
+          { count, page }
+        ),
+        onPageClick
+      ),
+    [t, onPageClick]
+  )
+
   const contractMessage = useMemo(() => {
     if (!hasContractObject || contractCount === 0) return null
 
-    return generateTranslatedMessage(
+    return buildMessage(
       t("Contrat"),
       contractCount,
-      settingsBiomethaneRoutes.CONTRACT,
-      t(
-        "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
-        { count: contractCount, page: t("Contrat") }
-      ),
-      onPageClick
+      settingsBiomethaneRoutes.CONTRACT
     )
   }, [
     contractCount,
     settingsBiomethaneRoutes.CONTRACT,
-    onPageClick,
     t,
     hasContractObject,
+    buildMessage,
   ])
 
   const productionMessage = useMemo(() => {
     if (!hasProductionUnitObject || productionUnitCount === 0) return null
-    return generateTranslatedMessage(
+    return buildMessage(
       t("Site de production"),
       productionUnitCount,
-      settingsBiomethaneRoutes.PRODUCTION,
-      t(
-        "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
-        {
-          count: productionUnitCount,
-          page: t("Site de production"),
-        }
-      ),
-      onPageClick
+      settingsBiomethaneRoutes.PRODUCTION
     )
   }, [
     productionUnitCount,
     settingsBiomethaneRoutes.PRODUCTION,
-    onPageClick,
     t,
     hasProductionUnitObject,
+    buildMessage,
   ])
 
   const injectionMessage = useMemo(() => {
     if (!hasInjectionObject || injectionCount === 0) return null
-    return generateTranslatedMessage(
+    return buildMessage(
       t("Site d'injection"),
       injectionCount,
-      settingsBiomethaneRoutes.INJECTION,
-      t(
-        "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
-        { count: injectionCount, page: t("Site d'injection") }
-      ),
-      onPageClick
+      settingsBiomethaneRoutes.INJECTION
     )
   }, [
     injectionCount,
     settingsBiomethaneRoutes.INJECTION,
-    onPageClick,
     t,
     hasInjectionObject,
+    buildMessage,
   ])
 
   const errorMessage = useMemo(() => {

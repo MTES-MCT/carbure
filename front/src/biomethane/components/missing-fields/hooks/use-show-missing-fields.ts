@@ -75,7 +75,6 @@ export const useShowMissingFields = <FormType extends object | undefined>(
       // Otherwise scroll to the section and highlight it
       if (firstMissingFieldConfig?.field.type === "section") {
         scrollToSection(firstMissingFieldConfig.sectionId)
-        // sectionsManager.setSectionError(firstMissingFieldConfig.sectionId, true)
       }
     }
   }, [currentPage, annualDeclaration?.missing_fields, sectionsManager, form, t])
