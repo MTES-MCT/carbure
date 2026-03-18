@@ -31,6 +31,11 @@ Lancer l'application.
 $ docker compose up
 ```
 
+Le backend utilise `uv` (https://docs.astral.sh/uv/) pour gérer le projet et ses dépendances.
+Pour pouvoir lancer des scripts python en utilisant toutes les dépendances installées, il faut préfixer l'appel par `uv run python ...`.
+Pour charger les variables d'environnement listées dans `.env`, rajouter `uv run --env-file .env ...` dans la commande.
+Pour ne pas avoir à réécrire `--env-file .env` sur chaque commande, on peut définir une variable d'environnement `UV_ENV_FILE=.env` à plus haut niveau.
+
 ## Création d'un nom de domaine local personnalisé
 
 Dans le fichier `/etc/hosts` ajouter la ligne `127.0.0.1 carbure.local`
