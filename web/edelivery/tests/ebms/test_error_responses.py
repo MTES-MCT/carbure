@@ -1,7 +1,35 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.ebms.error_responses import InvalidRequestErrorResponse, NotFoundErrorResponse, UnknownStatusErrorResponse
+from edelivery.ebms.error_responses import (
+    FailedErrorResponse,
+    InvalidRequestErrorResponse,
+    NotFoundErrorResponse,
+    UnknownStatusErrorResponse,
+)
+
+
+class FailedErrorResponseTest(TestCase):
+    @staticmethod
+    def payload(message="Error!"):
+        return f"""\
+<?xml version="1.0" encoding="UTF-8"?>
+<udb:ErrorResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <RESPONSE_HEADER REQUEST_ID="123" STATUS="FAILED" OBSERVATION="{message}" />
+</udb:ErrorResponse>"""
+
+    def test_knows_its_error_message(self):
+        response = FailedErrorResponse(self.payload(message="Oops"))
+        self.assertEqual("Oops", response.error_message())
+
+    @patch("edelivery.ebms.error_responses.log_error")
+    def test_sends_sentry_alert_as_post_retrieval_action(self, patched_log_error):
+        response = FailedErrorResponse(self.payload(message="Oops"))
+        patched_log_error.assert_not_called()
+
+        result = response.post_retrieval_action_result()
+        patched_log_error.assert_called_with("UDB failed to respond", {"error": "Oops"})
+        self.assertEqual({"error": "UDB failed to respond", "message": "Oops"}, result)
 
 
 class InvalidRequestErrorResponseTest(TestCase):
@@ -43,8 +71,8 @@ class NotFoundErrorResponseTest(TestCase):
         patched_log_error.assert_not_called()
 
         result = response.post_retrieval_action_result()
-        patched_log_error.assert_called_with("UDB Search returned no result")
-        self.assertEqual({"error": "Not found"}, result)
+        patched_log_error.assert_called_with("UDB Search returned no result", None)
+        self.assertEqual({"error": "UDB Search returned no result"}, result)
 
 
 class UnknownStatusErrorResponseTest(TestCase):
@@ -67,4 +95,4 @@ class UnknownStatusErrorResponseTest(TestCase):
 
         result = response.post_retrieval_action_result()
         patched_log_error.assert_called_with("Received UDB response with unknown status", {"status": "SOME_UNKNOWN_STATUS"})
-        self.assertEqual({"error": "Unknown response status", "status": "SOME_UNKNOWN_STATUS"}, result)
+        self.assertEqual({"error": "Received UDB response with unknown status", "status": "SOME_UNKNOWN_STATUS"}, result)

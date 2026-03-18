@@ -7,6 +7,7 @@ import {
   QualichargeGroupBy,
 } from "./types"
 import { apiTypes } from "common/services/api-fetch.types"
+import { download } from "common/services/api"
 
 const getQuery = (query: QualichargeQuery) => {
   const query2 =
@@ -139,4 +140,11 @@ export function validateQualichargeVolumes(
       ...filters,
     },
   })
+}
+
+export function exportQualichargeCertificates(query: QualichargeQuery) {
+  return download(
+    "/elec/provision-certificates-qualicharge/export/",
+    getQuery(query)
+  )
 }

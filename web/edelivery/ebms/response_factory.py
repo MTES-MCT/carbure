@@ -1,10 +1,16 @@
 import xml.etree.ElementTree as ET
 
-from edelivery.ebms.error_responses import InvalidRequestErrorResponse, NotFoundErrorResponse, UnknownStatusErrorResponse
+from edelivery.ebms.error_responses import (
+    FailedErrorResponse,
+    InvalidRequestErrorResponse,
+    NotFoundErrorResponse,
+    UnknownStatusErrorResponse,
+)
 
 
 class ResponseFactory:
     _ERROR_RESPONSE_CLASSES = {
+        "FAILED": FailedErrorResponse,
         "INVALID_REQUEST": InvalidRequestErrorResponse,
         "NOT_FOUND": NotFoundErrorResponse,
     }
