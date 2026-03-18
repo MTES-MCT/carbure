@@ -81,6 +81,7 @@ export const ContractAidOrganism = ({
                     "Précisez le nom du ou des organismes publics ayant octroyé l'aide"
                   )}
                   {...bind("complementary_aid_other_organism_name")}
+                  required
                 />
               )}
             </>
