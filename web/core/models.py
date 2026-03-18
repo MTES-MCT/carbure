@@ -42,8 +42,9 @@ class Pays(models.Model):
 
 
 class Department(models.Model):
-    code_dept = models.CharField(max_length=3)
+    code_dept = models.CharField(max_length=3, unique=True)
     name = models.CharField(max_length=128)
+    region = models.ForeignKey("Region", on_delete=models.SET_NULL, null=True, blank=False)
 
     def __str__(self):
         return f"{self.code_dept} - {self.name}"
@@ -52,6 +53,7 @@ class Department(models.Model):
         return {
             "code_dept": self.code_dept,
             "name": self.name,
+            "region": self.region.natural_key() if self.region else None,
         }
 
     class Meta:
@@ -59,6 +61,26 @@ class Department(models.Model):
         verbose_name = "Département"
         verbose_name_plural = "Départements"
         ordering = ["code_dept"]
+
+
+class Region(models.Model):
+    code_region = models.CharField(max_length=3, unique=True)
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return f"{self.code_region} - {self.name}"
+
+    def natural_key(self):
+        return {
+            "code_region": self.code_region,
+            "name": self.name,
+        }
+
+    class Meta:
+        db_table = "regions"
+        verbose_name = "Région"
+        verbose_name_plural = "Régions"
+        ordering = ["code_region"]
 
 
 class EntityManager(models.Manager):
