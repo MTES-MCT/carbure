@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { EditableCard } from "common/molecules/editable-card"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { RadioGroup, TextInput } from "common/components/inputs2"
 import { BiomethaneInjectionSiteAddRequest } from "./types"
 import { useForm } from "common/components/form2"
@@ -17,7 +17,7 @@ import { UniqueIdentificationNumberHelper } from "./components/unique-identifica
 type InjectionSiteForm = Partial<BiomethaneInjectionSiteAddRequest>
 export const BiomethaneInjectionPage = () => {
   const { t } = useTranslation()
-  const { hasSelectedEntity } = useSelectedEntity()
+  const allowedToEdit = useAllowedToEdit()
 
   const { value, setValue, bind } = useForm<InjectionSiteForm>({
     city: "",
@@ -37,7 +37,7 @@ export const BiomethaneInjectionPage = () => {
   const yesNoOptions = getYesNoOptions()
 
   return (
-    <EditableCard title={t("Site d'injection")} readOnly={hasSelectedEntity}>
+    <EditableCard title={t("Site d'injection")} readOnly={!allowedToEdit}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => updateInjectionSite(value)}>
           <TextInput

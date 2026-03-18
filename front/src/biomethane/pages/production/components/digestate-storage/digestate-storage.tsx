@@ -6,14 +6,14 @@ import { Table } from "common/components/table2"
 import { EditableCard } from "common/molecules/editable-card"
 import { AddDigestateStorage } from "./add-digestate-storage"
 import { useDigestateStorages } from "../../production.hooks"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { useDigestateStorageColumns } from "./digestate-storage.hooks"
 
 export function DigestateStorage() {
   const { t } = useTranslation()
   const { result: storages } = useDigestateStorages()
   const columns = useDigestateStorageColumns()
-  const { hasSelectedEntity } = useSelectedEntity()
+  const allowedToEdit = useAllowedToEdit()
 
   const portal = usePortal()
 
@@ -23,9 +23,9 @@ export function DigestateStorage() {
   return (
     <EditableCard
       title={t("Stockage de digestat")}
-      readOnly={hasSelectedEntity}
+      readOnly={!allowedToEdit}
       headerActions={
-        !hasSelectedEntity && (
+        allowedToEdit && (
           <Button
             iconId="ri-add-line"
             onClick={() =>
