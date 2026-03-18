@@ -7,13 +7,13 @@ import { Button } from "common/components/button2"
 import { usePortal } from "common/components/portal"
 import { useDeleteDigestateStorage } from "../../production.hooks"
 import { Confirm } from "common/components/dialog2"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 
 export const useDigestateStorageColumns = () => {
   const { t } = useTranslation()
   const portal = usePortal()
   const { execute: deleteStorage } = useDeleteDigestateStorage()
-  const { hasSelectedEntity } = useSelectedEntity()
+  const allowedToEdit = useAllowedToEdit()
 
   const columns: Column<BiomethaneDigestateStorage>[] = compact([
     { header: t("Dispositif"), cell: (storage) => storage.type },
@@ -29,7 +29,7 @@ export const useDigestateStorageColumns = () => {
       header: t("Récupération du biogaz"),
       cell: (storage) => (storage.has_biogas_recovery ? t("Oui") : t("Non")),
     },
-    !hasSelectedEntity && {
+    allowedToEdit && {
       header: t("Actions"),
       cell: (storage) => (
         <Button
