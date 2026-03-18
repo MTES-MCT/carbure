@@ -47,7 +47,7 @@ export const SettingsNotFilled = () => {
         {errorsMapping.map((error) => (
           <Text key={error.route} size="lg">
             <Trans
-              defaults="<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>."
+              defaults="<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>."
               values={{ page: error.name, count: error.errors.length }}
               components={{
                 CustomLink: (

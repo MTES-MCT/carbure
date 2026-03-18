@@ -48,7 +48,7 @@ export const useMissingFieldsMessages = ({
       digestateCount,
       biomethaneRoutes.PRODUCER.DIGESTATE,
       t(
-        "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
+        "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>.",
         {
           count: digestateCount,
           page: t("Digestat"),
@@ -83,7 +83,7 @@ export const useMissingFieldsMessages = ({
       energyCount,
       biomethaneRoutes.PRODUCER.ENERGY,
       t(
-        "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
+        "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>.",
         {
           count: energyCount,
           page: t("Energie"),

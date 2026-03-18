@@ -33,7 +33,7 @@ export const useSettingsMissingFieldsMessages = ({
         count,
         route,
         t(
-          "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
+          "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>.",
           { count, page }
         ),
         onPageClick
