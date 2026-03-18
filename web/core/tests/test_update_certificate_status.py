@@ -1,4 +1,5 @@
 from datetime import timedelta
+from io import StringIO
 from unittest import TestCase
 
 from django.core.management import call_command
@@ -63,7 +64,11 @@ class UpdateCertificateStatusTest(TestCase):
             last_status_update=yesterday,
         )
 
-        call_command("update_certificate_status")
+        call_command(
+            "update_certificate_status",
+            stdout=StringIO(),
+            stderr=StringIO(),
+        )
 
         valid_cert_1.refresh_from_db()
         valid_cert_2.refresh_from_db()
