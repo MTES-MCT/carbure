@@ -79,12 +79,21 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
   const entity = useEntity()
   const portal = usePortal()
   const { hasWatchedFieldsChanged } = useWatchedFields<BiomethaneContract>()
-  const { annualDeclaration, annualDeclarationKey } = useAnnualDeclaration()
+  const {
+    annualDeclaration,
+    annualDeclarationKey,
+    annualDeclarationMissingFieldsData,
+  } = useAnnualDeclaration()
 
   const mutation = useMutation(
     (data) =>
       saveContract(entity.id, data).then(() => {
-        if (contract && hasWatchedFieldsChanged(contract, data)) {
+        // If the pages contract/production/injection have missing fields, we should not reset the annual declaration)
+        if (
+          contract &&
+          !annualDeclarationMissingFieldsData.hasBiomethaneSettingsMissingObjects &&
+          hasWatchedFieldsChanged(contract, data)
+        ) {
           portal((close) => (
             <AnnualDeclarationResetDialog
               onClose={close}
