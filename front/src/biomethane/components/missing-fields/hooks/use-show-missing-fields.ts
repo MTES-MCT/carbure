@@ -53,6 +53,15 @@ export const useShowMissingFields = <FormType extends object | undefined>(
       form.setFieldError(field as keyof FormType, t("Ce champ est obligatoire"))
     })
 
+    // Check if there are missing fields with type = section and set the sections with error = true
+    const missingSectionFields = missingFields.filter(
+      (field) => getMissingFieldConfig(field)?.field.type === "section"
+    )
+    const missingSectionIds = getMissingFieldsSectionIds(missingSectionFields)
+    missingSectionIds.forEach((sectionId) => {
+      sectionsManager.setSectionError(sectionId, true)
+    })
+
     if (missingFields.length > 0) {
       const firstMissingField = missingFields[0]
       if (!firstMissingField) return
@@ -66,7 +75,7 @@ export const useShowMissingFields = <FormType extends object | undefined>(
       // Otherwise scroll to the section and highlight it
       if (firstMissingFieldConfig?.field.type === "section") {
         scrollToSection(firstMissingFieldConfig.sectionId)
-        sectionsManager.setSectionError(firstMissingFieldConfig.sectionId, true)
+        // sectionsManager.setSectionError(firstMissingFieldConfig.sectionId, true)
       }
     }
   }, [currentPage, annualDeclaration?.missing_fields, sectionsManager, form, t])
