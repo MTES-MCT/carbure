@@ -10,7 +10,7 @@ import {
   BiomethaneProductionUnitPatchRequest,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { IcpeNumberHelper } from "./icpe-number-helper"
 
 type ICPEForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
@@ -21,7 +21,7 @@ export function ICPE({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { hasSelectedEntity } = useSelectedEntity()
+  const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useForm<ICPEForm>({
     icpe_number: productionUnit?.icpe_number,
@@ -47,7 +47,7 @@ export function ICPE({
   ]
 
   return (
-    <EditableCard title={t("ICPE")} readOnly={hasSelectedEntity}>
+    <EditableCard title={t("ICPE")} readOnly={!allowedToEdit}>
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
           <TextInput

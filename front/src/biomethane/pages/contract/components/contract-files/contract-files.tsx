@@ -8,8 +8,8 @@ import { DateInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
 import { usePortal } from "common/components/portal"
 import { AddContract } from "./add-contract"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { formatDate } from "common/utils/formatters"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 
 type ContractFile = {
   name: string
@@ -23,7 +23,7 @@ export const ContractFiles = ({
 }) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const { hasSelectedEntity } = useSelectedEntity()
+  const allowedToEdit = useAllowedToEdit()
 
   const files: ContractFile[] = [
     {
@@ -62,7 +62,7 @@ export const ContractFiles = ({
     <EditableCard
       title={t("Conditions générales et particulières")}
       headerActions={
-        !hasSelectedEntity && (
+        allowedToEdit && (
           <Button
             iconId="ri-add-line"
             disabled={!contract || Boolean(contract.conditions_file)}

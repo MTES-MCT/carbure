@@ -12,7 +12,7 @@ import { AddAmendment } from "./add-amendment"
 import HashRoute from "common/components/hash-route"
 import { AmendmentDetail } from "./amendment-detail"
 import { formatDate } from "common/utils/formatters"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 
 export const ContractAmendments = ({
   contract,
@@ -21,7 +21,7 @@ export const ContractAmendments = ({
 }) => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const { hasSelectedEntity } = useSelectedEntity()
+  const allowedToEdit = useAllowedToEdit()
 
   const amendments = contract?.amendments ?? []
   const columns: Column<BiomethaneContractAmendment>[] = [
@@ -60,7 +60,7 @@ export const ContractAmendments = ({
     <EditableCard
       title={t("Avenants au contrat d'achat")}
       headerActions={
-        !hasSelectedEntity && (
+        allowedToEdit && (
           <Button
             iconId="ri-add-line"
             disabled={!contract || (contract && !contract.conditions_file)}

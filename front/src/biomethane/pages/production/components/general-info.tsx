@@ -13,7 +13,7 @@ import {
 import { useSaveProductionUnit } from "../production.hooks"
 import { SiretPicker } from "common/molecules/siret-picker"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 
 type GeneralInfoForm = DeepPartial<
   Pick<
@@ -35,7 +35,7 @@ export function GeneralInfo({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
-  const { hasSelectedEntity } = useSelectedEntity()
+  const allowedToEdit = useAllowedToEdit()
 
   const { bind, value, setField } = useForm<GeneralInfoForm>({
     name: productionUnit?.name,
@@ -81,7 +81,7 @@ export function GeneralInfo({
   return (
     <EditableCard
       title={t("Informations générales du site de production")}
-      readOnly={hasSelectedEntity}
+      readOnly={!allowedToEdit}
     >
       {({ isEditing }) => (
         <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
