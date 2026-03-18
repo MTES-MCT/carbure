@@ -65,6 +65,10 @@ if env.get("IMAGE_TAG") == "prod":
     def periodic_get_redcert_pdf_certificates() -> None:
         call_command("get_redcert_pdf", "--no-pdf")
 
+    @db_periodic_task(crontab(day_of_week=7, hour=6, minute=0))
+    def periodic_update_certificate_status() -> None:
+        call_command("update_certificate_status")
+
     @db_periodic_task(crontab(hour="19,20,21,22,23", minute=30))
     def periodic_send_notification_emails() -> None:
         send_notification_emails()
