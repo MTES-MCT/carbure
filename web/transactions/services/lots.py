@@ -51,15 +51,7 @@ def create_lot(user, entity, source, lot_data):
 
 def do_update_lot(user, entity, lot_to_update, update_data):
     prefetched_data = get_prefetched_data(entity)
-
-    double_counting_agreement = get_lot_dc_agreement(
-        update_data.get("feedstock"),
-        update_data.get("delivery_date"),
-        update_data.get("carbure_production_site"),
-    )
-
-    if double_counting_agreement:
-        update_data["production_site_double_counting_certificate"] = double_counting_agreement
+    update_data |= double_counting_certificate_data(update_data)
 
     nodes = get_traceability_nodes([lot_to_update])
     lot_node = nodes[0]
@@ -92,6 +84,19 @@ def do_update_lot(user, entity, lot_to_update, update_data):
                 metadata=diff_to_metadata(lot_node.diff),
                 entity=entity,
             )
+
+
+def double_counting_certificate_data(update_data):
+    double_counting_certificate = get_lot_dc_agreement(
+        update_data.get("feedstock"),
+        update_data.get("delivery_date"),
+        update_data.get("carbure_production_site"),
+    )
+
+    if not double_counting_certificate:
+        return {}
+
+    return {"production_site_double_counting_certificate": double_counting_certificate}
 
 
 def enforce_stock_integrity(lot_node: LotNode, update_data: dict):
