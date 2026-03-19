@@ -103,9 +103,7 @@ class InviteUserActionMixin:
             UserRightsRequests.objects.update_or_create(
                 user=user, entity=entity, defaults={"role": role, "status": "ACCEPTED"}
             )
-            UserRights.objects.update_or_create(
-                user=user, entity=entity, defaults={"role": role}
-            )
+            UserRights.objects.update_or_create(user=user, entity=entity, defaults={"role": role})
 
         except Exception:
             return Response(

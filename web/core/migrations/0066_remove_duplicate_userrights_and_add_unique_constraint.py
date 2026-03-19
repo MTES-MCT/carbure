@@ -13,9 +13,7 @@ def remove_duplicate_user_rights(apps, schema_editor):
     UserRights = apps.get_model("core", "UserRights")
 
     duplicates = (
-        UserRights.objects.values("user_id", "entity_id")
-        .annotate(cnt=Count("id"), max_id=Max("id"))
-        .filter(cnt__gt=1)
+        UserRights.objects.values("user_id", "entity_id").annotate(cnt=Count("id"), max_id=Max("id")).filter(cnt__gt=1)
     )
 
     ids_to_delete = []
