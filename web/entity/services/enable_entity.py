@@ -18,17 +18,15 @@ def enable_entity(entity, http_request):
     right_requests.update(status="ACCEPTED")
 
     # create user rights
-    UserRights.objects.bulk_create(
-        [
-            UserRights(
-                entity=req.entity,
-                user=req.user,
-                role=req.role,
-                expiration_date=req.expiration_date,
-            )
-            for req in right_requests
-        ]
-    )
+    for req in right_requests:
+        UserRights.objects.update_or_create(
+            user=req.user,
+            entity=req.entity,
+            defaults={
+                "role": req.role,
+                "expiration_date": req.expiration_date,
+            },
+        )
 
     # enable entity
     entity.is_enabled = True
