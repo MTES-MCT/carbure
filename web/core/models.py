@@ -341,6 +341,7 @@ class UserRights(models.Model):
         db_table = "users_rights"
         verbose_name = "User Right"
         verbose_name_plural = "Users Rights"
+        unique_together = [("user", "entity")]
 
 
 class UserRightsRequests(models.Model):
