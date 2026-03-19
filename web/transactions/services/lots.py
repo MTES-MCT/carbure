@@ -49,25 +49,25 @@ def create_lot(user, entity, source, lot_data):
     return CarbureLotPublicSerializer(lots_created[0]).data
 
 
-def do_update_lot(user, entity, updated_lot, update):
+def do_update_lot(user, entity, lot_to_update, update_data):
     prefetched_data = get_prefetched_data(entity)
 
-    dc_agreement = get_lot_dc_agreement(
-        update.get("feedstock"),
-        update.get("delivery_date"),
-        update.get("carbure_production_site"),
+    double_counting_agreement = get_lot_dc_agreement(
+        update_data.get("feedstock"),
+        update_data.get("delivery_date"),
+        update_data.get("carbure_production_site"),
     )
 
-    if dc_agreement:
-        update["production_site_double_counting_certificate"] = dc_agreement
+    if double_counting_agreement:
+        update_data["production_site_double_counting_certificate"] = double_counting_agreement
 
-    nodes = get_traceability_nodes([updated_lot])
+    nodes = get_traceability_nodes([lot_to_update])
     lot_node = nodes[0]
-    stock_update, stock_error = enforce_stock_integrity(lot_node, update)
+    stock_update, stock_error = enforce_stock_integrity(lot_node, update_data)
     if stock_update is not None:
-        update.update(stock_update)
+        update_data.update(stock_update)
 
-    lot_node.update(update, entity.id)
+    lot_node.update(update_data, entity.id)
     lot_node.data.update_ghg()
 
     integrity_errors = lot_node.check_integrity(ignore_diff=True)
@@ -94,7 +94,7 @@ def do_update_lot(user, entity, updated_lot, update):
             )
 
 
-def enforce_stock_integrity(lot_node: LotNode, update: dict):
+def enforce_stock_integrity(lot_node: LotNode, update_data: dict):
     ancestor_stock_node = lot_node.get_closest(LotNode.STOCK)
 
     if ancestor_stock_node is None:
@@ -102,11 +102,11 @@ def enforce_stock_integrity(lot_node: LotNode, update: dict):
 
     ancestor_stock = ancestor_stock_node.data
     volume_before_update = lot_node.data.volume
-    volume_change = round(update["volume"] - volume_before_update, 2)
+    volume_change = round(update_data["volume"] - volume_before_update, 2)
 
     # if the volume is above the allowed limit, reset it and create an error to explain why
     if volume_change > 0 and ancestor_stock.remaining_volume < volume_change:
-        biofuel = update.get("biofuel") or lot_node.data.biofuel
+        biofuel = update_data.get("biofuel") or lot_node.data.biofuel
         reset_quantity = compute_lot_quantity(biofuel, {"volume": volume_before_update})
         error = GenericError(
             lot=lot_node.data,
