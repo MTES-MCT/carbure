@@ -121,6 +121,9 @@ class Operation(models.Model):
     )
     # Specific field for exportation/expedition
     export_recipient = models.CharField(max_length=255, blank=True)
+    # Specific field for Teneur operations
+    declaration_year = models.IntegerField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     validation_date = models.DateField(null=True, blank=True)
     renewable_energy_share = models.FloatField(default=1)
@@ -167,8 +170,8 @@ class Operation(models.Model):
             return False
         return self.credited_entity.id == int(entity_id) and self.type == Operation.CESSION
 
-    def quantity(self, unit="l"):
-        if getattr(self, "_quantity", None) is not None:
+    def quantity(self, unit="l", force=False):
+        if getattr(self, "_quantity", None) is not None and not force:
             return round(self._quantity, 2)
 
         volume = self.volume_l

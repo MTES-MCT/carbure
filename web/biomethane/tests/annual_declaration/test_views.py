@@ -44,7 +44,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         # Mock date to ensure we're within the declaration period
         with (
             patch("biomethane.services.annual_declaration.date") as mock_date_service,
-            patch("biomethane.models.biomethane_declaration_period.date") as mock_date_model,
+            patch("core.models.declaration_period.date") as mock_date_model,
         ):
             mock_date_service.today.return_value = date(2026, 2, 15)
             mock_date_model.today.return_value = date(2026, 2, 15)

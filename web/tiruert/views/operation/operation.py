@@ -1,5 +1,4 @@
 from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -17,6 +16,7 @@ from tiruert.serializers import (
     OperationSerializer,
     OperationUpdateSerializer,
 )
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.views.mixins import UnitMixin
 
 from .mixins import ActionMixin
@@ -29,9 +29,8 @@ class OperationPagination(MetadataPageNumberPagination):
         metadata = {"total_quantity": 0}
 
         for operation in self.queryset:
-            volume_sign = 1 if operation.is_credit(self.request.entity.id) else -1
-            quantity = operation.volume_to_quantity(operation.volume * operation.renewable_energy_share, self.request.unit)
-            metadata["total_quantity"] += quantity * volume_sign
+            quantity = operation.quantity(unit=self.request.unit) * operation.renewable_energy_share
+            metadata["total_quantity"] += quantity
         return metadata
 
 
@@ -57,7 +56,6 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
     queryset = Operation.objects.all()
     serializer_class = OperationListSerializer
     filterset_class = OperationFilter
-    filter_backends = [DjangoFilterBackend]
     http_method_names = ["get", "post", "patch", "delete"]
     pagination_class = OperationPagination
 
@@ -82,6 +80,8 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["details"] = self.request.GET.get("details", "0") == "1"  # For debugging purposes
+        if self.action in ["create", "update", "partial_update"]:
+            context["declaration_year"] = DeclarationPeriodService.get_current_declaration_year()
         return context
 
     def get_serializer_class(self):

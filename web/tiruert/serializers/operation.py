@@ -114,7 +114,7 @@ class OperationSerializer(BaseOperationSerializer):
         return instance.avoided_emissions
 
     def get_quantity_mj(self, instance) -> float:
-        return instance.quantity(unit="mj")
+        return instance.quantity(unit="mj", force=True)
 
 
 class OperationLotSerializer(serializers.Serializer):
@@ -161,8 +161,11 @@ class OperationInputSerializer(serializers.ModelSerializer):
             entity_id = request.entity.id
             unit = request.unit
             selected_lots = validated_data.pop("lots")
+            declaration_year = self.context.get("declaration_year")
 
-            OperationService.perform_checks_before_create(request, entity_id, selected_lots, validated_data, unit)
+            OperationService.perform_checks_before_create(
+                request, entity_id, selected_lots, validated_data, unit, declaration_year
+            )
 
             OperationService.define_operation_status(validated_data)
 

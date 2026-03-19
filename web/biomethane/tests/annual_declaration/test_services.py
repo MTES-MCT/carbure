@@ -49,7 +49,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         # Test when we're in the period - need to mock date in both service and model
         with (
             patch("biomethane.services.annual_declaration.date") as mock_date_service,
-            patch("biomethane.models.biomethane_declaration_period.date") as mock_date_model,
+            patch("core.models.declaration_period.date") as mock_date_model,
         ):
             mock_date_service.today.return_value = date(2026, 2, 15)
             mock_date_model.today.return_value = date(2026, 2, 15)
@@ -59,7 +59,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         # Test when we're after the period
         with (
             patch("biomethane.services.annual_declaration.date") as mock_date_service,
-            patch("biomethane.models.biomethane_declaration_period.date") as mock_date_model,
+            patch("core.models.declaration_period.date") as mock_date_model,
         ):
             mock_date_service.today.return_value = date(2026, 5, 15)
             mock_date_model.today.return_value = date(2026, 5, 15)

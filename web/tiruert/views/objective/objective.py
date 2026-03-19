@@ -1,6 +1,5 @@
 from django.http import Http404
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -12,7 +11,9 @@ from tiruert.filters.elec_operation import ElecOperationFilterForBalance
 from tiruert.models import MacFossilFuel, Objective, Operation
 from tiruert.models.elec_operation import ElecOperation
 from tiruert.serializers import ObjectiveAdminInputSerializer, ObjectiveInputSerializer, ObjectiveOutputSerializer
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.objective import ObjectiveService
+from tiruert.services.objective_snapshot import ObjectiveSnapshotService
 from tiruert.views.mixins import UnitMixin
 
 
@@ -32,27 +33,12 @@ from tiruert.views.mixins import UnitMixin
             description="Year of the objectives",
             required=True,
         ),
-        OpenApiParameter(
-            name="date_from",
-            type=OpenApiTypes.DATE,
-            location=OpenApiParameter.QUERY,
-            description="Date from which to calculate balance for teneur",
-            required=True,
-        ),
-        OpenApiParameter(
-            name="date_to",
-            type=OpenApiTypes.DATE,
-            location=OpenApiParameter.QUERY,
-            description="Date to which to calculate balance for teneur",
-            required=True,
-        ),
     ]
 )
 class ObjectiveViewSet(UnitMixin, GenericViewSet):
     queryset = Objective.objects.all()
     filterset_class = ObjectiveFilter
     serializer_class = ObjectiveOutputSerializer
-    filter_backends = [DjangoFilterBackend]
     http_method_names = ["get"]
     pagination_class = None
 
@@ -111,6 +97,10 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
     def get_agregated_objectives_admin_view(self, request):
         """Get agregated objectives for all entities - admin view"""
 
+        data = ObjectiveInputSerializer(data=request.GET)
+        if not data.is_valid():
+            return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
+
         # Retrieve all entities that are liable for Tiruert
         tiruert_liable_entities = Entity.objects.filter(is_tiruert_liable=True)
         if not tiruert_liable_entities.exists():
@@ -123,8 +113,9 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
                 entity_objectives = self._get_objectives(request, entity.id)
                 if entity_objectives:
                     objectives_list.append(entity_objectives)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Http404:
+                # Case where no objectives are found for the entity, we simply skip it
+                continue
 
         if not objectives_list:
             return Response({}, status=status.HTTP_200_OK)
@@ -138,20 +129,36 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
     def _get_objectives(self, request, target_entity_id):
         """Internal method to get objectives for a specific entity."""
 
-        date_from = request.query_params.get("date_from")
         query_params = request.GET.copy()
         query_params["entity_id"] = target_entity_id
+        requested_year = int(query_params.get("year"))
 
-        # Get queryset with filters for MacFossilFuel, Objective and Operation
-        # Objectives
-        if self._execution_cache.get("objectives") is not None:
+        # Use snapshot for past declaration years if available
+        if "current_year" not in self._execution_cache:
+            self._execution_cache["current_year"] = DeclarationPeriodService.get_current_declaration_year()
+        current_year = self._execution_cache["current_year"]
+
+        if current_year and requested_year < current_year:
+            snapshot_data = ObjectiveSnapshotService.get_snapshot(target_entity_id, requested_year)
+            if snapshot_data is not None:
+                return snapshot_data
+
+        # Derive date_from from the declaration period for the requested year
+        if "period" not in self._execution_cache:
+            self._execution_cache["period"] = DeclarationPeriodService.get_period_by_year(requested_year)
+        period = self._execution_cache["period"]
+        if period is None:
+            return None
+        date_from = period.start_date
+
+        # Objectives (shared across all entities for the same request)
+        if "objectives" in self._execution_cache:
             objectives = self._execution_cache["objectives"]
         else:
             objectives = self.filter_queryset(self.get_queryset())
             if not objectives.exists():
                 raise Http404("No objectives found.")
-            else:
-                self._execution_cache["objectives"] = objectives
+            self._execution_cache["objectives"] = objectives
 
         # MacFossilFuel
         macs = MacFilter(query_params, queryset=MacFossilFuel.objects.all(), request=request).qs
@@ -159,48 +166,12 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
             return
 
         # Operations
-        operations_qs = Operation.objects.all()
-        operations = OperationFilterForBalance(query_params, queryset=operations_qs, request=request).qs
+        operations = OperationFilterForBalance(query_params, queryset=Operation.objects.all(), request=request).qs
         if not operations.exists():
             return
 
-        # 1. Calculate "assiette" used for objectives calculation (global, for categories and main objective)
-        energy_basis = ObjectiveService.calculate_energy_basis(macs, year=query_params.get("year"))
-
-        # 2. Calculate the balances per category and sector
-        balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
-            operations, target_entity_id, date_from
-        )
-
-        # 3. Calculate the objectives per category (using global energy_basis)
-        objective_per_category = ObjectiveService.calculate_objectives_and_penalties(
-            balance_per_category,
-            objectives,
-            Objective.BIOFUEL_CATEGORY,
-            energy_basis=energy_basis,
-        )
-
-        # 4. Calculate the objectives per sector (using sector-specific energy_basis)
-        objective_per_sector = ObjectiveService.calculate_objectives_and_penalties(
-            balance_per_sector,
-            objectives,
-            Objective.SECTOR,
-            mac_queryset=macs,
-            year=query_params.get("year"),
-        )
-
-        # 5. Calculate elec category
         elec_ops = ElecOperationFilterForBalance(query_params, queryset=ElecOperation.objects.all(), request=request).qs
-        elec_category = ObjectiveService.get_elec_category(elec_ops, target_entity_id, date_from)
 
-        # 6. Calculate the global objective (aggregated from sectors + elec)
-        global_objective = ObjectiveService.calculate_global_objective(
-            objective_per_sector, elec_category, objectives, energy_basis
+        return ObjectiveService.build_objectives_result(
+            objectives, macs, operations, elec_ops, target_entity_id, date_from, year=query_params.get("year")
         )
-
-        # 6. Return the results
-        return {
-            "main": global_objective,
-            "sectors": objective_per_sector,
-            "categories": [*objective_per_category, elec_category],
-        }
