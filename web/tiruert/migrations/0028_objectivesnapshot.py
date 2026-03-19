@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0036_alter_depot_depot_type"),
         ("tiruert", "0027_operation_declaration_year"),
     ]
 

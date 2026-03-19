@@ -5,8 +5,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("biomethane", "0043_add_type_cive_to_supply_input_and_more"),
-        ("core", "0063_declarationperiod"),
+        ("biomethane", "0045_merge_20260302_1413"),
+        ("core", "0067_declarationperiod"),
     ]
 
     operations = [

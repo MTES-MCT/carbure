@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0064_alter_declarationperiod_options_and_more"),
+        ("core", "0068_alter_declarationperiod_options_and_more"),
     ]
 
     operations = [

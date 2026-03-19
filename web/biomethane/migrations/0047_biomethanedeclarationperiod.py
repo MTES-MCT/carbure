@@ -5,8 +5,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("biomethane", "0044_move_declarationperiod_to_core"),
-        ("core", "0065_alter_declarationperiod_year"),
+        ("biomethane", "0046_move_declarationperiod_to_core"),
+        ("core", "0069_alter_declarationperiod_year"),
     ]
 
     operations = [
