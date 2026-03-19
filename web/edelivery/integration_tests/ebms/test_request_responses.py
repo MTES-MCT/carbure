@@ -3,25 +3,11 @@ from datetime import date
 from django.test import TestCase
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
-from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
-from edelivery.tests.ebms.fixtures.udb_xml_data import transaction_data
-from edelivery.tests.ebms.test_request_responses import BaseRequestResponseTest
-from transactions.api.lots.tests.tests_utils import get_lot
+from edelivery.ebms.request_responses import EOGetTransactionResponse
+from edelivery.tests.ebms.fixtures.payloads import eo_get_transaction_response_payload
+
 
 class EOGetTransactionResponseTest(TestCase):
-    def payload(self, nb_transactions=1, **kwargs):
-        transactions = "".join([transaction_data(**kwargs) for i in range(0, nb_transactions)])
-
-        return f"""\
-<udb:EOGetTransactionResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <RESPONSE_HEADER REQUEST_ID="e0907dde-11f5-423b-90e7-6a79728a5ef8"
-            PROCESSING_DATE="2025-12-23T11:11:57.548+01:00"
-            STATUS="FOUND" />
-  <EO_TRANS_HEADER>
-    {transactions}
-  </EO_TRANS_HEADER>
-</udb:EOGetTransactionResponse>"""
-
     @classmethod
     def setUpTestData(cls):
         Biocarburant.objects.create(code="EMAG", pci_kg=27.0, pci_litre=21.0, masse_volumique=0.778)
@@ -30,7 +16,7 @@ class EOGetTransactionResponseTest(TestCase):
         cls.entite = Entity.objects.create(registered_country=france, registration_id="123456789")
 
     def test_creates_lot_with_non_draft_status(self):
-        payload = self.payload(
+        payload = eo_get_transaction_response_payload(
             biofuel={"code": "FBM0003", "name": "FAME"},
             client_id="FR_SIREN_CD123456789",
             feedstock={"code": "URWR001", "name": "Rapeseed"},
@@ -54,14 +40,16 @@ class EOGetTransactionResponseTest(TestCase):
             year=2026,
         )
 
-        response = EOGetTransactionResponse(self.payload(
+        payload = eo_get_transaction_response_payload(
             biofuel={"code": "FBM0003", "name": "FAME"},
             client_id="FR_SIREN_CD123456789",
             feedstock={"code": "URWR001", "name": "Rapeseed"},
             supplier_id="FR_SIREN_CD123456789",
             udb_transaction_id="12345",
-            loading_date=date(2026,3,15),
-        ))
+            loading_date=date(2026, 3, 15),
+        )
+        response = EOGetTransactionResponse(payload)
+
         response.post_retrieval_action_result()
         existing_lot.refresh_from_db()
-        self.assertEqual(date(2026,3,15), existing_lot.dispatch_date)
+        self.assertEqual(date(2026, 3, 15), existing_lot.dispatch_date)

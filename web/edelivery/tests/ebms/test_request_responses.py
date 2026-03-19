@@ -4,7 +4,7 @@ from unittest.mock import ANY, MagicMock, patch
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from edelivery.ebms.converters import UDBConversionError
 from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
-from edelivery.tests.ebms.fixtures.udb_xml_data import transaction_data
+from edelivery.tests.ebms.fixtures.payloads import eo_get_transaction_response_payload
 
 
 class BaseRequestResponseTest(TestCase):
@@ -53,19 +53,6 @@ class BaseEOGetTransactionResponseTest(TestCase):
     def tearDown(self):
         patch.stopall()
 
-    def payload(self, nb_transactions=1, **kwargs):
-        transactions = "".join([transaction_data(**kwargs) for i in range(0, nb_transactions)])
-
-        return f"""\
-<udb:EOGetTransactionResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <RESPONSE_HEADER REQUEST_ID="e0907dde-11f5-423b-90e7-6a79728a5ef8"
-            PROCESSING_DATE="2025-12-23T11:11:57.548+01:00"
-            STATUS="FOUND" />
-  <EO_TRANS_HEADER>
-    {transactions}
-  </EO_TRANS_HEADER>
-</udb:EOGetTransactionResponse>"""
-
 
 class EOGetTransactionResponseLeadingToLotCreationTest(BaseEOGetTransactionResponseTest):
     def setUp(self):
@@ -77,7 +64,7 @@ class EOGetTransactionResponseLeadingToLotCreationTest(BaseEOGetTransactionRespo
     def test_fetches_supplier_entity(self):
         get_entity = self.patched_Entity.objects.get
         self.patched_Transaction.return_value.to_lot_attributes.return_value = {"carbure_supplier_id": 99999}
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         get_entity.assert_not_called()
 
         response.post_retrieval_action_result()
@@ -87,7 +74,7 @@ class EOGetTransactionResponseLeadingToLotCreationTest(BaseEOGetTransactionRespo
         supplier = Entity()
         get_entity = self.patched_Entity.objects.get
         get_entity.return_value = supplier
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         self.patched_create_lot.assert_not_called()
 
         response.post_retrieval_action_result()
@@ -96,7 +83,7 @@ class EOGetTransactionResponseLeadingToLotCreationTest(BaseEOGetTransactionRespo
     def test_update_lot_status_as_a_separate_step(self):
         patched_carbure_status = self.patched_Transaction.return_value.carbure_status
         patched_carbure_status.return_value = "PENDING"
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         patched_carbure_status.assert_not_called()
         self.patched_created_lot.save.assert_not_called()
 
@@ -107,7 +94,7 @@ class EOGetTransactionResponseLeadingToLotCreationTest(BaseEOGetTransactionRespo
 
     def test_returns_created_lot_summary(self):
         self.patched_created_lot.id = 12345
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         result = response.post_retrieval_action_result()
         self.assertEqual([{"newLotCreated": True, "id": 12345}], result)
 
@@ -122,7 +109,7 @@ class EOGetTransactionResponseLeadingToLotUpdateTest(BaseEOGetTransactionRespons
     def test_updates_existing_lot(self):
         supplier = Entity()
         self.patched_existing_lot.carbure_supplier = supplier
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         self.patched_do_update_lot.assert_not_called()
 
         response.post_retrieval_action_result()
@@ -132,7 +119,7 @@ class EOGetTransactionResponseLeadingToLotUpdateTest(BaseEOGetTransactionRespons
         self.patched_Transaction.return_value.to_lot_attributes.return_value["biofuel_code"] = "B_CODE"
         patched_get = self.patched_Biocarburant.objects.get
         patched_get.return_value = Biocarburant(id=111)
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         patched_get.assert_not_called()
 
         response.post_retrieval_action_result()
@@ -146,7 +133,7 @@ class EOGetTransactionResponseLeadingToLotUpdateTest(BaseEOGetTransactionRespons
         self.patched_Transaction.return_value.to_lot_attributes.return_value["feedstock_code"] = "F_CODE"
         patched_get = self.patched_MatierePremiere.objects.get
         patched_get.return_value = MatierePremiere(id=111)
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         patched_get.assert_not_called()
 
         response.post_retrieval_action_result()
@@ -160,7 +147,7 @@ class EOGetTransactionResponseLeadingToLotUpdateTest(BaseEOGetTransactionRespons
         self.patched_existing_lot.lot_status = "SHOULD_CHANGE"
         patched_carbure_status = self.patched_Transaction.return_value.carbure_status
         patched_carbure_status.return_value = "PENDING"
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         self.assertEqual("SHOULD_CHANGE", self.patched_existing_lot.lot_status)
         patched_carbure_status.assert_not_called()
         self.patched_existing_lot.save.assert_not_called()
@@ -174,7 +161,7 @@ class EOGetTransactionResponseLeadingToLotUpdateTest(BaseEOGetTransactionRespons
 
     def test_returns_updated_lot_summary(self):
         self.patched_existing_lot.id = 12345
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         result = response.post_retrieval_action_result()
         self.assertEqual([{"newLotCreated": False, "id": 12345}], result)
 
@@ -184,7 +171,7 @@ class EOGetTransactionResponseTest(BaseEOGetTransactionResponseTest):
         patched_get = self.patched_CarbureLot.objects.get
         self.patched_Transaction.return_value.udb_transaction_id.return_value = "111"
 
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         patched_get.assert_not_called()
 
         response.post_retrieval_action_result()
@@ -198,13 +185,13 @@ class EOGetTransactionResponseTest(BaseEOGetTransactionResponseTest):
         self.patched_CarbureLot.objects.get.side_effect = [existing_lot, CarbureLot.DoesNotExist(), created_lot]
         self.patched_Transaction.return_value.to_lot_attributes.return_value["carbure_supplier_id"] = 99999
 
-        response = EOGetTransactionResponse(self.payload(nb_transactions=2))
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload(nb_transactions=2))
         result = response.post_retrieval_action_result()
         self.assertEqual([{"newLotCreated": False, "id": "12345"}, {"newLotCreated": True, "id": "98765"}], result)
 
     def test_logs_error_on_conversion_error(self):
         self.patched_Transaction.return_value.to_lot_attributes.side_effect = UDBConversionError("Oups")
-        response = EOGetTransactionResponse(self.payload())
+        response = EOGetTransactionResponse(eo_get_transaction_response_payload())
         self.patched_log_error.assert_not_called()
 
         result = response.post_retrieval_action_result()
