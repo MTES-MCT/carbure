@@ -50,7 +50,6 @@ def create_lot(user, entity, source, lot_data):
 
 
 def do_update_lot(user, entity, lot_to_update, update_data):
-    prefetched_data = get_prefetched_data(entity)
     update_data |= double_counting_certificate_data(update_data)
 
     nodes = get_traceability_nodes([lot_to_update])
@@ -67,23 +66,7 @@ def do_update_lot(user, entity, lot_to_update, update_data):
         errors = serialize_integrity_errors(integrity_errors)
         raise LotUpdateFailure(LotUpdateFailure.INTEGRITY_CHECKS_FAILED, {"errors": errors})
 
-    with transaction.atomic():
-        lot_node.data.save()
-
-        bulk_sanity_checks([lot_node.data], prefetched_data)
-        background_bulk_scoring([lot_node.data], prefetched_data)
-
-        if stock_error is not None:
-            stock_error.save()
-
-        if len(lot_node.diff) > 0:
-            CarbureLotEvent.objects.create(
-                event_type=CarbureLotEvent.UPDATED,
-                lot=lot_node.data,
-                user=user,
-                metadata=diff_to_metadata(lot_node.diff),
-                entity=entity,
-            )
+    persist_changes(user, entity, lot_node, stock_error)
 
 
 def double_counting_certificate_data(update_data):
@@ -100,10 +83,11 @@ def double_counting_certificate_data(update_data):
 
 
 def enforce_stock_integrity(lot_node: LotNode, update_data: dict):
+    no_error = None
     ancestor_stock_node = lot_node.get_closest(LotNode.STOCK)
 
     if ancestor_stock_node is None:
-        return {}, None
+        return {}, no_error
 
     ancestor_stock = ancestor_stock_node.data
     volume_before_update = lot_node.data.volume
@@ -127,4 +111,27 @@ def enforce_stock_integrity(lot_node: LotNode, update_data: dict):
     ancestor_stock.remaining_lhv_amount = ancestor_stock.get_lhv_amount()
     ancestor_stock.save()
 
-    return {}, None
+    return {}, no_error
+
+
+def persist_changes(user, entity, lot_node, stock_error):
+    prefetched_data = get_prefetched_data(entity)
+
+    with transaction.atomic():
+        lot = lot_node.data
+        lot.save()
+
+        bulk_sanity_checks([lot], prefetched_data)
+        background_bulk_scoring([lot], prefetched_data)
+
+        if stock_error:
+            stock_error.save()
+
+        if len(lot_node.diff) > 0:
+            CarbureLotEvent.objects.create(
+                event_type=CarbureLotEvent.UPDATED,
+                lot=lot,
+                user=user,
+                metadata=diff_to_metadata(lot_node.diff),
+                entity=entity,
+            )
