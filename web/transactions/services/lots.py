@@ -24,14 +24,14 @@ class LotUpdateFailure(RuntimeError):
 
 
 def create_lot(user, entity, source, lot_data):
-    d = get_prefetched_data(entity)
-    lot, errors = construct_carbure_lot(d, entity, lot_data)
+    prefetched_data = get_prefetched_data(entity)
+    lot, errors = construct_carbure_lot(prefetched_data, entity, lot_data)
 
     if not lot:
         raise LotCreationFailure()
 
     with transaction.atomic():
-        lots_created = bulk_insert_lots(entity, [lot], [errors], d)
+        lots_created = bulk_insert_lots(entity, [lot], [errors], prefetched_data)
 
         if len(lots_created) == 0:
             raise LotCreationFailure()
