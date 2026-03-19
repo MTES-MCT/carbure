@@ -19,7 +19,7 @@ def create_dreal_entity_with_department(department, name="DREAL"):
 
 class EntityTest(TestCase):
     def setUp(self):
-        self.patched_UserRights = patch("core.models.UserRights").start()
+        self.patched_UserRights = patch("core.models.models.UserRights").start()
         self.dept_01 = Department.objects.create(code_dept="01", name="Ain")
         self.dept_02 = Department.objects.create(code_dept="02", name="Aisne")
         self.dept_03 = Department.objects.create(code_dept="03", name="Allier")
