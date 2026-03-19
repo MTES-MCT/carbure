@@ -24,7 +24,7 @@ class BaseRequestResponse:
 
 class EOGetTransactionResponse(BaseRequestResponse):
     def handle_error(self, message, cause=None):
-        if cause is not None:
+        if cause:
             log_error(message, {"cause": cause})
             return {"error": message, "cause": cause}
 
@@ -51,7 +51,7 @@ class EOGetTransactionResponse(BaseRequestResponse):
             no_user = None
             lot_attributes = transaction.to_lot_attributes()
             udb_transaction_id = transaction.udb_transaction_id()
-            existing_lot = CarbureLot.objects.get(udb_transaction_id=udb_transaction_id)
+            existing_lot = CarbureLot.objects.get(udb_transaction_id=udb_transaction_id)  # May throw ObjectNotExist
 
             accomodate_attributes_to_do_update_lot_api(lot_attributes)
             do_update_lot(no_user, existing_lot.carbure_supplier, existing_lot, lot_attributes)
