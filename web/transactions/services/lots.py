@@ -55,9 +55,9 @@ def do_update_lot(user, entity, lot_to_update, update_data):
 
     nodes = get_traceability_nodes([lot_to_update])
     lot_node = nodes[0]
-    stock_update, stock_error = enforce_stock_integrity(lot_node, update_data)
-    if stock_update is not None:
-        update_data.update(stock_update)
+
+    stock_reset, stock_error = enforce_stock_integrity(lot_node, update_data)
+    update_data |= stock_reset
 
     lot_node.update(update_data, entity.id)
     lot_node.data.update_ghg()
@@ -103,7 +103,7 @@ def enforce_stock_integrity(lot_node: LotNode, update_data: dict):
     ancestor_stock_node = lot_node.get_closest(LotNode.STOCK)
 
     if ancestor_stock_node is None:
-        return None, None
+        return {}, None
 
     ancestor_stock = ancestor_stock_node.data
     volume_before_update = lot_node.data.volume
@@ -127,4 +127,4 @@ def enforce_stock_integrity(lot_node: LotNode, update_data: dict):
     ancestor_stock.remaining_lhv_amount = ancestor_stock.get_lhv_amount()
     ancestor_stock.save()
 
-    return None, None
+    return {}, None
