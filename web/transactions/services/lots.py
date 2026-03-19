@@ -73,8 +73,8 @@ def do_update_lot(user, entity, lot_to_update, update_data):
         volume_before_update = lot_node.data.volume
         volume_change = round(update_data["volume"] - volume_before_update, 2)
 
-        # if the volume is above the allowed limit, reset it and create an error to explain why
-        if volume_change > 0 and ancestor_stock.remaining_volume < volume_change:
+        volume_above_allowed_limit = volume_change > 0 and ancestor_stock.remaining_volume < volume_change
+        if volume_above_allowed_limit:
             biofuel = update_data.get("biofuel") or lot_node.data.biofuel
             reset_quantity = compute_lot_quantity(biofuel, {"volume": volume_before_update})
             error = GenericError(
@@ -85,12 +85,10 @@ def do_update_lot(user, entity, lot_to_update, update_data):
             )
             return reset_quantity, error
 
-        # otherwise, update the parent stock volume to match the new reality
         ancestor_stock.remaining_volume = round(ancestor_stock.remaining_volume - volume_change, 2)
         ancestor_stock.remaining_weight = ancestor_stock.get_weight()
         ancestor_stock.remaining_lhv_amount = ancestor_stock.get_lhv_amount()
         ancestor_stock.save()
-
         return {}, no_error
 
     def persist_changes(user, entity, lot_node, stock_error):
