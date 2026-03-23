@@ -120,6 +120,7 @@ export function EnergyEfficiency({
                       min={0}
                       {...bind("purified_biogas_quantity_nm3")}
                       required
+                      step={0.01}
                     />
                     <NumberInput
                       readOnly={!isEditing}
@@ -132,6 +133,7 @@ export function EnergyEfficiency({
                       min={0}
                       {...bind("purification_electric_consumption_kwe")}
                       required
+                      step={0.01}
                     />
                   </>
                 )}
@@ -145,6 +147,7 @@ export function EnergyEfficiency({
                       min={0}
                       {...bind("self_consumed_biogas_nm3")}
                       required
+                      step={0.01}
                     />
                     <NumberInput
                       readOnly={!isEditing}
@@ -157,6 +160,7 @@ export function EnergyEfficiency({
                       min={0}
                       {...bind("total_unit_electric_consumption_kwe")}
                       required
+                      step={0.01}
                     />
                   </>
                 )}
@@ -180,6 +184,7 @@ export function EnergyEfficiency({
                 min={0}
                 {...bind("fossil_fuel_consumed_kwh")}
                 required
+                step={0.01}
               />
             </Grid>
 

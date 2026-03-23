@@ -58,6 +58,7 @@ export function IncinerationLandfill({
               min={0}
               {...bind("annual_eliminated_volume")}
               required
+              step={0.01}
             />
             <TextInput
               readOnly={!isEditing}
@@ -79,6 +80,7 @@ export function IncinerationLandfill({
               min={0}
               {...bind("wwtp_materials_to_incineration")}
               required
+              step={0.01}
             />
           )}
 

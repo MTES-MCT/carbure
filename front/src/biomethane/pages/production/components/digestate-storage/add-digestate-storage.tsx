@@ -62,6 +62,7 @@ export const AddDigestateStorage = ({ onClose }: AddDigestateStorageProps) => {
             min={0}
             label={t("Capacité de stockage (m3)")}
             {...bind("capacity")}
+            step={0.01}
           />
           <RadioGroup
             required

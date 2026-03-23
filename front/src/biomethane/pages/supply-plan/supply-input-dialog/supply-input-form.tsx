@@ -132,6 +132,7 @@ export const SupplyInputForm = ({
                     required={!isBiogazIsdnd}
                     {...bind("dry_matter_ratio_percent")}
                     readOnly={readOnly}
+                    step={0.01}
                   />
                   <NumberInput
                     label={t("Tonnage (tMS)")}
@@ -139,6 +140,7 @@ export const SupplyInputForm = ({
                     required={!isBiogazIsdnd}
                     {...bind("volume")}
                     readOnly={readOnly}
+                    step={0.01}
                   />
                 </>
               )}
@@ -150,6 +152,7 @@ export const SupplyInputForm = ({
                   required={!isBiogazIsdnd}
                   {...bind("volume")}
                   readOnly={readOnly}
+                  step={0.01}
                 />
               )}
             </>
@@ -177,7 +180,7 @@ export const SupplyInputForm = ({
             readOnly={readOnly}
             required={isFranceOriginCountry}
             max={value?.maximum_distance_km ?? undefined}
-            step={0.1}
+            step={0.01}
           />
           <NumberInput
             label={t("Distance maximale (Km)")}
@@ -185,7 +188,7 @@ export const SupplyInputForm = ({
             {...bind("maximum_distance_km")}
             readOnly={readOnly}
             required={isFranceOriginCountry}
-            step={0.1}
+            step={0.01}
           />
         </Dialog.Section>
       </Grid>
