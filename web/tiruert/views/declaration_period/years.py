@@ -37,9 +37,5 @@ def declaration_period_years(request):
     if current_period_year is None:
         return Response({"years": []}, status=status.HTTP_200_OK)
 
-    years = (
-        TiruertDeclarationPeriod.objects.filter(year__lte=current_period_year)
-        .order_by("year")
-        .values_list("year", flat=True)
-    )
+    years = TiruertDeclarationPeriod.objects.order_by("year").values_list("year", flat=True)
     return Response({"years": list(years)}, status=status.HTTP_200_OK)
