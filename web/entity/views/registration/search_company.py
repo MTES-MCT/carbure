@@ -1,7 +1,9 @@
 import requests
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 
 from core.decorators import otp_or_403
@@ -23,6 +25,12 @@ class SeachCompanyFormError:
     NO_COMPANY_FOUND = "NO_COMPANY_FOUND"
 
 
+class CompanyNotFoundError(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("Company not found")
+    default_code = "NO_COMPANY_FOUND"
+
+
 @extend_schema(
     request=SeachCompanySerializer,
     responses=ResponseDataSerializer,
@@ -35,13 +43,7 @@ def search_company_view(request):
 
     registration_id = serializer.validated_data["registration_id"]
 
-    try:
-        company_preview = fetch_company_preview(registration_id)
-    except CompanyNotFoundError:
-        return Response(
-            {"error": SeachCompanyFormError.NO_COMPANY_FOUND},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    company_preview = fetch_company_preview(registration_id)
 
     response_data = {"company_preview": company_preview}
 
@@ -50,10 +52,6 @@ def search_company_view(request):
         response_data["warning"] = warning
 
     return Response(response_data, status=status.HTTP_200_OK)
-
-
-class CompanyNotFoundError(Exception):
-    pass
 
 
 def fetch_company_preview(registration_id: str) -> dict:
