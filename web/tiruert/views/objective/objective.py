@@ -167,8 +167,6 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
 
         # Operations
         operations = OperationFilterForBalance(query_params, queryset=Operation.objects.all(), request=request).qs
-        if not operations.exists():
-            return
 
         elec_ops = ElecOperationFilterForBalance(query_params, queryset=ElecOperation.objects.all(), request=request).qs
 
