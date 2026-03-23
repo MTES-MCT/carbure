@@ -1,7 +1,7 @@
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { getQualichargeData } from "./api"
-import { Content, Main } from "common/components/scaffold"
+import { exportQualichargeCertificates, getQualichargeData } from "./api"
+import { ActionBar, Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { useState } from "react"
 import { Tabs } from "common/components/tabs2"
@@ -31,6 +31,7 @@ import useEntity from "common/hooks/entity"
 import { ExternalAdminPages } from "common/types"
 import { Button } from "common/components/button2"
 import { ValidateAllDataDialog } from "./components/validate-all-data-dialog"
+import { ExportButton } from "common/components/export"
 
 export const Qualicharge = () => {
   const { state, actions, query, status, years } = useQualichargeQueryBuilder()
@@ -178,13 +179,21 @@ export const Qualicharge = () => {
                     )}
                   />
                   {status === QualichargeTab.PENDING && (
-                    <Button
-                      priority="secondary"
-                      onClick={openValidateAllDataModal}
-                    >
-                      {t("Valider toutes les données")}
-                    </Button>
+                    <ActionBar>
+                      <Button
+                        priority="secondary"
+                        onClick={openValidateAllDataModal}
+                      >
+                        {t("Valider toutes les données")}
+                      </Button>
+                      <ActionBar.Grow />
+                      <ExportButton
+                        query={query}
+                        download={exportQualichargeCertificates}
+                      />
+                    </ActionBar>
                   )}
+
                   <Table
                     rows={result?.data?.results ?? []}
                     columns={columns}

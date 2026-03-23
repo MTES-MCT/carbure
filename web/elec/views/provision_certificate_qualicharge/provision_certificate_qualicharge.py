@@ -65,7 +65,12 @@ class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination
         },
     )
 )
-class ElecProvisionCertificateQualichargeViewSet(ListModelMixin, RetrieveModelMixin, ActionMixin, GenericViewSet):
+class ElecProvisionCertificateQualichargeViewSet(
+    ListModelMixin,
+    RetrieveModelMixin,
+    ActionMixin,
+    GenericViewSet,
+):
     queryset = ElecProvisionCertificateQualicharge.objects.all()
     serializer_class = ElecProvisionCertificateQualichargeSerializer
     filterset_class = ProvisionCertificateQualichargeFilter
