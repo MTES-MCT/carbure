@@ -58,6 +58,7 @@ export function Production({
                   min={0}
                   {...bind("raw_digestate_tonnage_produced")}
                   required
+                  step={0.01}
                 />
                 <NumberInput
                   readOnly={!isEditing}
@@ -67,6 +68,7 @@ export function Production({
                   max={100}
                   {...bind("raw_digestate_dry_matter_rate")}
                   required
+                  step={0.01}
                 />
               </>
             )}
@@ -79,6 +81,7 @@ export function Production({
                   min={0}
                   {...bind("solid_digestate_tonnage")}
                   required
+                  step={0.01}
                 />
                 <NumberInput
                   readOnly={!isEditing}
@@ -87,6 +90,7 @@ export function Production({
                   min={0}
                   {...bind("liquid_digestate_quantity")}
                   required
+                  step={0.01}
                 />
                 <NumberInput
                   readOnly={!isEditing}
@@ -98,6 +102,7 @@ export function Production({
                   min={0}
                   {...bind("raw_digestate_tonnage_produced")}
                   required
+                  step={0.01}
                 />
               </>
             )}

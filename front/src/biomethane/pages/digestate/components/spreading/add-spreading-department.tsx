@@ -88,6 +88,7 @@ export const AddSpreadingDepartment = ({
             label={t("Quantité épandue (t)")}
             placeholder={t("Quantité épandue (t)")}
             min={0}
+            step={0.01}
             {...bind("spread_quantity")}
             required
           />
@@ -95,6 +96,7 @@ export const AddSpreadingDepartment = ({
             label={t("Superficie des parcelles épandues (ha)")}
             placeholder={t("Superficie des parcelles épandues (ha)")}
             min={0}
+            step={0.01}
             {...bind("spread_parcels_area")}
             required
           />

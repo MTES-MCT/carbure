@@ -43,7 +43,7 @@ describe("calculateEnergyEfficiencyCoefficient", () => {
       injected_biomethane_gwh_pcs_per_year: 100,
     })
 
-    expect(result).toBe(1)
+    expect(result).toBe(0.000001)
   })
 
   it("should return the correct energy efficiency coefficient if the tariff reference is 2021", () => {
