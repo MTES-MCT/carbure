@@ -52,6 +52,7 @@ export function BiogasProduction() {
               min={0}
               {...bind("produced_biogas_nm3_per_year")}
               required
+              step={0.01}
             />
             <NumberInput
               readOnly={!isEditing}
@@ -60,6 +61,7 @@ export function BiogasProduction() {
               min={0}
               {...bind("flared_biogas_nm3_per_year")}
               required
+              step={0.01}
             />
           </Grid>
 

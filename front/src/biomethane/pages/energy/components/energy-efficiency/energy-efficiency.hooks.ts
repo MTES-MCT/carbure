@@ -45,7 +45,9 @@ export function calculateEnergyEfficiencyCoefficient({
 
   if (isTariffReference2023) {
     return (
-      total_unit_electric_consumption_kwe / injected_biomethane_gwh_pcs_per_year
+      (total_unit_electric_consumption_kwe /
+        injected_biomethane_gwh_pcs_per_year) *
+      Math.pow(10, -6)
     )
   }
 
@@ -85,7 +87,7 @@ export const useEnergyEfficiencyCoefficient = ({
               )
             : undefined,
         tooltip: t(
-          "Le coefficient d'efficacité énergétique est calculé en fonction de la consommation électrique soutirée pour l'ensemble de l'unité (kWe) divisé par la quantité de biométhane injecté (GWhPCS/an)."
+          "Le coefficient d'efficacité énergétique est calculé en fonction de la consommation électrique soutirée pour l'ensemble de l'unité (kWe) divisé par la quantité de biométhane injecté (GWhPCS/an) * 10^-6."
         ),
       }
     }

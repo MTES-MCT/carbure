@@ -45,6 +45,7 @@ export function SpreadingDistance() {
             min={0}
             {...bind("average_spreading_valorization_distance")}
             required
+            step={0.01}
           />
           {isEditing && (
             <Button type="submit" iconId="ri-save-line" asideX>
