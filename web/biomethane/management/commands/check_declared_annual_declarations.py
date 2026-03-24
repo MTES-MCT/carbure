@@ -64,13 +64,19 @@ class Command(BaseCommand):
             production_unit = getattr(producer, "biomethane_production_unit", None)
             department = production_unit.department if production_unit else None
             managing_external_admins = producer.get_managing_external_admins() or []
+            external_admins_emails = []
+            for admin_entity in managing_external_admins:
+                external_admins_emails.extend(
+                    admin_entity.get_admin_users_emails(user__is_staff=False, user__is_superuser=False)
+                )
 
             csv_rows.append(
                 {
                     "Nom de l'entité": producer_name,
                     "Emails des admins": ", ".join(sorted(set(emails))),
                     "Département": str(department) if department else "",
-                    "DREAL associée": ", ".join(sorted({entity.name for entity in managing_external_admins})),
+                    "Nom DREALS": ", ".join(sorted({entity.name for entity in managing_external_admins})),
+                    "Emails DREALS": ", ".join(sorted(external_admins_emails)),
                 }
             )
 
@@ -85,7 +91,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(update_msg))
             summary += " " + update_msg
 
-        fieldnames = ["Nom de l'entité", "Emails des admins", "Département", "DREAL associée"]
+        fieldnames = ["Nom de l'entité", "Emails des admins", "Département", "Nom DREALS", "Emails DREALS"]
 
         csv_buffer = io.StringIO()
         writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
