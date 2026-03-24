@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next"
 import { formatSector } from "accounting/utils/formatters"
-import { CardProgress } from "../card-progress"
+import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
-import { RecapData } from "../recap-data"
-import { SectorObjective } from "../../types"
-import { CardGrid } from "../card-grid"
+import { RecapData } from "../../recap-data"
+import { SectorObjective } from "../../../types"
+import { CardGrid } from "../../card-grid"
 import { ExtendedUnit } from "common/types"
 import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -14,6 +15,8 @@ type SectorProgressProps = {
 
 export const SectorProgress = ({ sectors }: SectorProgressProps) => {
   const { t } = useTranslation()
+  const { selectedYear, isDeclarationInCurrentPeriod } =
+    useAnnualDeclarationTiruert()
 
   return (
     <ObjectiveSection
@@ -28,7 +31,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             description={t(
               "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total pour cette catégorie)",
               {
-                date: "2025",
+                date: selectedYear,
                 objective: formatUnit(sector.target, ExtendedUnit.GJ, {
                   fractionDigits: 0,
                 }),
@@ -53,30 +56,32 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
             }
             penalty={sector.penalty}
           >
-            <ul>
-              <li>
-                <RecapData.TeneurDeclaredMonth
-                  value={formatUnit(
-                    sector.teneur_declared_month,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-              <li>
-                <RecapData.QuantityAvailable
-                  value={formatUnit(
-                    sector.quantity_available,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-            </ul>
+            {isDeclarationInCurrentPeriod && (
+              <ul>
+                <li>
+                  <RecapData.TeneurDeclaredMonth
+                    value={formatUnit(
+                      sector.teneur_declared_month,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+                <li>
+                  <RecapData.QuantityAvailable
+                    value={formatUnit(
+                      sector.quantity_available,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+              </ul>
+            )}
           </CardProgress>
         ))}
       </CardGrid>

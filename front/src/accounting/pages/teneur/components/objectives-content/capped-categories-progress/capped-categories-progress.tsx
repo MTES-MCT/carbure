@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next"
-import { CardProgress } from "../card-progress"
+import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
-import { RecapData } from "../recap-data"
-import { CategoryObjective, TargetType } from "../../types"
+import { RecapData } from "../../recap-data"
+import { CategoryObjective, TargetType } from "../../../types"
 import Badge from "@codegouvfr/react-dsfr/Badge"
-import { CardGrid } from "../card-grid"
-import { computeObjectiveEnergy } from "../../utils/formatters"
+import { CardGrid } from "../../card-grid"
+import { computeObjectiveEnergy } from "../../../utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type CappedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -21,6 +22,8 @@ export const CappedCategoriesProgress = ({
   readOnly,
 }: CappedCategoriesProgressProps) => {
   const { t } = useTranslation()
+  const { selectedYear, isDeclarationInCurrentPeriod } =
+    useAnnualDeclarationTiruert()
 
   return (
     <ObjectiveSection
@@ -40,7 +43,7 @@ export const CappedCategoriesProgress = ({
             description={t(
               "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
               {
-                date: "2025",
+                date: selectedYear,
                 objective: formatUnit(category.target, ExtendedUnit.GJ, {
                   fractionDigits: 0,
                 }),
@@ -61,46 +64,48 @@ export const CappedCategoriesProgress = ({
             }
             penalty={category.penalty}
             onClick={
-              readOnly
+              readOnly || !isDeclarationInCurrentPeriod
                 ? undefined
                 : () => onCategoryClick(category, TargetType.CAP)
             }
           >
-            <ul>
-              <li>
-                <RecapData.TeneurDeclaredMonth
-                  value={formatUnit(
-                    category.teneur_declared_month,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-              <li>
-                <RecapData.RemainingQuantityBeforeLimit
-                  value={formatUnit(
-                    computeObjectiveEnergy(category),
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-              <li>
-                <RecapData.QuantityAvailable
-                  value={formatUnit(
-                    category.quantity_available,
-                    ExtendedUnit.GJ,
-                    {
-                      fractionDigits: 0,
-                    }
-                  )}
-                />
-              </li>
-            </ul>
+            {isDeclarationInCurrentPeriod && (
+              <ul>
+                <li>
+                  <RecapData.TeneurDeclaredMonth
+                    value={formatUnit(
+                      category.teneur_declared_month,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+                <li>
+                  <RecapData.RemainingQuantityBeforeLimit
+                    value={formatUnit(
+                      computeObjectiveEnergy(category),
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+                <li>
+                  <RecapData.QuantityAvailable
+                    value={formatUnit(
+                      category.quantity_available,
+                      ExtendedUnit.GJ,
+                      {
+                        fractionDigits: 0,
+                      }
+                    )}
+                  />
+                </li>
+              </ul>
+            )}
           </CardProgress>
         ))}
       </CardGrid>

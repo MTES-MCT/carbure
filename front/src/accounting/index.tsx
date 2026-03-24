@@ -7,6 +7,13 @@ import Balances from "./pages/balances"
 import useEntity from "common/hooks/entity"
 import { TeneurLayout } from "./layouts/teneur-layout"
 import { useLastSectorVisited } from "./hooks/last-sector-visited"
+import { ObjectivesLayout } from "./pages/admin/objectives/objectives-layout"
+import { Objectives } from "./pages/admin/objectives/objectives"
+import {
+  AnnualDeclarationTiruertProvider,
+  useAnnualDeclarationTiruert,
+} from "./providers/annual-declaration-tiruert.provider"
+import { useRoutes } from "common/hooks/routes"
 
 const MaterialAccounting = () => {
   const entity = useEntity()
@@ -31,10 +38,25 @@ const MaterialAccounting = () => {
             element={<Navigate replace to={lastSector} />}
           />
         </Route>
-        {(entity.is_tiruert_liable || isAdmin || allowAccounting) && (
-          <Route element={<TeneurLayout />}>
-            <Route path="teneur" element={<Navigate replace to="2025" />} />
+        {entity.is_tiruert_liable && (
+          <Route
+            element={
+              <AnnualDeclarationTiruertProvider>
+                <TeneurLayout />
+              </AnnualDeclarationTiruertProvider>
+            }
+          >
+            <Route
+              path="teneur"
+              element={<RedirectToCurrentDeclarationYearRoute />}
+            />
             <Route path="teneur/:year" element={<Teneur />} />
+          </Route>
+        )}
+        {(isAdmin || allowAccounting) && (
+          <Route path="admin/objectives" element={<ObjectivesLayout />}>
+            <Route index element={<Objectives />} />
+            <Route path=":entityId" element={<Objectives />} />
           </Route>
         )}
         <Route path="*" element={<Navigate replace to="operations" />} />
@@ -43,4 +65,16 @@ const MaterialAccounting = () => {
   )
 }
 
+const RedirectToCurrentDeclarationYearRoute = () => {
+  const { currentDeclarationYear } = useAnnualDeclarationTiruert()
+  const routes = useRoutes().ACCOUNTING
+  const year = currentDeclarationYear ?? new Date().getFullYear()
+
+  // This case can't happen, but we log an error to be sure
+  if (!currentDeclarationYear) {
+    console.error("No current declaration year found")
+  }
+
+  return <Navigate to={routes.TENEUR.YEAR(year)} />
+}
 export default MaterialAccounting

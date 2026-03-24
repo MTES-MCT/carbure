@@ -87,7 +87,22 @@ class ObjectiveService:
                 continue
 
             if key not in balance:
-                continue
+                # No operations for this objective key: initialize an empty balance entry
+                balance[key] = {
+                    "code": key,
+                    "available_balance": 0,
+                    "pending_teneur": 0,
+                    "declared_teneur": 0,
+                    "unit": "mj",
+                    "objective": {
+                        "target_mj": None,
+                        "target_type": None,
+                        "penalty": None,
+                        "target_percent": None,
+                    },
+                }
+                if objective_type == Objective.SECTOR:
+                    balance[key]["energy_basis"] = 0
 
             # Calculate energy basis for this objective
             if objective_type == Objective.SECTOR and mac_queryset:
@@ -142,7 +157,11 @@ class ObjectiveService:
         Calculate the global objective of CO2 emissions reduction
         """
         objective = objective_queryset.filter(type=Objective.MAIN).values("target", "penalty").first()
-        target = ObjectiveService._calculate_target_for_objective(objective["target"], energy_basis) if objective else 0
+        target = (
+            ObjectiveService._calculate_target_for_objective(objective["target"], energy_basis)
+            if objective and objective["target"] is not None
+            else 0
+        )
         penalty = objective["penalty"] if objective else 0
         target_percent = objective["target"] if objective else 0
         return target, penalty, target_percent
@@ -368,6 +387,8 @@ class ObjectiveService:
         """
         Calculate the target for the given objective
         """
+        if target is None or energy_basis is None:
+            return 0
         return energy_basis * target  # MJ
 
     @staticmethod
