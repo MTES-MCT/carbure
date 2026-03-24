@@ -9,7 +9,6 @@ class OperationManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .exclude(status=Operation.EXPIRED)
             .select_related("biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
             .prefetch_related("details")
             .only(
@@ -53,7 +52,6 @@ class Operation(models.Model):
     CORRECTED = "CORRECTED"  # By customs
     VALIDATED = "VALIDATED"  # By customs
     DRAFT = "DRAFT"  # For transfert operations
-    EXPIRED = "EXPIRED"  # For incorporation operations that are too old and should not be used anymore
 
     OPERATION_STATUSES = (
         (PENDING, PENDING),
@@ -64,7 +62,6 @@ class Operation(models.Model):
         (CORRECTED, CORRECTED),
         (VALIDATED, VALIDATED),
         (DRAFT, DRAFT),
-        (EXPIRED, EXPIRED),
     )
 
     INCORPORATION = "INCORPORATION"
@@ -78,6 +75,7 @@ class Operation(models.Model):
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION"
     TRANSFERT = "TRANSFERT"
     EXPEDITION = "EXPEDITION"
+    EXPIRATION = "EXPIRATION"
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -89,6 +87,7 @@ class Operation(models.Model):
         (DEVALUATION, DEVALUATION),
         (CUSTOMS_CORRECTION, CUSTOMS_CORRECTION),
         (TRANSFERT, TRANSFERT),
+        (EXPIRATION, EXPIRATION),
     )
 
     API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR]
