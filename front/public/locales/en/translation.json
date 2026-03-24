@@ -312,7 +312,7 @@
   "Contacter l'administration": "Contact the administration",
   "Digestat": "Digestat",
   "<CustomLink>{{page}}</CustomLink> : veuillez renseigner les différents champs de la page.": "<CustomLink>{{page}}</CustomLink>: please fill in the various fields on the page.",
-  "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>._one": "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>.",
+  "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>._one": "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} information non renseignée</strong>.",
   "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>._other": "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>.",
   "Energie": "Energie",
   "<CustomLink>{{page}}</CustomLink> : veuillez renseigner les différents champs de la page. ": "<CustomLink>{{page}}</CustomLink>: please fill in the various fields on the page.",
