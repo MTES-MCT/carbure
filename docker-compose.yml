@@ -3,9 +3,9 @@ x-carbure: &common-settings
   networks: [carbure]
 
 services:
-  carbure-mariadb:
+  carbure-mysql:
     image: mysql:8.0.39
-    container_name: carbure_mariadb
+    container_name: carbure_mysql
     <<: *common-settings
     environment:
       ENV: ${IMAGE_TAG}
@@ -49,14 +49,14 @@ services:
     image: carbure_app:local
     container_name: carbure_app
     depends_on:
-      - carbure-mariadb
+      - carbure-mysql
       - carbure-redis
     build:
       context: .
       dockerfile: ./web/Dockerfile
     <<: *common-settings
     environment:
-      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mariadb:3306/$MYSQL_DATABASE
+      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mysql:3306/$MYSQL_DATABASE
       REDIS_URL: redis://carbure-redis:6379
       CARBURE_HOME: /app
       PYTHONPATH: /app:/app/web
