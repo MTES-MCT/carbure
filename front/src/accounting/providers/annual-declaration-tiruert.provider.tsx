@@ -36,13 +36,10 @@ export function AnnualDeclarationTiruertProvider({
     key: "annual-declaration-tiruert",
     params: [entity.id],
   })
-  // const parsedYear = useAnnualDeclarationTiruertYear()
 
   const currentDeclarationYear = result?.data?.year
   const year = selectedYear ?? currentYear
-  const isDeclarationInCurrentPeriod = year
-    ? new Date().getFullYear() === year + 1
-    : false
+  const isDeclarationInCurrentPeriod = year === currentDeclarationYear
 
   const value = useMemo<AnnualDeclarationTiruertContextValue>(
     () => ({

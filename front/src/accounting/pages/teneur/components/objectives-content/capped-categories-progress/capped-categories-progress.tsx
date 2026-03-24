@@ -64,7 +64,7 @@ export const CappedCategoriesProgress = ({
             }
             penalty={category.penalty}
             onClick={
-              readOnly
+              readOnly || !isDeclarationInCurrentPeriod
                 ? undefined
                 : () => onCategoryClick(category, TargetType.CAP)
             }

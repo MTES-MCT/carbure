@@ -31,7 +31,11 @@ export const UnconstrainedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={formatCategory(category.code)}
-            onClick={readOnly ? undefined : () => onCategoryClick(category)}
+            onClick={
+              readOnly || !isDeclarationInCurrentPeriod
+                ? undefined
+                : () => onCategoryClick(category)
+            }
             mainValue={floorNumber(
               category.teneur_declared + category.teneur_declared_month,
               0

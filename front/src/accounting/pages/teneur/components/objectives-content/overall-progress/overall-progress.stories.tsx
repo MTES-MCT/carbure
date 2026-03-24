@@ -24,6 +24,9 @@ export const Default: Story = {
   args: {
     objective: overallObjective,
   },
+  parameters: {
+    mockingDate: new Date(2025, 11, 1),
+  },
 }
 
 export const PreviousYearDeclaration: Story = {
