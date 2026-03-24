@@ -61,24 +61,24 @@ class Command(BaseCommand):
                 lines.append(f"[INCOMPLETE] {producer_name} - {emails}")
                 self.stdout.write(self.style.WARNING(lines[-1]))
 
-            production_unit = getattr(producer, "biomethane_production_unit", None)
-            department = production_unit.department if production_unit else None
-            managing_external_admins = producer.get_managing_external_admins() or []
-            external_admins_emails = []
-            for admin_entity in managing_external_admins:
-                external_admins_emails.extend(
-                    admin_entity.get_admin_users_emails(user__is_staff=False, user__is_superuser=False)
-                )
+                production_unit = getattr(producer, "biomethane_production_unit", None)
+                department = production_unit.department if production_unit else None
+                managing_external_admins = producer.get_managing_external_admins() or []
+                external_admins_emails = []
+                for admin_entity in managing_external_admins:
+                    external_admins_emails.extend(
+                        admin_entity.get_admin_users_emails(user__is_staff=False, user__is_superuser=False)
+                    )
 
-            csv_rows.append(
-                {
-                    "Nom de l'entité": producer_name,
-                    "Emails des admins": ", ".join(sorted(set(emails))),
-                    "Département": str(department) if department else "",
-                    "Nom DREALS": ", ".join(sorted({entity.name for entity in managing_external_admins})),
-                    "Emails DREALS": ", ".join(sorted(external_admins_emails)),
-                }
-            )
+                csv_rows.append(
+                    {
+                        "Nom de l'entité": producer_name,
+                        "Emails des admins": ", ".join(sorted(set(emails))),
+                        "Département": str(department) if department else "",
+                        "Nom DREALS": ", ".join(sorted({entity.name for entity in managing_external_admins})),
+                        "Emails DREALS": ", ".join(sorted(external_admins_emails)),
+                    }
+                )
 
         summary = f"Summary: {total} checked — {complete_count} complete, {incomplete_count} incomplete."
         self.stdout.write(self.style.SUCCESS(f"\n{summary}"))
