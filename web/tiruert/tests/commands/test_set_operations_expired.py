@@ -228,13 +228,13 @@ class SetOperationsExpiredIntegrationTest(BaseExpirationTestCase):
         self.assertEqual(OperationDetail.objects.filter(operation=exp2).first().volume, 500.0)
 
     def test_handles_cession_transferred_lots(self):
-        """Ceded lots: both cedant and cessionnaire get appropriate EXPIRATION volumes."""
+        """CESSION: Both debited entity and credited entity get appropriate EXPIRATION volumes."""
         entity_b, _ = Entity.objects.get_or_create(name="Entity B", entity_type=Entity.OPERATOR)
 
         _, detail = self._create_incorporation(volume=1000.0)
         lot = detail.lot
 
-        # Entity A cedes 400L to Entity B
+        # Entity A creates a CESSION operation of 400L to Entity B
         cession = OperationFactory.create_cession(
             debited_entity=self.entity,
             credited_entity=entity_b,
@@ -297,7 +297,8 @@ class SetOperationsExpiredIntegrationTest(BaseExpirationTestCase):
 
         self._call_command()
 
-        # 2024 lot: balance should be 0 (credit 1000 - expiration 1000)
+        # 2024 lot: EXPIRATION operation has been created and balance should be 0 (credit 1000 - expiration 1000)
+        self.assertTrue(OperationDetail.objects.filter(operation__type=Operation.EXPIRATION, lot=lot_2024).exists())
         self.assertEqual(self._get_lot_balance(self.entity, lot_2024), 0)
 
         # 2025 lot: no EXPIRATION, balance should be full 800
