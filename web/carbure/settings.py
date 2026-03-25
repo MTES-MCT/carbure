@@ -378,7 +378,7 @@ CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + (
     "'sha256-/kXZODfqoc2myS1eI6wr0HH8lUt+vRhW8H/oL+YJcMg='",
 )
 
-CSP_FRAME_SRC = CSP_DEFAULT_SRC
+CSP_FRAME_SRC = CSP_DEFAULT_SRC + ("carbure-1.gitbook.io")
 
 # data: autorise les SVG inline (ex. icônes checkbox/radio de @codegouvfr/react-dsfr)
 CSP_IMG_SRC = CSP_DEFAULT_SRC + (

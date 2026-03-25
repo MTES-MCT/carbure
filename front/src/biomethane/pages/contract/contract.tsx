@@ -13,6 +13,7 @@ import { FormContext, useForm } from "common/components/form2"
 import { ContractInfosForm } from "./types"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
 import { useMissingFields } from "biomethane/components/missing-fields"
+import { GitBookProvider, GitBookFrame } from "@gitbook/embed/react"
 
 export const BiomethaneContractPageContent = () => {
   const form = useForm<ContractInfosForm>({})
@@ -54,7 +55,25 @@ export const BiomethaneContractPageContent = () => {
 }
 
 export const BiomethaneContractPage = () => (
-  <SectionsManagerProvider>
-    <BiomethaneContractPageContent />
-  </SectionsManagerProvider>
+  <>
+    <SectionsManagerProvider>
+      <BiomethaneContractPageContent />
+    </SectionsManagerProvider>
+
+    <GitBookProvider siteURL="https://carbure-1.gitbook.io/">
+      <GitBookFrame
+        tabs={["docs"]}
+        actions={[
+          {
+            icon: "circle-question",
+            label: "Contact Support",
+            onClick: () => {
+              window.open("https://support.example.com", "_blank")
+            },
+          },
+        ]}
+        closeButton
+      />
+    </GitBookProvider>
+  </>
 )
