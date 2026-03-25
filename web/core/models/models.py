@@ -264,8 +264,8 @@ class Entity(models.Model):
         filter_result = UserRights.objects.filter(entity=self, user__is_active=True, **filters)
         return filter_result.values_list("user__email", flat=True)
 
-    def get_admin_users_emails(self):
-        return self.get_users_emails(role=UserRights.ADMIN)
+    def get_admin_users_emails(self, **filters):
+        return self.get_users_emails(role=UserRights.ADMIN, **filters)
 
     # Return the entities that are allowed to be accessed by this entity
     def get_allowed_entities(self):

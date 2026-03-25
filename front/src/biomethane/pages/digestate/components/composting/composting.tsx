@@ -102,6 +102,7 @@ export function Composting() {
                 min={0}
                 {...bind("external_platform_digestate_volume")}
                 required
+                step={0.01}
               />
 
               <AutoCompleteDepartments
@@ -125,6 +126,7 @@ export function Composting() {
               min={0}
               {...bind("on_site_composted_digestate_volume")}
               required
+              step={0.01}
             />
           )}
           {isEditing && (
