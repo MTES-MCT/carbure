@@ -4,7 +4,6 @@ from core.models import Entity, MatierePremiere
 from tiruert.models.operation import Operation
 from tiruert.serializers.objective import (
     MainObjectiveSerializer,
-    ObjectiveAdminInputSerializer,
     ObjectiveCategorySerializer,
     ObjectiveInputSerializer,
     ObjectiveOutputSerializer,
@@ -513,7 +512,7 @@ class ObjectiveInputSerializerTest(TestCase):
 
 
 class ObjectiveAdminInputSerializerTest(TestCase):
-    """Unit tests for ObjectiveAdminInputSerializer."""
+    """Unit tests for ObjectiveInputSerializer with optional selected_entity_id (admin usage)."""
 
     fixtures = [
         "json/countries.json",
@@ -534,7 +533,7 @@ class ObjectiveAdminInputSerializerTest(TestCase):
         cls.non_liable_entity = Entity.objects.filter(is_tiruert_liable=False).first()
 
     def test_serializes_valid_admin_input_data(self):
-        """Test ObjectiveAdminInputSerializer validates valid admin input."""
+        """Test ObjectiveInputSerializer validates valid admin input with selected_entity_id."""
         if not self.liable_entity:
             self.skipTest("No tiruert-liable entity available")
 
@@ -544,41 +543,25 @@ class ObjectiveAdminInputSerializerTest(TestCase):
             "selected_entity_id": self.liable_entity.id,
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.validated_data["selected_entity_id"], self.liable_entity)
 
-    def test_inherits_from_objective_input_serializer(self):
-        """Test ObjectiveAdminInputSerializer inherits ObjectiveInputSerializer fields."""
-        if not self.liable_entity:
-            self.skipTest("No tiruert-liable entity available")
-
-        # Missing inherited required fields should fail
-        data = {
-            "selected_entity_id": self.liable_entity.id,
-        }
-
-        serializer = ObjectiveAdminInputSerializer(data=data)
-
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("entity_id", serializer.errors)
-        self.assertIn("year", serializer.errors)
-
-    def test_requires_selected_entity_id(self):
-        """Test ObjectiveAdminInputSerializer requires selected_entity_id."""
+    def test_selected_entity_id_is_optional(self):
+        """Test ObjectiveInputSerializer accepts input without selected_entity_id."""
         data = {
             "entity_id": 1,
             "year": 2024,
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("selected_entity_id", serializer.errors)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertIsNone(serializer.validated_data.get("selected_entity_id"))
 
     def test_rejects_non_liable_entity(self):
-        """Test ObjectiveAdminInputSerializer rejects entities that are not tiruert-liable."""
+        """Test ObjectiveInputSerializer rejects entities that are not tiruert-liable."""
         if not self.non_liable_entity:
             self.skipTest("No non-tiruert-liable entity available")
 
@@ -588,20 +571,20 @@ class ObjectiveAdminInputSerializerTest(TestCase):
             "selected_entity_id": self.non_liable_entity.id,
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("selected_entity_id", serializer.errors)
 
     def test_rejects_non_existent_entity(self):
-        """Test ObjectiveAdminInputSerializer rejects non-existent entity IDs."""
+        """Test ObjectiveInputSerializer rejects non-existent entity IDs."""
         data = {
             "entity_id": 1,
             "year": 2024,
             "selected_entity_id": 99999,  # Non-existent ID
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("selected_entity_id", serializer.errors)
