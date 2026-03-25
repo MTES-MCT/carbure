@@ -56,7 +56,12 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
         return
       }
 
-      notifyError(new Error(t("Erreur lors de l'import du fichier")))
+      notifyError(
+        error,
+        t(
+          "Erreur lors de l'import du fichier. Essayez de télécharger de nouveau le template afin d'avoir la dernière version à jour."
+        )
+      )
     },
   })
 
