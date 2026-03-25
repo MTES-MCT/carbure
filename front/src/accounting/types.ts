@@ -65,6 +65,7 @@ export type BalancesQuery = BalancesQueryBuilder["query"] & {
   [BalancesFilter.sector]?: OperationSector[]
   [BalancesFilter.customs_category]?: OperationBiofuelCategory[]
   [BalancesFilter.biofuel]?: string[]
+  [BalancesFilter.feedstock]?: string[]
 }
 
 // For operations and balances, we want to display specific views for each sector

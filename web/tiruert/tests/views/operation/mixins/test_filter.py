@@ -166,6 +166,9 @@ class FilterBalanceEndpointTest(TestCase):
             "customs_category": "customs_category",
             "biofuel": "biofuel__code",
             "depot": "depots",
+            "feedstock": "details__lot__feedstock__code",
+            "durability_period": "durability_period",
+            "origin_country": "details__lot__country_of_origin__code_pays",
         }
 
         for filter_name, expected_column in expected_mappings.items():

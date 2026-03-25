@@ -24,6 +24,7 @@ import {
   RecipientSummary,
 } from "accounting/components/recipient-form"
 import { GHGRangeForm } from "accounting/components/ghg-range-form"
+import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filters/advanced-filters"
 
 interface TransfertDialogProps {
   onClose: () => void
@@ -111,9 +112,10 @@ export const TransfertDialogContent = ({
                 <Box>
                   <RecipientForm />
                 </Box>
-                <Box>
+                <AdvancedFiltersBalanceCard />
+                {/* <Box>
                   <GHGRangeForm balance={balance} />
-                </Box>
+                </Box> */}
               </>
             )}
             {currentStep?.key === quantityFormStepKey && (
