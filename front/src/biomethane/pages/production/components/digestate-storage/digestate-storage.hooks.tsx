@@ -8,12 +8,16 @@ import { usePortal } from "common/components/portal"
 import { useDeleteDigestateStorage } from "../../production.hooks"
 import { Confirm } from "common/components/dialog2"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useDigestateStorageColumns = () => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const { execute: deleteStorage } = useDeleteDigestateStorage()
+  const { annualDeclarationKey } = useAnnualDeclaration()
   const allowedToEdit = useAllowedToEdit()
+  const { execute: deleteStorage } = useDeleteDigestateStorage({
+    annualDeclarationKey,
+  })
 
   const columns: Column<BiomethaneDigestateStorage>[] = compact([
     { header: t("Dispositif"), cell: (storage) => storage.type },

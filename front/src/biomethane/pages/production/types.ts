@@ -10,6 +10,7 @@ import {
   InstalledMetersEnum as InstalledMeters,
 } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
+import { DeepPartial } from "common/types"
 
 export {
   UnitType,
@@ -28,6 +29,8 @@ export {
 export type BiomethaneProductionUnit = apiTypes["BiomethaneProductionUnit"]
 export type BiomethaneProductionUnitPatchRequest =
   apiTypes["BiomethaneProductionUnitUpsertRequest"]
+export type ProductionUnitForm =
+  DeepPartial<BiomethaneProductionUnitPatchRequest>
 
 // Digestate Storage
 

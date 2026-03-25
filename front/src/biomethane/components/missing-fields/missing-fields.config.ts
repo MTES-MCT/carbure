@@ -93,6 +93,69 @@ export const BIOMETHANE_SECTIONS_CONFIG = {
     },
     { name: "injection_impossibility_hours", type: "field" },
   ],
+
+  // Contract page
+  "contract-infos": [
+    { name: "tariff_reference", type: "field" },
+    { name: "buyer", type: "field" },
+    { name: "installation_category", type: "field" },
+    { name: "cmax", type: "field" },
+    { name: "pap_contracted", type: "field" },
+    { name: "cmax_annualized", type: "field" },
+    { name: "cmax_annualized_value", type: "field" },
+  ],
+  "contract-files": [
+    { name: "conditions_file", type: "section" },
+    { name: "effective_date", type: "section" },
+    { name: "signature_date", type: "section" },
+  ],
+  "contract-aid-organism": [
+    {
+      name: "has_complementary_investment_aid",
+      type: "field",
+    },
+    { name: "complementary_aid_organisms", type: "field" },
+  ],
+
+  // Production page (unité de production)
+  "general-info": [
+    { name: "name", type: "field" },
+    { name: "site_siret", type: "field" },
+    { name: "unit_type", type: "field" },
+    { name: "address", type: "field" },
+    { name: "postal_code", type: "field" },
+    { name: "city", type: "field" },
+    { name: "department", type: "field" },
+    { name: "insee_code", type: "field" },
+  ],
+  "sanitary-agreement": [
+    { name: "has_sanitary_approval", type: "field" },
+    { name: "sanitary_approval_number", type: "field" },
+    { name: "has_hygienization_exemption", type: "field" },
+    { name: "hygienization_exemption_type", type: "field" },
+  ],
+  icpe: [
+    { name: "icpe_number", type: "field" },
+    { name: "icpe_regime", type: "field" },
+  ],
+  "production-site": [
+    { name: "process_type", type: "field" },
+    { name: "methanization_process", type: "field" },
+    { name: "production_efficiency", type: "field" },
+    { name: "installed_meters", type: "field" },
+    { name: "has_hygienization_unit", type: "field" },
+    { name: "has_co2_valorization_process", type: "field" },
+  ],
+  "digestate-processing": [
+    { name: "has_digestate_phase_separation", type: "field" },
+    { name: "raw_digestate_treatment_steps", type: "field" },
+    { name: "liquid_phase_treatment_steps", type: "field" },
+    { name: "solid_phase_treatment_steps", type: "field" },
+    { name: "digestate_valorization_methods", type: "field" },
+    { name: "spreading_management_methods", type: "field" },
+    { name: "digestate_sale_types", type: "field" },
+  ],
+  "digestate-storage": [{ name: "digestate_storage", type: "section" }],
 } as const
 
 // Index built once at module loading

@@ -1,25 +1,3 @@
-.radio-group {
-  margin: 0;
-  padding: 0;
-}
-
-.radio-group :global(.fr-fieldset__content) {
-  margin: 0;
-}
-
-.radio-group :global(.fr-fieldset__legend) {
-  padding: 0 0 1rem 0;
-  margin: 0;
-}
-
-.radio-group :global(.fr-fieldset__content .fr-radio-group label) {
-  padding-bottom: 0;
-}
-
-.radio-group--read-only:disabled :global(.fr-label) {
-  color: var(--text-default-grey);
-}
-
-.radio-group--horizontal :global(.fr-fieldset__legend) {
-  padding: 0;
+.radio-group:global(.fr-fieldset) {
+  margin-bottom: 0;
 }

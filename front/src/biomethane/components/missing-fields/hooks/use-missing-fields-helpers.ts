@@ -17,14 +17,31 @@ export const useMissingFieldCounts = () => {
     annualDeclaration?.missing_fields?.digestate_missing_fields?.length ?? 0
   const energyCount =
     annualDeclaration?.missing_fields?.energy_missing_fields?.length ?? 0
+  const contractCount =
+    annualDeclaration?.missing_fields?.contract_missing_fields?.length ?? 0
+  const productionUnitCount =
+    annualDeclaration?.missing_fields?.production_unit_missing_fields?.length ??
+    0
+  const injectionCount =
+    annualDeclaration?.missing_fields?.injection_missing_fields?.length ?? 0
 
   return {
     digestateCount,
     energyCount,
+    contractCount,
+    productionUnitCount,
+    injectionCount,
     hasDigestateObject:
       annualDeclaration?.missing_fields?.digestate_missing_fields !== null,
     hasEnergyObject:
       annualDeclaration?.missing_fields?.energy_missing_fields !== null,
+    hasContractObject:
+      annualDeclaration?.missing_fields?.contract_missing_fields !== null,
+    hasProductionUnitObject:
+      annualDeclaration?.missing_fields?.production_unit_missing_fields !==
+      null,
+    hasInjectionObject:
+      annualDeclaration?.missing_fields?.injection_missing_fields !== null,
   }
 }
 

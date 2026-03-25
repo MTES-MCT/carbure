@@ -58,3 +58,11 @@ export const ReadOnly: Story = {
     readOnly: true,
   },
 }
+
+export const WithError: Story = {
+  args: {
+    label: "Label",
+    state: "error",
+    stateRelatedMessage: "Erreur de test",
+  },
+}
