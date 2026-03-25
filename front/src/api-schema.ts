@@ -13692,6 +13692,9 @@ export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
 export enum PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter {
     biofuel = "biofuel",
     customs_category = "customs_category",
+    durability_period = "durability_period",
+    feedstock = "feedstock",
+    origin_country = "origin_country",
     sector = "sector"
 }
 export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {

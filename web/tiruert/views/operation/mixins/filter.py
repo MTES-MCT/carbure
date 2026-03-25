@@ -113,7 +113,7 @@ class FilterActionMixin:
             OpenApiParameter(
                 name="filter",
                 type=str,
-                enum=["sector", "customs_category", "biofuel"],
+                enum=["sector", "customs_category", "biofuel", "feedstock", "durability_period", "origin_country"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
                 required=True,
@@ -161,6 +161,9 @@ class FilterActionMixin:
             "customs_category": "customs_category",
             "biofuel": "biofuel__code",
             "depot": "depots",
+            "feedstock": "details__lot__feedstock__code",
+            "durability_period": "durability_period",
+            "origin_country": "details__lot__country_of_origin__code_pays",
         }
 
         column = filters.get(filter)

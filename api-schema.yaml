@@ -10893,6 +10893,9 @@ paths:
             enum:
               - biofuel
               - customs_category
+              - durability_period
+              - feedstock
+              - origin_country
               - sector
           description: Filter string to apply
           required: true

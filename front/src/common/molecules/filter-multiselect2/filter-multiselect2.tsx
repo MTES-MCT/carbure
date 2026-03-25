@@ -29,7 +29,7 @@ export interface FilterMultiSelectProps2<
   selected: QueryFilters
   onSelect: (filters: QueryFilters) => void
   getFilterOptions: (filter: Key) => Promise<any[]>
-  normalizers?: Record<string, Normalizer<Key, Value>>
+  normalizers?: Partial<Record<string, Normalizer<Key, Value>>>
 }
 
 export const FilterMultiSelect2 = <
