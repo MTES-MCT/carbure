@@ -82,11 +82,11 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 5  # 5 days
 SESSION_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod") and not env("FAKE_PROD")
+SESSION_COOKIE_SECURE = env("IMAGE_TAG") in ("local", "dev", "staging", "prod") and not env("FAKE_PROD")
 
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 CSRF_COOKIE_SAMESITE = "Strict"
-CSRF_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod") and not env("FAKE_PROD")
+CSRF_COOKIE_SECURE = env("IMAGE_TAG") in ("local", "dev", "staging", "prod") and not env("FAKE_PROD")
 
 # OTP Email Configuration
 OTP_EMAIL_TOKEN_VALIDITY = 1800  # 30 minutes
@@ -361,7 +361,7 @@ if env("TEST"):
 
 
 # CSP header configuration
-CSP_DEFAULT_SRC = (
+CSP_DEFAULT_SRC = [
     "'self'",
     "stats.beta.gouv.fr",
     "metabase.carbure.beta.gouv.fr",
@@ -370,23 +370,27 @@ CSP_DEFAULT_SRC = (
     "sentry.incubateur.net",
     "https://tally.so",
     "contact.carbure.beta.gouv.fr",
-)
+]
 
-CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + (
+CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + [
     "'sha256-xVQ4mcypV0CvOtZpQgVcKpcoNvdUkR9BrwZBrtBbU+w='",
     "'sha256-l0hQskZAA39ZNB1SAbclU+zKPtFeMvhhkjKEgiL2HI0='",
     "'sha256-/kXZODfqoc2myS1eI6wr0HH8lUt+vRhW8H/oL+YJcMg='",
-)
+]
 
-CSP_FRAME_SRC = CSP_DEFAULT_SRC + ("carbure-1.gitbook.io")
+CSP_FRAME_SRC = CSP_DEFAULT_SRC + [
+    "carbure-1.gitbook.io",
+]
 
 # data: autorise les SVG inline (ex. icônes checkbox/radio de @codegouvfr/react-dsfr)
-CSP_IMG_SRC = CSP_DEFAULT_SRC + (
+CSP_IMG_SRC = CSP_DEFAULT_SRC + [
     "https://*.tile.openstreetmap.org/",
     "data:",
-)
+]
 
-CSP_STYLE_SRC = ("'self'",)
+CSP_STYLE_SRC = [
+    "'self'",
+]
 
 CSP_EXCLUDE_URL_PREFIXES = "/admin"
 

@@ -36,7 +36,14 @@ $ docker compose up
 
 Dans le fichier `/etc/hosts` ajouter la ligne `127.0.0.1 carbure.local`
 
-Il est maintenant possible d'accéder à la version locale de CarbuRe à l'adresse `http://carbure.local:8090`.
+Créer ensuite les certificats locaux attendus par Nginx :
+
+```bash
+$ mkcert -install
+$ mkcert -cert-file gateway/certs/carbure.local.pem -key-file gateway/certs/carbure.local-key.pem carbure.local
+```
+
+Il est maintenant possible d'accéder à la version locale de CarbuRe à l'adresse `https://carbure.local:8090`.
 
 
 # Authentification à Carbure
@@ -49,7 +56,7 @@ Ajouter un nouveau super utilisateur CarbuRe dans la db locale :
 docker compose exec carbure-django pipenv run python3 web/manage.py createsuperuser
 ```
 
-… et renseigner les informations demandées. Aller ensuite sur `http://carbure.local:8090/auth/login` et compléter le formulaire d'authentification. CarbuRe demande d'entrer un code envoyé par eMail. Dans la version de dev toutefois, la fonctionnalité d'envoi d'eMail est bouchonnée et le code apparaît dans les logs de Django (consultable par la commande `docker compose logs carbure-django`).
+… et renseigner les informations demandées. Aller ensuite sur `https://carbure.local:8090/auth/login` et compléter le formulaire d'authentification. CarbuRe demande d'entrer un code envoyé par eMail. Dans la version de dev toutefois, la fonctionnalité d'envoi d'eMail est bouchonnée et le code apparaît dans les logs de Django (consultable par la commande `docker compose logs carbure-django`).
 
 
 # Migrations de données
@@ -74,7 +81,7 @@ Il faut parfois revenir à la migration précédente. Par exemple si on veut ann
 Lorsqu'un endpoint de l'API est lent, c'est 9 fois sur 10 à cause de problèmes avec la base de données: trop de requêtes successives, trop de résultats en une seule fois, etc.
 
 Pour pouvoir analyser ces problèmes, l'outil `silk` a été mis en place sur le serveur.
-On peut y accéder uniquement en local à l'adresse <http://carbure.local:8090/silk>.
+On peut y accéder uniquement en local à l'adresse <https://carbure.local:8090/silk>.
 
 La dashboard à cette adresse liste toutes les requêtes envoyées au serveur, et tout une série de métriques comprenant les différentes requêtes envoyées à la base de données ainsi que leur performance.
 

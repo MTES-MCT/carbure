@@ -72,7 +72,7 @@
   },
   "scripts": {
     "start-server": "cd ../ && docker-compose up -d && cd front && npm run open",
-    "open": "open http://carbure.local:8090/",
+    "open": "open https://carbure.local:8090/",
     "stop-server": "docker-compose down",
     "start": "vite",
     "build": "vite build",

@@ -155,3 +155,7 @@ sanity_checks.json
 **/locales/**/*_old.json
 
 .cursor/
+
+# local https certificates
+gateway/certs/*
+
