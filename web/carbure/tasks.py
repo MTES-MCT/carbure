@@ -122,12 +122,10 @@ if env.get("IMAGE_TAG") == "prod":
         call_command("set_biomethane_declarations_open", "--open=false")
 
     # Tiruert update operations
-    @periodic_task(crontab(hour=0, minute=1))
-    def cancel_teneur_operations() -> None:
+    @db_periodic_task(crontab(hour=0, minute=1))
+    def run_tiruert_expiration_tasks() -> None:
         call_command("cancel_teneur_operations")
-
-    @periodic_task(crontab(hour=0, minute=1))
-    def set_operations_expired() -> None:
+        # Only runs if cancel_teneur_operations succeeds (no exception raised)
         call_command("set_operations_expired")
 
 
