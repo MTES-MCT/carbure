@@ -93,6 +93,15 @@ class Operation(models.Model):
     API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR]
     API_DELETABLE_TYPES = [CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION]
 
+    # Types that generate initial credit volumes (from physical operations)
+    CREDIT_TYPES = [INCORPORATION, MAC_BIO, LIVRAISON_DIRECTE]
+
+    # Statuses considered active in balance calculation (credits + debits)
+    ACTIVE_STATUSES = [PENDING, ACCEPTED, VALIDATED, DECLARED, DRAFT]
+
+    # Definitive statuses for confirmed operations (no longer pending)
+    CONFIRMED_STATUSES = [ACCEPTED, VALIDATED, DECLARED]
+
     ESSENCE = "ESSENCE"
     GAZOLE = "GAZOLE"
     CARBUREACTEUR = "CARBURÉACTEUR"
