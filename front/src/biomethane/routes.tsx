@@ -14,6 +14,7 @@ import { ExternalAdminPages } from "common/types"
 import { Contact } from "./pages/admin/declaration-detail/pages/contact"
 import { lastAnnualDeclarationYearAdmin } from "./pages/admin/hooks/use-annual-declaration-years-admin"
 import SupplyInputsAdminPage from "./pages/admin/supply-inputs"
+import { MissingFieldsSettings } from "./components/missing-fields"
 
 const currentYear = new Date().getFullYear()
 
@@ -130,6 +131,7 @@ export const BiomethaneSettingsRoutes = () => {
         path=""
         element={
           <AnnualDeclarationProvider>
+            <MissingFieldsSettings />
             <Outlet />
           </AnnualDeclarationProvider>
         }

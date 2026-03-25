@@ -1,74 +1,18 @@
 /**
- * Builds i18n messages (JSX) describing missing fields per page.
- * - Computes counts per page and generates links to the #missing-fields anchor
- * - Also returns the counts for conditional rendering in the parent component
+ * Builds i18n messages (JSX) for declaration missing fields only:
+ * Digestat, Énergie, Plan d'approvisionnement.
+ * Used by MissingFields on digestate, energy, supply-plan pages.
  */
 import { useMemo } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { Button } from "common/components/button2"
 import { useRoutes } from "common/hooks/routes"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { MISSING_FIELDS_HASH } from "../missing-fields.constants"
 import { useMissingFieldCounts } from "./use-missing-fields-helpers"
-
-const generateNoObjectMessage = (
-  page: string,
-  url: string,
-  message: string,
-  onPageClick?: (page: string) => void
-) => {
-  return (
-    <span key={page}>
-      <Trans
-        defaults={message}
-        components={{
-          CustomLink: (
-            // @ts-ignore children is propagated to the button by i18next
-            <Button
-              customPriority="link"
-              linkProps={{
-                to: url,
-                onClick: () => onPageClick?.(page),
-              }}
-            />
-          ),
-        }}
-      />
-    </span>
-  )
-}
-
-const generateTranslatedMessage = (
-  page: string,
-  count: number,
-  url: string,
-  message: string,
-  onPageClick?: (page: string) => void
-) => {
-  return (
-    <span key={page}>
-      <Trans
-        defaults={message}
-        values={{ count, page }}
-        components={{
-          strong: <strong />,
-          CustomLink: (
-            // @ts-ignore children is propagated to the button by i18next
-            <Button
-              customPriority="link"
-              linkProps={{
-                to: `${url}#${MISSING_FIELDS_HASH}`,
-                onClick: () => onPageClick?.(page),
-              }}
-            />
-          ),
-        }}
-        key={page}
-        is="span"
-      />
-    </span>
-  )
-}
+import {
+  generateNoObjectMessage,
+  generateTranslatedMessage,
+} from "../missing-fields-message.utils"
 
 export const useMissingFieldsMessages = ({
   onPageClick,
@@ -104,7 +48,7 @@ export const useMissingFieldsMessages = ({
       digestateCount,
       biomethaneRoutes.PRODUCER.DIGESTATE,
       t(
-        "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
+        "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>.",
         {
           count: digestateCount,
           page: t("Digestat"),
@@ -139,7 +83,7 @@ export const useMissingFieldsMessages = ({
       energyCount,
       biomethaneRoutes.PRODUCER.ENERGY,
       t(
-        "<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>.",
+        "<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>.",
         {
           count: energyCount,
           page: t("Energie"),
@@ -190,7 +134,6 @@ export const useMissingFieldsMessages = ({
   ])
 
   const errorMessage = useMemo(() => {
-    // Filter out null values (when supplyPlanErrorMessage is null)
     const messages = [
       supplyPlanErrorMessage,
       digestateMessage,

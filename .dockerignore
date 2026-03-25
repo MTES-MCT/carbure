@@ -1,4 +1,18 @@
-front/node_modules
-front/dist
-front/.parcel-cache
 .dockerignore
+
+# frontend artifacts
+front/node_modules
+front/build
+
+# Python: cache et environnements virtuels
+**/__pycache__
+*.py[cod]
+*$py.class
+.venv
+venv
+env
+.pytest_cache
+
+# Git (évite d’envoyer ~100 Mo d’historique au build)
+.git
+.gitignore

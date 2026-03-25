@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from django.db import models
 from django.utils import timezone
@@ -13,11 +13,14 @@ from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 class ObjectiveService:
     @staticmethod
-    def calculate_energy_basis(mac_queryset, year=datetime.now().year):
+    def calculate_energy_basis(mac_queryset, year=None):
         """
         Calculate the energy basis (from fossil fuels mac), used for all objectives calculations
         E_nt = ∑(Volume MaC x PCI relatif x Taux de prise en compte relatif)
         """
+        if year is None:
+            year = timezone.now().year
+
         total_energy = mac_queryset.annotate(
             energy=models.F("volume")
             * models.F("fuel__fuel_category__pci_litre")
@@ -84,7 +87,22 @@ class ObjectiveService:
                 continue
 
             if key not in balance:
-                continue
+                # No operations for this objective key: initialize an empty balance entry
+                balance[key] = {
+                    "code": key,
+                    "available_balance": 0,
+                    "pending_teneur": 0,
+                    "declared_teneur": 0,
+                    "unit": "mj",
+                    "objective": {
+                        "target_mj": None,
+                        "target_type": None,
+                        "penalty": None,
+                        "target_percent": None,
+                    },
+                }
+                if objective_type == Objective.SECTOR:
+                    balance[key]["energy_basis"] = 0
 
             # Calculate energy basis for this objective
             if objective_type == Objective.SECTOR and mac_queryset:
@@ -139,7 +157,11 @@ class ObjectiveService:
         Calculate the global objective of CO2 emissions reduction
         """
         objective = objective_queryset.filter(type=Objective.MAIN).values("target", "penalty").first()
-        target = ObjectiveService._calculate_target_for_objective(objective["target"], energy_basis) if objective else 0
+        target = (
+            ObjectiveService._calculate_target_for_objective(objective["target"], energy_basis)
+            if objective and objective["target"] is not None
+            else 0
+        )
         penalty = objective["penalty"] if objective else 0
         target_percent = objective["target"] if objective else 0
         return target, penalty, target_percent
@@ -289,9 +311,64 @@ class ObjectiveService:
                             aggregated[code]["objective"][key] += item["objective"][key]
 
     @staticmethod
-    def get_balances_for_objectives_calculation(operations, entity_id, date_from):
-        date_from = make_aware(datetime.strptime(date_from, "%Y-%m-%d"))
+    def build_objectives_result(objectives, macs, operations, elec_ops, entity_id, date_from, year):
+        """
+        Core computation of objectives from pre-built querysets.
+        Returns the dict {'main', 'sectors', 'categories'} or None if energy_basis is missing.
 
+        Args:
+            objectives: Queryset of Objective for the given year
+            macs: Queryset of MacFossilFuel for the given entity/year
+            operations: Queryset of Operation (already filtered)
+            elec_ops: Queryset of ElecOperation (already filtered)
+            entity_id: ID of the entity
+            date_from: Start of the teneur period (date object)
+            year: Declaration year (int or str)
+        """
+        # 1. Calculate "assiette" used for objectives calculation (global, for categories and main objective)
+        energy_basis = ObjectiveService.calculate_energy_basis(macs, year=year)
+        if not energy_basis:
+            return None
+
+        # 2. Calculate the balances per category and sector
+        date_from_dt = make_aware(datetime.combine(date_from, time.min))
+        balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
+            operations, entity_id, date_from_dt
+        )
+
+        # 3. Calculate the objectives per category (using global energy_basis)
+        objective_per_category = ObjectiveService.calculate_objectives_and_penalties(
+            balance_per_category,
+            objectives,
+            Objective.BIOFUEL_CATEGORY,
+            energy_basis=energy_basis,
+        )
+
+        # 4. Calculate the objectives per sector (using sector-specific energy_basis)
+        objective_per_sector = ObjectiveService.calculate_objectives_and_penalties(
+            balance_per_sector,
+            objectives,
+            Objective.SECTOR,
+            mac_queryset=macs,
+            year=year,
+        )
+
+        # 5. Calculate elec category
+        elec_category = ObjectiveService.get_elec_category(elec_ops, entity_id, date_from_dt)
+
+        # 6. Calculate the global objective (aggregated from sectors + elec)
+        global_objective = ObjectiveService.calculate_global_objective(
+            objective_per_sector, elec_category, objectives, energy_basis
+        )
+
+        return {
+            "main": global_objective,
+            "sectors": objective_per_sector,
+            "categories": [*objective_per_category, elec_category],
+        }
+
+    @staticmethod
+    def get_balances_for_objectives_calculation(operations, entity_id, date_from):
         balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from)
         balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj", date_from)
 
@@ -310,6 +387,8 @@ class ObjectiveService:
         """
         Calculate the target for the given objective
         """
+        if target is None or energy_basis is None:
+            return 0
         return energy_basis * target  # MJ
 
     @staticmethod

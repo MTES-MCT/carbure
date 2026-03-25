@@ -1,19 +1,23 @@
 import { Button } from "common/components/button2"
 import { RadioGroup, TextInput } from "common/components/inputs2"
-import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
-import { DeepPartial } from "common/types"
+import { useFormContext } from "common/components/form2"
 import {
   IcpeRegime,
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitPatchRequest,
+  ProductionUnitForm,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { IcpeNumberHelper } from "./icpe-number-helper"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
-type ICPEForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
+type ICPEForm = Pick<ProductionUnitForm, "icpe_number" | "icpe_regime">
+
+const extractValues = (form?: ICPEForm) => ({
+  icpe_number: form?.icpe_number,
+  icpe_regime: form?.icpe_regime,
+})
 
 export function ICPE({
   productionUnit,
@@ -23,11 +27,7 @@ export function ICPE({
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { bind, value } = useForm<ICPEForm>({
-    icpe_number: productionUnit?.icpe_number,
-    icpe_regime: productionUnit?.icpe_regime,
-  })
-
+  const { bind, value } = useFormContext<ICPEForm>()
   const { execute: saveProductionUnit, loading } =
     useSaveProductionUnit(productionUnit)
 
@@ -47,9 +47,15 @@ export function ICPE({
   ]
 
   return (
-    <EditableCard title={t("ICPE")} readOnly={!allowedToEdit}>
+    <ManagedEditableCard
+      sectionId="icpe"
+      title={t("ICPE")}
+      readOnly={!allowedToEdit}
+    >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
+        <ManagedEditableCard.Form
+          onSubmit={() => saveProductionUnit(extractValues(value))}
+        >
           <TextInput
             required
             readOnly={!isEditing}
@@ -80,8 +86,8 @@ export function ICPE({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

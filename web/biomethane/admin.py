@@ -27,7 +27,7 @@ class BiomethaneContractAdmin(admin.ModelAdmin):
 @admin.register(BiomethaneContractAmendment)
 class BiomethaneContractAmendmentAdmin(admin.ModelAdmin):
     list_display = ("id", "contract__producer__name", "signature_date", "effective_date")
-    search_fields = ("contract__buyer__name", "contract__producer__name", "producer__pk")
+    search_fields = ("contract__buyer__name", "contract__producer__name", "contract__producer__pk")
 
 
 @admin.register(BiomethaneInjectionSite)

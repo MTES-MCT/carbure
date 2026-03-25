@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next"
-import { EditableCard } from "common/molecules/editable-card"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { RadioGroup, TextInput } from "common/components/inputs2"
 import { BiomethaneInjectionSiteAddRequest } from "./types"
@@ -13,17 +12,24 @@ import {
 } from "./injection.hooks"
 import { Button } from "common/components/button2"
 import { UniqueIdentificationNumberHelper } from "./components/unique-identification-number-helper"
+import { useMissingFields } from "biomethane/components/missing-fields"
+import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
 type InjectionSiteForm = Partial<BiomethaneInjectionSiteAddRequest>
-export const BiomethaneInjectionPage = () => {
+
+const BiomethaneInjectionContent = () => {
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { value, setValue, bind } = useForm<InjectionSiteForm>({
+  const form = useForm<InjectionSiteForm>({
     city: "",
     company_address: "",
     postal_code: "",
   })
+  const { value, setValue, bind } = form
+
+  useMissingFields(form)
   useGetInjectionSite({
     onSuccess: (data) => {
       if (data) {
@@ -37,9 +43,13 @@ export const BiomethaneInjectionPage = () => {
   const yesNoOptions = getYesNoOptions()
 
   return (
-    <EditableCard title={t("Site d'injection")} readOnly={!allowedToEdit}>
+    <ManagedEditableCard
+      sectionId="injection-site"
+      title={t("Site d'injection")}
+      readOnly={!allowedToEdit}
+    >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => updateInjectionSite(value)}>
+        <ManagedEditableCard.Form onSubmit={() => updateInjectionSite(value)}>
           <TextInput
             label={t("Numéro d'identifiant unique du site d'injection")}
             hintText={<UniqueIdentificationNumberHelper />}
@@ -122,8 +132,16 @@ export const BiomethaneInjectionPage = () => {
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
+  )
+}
+
+export const BiomethaneInjectionPage = () => {
+  return (
+    <SectionsManagerProvider>
+      <BiomethaneInjectionContent />
+    </SectionsManagerProvider>
   )
 }

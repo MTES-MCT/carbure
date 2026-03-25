@@ -1,6 +1,5 @@
 import { NumberInput, RadioGroup } from "common/components/inputs2"
 import { SelectDsfr } from "common/components/selects2"
-import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
 import {
   useMutateContractInfos,
@@ -9,7 +8,7 @@ import {
 } from "./contract-infos.hooks"
 import { Grid } from "common/components/scaffold"
 import { Autocomplete } from "common/components/autocomplete2"
-import { Form, useForm } from "common/components/form2"
+import { useFormContext } from "common/components/form2"
 import { DeepPartial } from "common/types"
 import {
   getRediiThresholdLabel,
@@ -26,14 +25,17 @@ import {
 import { Notice } from "common/components/notice"
 import { findBuyerBiomethaneEntities } from "biomethane/pages/contract/api"
 import useEntity from "common/hooks/entity"
-import { useState } from "react"
 import { usePortal } from "common/components/portal"
 import { RedIIDialog } from "./red-ii-dialog"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useSectionsManager } from "common/providers/sections-manager.provider"
 
 type ContractInfosForm = DeepPartial<BiomethaneContractPatchRequest>
 
-const extractValues = (contract?: BiomethaneContract) => {
+const CONTRACT_INFOS_SECTION_ID = "contract-infos"
+
+const extractValues = (contract?: ContractInfosForm) => {
   return {
     tariff_reference: contract?.tariff_reference,
     buyer: contract?.buyer,
@@ -44,6 +46,7 @@ const extractValues = (contract?: BiomethaneContract) => {
     cmax_annualized_value: contract?.cmax_annualized_value,
   }
 }
+
 export const ContractInfos = ({
   contract,
 }: {
@@ -53,18 +56,19 @@ export const ContractInfos = ({
   const entity = useEntity()
   const allowedToEdit = useAllowedToEdit()
   const portal = usePortal()
-  const [isEditing, setIsEditing] = useState(false)
-  const { bind, value } = useForm<ContractInfosForm>(
-    contract ? extractValues(contract) : {}
-  )
+  const { bind, value } = useFormContext<ContractInfosForm>()
   const tariffReferenceOptions = useTariffReferenceOptions()
   const installationCategoryOptions = useInstallationCategoryOptions()
   const { execute: updateContract, loading } = useMutateContractInfos(contract)
+  const { setSectionExpanded, isSectionExpanded } = useSectionsManager()
+
+  const isEditing = isSectionExpanded(CONTRACT_INFOS_SECTION_ID)
 
   const onSubmit = () => {
+    const formData = extractValues(value)
     const update = (is_red_ii: boolean) => {
-      updateContract({ ...value, is_red_ii }).then(() => {
-        setIsEditing(false)
+      updateContract({ ...formData, is_red_ii }).then(() => {
+        setSectionExpanded(CONTRACT_INFOS_SECTION_ID, false)
       })
     }
 
@@ -79,20 +83,22 @@ export const ContractInfos = ({
         />
       ))
     } else {
-      updateContract(value).then(() => {
-        setIsEditing(false)
+      updateContract(formData).then(() => {
+        setSectionExpanded(CONTRACT_INFOS_SECTION_ID, false)
       })
     }
   }
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId={CONTRACT_INFOS_SECTION_ID}
       title={t("Caractéristiques du contrat d’achat à tarif réglementé")}
-      isEditing={isEditing}
-      onEdit={setIsEditing}
+      onEdit={(editing) =>
+        setSectionExpanded(CONTRACT_INFOS_SECTION_ID, editing)
+      }
       readOnly={!allowedToEdit}
     >
-      <Form onSubmit={onSubmit}>
+      <ManagedEditableCard.Form onSubmit={onSubmit}>
         {isContractRedii(value) && (
           <Notice variant="info" icon="fr-icon-info-line">
             {isTariffReference2011Or2020(value.tariff_reference)
@@ -195,7 +201,7 @@ export const ContractInfos = ({
             {t("Sauvegarder")}
           </Button>
         )}
-      </Form>
-    </EditableCard>
+      </ManagedEditableCard.Form>
+    </ManagedEditableCard>
   )
 }

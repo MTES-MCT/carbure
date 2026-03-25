@@ -6,6 +6,7 @@ import { Text } from "common/components/text"
 import { Title } from "common/components/title"
 import { Trans, useTranslation } from "react-i18next"
 import { useSettingsNotFilled } from "./use-settings-not-filled"
+import { MISSING_FIELDS_HASH } from "../missing-fields/missing-fields.constants"
 
 /**
  * Displays a message when the user has not filled in all the settings for their installation.
@@ -46,10 +47,15 @@ export const SettingsNotFilled = () => {
         {errorsMapping.map((error) => (
           <Text key={error.route} size="lg">
             <Trans
-              defaults="<CustomLink>{{page}}</CustomLink> : il y a <strong>{{count}} champs manquants</strong>."
+              defaults="<CustomLink>{{page}}</CustomLink> : <strong>{{count}} informations non renseignées</strong>."
               values={{ page: error.name, count: error.errors.length }}
               components={{
-                CustomLink: <NavLink to={error.route} underline />,
+                CustomLink: (
+                  <NavLink
+                    to={{ pathname: error.route, hash: MISSING_FIELDS_HASH }}
+                    underline
+                  />
+                ),
                 strong: <strong />,
               }}
             />

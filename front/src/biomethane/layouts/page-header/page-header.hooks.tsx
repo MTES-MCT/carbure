@@ -13,9 +13,11 @@ import {
 } from "biomethane/api"
 import useEntity from "common/hooks/entity"
 import { HttpError } from "common/services/api-fetch"
-import { MissingFields } from "biomethane/components/missing-fields"
 import { Text } from "common/components/text"
-import { useNavigateToMissingFields } from "biomethane/components/missing-fields"
+import {
+  useNavigateToMissingFields,
+  MissingFields,
+} from "biomethane/components/missing-fields"
 import { AnnualDeclarationStatus } from "biomethane/types"
 import { DeclarationValidatedModalStep1 } from "./declaration-validated-modal/declaration-validated-modal-step1"
 

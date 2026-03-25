@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import serializers
 
-from core.models import Entity, EntityCertificate, GenericCertificate, Pays, UserRights, UserRightsRequests
+from core.models import Entity, EntityCertificate, Pays, UserRights, UserRightsRequests
 from core.tests_utils import assert_object_contains_data, setup_current_user
 from entity.factories.entity import EntityFactory
 from entity.services.enable_entity import enable_entity
@@ -34,7 +34,7 @@ class EntityRegistrationAddCompanyTest(TestCase):
         self.entity_data["registered_country"] = "FR"
 
     def test_register_company(self):
-        GenericCertificate.objects.create(
+        GenericCertificateFactory.create(
             certificate_id="EU-ISCC-Cert-PL123-12345678",
             certificate_type="ISCC",
             valid_from=datetime.date(2020, 1, 1),
