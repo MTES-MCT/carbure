@@ -148,9 +148,7 @@ class BalanceService:
         # Use a defaultdict with a factory function that creates an appropriate balance entry
         balance = defaultdict(partial(BalanceService._init_balance_entry, unit))
 
-        operations = operations.filter(
-            status__in=[Operation.PENDING, Operation.ACCEPTED, Operation.VALIDATED, Operation.DECLARED, Operation.DRAFT]
-        )
+        operations = operations.filter(status__in=Operation.ACTIVE_STATUSES)
 
         for operation in operations:
             credit_operation = operation.is_credit(entity_id)
@@ -181,7 +179,7 @@ class BalanceService:
                     if group_by != BalanceService.GROUP_BY_CATEGORY:
                         balance[key]["biofuel"] = operation.biofuel
 
-                if not (credit_operation and (operation.status == Operation.PENDING or operation.status == Operation.DRAFT)):
+                if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
                     # Update available balance
                     BalanceService._update_available_balance(
                         balance, key, operation, detail, credit_operation, conversion_factor

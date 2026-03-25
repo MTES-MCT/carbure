@@ -52,6 +52,7 @@ class Operation(models.Model):
     CORRECTED = "CORRECTED"  # By customs
     VALIDATED = "VALIDATED"  # By customs
     DRAFT = "DRAFT"  # For transfert operations
+
     OPERATION_STATUSES = (
         (PENDING, PENDING),
         (ACCEPTED, ACCEPTED),
@@ -74,6 +75,7 @@ class Operation(models.Model):
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION"
     TRANSFERT = "TRANSFERT"
     EXPEDITION = "EXPEDITION"
+    EXPIRATION = "EXPIRATION"
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -85,10 +87,20 @@ class Operation(models.Model):
         (DEVALUATION, DEVALUATION),
         (CUSTOMS_CORRECTION, CUSTOMS_CORRECTION),
         (TRANSFERT, TRANSFERT),
+        (EXPIRATION, EXPIRATION),
     )
 
     API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR]
     API_DELETABLE_TYPES = [CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION]
+
+    # Types that generate initial credit volumes (from physical operations)
+    CREDIT_TYPES = [INCORPORATION, MAC_BIO, LIVRAISON_DIRECTE]
+
+    # Statuses considered active in balance calculation (credits + debits)
+    ACTIVE_STATUSES = [PENDING, ACCEPTED, VALIDATED, DECLARED, DRAFT]
+
+    # Definitive statuses for confirmed operations (no longer pending)
+    CONFIRMED_STATUSES = [ACCEPTED, VALIDATED, DECLARED]
 
     ESSENCE = "ESSENCE"
     GAZOLE = "GAZOLE"
