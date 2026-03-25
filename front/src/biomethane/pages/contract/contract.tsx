@@ -13,7 +13,9 @@ import { FormContext, useForm } from "common/components/form2"
 import { ContractInfosForm } from "./types"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
 import { useMissingFields } from "biomethane/components/missing-fields"
-import { GitBookProvider, GitBookFrame } from "@gitbook/embed/react"
+import { GitBookProvider, useGitBook } from "@gitbook/embed/react"
+import { GitBookFrameClient } from "@gitbook/embed"
+import { useEffect, useRef } from "react"
 
 export const BiomethaneContractPageContent = () => {
   const form = useForm<ContractInfosForm>({})
@@ -28,6 +30,7 @@ export const BiomethaneContractPageContent = () => {
   const { hasSelectedEntity } = useSelectedEntity()
 
   useMissingFields(form)
+  useDocumentation("/biomethane/parametres-de-la-societe/contrat")
 
   if (loading) return <LoaderOverlay />
 
@@ -56,24 +59,40 @@ export const BiomethaneContractPageContent = () => {
 
 export const BiomethaneContractPage = () => (
   <>
-    <SectionsManagerProvider>
-      <BiomethaneContractPageContent />
-    </SectionsManagerProvider>
-
     <GitBookProvider siteURL="https://carbure-1.gitbook.io/">
-      <GitBookFrame
-        tabs={["docs"]}
-        actions={[
-          {
-            icon: "circle-question",
-            label: "Contact Support",
-            onClick: () => {
-              window.open("https://support.example.com", "_blank")
-            },
-          },
-        ]}
-        closeButton
-      />
+      <SectionsManagerProvider>
+        <BiomethaneContractPageContent />
+      </SectionsManagerProvider>
     </GitBookProvider>
   </>
 )
+
+function useDocumentation(path: string) {
+  const gitbook = useGitBook()
+  const iframeRef = useRef<HTMLIFrameElement>()
+  const frameRef = useRef<GitBookFrameClient>()
+
+  useEffect(() => {
+    const iframe = iframeRef.current ?? document.createElement("iframe")
+    iframe.src = gitbook.getFrameURL({})
+    iframe.width = "720px"
+    iframe.height = "100%"
+    iframe.style.border = "1px solid var(--border-default-grey)"
+    iframeRef.current = iframe
+
+    const sibling = document.querySelector("#root #app div section")
+    sibling?.after(iframe)
+
+    const frame = gitbook.createFrame(iframeRef.current)
+    frameRef.current = frame
+    frame.configure({ tabs: ["docs"] })
+
+    return () => {
+      iframeRef.current?.remove()
+    }
+  }, [gitbook, path])
+
+  useEffect(() => {
+    frameRef.current?.navigateToPage(path)
+  }, [path])
+}
