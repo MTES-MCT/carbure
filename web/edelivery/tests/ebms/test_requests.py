@@ -9,12 +9,14 @@ from edelivery.ebms.requests import BaseRequest, EOGetTransactionRequest, GetSou
 class BaseRequestTest(TestCase):
     def setUp(self):
         self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
+        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
 
     def tearDown(self):
         patch.stopall()
 
     def test_inserts_request_id(self):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
+
         request = BaseRequest("<request/>")
         expected_body = """\
 <request>
@@ -24,7 +26,8 @@ class BaseRequestTest(TestCase):
 
     @patch("edelivery.ebms.requests.zip_and_stream_udb_request")
     def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
+
         patched_zip_and_stream_udb_request.return_value = "abcdef"
         request = BaseRequest("<request/>")
 
@@ -41,21 +44,15 @@ class BaseRequestTest(TestCase):
         self.assertEqual(BaseRequestResponse, request.response_class)
 
 
-class GetSourcingContactByIdRequestTest(TestCase):
-    def setUp(self):
-        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
-
-    def tearDown(self):
-        patch.stopall()
-
+class GetSourcingContactByIdRequestTest(BaseRequestTest):
     def test_knows_its_identifier(self):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
 
         request = GetSourcingContactByIdRequest("")
         self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.id)
 
     def test_injects_request_id_and_sourcing_contact_id_in_body(self):
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
 
         request = GetSourcingContactByIdRequest("99999")
         expected_body = """\
@@ -72,14 +69,7 @@ class GetSourcingContactByIdRequestTest(TestCase):
 
 
 @patch.dict("os.environ", {"CARBURE_NTR": "123"})
-class EOGetTransactionRequestTest(TestCase):
-    def setUp(self):
-        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
-
-    def tearDown(self):
-        patch.stopall()
-
+class EOGetTransactionRequestTest(BaseRequestTest):
     def test_knows_its_response_class(self):
         request = EOGetTransactionRequest("99999")
         self.assertEqual(EOGetTransactionResponse, request.response_class)
