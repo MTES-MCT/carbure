@@ -10,26 +10,18 @@ import { SimpleMenu } from "common/components/menu2"
 
 type GHGRangeFormComponentProps = {
   balance: Balance
-  ghgReductionMin?: number
-  ghgReductionMax?: number
+  onRangeChange?: (gesBoundMin: number, gesBoundMax: number) => void
 }
 
 export const GHGRangeForm = ({
   balance,
-  ghgReductionMin,
-  ghgReductionMax,
+  onRangeChange,
 }: GHGRangeFormComponentProps) => {
   const { t } = useTranslation()
   const { value, bind, setValue } = useFormContext<GHGRangeFormProps>()
 
-  const _ghgReductionMin = floorNumber(
-    ghgReductionMin ?? balance?.ghg_reduction_min ?? 50,
-    1
-  )
-  const _ghgReductionMax = ceilNumber(
-    ghgReductionMax ?? balance?.ghg_reduction_max ?? 100,
-    1
-  )
+  const ghgReductionMin = floorNumber(balance?.ghg_reduction_min ?? 50, 1)
+  const ghgReductionMax = ceilNumber(balance?.ghg_reduction_max ?? 100, 1)
 
   // When the component is mounted, init form values with the balance values only if they are not already set
   useEffect(() => {
@@ -48,10 +40,18 @@ export const GHGRangeForm = ({
       step={0.1}
       suffix="%"
       label={t("Définissez le taux de réduction GES des lots à prélever")}
-      minRange={bind("gesBoundMin")}
-      maxRange={bind("gesBoundMax")}
-      min={_ghgReductionMin}
-      max={_ghgReductionMax}
+      minRange={bind("gesBoundMin", {
+        onChange: onRangeChange
+          ? (_value) => onRangeChange(_value!, value.gesBoundMax!)
+          : undefined,
+      })}
+      maxRange={bind("gesBoundMax", {
+        onChange: onRangeChange
+          ? (_value) => onRangeChange(value.gesBoundMin!, _value!)
+          : undefined,
+      })}
+      min={ghgReductionMin}
+      max={ghgReductionMax}
     />
   )
 }
