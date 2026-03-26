@@ -41,11 +41,13 @@ export const useAdvancedFiltersBalance = ({
       {
         ...query,
         [BalancesFilter.feedstock]: value.feedstock ?? [],
-        // [BalancesFilter.durability_period]: value.durability_period ?? [],
-        // [BalancesFilter.origin_country]: value.origin_country ?? [],
+        [BalancesFilter.durability_period]: value.durability_period ?? [],
+        [BalancesFilter.origin_country]: value.origin_country ?? [],
         sector: [balance.sector],
         customs_category: [balance.customs_category],
         biofuel: [balance.biofuel?.code],
+        ges_bound_min: value.gesBoundMin,
+        ges_bound_max: value.gesBoundMax,
       },
       filter as BalancesFilter
     )

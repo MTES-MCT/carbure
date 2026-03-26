@@ -9960,11 +9960,28 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: from_to
           schema:
@@ -10067,6 +10084,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -10601,6 +10626,15 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -10609,11 +10643,7 @@ paths:
         - in: query
           name: feedstock
           schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
+            type: string
         - in: query
           name: from_to
           schema:
@@ -10732,6 +10762,10 @@ paths:
           required: false
           in: query
           description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: origin_country
           schema:
             type: string
         - name: page
@@ -10889,11 +10923,28 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: filter
           schema:
@@ -11009,6 +11060,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -11211,11 +11270,28 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: filter
           schema:
@@ -11334,6 +11410,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
