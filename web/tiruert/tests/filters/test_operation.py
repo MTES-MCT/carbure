@@ -4,7 +4,7 @@ from django.http import QueryDict
 from django.test import RequestFactory, TestCase
 
 from core.models import Entity
-from tiruert.filters.operation import BaseFilter, OperationFilter, OperationFilterForBalance
+from tiruert.filters.operation import BaseFilter, OperationFilterForBalance
 from tiruert.models.operation import Operation
 
 
@@ -189,25 +189,6 @@ class BaseFilterTest(TestCase):
         self.assertEqual(len(q_filter.children), 2)
 
         queryset.filter.return_value.distinct.assert_called_once()
-
-
-class OperationFilterTest(TestCase):
-    """Unit tests for OperationFilter."""
-
-    def setUp(self):
-        self.factory = RequestFactory()
-
-    def test_date_from_filter_field_mapping(self):
-        """Test OperationFilter has date_from filter mapped to created_at__gte."""
-        request = self.factory.get("/test/?date_from=2024-01-01")
-        queryset = Operation.objects.none()
-
-        filterset = OperationFilter({"date_from": "2024-01-01"}, queryset=queryset, request=request)
-
-        # Verify date_from is in filters
-        self.assertIn("date_from", filterset.filters)
-        self.assertEqual(filterset.filters["date_from"].field_name, "created_at")
-        self.assertEqual(filterset.filters["date_from"].lookup_expr, "gte")
 
 
 class OperationFilterForBalanceTest(TestCase):

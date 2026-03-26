@@ -5,7 +5,6 @@ from django.conf import settings
 from django.db.models import Q
 from django_filters import (
     CharFilter,
-    DateFilter,
     FilterSet,
     NumberFilter,
     AllValuesMultipleFilter,
@@ -21,7 +20,6 @@ from tiruert.models.operation import Operation
 
 class BaseFilter(FilterSet):
     entity_id = CharFilter(method="filter_entity")
-    date_to = DateFilter(field_name="created_at", lookup_expr="lte")
     operation = MultipleChoiceFilter(
         choices=Operation.OPERATION_TYPES + (("ACQUISITION", "ACQUISITION"),), field_name="type"
     )
@@ -121,13 +119,13 @@ class BaseFilter(FilterSet):
             "operation",
             "status",
             "entity_id",
-            "date_to",
             "period",
         ]
 
 
 class OperationFilter(BaseFilter):
-    date_from = DateFilter(field_name="created_at", lookup_expr="gte")
+    # date_from = DateFilter(field_name="created_at", lookup_expr="gte")
+    pass
 
 
 class OperationFilterForBalance(BaseFilter):
