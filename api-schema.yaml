@@ -10607,6 +10607,14 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: from_to
           schema:
             type: string

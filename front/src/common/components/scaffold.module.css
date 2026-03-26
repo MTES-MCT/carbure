@@ -160,6 +160,10 @@ section.actionbar {
   gap: var(--spacing-2w);
 }
 
+.row--gap-sm {
+  gap: var(--spacing-1w);
+}
+
 .grid {
   --grid-cell-width: 192px;
   display: grid;
