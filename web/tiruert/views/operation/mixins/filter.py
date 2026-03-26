@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation import Operation
+from tiruert.models.operation_detail import OperationDetail
 
 
 class FilterActionMixin:
@@ -153,37 +154,58 @@ class FilterActionMixin:
         if filter in query_params:
             query_params.pop(filter)
 
-        filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
-        queryset = filterset.qs
-
         filters = {
+            # Lot-level
+            "feedstock": "lot__feedstock__code",
+            "origin_country": "lot__country_of_origin__code_pays",
+            # Operation-level
             "sector": "sector",
-            "customs_category": "customs_category",
-            "biofuel": "biofuel__code",
+            "customs_category": "operation__customs_category",
+            "biofuel": "operation__biofuel__code",
             "depot": "depots",
-            "feedstock": "details__lot__feedstock__code",
-            "durability_period": "durability_period",
-            "origin_country": "details__lot__country_of_origin__code_pays",
+            "durability_period": "operation__durability_period",
         }
 
         column = filters.get(filter)
         if not column:
             raise Exception(f"Filter '{filter}' does not exist for balances")
 
-        queryset = queryset.annotate(
+        ges_bound_min = request.query_params.get("ges_bound_min")
+        ges_bound_max = request.query_params.get("ges_bound_max")
+
+        feedstock_values = query_params.pop("feedstock", [])
+        origin_country_values = query_params.pop("origin_country", [])
+
+        filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
+        operation_qs = filterset.qs
+
+        details_qs = OperationDetail.objects.filter(operation__in=operation_qs)
+
+        if feedstock_values:
+            details_qs = details_qs.filter(lot__feedstock__code__in=feedstock_values)
+        if origin_country_values:
+            details_qs = details_qs.filter(lot__country_of_origin__code_pays__in=origin_country_values)
+
+        if ges_bound_min is not None and ges_bound_max is not None:
+            details_qs = details_qs.filter(
+                lot__ghg_reduction_red_ii__gte=float(ges_bound_min),
+                lot__ghg_reduction_red_ii__lte=float(ges_bound_max),
+            )
+
+        details_qs = details_qs.annotate(
             sector=Case(
-                When(biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
-                When(biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
-                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
+                When(operation__biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
+                When(operation__biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
+                When(operation__biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
                 default=Value(None),
                 output_field=CharField(),
             ),
             depots=Coalesce(
-                "from_depot__name",
-                "to_depot__name",
+                "operation__from_depot__name",
+                "operation__to_depot__name",
             ),
         )
-        values = queryset.values_list(column, flat=True).distinct()
+
+        values = details_qs.values_list(column, flat=True).distinct()
         results = [v for v in values if v]
-        data = set(results)
-        return Response(list(data))
+        return Response(list(set(results)))

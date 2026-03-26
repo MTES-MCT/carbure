@@ -31,6 +31,9 @@ class BaseFilter(FilterSet):
     period = CharFilter(method="filter_period")
     customs_category = MultipleChoiceFilter(choices=MatierePremiere.MP_CATEGORIES)
     status = MultipleChoiceFilter(choices=Operation.OPERATION_STATUSES)
+    feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code")
+    origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays")
+    durability_period = AllValuesMultipleFilter(field_name="durability_period")
 
     order_by = CustomOrderingFilter(
         fields=(
