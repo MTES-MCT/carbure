@@ -12740,6 +12740,7 @@ export interface operations {
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 from_to?: string;
                 ges_bound_max?: number;
                 ges_bound_min?: number;

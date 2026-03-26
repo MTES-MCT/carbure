@@ -1,52 +1,79 @@
 import { Box } from "common/components/scaffold"
 import { Text } from "common/components/text"
-import { useAdvancedFiltersBalance } from "./advanced-filters.hooks"
+import {
+  hasFiltersSelected,
+  useAdvancedFiltersBalance,
+} from "./advanced-filters.hooks"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
+import { useFormContext } from "common/components/form2"
+import { Balance } from "accounting/types"
+import { useMemo } from "react"
+import { QueryFilters } from "common/hooks/query-builder-2"
+import { GHGRangeForm } from "../ghg-range-form"
+import { AvailableBalance } from "./available-balance"
+import {
+  AdvancedFiltersFormProps,
+  ADVANCED_FILTER_FIELDS,
+  Filters,
+} from "./advanced-filters.types"
 
-/**
- * Composant avec value qui est un objet avec les filtres et leurs valeurs sélectionnées, selon le type de filtre
- * filtres :
- * - matiere premiere
- * - période de durabilité
- * - taux de réduction GES
- * - Pays d'origine
- *
- * il faut pouvoir faire un appel http pour chaque filtre pour récupérer les options possibles, avec éventuellement les valeurs des autres filtres
- *
- * Plan :
- * - Utiliser l'endpoint /api/accounting/biofuels/filters pour récupérer les options possibles pour chaque filtre et en faire un hook useGetFilterOptions
- * - Utiliser le hook useGetFilterOptions pour récupérer les options possibles pour chaque filtre
- * - définir les labels pour chaque filtre
- * - Populer les valeurs de la variable value dans les champs
- */
+export const AdvancedFiltersBalance = ({ balance }: { balance: Balance }) => {
+  const { getFilterOptions, filterNormalizers, filterLabels } =
+    useAdvancedFiltersBalance({ balance })
 
-export type AdvancedFiltersBalanceProps = {
-  value?: {
-    feedstock: string[]
-    durabilityPeriod: string[]
-    originCountry: string[]
+  const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
+
+  const selected2: Filters = useMemo(
+    () =>
+      Object.fromEntries(
+        ADVANCED_FILTER_FIELDS.map((filterField) => [
+          filterField,
+          value[filterField] ?? [],
+        ])
+      ) as Filters,
+    [value]
+  )
+
+  const onSelect = (filters: QueryFilters) => {
+    Object.entries(filters).forEach(([filter, value]) => {
+      setField(filter as keyof AdvancedFiltersFormProps, value ?? [])
+    })
   }
-}
 
-export const AdvancedFiltersBalance = (props: AdvancedFiltersBalanceProps) => {
-  const { getFilterOptions, state, actions, filterNormalizers, filterLabels } =
-    useAdvancedFiltersBalance()
   return (
-    <FilterMultiSelect2
-      filterLabels={filterLabels}
-      getFilterOptions={getFilterOptions}
-      selected={state.filters}
-      onSelect={actions.setFilters}
-      normalizers={filterNormalizers}
-    />
+    <div>
+      <Text margin> Filtres avancés </Text>
+      <FilterMultiSelect2
+        filterLabels={filterLabels}
+        getFilterOptions={getFilterOptions}
+        selected={selected2}
+        onSelect={onSelect}
+        normalizers={filterNormalizers}
+      />
+    </div>
   )
 }
 
-export const AdvancedFiltersBalanceCard = (
-  props: AdvancedFiltersBalanceProps
-) => (
-  <Box>
-    <Text>Filtres avancés</Text>
-    <AdvancedFiltersBalance {...props} />
-  </Box>
-)
+export const AdvancedFiltersBalanceCard = ({
+  balance,
+}: {
+  balance: Balance
+}) => {
+  const { value } = useFormContext<AdvancedFiltersFormProps>()
+  const _hasFiltersSelected = hasFiltersSelected(value)
+
+  return (
+    <Box>
+      <div style={{ maxWidth: "600px" }}>
+        <GHGRangeForm
+          balance={balance}
+          ghgReductionMin={_hasFiltersSelected ? value.gesBoundMin : undefined}
+          ghgReductionMax={_hasFiltersSelected ? value.gesBoundMax : undefined}
+        />
+      </div>
+      <AdvancedFiltersBalance balance={balance} />
+
+      <AvailableBalance balance={balance} />
+    </Box>
+  )
+}
