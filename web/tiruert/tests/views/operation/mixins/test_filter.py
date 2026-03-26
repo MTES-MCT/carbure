@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.test import RequestFactory, TestCase
 from rest_framework.request import Request
@@ -126,17 +126,22 @@ class FilterBalanceEndpointTest(TestCase):
 
     def _setup_mock_queryset(self, return_values):
         """Setup mock queryset with given return values."""
-        mock_queryset = Mock()
-        mock_queryset.annotate.return_value = mock_queryset
-        mock_queryset.values_list.return_value.distinct.return_value = return_values
-        self.view.queryset = mock_queryset
+        mock_operation_qs = Mock()
+        self.view.queryset = mock_operation_qs
 
         # Setup filterset mock
         mock_filterset = Mock()
-        mock_filterset.qs = mock_queryset
+        mock_filterset.qs = mock_operation_qs
         self.view.filterset_class.return_value = mock_filterset
 
-        return mock_queryset
+        # Setup OperationDetail mock queryset
+        mock_details_qs = Mock()
+        mock_details_qs.filter.return_value = mock_details_qs
+        mock_details_qs.annotate.return_value = mock_details_qs
+        mock_details_qs.values_list.return_value.distinct.return_value = return_values
+        self._mock_details_qs = mock_details_qs
+
+        return mock_details_qs
 
     def test_raises_exception_when_no_filter_specified(self):
         """Test filters_balance raises exception when filter parameter is missing."""
@@ -159,21 +164,23 @@ class FilterBalanceEndpointTest(TestCase):
 
         self.assertEqual(str(context.exception), "Filter 'invalid_filter' does not exist for balances")
 
-    def test_supported_filters_mapping(self):
+    @patch("tiruert.views.operation.mixins.filter.OperationDetail.objects")
+    def test_supported_filters_mapping(self, mock_od_manager):
         """Test all supported filters map to correct columns."""
         expected_mappings = {
             "sector": "sector",
-            "customs_category": "customs_category",
-            "biofuel": "biofuel__code",
+            "customs_category": "operation__customs_category",
+            "biofuel": "operation__biofuel__code",
             "depot": "depots",
-            "feedstock": "details__lot__feedstock__code",
-            "durability_period": "durability_period",
-            "origin_country": "details__lot__country_of_origin__code_pays",
+            "feedstock": "lot__feedstock__code",
+            "durability_period": "operation__durability_period",
+            "origin_country": "lot__country_of_origin__code_pays",
         }
 
         for filter_name, expected_column in expected_mappings.items():
             with self.subTest(filter=filter_name):
                 mock_queryset = self._setup_mock_queryset([])
+                mock_od_manager.filter.return_value = mock_queryset
                 request = self._make_drf_request(f"/operations/balance/filters/?filter={filter_name}")
                 self.view.request = request
 
@@ -181,9 +188,11 @@ class FilterBalanceEndpointTest(TestCase):
 
                 mock_queryset.values_list.assert_called_with(expected_column, flat=True)
 
-    def test_returns_unique_non_null_values(self):
+    @patch("tiruert.views.operation.mixins.filter.OperationDetail.objects")
+    def test_returns_unique_non_null_values(self, mock_od_manager):
         """Test filters_balance returns unique values and excludes None."""
-        self._setup_mock_queryset(["value1", "value2", "value1", None])
+        mock_details_qs = self._setup_mock_queryset(["value1", "value2", "value1", None])
+        mock_od_manager.filter.return_value = mock_details_qs
         request = self._make_drf_request("/operations/balance/filters/?filter=biofuel")
         self.view.request = request
 
