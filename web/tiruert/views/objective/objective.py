@@ -133,11 +133,11 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
         query_params["entity_id"] = target_entity_id
         requested_year = int(query_params.get("year"))
 
-        # Use snapshot for past declaration years if available
         if "current_year" not in self._execution_cache:
             self._execution_cache["current_year"] = DeclarationPeriodService.get_current_declaration_year()
         current_year = self._execution_cache["current_year"]
 
+        # Use snapshot for past declaration years if available
         if current_year and requested_year < current_year:
             snapshot_data = ObjectiveSnapshotService.get_snapshot(target_entity_id, requested_year)
             if snapshot_data is not None:

@@ -1,12 +1,12 @@
 from datetime import datetime, time
 
 from django.db import models
-from django.utils import timezone
 from django.utils.timezone import make_aware
 
 from tiruert.models import MacFossilFuel, Objective
 from tiruert.models.elec_operation import ElecOperation
 from tiruert.services.balance import BalanceService
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.elec_balance import ElecBalanceService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
@@ -19,7 +19,7 @@ class ObjectiveService:
         E_nt = ∑(Volume MaC x PCI relatif x Taux de prise en compte relatif)
         """
         if year is None:
-            year = timezone.now().year
+            year = DeclarationPeriodService.get_current_declaration_year()
 
         total_energy = mac_queryset.annotate(
             energy=models.F("volume")
@@ -397,7 +397,7 @@ class ObjectiveService:
         Calculate the objective target for a specific customs category
         """
         # 1. Get the capped objective for the given year and customs category
-        year = timezone.now().year
+        year = DeclarationPeriodService.get_current_declaration_year()
         capped_objectives = ObjectiveService._get_capped_objectives(year)
         objective = capped_objectives.filter(customs_category=customs_category).first()
         if not objective:
