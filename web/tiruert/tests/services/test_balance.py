@@ -582,7 +582,11 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
 
         # Filter to exclude high GHG (keep only 50-70%)
         result = BalanceService.calculate_balance(
-            operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "liters", ges_bound_min=50.0, ges_bound_max=70.0
+            operations,
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "liters",
+            detail_filters={"ges_bound_min": 50.0, "ges_bound_max": 70.0},
         )
 
         # Operations should be excluded, so all quantities should be 0

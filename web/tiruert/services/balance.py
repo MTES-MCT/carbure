@@ -1,7 +1,10 @@
 from collections import defaultdict
 from functools import partial
 
+from django.db.models import Prefetch
+
 from tiruert.models import Operation
+from tiruert.models.operation_detail import OperationDetail
 
 
 class BalanceService:
@@ -129,7 +132,34 @@ class BalanceService:
         )
 
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit, date_from=None, ges_bound_min=None, ges_bound_max=None):
+    def _prefetch_filtered_details(operations, detail_filters=None):
+        """
+        Pre-filter OperationDetails at DB level using Prefetch.
+        detail_filters keys: ges_bound_min, ges_bound_max, feedstock, origin_country
+        """
+        details_qs = OperationDetail.objects.select_related("lot")
+
+        if detail_filters:
+            ges_min = detail_filters.get("ges_bound_min")
+            ges_max = detail_filters.get("ges_bound_max")
+            if ges_min is not None and ges_max is not None:
+                details_qs = details_qs.filter(
+                    lot__ghg_reduction_red_ii__gt=float(ges_min),
+                    lot__ghg_reduction_red_ii__lt=float(ges_max),
+                )
+
+            feedstock = detail_filters.get("feedstock")
+            if feedstock:
+                details_qs = details_qs.filter(lot__feedstock__code__in=feedstock)
+
+            origin_country = detail_filters.get("origin_country")
+            if origin_country:
+                details_qs = details_qs.filter(lot__country_of_origin__code_pays__in=origin_country)
+
+        return operations.prefetch_related(Prefetch("details", queryset=details_qs, to_attr="prefetched_details"))
+
+    @staticmethod
+    def calculate_balance(operations, entity_id, group_by, unit, date_from=None, detail_filters=None):
         """
         Calculates balances based on the specified grouping
         'operations' is a queryset of already filtered operations
@@ -140,7 +170,7 @@ class BalanceService:
         - group_by: The grouping type for the balance calculation (e.g., sector, category, lot, depot)
         - unit: The unit for the balance calculation
         - date_from: (Optional) used to calculate teneur on a specific period
-        - ges_bound_min and ges_bound_max: (Optional) used to filter lots based on their GHG reduction values
+        - detail_filters: (Optional) dict with lot-level filters (ges_bound_min, ges_bound_max, feedstock, origin_country)
 
         Returns:
         - A dictionary containing the calculated balances based on the specified grouping
@@ -151,6 +181,8 @@ class BalanceService:
         operations = operations.filter(
             status__in=[Operation.PENDING, Operation.ACCEPTED, Operation.VALIDATED, Operation.DECLARED, Operation.DRAFT]
         )
+
+        operations = BalanceService._prefetch_filtered_details(operations, detail_filters)
 
         for operation in operations:
             credit_operation = operation.is_credit(entity_id)
@@ -163,14 +195,7 @@ class BalanceService:
 
             conversion_factor = BalanceService._get_conversion_factor(operation, unit)
 
-            for detail in operation.details.all():
-                # Keep only lots with requested GHG reduction
-                if ges_bound_min is not None and ges_bound_max is not None:
-                    if detail.lot.ghg_reduction_red_ii <= float(ges_bound_min) or detail.lot.ghg_reduction_red_ii >= float(
-                        ges_bound_max
-                    ):
-                        continue
-
+            for detail in operation.prefetched_details:
                 key = BalanceService._get_key(operation, group_by, detail, depot)
 
                 if group_by != BalanceService.GROUP_BY_CATEGORY:
