@@ -126,24 +126,19 @@ class SimulationLotOutputSerializerTest(TestCase):
         test_cases = [
             # (data, field_checks)
             (
-                {"lot_id": 42, "volume": 123.45, "emission_rate_per_mj": 55.5},
+                {"lot_id": 42, "volume": 123.45},
                 [
                     ("lot_id", 42, int),
                     ("volume", 123.45, None),  # Check float conversion
-                    ("emission_rate_per_mj", 55.5, float),
                 ],
             ),
             (
-                {"lot_id": 99, "volume": 100.0, "emission_rate_per_mj": 50.0},
+                {"lot_id": 99, "volume": 100.0},
                 [("lot_id", 99, int)],
             ),
             (
-                {"lot_id": 1, "volume": 123.456789, "emission_rate_per_mj": 50.0},
+                {"lot_id": 1, "volume": 123.456789},
                 [("volume", 123.456789, None)],  # High precision
-            ),
-            (
-                {"lot_id": 1, "volume": 100.0, "emission_rate_per_mj": 62.5},
-                [("emission_rate_per_mj", 62.5, float)],
             ),
         ]
 

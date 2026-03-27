@@ -134,7 +134,7 @@ class OperationInputSerializerCreateTest(TestCase):
             "debited_entity": self.entity,
             "credited_entity": self.entity,
             "to_depot": self.depot,
-            "lots": [{"id": lot.id, "volume": 500, "emission_rate_per_mj": 10.5}],
+            "lots": [{"id": lot.id, "volume": 500}],
         }
 
         mock_service.perform_checks_before_create.return_value = None
@@ -166,7 +166,7 @@ class OperationInputSerializerCreateTest(TestCase):
             "debited_entity": self.entity,
             "credited_entity": self.entity,
             "to_depot": self.depot,
-            "lots": [{"id": lot.id, "volume": 500, "emission_rate_per_mj": 10.5}],
+            "lots": [{"id": lot.id, "volume": 500}],
         }
 
         mock_service.perform_checks_before_create.return_value = None
@@ -186,6 +186,7 @@ class OperationInputSerializerCreateTest(TestCase):
             biofuel=self.biofuel_eth,
             lot_status="ACCEPTED",
             volume=1000,
+            ghg_total=9.8,
         )
 
         serializer = OperationInputSerializer(context={"request": self.mock_request})
@@ -197,8 +198,8 @@ class OperationInputSerializerCreateTest(TestCase):
             "credited_entity": self.entity,
             "to_depot": self.depot,
             "lots": [
-                {"id": lot.id, "volume": 500, "emission_rate_per_mj": 10.5},
-                {"id": lot.id, "volume": 300, "emission_rate_per_mj": 12.3},
+                {"id": lot.id, "volume": 500},
+                {"id": lot.id, "volume": 300},
             ],
         }
 
@@ -217,7 +218,8 @@ class OperationInputSerializerCreateTest(TestCase):
         detail1 = operation.details.first()
         self.assertEqual(detail1.lot_id, lot.id)
         self.assertEqual(detail1.volume, 500)
-        self.assertEqual(detail1.emission_rate_per_mj, 10.5)
+        # emission_rate_per_mj comes from CarbureLot.ghg_total
+        self.assertEqual(detail1.emission_rate_per_mj, 9.8)
 
     def test_validate_type_accepts_authorized_types(self):
         """Should accept types in Operation.API_CREATABLE_TYPES."""

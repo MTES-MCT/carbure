@@ -70,7 +70,7 @@ export const useOperationsBiofuelsColumns = ({
       key: OperationOrder.customs_category,
     },
     {
-      header: t("Date"),
+      header: t("Date de création"),
       cell: (item) => <Cell text={formatDate(item.created_at)} />,
       key: OperationOrder.created_at,
     },
