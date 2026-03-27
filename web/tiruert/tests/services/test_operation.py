@@ -368,10 +368,8 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         mock_calculate_target.return_value = 100000  # Dummy target
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
 
-        # Mock CarbureLot.objects.get to return a lot with pci_litre
-        mock_lot = Mock()
-        mock_lot.biofuel.pci_litre = 21.3
-        mock_carbure_lot.objects.get.return_value = mock_lot
+        # Mock CarbureLot.objects.filter().select_related().values_list()
+        mock_carbure_lot.objects.filter.return_value.select_related.return_value.values_list.return_value = [(1, 21.3)]
 
         mock_request = Mock()
         mock_request.entity.id = 1
@@ -408,9 +406,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 50000, "declared_teneur": 20000}}
 
         # Mock CarbureLot with pci_litre = 10 MJ/L
-        mock_lot = Mock()
-        mock_lot.biofuel.pci_litre = 10
-        mock_carbure_lot.objects.get.return_value = mock_lot
+        mock_carbure_lot.objects.filter.return_value.select_related.return_value.values_list.return_value = [(1, 10)]
 
         mock_request = Mock()
         mock_request.entity.id = 1
@@ -440,9 +436,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 80000, "declared_teneur": 15000}}
 
         # Mock CarbureLot with pci_litre = 10 MJ/L
-        mock_lot = Mock()
-        mock_lot.biofuel.pci_litre = 10
-        mock_carbure_lot.objects.get.return_value = mock_lot
+        mock_carbure_lot.objects.filter.return_value.select_related.return_value.values_list.return_value = [(1, 10)]
 
         mock_request = Mock()
         mock_request.entity.id = 1

@@ -76,8 +76,12 @@ class OperationService:
 
             # 3. Convert the teneur to add from liters to MJ
             teneur_to_add = 0
+            lot_ids = [lot["id"] for lot in selected_lots]
+            pci_by_lot = dict(
+                CarbureLot.objects.filter(id__in=lot_ids).select_related("biofuel").values_list("id", "biofuel__pci_litre")
+            )
             for lot in selected_lots:
-                pci = CarbureLot.objects.get(id=lot["id"]).biofuel.pci_litre
+                pci = pci_by_lot.get(lot["id"], 0)
                 teneur_to_add += lot["volume"] * pci
 
             # 4. Check if the futur teneur is below the target
