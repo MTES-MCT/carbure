@@ -311,7 +311,7 @@ class TeneurService:
             data.get("max_n_batches", None),
         )
 
-        return selected_lots, lot_ids, emissions, fun
+        return selected_lots, lot_ids, fun
 
     @staticmethod
     def get_min_and_max_emissions(data, unit):

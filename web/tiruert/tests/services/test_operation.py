@@ -261,7 +261,6 @@ class OperationServiceCheckVolumesTest(TestCase):
     @patch("tiruert.services.operation.TeneurService.prepare_data")
     def test_check_volumes_passes_when_volumes_sufficient(self, mock_prepare_data):
         """Should pass when requested volumes are available."""
-        # Mock TeneurService.prepare_data to return available volumes
         mock_prepare_data.return_value = (
             [1000.0, 2000.0],  # np_volumes (available)
             None,
@@ -285,7 +284,6 @@ class OperationServiceCheckVolumesTest(TestCase):
     @patch("tiruert.services.operation.TeneurService.prepare_data")
     def test_check_volumes_raises_error_when_lot_not_found(self, mock_prepare_data):
         """Should raise ValidationError when requested lot_id doesn't exist."""
-        # Mock TeneurService.prepare_data with only lot_id=1 available
         mock_prepare_data.return_value = (
             [1000.0],  # np_volumes
             None,
@@ -313,7 +311,6 @@ class OperationServiceCheckVolumesTest(TestCase):
     @patch("tiruert.services.operation.TeneurService.prepare_data")
     def test_check_volumes_raises_error_when_insufficient_volume(self, mock_prepare_data):
         """Should raise ValidationError when requested volume exceeds available."""
-        # Mock TeneurService.prepare_data with 1000L available
         mock_prepare_data.return_value = (
             [1000.0],  # np_volumes (available)
             None,
@@ -358,24 +355,18 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Should not raise exception (no target = no check)
         OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
 
-    @patch("tiruert.services.operation.CarbureLot")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
-    def test_check_services_method_are_called_with_data(
-        self, mock_calculate_target, mock_calculate_balance, mock_carbure_lot
-    ):
+    def test_check_services_method_are_called_with_data(self, mock_calculate_target, mock_calculate_balance):
         """Should call ObjectiveService and BalanceService with correct parameters (MJ unit)."""
         mock_calculate_target.return_value = 100000  # Dummy target
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
-
-        # Mock CarbureLot.objects.filter().select_related().values_list()
-        mock_carbure_lot.objects.filter.return_value.select_related.return_value.values_list.return_value = [(1, 21.3)]
 
         mock_request = Mock()
         mock_request.entity.id = 1
         mock_request.GET = {}
 
-        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH")}
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=21.3)}
         selected_lots = [{"id": 1, "volume": 1000}]
         entity_id = 1
 
@@ -392,12 +383,9 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         self.assertEqual(called_args[2], None)  # depot_id
         self.assertEqual(called_args[3], "mj")  # unit
 
-    @patch("tiruert.services.operation.CarbureLot")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
-    def test_check_objectives_compliance_passes_when_below_target(
-        self, mock_calculate_target, mock_calculate_balance, mock_carbure_lot
-    ):
+    def test_check_objectives_compliance_passes_when_below_target(self, mock_calculate_target, mock_calculate_balance):
         """Should pass when future teneur is below target."""
         # Target = 100,000 MJ
         mock_calculate_target.return_value = 100000
@@ -405,14 +393,11 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Current balance: 50,000 MJ pending + 20,000 MJ declared
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 50000, "declared_teneur": 20000}}
 
-        # Mock CarbureLot with pci_litre = 10 MJ/L
-        mock_carbure_lot.objects.filter.return_value.select_related.return_value.values_list.return_value = [(1, 10)]
-
         mock_request = Mock()
         mock_request.entity.id = 1
         mock_request.GET = {}
 
-        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH")}
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
 
         # Request to add 1000L = 10,000 MJ
         # Future teneur: 50,000 + 20,000 + 10,000 = 80,000 MJ < 100,000 (OK)
@@ -422,11 +407,10 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Should not raise exception
         OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
 
-    @patch("tiruert.services.operation.CarbureLot")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_raises_error_when_exceeds_target(
-        self, mock_calculate_target, mock_calculate_balance, mock_carbure_lot
+        self, mock_calculate_target, mock_calculate_balance
     ):
         """Should raise ValidationError when future teneur exceeds target."""
         # Target = 100,000 MJ
@@ -435,14 +419,11 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Current balance: 80,000 MJ pending + 15,000 MJ declared
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 80000, "declared_teneur": 15000}}
 
-        # Mock CarbureLot with pci_litre = 10 MJ/L
-        mock_carbure_lot.objects.filter.return_value.select_related.return_value.values_list.return_value = [(1, 10)]
-
         mock_request = Mock()
         mock_request.entity.id = 1
         mock_request.GET = {}
 
-        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH")}
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
 
         # Request to add 2000L = 20,000 MJ
         # Future teneur: 80,000 + 15,000 + 20,000 = 115,000 MJ > 100,000 (ERROR)

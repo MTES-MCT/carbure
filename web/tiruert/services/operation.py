@@ -41,12 +41,12 @@ class OperationService:
         Check if the selected lots exist and have enough volume to perform the operation
         """
         np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
-
-        # Round available volumes to 8 decimals to match optimization algorithm precision
         available_volumes = {int(lot_id): round(float(volume), 8) for lot_id, volume in zip(np_lot_ids, np_volumes)}
-        requested_volumes = {lot["id"]: lot["volume"] for lot in selected_lots}
 
-        for lot_id, volume in requested_volumes.items():
+        for lot in selected_lots:
+            lot_id = lot["id"]
+            volume = lot["volume"]
+
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
 
@@ -75,14 +75,8 @@ class OperationService:
             balance = list(balance.values())[0]  # keep the first (and only one) element
 
             # 3. Convert the teneur to add from liters to MJ
-            teneur_to_add = 0
-            lot_ids = [lot["id"] for lot in selected_lots]
-            pci_by_lot = dict(
-                CarbureLot.objects.filter(id__in=lot_ids).select_related("biofuel").values_list("id", "biofuel__pci_litre")
-            )
-            for lot in selected_lots:
-                pci = pci_by_lot.get(lot["id"], 0)
-                teneur_to_add += lot["volume"] * pci
+            pci = data["biofuel"].pci_litre
+            teneur_to_add = sum(lot["volume"] * pci for lot in selected_lots)
 
             # 4. Check if the futur teneur is below the target
             futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ

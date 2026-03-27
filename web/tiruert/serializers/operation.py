@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db import transaction
 from rest_framework import serializers
 
-from core.models import Pays
+from core.models import CarbureLot, Pays
 from core.serializers import CountrySerializer
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.operation_detail import OperationDetailSerializer
@@ -120,7 +120,6 @@ class OperationSerializer(BaseOperationSerializer):
 class OperationLotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     volume = serializers.FloatField()
-    emission_rate_per_mj = serializers.FloatField()
 
 
 class OperationInputSerializer(serializers.ModelSerializer):
@@ -167,12 +166,16 @@ class OperationInputSerializer(serializers.ModelSerializer):
                 request, entity_id, selected_lots, validated_data, unit, declaration_year
             )
 
+            # Fetch emission rates from CarbureLot
+            lot_ids = [lot["id"] for lot in selected_lots]
+            emissions_by_lot = dict(CarbureLot.objects.filter(id__in=lot_ids).values_list("id", "ghg_total"))
+
             OperationService.define_operation_status(validated_data)
 
             # Create the operation
             operation = Operation.objects.create(**validated_data)
 
-            # Create the details
+            # Create the details using server-side emission rates
             detail_operations_data = []
             for lot in selected_lots:
                 detail_operations_data.append(
@@ -180,7 +183,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
                         "operation": operation,
                         "lot_id": lot["id"],
                         "volume": lot["volume"],
-                        "emission_rate_per_mj": lot["emission_rate_per_mj"],  # gCO2/MJ
+                        "emission_rate_per_mj": emissions_by_lot[lot["id"]],
                     }
                 )
 
