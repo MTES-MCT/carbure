@@ -3,6 +3,7 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 import scipy.optimize
+import scipy.sparse
 from django.db.models import Q
 
 from adapters.logger import log_warning
@@ -81,58 +82,131 @@ class TeneurService:
         if max_n_batches is not None:
             if max_n_batches < (enforced_volumes != 0).sum():
                 raise ValueError(TeneurServiceErrors.INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES)
-        else:
-            max_n_batches = len(batches_volumes)
 
-        # Optimization objective
-        c = np.concat(
-            (
-                -1 / target_volume * batches_emissions,
-                [0.0 for _ in batches_volumes],
-                [target_emission],
-            )
-        )
-        # Linear inequality constraints
-        A = np.vstack(
-            (
-                c,
-                np.array(
-                    [1 for _ in batches_volumes] + [0 for _ in batches_volumes] + [0],
-                ),
-                np.array(
-                    [0 for _ in batches_volumes] + [1 for _ in batches_volumes] + [0],
-                ),
-                np.hstack(
-                    (
-                        np.diag(-1.0 * np.ones(len(batches_volumes))),
-                        batches_volumes.max() * np.identity(len(batches_volumes)),
-                        np.zeros((len(batches_volumes), 1)),
-                    )
-                ),
-            )
-        )
-        b_l = [0.0, target_volume, 0] + [0.0 for _ in batches_volumes]
-        b_u = [np.inf, target_volume, max_n_batches] + [np.inf for _ in batches_volumes]
+        n = len(batches_volumes)
+        use_binary = max_n_batches is not None
 
-        # Response vector constraints
+        # Response vector constraints on volumes
         enforced_mask = enforced_volumes != 0
         vol_lb = np.where(enforced_mask, enforced_volumes, np.zeros_like(batches_volumes))
         vol_ub = np.where(enforced_mask, enforced_volumes, batches_volumes)
 
-        x_bounds = scipy.optimize.Bounds(
-            lb=np.concatenate((vol_lb, [0 for _ in batches_volumes], [1])),
-            ub=np.concatenate((vol_ub, [1 for _ in batches_volumes], [1])),
-        )
+        if use_binary:
+            # MILP formulation with binary flags to limit the number of selected batches
+            c = np.concatenate(
+                (
+                    -1 / target_volume * batches_emissions,
+                    np.zeros(n),
+                    [target_emission],
+                )
+            )
 
-        res = scipy.optimize.milp(
-            c,
-            # The volumes need not be integers, but the coefficient associated with the max
-            # number of batches are binary variables, so we set them to integers inside
-            # [0;1]
-            integrality=[0 for _ in batches_volumes] + [1 for _ in batches_volumes] + [0],
-            bounds=x_bounds,
-            constraints=(A, b_l, b_u),
-        )
+            width = 2 * n + 1
+
+            row_indices = []
+            col_indices = []
+            values = []
+
+            # Row 0: emission constraint (same as c)
+            for j in range(n):
+                if c[j] != 0:
+                    row_indices.append(0)
+                    col_indices.append(j)
+                    values.append(c[j])
+            row_indices.append(0)
+            col_indices.append(width - 1)
+            values.append(target_emission)
+
+            # Row 1: sum of volumes = target_volume
+            for j in range(n):
+                row_indices.append(1)
+                col_indices.append(j)
+                values.append(1.0)
+
+            # Row 2: sum of binary flags <= max_n_batches
+            for j in range(n):
+                row_indices.append(2)
+                col_indices.append(n + j)
+                values.append(1.0)
+
+            # Rows 3..N+2: -vol_i + V_max * flag_i >= 0
+            v_max = batches_volumes.max()
+            for i in range(n):
+                row_indices.append(3 + i)
+                col_indices.append(i)
+                values.append(-1.0)
+                row_indices.append(3 + i)
+                col_indices.append(n + i)
+                values.append(v_max)
+
+            A = scipy.sparse.csc_matrix(
+                (values, (row_indices, col_indices)),
+                shape=(n + 3, width),
+            )
+            b_l = [0.0, target_volume, 0] + [0.0] * n
+            b_u = [np.inf, target_volume, max_n_batches] + [np.inf] * n
+
+            x_bounds = scipy.optimize.Bounds(
+                lb=np.concatenate((vol_lb, np.zeros(n), [1])),
+                ub=np.concatenate((vol_ub, np.ones(n), [1])),
+            )
+
+            res = scipy.optimize.milp(
+                c,
+                integrality=np.concatenate((np.zeros(n), np.ones(n), [0])),
+                bounds=x_bounds,
+                constraints=scipy.optimize.LinearConstraint(A, b_l, b_u),
+            )
+        else:
+            # Pure LP formulation (no max_n_batches constraint): much faster
+            # Decision variables: [volumes..., target_emission_coeff]
+            c = np.concatenate(
+                (
+                    -1 / target_volume * batches_emissions,
+                    [target_emission],
+                )
+            )
+
+            width = n + 1
+
+            row_indices = []
+            col_indices = []
+            values = []
+
+            # Row 0: emission constraint (same as c)
+            for j in range(n):
+                if c[j] != 0:
+                    row_indices.append(0)
+                    col_indices.append(j)
+                    values.append(c[j])
+            row_indices.append(0)
+            col_indices.append(n)
+            values.append(target_emission)
+
+            # Row 1: sum of volumes = target_volume
+            for j in range(n):
+                row_indices.append(1)
+                col_indices.append(j)
+                values.append(1.0)
+
+            A = scipy.sparse.csc_matrix(
+                (values, (row_indices, col_indices)),
+                shape=(2, width),
+            )
+            b_l = [0.0, target_volume]
+            b_u = [np.inf, target_volume]
+
+            x_bounds = scipy.optimize.Bounds(
+                lb=np.concatenate((vol_lb, [1])),
+                ub=np.concatenate((vol_ub, [1])),
+            )
+
+            res = scipy.optimize.milp(
+                c,
+                integrality=np.zeros(width),
+                bounds=x_bounds,
+                constraints=scipy.optimize.LinearConstraint(A, b_l, b_u),
+            )
 
         result_array = res.x
 
@@ -156,6 +230,10 @@ class TeneurService:
             # Ensure we never exceed available volume, then round to 2 decimals
             safe_volume = min(optimized_volume, available_volume_clean)
             selected_volume = round(safe_volume, 2)
+
+            # Skip negligible volumes that add noise to the response
+            if selected_volume <= 0:
+                continue
 
             selected_batches_volumes[idx] = selected_volume
 
@@ -308,18 +386,31 @@ class TeneurService:
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums
         # For each we have something like:
         # array([30.52876597, 42.1162736 , 30.07384206, 25.05628985, 85.52717505])
-        volumes, emissions, lot_ids = np.array([]), np.array([]), np.array([])
-        enforced_volumes = np.array([]) if "enforced_volumes" in data else None
+        has_enforced = "enforced_volumes" in data
+        enforced_set = set(data["enforced_volumes"]) if has_enforced else set()
+
+        volumes_list, emissions_list, lot_ids_list = [], [], []
+        enforced_list = [] if has_enforced else None
 
         for key, value in balance.items():
             sector, customs_cat, biofuel, lot_id = key
-            volumes = np.append(volumes, value["available_balance"])
-            emissions = np.append(emissions, value["emission_rate_per_mj"])
-            lot_ids = np.append(lot_ids, lot_id)
+            available = value["available_balance"]
 
-            if enforced_volumes is not None:
-                volume = value["available_balance"] if lot_id in data["enforced_volumes"] else 0
-                enforced_volumes = np.append(enforced_volumes, volume)
+            # Skip lots with no usable volume (unless they are enforced)
+            if available <= 0 and lot_id not in enforced_set:
+                continue
+
+            volumes_list.append(available)
+            emissions_list.append(value["emission_rate_per_mj"])
+            lot_ids_list.append(lot_id)
+
+            if enforced_list is not None:
+                enforced_list.append(available if lot_id in enforced_set else 0)
+
+        volumes = np.array(volumes_list, dtype=np.float64)
+        emissions = np.array(emissions_list, dtype=np.float64)
+        lot_ids = np.array(lot_ids_list)
+        enforced_volumes = np.array(enforced_list, dtype=np.float64) if enforced_list is not None else None
 
         # Check for negative volumes and report to Sentry
         if len(volumes) > 0:
