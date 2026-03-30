@@ -1,4 +1,7 @@
+from datetime import datetime, time
+
 from django.http import Http404
+from django.utils.timezone import make_aware
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -165,10 +168,14 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
         if not macs.exists():
             return
 
-        # Operations
-        operations = OperationFilterForBalance(query_params, queryset=Operation.objects.all(), request=request).qs
-
-        elec_ops = ElecOperationFilterForBalance(query_params, queryset=ElecOperation.objects.all(), request=request).qs
+        # Operations bounded to the period end date (same logic as ObjectiveSnapshotService.compute)
+        date_to = make_aware(datetime.combine(period.end_date, time.max))
+        operations = OperationFilterForBalance(query_params, queryset=Operation.objects.all(), request=request).qs.filter(
+            created_at__lte=date_to
+        )
+        elec_ops = ElecOperationFilterForBalance(
+            query_params, queryset=ElecOperation.objects.all(), request=request
+        ).qs.filter(created_at__lte=date_to)
 
         return ObjectiveService.build_objectives_result(
             objectives, macs, operations, elec_ops, target_entity_id, date_from, year=query_params.get("year")
