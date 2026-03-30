@@ -159,7 +159,7 @@ const QuantitySection = ({
   })
 
   const quantityMaxLabel = quantityMax
-    ? `(${t("solde")}: ${formatUnit(balance.available_balance, { fractionDigits: 0 })})`
+    ? `(${t("solde")}: ${formatUnit(balance.available_balance, { fractionDigits: 0, mode: "floor" })})`
     : undefined
 
   return (

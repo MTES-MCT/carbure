@@ -54,7 +54,14 @@ const MaterialAccounting = () => {
           </Route>
         )}
         {(isAdmin || allowAccounting) && (
-          <Route path="admin/objectives" element={<ObjectivesLayout />}>
+          <Route
+            path="admin/objectives"
+            element={
+              <AnnualDeclarationTiruertProvider>
+                <ObjectivesLayout />
+              </AnnualDeclarationTiruertProvider>
+            }
+          >
             <Route index element={<Objectives />} />
             <Route path=":entityId" element={<Objectives />} />
           </Route>
