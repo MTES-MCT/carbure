@@ -106,10 +106,7 @@ function parseObjectivesResponse(objectives: any) {
   }
 }
 
-type ObjectivesEndpoint =
-  | "/tiruert/objectives/"
-  | "/tiruert/admin-objectives/"
-  | "/tiruert/admin-objectives-entity/"
+type ObjectivesEndpoint = "/tiruert/objectives/"
 
 type ObjectivesParams = {
   entity_id: number
@@ -134,34 +131,15 @@ async function fetchObjectives(
 export const getObjectives = async (
   entity_id: number,
   year: number,
-  isAdmin?: boolean
+  selected_entity_id?: number
 ): Promise<Objectives> => {
-  const params = {
+  const params: ObjectivesParams | AdminObjectivesEntityParams = {
     entity_id,
     year: `${year}`,
-  }
+    ...(selected_entity_id !== undefined && { selected_entity_id }),
+  } as ObjectivesParams | AdminObjectivesEntityParams
 
-  if (isAdmin) {
-    return fetchObjectives("/tiruert/admin-objectives/", params)
-  } else {
-    return fetchObjectives("/tiruert/objectives/", params)
-  }
-}
-
-export const getAdminObjectivesEntity = async (
-  entity_id: number,
-  year: number,
-  selected_entity_id: number
-): Promise<Objectives> => {
-  const params = {
-    entity_id,
-    year: `${year}`,
-    date_from: `${year}-01-01`,
-    date_to: `${year}-12-31`,
-    selected_entity_id,
-  }
-
-  return fetchObjectives("/tiruert/admin-objectives-entity/", params)
+  return fetchObjectives("/tiruert/objectives/", params)
 }
 
 /**

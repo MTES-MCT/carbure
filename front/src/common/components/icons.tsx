@@ -4,10 +4,8 @@ import css from "./icons.module.css"
 
 // icons were adapted from https://github.com/tabler/tabler-icons
 
-export interface IconProps extends Omit<
-  React.SVGProps<SVGSVGElement>,
-  "stroke"
-> {
+export interface IconProps
+  extends Omit<React.SVGProps<SVGSVGElement>, "stroke"> {
   passthrough?: boolean
   size?: number
   color?: string
