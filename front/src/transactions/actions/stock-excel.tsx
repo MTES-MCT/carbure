@@ -138,8 +138,11 @@ function useExtractStock(onClose?: () => void) {
       onClose?.()
     },
 
-    onError: () => {
-      notify(t("La répartition des stocks a échoué"), { variant: "danger" })
+    onError: (error) => {
+      const msg =
+        (error as any).response?.data?.message ??
+        t("La répartition des stocks a échoué")
+      notify(msg, { variant: "danger" })
       onClose?.()
     },
   })
