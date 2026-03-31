@@ -53,9 +53,9 @@ def add_excel(request, *args, **kwargs):
                 nb_invalid += 1
             else:
                 nb_valid += 1
+                lots.append(lot_obj)
+                lots_errors.append(errors)
             nb_total += 1
-            lots.append(lot_obj)
-            lots_errors.append(errors)
         lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
         if len(lots_created) == 0:
             return JsonResponse({"status": "error", "message": "Something went wrong"}, status=500)
