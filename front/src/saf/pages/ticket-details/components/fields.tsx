@@ -99,6 +99,15 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
       <Dialog.Section label={t("Affectation")}>
         <TextInput label={t("Fournisseur")} value={ticket.supplier} readOnly />
         <TextInput label={t("Client")} value={ticket.client} readOnly />
+
+        {ticket.agreement_reference && (
+          <TextInput
+            label={t("N° du certificat d'acquisition")}
+            value={ticket.agreement_reference}
+            readOnly
+          />
+        )}
+
         <TextInput
           label={t("Période d'affectation")}
           value={formatPeriod(ticket.assignment_period)}
