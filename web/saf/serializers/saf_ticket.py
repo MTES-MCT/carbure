@@ -75,6 +75,7 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
 
 
 class SafTicketSerializer(SafTicketPreviewSerializer):
+    client_type = serializers.SlugRelatedField(read_only=True, source="client", slug_field="entity_type")
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
     parent_ticket_source = SafRelatedTicketSourceSerializer(read_only=True)
@@ -87,6 +88,7 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
         fields = SafTicketPreviewSerializer.Meta.fields + [
             "free_field",
             "agreement_reference",
+            "client_type",
             "carbure_producer",
             "unknown_producer",
             "carbure_production_site",
