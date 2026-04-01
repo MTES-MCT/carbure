@@ -23,7 +23,7 @@ class SafTicketExportTest(TestCase):
         workbook = load_workbook(BytesIO(response.content))
         self.addCleanup(workbook.close)
 
-        self.assertEqual(workbook.sheetnames, ["tickets", "aeroports"])
+        self.assertEqual(workbook.sheetnames, ["tickets", "aeroports", "biocarburants"])
 
         tickets_sheet = workbook["tickets"]
         headers = [cell.value for cell in tickets_sheet[1]]
@@ -47,6 +47,8 @@ class SafTicketExportTest(TestCase):
                 "production_site",
                 "production_country",
                 "production_site_commissioning_date",
+                "origin_depot",
+                "reception_airport",
                 "eec",
                 "el",
                 "ep",
@@ -59,12 +61,6 @@ class SafTicketExportTest(TestCase):
                 "ghg_total",
                 "ghg_reduction",
                 "free_field",
-                "origin_depot",
-                "reception_airport",
-                "reception_airport_icao",
-                "biofuel_pci_kg",
-                "biofuel_pci_litre",
-                "biofuel_masse_volumique",
                 "ets_status",
             ],
         )
@@ -72,7 +68,7 @@ class SafTicketExportTest(TestCase):
         self.assertEqual(tickets_sheet["A2"].value, self.ticket.carbure_id)
         self.assertEqual(tickets_sheet["B2"].value, self.ticket.year)
         self.assertEqual(tickets_sheet["F2"].value, self.ticket.volume)
-        self.assertEqual(tickets_sheet["AI2"].value, SafTicket.ETS_VALUATION)
+        self.assertEqual(tickets_sheet["AE2"].value, SafTicket.ETS_VALUATION)
 
     def test_saf_ticket_export_does_not_include_ets_status_for_operator(self):
         self.ticket.ets_status = SafTicket.ETS_VALUATION

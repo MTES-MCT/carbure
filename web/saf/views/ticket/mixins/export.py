@@ -6,7 +6,9 @@ from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
 from core.models import Entity
-from core.serializers import AirportSerializer
+from core.models.models import Biocarburant
+from core.serializers import AirportSerializer, BiofuelDetailSerializer
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from saf.serializers.saf_ticket import SafTicketSerializer
 from transactions.models.airport import Airport
 
@@ -56,6 +58,8 @@ def export_tickets_to_excel(tickets, entity):
         {"label": "production_site", "value": get_production_site},
         {"label": "production_country", "value": get_production_country},
         {"label": "production_site_commissioning_date", "value": "production_site_commissioning_date"},
+        {"label": "origin_depot", "value": "origin_lot_site.name"},
+        {"label": "reception_airport", "value": "reception_airport.name"},
         {"label": "eec", "value": "eec"},
         {"label": "el", "value": "el"},
         {"label": "ep", "value": "ep"},
@@ -68,12 +72,6 @@ def export_tickets_to_excel(tickets, entity):
         {"label": "ghg_total", "value": "ghg_total"},
         {"label": "ghg_reduction", "value": "ghg_reduction"},
         {"label": "free_field", "value": "free_field"},
-        {"label": "origin_depot", "value": "origin_lot_site.name"},
-        {"label": "reception_airport", "value": "reception_airport.name"},
-        {"label": "reception_airport_icao", "value": "reception_airport.icao_code"},
-        {"label": "biofuel_pci_kg", "value": "biofuel.pci_kg"},
-        {"label": "biofuel_pci_litre", "value": "biofuel.pci_litre"},
-        {"label": "biofuel_masse_volumique", "value": "biofuel.masse_volumique"},
     ]
 
     is_airline = entity.entity_type == Entity.AIRLINE
@@ -81,6 +79,9 @@ def export_tickets_to_excel(tickets, entity):
 
     if is_airline or is_admin:
         ticket_columns.append({"label": "ets_status", "value": "ets_status"})
+
+    airports = Airport.objects.all().select_related("country")
+    biofuels = Biocarburant.objects.filter(code__in=SAF_BIOFUEL_TYPES)
 
     result = export_to_excel(
         location,
@@ -92,12 +93,23 @@ def export_tickets_to_excel(tickets, entity):
             },
             {
                 "label": _("aeroports"),
-                "rows": AirportSerializer(Airport.objects.all().select_related("country"), many=True).data,
+                "rows": AirportSerializer(airports, many=True).data,
                 "columns": [
                     {"label": "name", "value": "name"},
                     {"label": "icao_code", "value": "icao_code"},
                     {"label": "city", "value": "city"},
                     {"label": "country", "value": "country.name"},
+                ],
+            },
+            {
+                "label": _("biocarburants"),
+                "rows": BiofuelDetailSerializer(biofuels, many=True).data,
+                "columns": [
+                    {"label": "name", "value": "name"},
+                    {"label": "code", "value": "code"},
+                    {"label": "pci_kg", "value": "pci_kg"},
+                    {"label": "pci_litre", "value": "pci_litre"},
+                    {"label": "masse_volumique", "value": "masse_volumique"},
                 ],
             },
         ],
