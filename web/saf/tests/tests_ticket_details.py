@@ -112,6 +112,7 @@ class SafTicketDetailsTest(TestCase):
             "production_site_commissioning_date": "2001-01-01",
             "supplier": self.entity.name,
             "client": self.ticket_client.name,
+            "client_type": self.ticket_client.entity_type,
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
                 "name_en": "CI/CII Animal fat",
@@ -161,4 +162,5 @@ class SafTicketDetailsTest(TestCase):
         data = response.json()
         data.pop("created_at")
 
+        self.maxDiff = None
         self.assertEqual(data, expected_ticket)
