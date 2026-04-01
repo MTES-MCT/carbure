@@ -9943,16 +9943,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -9981,6 +9971,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9998,6 +9989,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -10589,11 +10581,6 @@ paths:
             format: date
           description: Date from where to calculate teneur and quantity
         - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -10640,6 +10627,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -10657,6 +10645,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -10864,16 +10853,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -10912,6 +10891,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -10929,6 +10909,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11183,16 +11164,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -11237,6 +11208,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -11254,6 +11226,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -13853,6 +13826,36 @@ components:
         - category
         - group
         - subcategory
+    ClientTypeEnum:
+      enum:
+        - Producteur
+        - Opérateur
+        - Administration
+        - Trader
+        - Auditor
+        - Administration Externe
+        - Charge Point Operator
+        - Compagnie aérienne
+        - Unknown
+        - Power or Heat Producer
+        - SAF Trader
+        - Producteur de biométhane
+        - Fournisseur de biométhane
+      type: string
+      description: |-
+        * `Producteur` - Producteur
+        * `Opérateur` - Opérateur
+        * `Administration` - Administration
+        * `Trader` - Trader
+        * `Auditor` - Auditeur
+        * `Administration Externe` - Administration Externe
+        * `Charge Point Operator` - Charge Point Operator
+        * `Compagnie aérienne` - Compagnie aérienne
+        * `Unknown` - Unknown
+        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        * `SAF Trader` - Trader de SAF
+        * `Producteur de biométhane` - Producteur de biométhane
+        * `Fournisseur de biométhane` - Fournisseur de biométhane
     CollectionTypeEnum:
       enum:
         - PRIVATE
@@ -16958,11 +16961,7 @@ components:
         volume:
           type: number
           format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
       required:
-        - emission_rate_per_mj
         - id
         - volume
     OperationLotRequest:
@@ -16973,11 +16972,7 @@ components:
         volume:
           type: number
           format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
       required:
-        - emission_rate_per_mj
         - id
         - volume
     OperationStatusEnum:
@@ -17012,6 +17007,7 @@ components:
         - DEVALUATION
         - CUSTOMS_CORRECTION
         - TRANSFERT
+        - EXPIRATION
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -17024,6 +17020,7 @@ components:
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
+        * `EXPIRATION` - EXPIRATION
     OperationUpdate:
       type: object
       properties:
@@ -18066,6 +18063,10 @@ components:
           type: string
           nullable: true
           maxLength: 64
+        client_type:
+          allOf:
+            - $ref: "#/components/schemas/ClientTypeEnum"
+          readOnly: true
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -18077,6 +18078,10 @@ components:
         carbure_production_site:
           allOf:
             - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        production_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
           readOnly: true
         unknown_production_site:
           type: string
@@ -18143,11 +18148,13 @@ components:
         - carbure_production_site
         - child_ticket_sources
         - client
+        - client_type
         - country_of_origin
         - created_at
         - feedstock
         - id
         - parent_ticket_source
+        - production_country
         - reception_airport
         - supplier
         - volume
@@ -18643,11 +18650,7 @@ components:
         volume:
           type: string
           format: decimal
-        emission_rate_per_mj:
-          type: number
-          format: double
       required:
-        - emission_rate_per_mj
         - lot_id
         - volume
     SimulationMinMaxInputRequest:
