@@ -19,6 +19,9 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
 
   if (!ticket) return null
 
+  const productionCountry =
+    ticket.carbure_production_site?.country ?? ticket.production_country
+
   return (
     <div className={cl(css.form, css.columns)}>
       <Dialog.Section label={t("Lot")}>
@@ -84,8 +87,8 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
         <TextInput
           label={t("Pays de production")}
           value={
-            ticket.carbure_production_site
-              ? norm.normalizeCountry(ticket.country_of_origin).label
+            productionCountry
+              ? norm.normalizeCountry(productionCountry).label
               : t("Inconnu")
           }
           readOnly

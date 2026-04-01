@@ -37,6 +37,12 @@ class BiofuelSerializer(serializers.ModelSerializer):
         fields = ["name", "name_en", "code"]
 
 
+class BiofuelDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Biocarburant
+        fields = ["name", "name_en", "code", "pci_kg", "pci_litre", "masse_volumique"]
+
+
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Pays
