@@ -3901,6 +3901,23 @@ export interface components {
             subcategory: string;
         };
         /**
+         * @description * `Producteur` - Producteur
+         *     * `Opérateur` - Opérateur
+         *     * `Administration` - Administration
+         *     * `Trader` - Trader
+         *     * `Auditor` - Auditeur
+         *     * `Administration Externe` - Administration Externe
+         *     * `Charge Point Operator` - Charge Point Operator
+         *     * `Compagnie aérienne` - Compagnie aérienne
+         *     * `Unknown` - Unknown
+         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+         *     * `SAF Trader` - Trader de SAF
+         *     * `Producteur de biométhane` - Producteur de biométhane
+         *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+         * @enum {string}
+         */
+        ClientTypeEnum: PathsApiSafTicketsGetParametersQueryClient_type;
+        /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
          * @enum {string}
@@ -5151,15 +5168,11 @@ export interface components {
             id: number;
             /** Format: double */
             volume: number;
-            /** Format: double */
-            emission_rate_per_mj: number;
         };
         OperationLotRequest: {
             id: number;
             /** Format: double */
             volume: number;
-            /** Format: double */
-            emission_rate_per_mj: number;
         };
         /**
          * @description * `PENDING` - PENDING
@@ -5184,6 +5197,7 @@ export interface components {
          *     * `DEVALUATION` - DEVALUATION
          *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
          *     * `TRANSFERT` - TRANSFERT
+         *     * `EXPIRATION` - EXPIRATION
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -5681,9 +5695,11 @@ export interface components {
             readonly reception_airport: components["schemas"]["Airport"];
             free_field?: string | null;
             agreement_reference?: string | null;
+            readonly client_type: components["schemas"]["ClientTypeEnum"];
             readonly carbure_producer: components["schemas"]["EntityPreview"];
             unknown_producer?: string | null;
             readonly carbure_production_site: components["schemas"]["ProductionSite"];
+            readonly production_country: components["schemas"]["Country"];
             unknown_production_site?: string | null;
             /** Format: date */
             production_site_commissioning_date?: string | null;
@@ -5896,8 +5912,6 @@ export interface components {
             lot_id: number;
             /** Format: decimal */
             volume: string;
-            /** Format: double */
-            emission_rate_per_mj: number;
         };
         SimulationMinMaxInputRequest: {
             customs_category: components["schemas"]["MPCategoriesEnum"];
@@ -12455,8 +12469,6 @@ export interface operations {
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
-                date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -12471,6 +12483,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -12799,7 +12812,6 @@ export interface operations {
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 /** @description Date from where to calculate teneur and quantity */
                 date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -12818,6 +12830,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -12902,8 +12915,6 @@ export interface operations {
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
-                date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -12920,6 +12931,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -13024,8 +13036,6 @@ export interface operations {
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
-                date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -13042,6 +13052,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -13631,6 +13642,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     DEVALUATION = "DEVALUATION",
     EXPEDITION = "EXPEDITION",
+    EXPIRATION = "EXPIRATION",
     EXPORTATION = "EXPORTATION",
     INCORPORATION = "INCORPORATION",
     LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
@@ -13921,7 +13933,8 @@ export enum OperationTypeEnum {
     EXPEDITION = "EXPEDITION",
     DEVALUATION = "DEVALUATION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
-    TRANSFERT = "TRANSFERT"
+    TRANSFERT = "TRANSFERT",
+    EXPIRATION = "EXPIRATION"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

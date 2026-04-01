@@ -78,6 +78,7 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
     client_type = serializers.SlugRelatedField(read_only=True, source="client", slug_field="entity_type")
     carbure_producer = EntityPreviewSerializer(read_only=True)
     carbure_production_site = ProductionSiteSerializer(read_only=True)
+    production_country = CountrySerializer(read_only=True)
     parent_ticket_source = SafRelatedTicketSourceSerializer(read_only=True)
     child_ticket_sources = serializers.SerializerMethodField()
     origin_lot = SafParentLotSerializer(required=False)
@@ -92,6 +93,7 @@ class SafTicketSerializer(SafTicketPreviewSerializer):
             "carbure_producer",
             "unknown_producer",
             "carbure_production_site",
+            "production_country",
             "unknown_production_site",
             "production_site_commissioning_date",
             "eec",
