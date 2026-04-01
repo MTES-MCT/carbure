@@ -115,16 +115,16 @@ class ObjectiveService:
                 # Use global energy basis
                 objective_energy_basis = energy_basis
 
-            if not objective_energy_basis:
-                continue
-
-            # Calculate target and penalty using appropriate energy basis
-            target = ObjectiveService._calculate_target_for_objective(objective.target, objective_energy_basis)
-            penalty_amount = ObjectiveService._calcule_penalty(
-                objective.penalty,
-                balance[key]["pending_teneur"] + balance[key]["declared_teneur"],
-                target,
-            )
+            target = None
+            penalty_amount = None
+            if objective_energy_basis:
+                # Calculate target and penalty using appropriate energy basis
+                target = ObjectiveService._calculate_target_for_objective(objective.target, objective_energy_basis)
+                penalty_amount = ObjectiveService._calcule_penalty(
+                    objective.penalty,
+                    balance[key]["pending_teneur"] + balance[key]["declared_teneur"],
+                    target,
+                )
 
             balance[key]["objective"] = {
                 "target_mj": target,
@@ -327,8 +327,6 @@ class ObjectiveService:
         """
         # 1. Calculate "assiette" used for objectives calculation (global, for categories and main objective)
         energy_basis = ObjectiveService.calculate_energy_basis(macs, year=year)
-        if not energy_basis:
-            return None
 
         # 2. Calculate the balances per category and sector
         date_from_dt = make_aware(datetime.combine(date_from, time.min))

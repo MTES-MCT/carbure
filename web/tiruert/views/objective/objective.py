@@ -165,8 +165,6 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
 
         # MacFossilFuel
         macs = MacFilter(query_params, queryset=MacFossilFuel.objects.all(), request=request).qs
-        if not macs.exists():
-            return
 
         # Operations bounded to the period end date (same logic as ObjectiveSnapshotService.compute)
         date_to = make_aware(datetime.combine(period.end_date, time.max))
