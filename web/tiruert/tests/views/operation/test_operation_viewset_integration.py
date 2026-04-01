@@ -1,7 +1,9 @@
+from datetime import date
+
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Biocarburant, Entity, MatierePremiere
+from core.models import Biocarburant, DeclarationPeriod, Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 from tiruert.models import Operation, OperationDetail
 from transactions.factories import CarbureLotFactory
@@ -23,6 +25,15 @@ class OperationViewSetIntegrationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         """Create test data once for the entire test class."""
+        # Create declaration period for current year (covers entire year for tests)
+        current_year = date.today().year
+        DeclarationPeriod.objects.create(
+            year=current_year,
+            start_date=date(current_year, 1, 1),
+            end_date=date(current_year, 12, 31),
+            app=DeclarationPeriod.TIRUERT,
+        )
+
         # Get references from fixtures
         cls.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
         cls.other_entity = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=cls.entity.id).first()

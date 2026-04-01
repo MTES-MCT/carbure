@@ -1,33 +1,43 @@
 import { Button } from "common/components/button2"
 import { RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
-import { DeepPartial } from "common/types"
+import { useFormContext } from "common/components/form2"
 import {
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitPatchRequest,
+  ProductionUnitForm,
   UnitType,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
 import { SiretPicker } from "common/molecules/siret-picker"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
-type GeneralInfoForm = DeepPartial<
-  Pick<
-    BiomethaneProductionUnitPatchRequest,
-    | "name"
-    | "site_siret"
-    | "unit_type"
-    | "address"
-    | "postal_code"
-    | "city"
-    | "department"
-    | "insee_code"
-  >
+type GeneralInfoForm = Pick<
+  ProductionUnitForm,
+  | "name"
+  | "site_siret"
+  | "unit_type"
+  | "address"
+  | "postal_code"
+  | "city"
+  | "department"
+  | "insee_code"
 >
+
+const GENERAL_INFO_SECTION_ID = "general-info"
+
+const extractValues = (form?: GeneralInfoForm) => ({
+  name: form?.name,
+  site_siret: form?.site_siret,
+  unit_type: form?.unit_type,
+  address: form?.address,
+  postal_code: form?.postal_code,
+  city: form?.city,
+  department: form?.department,
+  insee_code: form?.insee_code,
+})
 
 export function GeneralInfo({
   productionUnit,
@@ -37,17 +47,7 @@ export function GeneralInfo({
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { bind, value, setField } = useForm<GeneralInfoForm>({
-    name: productionUnit?.name,
-    site_siret: productionUnit?.site_siret,
-    unit_type: productionUnit?.unit_type,
-    address: productionUnit?.address,
-    postal_code: productionUnit?.postal_code,
-    city: productionUnit?.city,
-    department: productionUnit?.department,
-    insee_code: productionUnit?.insee_code,
-  })
-
+  const { bind, value, setField } = useFormContext<GeneralInfoForm>()
   const { execute: saveProductionUnit, loading } =
     useSaveProductionUnit(productionUnit)
 
@@ -78,13 +78,18 @@ export function GeneralInfo({
     },
   ]
 
+  const handleSubmit = () => {
+    saveProductionUnit(extractValues(value))
+  }
+
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId={GENERAL_INFO_SECTION_ID}
       title={t("Informations générales du site de production")}
       readOnly={!allowedToEdit}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
+        <ManagedEditableCard.Form onSubmit={handleSubmit}>
           <Grid cols={2} gap="lg">
             <TextInput
               readOnly={!isEditing}
@@ -160,8 +165,8 @@ export function GeneralInfo({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

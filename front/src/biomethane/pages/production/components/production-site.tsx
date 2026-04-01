@@ -5,24 +5,39 @@ import {
   RadioGroup,
 } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
-import { DeepPartial } from "common/types"
+import { useFormContext } from "common/components/form2"
 import {
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitPatchRequest,
   ProcessType,
   MethanizationProcess,
   InstalledMeters,
+  ProductionUnitForm,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
-type ProductionSiteForm = DeepPartial<BiomethaneProductionUnitPatchRequest> & {
+type ProductionSiteForm = Pick<
+  ProductionUnitForm,
+  | "process_type"
+  | "methanization_process"
+  | "production_efficiency"
+  | "has_hygienization_unit"
+  | "has_co2_valorization_process"
+> & {
   installed_meters?: InstalledMeters[]
 }
+
+const extractValues = (productionUnit?: ProductionUnitForm) => ({
+  process_type: productionUnit?.process_type,
+  methanization_process: productionUnit?.methanization_process,
+  production_efficiency: productionUnit?.production_efficiency,
+  installed_meters: productionUnit?.installed_meters,
+  has_hygienization_unit: productionUnit?.has_hygienization_unit,
+  has_co2_valorization_process: productionUnit?.has_co2_valorization_process,
+})
 
 export function ProductionSite({
   productionUnit,
@@ -32,14 +47,7 @@ export function ProductionSite({
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { bind, value } = useForm<ProductionSiteForm>({
-    process_type: productionUnit?.process_type,
-    methanization_process: productionUnit?.methanization_process,
-    production_efficiency: productionUnit?.production_efficiency,
-    installed_meters: productionUnit?.installed_meters,
-    has_hygienization_unit: productionUnit?.has_hygienization_unit,
-    has_co2_valorization_process: productionUnit?.has_co2_valorization_process,
-  })
+  const { bind, value } = useFormContext<ProductionSiteForm>()
 
   const { execute: saveProductionUnit, loading } =
     useSaveProductionUnit(productionUnit)
@@ -109,13 +117,18 @@ export function ProductionSite({
     },
   ]
 
+  const handleSubmit = () => {
+    saveProductionUnit(extractValues(value))
+  }
+
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="production-site"
       title={t("Caractéristiques du site de production")}
       readOnly={!allowedToEdit}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
+        <ManagedEditableCard.Form onSubmit={handleSubmit}>
           <RadioGroup
             required
             readOnly={!isEditing}
@@ -173,8 +186,8 @@ export function ProductionSite({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

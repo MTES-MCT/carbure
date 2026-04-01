@@ -28,15 +28,16 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
             [(self.producer_entity, "RW")],
         )
 
-        self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        self.current_declaration_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        self.current_year = date.today().year
         self.annual_declaration_url = reverse("biomethane-annual-declaration")
         self.base_params = {"entity_id": self.producer_entity.id}
 
         # Create an open declaration period for the current year
         BiomethaneDeclarationPeriod.objects.create(
-            year=self.current_year,
-            start_date="2026-01-01",
-            end_date="2026-03-31",
+            year=self.current_declaration_year,
+            start_date=f"{self.current_year}-01-01",
+            end_date=f"{self.current_year}-03-31",
         )
 
     def test_retrieve_creates_declaration_if_not_exists(self):
@@ -44,15 +45,15 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         # Mock date to ensure we're within the declaration period
         with (
             patch("biomethane.services.annual_declaration.date") as mock_date_service,
-            patch("biomethane.models.biomethane_declaration_period.date") as mock_date_model,
+            patch("core.models.declaration_period.date") as mock_date_model,
         ):
-            mock_date_service.today.return_value = date(2026, 2, 15)
-            mock_date_model.today.return_value = date(2026, 2, 15)
+            mock_date_service.today.return_value = date(self.current_year, 2, 15)
+            mock_date_model.today.return_value = date(self.current_year, 2, 15)
 
             response = self.client.get(self.annual_declaration_url, self.base_params)
 
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-            self.assertEqual(response.data["year"], self.current_year)
+            self.assertEqual(response.data["year"], self.current_declaration_year)
             self.assertEqual(response.data["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
             self.assertTrue(response.data["is_open"])
             self.assertIn("missing_fields", response.data)
@@ -61,7 +62,9 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
             self.assertIn("is_complete", response.data)
 
             # Verify that the declaration was created in the database
-            declaration = BiomethaneAnnualDeclaration.objects.get(producer=self.producer_entity, year=self.current_year)
+            declaration = BiomethaneAnnualDeclaration.objects.get(
+                producer=self.producer_entity, year=self.current_declaration_year
+            )
             self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
             self.assertTrue(declaration.is_open)
 
@@ -70,14 +73,17 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         # Create an existing declaration
         _declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=self.current_year,
+            year=self.current_declaration_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        response = self.client.get(self.annual_declaration_url, self.base_params)
+        # Mock date to be within the declaration period (before March 31)
+        with patch("biomethane.services.annual_declaration.date") as mock_date_service:
+            mock_date_service.today.return_value = date(self.current_year, 2, 15)
+            response = self.client.get(self.annual_declaration_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["year"], self.current_year)
+        self.assertEqual(response.data["year"], self.current_declaration_year)
         self.assertEqual(response.data["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
         self.assertIn("missing_fields", response.data)
         self.assertIn("digestate_missing_fields", response.data["missing_fields"])
@@ -88,18 +94,21 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         """Test successful partial update of declaration status to IN_PROGRESS"""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=self.current_year,
+            year=self.current_declaration_year,
             status=BiomethaneAnnualDeclaration.DECLARED,
         )
 
         update_data = {"status": BiomethaneAnnualDeclaration.IN_PROGRESS}
 
-        response = self.client.patch(
-            self.annual_declaration_url,
-            update_data,
-            content_type="application/json",
-            query_params=self.base_params,
-        )
+        # Mock date to be within the declaration period (before March 31)
+        with patch("biomethane.services.annual_declaration.date") as mock_date_service:
+            mock_date_service.today.return_value = date(self.current_year, 2, 15)
+            response = self.client.patch(
+                self.annual_declaration_url,
+                update_data,
+                content_type="application/json",
+                query_params=self.base_params,
+            )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
@@ -111,18 +120,21 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         """Test partial update when declaration is already IN_PROGRESS"""
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=self.current_year,
+            year=self.current_declaration_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
         update_data = {"status": BiomethaneAnnualDeclaration.IN_PROGRESS}
 
-        response = self.client.patch(
-            self.annual_declaration_url,
-            update_data,
-            content_type="application/json",
-            query_params=self.base_params,
-        )
+        # Mock date to be within the declaration period (before March 31)
+        with patch("biomethane.services.annual_declaration.date") as mock_date_service:
+            mock_date_service.today.return_value = date(self.current_year, 2, 15)
+            response = self.client.patch(
+                self.annual_declaration_url,
+                update_data,
+                content_type="application/json",
+                query_params=self.base_params,
+            )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
@@ -131,7 +143,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         """Test that partial update to DECLARED status is forbidden"""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=self.current_year,
+            year=self.current_declaration_year,
             status=BiomethaneAnnualDeclaration.DECLARED,
         )
 
@@ -168,26 +180,26 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         # Create declarations for different years
         _old_declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=self.current_year - 1,
+            year=self.current_declaration_year - 1,
             status=BiomethaneAnnualDeclaration.DECLARED,
         )
 
         _current_declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=self.current_year,
+            year=self.current_declaration_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
         response = self.client.get(self.annual_declaration_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["year"], self.current_year)
-        self.assertNotEqual(response.data["year"], self.current_year - 1)
+        self.assertEqual(response.data["year"], self.current_declaration_year)
+        self.assertNotEqual(response.data["year"], self.current_declaration_year - 1)
 
     def test_retrieve_closed_declaration_period_returns_404(self):
         """Test that retrieve returns 404 when declaration period is closed"""
         # Remove the open declaration period
-        BiomethaneDeclarationPeriod.objects.filter(year=self.current_year).delete()
+        BiomethaneDeclarationPeriod.objects.filter(year=self.current_declaration_year).delete()
 
         response = self.client.get(self.annual_declaration_url, self.base_params)
 
@@ -197,7 +209,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         """Test that is_open field has default value of True when creating a declaration"""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
-            year=self.current_year,
+            year=self.current_declaration_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 

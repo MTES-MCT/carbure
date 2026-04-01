@@ -1,19 +1,19 @@
-from datetime import date
-
 from django.db import models
 
+from core.models.declaration_period import DeclarationPeriod
 
-class BiomethaneDeclarationPeriod(models.Model):
-    year = models.IntegerField(unique=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
 
+class DeclarationPeriodManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(app=DeclarationPeriod.BIOMETHANE)
+
+
+class BiomethaneDeclarationPeriod(DeclarationPeriod):
     class Meta:
-        db_table = "biomethane_declaration_period"
-        verbose_name = "Période de déclaration"
-        verbose_name_plural = "Périodes de déclaration"
+        proxy = True
 
-    @property
-    def is_open(self):
-        today = date.today()
-        return self.start_date <= today <= self.end_date
+    def save(self, *args, **kwargs):
+        self.app = DeclarationPeriod.BIOMETHANE
+        super().save(*args, **kwargs)
+
+    objects = DeclarationPeriodManager()

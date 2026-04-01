@@ -38,7 +38,6 @@ class SimulationInputSerializer(serializers.ModelSerializer):
 class SimulationLotOutputSerializer(serializers.Serializer):
     lot_id = serializers.IntegerField()
     volume = serializers.DecimalField(max_digits=None, decimal_places=None)
-    emission_rate_per_mj = serializers.FloatField()
 
 
 class SimulationOutputSerializer(serializers.Serializer):

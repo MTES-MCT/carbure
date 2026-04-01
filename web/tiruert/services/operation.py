@@ -21,10 +21,11 @@ class OperationServiceErrors:
 
 class OperationService:
     @staticmethod
-    def perform_checks_before_create(request, entity_id, selected_lots, data, unit):
+    def perform_checks_before_create(request, entity_id, selected_lots, data, unit, declaration_year):
         OperationService.check_debited_entity(entity_id, data)
         OperationService.check_volumes(selected_lots, data, unit)
         OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
+        OperationService.check_declaration_year(declaration_year, data)
 
     @staticmethod
     def check_debited_entity(entity_id, data):
@@ -40,12 +41,12 @@ class OperationService:
         Check if the selected lots exist and have enough volume to perform the operation
         """
         np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
-
-        # Round available volumes to 8 decimals to match optimization algorithm precision
         available_volumes = {int(lot_id): round(float(volume), 8) for lot_id, volume in zip(np_lot_ids, np_volumes)}
-        requested_volumes = {lot["id"]: lot["volume"] for lot in selected_lots}
 
-        for lot_id, volume in requested_volumes.items():
+        for lot in selected_lots:
+            lot_id = lot["id"]
+            volume = lot["volume"]
+
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
 
@@ -74,10 +75,8 @@ class OperationService:
             balance = list(balance.values())[0]  # keep the first (and only one) element
 
             # 3. Convert the teneur to add from liters to MJ
-            teneur_to_add = 0
-            for lot in selected_lots:
-                pci = CarbureLot.objects.get(id=lot["id"]).biofuel.pci_litre
-                teneur_to_add += lot["volume"] * pci
+            pci = data["biofuel"].pci_litre
+            teneur_to_add = sum(lot["volume"] * pci for lot in selected_lots)
 
             # 4. Check if the futur teneur is below the target
             futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ
@@ -86,6 +85,13 @@ class OperationService:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )
+
+    @staticmethod
+    def check_declaration_year(declaration_year, validated_data):
+        if not declaration_year:
+            raise serializers.ValidationError({"declaration_year": "Declaration year is required"})
+
+        validated_data["declaration_year"] = declaration_year
 
     @staticmethod
     def define_operation_status(validated_data):

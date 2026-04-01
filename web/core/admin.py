@@ -24,6 +24,7 @@ from core.models import (
     CarbureNotification,
     CarbureStock,
     CarbureStockTransformation,
+    DeclarationPeriod,
     Department,
     EntityCertificate,
     ExternalAdminRights,
@@ -621,11 +622,12 @@ class GenericCertificateAdmin(ImportExportModelAdmin):
     list_display = [
         "certificate_id",
         "certificate_type",
+        "status",
         "certificate_holder",
         "valid_from",
         "valid_until",
     ]
-    list_filter = ["certificate_type"]
+    list_filter = ["certificate_type", "status"]
     search_fields = ("certificate_holder", "certificate_id")
 
 
@@ -691,3 +693,13 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ("code_dept", "name")
     search_fields = ("code_dept", "name")
     ordering = ("code_dept",)
+
+
+@admin.register(DeclarationPeriod)
+class DeclarationPeriodAdmin(admin.ModelAdmin):
+    list_display = ("year", "start_date", "end_date", "app")
+    search_fields = ("year",)
+    list_filter = [
+        "year",
+        "app",
+    ]

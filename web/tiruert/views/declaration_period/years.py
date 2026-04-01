@@ -1,0 +1,41 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from tiruert.models.declaration_period import TiruertDeclarationPeriod
+from tiruert.services.declaration_period import DeclarationPeriodService
+
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ],
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "years": {
+                    "type": "array",
+                    "items": {"type": "integer"},
+                },
+            },
+        },
+    },
+)
+@api_view(["GET"])
+def declaration_period_years(request):
+    """Return the list of past years until the current one"""
+    current_period_year = DeclarationPeriodService.get_current_declaration_year()
+
+    if current_period_year is None:
+        return Response({"years": []}, status=status.HTTP_200_OK)
+
+    years = TiruertDeclarationPeriod.objects.order_by("year").values_list("year", flat=True)
+    return Response({"years": list(years)}, status=status.HTTP_200_OK)

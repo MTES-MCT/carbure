@@ -1,8 +1,9 @@
 from django.urls import reverse
 
-from core.models import Entity, ExternalAdminRights, GenericCertificate, UserRights, UserRightsRequests
+from core.models import Entity, ExternalAdminRights, UserRights, UserRightsRequests
 from core.tests_utils import setup_current_user
 from entity.tests import TestCase
+from transactions.factories.certificate import GenericCertificateFactory
 
 FAKE_COMPANY_DATA = {
     "name": None,
@@ -28,7 +29,7 @@ class EntityEnableSourceTest(TestCase):
     def setUp(self):
         super().setUp()
 
-        GenericCertificate.objects.update_or_create(
+        GenericCertificateFactory.create(
             certificate_id="CERT123456",
             certificate_type="ISCC",
             valid_from="2024-01-01",

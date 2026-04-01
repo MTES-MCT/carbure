@@ -6,12 +6,18 @@ import { generateWatchedFieldsProvider } from "biomethane/providers/watched-fiel
 import { updateContractOk } from "../../tests/api"
 import { okEntitySearch } from "common/__test__/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
-import { InstallationCategory, TariffReference } from "../../types"
+import {
+  ContractInfosForm,
+  InstallationCategory,
+  TariffReference,
+} from "../../types"
 import { fireEvent, userEvent, waitFor, within } from "@storybook/test"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType } from "common/types"
 import { producer } from "common/__test__/data"
 import { buildAnnualDeclarationHandler } from "biomethane/tests/api"
+import { FormContext, useForm } from "common/components/form2"
+import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
 
 const MOCKS = [
   mockUser(EntityType.Producteur_de_biom_thane),
@@ -32,6 +38,16 @@ const meta: Meta<typeof ContractInfos> = {
   decorators: [
     ...AnnualDeclarationStoryUtils.decorators,
     generateWatchedFieldsProvider([]),
+    (Story, { args }) => {
+      const form = useForm<ContractInfosForm>(args?.contract ?? {})
+      return (
+        <SectionsManagerProvider>
+          <FormContext.Provider value={form}>
+            <Story />
+          </FormContext.Provider>
+        </SectionsManagerProvider>
+      )
+    },
   ],
 }
 

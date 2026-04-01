@@ -114,8 +114,6 @@ type ObjectivesEndpoint =
 type ObjectivesParams = {
   entity_id: number
   year: string
-  date_from: string
-  date_to: string
 }
 
 type AdminObjectivesParams = ObjectivesParams
@@ -141,8 +139,6 @@ export const getObjectives = async (
   const params = {
     entity_id,
     year: `${year}`,
-    date_from: `${year}-01-01`,
-    date_to: `${year}-12-31`,
   }
 
   if (isAdmin) {

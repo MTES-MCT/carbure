@@ -47,13 +47,9 @@ export const focusFirstMissingField = (missingFields: string[]) => {
   if (missingFields.length === 0) return
 
   whenElementReady(() => {
-    const { inputs, inputsByName } = findMissingFieldInputs(missingFields)
+    const { inputs } = findMissingFieldInputs(missingFields)
 
-    if (
-      inputs.length > 0 &&
-      inputs[0] &&
-      inputsByName.size === missingFields.length
-    ) {
+    if (inputs.length > 0 && inputs[0]) {
       const firstInput = inputs[0] as HTMLElement
       firstInput.scrollIntoView({ behavior: "smooth", block: "center" })
       firstInput.focus()

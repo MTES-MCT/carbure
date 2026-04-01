@@ -94,12 +94,7 @@ export const RadioGroup = <V extends RadioValueType>({
     <RadioButtons
       {...props}
       options={optionsWithNativeInputProps}
-      className={cl(
-        props.className,
-        styles["radio-group"],
-        props.orientation === "horizontal" && styles["radio-group--horizontal"],
-        readOnly && styles["radio-group--read-only"]
-      )}
+      className={cl(props.className, styles["radio-group"])}
       legend={
         <Label
           label={label}
