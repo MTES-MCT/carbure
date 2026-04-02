@@ -57,7 +57,7 @@ class ObjectiveService:
             year: Year for calculation (required if mac_queryset provided)
 
         Returns:
-            List of objectives with balances and energy basis
+            List of objectives (only existing ones) with balances and energy basis
         """
         # Initialize balance structure
         for key in balance:
@@ -74,7 +74,9 @@ class ObjectiveService:
 
         objectives = objective_queryset.filter(type=objective_type)
         if not objectives.exists():
-            return list(balance.values())
+            return []
+
+        keys_with_objective = set()
 
         # Calculate objectives
         for objective in objectives:
@@ -103,6 +105,8 @@ class ObjectiveService:
                 }
                 if objective_type == Objective.SECTOR:
                     balance[key]["energy_basis"] = 0
+
+            keys_with_objective.add(key)
 
             # Calculate energy basis for this objective
             if objective_type == Objective.SECTOR and mac_queryset:
@@ -133,7 +137,8 @@ class ObjectiveService:
                 "target_percent": objective.target,
             }
 
-        return list(balance.values())
+        # Return only balance entries for existing objectives
+        return [item for item in balance.values() if item["code"] in keys_with_objective]
 
     @staticmethod
     def get_elec_category(elec_operations, entity_id, date_from):
