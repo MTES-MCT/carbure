@@ -110,8 +110,15 @@ class SafTicketDetailsTest(TestCase):
             "carbure_production_site": None,
             "unknown_production_site": "External Production Site",
             "production_site_commissioning_date": "2001-01-01",
+            "production_country": {
+                "name": "Espagne",
+                "name_en": "Spain",
+                "code_pays": "ES",
+                "is_in_europe": True,
+            },
             "supplier": self.entity.name,
             "client": self.ticket_client.name,
+            "client_type": self.ticket_client.entity_type,
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
                 "name_en": "CI/CII Animal fat",
