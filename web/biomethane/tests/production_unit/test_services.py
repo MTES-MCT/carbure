@@ -4,7 +4,11 @@ from django.test import TestCase
 
 from biomethane.factories.production_unit import BiomethaneDigestateStorageFactory, BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneProductionUnit
-from biomethane.services.production_unit import BiomethaneProductionUnitService, _build_production_unit_rules
+from biomethane.services.production_unit import (
+    BiomethaneProductionUnitService,
+    _build_production_unit_clearing_rules,
+    _build_production_unit_optional_rules,
+)
 from core.models import Entity
 
 
@@ -12,7 +16,8 @@ class ProductionUnitRulesConfigurationTests(TestCase):
     """Unit tests for _build_production_unit_rules configuration."""
 
     def setUp(self):
-        self.rules = _build_production_unit_rules()
+        self.rules = _build_production_unit_clearing_rules()
+        self.optional_rules = _build_production_unit_optional_rules()
 
     def test_all_expected_rules_are_configured(self):
         """Test that all expected rule names are present in the correct order."""
@@ -21,8 +26,9 @@ class ProductionUnitRulesConfigurationTests(TestCase):
             "no_hygienization_exemption",
             "no_phase_separation",
             "spreading_not_selected",
+            "STEP_unit_type",
         ]
-        actual_rule_names = [rule.name for rule in self.rules]
+        actual_rule_names = [rule.name for rule in self.rules + self.optional_rules]
         self.assertEqual(expected_rule_names, actual_rule_names)
 
     def test_no_sanitary_approval_rule_fields_and_condition(self):
@@ -83,6 +89,20 @@ class ProductionUnitRulesConfigurationTests(TestCase):
             BiomethaneProductionUnit.COMPOSTING,
         ]
         self.assertFalse(rule.condition(mock_instance))
+
+    def test_STEP_unit_type_rule_fields_and_condition(self):
+        """Test STEP_unit_type rule has correct fields and condition logic."""
+        rule = next(r for r in self.optional_rules if r.name == "STEP_unit_type")
+        self.assertEqual(rule.fields, BiomethaneProductionUnitService.ICPE_FIELDS)
+
+        mock_instance = Mock()
+        # Should not trigger when unit type is not STEP
+        mock_instance.unit_type = BiomethaneProductionUnit.OTHER
+        self.assertFalse(rule.condition(mock_instance))
+
+        # Should trigger when unit type is STEP
+        mock_instance.unit_type = BiomethaneProductionUnit.STEP
+        self.assertTrue(rule.condition(mock_instance))
 
 
 class BiomethaneProductionUnitServiceIntegrationTests(TestCase):
