@@ -5,8 +5,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiTypes, extend_schema
 from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
-from core.models import Entity
-from core.models.models import Biocarburant
+from core.models import Biocarburant, Entity
 from core.serializers import AirportSerializer, BiofuelDetailSerializer
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from saf.serializers.saf_ticket import SafTicketSerializer
