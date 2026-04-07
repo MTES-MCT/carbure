@@ -7,21 +7,17 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import Entity, ExternalAdminRights, UserRights
-from core.permissions import AdminRightsFactory, UserRightsFactory
+from core.models import Entity
 from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilterForBalance
 from tiruert.filters.elec_operation import ElecOperationFilterForBalance
 from tiruert.models import MacFossilFuel, Objective, Operation
 from tiruert.models.elec_operation import ElecOperation
+from tiruert.permissions import HasTiruertRightsObjectives
 from tiruert.serializers import ObjectiveInputSerializer, ObjectiveOutputSerializer
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.objective_snapshot import ObjectiveSnapshotService
 from tiruert.views.mixins import UnitMixin
-
-AdminRightsFactory = AdminRightsFactory(allow_external=[ExternalAdminRights.TIRIB_STATS])
-UserRightsFactory = UserRightsFactory(role=[UserRights.ADMIN, UserRights.RW, UserRights.RO], entity_type=[Entity.OPERATOR])
-OperatorOrAdmin = AdminRightsFactory | UserRightsFactory
 
 
 @extend_schema(
@@ -60,7 +56,7 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
     pagination_class = None
 
     def get_permissions(self):
-        return [OperatorOrAdmin()]
+        return [HasTiruertRightsObjectives()]
 
     def initial(self, request, *args, **kwargs):
         """Reset execution cache for each request to avoid concurrency issues."""

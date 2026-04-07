@@ -6,10 +6,11 @@ from rest_framework.viewsets import ModelViewSet
 
 from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
-from entity.permissions import HasDgddiWriteRights, HasOperatorRights, HasOperatorWriteRights
+from entity.permissions import HasDgddiWriteRights
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
+from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights
 from tiruert.serializers import (
     OperationInputSerializer,
     OperationListSerializer,
@@ -72,10 +73,10 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
             "export_operations_to_excel",
             "declare_teneur",
         ]:
-            return [HasOperatorWriteRights()]
+            return [HasTiruertWriteRights()]
         elif self.action == "correct":
             return [HasDgddiWriteRights()]
-        return [(HasOperatorRights | HasDgddiWriteRights)()]
+        return [(HasTiruertRightsBalanceAndOperations | HasDgddiWriteRights)()]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
