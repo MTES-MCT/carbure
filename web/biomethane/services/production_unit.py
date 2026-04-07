@@ -1,4 +1,4 @@
-from biomethane.services.rules import FieldClearingRule, get_fields_from_applied_rules
+from biomethane.services.rules import FieldClearingRule, OptionalFieldRule, get_fields_from_applied_rules
 
 
 class BiomethaneProductionUnitService:
@@ -12,6 +12,7 @@ class BiomethaneProductionUnitService:
     HYGIENIZATION_EXEMPTION_FIELDS = ["hygienization_exemption_type"]
     PHASE_SEPARATION_FIELDS = ["liquid_phase_treatment_steps", "solid_phase_treatment_steps"]
     SPREADING_MANAGEMENT_FIELDS = ["spreading_management_methods", "digestate_sale_types"]
+    ICPE_FIELDS = ["icpe_number", "icpe_regime"]
 
     # Fields that are never required for the annual declaration completeness check.
     # Includes:
@@ -38,7 +39,9 @@ class BiomethaneProductionUnitService:
         Return the list of optional fields for a given instance.
         Used by the optional_fields property of the model.
         """
-        rules = _build_production_unit_rules()
+        optional_fields_rules = _build_production_unit_optional_rules()
+        clearing_rueles = _build_production_unit_clearing_rules()
+        rules = optional_fields_rules + clearing_rueles
         conditional_optional = get_fields_from_applied_rules(rules, instance)
         return conditional_optional + BiomethaneProductionUnitService.ALWAYS_OPTIONAL_FIELDS
 
@@ -48,12 +51,12 @@ class BiomethaneProductionUnitService:
         Return the list of fields to clear for a given instance.
         Used by signals.
         """
-        rules = _build_production_unit_rules()
+        rules = _build_production_unit_clearing_rules()
         return get_fields_from_applied_rules(rules, instance)
 
 
 # Rule configuration: declarative definition of all field clearing rules
-def _build_production_unit_rules() -> list[FieldClearingRule]:
+def _build_production_unit_clearing_rules() -> list[FieldClearingRule]:
     """
     Build the list of field clearing rules for production unit instances.
     """
@@ -84,5 +87,22 @@ def _build_production_unit_rules() -> list[FieldClearingRule]:
             fields=BiomethaneProductionUnitService.SPREADING_MANAGEMENT_FIELDS,
             condition=lambda instance: BiomethaneProductionUnit.SPREADING
             not in (instance.digestate_valorization_methods or []),
+        ),
+    ]
+
+
+# Rule configuration: declarative definition of all optional fields rules
+def _build_production_unit_optional_rules() -> list[FieldClearingRule]:
+    """
+    Build the list of optional fields rules for production unit instances.
+    """
+    from biomethane.models import BiomethaneProductionUnit
+
+    return [
+        # ICPE fields are optionals only when unit type is STEP
+        OptionalFieldRule(
+            name="STEP_unit_type",
+            fields=BiomethaneProductionUnitService.ICPE_FIELDS,
+            condition=lambda instance: instance.unit_type == BiomethaneProductionUnit.STEP,
         ),
     ]
