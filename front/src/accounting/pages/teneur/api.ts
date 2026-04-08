@@ -10,7 +10,7 @@ import { api, getDownloadUrl } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS } from "common/utils/formatters"
 
-function parseObjectivesResponse(objectives: any) {
+function parseObjectivesResponse(objectives?: apiTypes["ObjectiveOutput"]) {
   const baseObjective = {
     global: {
       target: objectives?.main.target ?? 0,
@@ -26,7 +26,7 @@ function parseObjectivesResponse(objectives: any) {
       ),
     },
     sectors:
-      objectives?.sectors.map((sector: any) => ({
+      objectives?.sectors.map((sector: apiTypes["ObjectiveSector"]) => ({
         code: sector.code,
         target: CONVERSIONS.energy.MJ_TO_GJ(sector.objective.target_mj),
         teneur_declared: CONVERSIONS.energy.MJ_TO_GJ(sector.declared_teneur),
@@ -53,7 +53,10 @@ function parseObjectivesResponse(objectives: any) {
 
   const categories =
     objectives?.categories.reduce(
-      (objCategories: typeof defaultCategories, category: any) => {
+      (
+        objCategories: typeof defaultCategories,
+        category: apiTypes["ObjectiveCategory"]
+      ) => {
         if (
           category.objective.target_mj &&
           category.objective.target_mj === 0
@@ -106,40 +109,20 @@ function parseObjectivesResponse(objectives: any) {
   }
 }
 
-type ObjectivesEndpoint = "/tiruert/objectives/"
-
-type ObjectivesParams = {
-  entity_id: number
-  year: string
-}
-
-type AdminObjectivesParams = ObjectivesParams
-
-type AdminObjectivesEntityParams = ObjectivesParams & {
-  selected_entity_id: number
-}
-
-async function fetchObjectives(
-  endpoint: ObjectivesEndpoint,
-  params: ObjectivesParams | AdminObjectivesParams | AdminObjectivesEntityParams
-): Promise<Objectives> {
-  return api
-    .GET(endpoint, { params: { query: params } })
-    .then((res) => parseObjectivesResponse(res?.data))
-}
-
 export const getObjectives = async (
   entity_id: number,
   year: number,
   selected_entity_id?: number
 ): Promise<Objectives> => {
-  const params: ObjectivesParams | AdminObjectivesEntityParams = {
+  const params = {
     entity_id,
     year: `${year}`,
     ...(selected_entity_id !== undefined && { selected_entity_id }),
-  } as ObjectivesParams | AdminObjectivesEntityParams
+  }
 
-  return fetchObjectives("/tiruert/objectives/", params)
+  return api
+    .GET("/tiruert/objectives/", { params: { query: params } })
+    .then((res) => parseObjectivesResponse(res?.data))
 }
 
 /**
