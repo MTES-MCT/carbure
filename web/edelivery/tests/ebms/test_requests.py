@@ -3,7 +3,12 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
-from edelivery.ebms.requests import BaseRequest, EOGetTransactionRequest, GetSourcingContactByIdRequest
+from edelivery.ebms.requests import (
+    BaseRequest,
+    EOGetTransactionRequest,
+    GetCertificateRequest,
+    GetSourcingContactByIdRequest,
+)
 
 
 class BaseRequestTest(TestCase):
@@ -42,30 +47,6 @@ class BaseRequestTest(TestCase):
     def test_knows_its_response_class(self):
         request = BaseRequest("<request/>")
         self.assertEqual(BaseRequestResponse, request.response_class)
-
-
-class GetSourcingContactByIdRequestTest(BaseRequestTest):
-    def test_knows_its_identifier(self):
-        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
-
-        request = GetSourcingContactByIdRequest("")
-        self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.id)
-
-    def test_injects_request_id_and_sourcing_contact_id_in_body(self):
-        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
-
-        request = GetSourcingContactByIdRequest("99999")
-        expected_body = """\
-<udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
-  <SC_ID_HEADER>
-    <SC_ID>
-      <SOURCING_CONTACT_NUMBER>99999</SOURCING_CONTACT_NUMBER>
-    </SC_ID>
-  </SC_ID_HEADER>
-</udb:GetSourcingContactByIDRequest>"""
-
-        self.assertEqual(expected_body, request.body)
 
 
 @patch.dict("os.environ", {"CARBURE_NTR": "123"})
@@ -148,3 +129,40 @@ class EOGetTransactionRequestTest(BaseRequestTest):
             "`from_creation_date` keyword argument can't be `None` when `to_creation_date` is set",
             str(context.exception),
         )
+
+
+class GetCertificateRequestTest(BaseRequestTest):
+    def test_knows_its_body(self):
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
+
+        request = GetCertificateRequest()
+        expected_body = """\
+<udb:GetCertificateRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
+</udb:GetCertificateRequest>"""
+
+        self.assertEqual(expected_body, request.body)
+
+
+class GetSourcingContactByIdRequestTest(BaseRequestTest):
+    def test_knows_its_identifier(self):
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
+
+        request = GetSourcingContactByIdRequest("")
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.id)
+
+    def test_injects_request_id_and_sourcing_contact_id_in_body(self):
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
+
+        request = GetSourcingContactByIdRequest("99999")
+        expected_body = """\
+<udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
+  <SC_ID_HEADER>
+    <SC_ID>
+      <SOURCING_CONTACT_NUMBER>99999</SOURCING_CONTACT_NUMBER>
+    </SC_ID>
+  </SC_ID_HEADER>
+</udb:GetSourcingContactByIDRequest>"""
+
+        self.assertEqual(expected_body, request.body)
