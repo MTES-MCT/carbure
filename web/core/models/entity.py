@@ -233,6 +233,7 @@ class ExternalAdminRights(models.Model):
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
     BIOFUEL = "BIOFUEL"
     DREAL = "DREAL"
+    ADEME = "ADEME"
     DGDDI = "DGDDI"
 
     RIGHTS = (
@@ -244,6 +245,7 @@ class ExternalAdminRights(models.Model):
         (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
         (BIOFUEL, BIOFUEL),
         (DREAL, DREAL),
+        (ADEME, ADEME),
         (DGDDI, DGDDI),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)

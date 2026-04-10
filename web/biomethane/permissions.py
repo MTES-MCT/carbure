@@ -2,15 +2,12 @@ from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import HasAdminRights, UserRightsFactory
 
 
-class HasDrealRights(HasAdminRights):
+class HasExternalAdminDepartmentsRights(HasAdminRights):
     """
-    Permission for DREAL with department-based access control.
+    Permission for external admin departments with department-based access control.
     Verifies that the user has access to the production unit's department.
     READ access only.
     """
-
-    def __init__(self):
-        super().__init__(allow_external=[ExternalAdminRights.DREAL], allow_role=None)
 
     def has_object_permission(self, request, view, obj):
         """
@@ -22,9 +19,6 @@ class HasDrealRights(HasAdminRights):
         entity = request.entity
 
         if entity.entity_type != Entity.EXTERNAL_ADMIN:
-            return False
-
-        if not entity.has_external_admin_right(ExternalAdminRights.DREAL):
             return False
 
         # Get accessible departments
@@ -42,6 +36,34 @@ class HasDrealRights(HasAdminRights):
         return obj_dept and obj_dept.code_dept in accessible_dept_codes
 
 
+class HasDrealRights(HasExternalAdminDepartmentsRights):
+    """
+    Permission for DREAL with department-based access control.
+    Verifies that the user has access to the production unit's department.
+    READ access only.
+    """
+
+    def __init__(self):
+        super().__init__(allow_external=[ExternalAdminRights.DREAL], allow_role=None)
+
+    # def has_object_permission(self, request, view, obj):
+    #     if not request.entity.has_external_admin_right(ExternalAdminRights.DREAL):
+    #         return False
+
+    #     return super().has_object_permission(request, view, obj)
+
+
+class HasAdemeRights(HasExternalAdminDepartmentsRights):
+    """
+    Permission for ADEME with department-based access control.
+    Verifies that the user has access to the production unit's department.
+    READ access only.
+    """
+
+    def __init__(self):
+        super().__init__(allow_external=[ExternalAdminRights.ADEME], allow_role=None)
+
+
 # Permission READ access for biomethane producers
 HasBiomethaneProducerRights = UserRightsFactory(entity_type=[Entity.BIOMETHANE_PRODUCER])
 
@@ -52,7 +74,7 @@ HasBiomethaneProducerWriteRights = UserRightsFactory(
 )
 
 # Combined permission for DREAL (READ access)
-HasDrealOrProducerRights = HasBiomethaneProducerRights | HasDrealRights
+ReadAccessBiomethane = HasBiomethaneProducerRights | HasDrealRights | HasAdemeRights
 HasDrealOrAdminRights = HasDrealRights | UserRightsFactory(
     role=[UserRights.ADMIN],
 )
@@ -66,4 +88,4 @@ def get_biomethane_permissions(write_actions, action):
         if action == "partial_update":
             return [(HasBiomethaneProducerWriteRights | HasDrealRights)()]
         return [HasBiomethaneProducerWriteRights()]
-    return [HasDrealOrProducerRights()]
+    return [ReadAccessBiomethane()]
