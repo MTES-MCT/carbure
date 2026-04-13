@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.admin.annual_declaration import BiomethaneAdminAnnualDeclarationFilter
 from biomethane.models import BiomethaneAnnualDeclaration
-from biomethane.permissions import HasDrealRights
+from biomethane.permissions import CanAccessAdminModule
 from biomethane.serializers.admin.annual_declaration import BiomethaneAdminAnnualDeclarationSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.filters import FiltersActionFactory
@@ -27,7 +27,7 @@ class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, Fi
 
     queryset = BiomethaneAnnualDeclaration.objects.all()
     filterset_class = BiomethaneAdminAnnualDeclarationFilter
-    permission_classes = [HasDrealRights]
+    permission_classes = [CanAccessAdminModule]
     serializer_class = BiomethaneAdminAnnualDeclarationSerializer
 
     def get_queryset(self):

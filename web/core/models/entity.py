@@ -205,7 +205,9 @@ class Entity(models.Model):
             filter_condition |= Q(entity_type=Entity.PRODUCER)
         if self.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
             filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR)
-        if self.has_external_admin_right(ExternalAdminRights.DREAL):
+        if self.has_external_admin_right(ExternalAdminRights.DREAL) or self.has_external_admin_right(
+            ExternalAdminRights.ADEME
+        ):
             accessible_dept_codes = self.get_accessible_departments().values_list("code_dept", flat=True)
             filter_condition |= Q(
                 biomethane_production_unit__department__code_dept__in=accessible_dept_codes,

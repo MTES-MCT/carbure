@@ -46,12 +46,6 @@ class HasDrealRights(HasExternalAdminDepartmentsRights):
     def __init__(self):
         super().__init__(allow_external=[ExternalAdminRights.DREAL], allow_role=None)
 
-    # def has_object_permission(self, request, view, obj):
-    #     if not request.entity.has_external_admin_right(ExternalAdminRights.DREAL):
-    #         return False
-
-    #     return super().has_object_permission(request, view, obj)
-
 
 class HasAdemeRights(HasExternalAdminDepartmentsRights):
     """
@@ -83,6 +77,7 @@ ReadAccessBiomethane = HasBiomethaneProducerRights | HasDrealRights | HasAdemeRi
 
 # Custom permissions to access specific endpoints
 CanAccessContract = HasBiomethaneProducerRights | HasDrealRights
+CanAccessAdminModule = HasDrealRights | HasAdemeRights
 
 
 def get_biomethane_permissions(write_actions, action):
@@ -94,3 +89,10 @@ def get_biomethane_permissions(write_actions, action):
             return [(HasBiomethaneProducerWriteRights | HasDrealRights)()]
         return [HasBiomethaneProducerWriteRights()]
     return [ReadAccessBiomethane()]
+
+
+def is_entity_related_to_biomethane_external_admin(entity):
+    return entity.entity_type == Entity.EXTERNAL_ADMIN and (
+        entity.has_external_admin_right(ExternalAdminRights.DREAL)
+        or entity.has_external_admin_right(ExternalAdminRights.ADEME)
+    )
