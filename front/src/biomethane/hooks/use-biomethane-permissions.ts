@@ -13,6 +13,8 @@ export type BiomethanePermissionKey =
 export interface BiomethanePermissionsManager {
   canAccessAdmin: boolean
   canAccessContract: boolean
+  canAccessInjection: boolean
+  canAccessModule: boolean
 }
 
 export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
@@ -24,14 +26,19 @@ export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
       return {
         canAccessAdmin: false,
         canAccessContract: false,
+        canAccessInjection: false,
+        canAccessModule: false,
       }
+    const canAccessAdmin = entity.hasAnyAdminRight([
+      ExternalAdminPages.DREAL,
+      ExternalAdminPages.ADEME,
+    ])
 
     return {
-      canAccessAdmin: entity.hasAnyAdminRight([
-        ExternalAdminPages.DREAL,
-        ExternalAdminPages.ADEME,
-      ]),
+      canAccessAdmin,
       canAccessContract: entity.hasAdminRight(ExternalAdminPages.DREAL),
+      canAccessInjection: entity.hasAdminRight(ExternalAdminPages.DREAL),
+      canAccessModule: entity.isBiomethaneProducer || canAccessAdmin,
     }
   }, [entity, user])
 

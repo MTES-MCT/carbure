@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from biomethane.permissions import (
     CanAccessContract,
+    CanAccessInjection,
     HasBiomethaneProducerRights,
     HasBiomethaneProducerWriteRights,
     HasDrealRights,
@@ -107,7 +108,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneInjectionSiteViewSet,
             [
-                (["retrieve"], [ReadAccessBiomethane()]),
+                (["retrieve"], [CanAccessInjection()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )

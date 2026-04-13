@@ -77,6 +77,7 @@ ReadAccessBiomethane = HasBiomethaneProducerRights | HasDrealRights | HasAdemeRi
 
 # Custom permissions to access specific endpoints
 CanAccessContract = HasBiomethaneProducerRights | HasDrealRights
+CanAccessInjection = HasBiomethaneProducerRights | HasDrealRights
 CanAccessAdminModule = HasDrealRights | HasAdemeRights
 
 

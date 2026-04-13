@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneInjectionSite
-from biomethane.permissions import get_biomethane_permissions
+from biomethane.permissions import CanAccessInjection, get_biomethane_permissions
 from biomethane.serializers import BiomethaneInjectionSiteInputSerializer, BiomethaneInjectionSiteSerializer
 from biomethane.views.mixins.retrieve import RetrieveSingleObjectMixin
 
@@ -28,6 +28,9 @@ class BiomethaneInjectionSiteViewSet(RetrieveSingleObjectMixin, GenericViewSet):
     pagination_class = None
 
     def get_permissions(self):
+        if self.action == "retrieve":
+            return [CanAccessInjection()]
+
         return get_biomethane_permissions(["upsert"], self.action)
 
     def get_serializer_context(self):
