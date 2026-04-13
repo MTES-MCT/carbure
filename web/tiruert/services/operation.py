@@ -1,3 +1,4 @@
+from collections import defaultdict
 from copy import copy
 from decimal import Decimal
 
@@ -131,11 +132,9 @@ class OperationService:
         valid_lots = OperationService.process_ep2_lots(valid_lots)
 
         # Group validated_lots by delivery_type, feedstock, biofuel and depot
-        lots_by_delivery_type = {}
+        lots_by_delivery_type = defaultdict(list)
         for lot in valid_lots:
             key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code, lot.carbure_delivery_site)
-            if key not in lots_by_delivery_type:
-                lots_by_delivery_type[key] = []
             lots_by_delivery_type[key].append(lot)
 
         matching_types = {
@@ -145,12 +144,14 @@ class OperationService:
         }
 
         for key, lots in lots_by_delivery_type.items():
+            credited_entity = lots[0].carbure_client or lots[0].carbure_producer or lots[0].carbure_supplier
+
             operation = Operation.objects.create(
                 type=matching_types[key[0]],
                 status=Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
                 customs_category=key[1],
                 biofuel=lots[0].biofuel,
-                credited_entity=lots[0].carbure_client,
+                credited_entity=credited_entity,
                 debited_entity=None,
                 from_depot=None,
                 to_depot=lots[0].carbure_delivery_site,
