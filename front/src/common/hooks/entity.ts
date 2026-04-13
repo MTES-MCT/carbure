@@ -25,6 +25,9 @@ export interface EntityManager extends Entity {
   isSafTrader: boolean
   canTrade: boolean
   hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) => boolean
+  hasAnyAdminRight: (
+    pages: (ExternalAdminPages | `${ExternalAdminPages}`)[]
+  ) => boolean
   hasRights: (...roles: UserRole[]) => boolean
   canWrite: () => boolean
   isRelatedToBiomethane: () => boolean
@@ -91,6 +94,10 @@ export function useEntityManager(
 
     hasAdminRight: (page: ExternalAdminPages | `${ExternalAdminPages}`) =>
       hasAdminRight(page, entity),
+
+    hasAnyAdminRight: (
+      pages: (ExternalAdminPages | `${ExternalAdminPages}`)[]
+    ) => pages.some((page) => hasAdminRight(page, entity)),
 
     hasRights: (...roles: UserRole[]) =>
       entityRights?.role ? roles.includes(entityRights.role) : false,

@@ -21,7 +21,8 @@ export interface ElecChargePointsApplication {
   // audit_order_date?: string
 }
 
-export interface ElecChargePointsApplicationDetails extends ElecChargePointsApplication {
+export interface ElecChargePointsApplicationDetails
+  extends ElecChargePointsApplication {
   email_contacts: string[]
   sample?: ElecApplicationSample
 }
@@ -32,11 +33,13 @@ export interface ElecChargePointsSnapshot {
   power_total: number
 }
 
-export interface ElecChargePointsApplicationCheckInfo extends UploadCheckReportInfo {
+export interface ElecChargePointsApplicationCheckInfo
+  extends UploadCheckReportInfo {
   charge_point_count: number
 }
 
-export interface ElecMeterReadingsApplicationDetails extends ElecMeterReadingsApplication {
+export interface ElecMeterReadingsApplicationDetails
+  extends ElecMeterReadingsApplication {
   email_contacts: string[]
   power_total: number
   sample?: ElecApplicationSample
@@ -74,7 +77,8 @@ export interface ElecMeterReadingsApplication {
   status: ElecAuditApplicationStatus
 }
 
-export interface ElecMeterReadingsApplicationCheckInfo extends UploadCheckReportInfo {
+export interface ElecMeterReadingsApplicationCheckInfo
+  extends UploadCheckReportInfo {
   year: number
   quarter: number
   charge_point_count: number

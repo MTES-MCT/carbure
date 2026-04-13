@@ -10,11 +10,11 @@ import {
 } from "./providers/annual-declaration"
 import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
-import { ExternalAdminPages } from "common/types"
 import { Contact } from "./pages/admin/declaration-detail/pages/contact"
 import { lastAnnualDeclarationYearAdmin } from "./pages/admin/hooks/use-annual-declaration-years-admin"
 import SupplyInputsAdminPage from "./pages/admin/supply-inputs"
 import { MissingFieldsSettings } from "./components/missing-fields"
+import { useBiomethanePermissions } from "./hooks/use-biomethane-permissions"
 
 const currentYear = new Date().getFullYear()
 
@@ -69,9 +69,10 @@ const RedirectToCurrentYear = ({ path }: { path: REDIRECTED_ROUTES }) => {
 }
 
 export const BiomethaneRoutes = () => {
-  const { isBiomethaneProducer, hasAdminRight } = useEntity()
+  const { isBiomethaneProducer } = useEntity()
+  const { canAccessAdmin } = useBiomethanePermissions()
 
-  if (hasAdminRight(ExternalAdminPages.DREAL)) return <BiomethaneAdminRoutes />
+  if (canAccessAdmin) return <BiomethaneAdminRoutes />
 
   if (!isBiomethaneProducer) return null
 

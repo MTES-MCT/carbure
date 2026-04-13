@@ -4761,6 +4761,7 @@ export interface components {
          *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
          *     * `BIOFUEL` - BIOFUEL
          *     * `DREAL` - DREAL
+         *     * `ADEME` - ADEME
          *     * `DGDDI` - DGDDI
          * @enum {string}
          */
@@ -13782,6 +13783,7 @@ export enum ExtAdminPagesEnum {
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
     BIOFUEL = "BIOFUEL",
     DREAL = "DREAL",
+    ADEME = "ADEME",
     DGDDI = "DGDDI"
 }
 export enum FileTypeEnum {
