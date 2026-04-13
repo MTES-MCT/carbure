@@ -74,10 +74,15 @@ HasBiomethaneProducerWriteRights = UserRightsFactory(
 )
 
 # Combined permission for DREAL (READ access)
-ReadAccessBiomethane = HasBiomethaneProducerRights | HasDrealRights | HasAdemeRights
 HasDrealOrAdminRights = HasDrealRights | UserRightsFactory(
     role=[UserRights.ADMIN],
 )
+
+# Combined permission for READ access for biomethane producers, DREAL and ADEME
+ReadAccessBiomethane = HasBiomethaneProducerRights | HasDrealRights | HasAdemeRights
+
+# Custom permissions to access specific endpoints
+CanAccessContract = HasBiomethaneProducerRights | HasDrealRights
 
 
 def get_biomethane_permissions(write_actions, action):
