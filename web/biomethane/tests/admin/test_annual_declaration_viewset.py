@@ -7,6 +7,8 @@ Covers filtering of annual declarations by department (DREAL):
 - filters endpoint (department, status, tariff_reference)
 """
 
+from datetime import date
+
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.urls import reverse
@@ -14,6 +16,7 @@ from rest_framework import status
 
 from biomethane.factories import BiomethaneContractFactory, BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneAnnualDeclaration
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.admin import BiomethaneAdminAnnualDeclarationViewSet
 from core.models import Department, Entity, ExternalAdminRights
@@ -26,6 +29,8 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
 
     @classmethod
     def setUpTestData(cls):
+        cls.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+
         # Departments
         cls.dept_01 = Department.objects.create(code_dept="01", name="Ain")
         cls.dept_02 = Department.objects.create(code_dept="02", name="Aisne")
@@ -42,6 +47,12 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         cls.dreal_other = Entity.objects.create(name="DREAL Other", entity_type=Entity.EXTERNAL_ADMIN)
         EntityScope.objects.create(entity=cls.dreal_other, content_type=dept_ct, object_id=cls.dept_03.id)
         ExternalAdminRights.objects.create(entity=cls.dreal_other, right=ExternalAdminRights.DREAL)
+
+        # ADEME with access to departments 01 and 02
+        cls.ademe = Entity.objects.create(name="ADEME Test", entity_type=Entity.EXTERNAL_ADMIN)
+        EntityScope.objects.create(entity=cls.ademe, content_type=dept_ct, object_id=cls.dept_01.id)
+        EntityScope.objects.create(entity=cls.ademe, content_type=dept_ct, object_id=cls.dept_02.id)
+        ExternalAdminRights.objects.create(entity=cls.ademe, right=ExternalAdminRights.ADEME)
 
         # Producers with production unit (department known)
         cls.producer_dept_01 = Entity.objects.create(
@@ -88,7 +99,6 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             registered_zipcode="03",
         )
 
-        cls.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         cls.admin_declarations_url = reverse("biomethane-admin-annual-declarations-list")
 
     def setUp(self):
@@ -253,6 +263,49 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
 
         self.assertEqual(len(results), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_list_applies_five_year_contract_filter_only_for_ademe(self):
+        """ADEME only sees declarations where effective_date year is >= current year - 4."""
+        ineligible_effective_date = date(self.current_year - 5, 1, 1)
+        eligible_effective_date = date(self.current_year - 4, 1, 1)
+
+        BiomethaneContractFactory.create(
+            producer=self.producer_dept_01,
+            effective_date=ineligible_effective_date,
+            has_complementary_investment_aid=True,
+            complementary_aid_organisms=[BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME],
+        )
+        BiomethaneContractFactory.create(
+            producer=self.producer_dept_02,
+            effective_date=eligible_effective_date,
+            has_complementary_investment_aid=True,
+            complementary_aid_organisms=[BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME],
+        )
+
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_01,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+        declaration_eligible = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_02,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        setup_current_user(
+            self,
+            "ademe@example.com",
+            "ADEME",
+            "User",
+            [(self.ademe, "ADMIN")],
+        )
+
+        response = self.client.get(self.admin_declarations_url, {"entity_id": self.ademe.id})
+
+        declaration_ids = [d["id"] for d in response.json()["results"]]
+
+        self.assertEqual(declaration_ids, [declaration_eligible.id])
 
     def test_filters_return_expected_values_for_accessible_declarations(self):
         """filters endpoint returns only department, status and tariff_reference values from current year declarations in

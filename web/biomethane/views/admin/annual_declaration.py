@@ -5,10 +5,12 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.admin.annual_declaration import BiomethaneAdminAnnualDeclarationFilter
 from biomethane.models import BiomethaneAnnualDeclaration
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.permissions import CanAccessAdminModule
 from biomethane.serializers.admin.annual_declaration import BiomethaneAdminAnnualDeclarationSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.filters import FiltersActionFactory
+from core.models.entity import ExternalAdminRights
 
 
 @extend_schema(
@@ -54,5 +56,15 @@ class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, Fi
             )
             .order_by("-priority", "producer__name")
         )
+
+        if entity.has_external_admin_right(ExternalAdminRights.ADEME):
+            # ADEME only sees the declarations for the first five years of the installation
+            # Ex : effective_date is 02/04/2023, ADEME will see the declarations for the years 2023 to 2027
+            declarations = declarations.filter(
+                producer__biomethane_contract__complementary_aid_organisms__contains=[
+                    BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME
+                ],
+                producer__biomethane_contract__effective_date__year__gte=year - 4,
+            )
 
         return declarations
