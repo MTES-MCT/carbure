@@ -11,6 +11,7 @@ import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { IcpeNumberHelper } from "./icpe-number-helper"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { UnitTypeEnum } from "api-schema"
 
 type ICPEForm = Pick<ProductionUnitForm, "icpe_number" | "icpe_regime">
 
@@ -31,6 +32,7 @@ export function ICPE({
   const { execute: saveProductionUnit, loading } =
     useSaveProductionUnit(productionUnit)
 
+  const requiredICPEFields = productionUnit?.unit_type !== UnitTypeEnum.STEP
   const icpeRegimeOptions = [
     {
       value: IcpeRegime.AUTHORIZATION,
@@ -57,7 +59,7 @@ export function ICPE({
           onSubmit={() => saveProductionUnit(extractValues(value))}
         >
           <TextInput
-            required
+            required={requiredICPEFields}
             readOnly={!isEditing}
             label={t("N° ICPE")}
             state="info"
@@ -66,7 +68,7 @@ export function ICPE({
             {...bind("icpe_number")}
           />
           <RadioGroup
-            required
+            required={requiredICPEFields}
             readOnly={!isEditing}
             label={t("Régime ICPE")}
             orientation="horizontal"

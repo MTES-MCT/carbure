@@ -36,6 +36,15 @@ class RequiredFieldRule:
     condition: Callable[[ContextType], bool]
 
 
+@dataclass
+class OptionalFieldRule:
+    """Rule to determine if fields should be optional based on a condition."""
+
+    name: str
+    fields: list[str]
+    condition: Callable[[ContextType], bool]
+
+
 class RuleBuilder:
     """Factory to build common field clearing rules."""
 
