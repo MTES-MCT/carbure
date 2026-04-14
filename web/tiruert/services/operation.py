@@ -41,6 +41,8 @@ class OperationService:
         Check if the selected lots exist and have enough volume to perform the operation
         """
         np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
+
+        # Round available volumes to 8 decimals to match optimization algorithm precision
         available_volumes = {int(lot_id): round(float(volume), 8) for lot_id, volume in zip(np_lot_ids, np_volumes)}
 
         for lot in selected_lots:
