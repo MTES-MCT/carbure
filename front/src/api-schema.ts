@@ -2513,40 +2513,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/tiruert/admin-objectives/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get agregated objectives for all entities - admin view */
-        get: operations["tiruert_admin_objectives_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/tiruert/admin-objectives-entity/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get objectives for a specific entity - admin view */
-        get: operations["tiruert_admin_objectives_entity_retrieve"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/tiruert/declaration-period/": {
         parameters: {
             query?: never;
@@ -2726,7 +2692,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Get all objectives */
+        /** @description Get objectives.
+         *
+         *     Behavior depends on the entity type of the authenticated user:
+         *     - Operator: returns objectives for their own entity.
+         *     - Admin/ExternalAdmin: if `selected_entity_id` is provided, returns objectives
+         *       for that specific entity. Otherwise, returns aggregated objectives for all
+         *       tiruert-liable entities. */
         get: operations["tiruert_objectives_retrieve"];
         put?: never;
         post?: never;
@@ -11914,56 +11886,6 @@ export interface operations {
             };
         };
     };
-    tiruert_admin_objectives_retrieve: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-                /** @description Year of the objectives */
-                year: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ObjectiveOutput"];
-                };
-            };
-        };
-    };
-    tiruert_admin_objectives_entity_retrieve: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-                /** @description Entity's objectives. */
-                selected_entity_id: number;
-                /** @description Year of the objectives */
-                year: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ObjectiveOutput"];
-                };
-            };
-        };
-    };
     tiruert_declaration_period_retrieve: {
         parameters: {
             query: {
@@ -12439,6 +12361,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Target entity ID (admin only). If provided, returns objectives for this entity. If omitted for admin, returns aggregated objectives for all tiruert-liable entities. */
+                selected_entity_id?: number;
                 /** @description Year of the objectives */
                 year: string;
             };

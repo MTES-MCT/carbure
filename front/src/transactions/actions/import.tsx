@@ -148,8 +148,11 @@ function useImportLots(onClose?: () => void) {
       onClose?.()
     },
 
-    onError: () => {
-      notify(t("Les lots n'ont pas pu être importés"), { variant: "danger" })
+    onError: (error) => {
+      const msg =
+        (error as any).response?.data?.message ??
+        t("Les lots n'ont pas pu être importés")
+      notify(msg, { variant: "danger" })
       onClose?.()
     },
   })

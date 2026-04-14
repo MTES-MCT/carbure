@@ -21,8 +21,10 @@ export interface MainObjective extends BaseObjective {
   energy_basis: number // GJ
 }
 
-export interface ElecCategoryObjective
-  extends Omit<BaseObjective, "target" | "target_percent"> {
+export interface ElecCategoryObjective extends Omit<
+  BaseObjective,
+  "target" | "target_percent"
+> {
   code: ElecOperationSector.ELEC
   target: null
   target_percent: null

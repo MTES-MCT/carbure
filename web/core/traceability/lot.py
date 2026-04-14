@@ -109,6 +109,7 @@ class LotNode(Node):
         "year",
         "period",
         "delivery_date",
+        "dispatch_date",
     ]
 
     # fields only available for stock extracts
