@@ -6,7 +6,7 @@ import { NumberInput, TextInput } from "common/components/inputs2"
 import {
   getHoursInMonth,
   getInjectionHours,
-  INJECTION_HOURS_EPSILON,
+  isInjectionHoursInError,
 } from "./declare-monthly-quantity.utils"
 import { useAnnualDeclarationYear } from "biomethane/providers/annual-declaration"
 
@@ -45,35 +45,55 @@ export const useDeclareMonthlyQuantityColumns = ({
     },
     {
       header: t("Volume injecté (Nm³)"),
-      cell: (item) => (
-        <NumberInput
-          value={item.injected_volume_nm3}
-          onChange={(value) =>
-            updateCellValue(item.month, "injected_volume_nm3", value)
-          }
-          min={0}
-          readOnly={isReadOnly}
-          required
-        />
-      ),
+      cell: (item) => {
+        const isError = isInjectionHoursInError(
+          selectedYear,
+          item.month,
+          item.injected_volume_nm3,
+          item.average_monthly_flow_nm3_per_hour
+        )
+
+        return (
+          <NumberInput
+            value={item.injected_volume_nm3}
+            onChange={(value) =>
+              updateCellValue(item.month, "injected_volume_nm3", value)
+            }
+            min={0}
+            readOnly={isReadOnly}
+            required
+            state={isError ? "error" : "default"}
+          />
+        )
+      },
     },
     {
       header: t("Débit moyen mensuel (Nm³/h)"),
-      cell: (item) => (
-        <NumberInput
-          value={item.average_monthly_flow_nm3_per_hour}
-          onChange={(value) =>
-            updateCellValue(
-              item.month,
-              "average_monthly_flow_nm3_per_hour",
-              value
-            )
-          }
-          min={0}
-          readOnly={isReadOnly}
-          required
-        />
-      ),
+      cell: (item) => {
+        const isError = isInjectionHoursInError(
+          selectedYear,
+          item.month,
+          item.injected_volume_nm3,
+          item.average_monthly_flow_nm3_per_hour
+        )
+
+        return (
+          <NumberInput
+            value={item.average_monthly_flow_nm3_per_hour}
+            onChange={(value) =>
+              updateCellValue(
+                item.month,
+                "average_monthly_flow_nm3_per_hour",
+                value
+              )
+            }
+            min={0}
+            readOnly={isReadOnly}
+            required
+            state={isError ? "error" : "default"}
+          />
+        )
+      },
     },
     {
       header: t("Heures d'injection (h)"),
@@ -82,16 +102,8 @@ export const useDeclareMonthlyQuantityColumns = ({
           item.injected_volume_nm3,
           item.average_monthly_flow_nm3_per_hour
         )
-        const hours = getHoursInMonth(selectedYear, item.month)
-        const isError = injectionHours > hours + INJECTION_HOURS_EPSILON
 
-        return (
-          <TextInput
-            value={formatNumber(injectionHours)}
-            disabled
-            state={isError ? "error" : "default"}
-          />
-        )
+        return <TextInput value={formatNumber(injectionHours)} disabled />
       },
     },
   ]
