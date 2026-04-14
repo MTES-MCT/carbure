@@ -76,7 +76,7 @@ def download_certificates(url: str, status: str) -> None:
 def save_2bs_certificates(status: str) -> Tuple[int, list]:
     today = date.today()
     certificates = []
-    filename = "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status, today.strftime("%Y-%m-%d"))
+    filename = "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), today.strftime("%Y-%m-%d"))
     csvfile = open(filename, "r")
     reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
     i = 0
