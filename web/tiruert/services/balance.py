@@ -133,13 +133,22 @@ class BalanceService:
         """
         Calculates balances based on the specified grouping
         'operations' is a queryset of already filtered operations
+
+        Parameters:
+        - operations: QuerySet of Operation objects to be included in the balance calculation
+        - entity_id: ID of the entity for which the balance is being calculated
+        - group_by: The grouping type for the balance calculation (e.g., sector, category, lot, depot)
+        - unit: The unit for the balance calculation
+        - date_from: (Optional) used to calculate teneur on a specific period
+        - ges_bound_min and ges_bound_max: (Optional) used to filter lots based on their GHG reduction values
+
+        Returns:
+        - A dictionary containing the calculated balances based on the specified grouping
         """
         # Use a defaultdict with a factory function that creates an appropriate balance entry
         balance = defaultdict(partial(BalanceService._init_balance_entry, unit))
 
-        operations = operations.filter(
-            status__in=[Operation.PENDING, Operation.ACCEPTED, Operation.VALIDATED, Operation.DECLARED, Operation.DRAFT]
-        )
+        operations = operations.filter(status__in=Operation.ACTIVE_STATUSES)
 
         for operation in operations:
             credit_operation = operation.is_credit(entity_id)
@@ -170,7 +179,7 @@ class BalanceService:
                     if group_by != BalanceService.GROUP_BY_CATEGORY:
                         balance[key]["biofuel"] = operation.biofuel
 
-                if not (credit_operation and (operation.status == Operation.PENDING or operation.status == Operation.DRAFT)):
+                if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
                     # Update available balance
                     BalanceService._update_available_balance(
                         balance, key, operation, detail, credit_operation, conversion_factor

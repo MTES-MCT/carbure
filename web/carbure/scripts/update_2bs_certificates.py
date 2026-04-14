@@ -30,7 +30,7 @@ DBS_NUMBER_KEY = "Numéro de Certificat 2BS"
 DBS_COMPANY_NAME_KEY = "Nom de l’opérateur économique"
 DBS_ADDRESS_KEY = "Adresse"
 DBS_COUNTRY_KEY = "Pays"
-DBS_VALID_FROM_KEY = "Date de début de validité du certificat"
+DBS_VALID_FROM_KEY = "Date Initiale de la Certification"
 DBS_VALID_UNTIL_KEY = "Date de fin de validité du certificat"
 DBS_WITHDRAWAL_DATE_KEY = "Date de retrait du certificat"
 DBS_SUSPENSION_DATE_KEY = "Date de suspension du certificat"
@@ -70,7 +70,7 @@ def download_certificates(url: str, status: str) -> None:
     html_io = StringIO(str(table))
     df = pd.read_html(html_io)[0]
     df = df[~df[DBS_NUMBER_KEY].isnull()]  # Pour une raison inconnue, la ligne de coordonnées est dupliquée
-    pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), str(date.today())), index=False)
+    pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status, str(date.today())), index=False)
 
 
 def save_2bs_certificates(status: str) -> Tuple[int, list]:

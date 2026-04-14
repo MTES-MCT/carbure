@@ -4,14 +4,20 @@ import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { useTranslation } from "react-i18next"
 
-export const useAddContract = ({ onSuccess }: { onSuccess?: () => void }) => {
+export const useAddContract = ({
+  onSuccess,
+  annualDeclarationKey,
+}: {
+  onSuccess?: () => void
+  annualDeclarationKey: string
+}) => {
   const notify = useNotify()
   const notifyError = useNotifyError()
   const { t } = useTranslation()
   const entity = useEntity()
 
   const mutation = useMutation((data) => saveContract(entity.id, data), {
-    invalidates: ["contract-infos"],
+    invalidates: ["contract-infos", annualDeclarationKey],
     onSuccess: () => {
       notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
       onSuccess?.()

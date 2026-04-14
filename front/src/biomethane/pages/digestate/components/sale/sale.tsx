@@ -51,6 +51,7 @@ export function Sale() {
               min={0}
               {...bind("sold_volume")}
               required
+              step={0.01}
             />
           </Grid>
           {isEditing && (

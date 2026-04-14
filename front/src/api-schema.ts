@@ -2513,15 +2513,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/tiruert/admin-objectives/": {
+    "/api/tiruert/declaration-period/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Get agregated objectives for all entities - admin view */
-        get: operations["tiruert_admin_objectives_retrieve"];
+        /** @description Check if there is a current declaration period and return the year if there is one */
+        get: operations["tiruert_declaration_period_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2530,15 +2530,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/tiruert/admin-objectives-entity/": {
+    "/api/tiruert/declaration-period/years/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Get objectives for a specific entity - admin view */
-        get: operations["tiruert_admin_objectives_entity_retrieve"];
+        /** @description Return the list of past years until the current one */
+        get: operations["tiruert_declaration_period_years_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2692,7 +2692,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Get all objectives */
+        /** @description Get objectives.
+         *
+         *     Behavior depends on the entity type of the authenticated user:
+         *     - Operator: returns objectives for their own entity.
+         *     - Admin/ExternalAdmin: if `selected_entity_id` is provided, returns objectives
+         *       for that specific entity. Otherwise, returns aggregated objectives for all
+         *       tiruert-liable entities. */
         get: operations["tiruert_objectives_retrieve"];
         put?: never;
         post?: never;
@@ -3866,6 +3872,23 @@ export interface components {
             category: string;
             subcategory: string;
         };
+        /**
+         * @description * `Producteur` - Producteur
+         *     * `Opérateur` - Opérateur
+         *     * `Administration` - Administration
+         *     * `Trader` - Trader
+         *     * `Auditor` - Auditeur
+         *     * `Administration Externe` - Administration Externe
+         *     * `Charge Point Operator` - Charge Point Operator
+         *     * `Compagnie aérienne` - Compagnie aérienne
+         *     * `Unknown` - Unknown
+         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+         *     * `SAF Trader` - Trader de SAF
+         *     * `Producteur de biométhane` - Producteur de biométhane
+         *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+         * @enum {string}
+         */
+        ClientTypeEnum: PathsApiSafTicketsGetParametersQueryClient_type;
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
@@ -5117,15 +5140,11 @@ export interface components {
             id: number;
             /** Format: double */
             volume: number;
-            /** Format: double */
-            emission_rate_per_mj: number;
         };
         OperationLotRequest: {
             id: number;
             /** Format: double */
             volume: number;
-            /** Format: double */
-            emission_rate_per_mj: number;
         };
         /**
          * @description * `PENDING` - PENDING
@@ -5150,6 +5169,7 @@ export interface components {
          *     * `DEVALUATION` - DEVALUATION
          *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
          *     * `TRANSFERT` - TRANSFERT
+         *     * `EXPIRATION` - EXPIRATION
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -5647,9 +5667,11 @@ export interface components {
             readonly reception_airport: components["schemas"]["Airport"];
             free_field?: string | null;
             agreement_reference?: string | null;
+            readonly client_type: components["schemas"]["ClientTypeEnum"];
             readonly carbure_producer: components["schemas"]["EntityPreview"];
             unknown_producer?: string | null;
             readonly carbure_production_site: components["schemas"]["ProductionSite"];
+            readonly production_country: components["schemas"]["Country"];
             unknown_production_site?: string | null;
             /** Format: date */
             production_site_commissioning_date?: string | null;
@@ -5862,8 +5884,6 @@ export interface components {
             lot_id: number;
             /** Format: decimal */
             volume: string;
-            /** Format: double */
-            emission_rate_per_mj: number;
         };
         SimulationMinMaxInputRequest: {
             customs_category: components["schemas"]["MPCategoriesEnum"];
@@ -11866,17 +11886,11 @@ export interface operations {
             };
         };
     };
-    tiruert_admin_objectives_retrieve: {
+    tiruert_declaration_period_retrieve: {
         parameters: {
             query: {
-                /** @description Date from which to calculate balance for teneur */
-                date_from: string;
-                /** @description Date to which to calculate balance for teneur */
-                date_to: string;
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Year of the objectives */
-                year: string;
             };
             header?: never;
             path?: never;
@@ -11889,24 +11903,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ObjectiveOutput"];
+                    "application/json": {
+                        year?: number;
+                    };
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
+                        message?: string;
+                    };
                 };
             };
         };
     };
-    tiruert_admin_objectives_entity_retrieve: {
+    tiruert_declaration_period_years_retrieve: {
         parameters: {
             query: {
-                /** @description Date from which to calculate balance for teneur */
-                date_from: string;
-                /** @description Date to which to calculate balance for teneur */
-                date_to: string;
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Entity's objectives. */
-                selected_entity_id: number;
-                /** @description Year of the objectives */
-                year: string;
             };
             header?: never;
             path?: never;
@@ -11919,7 +11938,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ObjectiveOutput"];
+                    "application/json": {
+                        years?: number[];
+                    };
                 };
             };
         };
@@ -12338,12 +12359,10 @@ export interface operations {
     tiruert_objectives_retrieve: {
         parameters: {
             query: {
-                /** @description Date from which to calculate balance for teneur */
-                date_from: string;
-                /** @description Date to which to calculate balance for teneur */
-                date_to: string;
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Target entity ID (admin only). If provided, returns objectives for this entity. If omitted for admin, returns aggregated objectives for all tiruert-liable entities. */
+                selected_entity_id?: number;
                 /** @description Year of the objectives */
                 year: string;
             };
@@ -12374,8 +12393,6 @@ export interface operations {
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
-                date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -12390,6 +12407,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -12419,11 +12437,15 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
@@ -12714,7 +12736,6 @@ export interface operations {
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 /** @description Date from where to calculate teneur and quantity */
                 date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -12733,6 +12754,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -12762,11 +12784,15 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
@@ -12813,8 +12839,6 @@ export interface operations {
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
-                date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -12831,6 +12855,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -12860,7 +12885,11 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
@@ -12931,8 +12960,6 @@ export interface operations {
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
-                date_from?: string;
-                date_to?: string;
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
@@ -12949,6 +12976,7 @@ export interface operations {
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
+                 *     * `EXPIRATION` - EXPIRATION
                  *     * `ACQUISITION` - ACQUISITION */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /** @description Ordre
@@ -12978,7 +13006,11 @@ export interface operations {
                  *     * `saved_emissions` - saved_emissions
                  *     * `-saved_emissions` - saved_emissions (descending) */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
                 period?: string[];
+                /** @description A search term. */
+                search?: string;
                 /** @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
@@ -13534,6 +13566,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     DEVALUATION = "DEVALUATION",
     EXPEDITION = "EXPEDITION",
+    EXPIRATION = "EXPIRATION",
     EXPORTATION = "EXPORTATION",
     INCORPORATION = "INCORPORATION",
     LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
@@ -13824,7 +13857,8 @@ export enum OperationTypeEnum {
     EXPEDITION = "EXPEDITION",
     DEVALUATION = "DEVALUATION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
-    TRANSFERT = "TRANSFERT"
+    TRANSFERT = "TRANSFERT",
+    EXPIRATION = "EXPIRATION"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

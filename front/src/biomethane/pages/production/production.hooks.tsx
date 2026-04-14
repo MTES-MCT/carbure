@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "common/hooks/async"
+import { QueryOptions, useMutation, useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import {
   getProductionUnit,
@@ -17,12 +17,18 @@ import { AnnualDeclarationResetDialog } from "biomethane/components/annual-decla
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
-export const useProductionUnit = () => {
+export const useProductionUnit = (
+  options?: Omit<
+    QueryOptions<BiomethaneProductionUnit | undefined, [number, number]>,
+    "key" | "params"
+  >
+) => {
   const entity = useEntity()
   const { selectedEntityId } = useSelectedEntity()
   const query = useQuery(getProductionUnit, {
     key: "production-unit",
     params: [entity.id, selectedEntityId],
+    ...options,
   })
 
   return query
@@ -90,14 +96,18 @@ export const useDigestateStorages = () => {
   return query
 }
 
-export const useAddDigestateStorage = () => {
+export const useAddDigestateStorage = ({
+  annualDeclarationKey,
+}: {
+  annualDeclarationKey: string
+}) => {
   const notify = useNotify()
   const notifyError = useNotifyError()
   const { t } = useTranslation()
   const entity = useEntity()
 
   const mutation = useMutation((data) => addDigestateStorage(entity.id, data), {
-    invalidates: ["digestate-storages"],
+    invalidates: ["digestate-storages", annualDeclarationKey],
     onSuccess: () => {
       notify(t("Le stockage de digestat a bien été ajouté."), {
         variant: "success",
@@ -136,7 +146,11 @@ export const useUpdateDigestateStorage = () => {
   return mutation
 }
 
-export const useDeleteDigestateStorage = () => {
+export const useDeleteDigestateStorage = ({
+  annualDeclarationKey,
+}: {
+  annualDeclarationKey: string
+}) => {
   const notify = useNotify()
   const notifyError = useNotifyError()
   const { t } = useTranslation()
@@ -145,7 +159,7 @@ export const useDeleteDigestateStorage = () => {
   const mutation = useMutation(
     (id: number) => deleteDigestateStorage(entity.id, id),
     {
-      invalidates: ["digestate-storages"],
+      invalidates: ["digestate-storages", annualDeclarationKey],
       onSuccess: () => {
         notify(t("Le stockage de digestat a bien été supprimé."), {
           variant: "success",

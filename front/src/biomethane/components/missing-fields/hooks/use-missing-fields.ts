@@ -12,14 +12,22 @@ import { MISSING_FIELDS_HASH } from "../missing-fields.constants"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 
 export const useMissingFields = <FormType extends object | undefined>(
-  form: FormManager<FormType>
+  form: FormManager<FormType>,
+  /**
+   * If true, the user will be redirected to the missing fields page when the hash is present,
+   * even if the user is not allowed to edit the declaration.
+   */
+  allowRedirection: boolean = true
 ) => {
   const location = useLocation()
   const navigate = useNavigate()
   const { showMissingFields } = useShowMissingFields(form)
   const { canEditDeclaration } = useAnnualDeclaration()
   useEffect(() => {
-    if (canEditDeclaration && location.hash.includes(MISSING_FIELDS_HASH)) {
+    if (
+      (canEditDeclaration || allowRedirection) &&
+      location.hash.includes(MISSING_FIELDS_HASH)
+    ) {
       showMissingFields()
       navigate({ hash: "" })
     }

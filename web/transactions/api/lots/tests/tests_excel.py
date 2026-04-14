@@ -1,4 +1,5 @@
 import os
+from unittest.mock import patch
 
 import pandas as pd
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -231,3 +232,25 @@ class LotsExcelImportTest(TestCase):
 
         assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
         assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
+
+    def test_excel_unknown_stock_id_returns_400(self):
+        # When a row references a carbure_stock_id that does not exist,
+        # the import should be rejected with a 400 and an explicit error message.
+        filepath = f"{os.environ['CARBURE_HOME']}/web/transactions/fixtures/test_lot_template.xlsx"
+        with open(filepath, "rb") as reader:
+            file = SimpleUploadedFile("test_lot_template.xlsx", reader.read())
+
+        with patch(
+            "transactions.api.lots.add_excel.construct_carbure_lot",
+            return_value=(None, []),
+        ):
+            response = self.client.post(
+                reverse("transactions-lots-add-excel"),
+                {"entity_id": self.owner.id, "file": file},
+            )
+
+        assert response.status_code == 400
+        data = response.json()
+        assert data["status"] == "error"
+        # No lot should have been created (transaction is rolled back)
+        assert CarbureLot.objects.filter(added_by=self.owner).count() == 0

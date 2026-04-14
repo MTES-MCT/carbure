@@ -14,9 +14,13 @@ type AddDigestateStorageForm =
 
 interface AddDigestateStorageProps {
   onClose: () => void
+  annualDeclarationKey: string
 }
 
-export const AddDigestateStorage = ({ onClose }: AddDigestateStorageProps) => {
+export const AddDigestateStorage = ({
+  onClose,
+  annualDeclarationKey,
+}: AddDigestateStorageProps) => {
   const { t } = useTranslation()
   const { bind, value } = useForm<AddDigestateStorageForm>({
     type: "",
@@ -24,7 +28,9 @@ export const AddDigestateStorage = ({ onClose }: AddDigestateStorageProps) => {
     has_cover: false,
     has_biogas_recovery: false,
   })
-  const { execute: addStorage, loading } = useAddDigestateStorage()
+  const { execute: addStorage, loading } = useAddDigestateStorage({
+    annualDeclarationKey,
+  })
 
   const handleSubmit = async () => {
     await addStorage(value)
@@ -62,6 +68,7 @@ export const AddDigestateStorage = ({ onClose }: AddDigestateStorageProps) => {
             min={0}
             label={t("Capacité de stockage (m3)")}
             {...bind("capacity")}
+            step={0.01}
           />
           <RadioGroup
             required

@@ -57,7 +57,7 @@ class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):
                 "origin_department",
             ]
             for field in required_fields:
-                if not validated_data.get(field):
+                if validated_data.get(field) is None:
                     raise serializers.ValidationError({field: "Ce champ est requis si le pays d'origine est France"})
 
         avg_dist = validated_data.get("average_weighted_distance_km")

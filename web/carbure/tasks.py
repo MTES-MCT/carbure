@@ -108,18 +108,25 @@ if env.get("IMAGE_TAG") == "prod":
         subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", env.get("READ_REPLICA_DATABASE_URL")])
 
     # Anonymization
-    @periodic_task(crontab(day=1, hour=1, minute=0))
+    @db_periodic_task(crontab(day=1, hour=1, minute=0))
     def anonymize_inactive_users() -> None:
         call_command("anonymize_inactive_users")
 
     # Biomethane declaration status update
-    @periodic_task(crontab(hour=0, minute=1))
+    @db_periodic_task(crontab(hour=0, minute=1))
     def create_new_biomethane_declaration() -> None:
         call_command("create_biomethane_annual_declarations")
 
-    @periodic_task(crontab(hour=0, minute=1))
+    @db_periodic_task(crontab(hour=0, minute=1))
     def close_biomethane_declaration_status() -> None:
         call_command("set_biomethane_declarations_open", "--open=false")
+
+    # Tiruert update operations
+    @db_periodic_task(crontab(hour=0, minute=1))
+    def run_tiruert_expiration_tasks() -> None:
+        call_command("cancel_teneur_operations")
+        # Only runs if cancel_teneur_operations succeeds (no exception raised)
+        call_command("set_operations_expired")
 
 
 if env.get("IMAGE_TAG") == "staging":

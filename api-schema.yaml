@@ -9010,97 +9010,73 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
-  /api/tiruert/admin-objectives/:
+  /api/tiruert/declaration-period/:
     get:
-      operationId: tiruert_admin_objectives_retrieve
-      description: Get agregated objectives for all entities - admin view
+      operationId: tiruert_declaration_period_retrieve
+      description: Check if there is a current declaration period and return the year
+        if there is one
       parameters:
-        - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-          description: Date from which to calculate balance for teneur
-          required: true
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-          description: Date to which to calculate balance for teneur
-          required: true
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: year
-          schema:
-            type: string
-          description: Year of the objectives
-          required: true
       tags:
         - tiruert
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectiveOutput"
+                type: object
+                properties:
+                  year:
+                    type: integer
           description: ""
-  /api/tiruert/admin-objectives-entity/:
+        "503":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+          description: ""
+  /api/tiruert/declaration-period/years/:
     get:
-      operationId: tiruert_admin_objectives_entity_retrieve
-      description: Get objectives for a specific entity - admin view
+      operationId: tiruert_declaration_period_years_retrieve
+      description: Return the list of past years until the current one
       parameters:
-        - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-          description: Date from which to calculate balance for teneur
-          required: true
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-          description: Date to which to calculate balance for teneur
-          required: true
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: selected_entity_id
-          schema:
-            type: integer
-          description: Entity's objectives.
-          required: true
-        - in: query
-          name: year
-          schema:
-            type: string
-          description: Year of the objectives
-          required: true
       tags:
         - tiruert
       security:
         - cookieAuth: []
         - basicAuth: []
+        - {}
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectiveOutput"
+                type: object
+                properties:
+                  years:
+                    type: array
+                    items:
+                      type: integer
           description: ""
   /api/tiruert/elec-operations/:
     get:
@@ -9825,28 +9801,32 @@ paths:
   /api/tiruert/objectives/:
     get:
       operationId: tiruert_objectives_retrieve
-      description: Get all objectives
+      description: >-
+        Get objectives.
+
+
+        Behavior depends on the entity type of the authenticated user:
+
+        - Operator: returns objectives for their own entity.
+
+        - Admin/ExternalAdmin: if `selected_entity_id` is provided, returns
+        objectives
+          for that specific entity. Otherwise, returns aggregated objectives for all
+          tiruert-liable entities.
       parameters:
-        - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-          description: Date from which to calculate balance for teneur
-          required: true
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-          description: Date to which to calculate balance for teneur
-          required: true
         - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: integer
+          description: Target entity ID (admin only). If provided, returns objectives for
+            this entity. If omitted for admin, returns aggregated objectives for
+            all tiruert-liable entities.
         - in: query
           name: year
           schema:
@@ -9917,16 +9897,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -9955,6 +9925,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -9972,6 +9943,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -10035,6 +10007,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - name: page
           required: false
           in: query
@@ -10054,6 +10032,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
@@ -10551,11 +10535,6 @@ paths:
             format: date
           description: Date from where to calculate teneur and quantity
         - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -10602,6 +10581,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -10619,6 +10599,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -10682,6 +10663,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - name: page
           required: false
           in: query
@@ -10701,6 +10688,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
@@ -10814,16 +10807,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -10862,6 +10845,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -10879,6 +10863,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -10942,6 +10927,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - in: query
           name: period
           schema:
@@ -10949,6 +10940,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
@@ -11121,16 +11118,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-        - in: query
-          name: date_to
-          schema:
-            type: string
-            format: date
-        - in: query
           name: depot
           schema:
             type: array
@@ -11175,6 +11162,7 @@ paths:
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
+                - EXPIRATION
                 - EXPORTATION
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
@@ -11192,6 +11180,7 @@ paths:
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
+            * `EXPIRATION` - EXPIRATION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11255,6 +11244,12 @@ paths:
             * `-saved_emissions` - saved_emissions (descending)
           explode: false
           style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
         - in: query
           name: period
           schema:
@@ -11262,6 +11257,12 @@ paths:
             items:
               type: string
               minLength: 1
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
         - in: query
           name: sector
           schema:
@@ -13779,6 +13780,36 @@ components:
         - category
         - group
         - subcategory
+    ClientTypeEnum:
+      enum:
+        - Producteur
+        - Opérateur
+        - Administration
+        - Trader
+        - Auditor
+        - Administration Externe
+        - Charge Point Operator
+        - Compagnie aérienne
+        - Unknown
+        - Power or Heat Producer
+        - SAF Trader
+        - Producteur de biométhane
+        - Fournisseur de biométhane
+      type: string
+      description: |-
+        * `Producteur` - Producteur
+        * `Opérateur` - Opérateur
+        * `Administration` - Administration
+        * `Trader` - Trader
+        * `Auditor` - Auditeur
+        * `Administration Externe` - Administration Externe
+        * `Charge Point Operator` - Charge Point Operator
+        * `Compagnie aérienne` - Compagnie aérienne
+        * `Unknown` - Unknown
+        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        * `SAF Trader` - Trader de SAF
+        * `Producteur de biométhane` - Producteur de biométhane
+        * `Fournisseur de biométhane` - Fournisseur de biométhane
     CollectionTypeEnum:
       enum:
         - PRIVATE
@@ -16884,11 +16915,7 @@ components:
         volume:
           type: number
           format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
       required:
-        - emission_rate_per_mj
         - id
         - volume
     OperationLotRequest:
@@ -16899,11 +16926,7 @@ components:
         volume:
           type: number
           format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
       required:
-        - emission_rate_per_mj
         - id
         - volume
     OperationStatusEnum:
@@ -16938,6 +16961,7 @@ components:
         - DEVALUATION
         - CUSTOMS_CORRECTION
         - TRANSFERT
+        - EXPIRATION
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -16950,6 +16974,7 @@ components:
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
+        * `EXPIRATION` - EXPIRATION
     OperationUpdate:
       type: object
       properties:
@@ -17992,6 +18017,10 @@ components:
           type: string
           nullable: true
           maxLength: 64
+        client_type:
+          allOf:
+            - $ref: "#/components/schemas/ClientTypeEnum"
+          readOnly: true
         carbure_producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -18003,6 +18032,10 @@ components:
         carbure_production_site:
           allOf:
             - $ref: "#/components/schemas/ProductionSite"
+          readOnly: true
+        production_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
           readOnly: true
         unknown_production_site:
           type: string
@@ -18069,11 +18102,13 @@ components:
         - carbure_production_site
         - child_ticket_sources
         - client
+        - client_type
         - country_of_origin
         - created_at
         - feedstock
         - id
         - parent_ticket_source
+        - production_country
         - reception_airport
         - supplier
         - volume
@@ -18569,11 +18604,7 @@ components:
         volume:
           type: string
           format: decimal
-        emission_rate_per_mj:
-          type: number
-          format: double
       required:
-        - emission_rate_per_mj
         - lot_id
         - volume
     SimulationMinMaxInputRequest:

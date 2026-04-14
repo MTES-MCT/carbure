@@ -58,7 +58,6 @@ class SimulateActionMixinTest(TestCase):
         mock_service.return_value = (
             {0: 100.0, 1: 900.0},  # selected_lots
             np.array([10, 11]),  # lot_ids
-            np.array([50.0, 60.0]),  # emissions
             0.5,  # fun
         )
 
@@ -71,7 +70,7 @@ class SimulateActionMixinTest(TestCase):
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
     def test_simulate_calls_service_with_correct_parameters(self, mock_service):
         """Test that simulate calls TeneurService.prepare_data_and_optimize with correct parameters"""
-        mock_service.return_value = ({0: 1000.0}, np.array([10]), np.array([50.0]), 0.5)
+        mock_service.return_value = ({0: 1000.0}, np.array([10]), 0.5)
 
         data = self._create_valid_data()
         request = self._create_request(data, unit="mj")
@@ -91,7 +90,6 @@ class SimulateActionMixinTest(TestCase):
         mock_service.return_value = (
             {0: 100.0, 2: 200.0},  # selected_lots (indices 0 and 2)
             np.array([10, 11, 12]),  # lot_ids
-            np.array([50.0, 55.0, 60.0]),  # emissions
             0.5,
         )
 
@@ -103,10 +101,8 @@ class SimulateActionMixinTest(TestCase):
         self.assertEqual(len(result["selected_lots"]), 2)
         self.assertEqual(result["selected_lots"][0]["lot_id"], 10)
         self.assertEqual(float(result["selected_lots"][0]["volume"]), 100.0)
-        self.assertEqual(result["selected_lots"][0]["emission_rate_per_mj"], 50.0)
         self.assertEqual(result["selected_lots"][1]["lot_id"], 12)
         self.assertEqual(float(result["selected_lots"][1]["volume"]), 200.0)
-        self.assertEqual(result["selected_lots"][1]["emission_rate_per_mj"], 60.0)
         self.assertEqual(response.data["fun"], 0.50)
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
@@ -147,7 +143,7 @@ class SimulateActionMixinTest(TestCase):
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
     def test_simulate_with_optional_fields(self, mock_service):
         """Test that simulate accepts optional fields"""
-        mock_service.return_value = ({0: 1000.0}, np.array([10]), np.array([50.0]), 0.5)
+        mock_service.return_value = ({0: 1000.0}, np.array([10]), 0.5)
 
         data = self._create_valid_data()
         data["max_n_batches"] = 5
@@ -162,7 +158,7 @@ class SimulateActionMixinTest(TestCase):
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
     def test_simulate_with_empty_result(self, mock_service):
         """Test that simulate handles empty result from service"""
-        mock_service.return_value = ({}, np.array([]), np.array([]), 0.0)
+        mock_service.return_value = ({}, np.array([]), 0.0)
 
         data = self._create_valid_data()
         request = self._create_request(data)

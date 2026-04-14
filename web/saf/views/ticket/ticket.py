@@ -81,7 +81,7 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
         if entity.entity_type in (Entity.SAF_TRADER, Entity.OPERATOR):
             queryset = queryset.filter(Q(client=entity) | Q(supplier=entity))
 
-        return queryset.select_related(
+        return queryset.prefetch_related("safticketsource_set").select_related(
             "parent_ticket_source",
             "feedstock",
             "biofuel",
@@ -90,6 +90,14 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
             "supplier",
             "client",
             "reception_airport",
+            "carbure_producer",
+            "carbure_production_site__productionsite",
+            "carbure_production_site__country",
+            "carbure_production_site__created_by",
+            "reception_airport__country",
+            "production_country",
+            "origin_lot",
+            "origin_lot_site",
         )
 
     @extend_schema(responses={200: SafTicketPreviewSerializer})

@@ -1,28 +1,41 @@
 import { Button } from "common/components/button2"
 import { CheckboxGroup, RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
-import { DeepPartial } from "common/types"
+import { useFormContext } from "common/components/form2"
 import {
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitPatchRequest,
+  ProductionUnitForm,
   DigestateValorizationMethods,
   SpreadingManagementMethods,
   DigestateSaleTypes,
 } from "../types"
-
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
-type DigestateProcessingForm =
-  DeepPartial<BiomethaneProductionUnitPatchRequest> & {
-    digestate_valorization_methods?: DigestateValorizationMethods[]
-    spreading_management_methods?: SpreadingManagementMethods[]
-    digestate_sale_types?: DigestateSaleTypes[]
-  }
+type DigestateProcessingForm = Pick<
+  ProductionUnitForm,
+  | "has_digestate_phase_separation"
+  | "raw_digestate_treatment_steps"
+  | "liquid_phase_treatment_steps"
+  | "solid_phase_treatment_steps"
+> & {
+  digestate_valorization_methods?: DigestateValorizationMethods[]
+  spreading_management_methods?: SpreadingManagementMethods[]
+  digestate_sale_types?: DigestateSaleTypes[]
+}
+
+const extractValues = (form?: DigestateProcessingForm) => ({
+  has_digestate_phase_separation: form?.has_digestate_phase_separation,
+  raw_digestate_treatment_steps: form?.raw_digestate_treatment_steps,
+  liquid_phase_treatment_steps: form?.liquid_phase_treatment_steps,
+  solid_phase_treatment_steps: form?.solid_phase_treatment_steps,
+  digestate_valorization_methods: form?.digestate_valorization_methods,
+  spreading_management_methods: form?.spreading_management_methods,
+  digestate_sale_types: form?.digestate_sale_types,
+})
 
 export function DigestateProcessing({
   productionUnit,
@@ -32,19 +45,7 @@ export function DigestateProcessing({
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { bind, value } = useForm<DigestateProcessingForm>({
-    has_digestate_phase_separation:
-      productionUnit?.has_digestate_phase_separation,
-    raw_digestate_treatment_steps:
-      productionUnit?.raw_digestate_treatment_steps,
-    liquid_phase_treatment_steps: productionUnit?.liquid_phase_treatment_steps,
-    solid_phase_treatment_steps: productionUnit?.solid_phase_treatment_steps,
-    digestate_valorization_methods:
-      productionUnit?.digestate_valorization_methods,
-    spreading_management_methods: productionUnit?.spreading_management_methods,
-    digestate_sale_types: productionUnit?.digestate_sale_types,
-  })
-
+  const { bind, value } = useFormContext<DigestateProcessingForm>()
   const { execute: saveProductionUnit, loading } =
     useSaveProductionUnit(productionUnit)
 
@@ -106,12 +107,15 @@ export function DigestateProcessing({
   ]
 
   return (
-    <EditableCard
+    <ManagedEditableCard
+      sectionId="digestate-processing"
       title={t("Traitement et valorisation du digestat")}
       readOnly={!allowedToEdit}
     >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
+        <ManagedEditableCard.Form
+          onSubmit={() => saveProductionUnit(extractValues(value))}
+        >
           <Grid cols={2} gap="lg">
             <RadioGroup
               required
@@ -188,8 +192,8 @@ export function DigestateProcessing({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }

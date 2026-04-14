@@ -4,7 +4,6 @@ from core.models import Entity, MatierePremiere
 from tiruert.models.operation import Operation
 from tiruert.serializers.objective import (
     MainObjectiveSerializer,
-    ObjectiveAdminInputSerializer,
     ObjectiveCategorySerializer,
     ObjectiveInputSerializer,
     ObjectiveOutputSerializer,
@@ -463,7 +462,6 @@ class ObjectiveInputSerializerTest(TestCase):
         data = {
             "entity_id": 1,
             "year": 2024,
-            "date_from": "2024-01-01",
         }
 
         serializer = ObjectiveInputSerializer(data=data)
@@ -472,27 +470,12 @@ class ObjectiveInputSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["entity_id"], 1)
         self.assertEqual(serializer.validated_data["year"], 2024)
 
-    def test_serializes_with_optional_date_to(self):
-        """Test ObjectiveInputSerializer accepts optional date_to field."""
-        data = {
-            "entity_id": 1,
-            "year": 2024,
-            "date_from": "2024-01-01",
-            "date_to": "2024-12-31",
-        }
-
-        serializer = ObjectiveInputSerializer(data=data)
-
-        self.assertTrue(serializer.is_valid())
-        self.assertIn("date_to", serializer.validated_data)
-
     def test_missing_required_fields_are_invalid(self):
-        """Test ObjectiveInputSerializer requires entity_id, year, and date_from."""
-        required_fields = ["entity_id", "year", "date_from"]
+        """Test ObjectiveInputSerializer requires entity_id and year."""
+        required_fields = ["entity_id", "year"]
         complete_data = {
             "entity_id": 1,
             "year": 2024,
-            "date_from": "2024-01-01",
         }
 
         for field_to_omit in required_fields:
@@ -503,25 +486,11 @@ class ObjectiveInputSerializerTest(TestCase):
                 self.assertFalse(serializer.is_valid())
                 self.assertIn(field_to_omit, serializer.errors)
 
-    def test_rejects_invalid_date_format(self):
-        """Test ObjectiveInputSerializer rejects invalid date format."""
-        data = {
-            "entity_id": 1,
-            "year": 2024,
-            "date_from": "invalid-date",
-        }
-
-        serializer = ObjectiveInputSerializer(data=data)
-
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("date_from", serializer.errors)
-
     def test_rejects_non_integer_entity_id(self):
         """Test ObjectiveInputSerializer rejects non-integer entity_id."""
         data = {
             "entity_id": "not-an-integer",
             "year": 2024,
-            "date_from": "2024-01-01",
         }
 
         serializer = ObjectiveInputSerializer(data=data)
@@ -534,7 +503,6 @@ class ObjectiveInputSerializerTest(TestCase):
         data = {
             "entity_id": 1,
             "year": "twenty-twenty-four",
-            "date_from": "2024-01-01",
         }
 
         serializer = ObjectiveInputSerializer(data=data)
@@ -544,7 +512,7 @@ class ObjectiveInputSerializerTest(TestCase):
 
 
 class ObjectiveAdminInputSerializerTest(TestCase):
-    """Unit tests for ObjectiveAdminInputSerializer."""
+    """Unit tests for ObjectiveInputSerializer with optional selected_entity_id (admin usage)."""
 
     fixtures = [
         "json/countries.json",
@@ -565,79 +533,58 @@ class ObjectiveAdminInputSerializerTest(TestCase):
         cls.non_liable_entity = Entity.objects.filter(is_tiruert_liable=False).first()
 
     def test_serializes_valid_admin_input_data(self):
-        """Test ObjectiveAdminInputSerializer validates valid admin input."""
+        """Test ObjectiveInputSerializer validates valid admin input with selected_entity_id."""
         if not self.liable_entity:
             self.skipTest("No tiruert-liable entity available")
 
         data = {
             "entity_id": 1,
             "year": 2024,
-            "date_from": "2024-01-01",
             "selected_entity_id": self.liable_entity.id,
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.validated_data["selected_entity_id"], self.liable_entity)
 
-    def test_inherits_from_objective_input_serializer(self):
-        """Test ObjectiveAdminInputSerializer inherits ObjectiveInputSerializer fields."""
-        if not self.liable_entity:
-            self.skipTest("No tiruert-liable entity available")
-
-        # Missing inherited required fields should fail
-        data = {
-            "selected_entity_id": self.liable_entity.id,
-        }
-
-        serializer = ObjectiveAdminInputSerializer(data=data)
-
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("entity_id", serializer.errors)
-        self.assertIn("year", serializer.errors)
-        self.assertIn("date_from", serializer.errors)
-
-    def test_requires_selected_entity_id(self):
-        """Test ObjectiveAdminInputSerializer requires selected_entity_id."""
+    def test_selected_entity_id_is_optional(self):
+        """Test ObjectiveInputSerializer accepts input without selected_entity_id."""
         data = {
             "entity_id": 1,
             "year": 2024,
-            "date_from": "2024-01-01",
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("selected_entity_id", serializer.errors)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertIsNone(serializer.validated_data.get("selected_entity_id"))
 
     def test_rejects_non_liable_entity(self):
-        """Test ObjectiveAdminInputSerializer rejects entities that are not tiruert-liable."""
+        """Test ObjectiveInputSerializer rejects entities that are not tiruert-liable."""
         if not self.non_liable_entity:
             self.skipTest("No non-tiruert-liable entity available")
 
         data = {
             "entity_id": 1,
             "year": 2024,
-            "date_from": "2024-01-01",
             "selected_entity_id": self.non_liable_entity.id,
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("selected_entity_id", serializer.errors)
 
     def test_rejects_non_existent_entity(self):
-        """Test ObjectiveAdminInputSerializer rejects non-existent entity IDs."""
+        """Test ObjectiveInputSerializer rejects non-existent entity IDs."""
         data = {
             "entity_id": 1,
             "year": 2024,
-            "date_from": "2024-01-01",
             "selected_entity_id": 99999,  # Non-existent ID
         }
 
-        serializer = ObjectiveAdminInputSerializer(data=data)
+        serializer = ObjectiveInputSerializer(data=data)
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("selected_entity_id", serializer.errors)

@@ -259,7 +259,7 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         mock_prepare.return_value = (volumes, emissions, lot_ids, enforced_volumes, target_volume)
         mock_optimize.return_value = ({0: 100.0, 1: 900.0}, 0.5)
 
-        selected_lots, returned_lot_ids, returned_emissions, fun = TeneurService.prepare_data_and_optimize(data, unit)
+        selected_lots, returned_lot_ids, fun = TeneurService.prepare_data_and_optimize(data, unit)
 
         mock_prepare.assert_called_once_with(data, unit)
         self.assertIsNotNone(selected_lots)

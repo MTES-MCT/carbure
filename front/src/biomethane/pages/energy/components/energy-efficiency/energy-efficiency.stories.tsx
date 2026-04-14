@@ -65,8 +65,8 @@ export const WithErrors2023Tariff: Story = {
   args: {
     energy: {
       ...energyData,
-      total_unit_electric_consumption_kwe: 2,
-      injected_biomethane_gwh_pcs_per_year: 1,
+      total_unit_electric_consumption_kwe: 20000000,
+      injected_biomethane_gwh_pcs_per_year: 10,
     },
     contract: { ...contractData, tariff_reference: TariffReference.Value2023 },
   },

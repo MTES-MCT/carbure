@@ -1,24 +1,103 @@
+[project]
+name = "carbure"
+version = "3.5.0"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3==1.35.99",
+    "beautifulsoup4==4.12.3",
+    "coverage==7.5.1",
+    "dictdiffer==0.9.0",
+    "django==5.2.2",
+    "django-admin-list-filter-dropdown==1.0.3",
+    "django-authtools==2.0.1",
+    "django-csp==3.8",
+    "django-environ==0.11.2",
+    "django-otp==1.5.0",
+    "django-silk==5.1.0",
+    "django-storages==1.14.3",
+    "djangorestframework==3.15.2",
+    "factory-boy==3.3.0",
+    "folium==0.20.0",
+    "gunicorn==23.0.0",
+    "huey==2.5.0",
+    "lxml==5.2.1",
+    "matplotlib==3.8.4",
+    "mysqlclient==2.2.4",
+    "openpyxl==3.1.2",
+    "pandas==2.2.2",
+    "pyjwt==2.10.1",
+    "python-dateutil==2.9.0",
+    "pytz==2024.1",
+    "redis==5.0.4",
+    "requests==2.32.4",
+    "sentry-sdk==2.35.0",
+    "tqdm==4.66.4",
+    "tzdata==2024.1",
+    "whitenoise==6.6.0",
+    "xlsxwriter==3.2.0",
+    "python-docx",
+    "django-filter",
+    "drf-spectacular",
+    "drf-nested-routers",
+    "setuptools==78.1.1",
+    "psutil",
+    "scipy",
+    "django-simple-history",
+    "scikit-learn",
+    "sqlalchemy",
+    "urllib3==2.5.0",
+    "djangorestframework-api-key==3.*",
+    "djangorestframework-simplejwt==5.*",
+    "django-import-export",
+]
+
 [tool.ruff]
 src = ["web"]
 exclude = ["__init__.py", "scripts", ".venv"]
 line-length = 125
 
+[dependency-groups]
+dev = [
+    "django-stubs",
+    "types-python-dateutil",
+    "types-pytz",
+    "types-requests",
+    "pandas-stubs",
+    "openpyxl-stubs",
+    "types-factory-boy",
+    "types-pyjwt",
+    "djangorestframework-stubs[compatible-mypy]",
+    "types-six",
+    "pre-commit",
+    "ruff==0.8.6",
+    "pip-audit",
+    "ipython",
+]
+
 [tool.ruff.lint]
 select = [
-    "F",  # Pyflakes
-    "E",  # Pycodestyle Error
-    "W",  # Pycodestyle Error
-    "I",  # isort
-    "C4", # comprehension list
-    "ICN", # Import convention
-    "PYI", # Type Hinting
-    "T20", # No direct printing
+    "F",    # Pyflakes
+    "E",    # Pycodestyle Error
+    "W",    # Pycodestyle Error
+    "I",    # isort
+    "C4",   # comprehension list
+    "ICN",  # Import convention
+    "PYI",  # Type Hinting
+    "T20",  # No direct printing
     "B018", # useless expression
     "B011", # assert false
     "B006", # Mutable argument default
     "B007", # unused loop variable
-    "INP", # No PEP420
+    "INP",  # No PEP420
 ]
 ignore = [
     "T201", # Print
 ]
+
+[tool.uv]
+package = false
+default-groups = "all"
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"

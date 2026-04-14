@@ -1,20 +1,32 @@
 import { Button } from "common/components/button2"
 import { RadioGroup, TextInput } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { EditableCard } from "common/molecules/editable-card"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useTranslation } from "react-i18next"
-import { useForm } from "common/components/form2"
-import { DeepPartial } from "common/types"
+import { useFormContext } from "common/components/form2"
 import {
   BiomethaneProductionUnit,
-  BiomethaneProductionUnitPatchRequest,
+  ProductionUnitForm,
   HygienizationExemptionType,
 } from "../types"
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
+import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 
-type SanitaryAgreementForm = DeepPartial<BiomethaneProductionUnitPatchRequest>
+type SanitaryAgreementForm = Pick<
+  ProductionUnitForm,
+  | "has_sanitary_approval"
+  | "sanitary_approval_number"
+  | "has_hygienization_exemption"
+  | "hygienization_exemption_type"
+>
+
+const extractValues = (form?: SanitaryAgreementForm) => ({
+  has_sanitary_approval: form?.has_sanitary_approval,
+  sanitary_approval_number: form?.sanitary_approval_number,
+  has_hygienization_exemption: form?.has_hygienization_exemption,
+  hygienization_exemption_type: form?.hygienization_exemption_type,
+})
 
 export function SanitaryAgreement({
   productionUnit,
@@ -24,13 +36,7 @@ export function SanitaryAgreement({
   const { t } = useTranslation()
   const allowedToEdit = useAllowedToEdit()
 
-  const { bind, value } = useForm<SanitaryAgreementForm>({
-    has_sanitary_approval: productionUnit?.has_sanitary_approval,
-    sanitary_approval_number: productionUnit?.sanitary_approval_number,
-    has_hygienization_exemption: productionUnit?.has_hygienization_exemption,
-    hygienization_exemption_type: productionUnit?.hygienization_exemption_type,
-  })
-
+  const { bind, value } = useFormContext<SanitaryAgreementForm>()
   const { execute: saveProductionUnit, loading } =
     useSaveProductionUnit(productionUnit)
 
@@ -46,9 +52,15 @@ export function SanitaryAgreement({
   ]
 
   return (
-    <EditableCard title={t("Agrément sanitaire")} readOnly={!allowedToEdit}>
+    <ManagedEditableCard
+      sectionId="sanitary-agreement"
+      title={t("Agrément sanitaire")}
+      readOnly={!allowedToEdit}
+    >
       {({ isEditing }) => (
-        <EditableCard.Form onSubmit={() => saveProductionUnit(value!)}>
+        <ManagedEditableCard.Form
+          onSubmit={() => saveProductionUnit(extractValues(value))}
+        >
           <Grid cols={2} gap="lg">
             <RadioGroup
               required
@@ -98,8 +110,8 @@ export function SanitaryAgreement({
               {t("Sauvegarder")}
             </Button>
           )}
-        </EditableCard.Form>
+        </ManagedEditableCard.Form>
       )}
-    </EditableCard>
+    </ManagedEditableCard>
   )
 }
