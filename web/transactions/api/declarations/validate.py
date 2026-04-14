@@ -85,7 +85,9 @@ def validate_declaration(request, *args, **kwargs):
         background_create_ticket_sources_from_lots(received_lots)
 
         # Create TIRUERT operations for declared received lots + mac lots
-        mac_lots = sent_lots.filter(delivery_type=CarbureLot.RFC, carbure_supplier__has_mac=True)
+        mac_lots = sent_lots.filter(
+            delivery_type=CarbureLot.RFC, carbure_supplier__has_mac=True
+        )  # TODO: limit to OPERATOR, TRADER and PRODUCER?
         tiruert_lots = received_lots | mac_lots
         background_create_tiruert_operations_from_lots(tiruert_lots)
 

@@ -144,7 +144,9 @@ class OperationService:
         }
 
         for key, lots in lots_by_delivery_type.items():
-            credited_entity = lots[0].carbure_client or lots[0].carbure_producer or lots[0].carbure_supplier
+            credited_entity = lots[0].carbure_client or lots[0].carbure_supplier
+            if not credited_entity:
+                continue  # skip if no credited entity (should not happen for valid lots)
 
             operation = Operation.objects.create(
                 type=matching_types[key[0]],
