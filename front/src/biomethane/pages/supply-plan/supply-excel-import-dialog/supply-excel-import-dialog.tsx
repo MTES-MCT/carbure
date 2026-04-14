@@ -13,6 +13,8 @@ import { Box } from "common/components/scaffold"
 import { ExcelImportErrors } from "./excel-import-errors"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { Text } from "common/components/text"
+import { useRoutes } from "common/hooks/routes"
+import { NavLink } from "common/components/nav-link"
 
 interface ImportFormData {
   supplyPlanFile: File | null
@@ -34,6 +36,7 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
   const entity = useEntity()
   const notify = useNotify()
   const notifyError = useNotifyError()
+  const routes = useRoutes()
   const { annualDeclarationKey, selectedYear } = useAnnualDeclaration()
   const [importErrors, setImportErrors] = useState<ImportErrorResponse | null>(
     null
@@ -56,11 +59,22 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
         return
       }
 
-      notifyError(
-        error,
-        t(
-          "Erreur lors de l'import du fichier. Essayez de télécharger de nouveau le template afin d'avoir la dernière version à jour."
-        )
+      notify(
+        <Trans
+          defaults="Erreur lors de l'import du fichier. Veuillez télécharger de nouveau le template <TemplateLink>ici</TemplateLink>. Si le problème n'est pas résolu, merci de <ContactLink>nous contacter</ContactLink>."
+          components={{
+            TemplateLink: (
+              // @ts-ignore children is propagated to the button by i18next
+              <NavLink to={filePath} target="_blank" underline />
+            ),
+            ContactLink: (
+              <NavLink to={routes.CONTACT} underline target="_blank" />
+            ),
+          }}
+        />,
+        {
+          variant: "danger",
+        }
       )
     },
   })

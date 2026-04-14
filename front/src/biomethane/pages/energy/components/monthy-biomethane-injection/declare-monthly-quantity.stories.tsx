@@ -96,9 +96,7 @@ export const InvalidMonthlyReportsClickValidate: Story = {
     // Le composant bloque l'enregistrement et affiche une notification
     const body = within(canvasElement.ownerDocument.body)
     await waitFor(() =>
-      body.getByText(
-        "Les heures d'injection calculées sont supérieures au nombre d'heures du mois :"
-      )
+      body.getByTestId("injection-hours-coherence-error-message")
     )
   },
 }

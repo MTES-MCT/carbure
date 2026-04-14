@@ -37,7 +37,7 @@ export const useInjectionHoursCoherence = () => {
     const monthsList = month.join(", ")
 
     return (
-      <div>
+      <div data-testid="injection-hours-coherence-error-message">
         {t(
           "Les heures d'injection calculées sont supérieures au nombre d'heures dans les mois suivants : {{months}}",
           { months: monthsList }
