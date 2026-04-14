@@ -23,6 +23,12 @@ class BiomethaneContractSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+# Serializer for contract with restricted fields (used for external entities like ADEME)
+class BiomethaneContractRestrictedSerializer(BiomethaneContractSerializer):
+    class Meta(BiomethaneContractSerializer.Meta):
+        fields = ["tariff_reference", "installation_category", "cmax", "pap_contracted"]
+
+
 class BiomethaneContractInputSerializer(serializers.ModelSerializer):
     # Allow null to distinguish between False and not provided
     cmax_annualized = serializers.BooleanField(allow_null=True, required=False)

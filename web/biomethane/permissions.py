@@ -76,8 +76,14 @@ HasDrealOrAdminRights = HasDrealRights | UserRightsFactory(
 ReadAccessBiomethane = HasBiomethaneProducerRights | HasDrealRights | HasAdemeRights
 
 # Custom permissions to access specific endpoints
-CanAccessContract = HasBiomethaneProducerRights | HasDrealRights
+
+## Permission to access contract with restricted serializer fields
+HasRestrictedAccessContract = HasAdemeRights
+
+## Permission to access injection site endpoint
 CanAccessInjection = HasBiomethaneProducerRights | HasDrealRights
+
+## Permission to access admin endpoints
 CanAccessAdminModule = HasDrealRights | HasAdemeRights
 
 

@@ -2,14 +2,17 @@ from datetime import date
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
 from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneSignedContractFactory
+from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneContract
-from core.models import Entity
+from core.models import Department, Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
+from entity.models import EntityScope
 
 User = get_user_model()
 
@@ -123,3 +126,39 @@ class BiomethaneContractViewsTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("signature_date", response.data)
         self.assertIn("effective_date", response.data)
+
+    def test_retrieve_contract_restricted_access_returns_only_watched_fields(self):
+        """Test restricted contract access returns only watched fields."""
+        department = Department.objects.create(code_dept="75", name="Paris")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+        BiomethaneContractFactory.create(
+            producer=self.producer_entity,
+            buyer=self.buyer_entity,
+            tariff_reference="2021",
+            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
+            pap_contracted=50.0,
+        )
+
+        restricted_entity = Entity.objects.create(name="Restricted Admin", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=restricted_entity, right=ExternalAdminRights.ADEME)
+        EntityScope.objects.create(
+            entity=restricted_entity,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        setup_current_user(
+            self,
+            "restricted-admin@carbure.local",
+            "Restricted Admin",
+            "gogogo",
+            [(restricted_entity, "RW")],
+        )
+
+        response = self.client.get(
+            self.contract_url, {"entity_id": restricted_entity.id, "producer_id": self.producer_entity.id}
+        )
+
+        watched_fields = ["tariff_reference", "installation_category", "cmax", "pap_contracted"]
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(set(response.data.keys()), set(watched_fields))

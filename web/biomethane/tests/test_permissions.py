@@ -1,9 +1,8 @@
 from django.test import TestCase
 
 from biomethane.permissions import (
-    CanAccessContract,
+    CanAccessAdminModule,
     CanAccessInjection,
-    HasBiomethaneProducerRights,
     HasBiomethaneProducerWriteRights,
     HasDrealRights,
     ReadAccessBiomethane,
@@ -46,10 +45,6 @@ class BiomethanePermissionsMixinTests(TestCase, PermissionTestMixin):
         permissions = get_biomethane_permissions(["upsert", "validate"], "retrieve")
         self.assertPermissionsEqual(permissions, [ReadAccessBiomethane()])
 
-    def test_can_access_contract_permissions(self):
-        """Test that contract access excludes ADEME rights"""
-        self.assertPermissionsEqual([CanAccessContract()], [(HasBiomethaneProducerRights | HasDrealRights)()])
-
 
 class BiomethanePermissions(TestCase, PermissionTestMixin):
     def test_contract_permissions(self):
@@ -57,8 +52,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneContractViewSet,
             [
-                (["retrieve"], [CanAccessContract()]),
-                (["watched_fields"], [ReadAccessBiomethane()]),
+                (["retrieve", "watched_fields"], [ReadAccessBiomethane()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -181,7 +175,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneProducersViewSet,
             [
-                (["list"], [HasDrealRights()]),
+                (["list"], [CanAccessAdminModule()]),
             ],
         )
 
@@ -190,6 +184,6 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneAdminAnnualDeclarationViewSet,
             [
-                (["list", "filters"], [HasDrealRights()]),
+                (["list", "filters"], [CanAccessAdminModule()]),
             ],
         )
