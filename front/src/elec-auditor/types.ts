@@ -16,8 +16,7 @@ export enum ElecAuditorApplicationsStatus {
   AuditDone = "AUDITED",
 }
 
-export interface ElecAuditorUploadCheckReportInfo
-  extends UploadCheckReportInfo {
+export interface ElecAuditorUploadCheckReportInfo extends UploadCheckReportInfo {
   comment_count?: number
 }
 
