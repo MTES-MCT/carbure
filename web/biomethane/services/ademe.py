@@ -51,6 +51,7 @@ class AdemeService:
             return False
 
         return (
-            BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME in contract.complementary_aid_organisms
+            contract.complementary_aid_organisms is not None
+            and BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME in contract.complementary_aid_organisms
             and contract.effective_date.year >= min_effective_year
         )
