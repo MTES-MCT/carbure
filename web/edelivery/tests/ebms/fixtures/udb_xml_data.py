@@ -13,11 +13,32 @@ def ghg_details_fragment():
 </GHG_DETAILS>"""
 
 
+def pos_data_fragment(etd):
+    pos_flag = "false"
+    etd_fragment = ""
+    transport_data_fragment = "<TRANSPORT_DATA />"
+
+    if etd is not None:
+        pos_flag = "true"
+        etd_fragment = f"<ETD>{etd}</ETD>"
+        transport_data_fragment = """\
+<TRANSPORT_DATA>
+  <MODE_OF_TRANSPORT_SHIP_DISTANCE_KM>20</MODE_OF_TRANSPORT_SHIP_DISTANCE_KM>
+</TRANSPORT_DATA>"""
+
+    return f"""\
+<POS_DATA>
+  <POS_FLAG>{pos_flag}</POS_FLAG>
+  {etd_fragment}
+  <SELLER_TRANSPORT>{transport_data_fragment}</SELLER_TRANSPORT>
+</POS_DATA>"""
+
+
 def transaction_data(
     biofuel=None,
     client_id="FR_SIREN_CD222222222",
     delivery_date="2025-01-30T00:00:00.000Z",
-    etd=20,
+    etd=None,
     feedstock=None,
     loading_date="2025-01-26T00:00:00.000Z",
     quantity=None,
@@ -71,15 +92,5 @@ def transaction_data(
     </POINT_OF_ORIGIN_MATERIAL_DATA>
     {ghg_details_fragment()}
   </EO_TRANS_DETAIL_MATERIALS>
-  <POS_DATA>
-    <POS_FLAG>true</POS_FLAG>
-    <METHOD_TYPE>AV</METHOD_TYPE>
-    <ETD>{etd}</ETD>
-    <COMMENTS>Anyway.</COMMENTS>
-    <SELLER_TRANSPORT>
-      <TRANSPORT_DATA>
-        <MODE_OF_TRANSPORT_ROAD_DISTANCE_KM>120</MODE_OF_TRANSPORT_ROAD_DISTANCE_KM>
-      </TRANSPORT_DATA>
-    </SELLER_TRANSPORT>
-  </POS_DATA>
+  {pos_data_fragment(etd)}
 </EO_TRANSACTION>"""

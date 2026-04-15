@@ -129,3 +129,11 @@ class TransactionTest(TestCase):
 
         lot_attributes = transaction.to_lot_attributes()
         self.assertEqual(5.5, lot_attributes["etd"])
+
+    def test_handles_absent_ETD_ghg_value(self):
+        xml_data = transaction_data(etd=None)
+        transaction = Transaction.from_xml(xml_data)
+        self.assertEqual(None, transaction.etd())
+
+        lot_attributes = transaction.to_lot_attributes()
+        self.assertTrue("etd" not in lot_attributes)

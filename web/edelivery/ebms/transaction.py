@@ -32,6 +32,9 @@ class Transaction:
 
     def etd(self):
         etd_element = self.xml_root_element.find("./POS_DATA/ETD")
+        if etd_element is None:
+            return None
+
         return float(etd_element.text)
 
     def feedstock_code(self):
@@ -61,7 +64,6 @@ class Transaction:
             "carbure_client_id": client_id,
             "carbure_supplier_id": supplier_id,
             "dispatch_date": self.loading_date(),
-            "etd": self.etd(),
             "feedstock_code": feedstock_code,
             "lot_status": lot_status,
             "udb_transaction_id": self.udb_transaction_id(),
@@ -71,6 +73,10 @@ class Transaction:
         delivery_date = self.delivery_date()
         if delivery_date is not None:
             attributes["delivery_date"] = delivery_date
+
+        etd = self.etd()
+        if etd is not None:
+            attributes |= {"etd": etd}
 
         return attributes
 
