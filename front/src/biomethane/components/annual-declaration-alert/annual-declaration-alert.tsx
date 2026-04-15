@@ -10,7 +10,7 @@ export const AnnualDeclarationAlert = () => {
 
   if (
     !isDeclarationInCurrentPeriod ||
-    annualDeclaration?.status === AnnualDeclarationStatus.IN_PROGRESS
+    annualDeclaration?.status !== AnnualDeclarationStatus.DECLARED
   )
     return null
 
