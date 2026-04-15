@@ -249,7 +249,12 @@ def clear_production_unit_fields_on_save(sender, instance, **kwargs):
     if fields_to_clear:
         update_data = {}
         for field in fields_to_clear:
-            # Special case: list fields should be set to empty list, not None
-            new_value = [] if field in ("spreading_management_methods", "digestate_sale_types") else None
+            model_field = BiomethaneProductionUnit._meta.get_field(field)
+            if isinstance(model_field, models.JSONField):
+                new_value = []
+            elif isinstance(model_field, models.BooleanField):
+                new_value = False
+            else:
+                new_value = None
             update_data[field] = new_value
         BiomethaneProductionUnit.objects.filter(pk=instance.pk).update(**update_data)

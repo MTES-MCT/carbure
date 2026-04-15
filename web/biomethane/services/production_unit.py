@@ -13,6 +13,16 @@ class BiomethaneProductionUnitService:
     PHASE_SEPARATION_FIELDS = ["liquid_phase_treatment_steps", "solid_phase_treatment_steps"]
     SPREADING_MANAGEMENT_FIELDS = ["spreading_management_methods", "digestate_sale_types"]
     ICPE_FIELDS = ["icpe_number", "icpe_regime"]
+    ISDND_RELATED_FIELDS = [
+        "process_type",
+        "methanization_process",
+        "has_hygienization_unit",
+        "has_digestate_phase_separation",
+        "raw_digestate_treatment_steps",
+        "digestate_valorization_methods",
+        "spreading_management_methods",
+        "digestate_sale_types",
+    ]
 
     # Fields that are never required for the annual declaration completeness check.
     # Includes:
@@ -87,6 +97,12 @@ def _build_production_unit_clearing_rules() -> list[FieldClearingRule]:
             fields=BiomethaneProductionUnitService.SPREADING_MANAGEMENT_FIELDS,
             condition=lambda instance: BiomethaneProductionUnit.SPREADING
             not in (instance.digestate_valorization_methods or []),
+        ),
+        # Clear ISDND-related fields when unit_type is ISDND
+        FieldClearingRule(
+            name="isdnd",
+            fields=BiomethaneProductionUnitService.ISDND_RELATED_FIELDS,
+            condition=lambda instance: instance.unit_type == BiomethaneProductionUnit.ISDND,
         ),
     ]
 
