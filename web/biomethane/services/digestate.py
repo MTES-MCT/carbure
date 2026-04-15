@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
+from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
 from biomethane.services.rules import FieldClearingRule, RuleBuilder, get_fields_from_applied_rules
 
 
@@ -111,6 +112,24 @@ class BiomethaneDigestateService:
         Used by signals.
         """
         return BiomethaneDigestateService._get_fields_to_clear(instance)
+
+    def build_missing_fields_for_declaration(digestate, is_current_declaration, production_unit):
+        """
+        Set specific rules to determine the missing fields for digestate in the annual declaration
+        """
+        from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+
+        if not is_current_declaration:
+            return []
+
+        if production_unit and production_unit.unit_type == BiomethaneProductionUnit.ISDND:
+            return []
+        else:
+            return (
+                BiomethaneAnnualDeclarationService._get_missing_fields(digestate, is_current_declaration)
+                if digestate
+                else None
+            )
 
 
 # Rule configuration: declarative definition of all field clearing rules
