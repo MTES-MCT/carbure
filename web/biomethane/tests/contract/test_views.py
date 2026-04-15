@@ -127,8 +127,12 @@ class BiomethaneContractViewsTests(TestCase):
         self.assertIn("signature_date", response.data)
         self.assertIn("effective_date", response.data)
 
-    def test_retrieve_contract_restricted_access_returns_only_watched_fields(self):
-        """Test restricted contract access returns only watched fields."""
+    @patch(
+        "biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.get_current_declaration_year",
+        return_value=2025,
+    )
+    def test_retrieve_contract_restricted_access_returns_only_specific_fields(self, _):
+        """Test restricted contract access returns only specific fields."""
         department = Department.objects.create(code_dept="75", name="Paris")
         BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
         BiomethaneContractFactory.create(
@@ -137,6 +141,9 @@ class BiomethaneContractViewsTests(TestCase):
             tariff_reference="2021",
             installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
             pap_contracted=50.0,
+            has_complementary_investment_aid=True,
+            complementary_aid_organisms=[BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME],
+            effective_date=date(2021, 1, 1),
         )
 
         restricted_entity = Entity.objects.create(name="Restricted Admin", entity_type=Entity.EXTERNAL_ADMIN)
@@ -159,6 +166,6 @@ class BiomethaneContractViewsTests(TestCase):
             self.contract_url, {"entity_id": restricted_entity.id, "producer_id": self.producer_entity.id}
         )
 
-        watched_fields = ["tariff_reference", "installation_category", "cmax", "pap_contracted"]
+        watched_fields = ["tariff_reference", "installation_category"]
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(set(response.data.keys()), set(watched_fields))

@@ -3,18 +3,20 @@ from unittest.mock import patch
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
+from biomethane.factories.contract import BiomethaneContractFactory
+from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
 from core.models import Department, Entity, ExternalAdminRights
 from entity.factories.entity import EntityFactory
 from entity.models import EntityScope
 
 
-def create_dreal_entity_with_department(department, name="DREAL"):
-    dreal = EntityFactory.create(entity_type=Entity.EXTERNAL_ADMIN, name=name)
+def create_entity_with_department(department, name="Entity", external_admin_right=ExternalAdminRights.DREAL):
+    entity = EntityFactory.create(entity_type=Entity.EXTERNAL_ADMIN, name=name)
     dept_ct = ContentType.objects.get_for_model(Department)
-    EntityScope.objects.create(entity=dreal, content_type=dept_ct, object_id=department.id)
-    ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
-    return dreal
+    EntityScope.objects.create(entity=entity, content_type=dept_ct, object_id=department.id)
+    ExternalAdminRights.objects.create(entity=entity, right=external_admin_right)
+    return entity
 
 
 class EntityTest(TestCase):
@@ -27,8 +29,8 @@ class EntityTest(TestCase):
         self.production_unit = BiomethaneProductionUnit.objects.create(
             producer=self.entity, name="Test Production Unit", department=self.dept_02
         )
-        self.dreal = create_dreal_entity_with_department(self.dept_01, name="DREAL 01")
-        self.dreal_other = create_dreal_entity_with_department(self.dept_02, name="DREAL 02")
+        self.dreal = create_entity_with_department(self.dept_01, name="DREAL 01")
+        self.dreal_other = create_entity_with_department(self.dept_02, name="DREAL 02")
 
     def tearDown(self):
         patch.stopall()
@@ -63,11 +65,44 @@ class EntityTest(TestCase):
 
     def test_get_managing_external_admins_returns_both_dreals_when_same_department(self):
         """Deux DREALs reliées au même département : on récupère bien les deux."""
-        dreal_a = create_dreal_entity_with_department(self.dept_03, name="DREAL A")
-        dreal_b = create_dreal_entity_with_department(self.dept_03, name="DREAL B")
+        dreal_a = create_entity_with_department(self.dept_03, name="DREAL A")
+        dreal_b = create_entity_with_department(self.dept_03, name="DREAL B")
         producer = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER)
         BiomethaneProductionUnit.objects.create(producer=producer, name="Unit", department=self.dept_03)
 
         result = producer.get_managing_external_admins()
 
         self.assertEqual(result, [dreal_a, dreal_b])
+
+    def test_get_allowed_entities_for_ademe_filters_to_ademe_eligible_producers(self):
+        ademe = create_entity_with_department(self.dept_02, external_admin_right=ExternalAdminRights.ADEME)
+        producer_with_ademe_contract = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER, name="Producer ADEME")
+        producer_without_ademe_contract = EntityFactory.create(
+            entity_type=Entity.BIOMETHANE_PRODUCER, name="Producer non ADEME"
+        )
+
+        BiomethaneProductionUnit.objects.create(
+            producer=producer_with_ademe_contract,
+            name="Unit ADEME",
+            department=self.dept_02,
+        )
+        BiomethaneProductionUnit.objects.create(
+            producer=producer_without_ademe_contract,
+            name="Unit non ADEME",
+            department=self.dept_02,
+        )
+
+        BiomethaneContractFactory.create(
+            producer=producer_with_ademe_contract,
+            has_complementary_investment_aid=True,
+            complementary_aid_organisms=[BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME],
+        )
+        BiomethaneContractFactory.create(
+            producer=producer_without_ademe_contract,
+            complementary_aid_organisms=[],
+        )
+
+        allowed_entities = ademe.get_allowed_entities()
+
+        self.assertIn(producer_with_ademe_contract, allowed_entities)
+        self.assertNotIn(producer_without_ademe_contract, allowed_entities)

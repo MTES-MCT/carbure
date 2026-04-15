@@ -1,3 +1,4 @@
+from biomethane.services.ademe import AdemeService
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import HasAdminRights, UserRightsFactory
 
@@ -51,11 +52,18 @@ class HasAdemeRights(HasExternalAdminDepartmentsRights):
     """
     Permission for ADEME with department-based access control.
     Verifies that the user has access to the production unit's department.
+    Also checks that the external admin is accessing contracts with ademe investment aids.
     READ access only.
     """
 
     def __init__(self):
         super().__init__(allow_external=[ExternalAdminRights.ADEME], allow_role=None)
+
+    def has_object_permission(self, request, view, obj):
+        if not super().has_object_permission(request, view, obj):
+            return False
+
+        return AdemeService.is_allowed_to_access_object(obj)
 
 
 # Permission READ access for biomethane producers
