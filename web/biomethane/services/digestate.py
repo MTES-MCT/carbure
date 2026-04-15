@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_digestate import BiomethaneDigestate
 from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
 from biomethane.services.rules import FieldClearingRule, RuleBuilder, get_fields_from_applied_rules
@@ -113,7 +114,7 @@ class BiomethaneDigestateService:
         """
         return BiomethaneDigestateService._get_fields_to_clear(instance)
 
-    def build_missing_fields_for_declaration(digestate, is_current_declaration, production_unit):
+    def build_missing_fields_for_declaration(digestate, is_current_declaration, production_unit, contract):
         """
         Set specific rules to determine the missing fields for digestate in the annual declaration
         """
@@ -122,7 +123,9 @@ class BiomethaneDigestateService:
         if not is_current_declaration:
             return []
 
-        if production_unit and production_unit.unit_type == BiomethaneProductionUnit.ISDND:
+        if (production_unit and production_unit.unit_type == BiomethaneProductionUnit.ISDND) or (
+            contract and contract.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_3
+        ):
             return []
         else:
             return (

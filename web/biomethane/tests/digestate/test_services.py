@@ -448,3 +448,92 @@ class BiomethaneDigestateSpreadingPropertyTests(TestCase):
     def test_in_extra_fields(self):
         """'digestate_spreading' must be listed in EXTRA_FIELDS so get_all_fields() picks it up."""
         self.assertIn("digestate_spreading", BiomethaneDigestate.EXTRA_FIELDS)
+
+
+class BuildMissingFieldsForDeclarationTests(TestCase):
+    """Unit tests for BiomethaneDigestateService.build_missing_fields_for_declaration."""
+
+    def setUp(self):
+        self.mock_contract = Mock(installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1)
+
+    def test_returns_empty_list_when_not_current_declaration(self):
+        """Returns [] for any past declaration, regardless of digestate or production unit."""
+        mock_digestate = Mock()
+        mock_production_unit = Mock(unit_type=BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS)
+
+        result = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate=mock_digestate,
+            is_current_declaration=False,
+            production_unit=mock_production_unit,
+            contract=self.mock_contract,
+        )
+
+        self.assertEqual(result, [])
+
+    def test_returns_empty_list_when_not_current_declaration_and_no_digestate(self):
+        """Returns [] even when digestate is None and not current declaration."""
+        result = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate=None,
+            is_current_declaration=False,
+            production_unit=None,
+            contract=self.mock_contract,
+        )
+
+        self.assertEqual(result, [])
+
+    def test_returns_empty_list_when_production_unit_is_isdnd(self):
+        """Returns [] for current declaration when production unit type is ISDND."""
+        mock_digestate = Mock()
+        mock_production_unit = Mock(unit_type=BiomethaneProductionUnit.ISDND)
+
+        result = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate=mock_digestate,
+            is_current_declaration=True,
+            production_unit=mock_production_unit,
+            contract=self.mock_contract,
+        )
+
+        self.assertEqual(result, [])
+
+    def test_returns_empty_list_when_contract_is_installation_category_3(self):
+        """Returns [] for current declaration when contract installation category is 3."""
+        mock_digestate = Mock()
+        mock_production_unit = Mock(unit_type=BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS)
+        mock_contract = Mock(installation_category=BiomethaneContract.INSTALLATION_CATEGORY_3)
+
+        result = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate=mock_digestate,
+            is_current_declaration=True,
+            production_unit=mock_production_unit,
+            contract=mock_contract,
+        )
+
+        self.assertEqual(result, [])
+
+    def test_returns_empty_list_when_isdnd_and_category_3(self):
+        """Returns [] when both ISDND and category 3 conditions are met."""
+        mock_digestate = Mock()
+        mock_production_unit = Mock(unit_type=BiomethaneProductionUnit.ISDND)
+        mock_contract = Mock(installation_category=BiomethaneContract.INSTALLATION_CATEGORY_3)
+
+        result = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate=mock_digestate,
+            is_current_declaration=True,
+            production_unit=mock_production_unit,
+            contract=mock_contract,
+        )
+
+        self.assertEqual(result, [])
+
+    def test_returns_none_when_digestate_is_none_and_current_declaration(self):
+        """Returns None when digestate is None for current declaration (non-ISDND, non-category-3)."""
+        mock_production_unit = Mock(unit_type=BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS)
+
+        result = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate=None,
+            is_current_declaration=True,
+            production_unit=mock_production_unit,
+            contract=self.mock_contract,
+        )
+
+        self.assertIsNone(result)

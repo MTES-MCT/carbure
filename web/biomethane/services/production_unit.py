@@ -135,7 +135,7 @@ def _build_production_unit_clearing_rules() -> list[FieldClearingRule]:
             fields=BiomethaneProductionUnitService.ISDND_RELATED_FIELDS,
             condition=lambda ctx: (
                 ctx.instance.unit_type == BiomethaneProductionUnit.ISDND
-                or ctx.contract.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_3
+                or (ctx.contract and ctx.contract.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_3)
             ),
         ),
     ]

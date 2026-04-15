@@ -233,7 +233,7 @@ def _build_energy_rules() -> list[FieldClearingRule]:
                 ctx.production_unit
                 and (
                     ctx.production_unit.unit_type == BiomethaneProductionUnit.ISDND
-                    or ctx.contract.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_3
+                    or (ctx.contract and ctx.contract.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_3)
                 )
                 and ctx.tariff_reference in ["2011", "2020", "2021"]
             ),

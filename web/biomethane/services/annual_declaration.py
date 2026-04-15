@@ -93,7 +93,10 @@ class BiomethaneAnnualDeclarationService:
         is_current_declaration = declaration.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
         digestate_missing_fields = BiomethaneDigestateService.build_missing_fields_for_declaration(
-            digestate, is_current_declaration, production_unit
+            digestate,
+            is_current_declaration,
+            production_unit,
+            contract,
         )
 
         return {

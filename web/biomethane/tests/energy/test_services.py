@@ -122,6 +122,7 @@ class EnergyRulesConfigurationTests(TestCase):
             "no_injection_difficulties",
             "no_fossil_for_energy",
             "no_biogas_or_biomethane_energy_type",
+            "isdnd_old_tariff",
         ]
 
         actual_rule_names = [rule.name for rule in self.rules]
@@ -323,16 +324,19 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
 
     def test_get_all_optional_fields_returns_correct_fields(self):
         """Test that get_all_optional_fields returns the correct fields."""
-        fields = sorted(BiomethaneEnergyService.get_all_optional_fields())
+        fields = sorted(set(BiomethaneEnergyService.get_all_optional_fields()))
         expected_fields = sorted(
-            BiomethaneEnergyService.OLD_TARIFF_FIELDS
-            + BiomethaneEnergyService.NEW_TARIFF_FIELDS
-            + BiomethaneEnergyService.MALFUNCTION_FIELDS
-            + BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD
-            + BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS
-            + BiomethaneEnergyService.ENERGY_TYPE_CONDITIONAL_FIELDS
-            + BiomethaneEnergyService.ENERGY_DETAILS_FIELD
-            + BiomethaneEnergyService.EXTRA_OPTIONAL_FIELDS,
+            set(
+                BiomethaneEnergyService.OLD_TARIFF_FIELDS
+                + BiomethaneEnergyService.NEW_TARIFF_FIELDS
+                + BiomethaneEnergyService.MALFUNCTION_FIELDS
+                + BiomethaneEnergyService.MALFUNCTION_DETAILS_FIELD
+                + BiomethaneEnergyService.INJECTION_DIFFICULTY_FIELDS
+                + BiomethaneEnergyService.ENERGY_TYPE_CONDITIONAL_FIELDS
+                + BiomethaneEnergyService.ENERGY_DETAILS_FIELD
+                + BiomethaneEnergyService.ISDND_RELATED_FIELDS
+                + BiomethaneEnergyService.EXTRA_OPTIONAL_FIELDS
+            )
         )
 
         self.assertEqual(fields, expected_fields)
