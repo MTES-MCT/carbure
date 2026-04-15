@@ -147,6 +147,7 @@ export const BiomethaneSettingsRoutes = () => {
 }
 
 export const BiomethaneAdminRoutes = () => {
+  const { canAccessSupplyPlanAdmin } = useBiomethanePermissions()
   return (
     <Routes>
       <Route path="admin" element={<Outlet />}>
@@ -176,11 +177,18 @@ export const BiomethaneAdminRoutes = () => {
         />
         <Route path="dashboard" element={<BiomethaneAdminDashboardPage />} />
 
-        <Route
-          path="supply-plan"
-          element={<Navigate to={`${lastAnnualDeclarationYearAdmin}`} />}
-        />
-        <Route path="supply-plan/:year" element={<SupplyInputsAdminPage />} />
+        {canAccessSupplyPlanAdmin && (
+          <>
+            <Route
+              path="supply-plan"
+              element={<Navigate to={`${lastAnnualDeclarationYearAdmin}`} />}
+            />
+            <Route
+              path="supply-plan/:year"
+              element={<SupplyInputsAdminPage />}
+            />
+          </>
+        )}
       </Route>
       <Route path="*" element={<Navigate replace to="admin/dashboard" />} />
     </Routes>

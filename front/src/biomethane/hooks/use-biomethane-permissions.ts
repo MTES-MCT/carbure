@@ -18,6 +18,9 @@ export interface BiomethanePermissionsManager {
 
   // Can edit the declaration if the entity has write rights and is a DREAL
   canEditDeclaration: boolean
+
+  // Can access the supply plan admin endpoint if the entity has ADEME rights
+  canAccessSupplyPlanAdmin: boolean
 }
 
 export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
@@ -32,6 +35,7 @@ export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
         canAccessInjection: false,
         canAccessModule: false,
         canEditDeclaration: false,
+        canAccessSupplyPlanAdmin: false,
       }
     const canAccessAdmin = entity.hasAnyAdminRight([
       ExternalAdminPages.DREAL,
@@ -45,6 +49,7 @@ export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
       canEditDeclaration:
         entity.canWrite() && entity.hasAdminRight(ExternalAdminPages.DREAL),
       canAccessModule: entity.isBiomethaneProducer || canAccessAdmin,
+      canAccessSupplyPlanAdmin: entity.hasAdminRight(ExternalAdminPages.DREAL),
     }
   }, [entity, user])
 

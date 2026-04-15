@@ -12,7 +12,8 @@ export const useBiomethane = () => {
   const { t } = useTranslation()
   const loc = useLocation()
   const { isBiomethaneProducer } = useEntity()
-  const { canAccessAdmin } = useBiomethanePermissions()
+  const { canAccessAdmin, canAccessSupplyPlanAdmin } =
+    useBiomethanePermissions()
 
   const routesDeclaration = ["digestate", "energy", "supply-plan"]
   const currentRouteIsDeclaration = routesDeclaration.some((route) =>
@@ -62,6 +63,7 @@ export const useBiomethane = () => {
         title: t("Intrants"),
         icon: "ri-leaf-line",
         iconActive: "ri-leaf-fill",
+        condition: canAccessSupplyPlanAdmin,
       },
       {
         path: routes.BIOMETHANE().ADMIN.DECLARATIONS,
