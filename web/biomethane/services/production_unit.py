@@ -1,4 +1,16 @@
+from dataclasses import dataclass
+from typing import Optional
+
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.services.rules import FieldClearingRule, OptionalFieldRule, get_fields_from_applied_rules
+
+
+@dataclass
+class ProductionUnitContext:
+    """Context data extracted from a production unit instance."""
+
+    instance: object
+    contract: Optional[object] = None
 
 
 class BiomethaneProductionUnitService:
@@ -19,6 +31,8 @@ class BiomethaneProductionUnitService:
         "has_hygienization_unit",
         "has_digestate_phase_separation",
         "raw_digestate_treatment_steps",
+        "liquid_phase_treatment_steps",
+        "solid_phase_treatment_steps",
         "digestate_valorization_methods",
         "spreading_management_methods",
         "digestate_sale_types",
@@ -44,15 +58,31 @@ class BiomethaneProductionUnitService:
     ]
 
     @staticmethod
+    def _extract_data(instance) -> ProductionUnitContext:
+        """Extract data from a production unit instance and return structured context."""
+        from django.core.exceptions import ObjectDoesNotExist
+
+        contract = None
+        producer = getattr(instance, "producer", None)
+        if producer:
+            try:
+                contract = producer.biomethane_contract
+            except ObjectDoesNotExist:
+                contract = None
+
+        return ProductionUnitContext(instance=instance, contract=contract)
+
+    @staticmethod
     def get_optional_fields(instance):
         """
         Return the list of optional fields for a given instance.
         Used by the optional_fields property of the model.
         """
+        ctx = BiomethaneProductionUnitService._extract_data(instance)
         optional_fields_rules = _build_production_unit_optional_rules()
         clearing_rueles = _build_production_unit_clearing_rules()
         rules = optional_fields_rules + clearing_rueles
-        conditional_optional = get_fields_from_applied_rules(rules, instance)
+        conditional_optional = get_fields_from_applied_rules(rules, ctx)
         return conditional_optional + BiomethaneProductionUnitService.ALWAYS_OPTIONAL_FIELDS
 
     @staticmethod
@@ -61,8 +91,9 @@ class BiomethaneProductionUnitService:
         Return the list of fields to clear for a given instance.
         Used by signals.
         """
+        ctx = BiomethaneProductionUnitService._extract_data(instance)
         rules = _build_production_unit_clearing_rules()
-        return get_fields_from_applied_rules(rules, instance)
+        return get_fields_from_applied_rules(rules, ctx)
 
 
 # Rule configuration: declarative definition of all field clearing rules
@@ -77,32 +108,35 @@ def _build_production_unit_clearing_rules() -> list[FieldClearingRule]:
         FieldClearingRule(
             name="no_sanitary_approval",
             fields=BiomethaneProductionUnitService.SANITARY_APPROVAL_FIELDS,
-            condition=lambda instance: not instance.has_sanitary_approval,
+            condition=lambda ctx: not ctx.instance.has_sanitary_approval,
         ),
         # Clear hygienization exemption type when hygienization exemption is disabled
         FieldClearingRule(
             name="no_hygienization_exemption",
             fields=BiomethaneProductionUnitService.HYGIENIZATION_EXEMPTION_FIELDS,
-            condition=lambda instance: not instance.has_hygienization_exemption,
+            condition=lambda ctx: not ctx.instance.has_hygienization_exemption,
         ),
         # Clear liquid/solid phase treatment steps when phase separation is disabled
         FieldClearingRule(
             name="no_phase_separation",
             fields=BiomethaneProductionUnitService.PHASE_SEPARATION_FIELDS,
-            condition=lambda instance: not instance.has_digestate_phase_separation,
+            condition=lambda ctx: not ctx.instance.has_digestate_phase_separation,
         ),
         # Clear spreading management fields when SPREADING is not a valorization method
         FieldClearingRule(
             name="spreading_not_selected",
             fields=BiomethaneProductionUnitService.SPREADING_MANAGEMENT_FIELDS,
-            condition=lambda instance: BiomethaneProductionUnit.SPREADING
-            not in (instance.digestate_valorization_methods or []),
+            condition=lambda ctx: BiomethaneProductionUnit.SPREADING
+            not in (ctx.instance.digestate_valorization_methods or []),
         ),
         # Clear ISDND-related fields when unit_type is ISDND
         FieldClearingRule(
             name="isdnd",
             fields=BiomethaneProductionUnitService.ISDND_RELATED_FIELDS,
-            condition=lambda instance: instance.unit_type == BiomethaneProductionUnit.ISDND,
+            condition=lambda ctx: (
+                ctx.instance.unit_type == BiomethaneProductionUnit.ISDND
+                or ctx.contract.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_3
+            ),
         ),
     ]
 
@@ -119,6 +153,6 @@ def _build_production_unit_optional_rules() -> list[FieldClearingRule]:
         OptionalFieldRule(
             name="STEP_unit_type",
             fields=BiomethaneProductionUnitService.ICPE_FIELDS,
-            condition=lambda instance: instance.unit_type == BiomethaneProductionUnit.STEP,
+            condition=lambda ctx: ctx.instance.unit_type == BiomethaneProductionUnit.STEP,
         ),
     ]

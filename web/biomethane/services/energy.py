@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_energy import BiomethaneEnergy
+from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
 from biomethane.services.rules import FieldClearingRule, RuleBuilder, get_fields_from_applied_rules
 
 
@@ -75,6 +77,13 @@ class BiomethaneEnergyService:
 
     # Fields not included in the rules, but they are related to other models for calculation purposes
     EXTRA_OPTIONAL_FIELDS = ["energy_types"]
+
+    ISDND_RELATED_FIELDS = [
+        "attest_no_fossil_for_energy",
+        "energy_types",
+        "energy_details",
+        "self_consumed_biogas_or_biomethane_kwh",
+    ]
 
     @staticmethod
     def _extract_data(instance) -> EnergyContext:
@@ -214,6 +223,19 @@ def _build_energy_rules() -> list[FieldClearingRule]:
                     BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOMETHANE,
                 ]
                 for energy_type in ctx.energy_types
+            ),
+        ),
+        # Clear ISDND-related fields when unit_type is ISDND and contract tariff_reference is 2011, 2020 or 2021
+        FieldClearingRule(
+            name="isdnd_old_tariff",
+            fields=BiomethaneEnergyService.ISDND_RELATED_FIELDS,
+            condition=lambda ctx: (
+                ctx.production_unit
+                and (
+                    ctx.production_unit.unit_type == BiomethaneProductionUnit.ISDND
+                    or ctx.contract.installation_category == BiomethaneContract.INSTALLATION_CATEGORY_3
+                )
+                and ctx.tariff_reference in ["2011", "2020", "2021"]
             ),
         ),
     ]
