@@ -238,8 +238,16 @@ def clear_energy_fields_on_related_model_save(sender, instance, **kwargs):
     fields_to_clear = BiomethaneEnergyService.get_fields_to_clear(energy_instance)
 
     if fields_to_clear:
-        update_data = {field: None for field in fields_to_clear}
-
+        update_data = {}
+        for field in fields_to_clear:
+            model_field = BiomethaneEnergy._meta.get_field(field)
+            if isinstance(model_field, models.JSONField):
+                new_value = []
+            elif isinstance(model_field, models.BooleanField):
+                new_value = False
+            else:
+                new_value = None
+            update_data[field] = new_value
         BiomethaneEnergy.objects.filter(pk=energy_instance.pk).update(**update_data)
 
 
