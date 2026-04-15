@@ -1,7 +1,5 @@
 from datetime import date
 
-from web.biomethane.services.ademe import AdemeService
-
 from biomethane.models import (
     BiomethaneAnnualDeclaration,
     BiomethaneContract,
@@ -12,6 +10,7 @@ from biomethane.models import (
     BiomethaneSupplyPlan,
 )
 from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
+from biomethane.services.ademe import AdemeService
 from core.models.entity import ExternalAdminRights
 
 

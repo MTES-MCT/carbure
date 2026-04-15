@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import patch
 
 from django.contrib.contenttypes.models import ContentType
@@ -74,7 +75,8 @@ class EntityTest(TestCase):
 
         self.assertEqual(result, [dreal_a, dreal_b])
 
-    def test_get_allowed_entities_for_ademe_filters_to_ademe_eligible_producers(self):
+    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    def test_get_allowed_entities_for_ademe_filters_to_ademe_eligible_producers(self, _):
         ademe = create_entity_with_department(self.dept_02, external_admin_right=ExternalAdminRights.ADEME)
         producer_with_ademe_contract = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER, name="Producer ADEME")
         producer_without_ademe_contract = EntityFactory.create(
@@ -96,10 +98,12 @@ class EntityTest(TestCase):
             producer=producer_with_ademe_contract,
             has_complementary_investment_aid=True,
             complementary_aid_organisms=[BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME],
+            effective_date=date(2021, 1, 1),
         )
         BiomethaneContractFactory.create(
             producer=producer_without_ademe_contract,
             complementary_aid_organisms=[],
+            effective_date=date(2021, 1, 1),
         )
 
         allowed_entities = ademe.get_allowed_entities()

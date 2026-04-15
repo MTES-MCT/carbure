@@ -28,6 +28,7 @@ const setup = ({
     hasAnyAdminRight: (pages: ExternalAdminPages[]) =>
       pages.some((page) => grantedPages.includes(page)),
     hasAdminRight: (page: ExternalAdminPages) => grantedPages.includes(page),
+    canWrite: () => true,
   } as Pick<
     EntityManager,
     "hasAnyAdminRight" | "hasAdminRight"
