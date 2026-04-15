@@ -30,6 +30,13 @@ class Transaction:
         delivery_date_text = delivery_date_element.text
         return datetime.fromisoformat(delivery_date_text).date()
 
+    def etd(self):
+        etd_element = self.xml_root_element.find("./POS_DATA/ETD")
+        if etd_element is None:
+            return None
+
+        return float(etd_element.text)
+
     def feedstock_code(self):
         xpath = "./EO_TRANS_DETAIL_MATERIALS/POINT_OF_ORIGIN_MATERIAL_DATA/MATERIAL_CODE"
         return self.xml_root_element.find(xpath).text
@@ -66,6 +73,10 @@ class Transaction:
         delivery_date = self.delivery_date()
         if delivery_date is not None:
             attributes["delivery_date"] = delivery_date
+
+        etd = self.etd()
+        if etd is not None:
+            attributes |= {"etd": etd}
 
         return attributes
 
