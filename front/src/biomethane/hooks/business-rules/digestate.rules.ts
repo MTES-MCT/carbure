@@ -1,5 +1,5 @@
 import { BiomethaneRulesContext } from "./types"
-import { buildCommonRules } from "./common"
+import { buildCommonRules } from "./common.rules"
 
 export interface DigestateBusinessRules {
   shouldFillDigestate: boolean

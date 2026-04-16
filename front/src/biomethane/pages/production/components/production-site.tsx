@@ -18,6 +18,7 @@ import {
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
 
 type ProductionSiteForm = Pick<
   ProductionUnitForm,
@@ -48,6 +49,7 @@ export function ProductionSite({
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<ProductionSiteForm>()
+  const { production } = useBiomethaneBusinessRules()
 
   const { execute: saveProductionUnit, loading } =
     useSaveProductionUnit(productionUnit)
@@ -129,20 +131,24 @@ export function ProductionSite({
     >
       {({ isEditing }) => (
         <ManagedEditableCard.Form onSubmit={handleSubmit}>
-          <RadioGroup
-            required
-            readOnly={!isEditing}
-            label={t("Type de voie")}
-            options={processTypeOptions}
-            {...bind("process_type")}
-          />
-          <RadioGroup
-            required
-            readOnly={!isEditing}
-            label={t("Procédé méthanisation")}
-            options={methanizationProcessOptions}
-            {...bind("methanization_process")}
-          />
+          {production.productionSite.displayProcessType && (
+            <RadioGroup
+              required
+              readOnly={!isEditing}
+              label={t("Type de voie")}
+              options={processTypeOptions}
+              {...bind("process_type")}
+            />
+          )}
+          {production.productionSite.displayMethanizationProcess && (
+            <RadioGroup
+              required
+              readOnly={!isEditing}
+              label={t("Procédé méthanisation")}
+              options={methanizationProcessOptions}
+              {...bind("methanization_process")}
+            />
+          )}
           <NumberInput
             required
             readOnly={!isEditing}
@@ -159,14 +165,16 @@ export function ProductionSite({
             {...bind("installed_meters")}
           />
           <Grid cols={2} gap="lg">
-            <RadioGroup
-              required
-              readOnly={!isEditing}
-              label={t("Présence d'un hygiénisateur")}
-              options={getYesNoOptions()}
-              orientation="horizontal"
-              {...bind("has_hygienization_unit")}
-            />
+            {production.productionSite.displayHygienizationUnit && (
+              <RadioGroup
+                required
+                readOnly={!isEditing}
+                label={t("Présence d'un hygiénisateur")}
+                options={getYesNoOptions()}
+                orientation="horizontal"
+                {...bind("has_hygienization_unit")}
+              />
+            )}
             <RadioGroup
               required
               readOnly={!isEditing}

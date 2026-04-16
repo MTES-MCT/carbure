@@ -11,8 +11,8 @@ export const buildCommonRules = (
 ): CommonBusinessRules => {
   return {
     isISDNDInstallation:
-      ctx.productionUnit?.unit_type !== UnitType.ISDND &&
-      ctx.contractInfos?.installation_category !==
+      ctx.productionUnit?.unit_type === UnitType.ISDND ||
+      ctx.contractInfos?.installation_category ===
         InstallationCategory.INSTALLATION_CATEGORY_3,
   }
 }
