@@ -30,7 +30,7 @@ export const BiomethaneProductionPageContent = () => {
   useMissingFields(form)
 
   if (loading) return <LoaderOverlay />
-  console.log("pppp", production)
+
   return (
     <FormContext.Provider value={form}>
       <WatchedFieldsProvider
