@@ -4,6 +4,7 @@ import { MenuSection } from "../sidebar.types"
 import useEntity from "common/hooks/entity"
 import { useLocation } from "react-router-dom"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
+import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
 
 const currentYear = new Date().getFullYear()
 
@@ -15,13 +16,15 @@ export const useBiomethane = () => {
   const { canAccessAdmin, canAccessSupplyPlanAdmin } =
     useBiomethanePermissions()
 
+  const { shouldFillDigestate } = useBiomethaneBusinessRules()
+
   const routesDeclaration = ["digestate", "energy", "supply-plan"]
   const currentRouteIsDeclaration = routesDeclaration.some((route) =>
     loc.pathname.includes(route)
   )
 
   // When we are not in the declaration pages, we don't need to pass the year to the routes
-  const year = !currentRouteIsDeclaration ? undefined : currentYear - 1
+  const year = currentRouteIsDeclaration ? currentYear - 1 : undefined
 
   const biomethaneProducerMenu: MenuSection = {
     title: t("Déclarations"),
@@ -38,6 +41,7 @@ export const useBiomethane = () => {
         title: t("Digestat"),
         icon: "ri-contrast-drop-line",
         iconActive: "ri-contrast-drop-fill",
+        condition: shouldFillDigestate,
       },
       {
         path: routes.BIOMETHANE(year).PRODUCER.ENERGY,
