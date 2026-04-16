@@ -137,3 +137,8 @@ class TransactionTest(TestCase):
 
         lot_attributes = transaction.to_lot_attributes()
         self.assertTrue("etd" not in lot_attributes)
+
+    def test_knows_its_loading_place_name(self):
+        xml_data = transaction_data(loading_site_name="Loading Site")
+        transaction = Transaction.from_xml(xml_data)
+        self.assertEqual("Loading Site", transaction.loading_site_name())

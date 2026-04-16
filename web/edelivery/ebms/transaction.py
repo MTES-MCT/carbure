@@ -45,6 +45,9 @@ class Transaction:
         loading_date_text = self.xml_root_element.find("./LOADING_DATE").text
         return datetime.fromisoformat(loading_date_text).date()
 
+    def loading_site_name(self):
+        return self.xml_root_element.find("./PLACE_OF_LOADING_NAME").text
+
     def status(self):
         return self.xml_root_element.find("./STATUS").text
 

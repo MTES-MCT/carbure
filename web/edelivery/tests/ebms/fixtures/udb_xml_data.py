@@ -41,6 +41,7 @@ def transaction_data(
     etd=None,
     feedstock=None,
     loading_date="2025-01-26T00:00:00.000Z",
+    loading_site_name="TestSite004",
     quantity=None,
     status="ACCEPTED",
     supplier_id="FR_SIREN_CD111111111",
@@ -61,7 +62,7 @@ def transaction_data(
   <SELLER_CERTIFICATE_NUMBER>EU-ISCC-Cert-Test-FR004</SELLER_CERTIFICATE_NUMBER>
   <BUYER_ECONOMIC_OPERATOR_NUMBER>{client_id}</BUYER_ECONOMIC_OPERATOR_NUMBER>
   <LOADING_DATE>{loading_date}</LOADING_DATE>
-  <PLACE_OF_LOADING_NAME>TestSite004</PLACE_OF_LOADING_NAME>
+  <PLACE_OF_LOADING_NAME>{loading_site_name}</PLACE_OF_LOADING_NAME>
   <PLACE_OF_LOADING_POSTCODE>1004</PLACE_OF_LOADING_POSTCODE>
   {delivery_date_xml_fragment}
   <REFERENCE_NUMBER>SOME_REFERENCE</REFERENCE_NUMBER>
