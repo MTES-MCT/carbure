@@ -232,10 +232,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description List biomethane producers visible by the current DREAL entity.
+        /**
+         * @description List biomethane producers visible by the current DREAL entity.
          *
          *     Returns producers that have production units in departments
-         *     accessible by the DREAL. */
+         *     accessible by the DREAL.
+         */
         get: operations["biomethane_admin_producers_list"];
         put?: never;
         post?: never;
@@ -255,11 +257,13 @@ export interface paths {
         /** @description Retrieve the declaration. Returns a single declaration object. */
         get: operations["biomethane_annual_declaration_retrieve"];
         put?: never;
-        /** @description Mixin that provides get_object() method with filterset and permission checks.
+        /**
+         * @description Mixin that provides get_object() method with filterset and permission checks.
          *
          *     The ViewSet must have:
          *     - filterset_class configured
-         *     - queryset defined */
+         *     - queryset defined
+         */
         post: operations["biomethane_annual_declaration_create"];
         delete?: never;
         options?: never;
@@ -277,11 +281,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Mixin that provides get_object() method with filterset and permission checks.
+        /**
+         * @description Mixin that provides get_object() method with filterset and permission checks.
          *
          *     The ViewSet must have:
          *     - filterset_class configured
-         *     - queryset defined */
+         *     - queryset defined
+         */
         post: operations["biomethane_annual_declaration_validate_create"];
         delete?: never;
         options?: never;
@@ -334,10 +340,12 @@ export interface paths {
         /** @description List objects with object-level permission check on the first result. */
         get: operations["biomethane_contract_amendments_list"];
         put?: never;
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         post: operations["biomethane_contract_amendments_create"];
         delete?: never;
         options?: never;
@@ -352,10 +360,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         get: operations["biomethane_contract_amendments_retrieve"];
         put?: never;
         post?: never;
@@ -372,12 +382,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for ViewSets that retrieve a single object without ID in URL.
+        /**
+         * @description Mixin for ViewSets that retrieve a single object without ID in URL.
          *     Uses filterset to get the object and checks object-level permissions.
          *
          *     The ViewSet must have:
          *     - filterset_class configured
-         *     - queryset defined */
+         *     - queryset defined
+         */
         get: operations["biomethane_contract_watched_fields_retrieve"];
         put?: never;
         post?: never;
@@ -415,10 +427,12 @@ export interface paths {
         /** @description List objects with object-level permission check on the first result. */
         get: operations["biomethane_digestate_storage_list"];
         put?: never;
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         post: operations["biomethane_digestate_storage_create"];
         delete?: never;
         options?: never;
@@ -433,28 +447,36 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         get: operations["biomethane_digestate_storage_retrieve"];
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         put: operations["biomethane_digestate_storage_update"];
         post?: never;
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         delete: operations["biomethane_digestate_storage_destroy"];
         options?: never;
         head?: never;
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         patch: operations["biomethane_digestate_storage_partial_update"];
         trace?: never;
     };
@@ -560,6 +582,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Export all biomethane data for a producer and a given year as an Excel file. */
+        get: operations["biomethane_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/injection-site/": {
         parameters: {
             query?: never;
@@ -603,12 +642,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for ViewSets that retrieve a single object without ID in URL.
+        /**
+         * @description Mixin for ViewSets that retrieve a single object without ID in URL.
          *     Uses filterset to get the object and checks object-level permissions.
          *
          *     The ViewSet must have:
          *     - filterset_class configured
-         *     - queryset defined */
+         *     - queryset defined
+         */
         get: operations["biomethane_production_unit_watched_fields_retrieve"];
         put?: never;
         post?: never;
@@ -628,10 +669,12 @@ export interface paths {
         /** @description List objects with object-level permission check on the first result. */
         get: operations["biomethane_supply_input_list"];
         put?: never;
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         post: operations["biomethane_supply_input_create"];
         delete?: never;
         options?: never;
@@ -646,28 +689,36 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         get: operations["biomethane_supply_input_retrieve"];
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         put: operations["biomethane_supply_input_update"];
         post?: never;
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         delete: operations["biomethane_supply_input_destroy"];
         options?: never;
         head?: never;
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         patch: operations["biomethane_supply_input_partial_update"];
         trace?: never;
     };
@@ -678,10 +729,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         get: operations["biomethane_supply_input_export_retrieve"];
         put?: never;
         post?: never;
@@ -698,10 +751,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         get: operations["biomethane_supply_input_filters_retrieve"];
         put?: never;
         post?: never;
@@ -735,10 +790,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin for list() actions that need to check object-level permissions.
+        /**
+         * @description Mixin for list() actions that need to check object-level permissions.
          *
          *     Override get_permission_object() to specify which object to check permissions on.
-         *     By default, checks permissions on the first object in the filtered queryset. */
+         *     By default, checks permissions on the first object in the filtered queryset.
+         */
         get: operations["biomethane_supply_plan_export_retrieve"];
         put?: never;
         post?: never;
@@ -757,7 +814,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Upload and process an Excel file to create supply plan entries.  */
+        /** @description Upload and process an Excel file to create supply plan entries. */
         post: operations["import_supply_plan_from_excel"];
         delete?: never;
         options?: never;
@@ -2692,13 +2749,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Get objectives.
+        /**
+         * @description Get objectives.
          *
          *     Behavior depends on the entity type of the authenticated user:
          *     - Operator: returns objectives for their own entity.
          *     - Admin/ExternalAdmin: if `selected_entity_id` is provided, returns objectives
          *       for that specific entity. Otherwise, returns aggregated objectives for all
-         *       tiruert-liable entities. */
+         *       tiruert-liable entities.
+         */
         get: operations["tiruert_objectives_retrieve"];
         put?: never;
         post?: never;
@@ -2715,7 +2774,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+        /**
+         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
          *
          *     This mixin automatically adds the unit to the request via `initialize_request()`
          *     and to the serializer context via `get_serializer_context()`.
@@ -2723,10 +2783,12 @@ export interface paths {
          *     The unit is determined in the following order:
          *     1. 'unit' parameter from the request (POST or GET)
          *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters) */
+         *     3. Default value: 'l' (liters)
+         */
         get: operations["tiruert_operations_list"];
         put?: never;
-        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+        /**
+         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
          *
          *     This mixin automatically adds the unit to the request via `initialize_request()`
          *     and to the serializer context via `get_serializer_context()`.
@@ -2734,7 +2796,8 @@ export interface paths {
          *     The unit is determined in the following order:
          *     1. 'unit' parameter from the request (POST or GET)
          *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters) */
+         *     3. Default value: 'l' (liters)
+         */
         post: operations["tiruert_operations_create"];
         delete?: never;
         options?: never;
@@ -2749,7 +2812,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+        /**
+         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
          *
          *     This mixin automatically adds the unit to the request via `initialize_request()`
          *     and to the serializer context via `get_serializer_context()`.
@@ -2757,11 +2821,13 @@ export interface paths {
          *     The unit is determined in the following order:
          *     1. 'unit' parameter from the request (POST or GET)
          *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters) */
+         *     3. Default value: 'l' (liters)
+         */
         get: operations["tiruert_operations_retrieve"];
         put?: never;
         post?: never;
-        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+        /**
+         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
          *
          *     This mixin automatically adds the unit to the request via `initialize_request()`
          *     and to the serializer context via `get_serializer_context()`.
@@ -2769,11 +2835,13 @@ export interface paths {
          *     The unit is determined in the following order:
          *     1. 'unit' parameter from the request (POST or GET)
          *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters) */
+         *     3. Default value: 'l' (liters)
+         */
         delete: operations["tiruert_operations_destroy"];
         options?: never;
         head?: never;
-        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+        /**
+         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
          *
          *     This mixin automatically adds the unit to the request via `initialize_request()`
          *     and to the serializer context via `get_serializer_context()`.
@@ -2781,7 +2849,8 @@ export interface paths {
          *     The unit is determined in the following order:
          *     1. 'unit' parameter from the request (POST or GET)
          *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters) */
+         *     3. Default value: 'l' (liters)
+         */
         patch: operations["tiruert_operations_partial_update"];
         trace?: never;
     };
@@ -2877,7 +2946,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
+        /**
+         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
          *
          *     This mixin automatically adds the unit to the request via `initialize_request()`
          *     and to the serializer context via `get_serializer_context()`.
@@ -2885,7 +2955,8 @@ export interface paths {
          *     The unit is determined in the following order:
          *     1. 'unit' parameter from the request (POST or GET)
          *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters) */
+         *     3. Default value: 'l' (liters)
+         */
         get: operations["tiruert_operations_export_retrieve"];
         put?: never;
         post?: never;
@@ -2972,8 +3043,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Takes a set of user credentials and returns an access and refresh JSON web
-         *     token pair to prove the authentication of those credentials. */
+        /**
+         * @description Takes a set of user credentials and returns an access and refresh JSON web
+         *     token pair to prove the authentication of those credentials.
+         */
         post: operations["token_create"];
         delete?: never;
         options?: never;
@@ -2990,8 +3063,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Takes a refresh type JSON web token and returns an access type JSON web
-         *     token if the refresh token is valid. */
+        /**
+         * @description Takes a refresh type JSON web token and returns an access type JSON web
+         *     token if the refresh token is valid.
+         */
         post: operations["token_refresh_create"];
         delete?: never;
         options?: never;
@@ -3252,23 +3327,44 @@ export interface components {
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
             readonly tracked_amendment_types: components["schemas"]["TrackedAmendmentTypesEnum"][];
             complementary_aid_organisms: components["schemas"]["ComplementaryAidOrganismsEnum"][];
+            /** Référence de l'arrêté tarifaire */
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
+            /** Catégorie d'installation */
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
+            /**
+             * Cmax (Nm³/h)
+             * Format: double
+             */
             cmax?: number | null;
+            /** Annualisation du contrôle de la Cmax */
             cmax_annualized?: boolean | null;
-            /** Format: double */
+            /**
+             * Cmax annualisée (GWhPCS/an)
+             * Format: double
+             */
             cmax_annualized_value?: number | null;
-            /** Format: double */
+            /**
+             * PAP contractualisée (GWhPCS/an)
+             * Format: double
+             */
             pap_contracted?: number | null;
-            /** Format: date */
+            /**
+             * Date de signature
+             * Format: date
+             */
             signature_date?: string | null;
-            /** Format: date */
+            /**
+             * Date de prise d'effet
+             * Format: date
+             */
             effective_date?: string | null;
             /** Format: uri */
             conditions_file?: string | null;
+            /** Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement? */
             has_complementary_investment_aid?: boolean | null;
+            /** Précisez le nom du ou des organismes publics ayant octroyé l'aide */
             complementary_aid_other_organism_name?: string | null;
+            /** Acheteur */
             buyer?: number | null;
             producer: number;
         };
@@ -3309,132 +3405,262 @@ export interface components {
             cmax_annualized?: boolean | null;
             is_red_ii?: boolean;
             complementary_aid_organisms?: components["schemas"]["ComplementaryAidOrganismsEnum"][];
+            /** Référence de l'arrêté tarifaire */
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
+            /** Catégorie d'installation */
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
+            /**
+             * Cmax (Nm³/h)
+             * Format: double
+             */
             cmax?: number | null;
-            /** Format: double */
+            /**
+             * Cmax annualisée (GWhPCS/an)
+             * Format: double
+             */
             cmax_annualized_value?: number | null;
-            /** Format: double */
+            /**
+             * PAP contractualisée (GWhPCS/an)
+             * Format: double
+             */
             pap_contracted?: number | null;
-            /** Format: date */
+            /**
+             * Date de signature
+             * Format: date
+             */
             signature_date?: string | null;
-            /** Format: date */
+            /**
+             * Date de prise d'effet
+             * Format: date
+             */
             effective_date?: string | null;
             /** Format: binary */
             conditions_file?: File | null;
             tracked_amendment_types?: unknown;
+            /** Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement? */
             has_complementary_investment_aid?: boolean | null;
+            /** Précisez le nom du ou des organismes publics ayant octroyé l'aide */
             complementary_aid_other_organism_name?: string | null;
+            /** Acheteur */
             buyer?: number | null;
         };
         BiomethaneDigestate: {
             readonly id: number;
             composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
             readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
+            /** Année */
             year: number;
-            /** Format: double */
+            /**
+             * Tonnage digestat brut produit (t)
+             * Format: double
+             */
             raw_digestate_tonnage_produced?: number | null;
-            /** Format: double */
+            /**
+             * Taux de MS du digestat brut (%)
+             * Format: double
+             */
             raw_digestate_dry_matter_rate?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage de digestat solide (t)
+             * Format: double
+             */
             solid_digestate_tonnage?: number | null;
-            /** Format: double */
+            /**
+             * Quantité digestat liquide (t)
+             * Format: double
+             */
             liquid_digestate_quantity?: number | null;
-            /** Format: double */
+            /**
+             * Distance moyenne de valorisation d'épandage (km)
+             * Format: double
+             */
             average_spreading_valorization_distance?: number | null;
+            /** Nom de la plateforme externe */
             external_platform_name?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur la plateforme externe (t)
+             * Format: double
+             */
             external_platform_digestate_volume?: number | null;
+            /** Département de la plateforme externe */
             external_platform_department?: string | null;
+            /** Commune de la plateforme externe */
             external_platform_municipality?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur site (t)
+             * Format: double
+             */
             on_site_composted_digestate_volume?: number | null;
-            /** Format: double */
+            /**
+             * Volume annuel éliminé (t)
+             * Format: double
+             */
             annual_eliminated_volume?: number | null;
+            /** Indiquer le nom de l'incinérateur ou du centre d'enfouissement */
             incinerator_landfill_center_name?: string | null;
-            /** Format: double */
+            /**
+             * Quantité de matières totales traitées par la STEP allant en incinération (t)
+             * Format: double
+             */
             wwtp_materials_to_incineration?: number | null;
+            /** Entreprise(s) acquérant le digestat */
             acquiring_companies?: string | null;
-            /** Format: double */
+            /**
+             * Volume vendu (t)
+             * Format: double
+             */
             sold_volume?: number | null;
             producer: number;
         };
         BiomethaneDigestateInputRequest: {
             composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
-            /** Format: double */
+            /**
+             * Tonnage digestat brut produit (t)
+             * Format: double
+             */
             raw_digestate_tonnage_produced?: number | null;
-            /** Format: double */
+            /**
+             * Taux de MS du digestat brut (%)
+             * Format: double
+             */
             raw_digestate_dry_matter_rate?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage de digestat solide (t)
+             * Format: double
+             */
             solid_digestate_tonnage?: number | null;
-            /** Format: double */
+            /**
+             * Quantité digestat liquide (t)
+             * Format: double
+             */
             liquid_digestate_quantity?: number | null;
-            /** Format: double */
+            /**
+             * Distance moyenne de valorisation d'épandage (km)
+             * Format: double
+             */
             average_spreading_valorization_distance?: number | null;
+            /** Nom de la plateforme externe */
             external_platform_name?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur la plateforme externe (t)
+             * Format: double
+             */
             external_platform_digestate_volume?: number | null;
+            /** Département de la plateforme externe */
             external_platform_department?: string | null;
+            /** Commune de la plateforme externe */
             external_platform_municipality?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur site (t)
+             * Format: double
+             */
             on_site_composted_digestate_volume?: number | null;
-            /** Format: double */
+            /**
+             * Volume annuel éliminé (t)
+             * Format: double
+             */
             annual_eliminated_volume?: number | null;
+            /** Indiquer le nom de l'incinérateur ou du centre d'enfouissement */
             incinerator_landfill_center_name?: string | null;
-            /** Format: double */
+            /**
+             * Quantité de matières totales traitées par la STEP allant en incinération (t)
+             * Format: double
+             */
             wwtp_materials_to_incineration?: number | null;
+            /** Entreprise(s) acquérant le digestat */
             acquiring_companies?: string | null;
-            /** Format: double */
+            /**
+             * Volume vendu (t)
+             * Format: double
+             */
             sold_volume?: number | null;
         };
         BiomethaneDigestateSpreading: {
             readonly id: number;
+            /** Département d'épandage */
             spreading_department: string;
-            /** Format: double */
+            /**
+             * Quantité épandue (t)
+             * Format: double
+             */
             spread_quantity: number;
-            /** Format: double */
+            /**
+             * Superficie des parcelles épandues (ha)
+             * Format: double
+             */
             spread_parcels_area: number;
             digestate: number;
         };
         BiomethaneDigestateSpreadingAdd: {
             readonly id: number;
+            /** Département d'épandage */
             spreading_department: string;
-            /** Format: double */
+            /**
+             * Quantité épandue (t)
+             * Format: double
+             */
             spread_quantity: number;
-            /** Format: double */
+            /**
+             * Superficie des parcelles épandues (ha)
+             * Format: double
+             */
             spread_parcels_area: number;
         };
         BiomethaneDigestateSpreadingAddRequest: {
             year: number;
+            /** Département d'épandage */
             spreading_department: string;
-            /** Format: double */
+            /**
+             * Quantité épandue (t)
+             * Format: double
+             */
             spread_quantity: number;
-            /** Format: double */
+            /**
+             * Superficie des parcelles épandues (ha)
+             * Format: double
+             */
             spread_parcels_area: number;
         };
         BiomethaneDigestateStorage: {
             readonly id: number;
+            /** Type de stockage */
             type: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
             producer: number;
         };
         BiomethaneDigestateStorageInput: {
             readonly id: number;
+            /** Type de stockage */
             type: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
         };
         BiomethaneDigestateStorageInputRequest: {
+            /** Type de stockage */
             type: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
         };
         BiomethaneEnergy: {
@@ -3442,20 +3668,41 @@ export interface components {
             energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             readonly monthly_reports: components["schemas"]["BiomethaneEnergyMonthlyReport"][];
+            /** Année */
             year: number;
-            /** Format: double */
+            /**
+             * Quantité de biométhane injecté (GWhPCS/an)
+             * Format: double
+             */
             injected_biomethane_gwh_pcs_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Taux de CH4 dans le biométhane injecté (%)
+             * Format: double
+             */
             injected_biomethane_ch4_rate_percent?: number | null;
-            /** Format: double */
+            /**
+             * PCS du biométhane injecté (kWh/Nm3)
+             * Format: double
+             */
             injected_biomethane_pcs_kwh_per_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz produit (Nm3/an)
+             * Format: double
+             */
             produced_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz torché (Nm3/an)
+             * Format: double
+             */
             flared_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Nombre d'heures de fonctionnement de la torchère (h)
+             * Format: double
+             */
             flaring_operating_hours?: number | null;
+            /** J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d'origine fossile */
             attest_no_fossil_for_energy?: boolean;
+            /** Précisions */
             energy_details?: string | null;
             /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
@@ -3465,36 +3712,70 @@ export interface components {
             self_consumed_biogas_nm3?: number | null;
             /** Format: double */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
+             * Format: double
+             */
             total_unit_electric_consumption_kwe?: number | null;
+            /** Addition de butane ou propane lors de l'injection du biométhane dans le réseau */
             butane_or_propane_addition?: boolean;
-            /** Format: double */
+            /**
+             * Quantité de combustible fossile consommé (kWh)
+             * Format: double
+             */
             fossil_fuel_consumed_kwh?: number | null;
+            /** L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement d'une opposition ou de plaintes de voisinage ? */
             has_opposition_or_complaints_acceptability?: boolean;
+            /** Nombre d'ETP estimé pour l'activité de méthanisation sur l'année */
             estimated_work_days_acceptability?: number | null;
+            /** Y'a t-il eu des dysfonctionnements ? */
             has_malfunctions?: boolean;
+            /** Durée cumulée du dysfonctionnement (en jours) */
             malfunction_cumulative_duration_days?: number | null;
+            /** Précisions sur les dysfonctionnements */
             malfunction_details?: string | null;
+            /** Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux */
             has_injection_difficulties_due_to_network_saturation?: boolean;
+            /** Nombre d'heures d'impossibilité d'injection (h) */
             injection_impossibility_hours?: number | null;
             producer: number;
         };
         BiomethaneEnergyInputRequest: {
             energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
-            /** Format: double */
+            /**
+             * Quantité de biométhane injecté (GWhPCS/an)
+             * Format: double
+             */
             injected_biomethane_gwh_pcs_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Taux de CH4 dans le biométhane injecté (%)
+             * Format: double
+             */
             injected_biomethane_ch4_rate_percent?: number | null;
-            /** Format: double */
+            /**
+             * PCS du biométhane injecté (kWh/Nm3)
+             * Format: double
+             */
             injected_biomethane_pcs_kwh_per_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz produit (Nm3/an)
+             * Format: double
+             */
             produced_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz torché (Nm3/an)
+             * Format: double
+             */
             flared_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Nombre d'heures de fonctionnement de la torchère (h)
+             * Format: double
+             */
             flaring_operating_hours?: number | null;
+            /** J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d'origine fossile */
             attest_no_fossil_for_energy?: boolean;
+            /** Précisions */
             energy_details?: string | null;
             /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
@@ -3504,17 +3785,31 @@ export interface components {
             self_consumed_biogas_nm3?: number | null;
             /** Format: double */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
+             * Format: double
+             */
             total_unit_electric_consumption_kwe?: number | null;
+            /** Addition de butane ou propane lors de l'injection du biométhane dans le réseau */
             butane_or_propane_addition?: boolean;
-            /** Format: double */
+            /**
+             * Quantité de combustible fossile consommé (kWh)
+             * Format: double
+             */
             fossil_fuel_consumed_kwh?: number | null;
+            /** L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement d'une opposition ou de plaintes de voisinage ? */
             has_opposition_or_complaints_acceptability?: boolean;
+            /** Nombre d'ETP estimé pour l'activité de méthanisation sur l'année */
             estimated_work_days_acceptability?: number | null;
+            /** Y'a t-il eu des dysfonctionnements ? */
             has_malfunctions?: boolean;
+            /** Durée cumulée du dysfonctionnement (en jours) */
             malfunction_cumulative_duration_days?: number | null;
+            /** Précisions sur les dysfonctionnements */
             malfunction_details?: string | null;
+            /** Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux */
             has_injection_difficulties_due_to_network_saturation?: boolean;
+            /** Nombre d'heures d'impossibilité d'injection (h) */
             injection_impossibility_hours?: number | null;
         };
         BiomethaneEnergyMonthlyReport: {
@@ -3527,26 +3822,44 @@ export interface components {
         };
         BiomethaneInjectionSite: {
             readonly id: number;
+            /** Numéro d'identifiant unique du site d'injection */
             unique_identification_number: string;
+            /** Raccordement à un site d'injection mutualisé */
             is_shared_injection_site?: boolean;
+            /** N° de compteur associé au site d'injection */
             meter_number?: string | null;
+            /** Le site d'injection est différent du site de production */
             is_different_from_production_site?: boolean;
+            /** Adresse du site d'injection (Numéro et rue) */
             company_address?: string | null;
+            /** Commune */
             city?: string | null;
+            /** Code postal */
             postal_code?: string | null;
+            /** Type de réseau */
             network_type?: components["schemas"]["NetworkTypeEnum"] | null;
+            /** Nom du gestionnaire de réseau */
             network_manager_name?: string | null;
             producer: number;
         };
         BiomethaneInjectionSiteInputRequest: {
+            /** Numéro d'identifiant unique du site d'injection */
             unique_identification_number: string;
+            /** Raccordement à un site d'injection mutualisé */
             is_shared_injection_site?: boolean;
+            /** N° de compteur associé au site d'injection */
             meter_number?: string | null;
+            /** Le site d'injection est différent du site de production */
             is_different_from_production_site?: boolean;
+            /** Adresse du site d'injection (Numéro et rue) */
             company_address?: string | null;
+            /** Commune */
             city?: string | null;
+            /** Code postal */
             postal_code?: string | null;
+            /** Type de réseau */
             network_type: components["schemas"]["NetworkTypeEnum"] | null;
+            /** Nom du gestionnaire de réseau */
             network_manager_name: string | null;
         };
         BiomethaneProducer: {
@@ -3569,23 +3882,42 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /** Code INSEE */
             insee_code?: string | null;
+            /** Type d'installation */
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
+            /** Votre site dispose-t-il d'un agrément sanitaire ? */
             has_sanitary_approval?: boolean;
+            /** N° Agrément sanitaire */
             sanitary_approval_number?: string | null;
+            /** Disposez vous d'une dérogation à l'hygiénisation? */
             has_hygienization_exemption?: boolean;
+            /** Si oui, dérogation à l'hygiénisation : */
             hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
+            /** N° ICPE */
             icpe_number?: string | null;
+            /** Régime ICPE */
             icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+            /** Type de voie */
             process_type?: components["schemas"]["ProcessTypeEnum"] | null;
+            /** Procédé méthanisation */
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
-            /** Format: double */
+            /**
+             * Rendement moyen de l'épurateur de l'installation (%)
+             * Format: double
+             */
             production_efficiency?: number | null;
+            /** Présence d'un hygiénisateur */
             has_hygienization_unit?: boolean;
+            /** Existence d'un procédé de valorisation du CO2 ? */
             has_co2_valorization_process?: boolean;
+            /** Le digestat subit-il une séparation de phase? */
             has_digestate_phase_separation?: boolean;
+            /** Étapes complémentaires de traitement du digestat brut */
             raw_digestate_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase liquide */
             liquid_phase_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase solide */
             solid_phase_treatment_steps?: string | null;
             country?: number | null;
             created_by?: number | null;
@@ -3606,23 +3938,42 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /** Code INSEE */
             insee_code?: string | null;
+            /** Type d'installation */
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
+            /** Votre site dispose-t-il d'un agrément sanitaire ? */
             has_sanitary_approval?: boolean;
+            /** N° Agrément sanitaire */
             sanitary_approval_number?: string | null;
+            /** Disposez vous d'une dérogation à l'hygiénisation? */
             has_hygienization_exemption?: boolean;
+            /** Si oui, dérogation à l'hygiénisation : */
             hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
+            /** N° ICPE */
             icpe_number?: string | null;
+            /** Régime ICPE */
             icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+            /** Type de voie */
             process_type?: components["schemas"]["ProcessTypeEnum"] | null;
+            /** Procédé méthanisation */
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
-            /** Format: double */
+            /**
+             * Rendement moyen de l'épurateur de l'installation (%)
+             * Format: double
+             */
             production_efficiency?: number | null;
+            /** Présence d'un hygiénisateur */
             has_hygienization_unit?: boolean;
+            /** Existence d'un procédé de valorisation du CO2 ? */
             has_co2_valorization_process?: boolean;
+            /** Le digestat subit-il une séparation de phase? */
             has_digestate_phase_separation?: boolean;
+            /** Étapes complémentaires de traitement du digestat brut */
             raw_digestate_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase liquide */
             liquid_phase_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase solide */
             solid_phase_treatment_steps?: string | null;
             country?: number | null;
             created_by?: number | null;
@@ -3632,19 +3983,37 @@ export interface components {
             origin_country: components["schemas"]["Country"];
             feedstock: components["schemas"]["FeedStockClassification"];
             producer: components["schemas"]["EntityPreview"];
+            /** Provenance */
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
+            /** Type de CIVE */
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            /** Précisez la culture */
             culture_details?: string | null;
+            /** Type de collecte */
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
+            /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
-            /** Format: double */
+            /**
+             * Ratio de matière sèche - tMS/tMS (%)
+             * Format: double
+             */
             dry_matter_ratio_percent?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage
+             * Format: double
+             */
             volume?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
-            /** Format: double */
+            /**
+             * Distance moyenne pondérée d'approvisionnement (km)
+             * Format: double
+             */
             average_weighted_distance_km?: number | null;
-            /** Format: double */
+            /**
+             * Distance maximale (km)
+             * Format: double
+             */
             maximum_distance_km?: number | null;
             supply_plan: number;
         };
@@ -3665,6 +4034,7 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
@@ -3683,6 +4053,7 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
         };
         /** @description Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche). */
@@ -3695,15 +4066,29 @@ export interface components {
             readonly material_unit: string;
             readonly type_cive: string;
             readonly collection_type: string;
+            /** Précisez la culture */
             culture_details?: string | null;
-            /** Format: double */
+            /**
+             * Ratio de matière sèche - tMS/tMS (%)
+             * Format: double
+             */
             dry_matter_ratio_percent?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage
+             * Format: double
+             */
             volume?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
-            /** Format: double */
+            /**
+             * Distance moyenne pondérée d'approvisionnement (km)
+             * Format: double
+             */
             average_weighted_distance_km?: number | null;
-            /** Format: double */
+            /**
+             * Distance maximale (km)
+             * Format: double
+             */
             maximum_distance_km?: number | null;
         };
         /**
@@ -5045,11 +5430,11 @@ export interface components {
             renewable_energy_share: number;
             credited_entity: components["schemas"]["OperationEntity"];
             debited_entity: components["schemas"]["OperationEntity"];
-            /**  entity */
+            /** entity */
             readonly _entity: string;
             from_depot: components["schemas"]["OperationDepot"];
             to_depot: components["schemas"]["OperationDepot"];
-            /**  depot */
+            /** depot */
             readonly _depot: string;
             readonly export_country: components["schemas"]["Country"];
             export_recipient?: string;
@@ -5123,11 +5508,11 @@ export interface components {
             renewable_energy_share: number;
             credited_entity: components["schemas"]["OperationEntity"];
             debited_entity: components["schemas"]["OperationEntity"];
-            /**  entity */
+            /** entity */
             readonly _entity: string;
             from_depot: components["schemas"]["OperationDepot"];
             to_depot: components["schemas"]["OperationDepot"];
-            /**  depot */
+            /** depot */
             readonly _depot: string;
             export_country?: number | null;
             /** Format: date-time */
@@ -5424,10 +5809,16 @@ export interface components {
             is_open?: boolean;
         };
         PatchedBiomethaneDigestateStorageInputRequest: {
+            /** Type de stockage */
             type?: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity?: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
         };
         PatchedBiomethaneSupplyInputCreateRequest: {
@@ -5446,6 +5837,7 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
         };
         /** @description Serializer for updating the status of a DoubleCountingApplication. */
@@ -6051,8 +6443,10 @@ export interface components {
         UpdatedQuotasRequest: {
             approved_quotas: number[][];
         };
-        /** @description Serializer for creating new users. Includes required fields
-         *     and repeated password validation. */
+        /**
+         * @description Serializer for creating new users. Includes required fields
+         *     and repeated password validation.
+         */
         UserCreation: {
             /**
              * Adresse électronique
@@ -6062,8 +6456,10 @@ export interface components {
             /** Nom */
             name: string;
         };
-        /** @description Serializer for creating new users. Includes required fields
-         *     and repeated password validation. */
+        /**
+         * @description Serializer for creating new users. Includes required fields
+         *     and repeated password validation.
+         */
         UserCreationRequest: {
             /**
              * Adresse électronique
@@ -6537,13 +6933,17 @@ export interface operations {
                 page_size?: number;
                 /** @description A search term. */
                 search?: string;
-                /** @description * `IN_PROGRESS` - IN_PROGRESS
-                 *     * `DECLARED` - DECLARED */
+                /**
+                 * @description * `IN_PROGRESS` - IN_PROGRESS
+                 *     * `DECLARED` - DECLARED
+                 */
                 status?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus[];
-                /** @description * `2011` - 2011
+                /**
+                 * @description * `2011` - 2011
                  *     * `2020` - 2020
                  *     * `2021` - 2021
-                 *     * `2023` - 2023 */
+                 *     * `2023` - 2023
+                 */
                 tariff_reference?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference[];
             };
             header?: never;
@@ -6574,13 +6974,17 @@ export interface operations {
                 ordering?: string;
                 /** @description A search term. */
                 search?: string;
-                /** @description * `IN_PROGRESS` - IN_PROGRESS
-                 *     * `DECLARED` - DECLARED */
+                /**
+                 * @description * `IN_PROGRESS` - IN_PROGRESS
+                 *     * `DECLARED` - DECLARED
+                 */
                 status?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus[];
-                /** @description * `2011` - 2011
+                /**
+                 * @description * `2011` - 2011
                  *     * `2020` - 2020
                  *     * `2021` - 2021
-                 *     * `2023` - 2023 */
+                 *     * `2023` - 2023
+                 */
                 tariff_reference?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference[];
             };
             header?: never;
@@ -7442,6 +7846,31 @@ export interface operations {
             };
         };
     };
+    biomethane_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
+                /** @description Year of the declaration. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     biomethane_injection_site_retrieve: {
         parameters: {
             query: {
@@ -7603,8 +8032,10 @@ export interface operations {
                 producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `INTERNAL` - Interne
-                 *     * `EXTERNAL` - Externe */
+                /**
+                 * @description * `INTERNAL` - Interne
+                 *     * `EXTERNAL` - Externe
+                 */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
@@ -7818,8 +8249,10 @@ export interface operations {
                 producer_name?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `INTERNAL` - Interne
-                 *     * `EXTERNAL` - Externe */
+                /**
+                 * @description * `INTERNAL` - Interne
+                 *     * `EXTERNAL` - Externe
+                 */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
                 /** @description Year of the supply plan. */
                 year: number;
@@ -7952,7 +8385,8 @@ export interface operations {
                 certificate_id?: string;
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -7961,7 +8395,8 @@ export interface operations {
                  *     * `producer` - Producer
                  *     * `-producer` - Producer (décroissant)
                  *     * `certificate_id` - Certificate id
-                 *     * `-certificate_id` - Certificate id (décroissant) */
+                 *     * `-certificate_id` - Certificate id (décroissant)
+                 */
                 order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8019,7 +8454,8 @@ export interface operations {
                 certificate_id?: string;
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -8028,7 +8464,8 @@ export interface operations {
                  *     * `producer` - Producer
                  *     * `-producer` - Producer (décroissant)
                  *     * `certificate_id` - Certificate id
-                 *     * `-certificate_id` - Certificate id (décroissant) */
+                 *     * `-certificate_id` - Certificate id (décroissant)
+                 */
                 order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8059,7 +8496,8 @@ export interface operations {
         parameters: {
             query?: {
                 certificate_id?: string;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -8068,7 +8506,8 @@ export interface operations {
                  *     * `producer` - Producer
                  *     * `-producer` - Producer (décroissant)
                  *     * `certificate_id` - Certificate id
-                 *     * `-certificate_id` - Certificate id (décroissant) */
+                 *     * `-certificate_id` - Certificate id (décroissant)
+                 */
                 order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8099,7 +8538,8 @@ export interface operations {
                 certificate_id?: string;
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -8108,7 +8548,8 @@ export interface operations {
                  *     * `producer` - Producer
                  *     * `-producer` - Producer (décroissant)
                  *     * `certificate_id` - Certificate id
-                 *     * `-certificate_id` - Certificate id (décroissant) */
+                 *     * `-certificate_id` - Certificate id (décroissant)
+                 */
                 order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8141,7 +8582,8 @@ export interface operations {
                 certificate_id?: string;
                 /** @description Filter string to apply */
                 filter?: string;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -8150,7 +8592,8 @@ export interface operations {
                  *     * `producer` - Producer
                  *     * `-producer` - Producer (décroissant)
                  *     * `certificate_id` - Certificate id
-                 *     * `-certificate_id` - Certificate id (décroissant) */
+                 *     * `-certificate_id` - Certificate id (décroissant)
+                 */
                 order_by?: PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8503,7 +8946,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryFilter;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -8514,7 +8958,8 @@ export interface operations {
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
                  *     * `certificate_id` - Certificate id
-                 *     * `-certificate_id` - Certificate id (décroissant) */
+                 *     * `-certificate_id` - Certificate id (décroissant)
+                 */
                 order_by?: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8573,7 +9018,8 @@ export interface operations {
                 certificate_id?: string;
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -8584,7 +9030,8 @@ export interface operations {
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
                  *     * `certificate_id` - Certificate id
-                 *     * `-certificate_id` - Certificate id (décroissant) */
+                 *     * `-certificate_id` - Certificate id (décroissant)
+                 */
                 order_by?: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8743,7 +9190,8 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 operating_unit?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
@@ -8754,7 +9202,8 @@ export interface operations {
                  *     * `operating_unit` - Operating unit
                  *     * `-operating_unit` - Operating unit (décroissant)
                  *     * `source` - Source
-                 *     * `-source` - Source (décroissant) */
+                 *     * `-source` - Source (décroissant)
+                 */
                 order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -8762,18 +9211,22 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
-                /** @description * `1` - T1
+                /**
+                 * @description * `1` - T1
                  *     * `2` - T2
                  *     * `3` - T3
-                 *     * `4` - T4 */
+                 *     * `4` - T4
+                 */
                 quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `MANUAL` - MANUAL
+                /**
+                 * @description * `MANUAL` - MANUAL
                  *     * `METER_READINGS` - METER_READINGS
                  *     * `QUALICHARGE` - QUALICHARGE
                  *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
-                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
+                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
+                 */
                 source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
                 year?: number;
             };
@@ -8813,10 +9266,12 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 station_id?: string[];
-                /** @description * `NO_ONE` - NO_ONE
+                /**
+                 * @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC
                  *     * `CPO` - CPO
-                 *     * `BOTH` - BOTH */
+                 *     * `BOTH` - BOTH
+                 */
                 validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[];
                 year?: number;
             };
@@ -8959,10 +9414,12 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 station_id?: string[];
-                /** @description * `NO_ONE` - NO_ONE
+                /**
+                 * @description * `NO_ONE` - NO_ONE
                  *     * `DGEC` - DGEC
                  *     * `CPO` - CPO
-                 *     * `BOTH` - BOTH */
+                 *     * `BOTH` - BOTH
+                 */
                 validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[];
                 year?: number;
             };
@@ -9063,7 +9520,8 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter;
                 operating_unit?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
@@ -9074,22 +9532,27 @@ export interface operations {
                  *     * `operating_unit` - Operating unit
                  *     * `-operating_unit` - Operating unit (décroissant)
                  *     * `source` - Source
-                 *     * `-source` - Source (décroissant) */
+                 *     * `-source` - Source (décroissant)
+                 */
                 order_by?: PathsApiElecProvisionCertificatesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                /** @description * `1` - T1
+                /**
+                 * @description * `1` - T1
                  *     * `2` - T2
                  *     * `3` - T3
-                 *     * `4` - T4 */
+                 *     * `4` - T4
+                 */
                 quarter?: PathsApiElecProvisionCertificatesGetParametersQueryQuarter[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `MANUAL` - MANUAL
+                /**
+                 * @description * `MANUAL` - MANUAL
                  *     * `METER_READINGS` - METER_READINGS
                  *     * `QUALICHARGE` - QUALICHARGE
                  *     * `ENR_RATIO_COMPENSATION` - ENR_RATIO_COMPENSATION
-                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION */
+                 *     * `ADMIN_ERROR_COMPENSATION` - ADMIN_ERROR_COMPENSATION
+                 */
                 source?: PathsApiElecProvisionCertificatesGetParametersQuerySource[];
                 year?: number;
             };
@@ -9175,7 +9638,8 @@ export interface operations {
                 cpo?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description * `1` - 1
+                /**
+                 * @description * `1` - 1
                  *     * `2` - 2
                  *     * `3` - 3
                  *     * `4` - 4
@@ -9186,10 +9650,12 @@ export interface operations {
                  *     * `9` - 9
                  *     * `10` - 10
                  *     * `11` - 11
-                 *     * `12` - 12 */
+                 *     * `12` - 12
+                 */
                 month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -9204,7 +9670,8 @@ export interface operations {
                  *     * `transfer_date` - Transfer date
                  *     * `-transfer_date` - Transfer date (décroissant)
                  *     * `consumption_date` - Consumption date
-                 *     * `-consumption_date` - Consumption date (décroissant) */
+                 *     * `-consumption_date` - Consumption date (décroissant)
+                 */
                 order_by?: PathsApiElecTransferCertificatesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -9215,8 +9682,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 status?: string;
-                /** @description * `true` - True
-                 *     * `false` - False */
+                /**
+                 * @description * `true` - True
+                 *     * `false` - False
+                 */
                 used_in_tiruert?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 year?: number;
             };
@@ -9375,7 +9844,8 @@ export interface operations {
                 entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter;
-                /** @description * `1` - 1
+                /**
+                 * @description * `1` - 1
                  *     * `2` - 2
                  *     * `3` - 3
                  *     * `4` - 4
@@ -9386,10 +9856,12 @@ export interface operations {
                  *     * `9` - 9
                  *     * `10` - 10
                  *     * `11` - 11
-                 *     * `12` - 12 */
+                 *     * `12` - 12
+                 */
                 month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -9404,15 +9876,18 @@ export interface operations {
                  *     * `transfer_date` - Transfer date
                  *     * `-transfer_date` - Transfer date (décroissant)
                  *     * `consumption_date` - Consumption date
-                 *     * `-consumption_date` - Consumption date (décroissant) */
+                 *     * `-consumption_date` - Consumption date (décroissant)
+                 */
                 order_by?: PathsApiElecTransferCertificatesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A search term. */
                 search?: string;
                 status?: string;
-                /** @description * `true` - True
-                 *     * `false` - False */
+                /**
+                 * @description * `true` - True
+                 *     * `false` - False
+                 */
                 used_in_tiruert?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 year?: number;
             };
@@ -10878,7 +11353,8 @@ export interface operations {
                 origin_depot_id?: number;
                 public_only?: boolean;
                 query?: string;
-                /** @description * `TRUCK` - Routier
+                /**
+                 * @description * `TRUCK` - Routier
                  *     * `BARGE` - Barge
                  *     * `TRAIN` - Train
                  *     * `SHIP` - Bateau
@@ -10887,7 +11363,8 @@ export interface operations {
                  *     * `PIPELINE_LHP` - Oléoduc LHP
                  *     * `PIPELINE_ODC` - Oléoduc ODC
                  *     * `PIPELINE_SPMR` - Oléoduc SPMR
-                 *     * `PIPELINE_SPSE` - Oléoduc SPSE */
+                 *     * `PIPELINE_SPSE` - Oléoduc SPSE
+                 */
                 shipping_method?: PathsApiResourcesAirportsGetParametersQueryShipping_method;
             };
             header?: never;
@@ -11199,7 +11676,8 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -11210,7 +11688,8 @@ export interface operations {
                  *     * `ghg_reduction` - Ghg reduction
                  *     * `-ghg_reduction` - Ghg reduction (décroissant)
                  *     * `added_by` - Added by
-                 *     * `-added_by` - Added by (décroissant) */
+                 *     * `-added_by` - Added by (décroissant)
+                 */
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -11223,8 +11702,10 @@ export interface operations {
                 production_site?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `HISTORY` - HISTORY
-                 *     * `AVAILABLE` - AVAILABLE */
+                /**
+                 * @description * `HISTORY` - HISTORY
+                 *     * `AVAILABLE` - AVAILABLE
+                 */
                 status?: PathsApiSafTicketSourcesGetParametersQueryStatus;
                 supplier?: string[];
                 year?: number;
@@ -11310,7 +11791,8 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 feedstock?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -11321,7 +11803,8 @@ export interface operations {
                  *     * `ghg_reduction` - Ghg reduction
                  *     * `-ghg_reduction` - Ghg reduction (décroissant)
                  *     * `added_by` - Added by
-                 *     * `-added_by` - Added by (décroissant) */
+                 *     * `-added_by` - Added by (décroissant)
+                 */
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -11330,8 +11813,10 @@ export interface operations {
                 production_site?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `HISTORY` - HISTORY
-                 *     * `AVAILABLE` - AVAILABLE */
+                /**
+                 * @description * `HISTORY` - HISTORY
+                 *     * `AVAILABLE` - AVAILABLE
+                 */
                 status?: PathsApiSafTicketSourcesGetParametersQueryStatus;
                 supplier?: string[];
                 year?: number;
@@ -11363,7 +11848,8 @@ export interface operations {
                 feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketSourcesFiltersGetParametersQueryFilter;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -11374,7 +11860,8 @@ export interface operations {
                  *     * `ghg_reduction` - Ghg reduction
                  *     * `-ghg_reduction` - Ghg reduction (décroissant)
                  *     * `added_by` - Added by
-                 *     * `-added_by` - Added by (décroissant) */
+                 *     * `-added_by` - Added by (décroissant)
+                 */
                 order_by?: PathsApiSafTicketSourcesGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -11383,8 +11870,10 @@ export interface operations {
                 production_site?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `HISTORY` - HISTORY
-                 *     * `AVAILABLE` - AVAILABLE */
+                /**
+                 * @description * `HISTORY` - HISTORY
+                 *     * `AVAILABLE` - AVAILABLE
+                 */
                 status?: PathsApiSafTicketSourcesGetParametersQueryStatus;
                 supplier?: string[];
                 year?: number;
@@ -11445,7 +11934,8 @@ export interface operations {
         parameters: {
             query: {
                 client?: string[];
-                /** @description * `Producteur` - Producteur
+                /**
+                 * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
                  *     * `Administration` - Administration
                  *     * `Trader` - Trader
@@ -11457,20 +11947,26 @@ export interface operations {
                  *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
-                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane */
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 */
                 client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
-                /** @description * `MAC` - MAC
-                 *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
+                /**
+                 * @description * `MAC` - MAC
+                 *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+                 */
                 consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[];
                 country_of_origin?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description * `ETS_VALUATION` - Valorisation ETS
+                /**
+                 * @description * `ETS_VALUATION` - Valorisation ETS
                  *     * `OUTSIDE_ETS` - Hors ETS (volontaire)
-                 *     * `NOT_CONCERNED` - Non concerné */
+                 *     * `NOT_CONCERNED` - Non concerné
+                 */
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -11489,7 +11985,8 @@ export interface operations {
                  *     * `consumption_type` - Consumption type
                  *     * `-consumption_type` - Consumption type (décroissant)
                  *     * `reception_airport` - Reception airport
-                 *     * `-reception_airport` - Reception airport (décroissant) */
+                 *     * `-reception_airport` - Reception airport (décroissant)
+                 */
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -11503,9 +12000,11 @@ export interface operations {
                 reception_airport?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `PENDING` - En attente
+                /**
+                 * @description * `PENDING` - En attente
                  *     * `ACCEPTED` - Accepté
-                 *     * `REJECTED` - Refusé */
+                 *     * `REJECTED` - Refusé
+                 */
                 status?: PathsApiSafTicketsGetParametersQueryStatus;
                 supplier?: string[];
                 year?: number;
@@ -11697,7 +12196,8 @@ export interface operations {
         parameters: {
             query: {
                 client?: string[];
-                /** @description * `Producteur` - Producteur
+                /**
+                 * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
                  *     * `Administration` - Administration
                  *     * `Trader` - Trader
@@ -11709,20 +12209,26 @@ export interface operations {
                  *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
-                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane */
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 */
                 client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
-                /** @description * `MAC` - MAC
-                 *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
+                /**
+                 * @description * `MAC` - MAC
+                 *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+                 */
                 consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[];
                 country_of_origin?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description * `ETS_VALUATION` - Valorisation ETS
+                /**
+                 * @description * `ETS_VALUATION` - Valorisation ETS
                  *     * `OUTSIDE_ETS` - Hors ETS (volontaire)
-                 *     * `NOT_CONCERNED` - Non concerné */
+                 *     * `NOT_CONCERNED` - Non concerné
+                 */
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -11741,7 +12247,8 @@ export interface operations {
                  *     * `consumption_type` - Consumption type
                  *     * `-consumption_type` - Consumption type (décroissant)
                  *     * `reception_airport` - Reception airport
-                 *     * `-reception_airport` - Reception airport (décroissant) */
+                 *     * `-reception_airport` - Reception airport (décroissant)
+                 */
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -11751,9 +12258,11 @@ export interface operations {
                 reception_airport?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `PENDING` - En attente
+                /**
+                 * @description * `PENDING` - En attente
                  *     * `ACCEPTED` - Accepté
-                 *     * `REJECTED` - Refusé */
+                 *     * `REJECTED` - Refusé
+                 */
                 status?: PathsApiSafTicketsGetParametersQueryStatus;
                 supplier?: string[];
                 year?: number;
@@ -11778,7 +12287,8 @@ export interface operations {
         parameters: {
             query: {
                 client?: string[];
-                /** @description * `Producteur` - Producteur
+                /**
+                 * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
                  *     * `Administration` - Administration
                  *     * `Trader` - Trader
@@ -11790,22 +12300,28 @@ export interface operations {
                  *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
-                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane */
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 */
                 client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
-                /** @description * `MAC` - MAC
-                 *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT */
+                /**
+                 * @description * `MAC` - MAC
+                 *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+                 */
                 consumption_type?: PathsApiSafTicketsGetParametersQueryConsumption_type[];
                 country_of_origin?: string[];
                 /** @description Entity ID */
                 entity_id: number;
-                /** @description * `ETS_VALUATION` - Valorisation ETS
+                /**
+                 * @description * `ETS_VALUATION` - Valorisation ETS
                  *     * `OUTSIDE_ETS` - Hors ETS (volontaire)
-                 *     * `NOT_CONCERNED` - Non concerné */
+                 *     * `NOT_CONCERNED` - Non concerné
+                 */
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketsFiltersGetParametersQueryFilter;
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -11824,7 +12340,8 @@ export interface operations {
                  *     * `consumption_type` - Consumption type
                  *     * `-consumption_type` - Consumption type (décroissant)
                  *     * `reception_airport` - Reception airport
-                 *     * `-reception_airport` - Reception airport (décroissant) */
+                 *     * `-reception_airport` - Reception airport (décroissant)
+                 */
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -11834,9 +12351,11 @@ export interface operations {
                 reception_airport?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `PENDING` - En attente
+                /**
+                 * @description * `PENDING` - En attente
                  *     * `ACCEPTED` - Accepté
-                 *     * `REJECTED` - Refusé */
+                 *     * `REJECTED` - Refusé
+                 */
                 status?: PathsApiSafTicketsGetParametersQueryStatus;
                 supplier?: string[];
                 year?: number;
@@ -11957,7 +12476,8 @@ export interface operations {
                 entity_id: number;
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -11970,7 +12490,8 @@ export interface operations {
                  *     * `quantity` - Quantity
                  *     * `-quantity` - Quantity (décroissant)
                  *     * `from_to` - From to
-                 *     * `-from_to` - From to (décroissant) */
+                 *     * `-from_to` - From to (décroissant)
+                 */
                 order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
@@ -12218,7 +12739,8 @@ export interface operations {
                 entity_id: number;
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -12231,7 +12753,8 @@ export interface operations {
                  *     * `quantity` - Quantity
                  *     * `-quantity` - Quantity (décroissant)
                  *     * `from_to` - From to
-                 *     * `-from_to` - From to (décroissant) */
+                 *     * `-from_to` - From to (décroissant)
+                 */
                 order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
@@ -12268,7 +12791,8 @@ export interface operations {
                 filter: PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter;
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -12281,7 +12805,8 @@ export interface operations {
                  *     * `quantity` - Quantity
                  *     * `-quantity` - Quantity (décroissant)
                  *     * `from_to` - From to
-                 *     * `-from_to` - From to (décroissant) */
+                 *     * `-from_to` - From to (décroissant)
+                 */
                 order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[];
                 period?: string[];
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
@@ -12387,18 +12912,21 @@ export interface operations {
         parameters: {
             query: {
                 biofuel?: string[];
-                /** @description * `CONV` - Conventionnel
+                /**
+                 * @description * `CONV` - Conventionnel
                  *     * `ANN-IX-A` - ANNEXE IX-A
                  *     * `ANN-IX-B` - ANNEXE IX-B
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
-                 *     * `EP2AM` - EP2AM */
+                 *     * `EP2AM` - EP2AM
+                 */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 from_to?: string;
-                /** @description * `INCORPORATION` - INCORPORATION
+                /**
+                 * @description * `INCORPORATION` - INCORPORATION
                  *     * `CESSION` - CESSION
                  *     * `TENEUR` - TENEUR
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
@@ -12409,9 +12937,11 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
-                 *     * `ACQUISITION` - ACQUISITION */
+                 *     * `ACQUISITION` - ACQUISITION
+                 */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -12436,7 +12966,8 @@ export interface operations {
                  *     * `pending_operations` - pending_operations
                  *     * `-pending_operations` - pending_operations (descending)
                  *     * `saved_emissions` - saved_emissions
-                 *     * `-saved_emissions` - saved_emissions (descending) */
+                 *     * `-saved_emissions` - saved_emissions (descending)
+                 */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -12447,21 +12978,27 @@ export interface operations {
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `ESSENCE` - ESSENCE
+                /**
+                 * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
-                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
+                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
-                /** @description * `PENDING` - PENDING
+                /**
+                 * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
                  *     * `REJECTED` - REJECTED
                  *     * `CANCELED` - CANCELED
                  *     * `DECLARED` - DECLARED
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
-                 *     * `DRAFT` - DRAFT */
+                 *     * `DRAFT` - DRAFT
+                 */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
-                /** @description * `CREDIT` - CREDIT
-                 *     * `DEBIT` - DEBIT */
+                /**
+                 * @description * `CREDIT` - CREDIT
+                 *     * `DEBIT` - DEBIT
+                 */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
@@ -12728,12 +13265,14 @@ export interface operations {
         parameters: {
             query: {
                 biofuel?: string[];
-                /** @description * `CONV` - Conventionnel
+                /**
+                 * @description * `CONV` - Conventionnel
                  *     * `ANN-IX-A` - ANNEXE IX-A
                  *     * `ANN-IX-B` - ANNEXE IX-B
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
-                 *     * `EP2AM` - EP2AM */
+                 *     * `EP2AM` - EP2AM
+                 */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 /** @description Date from where to calculate teneur and quantity */
                 date_from?: string;
@@ -12745,7 +13284,8 @@ export interface operations {
                 ges_bound_min?: number;
                 /** @description Group by sector, lot or depot. */
                 group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by;
-                /** @description * `INCORPORATION` - INCORPORATION
+                /**
+                 * @description * `INCORPORATION` - INCORPORATION
                  *     * `CESSION` - CESSION
                  *     * `TENEUR` - TENEUR
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
@@ -12756,9 +13296,11 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
-                 *     * `ACQUISITION` - ACQUISITION */
+                 *     * `ACQUISITION` - ACQUISITION
+                 */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -12783,7 +13325,8 @@ export interface operations {
                  *     * `pending_operations` - pending_operations
                  *     * `-pending_operations` - pending_operations (descending)
                  *     * `saved_emissions` - saved_emissions
-                 *     * `-saved_emissions` - saved_emissions (descending) */
+                 *     * `-saved_emissions` - saved_emissions (descending)
+                 */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -12794,21 +13337,27 @@ export interface operations {
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `ESSENCE` - ESSENCE
+                /**
+                 * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
-                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
+                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
-                /** @description * `PENDING` - PENDING
+                /**
+                 * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
                  *     * `REJECTED` - REJECTED
                  *     * `CANCELED` - CANCELED
                  *     * `DECLARED` - DECLARED
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
-                 *     * `DRAFT` - DRAFT */
+                 *     * `DRAFT` - DRAFT
+                 */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
-                /** @description * `CREDIT` - CREDIT
-                 *     * `DEBIT` - DEBIT */
+                /**
+                 * @description * `CREDIT` - CREDIT
+                 *     * `DEBIT` - DEBIT
+                 */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
@@ -12833,12 +13382,14 @@ export interface operations {
         parameters: {
             query: {
                 biofuel?: string[];
-                /** @description * `CONV` - Conventionnel
+                /**
+                 * @description * `CONV` - Conventionnel
                  *     * `ANN-IX-A` - ANNEXE IX-A
                  *     * `ANN-IX-B` - ANNEXE IX-B
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
-                 *     * `EP2AM` - EP2AM */
+                 *     * `EP2AM` - EP2AM
+                 */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
                 /** @description Authorised entity ID. */
@@ -12846,7 +13397,8 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter;
                 from_to?: string;
-                /** @description * `INCORPORATION` - INCORPORATION
+                /**
+                 * @description * `INCORPORATION` - INCORPORATION
                  *     * `CESSION` - CESSION
                  *     * `TENEUR` - TENEUR
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
@@ -12857,9 +13409,11 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
-                 *     * `ACQUISITION` - ACQUISITION */
+                 *     * `ACQUISITION` - ACQUISITION
+                 */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -12884,28 +13438,35 @@ export interface operations {
                  *     * `pending_operations` - pending_operations
                  *     * `-pending_operations` - pending_operations (descending)
                  *     * `saved_emissions` - saved_emissions
-                 *     * `-saved_emissions` - saved_emissions (descending) */
+                 *     * `-saved_emissions` - saved_emissions (descending)
+                 */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `ESSENCE` - ESSENCE
+                /**
+                 * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
-                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
+                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
-                /** @description * `PENDING` - PENDING
+                /**
+                 * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
                  *     * `REJECTED` - REJECTED
                  *     * `CANCELED` - CANCELED
                  *     * `DECLARED` - DECLARED
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
-                 *     * `DRAFT` - DRAFT */
+                 *     * `DRAFT` - DRAFT
+                 */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
-                /** @description * `CREDIT` - CREDIT
-                 *     * `DEBIT` - DEBIT */
+                /**
+                 * @description * `CREDIT` - CREDIT
+                 *     * `DEBIT` - DEBIT
+                 */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
@@ -12954,12 +13515,14 @@ export interface operations {
         parameters: {
             query: {
                 biofuel?: string[];
-                /** @description * `CONV` - Conventionnel
+                /**
+                 * @description * `CONV` - Conventionnel
                  *     * `ANN-IX-A` - ANNEXE IX-A
                  *     * `ANN-IX-B` - ANNEXE IX-B
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
-                 *     * `EP2AM` - EP2AM */
+                 *     * `EP2AM` - EP2AM
+                 */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
                 /** @description Authorised entity ID. */
@@ -12967,7 +13530,8 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter;
                 from_to?: string;
-                /** @description * `INCORPORATION` - INCORPORATION
+                /**
+                 * @description * `INCORPORATION` - INCORPORATION
                  *     * `CESSION` - CESSION
                  *     * `TENEUR` - TENEUR
                  *     * `LIVRAISON_DIRECTE` - LIVRAISON_DIRECTE
@@ -12978,9 +13542,11 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
-                 *     * `ACQUISITION` - ACQUISITION */
+                 *     * `ACQUISITION` - ACQUISITION
+                 */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
-                /** @description Ordre
+                /**
+                 * @description Ordre
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -13005,28 +13571,35 @@ export interface operations {
                  *     * `pending_operations` - pending_operations
                  *     * `-pending_operations` - pending_operations (descending)
                  *     * `saved_emissions` - saved_emissions
-                 *     * `-saved_emissions` - saved_emissions (descending) */
+                 *     * `-saved_emissions` - saved_emissions (descending)
+                 */
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
-                /** @description * `ESSENCE` - ESSENCE
+                /**
+                 * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
-                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR */
+                 *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
-                /** @description * `PENDING` - PENDING
+                /**
+                 * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
                  *     * `REJECTED` - REJECTED
                  *     * `CANCELED` - CANCELED
                  *     * `DECLARED` - DECLARED
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
-                 *     * `DRAFT` - DRAFT */
+                 *     * `DRAFT` - DRAFT
+                 */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
-                /** @description * `CREDIT` - CREDIT
-                 *     * `DEBIT` - DEBIT */
+                /**
+                 * @description * `CREDIT` - CREDIT
+                 *     * `DEBIT` - DEBIT
+                 */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;

@@ -10,12 +10,15 @@ import useEntity from "common/hooks/entity"
 import { PropsWithChildren } from "react"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 import { useAnnualDeclarationYears } from "biomethane/hooks/use-annual-declaration-years"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { DownloadDeclarationButton } from "biomethane/components/download-declaration-button"
 
 // Digestate / Energy / Supply Plan pages share the same page header and the same declaration validation logic
 export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const years = useAnnualDeclarationYears()
+  const { selectedEntityId } = useSelectedEntity()
 
   const { selectedYear, annualDeclaration, isDeclarationInCurrentPeriod } =
     useAnnualDeclaration()
@@ -32,14 +35,27 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
   return (
     <Main>
       <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
-        <Select
-          options={years.options}
-          value={selectedYear}
-          onChange={years.setYear}
-        />
+        <Row
+          style={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "var(--spacing-m)",
+          }}
+        >
+          <Select
+            options={years.options}
+            value={selectedYear}
+            onChange={years.setYear}
+          />
 
+          <DownloadDeclarationButton
+            year={selectedYear}
+            producerId={selectedEntityId ?? undefined}
+          />
+        </Row>
         <AnnualDeclarationStatusBadge status={status} />
       </Row>
+      <Row></Row>
       {annualDeclaration?.is_open && entity.canWrite() && (
         <Notice
           variant={

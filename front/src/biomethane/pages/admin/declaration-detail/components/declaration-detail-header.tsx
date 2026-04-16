@@ -9,6 +9,7 @@ import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { ToggleDeclarationButton } from "./toggle-declaration-button"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
+import { DownloadDeclarationButton } from "biomethane/components/download-declaration-button"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -26,7 +27,7 @@ export const DeclarationDetailHeader = ({
 }: DeclarationDetailHeaderProps) => {
   const { selectedEntityId } = useSelectedEntity()
   const { canEditDeclaration } = useBiomethanePermissions()
-  const { annualDeclaration } = useAnnualDeclaration()
+  const { annualDeclaration, selectedYear } = useAnnualDeclaration()
   const navigate = useNavigate()
   const routes = useRoutes()
 
@@ -44,6 +45,12 @@ export const DeclarationDetailHeader = ({
       />
 
       <SelectYears key={selectedEntityId} />
+      {selectedEntityId && (
+        <DownloadDeclarationButton
+          year={selectedYear}
+          producerId={selectedEntityId}
+        />
+      )}
       {/* Only display the open badge if the declaration exists */}
       {annualDeclaration?.status && (
         <AnnualDeclarationStatusBadge status={annualDeclaration.status} />
