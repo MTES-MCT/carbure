@@ -24,6 +24,7 @@ import {
 } from "./energy-efficiency.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { getYesNoOptions } from "common/utils/normalizers"
+import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -55,8 +56,8 @@ export function EnergyEfficiency({
   energy,
   contract,
 }: {
-  energy?: BiomethaneEnergy
-  contract?: BiomethaneContract
+  readonly energy?: BiomethaneEnergy
+  readonly contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
 
@@ -64,6 +65,7 @@ export function EnergyEfficiency({
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
   const displayConditionalSections = useDisplayConditionalSectionsEnergy()
+  const { energy: energyRules } = useBiomethaneBusinessRules()
 
   const handleSubmit = async () => saveEnergy.execute(extractValues(value))
 
@@ -98,18 +100,18 @@ export function EnergyEfficiency({
           <Grid cols={1} gap="lg">
             {displayConditionalSections && (
               <>
-                {energyTypesIncludesBiogazOrBiomethane(
-                  energy?.energy_types
-                ) && (
-                  <NumberInput
-                    readOnly={!isEditing}
-                    label={biogazOrBiomethaneAutoconsumptionLabel}
-                    min={0}
-                    {...bind("self_consumed_biogas_or_biomethane_kwh")}
-                    required
-                    step={0.01}
-                  />
-                )}
+                {energyTypesIncludesBiogazOrBiomethane(energy?.energy_types) &&
+                  energyRules.energyEfficiency
+                    .displaySelfConsumedBiogasOrBiomethaneField && (
+                    <NumberInput
+                      readOnly={!isEditing}
+                      label={biogazOrBiomethaneAutoconsumptionLabel}
+                      min={0}
+                      {...bind("self_consumed_biogas_or_biomethane_kwh")}
+                      required
+                      step={0.01}
+                    />
+                  )}
                 {!isTariffReference2023 && (
                   <>
                     <NumberInput

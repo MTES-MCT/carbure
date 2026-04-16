@@ -13,11 +13,16 @@ import {
   buildProductionRules,
   ProductionBusinessRules,
 } from "./business-rules/production.rules"
+import {
+  buildEnergyRules,
+  EnergyBusinessRules,
+} from "./business-rules/energy.rules"
 
 export interface BiomethaneBusinessRulesManager {
   digestate: DigestateBusinessRules
   common: CommonBusinessRules
   production: ProductionBusinessRules
+  energy: EnergyBusinessRules
 }
 
 /**
@@ -46,6 +51,7 @@ export const useBiomethaneBusinessRules =
         digestate: buildDigestateBusinessRules(context),
         common: buildCommonRules(context),
         production: buildProductionRules(context),
+        energy: buildEnergyRules(context),
       }),
       [context]
     )

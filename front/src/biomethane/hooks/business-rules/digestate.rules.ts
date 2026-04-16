@@ -15,6 +15,6 @@ export const buildDigestateBusinessRules = (
 ): DigestateBusinessRules => {
   const commonRules = buildCommonRules(ctx)
   return {
-    shouldFillDigestate: commonRules.isISDNDInstallation,
+    shouldFillDigestate: !commonRules.isISDNDInstallation,
   }
 }
