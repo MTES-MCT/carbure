@@ -84,7 +84,10 @@ def save_redcert_certificates() -> Tuple[int, list, list]:
         status = REDCERT_STATUS.get(cert["State"])
         valid_from = datetime.datetime.strptime(cert["Valid from"], "%d.%m.%Y").date()
         valid_until = datetime.datetime.strptime(cert["Valid until"], "%d.%m.%Y").date()
-       
+
+        if status is None: 
+            continue
+        
         if existing_cert is not None and existing_cert.status == GenericCertificate.VALID and status != GenericCertificate.VALID:
             invalidated.append(existing_cert)
 

@@ -1,7 +1,8 @@
 from django.test import TestCase
 
 from core.tests_utils import PermissionTestMixin
-from entity.permissions import HasDgddiWriteRights, HasOperatorRights, HasOperatorWriteRights
+from entity.permissions import HasDgddiWriteRights
+from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights
 from tiruert.views.operation import OperationViewSet
 
 
@@ -13,7 +14,7 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             OperationViewSet,
             [
-                # Write actions require HasOperatorWriteRights
+                # Write actions require HasTiruertWriteRights (OPERATOR, PRODUCER, TRADER with RW/ADMIN)
                 (
                     [
                         "reject",
@@ -27,17 +28,17 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                         "export_operations_to_excel",
                         "declare_teneur",
                     ],
-                    [HasOperatorWriteRights()],
+                    [HasTiruertWriteRights()],
                 ),
                 # Correct action requires HasDgddiWriteRights
                 (
                     ["correct"],
                     [HasDgddiWriteRights()],
                 ),
-                # Read actions require HasOperatorRights OR HasDgddiWriteRights
+                # Read actions require HasTiruertRightsBalanceAndOperations OR HasDgddiWriteRights
                 (
                     ["list", "retrieve", "balance", "filters", "filters_balance"],
-                    [(HasOperatorRights | HasDgddiWriteRights)()],
+                    [(HasTiruertRightsBalanceAndOperations | HasDgddiWriteRights)()],
                 ),
             ],
         )

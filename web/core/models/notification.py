@@ -1,0 +1,62 @@
+from django.db import models
+
+from .entity import Entity
+
+
+class CarbureNotification(models.Model):
+    CORRECTION_REQUEST = "CORRECTION_REQUEST"
+    CORRECTION_DONE = "CORRECTION_DONE"
+    LOTS_REJECTED = "LOTS_REJECTED"
+    LOTS_RECEIVED = "LOTS_RECEIVED"
+    LOTS_RECALLED = "LOTS_RECALLED"
+    CERTIFICATE_EXPIRED = "CERTIFICATE_EXPIRED"
+    CERTIFICATE_REJECTED = "CERTIFICATE_REJECTED"
+    DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
+    DECLARATION_CANCELLED = "DECLARATION_CANCELLED"
+    DECLARATION_REMINDER = "DECLARATION_REMINDER"
+    METER_READINGS_APP_STARTED = "METER_READINGS_APP_STARTED"
+    METER_READINGS_APP_ENDING_SOON = "METER_READINGS_APP_ENDING_SOON"
+    SAF_TICKET_RECEIVED = "SAF_TICKET_RECEIVED"
+    SAF_TICKET_ACCEPTED = "SAF_TICKET_ACCEPTED"
+    SAF_TICKET_REJECTED = "SAF_TICKET_REJECTED"
+    LOTS_UPDATED_BY_ADMIN = "LOTS_UPDATED_BY_ADMIN"
+    LOTS_DELETED_BY_ADMIN = "LOTS_DELETED_BY_ADMIN"
+    ELEC_TRANSFER_CERTIFICATE = "ELEC_TRANSFER_CERTIFICATE"
+
+    NOTIFICATION_TYPES = [
+        (CORRECTION_REQUEST, CORRECTION_REQUEST),
+        (CORRECTION_DONE, CORRECTION_DONE),
+        (LOTS_REJECTED, LOTS_REJECTED),
+        (LOTS_RECEIVED, LOTS_RECEIVED),
+        (LOTS_RECALLED, LOTS_RECALLED),
+        (CERTIFICATE_EXPIRED, CERTIFICATE_EXPIRED),
+        (CERTIFICATE_REJECTED, CERTIFICATE_REJECTED),
+        (DECLARATION_VALIDATED, DECLARATION_VALIDATED),
+        (DECLARATION_CANCELLED, DECLARATION_CANCELLED),
+        (METER_READINGS_APP_STARTED, METER_READINGS_APP_STARTED),
+        (METER_READINGS_APP_ENDING_SOON, METER_READINGS_APP_ENDING_SOON),
+        (DECLARATION_REMINDER, DECLARATION_REMINDER),
+        (SAF_TICKET_REJECTED, SAF_TICKET_REJECTED),
+        (SAF_TICKET_ACCEPTED, SAF_TICKET_ACCEPTED),
+        (SAF_TICKET_RECEIVED, SAF_TICKET_RECEIVED),
+        (LOTS_UPDATED_BY_ADMIN, LOTS_UPDATED_BY_ADMIN),
+        (LOTS_DELETED_BY_ADMIN, LOTS_DELETED_BY_ADMIN),
+        (ELEC_TRANSFER_CERTIFICATE, ELEC_TRANSFER_CERTIFICATE),
+    ]
+
+    dest = models.ForeignKey(Entity, blank=False, null=False, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(null=False, blank=False, auto_now_add=True)
+    type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPES)
+    acked = models.BooleanField(default=False)
+    send_by_email = models.BooleanField(default=False)
+    notify_administrator = models.BooleanField(default=False)
+    email_sent = models.BooleanField(default=False)
+    meta = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        db_table = "carbure_notifications"
+        indexes = [
+            models.Index(fields=["dest_id"]),
+        ]
+        verbose_name = "CarbureNotification"
+        verbose_name_plural = "CarbureNotifications"

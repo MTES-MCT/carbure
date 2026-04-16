@@ -3,7 +3,6 @@ from xml.etree import ElementTree as ET
 
 from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter
 from edelivery.ebms.ntr import from_national_trade_register
-from transactions.helpers import compute_lot_quantity
 
 
 class Transaction:
@@ -17,6 +16,9 @@ class Transaction:
     def biofuel_code(self):
         return self.xml_root_element.find("./MATERIAL_CODE").text
 
+    def carbure_status(self):
+        return StatusConverter().from_udb(self.status())
+
     def client_id(self):
         return self.xml_root_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text
 
@@ -26,28 +28,15 @@ class Transaction:
             return None
 
         delivery_date_text = delivery_date_element.text
-        return datetime.fromisoformat(delivery_date_text)
+        return datetime.fromisoformat(delivery_date_text).date()
 
     def feedstock_code(self):
         xpath = "./EO_TRANS_DETAIL_MATERIALS/POINT_OF_ORIGIN_MATERIAL_DATA/MATERIAL_CODE"
         return self.xml_root_element.find(xpath).text
 
-    def iso_format_delivery_date(self):
-        return self.delivery_date() and self.delivery_date().date().isoformat()
-
-    def iso_format_loading_date(self):
-        return self.loading_date().date().isoformat()
-
     def loading_date(self):
         loading_date_text = self.xml_root_element.find("./LOADING_DATE").text
-        return datetime.fromisoformat(loading_date_text)
-
-    def period(self):
-        period_date = self.period_date()
-        return period_date.year * 100 + period_date.month
-
-    def period_date(self):
-        return self.delivery_date() or self.loading_date()
+        return datetime.fromisoformat(loading_date_text).date()
 
     def status(self):
         return self.xml_root_element.find("./STATUS").text
@@ -56,29 +45,27 @@ class Transaction:
         return self.xml_root_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
 
     def to_lot_attributes(self):
-        biofuel = MaterialConverter().from_udb_biofuel_code(self.biofuel_code())
-        client = from_national_trade_register(self.client_id())
-        feedstock = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
-        lot_status = StatusConverter().from_udb(self.status())
+        biofuel_code = MaterialConverter().from_udb_biofuel_code(self.biofuel_code())
+        client_id = from_national_trade_register(self.client_id())
+        feedstock_code = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
+        lot_status = self.carbure_status()
         quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
-        computed_quantity_data = compute_lot_quantity(biofuel, quantity_data)
-        supplier = from_national_trade_register(self.supplier_id())
+        supplier_id = from_national_trade_register(self.supplier_id())
 
         attributes = {
-            "biofuel": biofuel,
-            "carbure_client": client,
-            "carbure_supplier": supplier,
-            "dispatch_date": self.iso_format_loading_date(),
-            "feedstock": feedstock,
-            "period": self.period(),
+            "biofuel_code": biofuel_code,
+            "carbure_client_id": client_id,
+            "carbure_supplier_id": supplier_id,
+            "dispatch_date": self.loading_date(),
+            "feedstock_code": feedstock_code,
             "lot_status": lot_status,
-            "year": self.year(),
-            **computed_quantity_data,
+            "udb_transaction_id": self.udb_transaction_id(),
+            **quantity_data,
         }
 
-        iso_format_delivery_date = self.iso_format_delivery_date()
-        if iso_format_delivery_date is not None:
-            attributes["delivery_date"] = iso_format_delivery_date
+        delivery_date = self.delivery_date()
+        if delivery_date is not None:
+            attributes["delivery_date"] = delivery_date
 
         return attributes
 
@@ -91,6 +78,3 @@ class Transaction:
 
     def unit(self):
         return self.xml_root_element.find("./EO_TRANS_DETAIL_MATERIALS/MEASURE_UNIT").text
-
-    def year(self):
-        return self.period_date().year

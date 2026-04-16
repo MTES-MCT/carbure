@@ -516,3 +516,64 @@ class OperationServiceProcessEP2LotsTest(TestCase):
 
         # Should return 3 lots: 2 from EP2 split + 1 unchanged CONV
         self.assertEqual(len(result_lots), 3)
+
+
+class OperationServiceCreditedEntityFallbackTest(TestCase):
+    """Test that credited_entity falls back to carbure_producer then carbure_supplier."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.operator = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        cls.trader = Entity.objects.filter(entity_type=Entity.TRADER).first()
+        cls.depot = Depot.objects.first()
+        cls.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
+        cls.biofuel_eth = Biocarburant.objects.get(code="ETH")
+
+    def test_credited_entity_uses_carbure_supplier_when_no_client(self):
+        """Should use carbure_supplier as credited_entity when carbure_client is None."""
+        lot = CarbureLotFactory.create(
+            carbure_client=None,
+            carbure_supplier=self.trader,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="RFC",
+            volume=1000,
+            ghg_total=5.0,
+            carbure_delivery_site=self.depot,
+        )
+
+        lots_qs = CarbureLot.objects.filter(id=lot.id)
+        OperationService.create_operations_from_lots(lots_qs)
+
+        operation = Operation.objects.get(type=Operation.MAC_BIO)
+        self.assertEqual(operation.credited_entity, self.trader)
+
+    def test_credited_entity_prefers_carbure_client_over_supplier(self):
+        """Should prefer carbure_client over carbure_supplier."""
+        lot = CarbureLotFactory.create(
+            carbure_client=self.operator,
+            carbure_supplier=self.trader,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="RFC",
+            volume=1000,
+            ghg_total=5.0,
+            carbure_delivery_site=self.depot,
+        )
+
+        lots_qs = CarbureLot.objects.filter(id=lot.id)
+        OperationService.create_operations_from_lots(lots_qs)
+
+        operation = Operation.objects.get(type=Operation.MAC_BIO)
+        self.assertEqual(operation.credited_entity, self.operator)

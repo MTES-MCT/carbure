@@ -7,7 +7,6 @@ from .elec_operation import ElecOperationInputSerializer
 from .elec_operation import ElecOperationListSerializer
 from .elec_operation import ElecOperationSerializer
 from .elec_operation import ElecOperationUpdateSerializer
-from .objective import ObjectiveAdminInputSerializer
 from .objective import ObjectiveInputSerializer
 from .objective import ObjectiveOutputSerializer
 from .operation import OperationCorrectionSerializer

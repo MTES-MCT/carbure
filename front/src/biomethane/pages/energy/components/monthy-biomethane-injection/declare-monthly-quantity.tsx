@@ -15,6 +15,7 @@ import { useDeclareMonthlyQuantityColumns } from "./declare-monthly-quantity.hoo
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useNavigate } from "react-router-dom"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useInjectionHoursCoherence } from "./declare-monthly-quantity.coherence.hooks"
 
 type BiomethaneEnergyMonthlyReportForm = Partial<
   Exclude<BiomethaneEnergyMonthlyReportDataRequest, "month">
@@ -46,6 +47,10 @@ export const DeclareMonthlyQuantity = ({
   const notifyError = useNotifyError()
   const navigate = useNavigate()
   const { selectedYear, annualDeclarationKey } = useAnnualDeclaration()
+  const {
+    validateInjectionHoursCoherence,
+    buildInjectionHoursCoherenceErrorMessage,
+  } = useInjectionHoursCoherence()
   // État pour stocker toutes les valeurs du tableau
   const [tableData, setTableData] = useState<
     BiomethaneEnergyMonthlyReportForm[]
@@ -66,6 +71,18 @@ export const DeclareMonthlyQuantity = ({
   })
 
   const handleSubmit = () => {
+    const coherenceErrors = validateInjectionHoursCoherence(
+      tableData,
+      selectedYear
+    )
+
+    if (coherenceErrors.length > 0) {
+      notify(buildInjectionHoursCoherenceErrorMessage(coherenceErrors), {
+        variant: "danger",
+      })
+      return
+    }
+
     const data = tableData.map((item) => ({
       month: item.month,
       injected_volume_nm3: item.injected_volume_nm3 ?? 0,

@@ -52,6 +52,7 @@ if settings.WITH_UDB_ACCEPTANCE_DATA:
                 "certificate_holder": producer_data["name"],
                 "valid_from": certificate_data["valid_from"],
                 "valid_until": certificate_data["valid_until"],
+                "last_status_update": certificate_data["valid_from"],
             },
         )
 

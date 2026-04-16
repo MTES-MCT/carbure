@@ -3,6 +3,7 @@ import unicodedata
 
 from django.db import transaction
 from django.http.response import JsonResponse
+from django.utils.translation import gettext as _
 
 from carbure.tasks import background_bulk_scoring
 from core.common import (
@@ -43,19 +44,21 @@ def add_excel(request, *args, **kwargs):
     data = convert_template_row_to_formdata(entity, d, filepath)
     nb_total = 0
     nb_valid = 0
-    nb_invalid = 0
     lots = []
     lots_errors = []
     with transaction.atomic():
         for row in data:
             lot_obj, errors = construct_carbure_lot(d, entity, row)
-            if not lot_obj:
-                nb_invalid += 1
+            if lot_obj is None:
+                stock_id = row.get("carbure_stock_id", "")
+                return JsonResponse(
+                    {"status": "error", "message": _(f"Fichier non importé. Le stock {stock_id} n'existe pas.")}, status=400
+                )
             else:
                 nb_valid += 1
+                lots.append(lot_obj)
+                lots_errors.append(errors)
             nb_total += 1
-            lots.append(lot_obj)
-            lots_errors.append(errors)
         lots_created = bulk_insert_lots(entity, lots, lots_errors, d)
         if len(lots_created) == 0:
             return JsonResponse({"status": "error", "message": "Something went wrong"}, status=500)
@@ -82,6 +85,6 @@ def add_excel(request, *args, **kwargs):
     return JsonResponse(
         {
             "status": "success",
-            "data": {"lots": nb_total, "valid": nb_valid, "invalid": nb_invalid},
+            "data": {"lots": nb_total, "valid": nb_valid},
         }
     )

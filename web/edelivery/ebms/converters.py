@@ -1,4 +1,4 @@
-from core.models import Biocarburant, CarbureLot, MatierePremiere
+from core.models import CarbureLot
 
 
 class UDBConversionError(RuntimeError):
@@ -29,12 +29,10 @@ class MaterialConverter(BaseConverter):
         return self.conversion_mapping[udb_code]
 
     def from_udb_biofuel_code(self, udb_code):
-        carbure_code = self._from_udb_material(udb_code)
-        return Biocarburant.objects.get(code=carbure_code)
+        return self._from_udb_material(udb_code)
 
     def from_udb_feedstock_code(self, udb_code):
-        carbure_code = self._from_udb_material(udb_code)
-        return MatierePremiere.objects.get(code=carbure_code)
+        return self._from_udb_material(udb_code)
 
 
 class QuantityConverter(BaseConverter):

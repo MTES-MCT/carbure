@@ -4,24 +4,10 @@ import { useTranslation } from "react-i18next"
 import { useParams } from "react-router-dom"
 import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
-import {
-  getAdminObjectivesEntity,
-  getObjectives,
-} from "accounting/pages/teneur/api"
+import { getObjectives } from "accounting/pages/teneur/api"
 import { ObjectivesContent } from "accounting/pages/teneur/components/objectives-content"
 
 const YEAR = 2025
-
-async function getAdminObjectives(
-  entityId: number,
-  year: number,
-  selectedEntityId: number | undefined
-) {
-  if (selectedEntityId !== undefined) {
-    return getAdminObjectivesEntity(entityId, year, selectedEntityId)
-  }
-  return getObjectives(entityId, year, true)
-}
 
 export const Objectives = () => {
   const entity = useEntity()
@@ -30,7 +16,7 @@ export const Objectives = () => {
 
   const selectedEntityId = entityId ? Number(entityId) : undefined
 
-  const { result: objectivesData, loading } = useQuery(getAdminObjectives, {
+  const { result: objectivesData, loading } = useQuery(getObjectives, {
     key: `admin-objectives-${entity.id}-${selectedEntityId ?? "consolidated"}`,
     params: [entity.id, YEAR, selectedEntityId],
   })

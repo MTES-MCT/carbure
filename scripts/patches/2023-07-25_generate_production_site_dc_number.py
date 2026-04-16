@@ -1,4 +1,4 @@
-# pipenv run python scripts/patches/2023-07-25_generate_production_site_dc_number.py
+# uv run python scripts/patches/2023-07-25_generate_production_site_dc_number.py
 import os
 
 import django

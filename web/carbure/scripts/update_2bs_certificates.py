@@ -70,13 +70,13 @@ def download_certificates(url: str, status: str) -> None:
     html_io = StringIO(str(table))
     df = pd.read_html(html_io)[0]
     df = df[~df[DBS_NUMBER_KEY].isnull()]  # Pour une raison inconnue, la ligne de coordonnées est dupliquée
-    pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), str(date.today())), index=False)
+    pd.DataFrame.to_csv(df, "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status, str(date.today())), index=False)
 
 
 def save_2bs_certificates(status: str) -> Tuple[int, list]:
     today = date.today()
     certificates = []
-    filename = "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status, today.strftime("%Y-%m-%d"))
+    filename = "%s/Certificates2BS_%s_%s.csv" % (DESTINATION_FOLDER, status.lower(), today.strftime("%Y-%m-%d"))
     csvfile = open(filename, "r")
     reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
     i = 0

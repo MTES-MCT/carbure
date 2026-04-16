@@ -7,13 +7,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import Entity, ExternalAdminRights, UserRights
-from core.permissions import HasAdminRights, HasUserRights
+from core.models import Entity
 from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilterForBalance
 from tiruert.filters.elec_operation import ElecOperationFilterForBalance
 from tiruert.models import MacFossilFuel, Objective, Operation
 from tiruert.models.elec_operation import ElecOperation
-from tiruert.serializers import ObjectiveAdminInputSerializer, ObjectiveInputSerializer, ObjectiveOutputSerializer
+from tiruert.permissions import HasTiruertRightsObjectives
+from tiruert.serializers import ObjectiveInputSerializer, ObjectiveOutputSerializer
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.objective_snapshot import ObjectiveSnapshotService
@@ -36,6 +36,16 @@ from tiruert.views.mixins import UnitMixin
             description="Year of the objectives",
             required=True,
         ),
+        OpenApiParameter(
+            name="selected_entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description=(
+                "Target entity ID (admin only). If provided, returns objectives for this entity. "
+                "If omitted for admin, returns aggregated objectives for all tiruert-liable entities."
+            ),
+            required=False,
+        ),
     ]
 )
 class ObjectiveViewSet(UnitMixin, GenericViewSet):
@@ -45,66 +55,53 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
     http_method_names = ["get"]
     pagination_class = None
 
+    def get_permissions(self):
+        return [HasTiruertRightsObjectives()]
+
     def initial(self, request, *args, **kwargs):
         """Reset execution cache for each request to avoid concurrency issues."""
         super().initial(request, *args, **kwargs)
         self._execution_cache = {}
 
-    def get_permissions(self):
-        if self.action in ["get_objectives_admin_view", "get_agregated_objectives_admin_view"]:
-            return [HasAdminRights(allow_external=[ExternalAdminRights.TIRIB_STATS])]
-        else:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW, UserRights.RO], [Entity.OPERATOR])]
-
     def get_objectives(self, request):
-        """Get all objectives"""
+        """Get objectives.
+
+        Behavior depends on the entity type of the authenticated user:
+        - Operator: returns objectives for their own entity.
+        - Admin/ExternalAdmin: if `selected_entity_id` is provided, returns objectives
+          for that specific entity. Otherwise, returns aggregated objectives for all
+          tiruert-liable entities.
+        """
 
         data = ObjectiveInputSerializer(data=request.GET)
         if not data.is_valid():
             return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        result = self._get_objectives(request, request.entity.id)
+        entity = request.entity
+
+        if entity.entity_type in (Entity.ADMIN, Entity.EXTERNAL_ADMIN):
+            selected_entity = data.validated_data.get("selected_entity_id")
+            if selected_entity:
+                # Admin view for a specific entity
+                return self._get_objectives_response(request, selected_entity.id)
+            else:
+                # Admin aggregated view across all tiruert-liable entities
+                return self._get_aggregated_objectives(request)
+        else:
+            # Operator view: own entity
+            return self._get_objectives_response(request, entity.id)
+
+    def _get_objectives_response(self, request, target_entity_id):
+        """Build and return objectives response for a single entity."""
+        result = self._get_objectives(request, target_entity_id)
         if result is None:
             return Response({}, status=status.HTTP_200_OK)
 
         serializer = self.get_serializer(result)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="selected_entity_id",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                description="Entity's objectives.",
-                required=True,
-            ),
-        ]
-    )
-    def get_objectives_admin_view(self, request):
-        """Get objectives for a specific entity - admin view"""
-
-        data = ObjectiveAdminInputSerializer(data=request.GET)
-        if not data.is_valid():
-            return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        selected_entity = data.validated_data.get("selected_entity_id")
-
-        result = self._get_objectives(request, selected_entity.id)
-        if result is None:
-            return Response({}, status=status.HTTP_200_OK)
-
-        serializer = self.get_serializer(result)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def get_agregated_objectives_admin_view(self, request):
-        """Get agregated objectives for all entities - admin view"""
-
-        data = ObjectiveInputSerializer(data=request.GET)
-        if not data.is_valid():
-            return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        # Retrieve all entities that are liable for Tiruert
+    def _get_aggregated_objectives(self, request):
+        """Aggregate objectives for all tiruert-liable entities (admin view)."""
         tiruert_liable_entities = Entity.objects.filter(is_tiruert_liable=True)
         if not tiruert_liable_entities.exists():
             return Response({"error": "No Tiruert liable entities found."}, status=status.HTTP_404_NOT_FOUND)

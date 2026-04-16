@@ -356,7 +356,7 @@ if DEBUG:
     MIDDLEWARE.remove("csp.middleware.CSPMiddleware")
 
 
-if env("TEST"):
+if env("TEST") or DEBUG:
     HUEY["immediate"] = True  # allow running background tasks immediately so we can have instant results in tests
 
 

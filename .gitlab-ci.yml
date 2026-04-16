@@ -27,7 +27,6 @@ variables:
   MYSQL_DATABASE: carbure_mysql_test_db
   MYSQL_ROOT_PASSWORD: carbure_mysql_ci_db_password
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PIPENV_VENV_IN_PROJECT: true
 
 # job: run linting and tests for backend
 check-backend:
@@ -40,9 +39,9 @@ check-backend:
     - export CARBURE_HOME=$(pwd)
     - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/$MYSQL_DATABASE
     - export REDIS_URL=redis://redis:6379
-    - pipenv run ruff check
-    - pipenv run ruff format --check
-    - TEST=1 pipenv run python web/manage.py test web
+    - uv run ruff check
+    - uv run ruff format --check
+    - TEST=1 uv run python web/manage.py test web
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_AUTO_MERGE_ENABLED == "true"
       when: never
@@ -85,13 +84,13 @@ pass:
   cache:
     - key:
         files:
-          - Pipfile.lock
+          - uv.lock
       paths:
         - .cache/pip/
         - .venv/
   before_script:
-    - pip install pipenv
-    - pipenv install --dev --deploy --ignore-pipfile
+    - pip install uv
+    - uv sync --frozen
   rules:
     - changes:
         - web/**/*

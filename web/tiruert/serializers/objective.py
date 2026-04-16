@@ -51,9 +51,6 @@ class ObjectiveOutputSerializer(serializers.Serializer):
 class ObjectiveInputSerializer(serializers.Serializer):
     entity_id = serializers.IntegerField(required=True)
     year = serializers.IntegerField(required=True)
-
-
-class ObjectiveAdminInputSerializer(ObjectiveInputSerializer):
     selected_entity_id = serializers.PrimaryKeyRelatedField(
-        queryset=Entity.objects.filter(is_tiruert_liable=True), required=True
+        queryset=Entity.objects.filter(is_tiruert_liable=True), required=False, allow_null=True, default=None
     )

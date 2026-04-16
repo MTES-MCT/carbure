@@ -1,5 +1,4 @@
 import datetime
-import traceback
 from typing import List
 
 import dateutil
@@ -346,7 +345,6 @@ def fill_volume_info(lot, data):
             lot.weight = quantity["weight"]
             lot.lhv_amount = quantity["lhv_amount"]
         except Exception:
-            traceback.print_exc()
             errors.append(
                 GenericError(
                     lot=lot,
@@ -561,7 +559,9 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot = existing_lot
     else:
         lot = CarbureLot()
+    lot.dispatch_date = try_get_date(data.get("dispatch_date", None))
     lot.free_field = data.get("free_field", None)
+    lot.udb_transaction_id = data.get("udb_transaction_id", "")
     lot.added_by = entity
     carbure_stock_id = data.get("carbure_stock_id", False)
 
@@ -576,7 +576,6 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
             try:
                 parent_stock = CarbureStock.objects.get(carbure_id=carbure_stock_id)
             except Exception:
-                # traceback.print_exc()
                 print("Could not find stock %s" % (carbure_stock_id))
                 return None, []
         original_lot = parent_stock.get_parent_lot()
