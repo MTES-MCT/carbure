@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
+from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse, GetCertificateResponse
 from edelivery.ebms.requests import (
     BaseRequest,
     EOGetTransactionRequest,
@@ -142,6 +142,10 @@ class GetCertificateRequestTest(BaseRequestTest):
 </udb:GetCertificateRequest>"""
 
         self.assertEqual(expected_body, request.body)
+
+    def test_associates_to_GetCertificateResponse_class(self):
+        request = GetCertificateRequest()
+        self.assertIs(GetCertificateResponse, request.response_class)
 
 
 class GetSourcingContactByIdRequestTest(BaseRequestTest):

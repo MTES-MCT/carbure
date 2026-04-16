@@ -81,3 +81,8 @@ class EOGetTransactionResponse(BaseRequestResponse):
         existing_lot.lot_status = transaction.carbure_status()
         existing_lot.save()
         return {"newLotCreated": new_lot_created, "id": existing_lot.id}
+
+
+class GetCertificateResponse(BaseRequestResponse):
+    def post_retrieval_action_result(self):
+        return self.payload

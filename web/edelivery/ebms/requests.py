@@ -4,7 +4,7 @@ from os import environ
 
 from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.adapters.zip_utils import zip_and_stream_udb_request
-from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
+from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse, GetCertificateResponse
 
 
 class BaseRequest:
@@ -64,7 +64,7 @@ class GetCertificateRequest(BaseRequest):
         body = """\
 <udb:GetCertificateRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
 </udb:GetCertificateRequest>"""
-        super().__init__(body)
+        super().__init__(body, GetCertificateResponse)
 
 
 class GetSourcingContactByIdRequest(BaseRequest):
