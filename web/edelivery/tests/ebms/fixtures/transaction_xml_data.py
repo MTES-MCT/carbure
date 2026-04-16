@@ -34,7 +34,7 @@ def pos_data_fragment(etd):
 </POS_DATA>"""
 
 
-def transaction_data(
+def transaction_xml_data(
     biofuel=None,
     client_id="FR_SIREN_CD222222222",
     delivery_date="2025-01-30T00:00:00.000Z",
