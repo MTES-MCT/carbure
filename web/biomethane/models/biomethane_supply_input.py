@@ -14,10 +14,10 @@ class BiomethaneSupplyInput(models.Model):
         (INTERNAL, "Interne"),
         (EXTERNAL, "Externe"),
     ]
-    source = models.CharField(max_length=10, choices=SOURCE_CHOICES, null=True, blank=True)
+    source = models.CharField(verbose_name="Provenance", max_length=10, choices=SOURCE_CHOICES, null=True, blank=True)
 
     # Intrant (matière première)
-    feedstock = models.ForeignKey("core.MatierePremiere", null=True, on_delete=models.PROTECT)
+    feedstock = models.ForeignKey("core.MatierePremiere", verbose_name="Intrant", null=True, on_delete=models.PROTECT)
 
     # Type de CIVE (obligatoire si feedstock en catégorie CIVE)
     SUMMER = "SUMMER"
@@ -26,10 +26,12 @@ class BiomethaneSupplyInput(models.Model):
         (SUMMER, "Été"),
         (WINTER, "Hiver"),
     ]
-    type_cive = models.CharField(max_length=10, choices=TYPE_CIVE_CHOICES, null=True, blank=True)
+    type_cive = models.CharField(
+        verbose_name="Type de CIVE", max_length=10, choices=TYPE_CIVE_CHOICES, null=True, blank=True
+    )
 
     # Détails culture (obligatoire pour certains codes intrant)
-    culture_details = models.CharField(max_length=255, null=True, blank=True)
+    culture_details = models.CharField(verbose_name="Précisez la culture", max_length=255, null=True, blank=True)
 
     # Type de collecte (obligatoire pour certains intrants déchets)
     PRIVATE = "PRIVATE"
@@ -38,7 +40,9 @@ class BiomethaneSupplyInput(models.Model):
         (PRIVATE, "Issus de collecteurs privés"),
         (LOCAL, "Issus de collectivités locales"),
     ]
-    collection_type = models.CharField(max_length=10, choices=COLLECTION_TYPE_CHOICES, null=True, blank=True)
+    collection_type = models.CharField(
+        verbose_name="Type de collecte", max_length=10, choices=COLLECTION_TYPE_CHOICES, null=True, blank=True
+    )
 
     # Unité matière
     DRY = "DRY"
@@ -49,27 +53,31 @@ class BiomethaneSupplyInput(models.Model):
         (WET, "Brute"),
     ]
 
-    material_unit = models.CharField(max_length=5, choices=MATERIAL_UNIT_CHOICES, null=True, blank=True)
+    material_unit = models.CharField(
+        verbose_name="Unité matière", max_length=5, choices=MATERIAL_UNIT_CHOICES, null=True, blank=True
+    )
 
     # Ratio de matière sèche (%) - Que si matière sèche
-    dry_matter_ratio_percent = models.FloatField(null=True, blank=True)
+    dry_matter_ratio_percent = models.FloatField(verbose_name="Ratio de matière sèche - tMS/tMS (%)", null=True, blank=True)
 
     # Volume (tMB ou tMS en fonction du choix)
-    volume = models.FloatField(null=True, blank=True)
+    volume = models.FloatField(verbose_name="Tonnage", null=True, blank=True)
 
     ##  Section Réception
 
     # Pays d'origine
-    origin_country = models.ForeignKey(Pays, on_delete=models.PROTECT, default=1)
+    origin_country = models.ForeignKey(Pays, verbose_name="Pays d'origine", on_delete=models.PROTECT, default=1)
 
     # Département d'origine
-    origin_department = models.CharField(max_length=3, null=True, blank=True)
+    origin_department = models.CharField(verbose_name="Département d'origine", max_length=3, null=True, blank=True)
 
     # Distance moyenne pondérée d'approvisionnement (Km)
-    average_weighted_distance_km = models.FloatField(null=True, blank=True)
+    average_weighted_distance_km = models.FloatField(
+        verbose_name="Distance moyenne pondérée d'approvisionnement (km)", null=True, blank=True
+    )
 
     # Distance maximale (Km)
-    maximum_distance_km = models.FloatField(null=True, blank=True)
+    maximum_distance_km = models.FloatField(verbose_name="Distance maximale (km)", null=True, blank=True)
 
     class Meta:
         db_table = "biomethane_supply_input"

@@ -42,16 +42,28 @@ class BiomethaneContract(models.Model):
         (INSTALLATION_CATEGORY_3, INSTALLATION_CATEGORY_3),
     )
 
-    tariff_reference = models.CharField(choices=TARIFF_REFERENCE_CHOICES, max_length=28, null=True, blank=True)
-    buyer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="buyer", null=True, blank=True)
+    tariff_reference = models.CharField(
+        verbose_name="Référence de l'arrêté tarifaire",
+        choices=TARIFF_REFERENCE_CHOICES,
+        max_length=28,
+        null=True,
+        blank=True,
+    )
+    buyer = models.ForeignKey(
+        Entity, verbose_name="Acheteur", on_delete=models.CASCADE, related_name="buyer", null=True, blank=True
+    )
     producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_contract")
-    installation_category = models.CharField(choices=INSTALLATION_CATEGORIES, max_length=32, null=True, blank=True)
-    cmax = models.FloatField(null=True, blank=True)
-    cmax_annualized = models.BooleanField(default=False, null=True, blank=True)
-    cmax_annualized_value = models.FloatField(null=True, blank=True)
-    pap_contracted = models.FloatField(null=True, blank=True)
-    signature_date = models.DateField(null=True, blank=True)
-    effective_date = models.DateField(null=True, blank=True)
+    installation_category = models.CharField(
+        verbose_name="Catégorie d'installation", choices=INSTALLATION_CATEGORIES, max_length=32, null=True, blank=True
+    )
+    cmax = models.FloatField(verbose_name="Cmax (Nm³/h)", null=True, blank=True)
+    cmax_annualized = models.BooleanField(
+        verbose_name="Annualisation du contrôle de la Cmax", default=False, null=True, blank=True
+    )
+    cmax_annualized_value = models.FloatField(verbose_name="Cmax annualisée (GWhPCS/an)", null=True, blank=True)
+    pap_contracted = models.FloatField(verbose_name="PAP contractualisée (GWhPCS/an)", null=True, blank=True)
+    signature_date = models.DateField(verbose_name="Date de signature", null=True, blank=True)
+    effective_date = models.DateField(verbose_name="Date de prise d'effet", null=True, blank=True)
     conditions_file = models.FileField(storage=private_storage, null=True, blank=True, upload_to=rename_conditions_file)
 
     # List of amendment types that are tracked for the contract when some values are updated
@@ -70,13 +82,27 @@ class BiomethaneContract(models.Model):
     ]
 
     # Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement?
-    has_complementary_investment_aid = models.BooleanField(default=False, null=True, blank=True)
+    has_complementary_investment_aid = models.BooleanField(
+        verbose_name=(
+            "Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement?"
+        ),
+        default=False,
+        null=True,
+        blank=True,
+    )
 
     # Préciser l'organisme qui a attribué l'aide complémentaire (Ademe, Région, Autre)
-    complementary_aid_organisms = models.JSONField(null=True, blank=True, default=list)
+    complementary_aid_organisms = models.JSONField(
+        verbose_name="Aide complémentaire attribuée par", null=True, blank=True, default=list
+    )
 
     # Précisez le nom du ou des organismes publics ayant octroyé l'aide (si "Autre" est sélectionné)
-    complementary_aid_other_organism_name = models.CharField(max_length=255, null=True, blank=True)
+    complementary_aid_other_organism_name = models.CharField(
+        verbose_name="Précisez le nom du ou des organismes publics ayant octroyé l'aide",
+        max_length=255,
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         db_table = "biomethane_contract"

@@ -10,29 +10,39 @@ class BiomethaneEnergy(models.Model):
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_energies")
 
     # Année de déclaration des informations
-    year = models.IntegerField()
+    year = models.IntegerField(verbose_name="Année")
 
     ## Biométhane injecté dans le réseau
 
     # Quantité de biométhane injecté (GWhPCS/an)
-    injected_biomethane_gwh_pcs_per_year = models.FloatField(null=True, blank=True)
+    injected_biomethane_gwh_pcs_per_year = models.FloatField(
+        verbose_name="Quantité de biométhane injecté (GWhPCS/an)", null=True, blank=True
+    )
 
     # Taux de Ch4 dans le biométhane injecté (%)
-    injected_biomethane_ch4_rate_percent = models.FloatField(null=True, blank=True)
+    injected_biomethane_ch4_rate_percent = models.FloatField(
+        verbose_name="Taux de CH4 dans le biométhane injecté (%)", null=True, blank=True
+    )
 
     # PCS du biométhane injecté (kWh/Nm3)
-    injected_biomethane_pcs_kwh_per_nm3 = models.FloatField(null=True, blank=True)
+    injected_biomethane_pcs_kwh_per_nm3 = models.FloatField(
+        verbose_name="PCS du biométhane injecté (kWh/Nm3)", null=True, blank=True
+    )
 
     ## Production de biogaz
 
     # Quantité de biogaz produit (Nm3/an)
-    produced_biogas_nm3_per_year = models.FloatField(null=True, blank=True)
+    produced_biogas_nm3_per_year = models.FloatField(
+        verbose_name="Quantité de biogaz produit (Nm3/an)", null=True, blank=True
+    )
 
     # Quantité de biogaz torché (Nm3/an)
-    flared_biogas_nm3_per_year = models.FloatField(null=True, blank=True)
+    flared_biogas_nm3_per_year = models.FloatField(verbose_name="Quantité de biogaz torché (Nm3/an)", null=True, blank=True)
 
     # Nombre d'heures de fonctionnement de la torchère (h)
-    flaring_operating_hours = models.FloatField(null=True, blank=True)
+    flaring_operating_hours = models.FloatField(
+        verbose_name="Nombre d'heures de fonctionnement de la torchère (h)", null=True, blank=True
+    )
 
     MALFUNCTION_TYPE_CONCEPTION = "CONCEPTION"
 
@@ -78,15 +88,25 @@ class BiomethaneEnergy(models.Model):
     ]
 
     # Besoins en énergie de l'installation de production de biométhane / au chauffage du digesteur
-    attest_no_fossil_for_energy = models.BooleanField(default=False)
+    attest_no_fossil_for_energy = models.BooleanField(
+        verbose_name=(
+            "J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d'origine fossile"
+        ),
+        default=False,
+    )
 
     # Type d'énergie utilisée pour le chauffage du digesteur
     # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
-    # le chauffage du digesteur et l’épuration du biogaz
-    energy_types = models.JSONField(null=True, blank=True, default=list)
+    # le chauffage du digesteur et l'épuration du biogaz
+    energy_types = models.JSONField(
+        verbose_name="Nature de l'énergie utilisée pour les besoins de l'installation",
+        null=True,
+        blank=True,
+        default=list,
+    )
 
     # Précisions
-    energy_details = models.TextField(null=True, blank=True)
+    energy_details = models.TextField(verbose_name="Précisions", null=True, blank=True)
 
     ## Efficacité énergétique
 
@@ -106,30 +126,47 @@ class BiomethaneEnergy(models.Model):
     self_consumed_biogas_or_biomethane_kwh = models.FloatField(null=True, blank=True)
 
     # Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
-    total_unit_electric_consumption_kwe = models.FloatField(null=True, blank=True)
+    total_unit_electric_consumption_kwe = models.FloatField(
+        verbose_name="Consommation électrique soutirée pour l'ensemble de l'unité (kWe)", null=True, blank=True
+    )
 
     # Addition de butane ou propane lors de l'injection du biométhane dans le réseau
-    butane_or_propane_addition = models.BooleanField(default=False)
+    butane_or_propane_addition = models.BooleanField(
+        verbose_name="Addition de butane ou propane lors de l'injection du biométhane dans le réseau",
+        default=False,
+    )
 
     # Quantité de combustible fossile consommé (kWh)
-    fossil_fuel_consumed_kwh = models.FloatField(null=True, blank=True)
+    fossil_fuel_consumed_kwh = models.FloatField(
+        verbose_name="Quantité de combustible fossile consommé (kWh)", null=True, blank=True
+    )
 
     ## Questions diverses
 
     # L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement
     # d'une opposition ou de plaintes de voisinage ?
-    has_opposition_or_complaints_acceptability = models.BooleanField(default=False)
+    has_opposition_or_complaints_acceptability = models.BooleanField(
+        verbose_name=(
+            "L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement "
+            "d'une opposition ou de plaintes de voisinage ?"
+        ),
+        default=False,
+    )
 
     # Nombre de jour travail estimé pour l'activité de méthanisation sur l'année
-    estimated_work_days_acceptability = models.IntegerField(null=True, blank=True)
+    estimated_work_days_acceptability = models.IntegerField(
+        verbose_name="Nombre d'ETP estimé pour l'activité de méthanisation sur l'année", null=True, blank=True
+    )
 
     ## Dysfonctionnements
 
     # Y a-t-il eu des dysfonctionnements ?
-    has_malfunctions = models.BooleanField(default=False)
+    has_malfunctions = models.BooleanField(verbose_name="Y'a t-il eu des dysfonctionnements ?", default=False)
 
     # Durée cumulée du dysfonctionnement (en jours)
-    malfunction_cumulative_duration_days = models.IntegerField(null=True, blank=True)
+    malfunction_cumulative_duration_days = models.IntegerField(
+        verbose_name="Durée cumulée du dysfonctionnement (en jours)", null=True, blank=True
+    )
 
     # Types de dysfonctionnement
     MALFUNCTION_TYPE_CONCEPTION = "CONCEPTION"
@@ -153,16 +190,21 @@ class BiomethaneEnergy(models.Model):
     ]
 
     # Types de dysfonctionnement (peut contenir plusieurs valeurs)
-    malfunction_types = models.JSONField(null=True, blank=True, default=list)
+    malfunction_types = models.JSONField(verbose_name="Types de dysfonctionnement", null=True, blank=True, default=list)
 
     # Précisions sur les dysfonctionnements
-    malfunction_details = models.TextField(null=True, blank=True)
+    malfunction_details = models.TextField(verbose_name="Précisions sur les dysfonctionnements", null=True, blank=True)
 
     # Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux
-    has_injection_difficulties_due_to_network_saturation = models.BooleanField(default=False)
+    has_injection_difficulties_due_to_network_saturation = models.BooleanField(
+        verbose_name="Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux",
+        default=False,
+    )
 
     # Nombre d'heures d'impossibilité d'injection (h)
-    injection_impossibility_hours = models.IntegerField(null=True, blank=True)
+    injection_impossibility_hours = models.IntegerField(
+        verbose_name="Nombre d'heures d'impossibilité d'injection (h)", null=True, blank=True
+    )
 
     class Meta:
         db_table = "biomethane_energy"
