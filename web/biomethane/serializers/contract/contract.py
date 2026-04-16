@@ -24,8 +24,9 @@ class BiomethaneContractSerializer(serializers.ModelSerializer):
 
 
 # Serializer for contract with restricted fields (used for external entities like ADEME)
-class BiomethaneContractRestrictedSerializer(BiomethaneContractSerializer):
+class BiomethaneContractRestrictedSerializer(serializers.ModelSerializer):
     class Meta(BiomethaneContractSerializer.Meta):
+        model = BiomethaneContract
         fields = ["tariff_reference", "installation_category"]
 
 

@@ -1,14 +1,18 @@
 from biomethane.services.ademe import AdemeService
 from core.models import Entity, ExternalAdminRights, UserRights
-from core.permissions import HasAdminRights, UserRightsFactory
+from core.permissions import AdminRightsFactory, HasAdminRights, UserRightsFactory
 
 
 class HasExternalAdminDepartmentsRights(HasAdminRights):
+    external_right = None
     """
     Permission for external admin departments with department-based access control.
     Verifies that the user has access to the production unit's department.
     READ access only.
     """
+
+    def __init__(self):
+        super().__init__(allow_external=[self.external_right], allow_role=None)
 
     def has_object_permission(self, request, view, obj):
         """
@@ -38,26 +42,22 @@ class HasExternalAdminDepartmentsRights(HasAdminRights):
 
 
 class HasDrealRights(HasExternalAdminDepartmentsRights):
+    external_right = ExternalAdminRights.DREAL
     """
     Permission for DREAL with department-based access control.
     Verifies that the user has access to the production unit's department.
     READ access only.
     """
 
-    def __init__(self):
-        super().__init__(allow_external=[ExternalAdminRights.DREAL], allow_role=None)
-
 
 class HasAdemeRights(HasExternalAdminDepartmentsRights):
+    external_right = ExternalAdminRights.ADEME
     """
     Permission for ADEME with department-based access control.
     Verifies that the user has access to the production unit's department.
     Also checks that the external admin is accessing contracts with ademe investment aids.
     READ access only.
     """
-
-    def __init__(self):
-        super().__init__(allow_external=[ExternalAdminRights.ADEME], allow_role=None)
 
     def has_object_permission(self, request, view, obj):
         if not super().has_object_permission(request, view, obj):
@@ -86,7 +86,9 @@ ReadAccessBiomethane = HasBiomethaneProducerRights | HasDrealRights | HasAdemeRi
 # Custom permissions to access specific endpoints
 
 ## Permission to access contract with restricted serializer fields
-HasRestrictedAccessContract = HasAdemeRights
+HasRestrictedAccessContract = AdminRightsFactory(
+    allow_external=[ExternalAdminRights.ADEME],
+)
 
 ## Permission to access injection site endpoint
 CanAccessInjection = HasBiomethaneProducerRights | HasDrealRights
