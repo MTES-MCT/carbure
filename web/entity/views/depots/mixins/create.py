@@ -12,12 +12,10 @@ from drf_spectacular.utils import (
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
-from core.carburetypes import CarbureSanityCheckErrors
 from core.helpers import send_mail
-from core.models import CarbureLot, Entity, GenericError
+from core.models import Entity
 from entity.serializers.depot import CreateDepotSerializer
-from entity.services.geolocation import get_coordinates
+from entity.services.depot import do_create
 
 
 class CreateDepotActionMixin:
@@ -59,30 +57,15 @@ class CreateDepotActionMixin:
     )
     @action(detail=False, methods=["post"], url_path="create-depot")
     def create_depot(self, request):
+        depot_data = request.data
         entity_id = self.request.query_params.get("entity_id")
         entity = Entity.objects.get(id=entity_id)
-        serializer = CreateDepotSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        depot = serializer.save()
-
-        depot.gps_coordinates = get_gps_coordinates(depot)
-        depot.save()
+        depot = do_create(depot_data, entity)
 
         send_email_to_user(entity, depot.name, request)
         send_email_to_dgec(entity, depot.name, request)
 
-        lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site=depot)
-        background_bulk_scoring(lots)
-        background_bulk_sanity_checks(lots)
-        GenericError.objects.filter(lot__in=lots, error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED).delete()
-
         return Response({"status": "success"})
-
-
-def get_gps_coordinates(depot):
-    address = depot.address + " " + depot.postal_code + " " + depot.city + ", " + depot.country.name
-    xy = get_coordinates(address)
-    return f"{xy[0]},{xy[1]}" if xy else None
 
 
 def send_email_to_user(entity, depot_name, request):

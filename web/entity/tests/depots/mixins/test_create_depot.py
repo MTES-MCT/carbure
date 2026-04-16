@@ -21,7 +21,7 @@ class TestCreateDepot(TestCase):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
         self.pays = Pays.objects.filter(code_pays="FR")[0]
 
-    @patch("entity.views.depots.mixins.create.get_coordinates")
+    @patch("entity.services.depot.get_coordinates")
     def test_create_depot_success(self, mock_get_coordinates):
         mock_get_coordinates.return_value = (48.8566, 2.3522)
         params = {
@@ -44,7 +44,7 @@ class TestCreateDepot(TestCase):
         assert new_depot.is_enabled is False
         assert new_depot.gps_coordinates == "48.8566,2.3522"
 
-    @patch("entity.views.depots.mixins.create.get_coordinates")
+    @patch("entity.services.depot.get_coordinates")
     def test_create_depot_fail(self, mock_get_coordinates):
         mock_get_coordinates.return_value = (48.8566, 2.3522)
         params = {

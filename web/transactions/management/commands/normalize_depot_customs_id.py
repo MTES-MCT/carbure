@@ -6,7 +6,7 @@ from django.db import transaction
 
 from core.models import Entity
 from entity.models import EntityScope
-from entity.views.depots.mixins.create import get_gps_coordinates
+from entity.services.depot import get_gps_coordinates
 from transactions.models.depot import Depot
 from transactions.models.site import Site
 
