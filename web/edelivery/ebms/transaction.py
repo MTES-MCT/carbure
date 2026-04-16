@@ -48,6 +48,9 @@ class Transaction:
     def loading_site_name(self):
         return self.xml_root_element.find("./PLACE_OF_LOADING_NAME").text
 
+    def loading_site_zipcode(self):
+        return self.xml_root_element.find("./PLACE_OF_LOADING_POSTCODE").text
+
     def status(self):
         return self.xml_root_element.find("./STATUS").text
 
