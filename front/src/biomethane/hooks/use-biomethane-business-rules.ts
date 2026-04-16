@@ -1,25 +1,42 @@
 import { useMemo } from "react"
-import { UnitType } from "biomethane/pages/production/types"
-import { InstallationCategory } from "biomethane/pages/contract/types"
 import { useBiomethaneProductionUnit } from "./use-biomethane-production-unit"
 import { useBiomethaneContractInfos } from "./use-biomethane-contract-infos"
+import {
+  buildDigestateBusinessRules,
+  DigestateBusinessRules,
+} from "./business-rules/digestate.rules"
+import { buildCommonRules } from "./business-rules/common"
 
 export interface BiomethaneBusinessRulesManager {
-  shouldFillDigestate: boolean
+  digestate: DigestateBusinessRules
 }
 
+/**
+ * Biomethane business rules are domain eligibility rules,
+ * not user authorization permissions.
+ *
+ * ex: `shouldFillDigestate` tells whether Digestate declaration
+ * must be completed for the selected entity/year context.
+ *
+ */
 export const useBiomethaneBusinessRules =
   (): BiomethaneBusinessRulesManager => {
     const { productionUnit } = useBiomethaneProductionUnit()
     const { contractInfos } = useBiomethaneContractInfos()
 
+    const context = useMemo(
+      () => ({
+        productionUnit,
+        contractInfos,
+      }),
+      [productionUnit, contractInfos]
+    )
+
     return useMemo(
       () => ({
-        shouldFillDigestate:
-          productionUnit?.unit_type !== UnitType.ISDND &&
-          contractInfos?.installation_category !==
-            InstallationCategory.INSTALLATION_CATEGORY_3,
+        digestate: buildDigestateBusinessRules(context),
+        common: buildCommonRules(context),
       }),
-      [productionUnit?.unit_type, contractInfos?.installation_category]
+      [context]
     )
   }

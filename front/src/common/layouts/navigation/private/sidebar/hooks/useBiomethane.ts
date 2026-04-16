@@ -16,7 +16,7 @@ export const useBiomethane = () => {
   const { canAccessAdmin, canAccessSupplyPlanAdmin } =
     useBiomethanePermissions()
 
-  const { shouldFillDigestate } = useBiomethaneBusinessRules()
+  const { digestate } = useBiomethaneBusinessRules()
 
   const routesDeclaration = ["digestate", "energy", "supply-plan"]
   const currentRouteIsDeclaration = routesDeclaration.some((route) =>
@@ -41,7 +41,7 @@ export const useBiomethane = () => {
         title: t("Digestat"),
         icon: "ri-contrast-drop-line",
         iconActive: "ri-contrast-drop-fill",
-        condition: shouldFillDigestate,
+        condition: digestate.shouldFillDigestate,
       },
       {
         path: routes.BIOMETHANE(year).PRODUCER.ENERGY,
