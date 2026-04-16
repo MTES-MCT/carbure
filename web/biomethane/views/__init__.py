@@ -1,6 +1,7 @@
 
 from .admin import BiomethaneAdminAnnualDeclarationViewSet, BiomethaneProducersViewSet
 from .annual_declaration import BiomethaneAnnualDeclarationViewSet, ValidateActionMixin
+from .declaration_export import export_annual_declaration
 from .contract import BiomethaneContractAmendmentViewSet, BiomethaneContractViewSet
 from .digestate import BiomethaneDigestateSpreadingViewSet, BiomethaneDigestateViewSet
 from .energy import BiomethaneEnergyMonthlyReportViewSet, BiomethaneEnergyViewSet
