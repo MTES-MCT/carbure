@@ -23,7 +23,7 @@ import { useContractProductionUnit } from "biomethane/providers/contract-product
 import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { useDisplayConditionalSectionsEnergy } from "./energy.hooks"
-import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 const EnergyPage = () => {
   const { t } = useTranslation()

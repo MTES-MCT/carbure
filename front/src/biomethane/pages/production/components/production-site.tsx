@@ -18,7 +18,7 @@ import {
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
-import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 type ProductionSiteForm = Pick<
   ProductionUnitForm,

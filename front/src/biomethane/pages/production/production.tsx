@@ -13,7 +13,7 @@ import { ProductionUnitForm } from "./types"
 import { FormContext, useForm } from "common/components/form2"
 import { useMissingFields } from "biomethane/components/missing-fields"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
-import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 export const BiomethaneProductionPageContent = () => {
   const form = useForm<ProductionUnitForm>({})

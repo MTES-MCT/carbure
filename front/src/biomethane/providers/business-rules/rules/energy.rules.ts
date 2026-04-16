@@ -1,5 +1,5 @@
 import { buildCommonRules } from "./common.rules"
-import { BiomethaneRulesContext } from "./types"
+import { BiomethaneRulesContext } from "../types"
 
 export interface EnergyBusinessRules {
   installationEnergyNeeds: {

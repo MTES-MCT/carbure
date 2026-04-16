@@ -24,7 +24,7 @@ import {
 } from "./energy-efficiency.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { getYesNoOptions } from "common/utils/normalizers"
-import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<

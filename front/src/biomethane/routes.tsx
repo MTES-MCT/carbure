@@ -15,7 +15,7 @@ import { lastAnnualDeclarationYearAdmin } from "./pages/admin/hooks/use-annual-d
 import SupplyInputsAdminPage from "./pages/admin/supply-inputs"
 import { MissingFieldsSettings } from "./components/missing-fields"
 import { useBiomethanePermissions } from "./hooks/use-biomethane-permissions"
-import { useBiomethaneBusinessRules } from "./hooks/use-biomethane-business-rules"
+import { useBiomethaneBusinessRules } from "./providers/business-rules"
 
 const currentYear = new Date().getFullYear()
 

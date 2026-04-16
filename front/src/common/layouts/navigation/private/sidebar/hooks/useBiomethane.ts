@@ -3,10 +3,9 @@ import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
 import useEntity from "common/hooks/entity"
 import { useLocation } from "react-router-dom"
-import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
-import { useBiomethaneBusinessRules } from "biomethane/hooks/use-biomethane-business-rules"
-
 const currentYear = new Date().getFullYear()
+import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 export const useBiomethane = () => {
   const routes = useRoutes()

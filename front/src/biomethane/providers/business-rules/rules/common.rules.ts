@@ -1,9 +1,9 @@
-import { BiomethaneRulesContext } from "./types"
 import { UnitType } from "biomethane/pages/production/types"
 import {
   InstallationCategory,
   TariffReference,
 } from "biomethane/pages/contract/types"
+import { BiomethaneRulesContext } from "../types"
 
 export interface CommonBusinessRules {
   isISDNDInstallation: boolean
