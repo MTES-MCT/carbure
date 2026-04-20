@@ -3,6 +3,7 @@ from .admin import BiomethaneAdminAnnualDeclarationViewSet, BiomethaneProducersV
 from .annual_declaration import BiomethaneAnnualDeclarationViewSet, ValidateActionMixin
 from .declaration_export import export_annual_declaration
 from .contract import BiomethaneContractAmendmentViewSet, BiomethaneContractViewSet
+from .field_metadata import get_field_metadata
 from .digestate import BiomethaneDigestateSpreadingViewSet, BiomethaneDigestateViewSet
 from .energy import BiomethaneEnergyMonthlyReportViewSet, BiomethaneEnergyViewSet
 from .injection_site import BiomethaneInjectionSiteViewSet
