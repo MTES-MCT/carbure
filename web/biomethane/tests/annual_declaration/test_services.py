@@ -155,6 +155,25 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertIsNotNone(missing_fields["production_unit_missing_fields"])
         self.assertNotIn("digestate_storage", missing_fields["production_unit_missing_fields"])
 
+    def test_get_missing_fields_production_unit_no_digestate_storage_isdnd(self):
+        """production_unit_missing_fields does not contain 'digestate_storage' for ISDND units."""
+        BiomethaneProductionUnitFactory.create(
+            producer=self.producer_entity,
+            unit_type=BiomethaneProductionUnit.ISDND,
+        )
+        # No BiomethaneDigestateStorage created
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+
+        self.assertIsNotNone(missing_fields["production_unit_missing_fields"])
+        self.assertNotIn("digestate_storage", missing_fields["production_unit_missing_fields"])
+
     def test_is_declaration_complete_false_when_production_unit_missing(self):
         """is_declaration_complete returns False when production_unit_missing_fields is None."""
         missing_fields = {

@@ -29,6 +29,7 @@ class ProductionUnitRulesConfigurationTests(TestCase):
             "spreading_not_selected",
             "isdnd",
             "STEP_unit_type",
+            "ISDND_unit_type",
         ]
         actual_rule_names = [rule.name for rule in self.rules + self.optional_rules]
         self.assertEqual(expected_rule_names, actual_rule_names)
@@ -132,6 +133,20 @@ class ProductionUnitRulesConfigurationTests(TestCase):
         # Should trigger when unit type is STEP
         mock_instance.unit_type = BiomethaneProductionUnit.STEP
         self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
+
+    def test_ISDND_unit_type_rule_fields_and_condition(self):
+        """Test ISDND_unit_type rule has correct fields and condition logic."""
+        rule = next(r for r in self.optional_rules if r.name == "ISDND_unit_type")
+        self.assertEqual(rule.fields, BiomethaneProductionUnitService.ISDND_OPTIONAL_FIELDS)
+
+        mock_instance = Mock()
+        # Should trigger when unit type is ISDND
+        mock_instance.unit_type = BiomethaneProductionUnit.ISDND
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
+
+        # Should not trigger when unit type is not ISDND
+        mock_instance.unit_type = BiomethaneProductionUnit.OTHER
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
 
 class BiomethaneProductionUnitServiceIntegrationTests(TestCase):
