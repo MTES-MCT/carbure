@@ -3,15 +3,17 @@ import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
 import useEntity from "common/hooks/entity"
 import { useLocation } from "react-router-dom"
+import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
 
 const currentYear = new Date().getFullYear()
-import { ExternalAdminPages } from "common/types"
 
 export const useBiomethane = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
   const loc = useLocation()
-  const { isBiomethaneProducer, hasAdminRight } = useEntity()
+  const { isBiomethaneProducer } = useEntity()
+  const { canAccessAdmin, canAccessSupplyPlanAdmin } =
+    useBiomethanePermissions()
 
   const routesDeclaration = ["digestate", "energy", "supply-plan"]
   const currentRouteIsDeclaration = routesDeclaration.some((route) =>
@@ -48,7 +50,7 @@ export const useBiomethane = () => {
 
   const biomethaneAdminMenu: MenuSection = {
     title: t("Biométhane"),
-    condition: hasAdminRight(ExternalAdminPages.DREAL),
+    condition: canAccessAdmin,
     children: [
       {
         path: routes.BIOMETHANE().ADMIN.DASHBOARD,
@@ -61,6 +63,7 @@ export const useBiomethane = () => {
         title: t("Intrants"),
         icon: "ri-leaf-line",
         iconActive: "ri-leaf-fill",
+        condition: canAccessSupplyPlanAdmin,
       },
       {
         path: routes.BIOMETHANE().ADMIN.DECLARATIONS,

@@ -10,6 +10,8 @@ from biomethane.models import (
     BiomethaneSupplyPlan,
 )
 from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
+from biomethane.services.ademe import AdemeService
+from core.models.entity import ExternalAdminRights
 
 
 class BiomethaneAnnualDeclarationService:
@@ -260,3 +262,15 @@ class BiomethaneAnnualDeclarationService:
                 declaration.save(update_fields=["status"])
         except BiomethaneAnnualDeclaration.DoesNotExist:
             pass
+
+    # ADEME only sees the declarations for the first five years of the installation
+    # Ex : effective_date is 02/04/2023, ADEME will see the declarations for the years 2023 to 2027
+    @staticmethod
+    def get_declarations_for_entity(queryset, entity):
+        if entity.has_external_admin_right(ExternalAdminRights.ADEME):
+            queryset = queryset.filter(
+                AdemeService.get_ademe_contract_filter(
+                    contract_prefix="producer__biomethane_contract__",
+                )
+            )
+        return queryset

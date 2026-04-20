@@ -7,8 +7,8 @@ import { BiomethaneProducer } from "../../types"
 import { useAnnualDeclarationYearsAdmin } from "../../hooks/use-annual-declaration-years-admin"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { ToggleDeclarationButton } from "./toggle-declaration-button"
-import useEntity from "common/hooks/entity"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
+import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -25,7 +25,7 @@ export const DeclarationDetailHeader = ({
   producers,
 }: DeclarationDetailHeaderProps) => {
   const { selectedEntityId } = useSelectedEntity()
-  const entity = useEntity()
+  const { canEditDeclaration } = useBiomethanePermissions()
   const { annualDeclaration } = useAnnualDeclaration()
   const navigate = useNavigate()
   const routes = useRoutes()
@@ -48,7 +48,7 @@ export const DeclarationDetailHeader = ({
       {annualDeclaration?.status && (
         <AnnualDeclarationStatusBadge status={annualDeclaration.status} />
       )}
-      {entity.canWrite() && <ToggleDeclarationButton />}
+      {canEditDeclaration && <ToggleDeclarationButton />}
     </Row>
   )
 }

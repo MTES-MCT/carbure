@@ -3,7 +3,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.permissions import HasDrealRights
+from biomethane.permissions import CanAccessAdminModule
 from biomethane.serializers.admin.producer import BiomethaneProducerSerializer
 from core.models import Entity
 
@@ -21,7 +21,7 @@ from core.models import Entity
 )
 class BiomethaneProducersViewSet(GenericViewSet, ListModelMixin):
     queryset = Entity.objects.filter(entity_type=Entity.BIOMETHANE_PRODUCER)
-    permission_classes = [HasDrealRights]
+    permission_classes = [CanAccessAdminModule]
     serializer_class = BiomethaneProducerSerializer
     pagination_class = None
 

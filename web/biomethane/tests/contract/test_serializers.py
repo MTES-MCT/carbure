@@ -7,6 +7,7 @@ from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneS
 from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_contract_amendment import BiomethaneContractAmendment
 from biomethane.serializers import BiomethaneContractInputSerializer
+from biomethane.serializers.contract.contract import BiomethaneContractRestrictedSerializer
 from core.models import Entity
 
 
@@ -201,3 +202,16 @@ class BiomethaneContractSerializerTests(TestCase):
         contract_updated = serializer.update(contract, data)
 
         self.assertEqual(contract_updated.tracked_amendment_types, [])
+
+    def test_restricted_serializer_only_exposes_allowed_fields(self):
+        contract = BiomethaneContractFactory.create(
+            producer=self.producer_entity,
+            tariff_reference="2023",
+            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
+            cmax=180.0,
+            pap_contracted=20.0,
+        )
+
+        serialized = BiomethaneContractRestrictedSerializer(contract).data
+
+        self.assertEqual(set(serialized.keys()), {"tariff_reference", "installation_category"})

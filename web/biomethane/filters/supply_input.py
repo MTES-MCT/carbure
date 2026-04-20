@@ -1,7 +1,7 @@
 from django_filters import AllValuesMultipleFilter, CharFilter, FilterSet, MultipleChoiceFilter, NumberFilter
 
 from biomethane.models import BiomethaneSupplyInput
-from core.models import ExternalAdminRights
+from biomethane.permissions import is_entity_related_to_biomethane_external_admin
 
 
 class BaseBiomethaneSupplyInputFilter(FilterSet):
@@ -25,7 +25,7 @@ class BaseBiomethaneSupplyInputFilter(FilterSet):
 
         entity = getattr(self.request, "entity", None)
 
-        if entity and entity.has_external_admin_right(ExternalAdminRights.DREAL):
+        if entity and is_entity_related_to_biomethane_external_admin(entity):
             if "producer_id" in self.data:
                 return queryset
             else:
