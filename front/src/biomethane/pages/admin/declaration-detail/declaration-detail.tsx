@@ -7,6 +7,7 @@ import { Content, LoaderOverlay, Main } from "common/components/scaffold"
 import { DeclarationDetailTabs } from "./components/declaration-detail-tabs"
 import { AnnualDeclarationProvider } from "biomethane/providers/annual-declaration"
 import { ContractProductionUnitProvider } from "biomethane/providers/contract-production-unit"
+import { BiomethaneBusinessRulesProvider } from "biomethane/providers/business-rules"
 
 export const BiomethaneAdminDeclarationDetailPage = () => {
   const { selectedEntityId } = useParams<{ selectedEntityId: string }>()
@@ -28,17 +29,19 @@ export const BiomethaneAdminDeclarationDetailPage = () => {
 
   return (
     <SelectedEntityProvider selectedEntityId={Number(selectedEntityId)}>
-      <AnnualDeclarationProvider>
-        <ContractProductionUnitProvider allowEmpty>
-          <Main>
-            <DeclarationDetailHeader producers={producers ?? []} />
-            <DeclarationDetailTabs />
-            <Content>
-              <Outlet />
-            </Content>
-          </Main>
-        </ContractProductionUnitProvider>
-      </AnnualDeclarationProvider>
+      <BiomethaneBusinessRulesProvider>
+        <AnnualDeclarationProvider>
+          <ContractProductionUnitProvider allowEmpty>
+            <Main>
+              <DeclarationDetailHeader producers={producers ?? []} />
+              <DeclarationDetailTabs />
+              <Content>
+                <Outlet />
+              </Content>
+            </Main>
+          </ContractProductionUnitProvider>
+        </AnnualDeclarationProvider>
+      </BiomethaneBusinessRulesProvider>
     </SelectedEntityProvider>
   )
 }

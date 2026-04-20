@@ -15,6 +15,10 @@ import { lastAnnualDeclarationYearAdmin } from "./pages/admin/hooks/use-annual-d
 import SupplyInputsAdminPage from "./pages/admin/supply-inputs"
 import { MissingFieldsSettings } from "./components/missing-fields"
 import { useBiomethanePermissions } from "./hooks/use-biomethane-permissions"
+import {
+  useBiomethaneBusinessRules,
+  BiomethaneBusinessRulesProvider,
+} from "./providers/business-rules"
 
 const currentYear = new Date().getFullYear()
 
@@ -68,13 +72,12 @@ const RedirectToCurrentYear = ({ path }: { path: REDIRECTED_ROUTES }) => {
   )
 }
 
-export const BiomethaneRoutes = () => {
-  const { isBiomethaneProducer } = useEntity()
-  const { canAccessAdmin } = useBiomethanePermissions()
+const BiomethaneRoutesContent = () => {
+  const { digestate } = useBiomethaneBusinessRules()
 
-  if (canAccessAdmin) return <BiomethaneAdminRoutes />
-
-  if (!isBiomethaneProducer) return null
+  const defaultRedirectTo = digestate.shouldFillDigestate
+    ? "digestate"
+    : "energy"
 
   return (
     <Routes>
@@ -87,10 +90,12 @@ export const BiomethaneRoutes = () => {
         }
       >
         {/* Routes sans année qui redirigent vers l'année de déclaration courante */}
-        <Route
-          path="digestate"
-          element={<RedirectToCurrentYear path="digestate" />}
-        />
+        {digestate.shouldFillDigestate && (
+          <Route
+            path="digestate"
+            element={<RedirectToCurrentYear path="digestate" />}
+          />
+        )}
         <Route
           path="energy"
           element={<RedirectToCurrentYear path="energy" />}
@@ -108,8 +113,10 @@ export const BiomethaneRoutes = () => {
             </ContractProductionUnitProvider>
           }
         >
-          <Route index element={<Navigate replace to="digestate" />} />
-          <Route path="digestate" element={<Digestate />} />
+          <Route index element={<Navigate replace to={defaultRedirectTo} />} />
+          {digestate.shouldFillDigestate && (
+            <Route path="digestate" element={<Digestate />} />
+          )}
           <Route path="energy" element={<Energy />} />
           <Route path="supply-plan" element={<SupplyPlan />} />
         </Route>
@@ -119,9 +126,27 @@ export const BiomethaneRoutes = () => {
           path="customer-satisfaction"
           element={<CustomerSatisfaction />}
         />
-        <Route path="" element={<RedirectToCurrentYear path="digestate" />} />
+        <Route
+          path=""
+          element={<RedirectToCurrentYear path={defaultRedirectTo} />}
+        />
       </Route>
     </Routes>
+  )
+}
+
+export const BiomethaneRoutes = () => {
+  const { isBiomethaneProducer } = useEntity()
+  const { canAccessAdmin } = useBiomethanePermissions()
+
+  if (canAccessAdmin) return <BiomethaneAdminRoutes />
+
+  if (!isBiomethaneProducer) return null
+
+  return (
+    <BiomethaneBusinessRulesProvider>
+      <BiomethaneRoutesContent />
+    </BiomethaneBusinessRulesProvider>
   )
 }
 
@@ -131,10 +156,12 @@ export const BiomethaneSettingsRoutes = () => {
       <Route
         path=""
         element={
-          <AnnualDeclarationProvider>
-            <MissingFieldsSettings />
-            <Outlet />
-          </AnnualDeclarationProvider>
+          <BiomethaneBusinessRulesProvider>
+            <AnnualDeclarationProvider>
+              <MissingFieldsSettings />
+              <Outlet />
+            </AnnualDeclarationProvider>
+          </BiomethaneBusinessRulesProvider>
         }
       >
         <Route index element={<Navigate replace to="contract" />} />

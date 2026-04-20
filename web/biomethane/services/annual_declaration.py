@@ -11,6 +11,7 @@ from biomethane.models import (
 )
 from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
 from biomethane.services.ademe import AdemeService
+from biomethane.services.digestate import BiomethaneDigestateService
 from core.models.entity import ExternalAdminRights
 
 
@@ -91,12 +92,16 @@ class BiomethaneAnnualDeclarationService:
 
         is_current_declaration = declaration.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
-        digestate_missing_fields = (
-            BiomethaneAnnualDeclarationService._get_missing_fields(digestate, is_current_declaration) if digestate else None
+        digestate_missing_fields = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate,
+            is_current_declaration,
+            production_unit,
+            contract,
         )
+
         return {
             # If the declaration is not the current year, there is no fields to fill for digestate
-            "digestate_missing_fields": digestate_missing_fields if is_current_declaration else [],
+            "digestate_missing_fields": digestate_missing_fields,
             "energy_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(energy, is_current_declaration)
             if energy
             else None,

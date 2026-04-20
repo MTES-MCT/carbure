@@ -13,9 +13,11 @@ import { ProductionUnitForm } from "./types"
 import { FormContext, useForm } from "common/components/form2"
 import { useMissingFields } from "biomethane/components/missing-fields"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 export const BiomethaneProductionPageContent = () => {
   const form = useForm<ProductionUnitForm>({})
+  const { production } = useBiomethaneBusinessRules()
   const { result: productionUnit, loading } = useProductionUnit({
     onSuccess: (productionUnit) => {
       form.setValue(productionUnit ?? {})
@@ -41,8 +43,11 @@ export const BiomethaneProductionPageContent = () => {
         <SanitaryAgreement productionUnit={productionUnit} />
         <ICPE productionUnit={productionUnit} />
         <ProductionSite productionUnit={productionUnit} />
-        <DigestateProcessing productionUnit={productionUnit} />
-        <DigestateStorage />
+
+        {production.digestateProcessing.displaySection && (
+          <DigestateProcessing productionUnit={productionUnit} />
+        )}
+        {production.digestateStorage.displaySection && <DigestateStorage />}
       </WatchedFieldsProvider>
     </FormContext.Provider>
   )
