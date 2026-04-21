@@ -4,7 +4,7 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from biomethane.permissions import HasDrealOrProducerRights
+from biomethane.permissions import HasBiomethaneProducerRights, HasDrealRights
 from biomethane.services.declaration_export import generate_annual_export
 from core.excel import ExcelResponse
 from core.models import Entity
@@ -23,7 +23,7 @@ from core.models import Entity
     ],
 )
 @api_view(["GET"])
-@permission_classes([HasDrealOrProducerRights])
+@permission_classes([HasBiomethaneProducerRights | HasDrealRights])
 def export_annual_declaration(request):
     """Export all biomethane data for a producer and a given year as an Excel file."""
     year = request.query_params.get("year")

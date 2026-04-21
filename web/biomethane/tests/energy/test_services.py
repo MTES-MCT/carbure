@@ -5,6 +5,7 @@ from django.test import TestCase
 from biomethane.factories import BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.energy import BiomethaneEnergyMonthlyReportFactory
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.services.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 from core.models import Entity
@@ -258,7 +259,9 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
         self.production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
-        self.contract = BiomethaneContractFactory.create(producer=self.producer_entity)
+        self.contract = BiomethaneContractFactory.create(
+            producer=self.producer_entity, installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1
+        )
 
     def test_full_integration_malfunction_rules(self):
         """Smoke test: verify malfunction rules work end-to-end."""
@@ -285,8 +288,8 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
         fields = BiomethaneEnergyService.get_fields_to_clear(energy)
         self.assertNotIn("malfunction_details", fields)
 
-    def test_full_integration_tariff_rules(self):
-        """Smoke test: verify tariff rules work end-to-end."""
+    def test_full_integration_fossil_energy_rule(self):
+        """Smoke test: verify the no_fossil_for_energy rule works end-to-end."""
         energy = BiomethaneEnergyFactory.create(
             producer=self.producer_entity,
             energy_types=[BiomethaneEnergy.ENERGY_TYPE_FOSSIL],
