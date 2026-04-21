@@ -12,6 +12,7 @@ import {
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type SanitaryAgreementForm = Pick<
   ProductionUnitForm,
@@ -34,6 +35,7 @@ export function SanitaryAgreement({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<SanitaryAgreementForm>()
@@ -65,7 +67,7 @@ export function SanitaryAgreement({
             <RadioGroup
               required
               readOnly={!isEditing}
-              label={t("Votre site dispose-t-il d'un agrément sanitaire ?")}
+              label={tBiomethaneInput("production.has_sanitary_approval")}
               options={getYesNoOptions()}
               orientation="horizontal"
               {...bind("has_sanitary_approval")}
@@ -74,7 +76,7 @@ export function SanitaryAgreement({
               <TextInput
                 required
                 readOnly={!isEditing}
-                label={t("N° Agrément sanitaire")}
+                label={tBiomethaneInput("production.sanitary_approval_number")}
                 placeholder="FR XX-XX-XXX"
                 {...bind("sanitary_approval_number")}
               />
@@ -84,7 +86,7 @@ export function SanitaryAgreement({
             <RadioGroup
               required
               readOnly={!isEditing}
-              label={t("Disposez vous d'une dérogation à l'hygiénisation?")}
+              label={tBiomethaneInput("production.has_hygienization_exemption")}
               options={getYesNoOptions()}
               orientation="horizontal"
               {...bind("has_hygienization_exemption")}
@@ -93,7 +95,9 @@ export function SanitaryAgreement({
               <RadioGroup
                 required
                 readOnly={!isEditing}
-                label={t("Si oui, dérogation à l'hygiénisation :")}
+                label={tBiomethaneInput(
+                  "production.hygienization_exemption_type"
+                )}
                 options={hygienizationExemptionOptions}
                 orientation="horizontal"
                 {...bind("hygienization_exemption_type")}

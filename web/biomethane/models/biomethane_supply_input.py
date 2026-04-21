@@ -74,11 +74,11 @@ class BiomethaneSupplyInput(models.Model):
 
     # Distance moyenne pondérée d'approvisionnement (Km)
     average_weighted_distance_km = models.FloatField(
-        verbose_name="Distance moyenne pondérée d'approvisionnement (km)", null=True, blank=True
+        verbose_name="Distance moyenne pondérée d'approvisionnement (Km)", null=True, blank=True
     )
 
     # Distance maximale (Km)
-    maximum_distance_km = models.FloatField(verbose_name="Distance maximale (km)", null=True, blank=True)
+    maximum_distance_km = models.FloatField(verbose_name="Distance maximale (Km)", null=True, blank=True)
 
     class Meta:
         db_table = "biomethane_supply_input"

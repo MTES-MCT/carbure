@@ -1,6 +1,6 @@
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useTranslation } from "react-i18next"
-import { MalfunctionTypes } from "../types"
+import { BiomethaneEnergyInputRequest, MalfunctionTypes } from "../types"
 import { useFormContext } from "common/components/form2"
 import { useSaveEnergy } from "../energy.hooks"
 import { Button } from "common/components/button2"
@@ -14,8 +14,8 @@ import {
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useMemo } from "react"
 import { DeepPartial } from "common/types"
-import { BiomethaneEnergyInputRequest } from "../types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type MalfunctionForm = DeepPartial<
   Pick<
@@ -44,6 +44,7 @@ const extractValues = (energy?: MalfunctionForm) => {
 
 export const Malfunction = () => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<MalfunctionForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
@@ -83,7 +84,7 @@ export const Malfunction = () => {
           <Grid cols={2} gap="lg">
             <RadioGroup
               readOnly={!isEditing}
-              label={t("Y'a t-il eu des dysfonctionnements ?")}
+              label={tBiomethaneInput("energy.has_malfunctions")}
               options={getYesNoOptions()}
               orientation="horizontal"
               required
@@ -92,7 +93,9 @@ export const Malfunction = () => {
             {value.has_malfunctions && (
               <NumberInput
                 readOnly={!isEditing}
-                label={t("Durée cumulée du dysfonctionnement (en jours)")}
+                label={tBiomethaneInput(
+                  "energy.malfunction_cumulative_duration_days"
+                )}
                 min={0}
                 required
                 {...bind("malfunction_cumulative_duration_days")}
@@ -103,7 +106,7 @@ export const Malfunction = () => {
             <>
               <CheckboxGroup
                 readOnly={!isEditing}
-                label={t("Types de dysfonctionnement")}
+                label={tBiomethaneInput("energy.malfunction_types")}
                 options={dysfunctionOptions}
                 required
                 {...bind("malfunction_types", {
@@ -113,7 +116,7 @@ export const Malfunction = () => {
               {value.malfunction_types?.includes(MalfunctionTypes.OTHER) && (
                 <TextInput
                   readOnly={!isEditing}
-                  label={t("Précisions")}
+                  label={tBiomethaneInput("energy.malfunction_details")}
                   required
                   {...bind("malfunction_details")}
                 />
@@ -122,8 +125,8 @@ export const Malfunction = () => {
           )}
           <RadioGroup
             readOnly={!isEditing}
-            label={t(
-              "Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux"
+            label={tBiomethaneInput(
+              "energy.has_injection_difficulties_due_to_network_saturation"
             )}
             options={getYesNoOptions()}
             orientation="horizontal"
@@ -133,7 +136,7 @@ export const Malfunction = () => {
           {value.has_injection_difficulties_due_to_network_saturation && (
             <NumberInput
               readOnly={!isEditing}
-              label={t("Nombre d’heures d’impossibilité d’injection (h)")}
+              label={tBiomethaneInput("energy.injection_impossibility_hours")}
               min={0}
               required
               {...bind("injection_impossibility_hours")}

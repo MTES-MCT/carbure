@@ -41,13 +41,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         locales = [locale.strip() for locale in options["locales"].split(",") if locale.strip()]
+
         if not locales:
             raise CommandError("No locale provided. Use --locales=fr,en")
+
         modules = [module.strip() for module in options["modules"].split(",") if module.strip()]
+
         if not modules:
             raise CommandError("No module provided. Use --modules=biomethane,saf")
 
         locales_dir = Path(options["locales_dir"]) if options["locales_dir"] else self._default_locales_dir()
+
         if not locales_dir.exists():
             raise CommandError(f"Locales directory does not exist: {locales_dir}")
 
@@ -64,6 +68,7 @@ class Command(BaseCommand):
         if not locale_dir.exists():
             raise CommandError(f"Locale directory does not exist: {locale_dir}")
 
+        # Force the locale to be used for the translation
         with override(locale):
             try:
                 backend_inputs = get_verbose_fields_for_translation(module_names=modules)

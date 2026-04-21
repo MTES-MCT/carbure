@@ -12,6 +12,7 @@ import { Button } from "common/components/button2"
 import { useMutateContractInfos } from "../contract-infos/contract-infos.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type ContractAidOrganismForm = Pick<
   BiomethaneContractPatchRequest,
@@ -36,6 +37,7 @@ export const ContractAidOrganism = ({
   contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<ContractAidOrganismForm>()
@@ -58,8 +60,8 @@ export const ContractAidOrganism = ({
         <ManagedEditableCard.Form onSubmit={onSubmit}>
           <RadioGroup
             readOnly={!isEditing}
-            label={t(
-              "Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement?"
+            label={tBiomethaneInput(
+              "contract.has_complementary_investment_aid"
             )}
             options={getYesNoOptions()}
             {...bind("has_complementary_investment_aid")}
@@ -70,7 +72,7 @@ export const ContractAidOrganism = ({
             <>
               <CheckboxGroup
                 readOnly={!isEditing}
-                label={t("Aide complémentaire attribuée par")}
+                label={tBiomethaneInput("contract.complementary_aid_organisms")}
                 options={complementaryAidOrganismOptions}
                 {...bind("complementary_aid_organisms")}
                 value={value.complementary_aid_organisms ?? []}
@@ -81,8 +83,8 @@ export const ContractAidOrganism = ({
               ) && (
                 <TextInput
                   readOnly={!isEditing}
-                  label={t(
-                    "Précisez le nom du ou des organismes publics ayant octroyé l'aide"
+                  label={tBiomethaneInput(
+                    "contract.complementary_aid_other_organism_name"
                   )}
                   {...bind("complementary_aid_other_organism_name")}
                   required

@@ -15,11 +15,13 @@ import { UniqueIdentificationNumberHelper } from "./components/unique-identifica
 import { useMissingFields } from "biomethane/components/missing-fields"
 import { SectionsManagerProvider } from "common/providers/sections-manager.provider"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type InjectionSiteForm = Partial<BiomethaneInjectionSiteAddRequest>
 
 const BiomethaneInjectionContent = () => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const allowedToEdit = useAllowedToEdit()
 
   const form = useForm<InjectionSiteForm>({
@@ -51,7 +53,7 @@ const BiomethaneInjectionContent = () => {
       {({ isEditing }) => (
         <ManagedEditableCard.Form onSubmit={() => updateInjectionSite(value)}>
           <TextInput
-            label={t("Numéro d'identifiant unique du site d'injection")}
+            label={tBiomethaneInput("injection.unique_identification_number")}
             hintText={<UniqueIdentificationNumberHelper />}
             {...bind("unique_identification_number")}
             required
@@ -61,14 +63,14 @@ const BiomethaneInjectionContent = () => {
           <RadioGroup
             options={yesNoOptions}
             {...bind("is_shared_injection_site")}
-            label={t("Raccordement à un site d'injection mutualisé")}
+            label={tBiomethaneInput("injection.is_shared_injection_site")}
             required
             readOnly={!isEditing}
             orientation="horizontal"
           />
           {value.is_shared_injection_site && (
             <TextInput
-              label={t("N° de compteur associé au site d'injection")}
+              label={tBiomethaneInput("injection.meter_number")}
               {...bind("meter_number")}
               required
               readOnly={!isEditing}
@@ -77,7 +79,9 @@ const BiomethaneInjectionContent = () => {
           <RadioGroup
             options={yesNoOptions}
             {...bind("is_different_from_production_site")}
-            label={t("Le site d'injection est différent du site de production")}
+            label={tBiomethaneInput(
+              "injection.is_different_from_production_site"
+            )}
             required
             readOnly={!isEditing}
             orientation="horizontal"
@@ -85,20 +89,20 @@ const BiomethaneInjectionContent = () => {
           {value.is_different_from_production_site && (
             <>
               <TextInput
-                label={t("Adresse du site d'injection (Numéro et rue)")}
+                label={tBiomethaneInput("injection.company_address")}
                 {...bind("company_address")}
                 readOnly={!isEditing}
                 required
               />
               <Grid cols={2} gap="lg">
                 <TextInput
-                  label={t("Code postal")}
+                  label={tBiomethaneInput("injection.postal_code")}
                   {...bind("postal_code")}
                   required
                   readOnly={!isEditing}
                 />
                 <TextInput
-                  label={t("Commune")}
+                  label={tBiomethaneInput("injection.city")}
                   {...bind("city")}
                   required
                   readOnly={!isEditing}
@@ -110,13 +114,13 @@ const BiomethaneInjectionContent = () => {
           <RadioGroup
             options={networkTypesOptions}
             {...bind("network_type")}
-            label={t("Type de réseau")}
+            label={tBiomethaneInput("injection.network_type")}
             required
             readOnly={!isEditing}
             orientation="horizontal"
           />
           <TextInput
-            label={t("Nom du gestionnaire de réseau")}
+            label={tBiomethaneInput("injection.network_manager_name")}
             {...bind("network_manager_name")}
             required
             readOnly={!isEditing}

@@ -41,13 +41,25 @@ class Site(models.Model):
     AIRPORT_TYPES = [AIRPORT]
 
     name = models.CharField(max_length=128, blank=False)
-    site_siret = models.CharField(max_length=64, blank=True)
+    site_siret = models.CharField(verbose_name="SIRET", max_length=64, blank=True)
     site_type = models.CharField(max_length=32, choices=SITE_TYPE, default=OTHER)
-    address = models.CharField(max_length=256, blank=True)
-    postal_code = models.CharField(max_length=32, blank=True)
-    city = models.CharField(max_length=128, blank=True)
-    country = models.ForeignKey("core.Pays", null=True, blank=False, on_delete=models.SET_NULL)
-    gps_coordinates = models.CharField(max_length=64, null=True, blank=True, default=None)
+    address = models.CharField(verbose_name="Adresse", max_length=256, blank=True)
+    postal_code = models.CharField(verbose_name="Code postal", max_length=32, blank=True)
+    city = models.CharField(verbose_name="Commune", max_length=128, blank=True)
+    country = models.ForeignKey(
+        "core.Pays",
+        verbose_name="Pays",
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+    )
+    gps_coordinates = models.CharField(
+        verbose_name="Coordonnées GPS",
+        max_length=64,
+        null=True,
+        blank=True,
+        default=None,
+    )
     private = models.BooleanField(default=False)
     is_enabled = models.BooleanField(default=True)
     created_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL)

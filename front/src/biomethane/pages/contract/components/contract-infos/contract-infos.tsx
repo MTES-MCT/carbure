@@ -30,6 +30,7 @@ import { RedIIDialog } from "./red-ii-dialog"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useSectionsManager } from "common/providers/sections-manager.provider"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type ContractInfosForm = DeepPartial<BiomethaneContractPatchRequest>
 
@@ -53,6 +54,7 @@ export const ContractInfos = ({
   contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const entity = useEntity()
   const allowedToEdit = useAllowedToEdit()
   const portal = usePortal()
@@ -118,14 +120,14 @@ export const ContractInfos = ({
         )}
         <Grid cols={2} gap="lg">
           <SelectDsfr
-            label={t("Référence de l'arrêté tarifaire")}
+            label={tBiomethaneInput("contract.tariff_reference")}
             options={tariffReferenceOptions}
             required
             {...bind("tariff_reference")}
             readOnly={!isEditing}
           />
           <Autocomplete
-            label={t("Acheteur")}
+            label={tBiomethaneInput("contract.buyer")}
             getOptions={findBuyerBiomethaneEntities}
             normalize={(entity) => ({
               label: entity.name,
@@ -137,7 +139,7 @@ export const ContractInfos = ({
           />
         </Grid>
         <SelectDsfr
-          label={t("Catégorie d'installation")}
+          label={tBiomethaneInput("contract.installation_category")}
           options={installationCategoryOptions}
           required
           {...bind("installation_category")}
@@ -148,7 +150,7 @@ export const ContractInfos = ({
           <>
             <Grid cols={2} gap="lg">
               <NumberInput
-                label={t("Cmax (Nm³/h)")}
+                label={tBiomethaneInput("contract.cmax")}
                 min={0}
                 {...bind("cmax")}
                 required
@@ -160,7 +162,7 @@ export const ContractInfos = ({
                 step={0.01}
               />
               <RadioGroup
-                label={t("Annualisation du contrôle de la Cmax")}
+                label={tBiomethaneInput("contract.cmax_annualized")}
                 options={getYesNoOptions()}
                 orientation="horizontal"
                 required
@@ -171,7 +173,7 @@ export const ContractInfos = ({
 
             {value.cmax_annualized && (
               <NumberInput
-                label={t("Cmax annualisée (GWhPCS/an)")}
+                label={tBiomethaneInput("contract.cmax_annualized_value")}
                 min={0}
                 required
                 {...bind("cmax_annualized_value")}
@@ -184,7 +186,7 @@ export const ContractInfos = ({
 
         {isTariffReference2021Or2023(value.tariff_reference) && (
           <NumberInput
-            label={t("PAP contractualisée (GWhPCS/an)")}
+            label={tBiomethaneInput("contract.pap_contracted")}
             min={0}
             {...bind("pap_contracted")}
             required

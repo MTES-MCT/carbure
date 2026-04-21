@@ -7,6 +7,7 @@ import { DeepPartial } from "common/types"
 import { BiomethaneDigestateInputRequest } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type SpreadingDistanceForm = DeepPartial<
   Pick<
@@ -23,6 +24,7 @@ const extractValues = (digestate?: SpreadingDistanceForm) => {
 }
 export function SpreadingDistance() {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<SpreadingDistanceForm>()
 
   const saveDigestate = useSaveDigestate()
@@ -41,7 +43,9 @@ export function SpreadingDistance() {
         <ManagedEditableCard.Form onSubmit={handleSave}>
           <NumberInput
             readOnly={!isEditing}
-            label={t("Distance moyenne de valorisation d'épandage (km)")}
+            label={tBiomethaneInput(
+              "digestate.average_spreading_valorization_distance"
+            )}
             min={0}
             {...bind("average_spreading_valorization_distance")}
             required

@@ -8,6 +8,7 @@ import { DeepPartial } from "common/types"
 import { BiomethaneEnergyInputRequest } from "../types"
 import { useSaveEnergy } from "../energy.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type BiogasProductionForm = DeepPartial<
   Pick<
@@ -27,6 +28,7 @@ const extractValues = (energy?: BiogasProductionForm) => {
 }
 export function BiogasProduction() {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<BiogasProductionForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
@@ -47,7 +49,7 @@ export function BiogasProduction() {
           <Grid cols={2} gap="lg">
             <NumberInput
               readOnly={!isEditing}
-              label={t("Quantité de biogaz produit (Nm3/an)")}
+              label={tBiomethaneInput("energy.produced_biogas_nm3_per_year")}
               type="number"
               min={0}
               {...bind("produced_biogas_nm3_per_year")}
@@ -56,7 +58,7 @@ export function BiogasProduction() {
             />
             <NumberInput
               readOnly={!isEditing}
-              label={t("Quantité de biogaz torché (Nm3/an)")}
+              label={tBiomethaneInput("energy.flared_biogas_nm3_per_year")}
               type="number"
               min={0}
               {...bind("flared_biogas_nm3_per_year")}
@@ -67,7 +69,7 @@ export function BiogasProduction() {
 
           <NumberInput
             readOnly={!isEditing}
-            label={t("Nombre d'heures de fonctionnement de la torchère (h)")}
+            label={tBiomethaneInput("energy.flaring_operating_hours")}
             type="number"
             min={0}
             {...bind("flaring_operating_hours")}

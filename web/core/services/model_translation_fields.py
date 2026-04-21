@@ -23,11 +23,7 @@ def get_verbose_fields_for_model(model, excluded_fields=None):
         field_name = getattr(field, "name", None)
         explicit_verbose_name = getattr(field, "_verbose_name", None)
 
-        if (
-            not field_name
-            or explicit_verbose_name is None
-            or field_name in excluded_fields_set
-        ):
+        if not field_name or explicit_verbose_name is None or field_name in excluded_fields_set:
             continue
 
         verbose_fields[field_name] = str(explicit_verbose_name)
