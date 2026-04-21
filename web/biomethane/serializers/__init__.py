@@ -34,6 +34,5 @@ from .supply_plan import (
     BiomethaneSupplyInputExportSerializer
 )
 from .annual_declaration import BiomethaneAnnualDeclarationSerializer
-from .field_metadata import FieldMetadataSerializer
 
 from .fields import LabelChoiceField, EuropeanFloatField, DepartmentField
