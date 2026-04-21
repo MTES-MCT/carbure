@@ -25,6 +25,7 @@ class BiomethaneProductionUnitService:
     PHASE_SEPARATION_FIELDS = ["liquid_phase_treatment_steps", "solid_phase_treatment_steps"]
     SPREADING_MANAGEMENT_FIELDS = ["spreading_management_methods", "digestate_sale_types"]
     ICPE_FIELDS = ["icpe_number", "icpe_regime"]
+    ISDND_OPTIONAL_FIELDS = ["digestate_storage"]
     ISDND_RELATED_FIELDS = [
         "process_type",
         "methanization_process",
@@ -154,5 +155,11 @@ def _build_production_unit_optional_rules() -> list[FieldClearingRule]:
             name="STEP_unit_type",
             fields=BiomethaneProductionUnitService.ICPE_FIELDS,
             condition=lambda ctx: ctx.instance.unit_type == BiomethaneProductionUnit.STEP,
+        ),
+        # Digestate storage is optional when unit type is ISDND
+        OptionalFieldRule(
+            name="ISDND_unit_type",
+            fields=BiomethaneProductionUnitService.ISDND_OPTIONAL_FIELDS,
+            condition=lambda ctx: ctx.instance.unit_type == BiomethaneProductionUnit.ISDND,
         ),
     ]

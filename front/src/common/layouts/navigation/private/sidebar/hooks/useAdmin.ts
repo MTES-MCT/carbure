@@ -3,7 +3,6 @@ import { MenuSection } from "../sidebar.types"
 import { useRoutes } from "common/hooks/routes"
 import useEntity from "common/hooks/entity"
 import { apiTypes } from "common/services/api-fetch.types"
-import { ExternalAdminPages } from "common/types"
 
 type AdminParams = Pick<apiTypes["NavStats"], "total_pending_action_for_admin">
 
@@ -12,15 +11,11 @@ type AdminParams = Pick<apiTypes["NavStats"], "total_pending_action_for_admin">
 export const useAdmin = (params?: AdminParams) => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const { isAdmin, isExternal, hasAdminRight } = useEntity()
-
-  // For now, only external admin ADEME cannot access admin module
-  const isAllowedToAccessAdmin =
-    isAdmin || (isExternal && !hasAdminRight(ExternalAdminPages.ADEME))
+  const { isAdmin, isExternal } = useEntity()
 
   const admin: MenuSection = {
     title: t("Admin"),
-    condition: isAllowedToAccessAdmin,
+    condition: isAdmin || isExternal,
     children: [
       {
         path: routes.ADMIN().COMPANIES,

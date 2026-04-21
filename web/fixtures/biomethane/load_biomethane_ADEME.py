@@ -18,7 +18,7 @@ load_external_admin_entities(filename, ExternalAdminRights.ADEME, "ADEME")
 
 # Create national entity for ADEME
 entity, created = Entity.objects.get_or_create(
-    name="ADEME",
+    name="ADEME - Biométhane",
     entity_type=Entity.EXTERNAL_ADMIN,
 )
 
