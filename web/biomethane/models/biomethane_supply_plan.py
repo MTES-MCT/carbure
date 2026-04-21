@@ -4,6 +4,8 @@ from core.models import Entity
 
 
 class BiomethaneSupplyPlan(models.Model):
+    translation_model_key = "supply_plan"
+
     # Producteur associé au plan d'approvisionnement
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_supply_plans")
 

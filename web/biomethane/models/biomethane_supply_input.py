@@ -5,6 +5,7 @@ from core.models import Pays
 
 
 class BiomethaneSupplyInput(models.Model):
+    translation_model_key = "supply_input"
     # Plan d'approvisionnement associé
     supply_plan = models.ForeignKey(BiomethaneSupplyPlan, on_delete=models.CASCADE, related_name="supply_inputs")
 

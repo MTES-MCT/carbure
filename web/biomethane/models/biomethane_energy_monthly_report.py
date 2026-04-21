@@ -5,6 +5,7 @@ from core.models.virtual_fields import virtual_field
 
 
 class BiomethaneEnergyMonthlyReport(models.Model):
+    translation_model_key = "energy.monthly_report"
     # Production d'énergie associée
     energy = models.ForeignKey(BiomethaneEnergy, on_delete=models.CASCADE, related_name="monthly_reports")
     # Mois du relevé (1-12)

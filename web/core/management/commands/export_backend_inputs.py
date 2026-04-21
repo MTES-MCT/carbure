@@ -35,7 +35,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--modules",
             type=str,
-            default="biomethane",
+            default="",
             help="Comma-separated Django app modules to export (default: biomethane).",
         )
 

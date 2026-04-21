@@ -6,6 +6,8 @@ from core.models import Entity
 
 
 class BiomethaneInjectionSite(models.Model):
+    translation_model_key = "injection"
+
     TRANSPORT = "TRANSPORT"
     DISTRIBUTION = "DISTRIBUTION"
 

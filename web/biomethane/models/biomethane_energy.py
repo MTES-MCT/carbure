@@ -8,6 +8,8 @@ from core.models.fields import JSONChoiceField
 
 
 class BiomethaneEnergy(models.Model):
+    translation_model_key = "energy"
+
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_energies")
 
     # Année de déclaration des informations

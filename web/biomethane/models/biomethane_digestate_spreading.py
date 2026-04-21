@@ -4,6 +4,7 @@ from .biomethane_digestate import BiomethaneDigestate
 
 
 class BiomethaneDigestateSpreading(models.Model):
+    translation_model_key = "digestate_spreading"
     digestate = models.ForeignKey(BiomethaneDigestate, on_delete=models.CASCADE, related_name="spreadings")
     spreading_department = models.CharField(verbose_name="Département d'épandage", max_length=3)
     spread_quantity = models.FloatField(verbose_name="Quantité épandue (t)")
