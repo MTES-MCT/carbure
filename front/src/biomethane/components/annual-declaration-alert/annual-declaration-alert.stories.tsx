@@ -64,3 +64,21 @@ export const DeclarationAlreadySubmitted: Story = {
     }),
   ],
 }
+
+export const DeclarationOverdue: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Case 4: In declaration period and declaration overdue - should not display alert",
+    },
+  },
+  decorators: [
+    generateAnnualDeclarationContextProvider({
+      isDeclarationInCurrentPeriod: true,
+      isDeclarationValidated: false,
+      annualDeclaration: createMockAnnualDeclaration(
+        AnnualDeclarationStatus.OVERDUE
+      ),
+    }),
+  ],
+}
