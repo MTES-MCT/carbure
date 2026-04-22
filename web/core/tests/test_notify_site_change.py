@@ -1,8 +1,13 @@
-from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from django import forms
+
 from core.services.notify_site_change import notify_site_change
+
+
+class SiteChangeForm(forms.Form):
+    name = forms.CharField(label="Name")
 
 
 class NotifySiteChangeTest(TestCase):
@@ -17,28 +22,30 @@ class NotifySiteChangeTest(TestCase):
         entity_filter,
         send_mail,
     ):
-        form = SimpleNamespace(
-            changed_data=["name"],
-            cleaned_data={"name": "Updated site"},
-            initial={"name": "Initial site"},
-        )
+        form = SiteChangeForm(data={"name": "Updated site"}, initial={"name": "Initial site"})
+        self.assertTrue(form.is_valid())
 
-        site_entity_values = MagicMock()
-        site_entity_values.distinct.return_value = site_entity_values
-        site_entity_values.values_list.return_value = [2]
+        site_entities = MagicMock()
+        site_entities.distinct.return_value = [2]
 
-        site = SimpleNamespace(
+        site = MagicMock(
             name="Demo site",
             created_by_id=1,
-            entitysite_set=SimpleNamespace(values=MagicMock(return_value=site_entity_values)),
+            entitysite_set=MagicMock(values_list=MagicMock(return_value=site_entities)),
         )
 
         lots = MagicMock()
-        lots.values.return_value.distinct.return_value.values_list.return_value = [3, None]
+        lots.values_list.side_effect = [
+            MagicMock(distinct=MagicMock(return_value=[3, None])),
+            MagicMock(distinct=MagicMock(return_value=[])),
+        ]
         lots_filter.return_value = lots
 
         tickets = MagicMock()
-        tickets.values.return_value.distinct.return_value.values_list.return_value = [4]
+        tickets.values_list.side_effect = [
+            MagicMock(distinct=MagicMock(return_value=[4])),
+            MagicMock(distinct=MagicMock(return_value=[])),
+        ]
         tickets_filter.return_value = tickets
 
         entity_1 = MagicMock()
