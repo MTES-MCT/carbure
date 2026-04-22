@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import (
@@ -9,6 +10,7 @@ from core.models import (
     Entity,
     ExternalAdminRights,
 )
+from core.permissions import HasUserRights
 from doublecount.models import DoubleCountingApplication
 from elec.models import ElecMeterReadingApplication
 from elec.models.elec_audit_sample import ElecAuditSample
@@ -31,6 +33,14 @@ class NavStatsSerializer(serializers.Serializer):
     tickets = serializers.IntegerField(required=False)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter("entity_id", OpenApiTypes.INT, OpenApiParameter.QUERY, description="Entity ID", required=True),
+    ],
+    responses={"200": NavStatsSerializer},
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, HasUserRights])
 def get_nav_stats(request):
     if not request or not request.user:
         return Response({})
@@ -95,11 +105,3 @@ def get_nav_stats(request):
 
     serializer = NavStatsSerializer(response_data)
     return Response(serializer.data)
-
-
-get_nav_stats = extend_schema(
-    parameters=[
-        OpenApiParameter("entity_id", OpenApiTypes.INT, OpenApiParameter.QUERY, description="Entity ID", required=True),
-    ],
-    responses={"200": NavStatsSerializer},
-)(api_view(["GET"])(get_nav_stats))

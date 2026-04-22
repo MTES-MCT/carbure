@@ -9,6 +9,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from tiruert.filters import MacFilter
 from tiruert.models import MacFossilFuel
+from tiruert.permissions import HasTiruertRightsObjectives
 
 
 @extend_schema(
@@ -38,6 +39,7 @@ class MacFossilFuelExportViewSet(GenericViewSet):
     queryset = MacFossilFuel.objects.all()
     filterset_class = MacFilter
     serializer_class = None
+    permission_classes = [HasTiruertRightsObjectives]
 
     @action(detail=False, methods=["get"], url_path="export")
     def export_macfossilfuel_to_excel(self, request, *args, **kwargs):
