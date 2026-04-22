@@ -15,7 +15,7 @@ import { useValidateVolumes } from "../hooks/use-validate-volumes"
 import { useNotify } from "common/components/notifications"
 import { QualichargeValidatedBy } from "../types"
 import { ExternalAdminPages } from "common/types"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatPercentage } from "common/utils/formatters"
 
 export const QualichargeDataDetail = () => {
   const match = useHashMatch("data/:id")
@@ -118,7 +118,7 @@ export const QualichargeDataDetail = () => {
               />
               <TextInput
                 label={t("Taux utilisé")}
-                value={(result?.data?.enr_ratio ?? 0) * 100 + " %"}
+                value={formatPercentage((result?.data?.enr_ratio ?? 0) * 100)}
                 readOnly
               />
             </Grid>
