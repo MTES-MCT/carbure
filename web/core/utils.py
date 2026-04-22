@@ -1,5 +1,6 @@
 import os
 import unicodedata
+from datetime import date
 
 import pandas as pd
 import xlsxwriter
@@ -7,6 +8,8 @@ from django import forms
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import connection, transaction
+from django.utils.formats import date_format
+from django.utils.translation import override
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.serializers import ValidationError
 
@@ -26,6 +29,20 @@ def normalize_string(input_str: str):
     nfkd_form = unicodedata.normalize("NFKD", lower_case)
     only_ascii = nfkd_form.encode("ASCII", "ignore")
     return only_ascii
+
+
+def format_month_label(month_value, locale="fr"):
+    """Return a localized month label from a month number."""
+    try:
+        month_number = int(month_value)
+    except (TypeError, ValueError):
+        return month_value
+
+    if month_number < 1 or month_number > 12:
+        return month_value
+
+    with override(locale):
+        return date_format(date(2000, month_number, 1), "F").capitalize()
 
 
 @transaction.atomic

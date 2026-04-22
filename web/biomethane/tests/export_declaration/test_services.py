@@ -13,6 +13,7 @@ from biomethane.factories.production_unit import BiomethaneDigestateStorageFacto
 from biomethane.models import (
     BiomethaneContract,
     BiomethaneEnergy,
+    BiomethaneEnergyMonthlyReport,
 )
 from biomethane.services.declaration_export import _format_value, generate_annual_export
 from core.models import Entity
@@ -23,6 +24,7 @@ EXPECTED_SHEETS = [
     "Site d'injection",
     "Digestat",
     "Énergie",
+    "Énergie mensuelle",
     "Approvisionnement",
     "Stockage digestat",
     "Épandage digestat",
@@ -69,8 +71,8 @@ class GenerateAnnualExportTests(TestCase):
         self.assertTrue(file.readable())
         file.close()
 
-    def test_excel_has_8_sheets(self):
-        """Generated workbook contains exactly the 8 expected sheets."""
+    def test_excel_has_9_sheets(self):
+        """Generated workbook contains exactly the 9 expected sheets."""
         file = generate_annual_export(self.producer, self.YEAR)
         wb = self._load_workbook(file)
         self.assertEqual(wb.sheetnames, EXPECTED_SHEETS)
@@ -128,6 +130,32 @@ class GenerateAnnualExportTests(TestCase):
         # 1 header row + 2 data rows
         self.assertEqual(wb["Stockage digestat"].max_row, 3)
 
+    def test_energy_monthly_reports_sheet_rows(self):
+        """'Énergie mensuelle' sheet has one row per BiomethaneEnergyMonthlyReport."""
+        energy = BiomethaneEnergy.objects.create(producer=self.producer, year=self.YEAR)
+        BiomethaneEnergyMonthlyReport.objects.create(
+            energy=energy,
+            month=1,
+            injected_volume_nm3=100.0,
+            average_monthly_flow_nm3_per_hour=10.0,
+        )
+        BiomethaneEnergyMonthlyReport.objects.create(
+            energy=energy,
+            month=2,
+            injected_volume_nm3=200.0,
+            average_monthly_flow_nm3_per_hour=20.0,
+        )
+
+        file = generate_annual_export(self.producer, self.YEAR)
+        wb = self._load_workbook(file)
+        # 1 header row + 2 data rows
+        self.assertEqual(wb["Énergie mensuelle"].max_row, 3)
+        self.assertEqual(wb["Énergie mensuelle"]["A2"].value, "Janvier")
+        self.assertEqual(wb["Énergie mensuelle"]["A3"].value, "Février")
+        self.assertEqual(wb["Énergie mensuelle"]["D1"].value, "Heures d'injection (h)")
+        self.assertEqual(wb["Énergie mensuelle"]["D2"].value, 10.0)
+        self.assertEqual(wb["Énergie mensuelle"]["D3"].value, 10.0)
+
     def test_empty_producer_has_only_headers(self):
         """When no data exists, all sheets contain only the header row."""
         file = generate_annual_export(self.producer, self.YEAR)
@@ -143,14 +171,20 @@ class GenerateAnnualExportTests(TestCase):
     def test_wrong_year_year_filtered_sheets_are_empty(self):
         """Year-filtered sheets are empty when data exists for a different year."""
         BiomethaneDigestateFactory.create(producer=self.producer, year=self.YEAR)
-        BiomethaneEnergy.objects.create(producer=self.producer, year=self.YEAR)
+        energy = BiomethaneEnergy.objects.create(producer=self.producer, year=self.YEAR)
+        BiomethaneEnergyMonthlyReport.objects.create(
+            energy=energy,
+            month=1,
+            injected_volume_nm3=100.0,
+            average_monthly_flow_nm3_per_hour=10.0,
+        )
         supply_plan = BiomethaneSupplyPlanFactory.create(producer=self.producer, year=self.YEAR)
         BiomethaneSupplyInputFactory.create(supply_plan=supply_plan)
 
         file = generate_annual_export(self.producer, self.YEAR - 1)
         wb = self._load_workbook(file)
 
-        for sheet_name in ("Digestat", "Énergie", "Approvisionnement"):
+        for sheet_name in ("Digestat", "Énergie", "Énergie mensuelle", "Approvisionnement"):
             with self.subTest(sheet=sheet_name):
                 self.assertEqual(
                     wb[sheet_name].max_row,

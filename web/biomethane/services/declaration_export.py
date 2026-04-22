@@ -10,6 +10,7 @@ from biomethane.models import (
     BiomethaneContract,
     BiomethaneDigestate,
     BiomethaneEnergy,
+    BiomethaneEnergyMonthlyReport,
     BiomethaneInjectionSite,
     BiomethaneProductionUnit,
     BiomethaneSupplyPlan,
@@ -18,6 +19,7 @@ from biomethane.models.biomethane_digestate_spreading import BiomethaneDigestate
 from biomethane.models.biomethane_digestate_storage import BiomethaneDigestateStorage
 from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from core.models import Entity
+from core.utils import format_month_label
 
 
 def _verbose_name(model_class, field_name):
@@ -25,6 +27,9 @@ def _verbose_name(model_class, field_name):
     try:
         return str(model_class._meta.get_field(field_name).verbose_name)
     except Exception:
+        attr = getattr(model_class, field_name, None)
+        if isinstance(attr, property) and getattr(attr, "verbose_name", None):
+            return str(attr.verbose_name)
         return field_name.replace("_", " ")
 
 
@@ -75,12 +80,23 @@ _SKIP_FIELDS = {
     "private",
     "is_enabled",
     "created_by",
+    "energy",  # owner FK for BiomethaneEnergyMonthlyReport
 }
 
 
-def _auto_fields(model_class):
+def _auto_fields(model_class, virtual_field=False):
     """Return exportable field names for a model, skipping internal/structural ones."""
-    return [f.name for f in model_class._meta.local_fields if f.name not in _SKIP_FIELDS]
+    fields = [f.name for f in model_class._meta.local_fields if f.name not in _SKIP_FIELDS]
+
+    if not virtual_field:
+        return fields
+
+    virtual_fields = [
+        name
+        for name, attr in model_class.__dict__.items()
+        if isinstance(attr, property) and getattr(attr, "is_virtual_field", False)
+    ]
+    return fields + virtual_fields
 
 
 # BiomethaneProductionUnit inherits from Site via multi-table inheritance.
@@ -145,6 +161,29 @@ def _write_digestate_spreading_sheet(workbook, digestate, header_format):
     for row_idx, spreading in enumerate(BiomethaneDigestateSpreading.objects.filter(digestate=digestate), start=1):
         for col_idx, (field_name, _) in enumerate(columns):
             value = getattr(spreading, field_name, None)
+            sheet.write(row_idx, col_idx, _format_value(value))
+
+
+def _write_energy_monthly_reports_sheet(workbook, energy, header_format):
+    """Write an Énergie mensuelle sheet with one row per monthly report."""
+    sheet = workbook.add_worksheet("Énergie mensuelle")
+    columns = [
+        (fn, _verbose_name(BiomethaneEnergyMonthlyReport, fn))
+        for fn in _auto_fields(BiomethaneEnergyMonthlyReport, virtual_field=True)
+    ]
+    sheet.set_column(0, len(columns) - 1, 35)
+    for col_idx, (_, label) in enumerate(columns):
+        sheet.write(0, col_idx, label, header_format)
+
+    if energy is None:
+        return
+
+    monthly_reports = BiomethaneEnergyMonthlyReport.objects.filter(energy=energy).order_by("month")
+    for row_idx, report in enumerate(monthly_reports, start=1):
+        for col_idx, (field_name, _) in enumerate(columns):
+            value = getattr(report, field_name, None)
+            if field_name == "month":
+                value = format_month_label(value, locale="fr")
             sheet.write(row_idx, col_idx, _format_value(value))
 
 
@@ -215,6 +254,9 @@ def generate_annual_export(producer: Entity, year: int) -> BufferedReader:
         _fields_from_model(energy, _auto_fields(BiomethaneEnergy)) if energy else [],
         header_format,
     )
+
+    # Déclaration production énergie mensuelle (table)
+    _write_energy_monthly_reports_sheet(workbook, energy, header_format)
 
     # Approvisionnement (table)
     supply_plan = BiomethaneSupplyPlan.objects.filter(producer=producer, year=year).first()
