@@ -17,15 +17,15 @@ def notify_site_change(site: Site, form: Form):
     changes_summary = "\n".join(f'- {field} : "{old}" → "{new}"' for field, (old, new) in changes.items())
 
     message = f"""
-    Bonjour,
+Bonjour,
 
-    Nous souhaitons vous informer que certaines données du site "{site.name}" ont été mises à jour.
+Nous souhaitons vous informer que certaines données du site "{site.name}" ont été mises à jour.
 
-    Modifications apportées :
-    {changes_summary}
+Modifications apportées :
+{changes_summary}
 
-    Bien cordialement,
-    L'équipe CarbuRe
+Bien cordialement,
+L'équipe CarbuRe
     """
 
     lots = CarbureLot.objects.filter(Q(carbure_production_site=site) | Q(carbure_delivery_site=site))
@@ -63,7 +63,8 @@ def notify_site_change(site: Site, form: Form):
 def build_changes(form: Form) -> dict[str, tuple[str, str]]:
     changes = {}
     for field in form.changed_data:
+        label = form[field].label
         old_value = form.initial.get(field)
         new_value = form.cleaned_data[field]
-        changes[field] = (old_value, new_value)
+        changes[label] = (old_value, new_value)
     return changes
