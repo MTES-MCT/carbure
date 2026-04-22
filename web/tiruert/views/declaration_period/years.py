@@ -1,9 +1,10 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from tiruert.models.declaration_period import TiruertDeclarationPeriod
+from tiruert.permissions import HasTiruertRightsObjectives
 from tiruert.services.declaration_period import DeclarationPeriodService
 
 
@@ -30,6 +31,7 @@ from tiruert.services.declaration_period import DeclarationPeriodService
     },
 )
 @api_view(["GET"])
+@permission_classes([HasTiruertRightsObjectives])
 def declaration_period_years(request):
     """Return the list of past years until the current one"""
     current_period_year = DeclarationPeriodService.get_current_declaration_year()
