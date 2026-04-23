@@ -23,6 +23,7 @@ import { useContractProductionUnit } from "biomethane/providers/contract-product
 import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { useDisplayConditionalSectionsEnergy } from "./energy.hooks"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
@@ -32,6 +33,8 @@ const EnergyPage = () => {
   const { selectedYear } = useAnnualDeclaration()
   const { contractInfos: contract } = useContractProductionUnit()
   const displayConditionalSections = useDisplayConditionalSectionsEnergy()
+  const { energy: energyRules } = useBiomethaneBusinessRules()
+
   const { result: energy, loading } = useQuery(getEnergy, {
     key: "energy",
     params: [entity.id, selectedYear, selectedEntityId],
@@ -55,7 +58,9 @@ const EnergyPage = () => {
       <InjectedBiomethane energy={energy} contract={contract} />
 
       <BiogasProduction />
-      <InstallationEnergyNeeds contract={contract} />
+      {energyRules.installationEnergyNeeds.displaySection && (
+        <InstallationEnergyNeeds contract={contract} />
+      )}
       <EnergyEfficiency energy={energy} contract={contract} />
 
       {displayConditionalSections &&

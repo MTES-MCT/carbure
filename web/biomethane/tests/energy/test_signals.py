@@ -36,7 +36,7 @@ class ClearEnergyFieldsSignalTests(TestCase):
         # Configure mocks after creation
         mock_get_fields.reset_mock()
         mock_filter.reset_mock()
-        mock_get_fields.return_value = ["field1", "field2"]
+        mock_get_fields.return_value = ["injected_biomethane_gwh_pcs_per_year", "produced_biogas_nm3_per_year"]
         mock_queryset = Mock()
         mock_filter.return_value = mock_queryset
 
@@ -51,11 +51,12 @@ class ClearEnergyFieldsSignalTests(TestCase):
 
         # Verify update was called with correct data
         mock_filter.assert_called_once_with(pk=energy.pk)
-        mock_queryset.update.assert_called_once_with(field1=None, field2=None)
+        mock_queryset.update.assert_called_once_with(
+            injected_biomethane_gwh_pcs_per_year=None, produced_biogas_nm3_per_year=None
+        )
 
     @patch("biomethane.services.energy.BiomethaneEnergyService.get_fields_to_clear")
-    @patch("biomethane.models.biomethane_energy.BiomethaneEnergy.objects.filter")
-    def test_handler_with_production_unit_sender_gets_latest_energy(self, mock_filter, mock_get_fields):
+    def test_handler_with_production_unit_sender_gets_latest_energy(self, mock_get_fields):
         """Test handler retrieves latest energy when sender is BiomethaneProductionUnit."""
         # Setup - create multiple energies with different years
         production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
@@ -65,7 +66,7 @@ class ClearEnergyFieldsSignalTests(TestCase):
 
         # Configure mocks after creation
         mock_get_fields.reset_mock()
-        mock_get_fields.return_value = ["field1"]
+        mock_get_fields.return_value = []
 
         # Execute
         clear_energy_fields_on_related_model_save(
@@ -77,8 +78,7 @@ class ClearEnergyFieldsSignalTests(TestCase):
         mock_get_fields.assert_called_once_with(energy_2024)
 
     @patch("biomethane.services.energy.BiomethaneEnergyService.get_fields_to_clear")
-    @patch("biomethane.models.biomethane_energy.BiomethaneEnergy.objects.filter")
-    def test_handler_with_contract_sender_gets_latest_energy(self, mock_filter, mock_get_fields):
+    def test_handler_with_contract_sender_gets_latest_energy(self, mock_get_fields):
         """Test handler retrieves latest energy when sender is BiomethaneContract."""
         # Setup - create multiple energies with different years
         buyer = Entity.objects.create(name="Buyer", entity_type=Entity.OPERATOR)
@@ -89,7 +89,7 @@ class ClearEnergyFieldsSignalTests(TestCase):
 
         # Configure mocks after creation
         mock_get_fields.reset_mock()
-        mock_get_fields.return_value = ["field1"]
+        mock_get_fields.return_value = []
 
         # Execute
         clear_energy_fields_on_related_model_save(

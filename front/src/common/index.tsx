@@ -10,6 +10,7 @@ import { lazy, Suspense } from "react"
 import { BiomethaneRoutes } from "biomethane/routes"
 import { useCacheBuster } from "./hooks/cache-buster"
 import { ExternalAdminPages } from "./types"
+import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -114,6 +115,8 @@ const currentYear = new Date().getFullYear()
 const Org = () => {
   const entity = useEntity()
   const user = useUser()
+  const { canAccessModule: canAccessBiomethaneModule } =
+    useBiomethanePermissions()
   useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO
 
   const {
@@ -127,7 +130,6 @@ const Org = () => {
     isCPO,
     isPowerOrHeatProducer,
     isSafTrader,
-    isBiomethaneProducer,
     has_saf,
     accise_number,
   } = entity
@@ -143,8 +145,7 @@ const Org = () => {
     isExternal && entity.hasAdminRight(ExternalAdminPages.TRANSFERRED_ELEC)
   const isBiofuelAdmin =
     isExternal && entity.hasAdminRight(ExternalAdminPages.BIOFUEL)
-  const isDrealAdmin =
-    isExternal && entity.hasAdminRight(ExternalAdminPages.DREAL)
+
   const userIsMTEDGEC = user?.rights.find(
     (right) => right.entity.name === "MTE - DGEC"
   )
@@ -260,7 +261,7 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="entities" />} />
       )}
 
-      {(isBiomethaneProducer || isDrealAdmin) && (
+      {canAccessBiomethaneModule && (
         <>
           <Route path="biomethane/*" element={<BiomethaneRoutes />} />
           <Route path="*" element={<Navigate replace to="biomethane" />} />

@@ -1,9 +1,11 @@
 from django.test import TestCase
 
 from biomethane.permissions import (
+    CanAccessAdminModule,
+    CanAccessInjection,
     HasBiomethaneProducerWriteRights,
-    HasDrealOrProducerRights,
     HasDrealRights,
+    ReadAccessBiomethane,
     get_biomethane_permissions,
 )
 from biomethane.views import (
@@ -22,11 +24,11 @@ from biomethane.views import (
     BiomethaneSupplyPlanViewSet,
 )
 from biomethane.views.admin.annual_declaration import BiomethaneAdminAnnualDeclarationViewSet
-from core.models import Entity, ExternalAdminRights, UserRights
+from core.models import Entity, UserRights
 from core.tests_utils import PermissionTestMixin
 
 
-class BiomethanePermissionsMixinTests(TestCase):
+class BiomethanePermissionsMixinTests(TestCase, PermissionTestMixin):
     def test_write_actions_initialization(self):
         """Test that write_actions throws an error if it is not a list"""
         with self.assertRaises(ValueError):
@@ -41,10 +43,7 @@ class BiomethanePermissionsMixinTests(TestCase):
     def test_get_permissions_with_read_action(self):
         """Test that get_permissions returns the correct permission for a read action"""
         permissions = get_biomethane_permissions(["upsert", "validate"], "retrieve")
-        self.assertEqual(permissions[0].op1.role, None)
-        self.assertEqual(permissions[0].op1.entity_type, [Entity.BIOMETHANE_PRODUCER])
-        self.assertEqual(permissions[0].op2.allow_external, [ExternalAdminRights.DREAL])
-        self.assertEqual(permissions[0].op2.allow_role, None)
+        self.assertPermissionsEqual(permissions, [ReadAccessBiomethane()])
 
 
 class BiomethanePermissions(TestCase, PermissionTestMixin):
@@ -53,7 +52,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneContractViewSet,
             [
-                (["retrieve", "watched_fields"], [HasDrealOrProducerRights()]),
+                (["retrieve", "watched_fields"], [ReadAccessBiomethane()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -63,7 +62,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneEnergyViewSet,
             [
-                (["retrieve", "get_optional_fields"], [HasDrealOrProducerRights()]),
+                (["retrieve", "get_optional_fields"], [ReadAccessBiomethane()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -73,7 +72,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneProductionUnitViewSet,
             [
-                (["retrieve", "watched_fields"], [HasDrealOrProducerRights()]),
+                (["retrieve", "watched_fields"], [ReadAccessBiomethane()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -83,7 +82,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneContractAmendmentViewSet,
             [
-                (["list", "retrieve"], [HasDrealOrProducerRights()]),
+                (["list", "retrieve"], [ReadAccessBiomethane()]),
                 (["create"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -93,7 +92,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneDigestateViewSet,
             [
-                (["retrieve", "get_optional_fields"], [HasDrealOrProducerRights()]),
+                (["retrieve", "get_optional_fields"], [ReadAccessBiomethane()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -103,7 +102,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneInjectionSiteViewSet,
             [
-                (["retrieve"], [HasDrealOrProducerRights()]),
+                (["retrieve"], [CanAccessInjection()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -113,7 +112,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneAnnualDeclarationViewSet,
             [
-                (["retrieve", "get_years"], [HasDrealOrProducerRights()]),
+                (["retrieve", "get_years"], [ReadAccessBiomethane()]),
                 (["validate_annual_declaration"], [HasBiomethaneProducerWriteRights()]),
                 (["create"], [HasDrealRights()]),
                 (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
@@ -125,7 +124,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneSupplyPlanViewSet,
             [
-                (["get_years"], [HasDrealOrProducerRights()]),
+                (["get_years"], [ReadAccessBiomethane()]),
                 (["import_supply_plan_from_excel"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -135,7 +134,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneSupplyInputViewSet,
             [
-                (["retrieve", "list", "export_supply_plan_to_excel", "filters"], [HasDrealOrProducerRights()]),
+                (["retrieve", "list", "export_supply_plan_to_excel", "filters"], [ReadAccessBiomethane()]),
                 (["create", "destroy", "update"], [HasBiomethaneProducerWriteRights()]),
                 (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
             ],
@@ -155,7 +154,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneEnergyMonthlyReportViewSet,
             [
-                (["list"], [HasDrealOrProducerRights()]),
+                (["list"], [ReadAccessBiomethane()]),
                 (["upsert"], [HasBiomethaneProducerWriteRights()]),
             ],
         )
@@ -165,7 +164,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneDigestateStorageViewSet,
             [
-                (["list", "retrieve"], [HasDrealOrProducerRights()]),
+                (["list", "retrieve"], [ReadAccessBiomethane()]),
                 (["create", "destroy", "update"], [HasBiomethaneProducerWriteRights()]),
                 (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
             ],
@@ -176,7 +175,7 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneProducersViewSet,
             [
-                (["list"], [HasDrealRights()]),
+                (["list"], [CanAccessAdminModule()]),
             ],
         )
 
@@ -185,6 +184,6 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneAdminAnnualDeclarationViewSet,
             [
-                (["list", "filters"], [HasDrealRights()]),
+                (["list", "filters"], [CanAccessAdminModule()]),
             ],
         )

@@ -3,15 +3,19 @@ import { useTranslation } from "react-i18next"
 import { MenuSection } from "../sidebar.types"
 import useEntity from "common/hooks/entity"
 import { useLocation } from "react-router-dom"
-
 const currentYear = new Date().getFullYear()
-import { ExternalAdminPages } from "common/types"
+import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
+import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
 
 export const useBiomethane = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
   const loc = useLocation()
-  const { isBiomethaneProducer, hasAdminRight } = useEntity()
+  const { isBiomethaneProducer } = useEntity()
+  const { canAccessAdmin, canAccessSupplyPlanAdmin } =
+    useBiomethanePermissions()
+
+  const { digestate } = useBiomethaneBusinessRules()
 
   const routesDeclaration = ["digestate", "energy", "supply-plan"]
   const currentRouteIsDeclaration = routesDeclaration.some((route) =>
@@ -19,7 +23,7 @@ export const useBiomethane = () => {
   )
 
   // When we are not in the declaration pages, we don't need to pass the year to the routes
-  const year = !currentRouteIsDeclaration ? undefined : currentYear - 1
+  const year = currentRouteIsDeclaration ? currentYear - 1 : undefined
 
   const biomethaneProducerMenu: MenuSection = {
     title: t("Déclarations"),
@@ -36,6 +40,7 @@ export const useBiomethane = () => {
         title: t("Digestat"),
         icon: "ri-contrast-drop-line",
         iconActive: "ri-contrast-drop-fill",
+        condition: digestate.shouldFillDigestate,
       },
       {
         path: routes.BIOMETHANE(year).PRODUCER.ENERGY,
@@ -48,7 +53,7 @@ export const useBiomethane = () => {
 
   const biomethaneAdminMenu: MenuSection = {
     title: t("Biométhane"),
-    condition: hasAdminRight(ExternalAdminPages.DREAL),
+    condition: canAccessAdmin,
     children: [
       {
         path: routes.BIOMETHANE().ADMIN.DASHBOARD,
@@ -61,6 +66,7 @@ export const useBiomethane = () => {
         title: t("Intrants"),
         icon: "ri-leaf-line",
         iconActive: "ri-leaf-fill",
+        condition: canAccessSupplyPlanAdmin,
       },
       {
         path: routes.BIOMETHANE().ADMIN.DECLARATIONS,

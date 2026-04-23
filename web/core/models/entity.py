@@ -205,12 +205,26 @@ class Entity(models.Model):
             filter_condition |= Q(entity_type=Entity.PRODUCER)
         if self.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
             filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR)
-        if self.has_external_admin_right(ExternalAdminRights.DREAL):
+        has_dreal_right = self.has_external_admin_right(ExternalAdminRights.DREAL)
+        has_ademe_right = self.has_external_admin_right(ExternalAdminRights.ADEME)
+
+        if has_dreal_right or has_ademe_right:
             accessible_dept_codes = self.get_accessible_departments().values_list("code_dept", flat=True)
-            filter_condition |= Q(
+            condition = Q(
                 biomethane_production_unit__department__code_dept__in=accessible_dept_codes,
                 entity_type=Entity.BIOMETHANE_PRODUCER,
             )
+
+            # ADEME access is restricted to biomethane producers in accessible departments
+            # that have received ADEME complementary aid.
+            # If the entity also has DREAL rights, keep the broader DREAL scope.
+            if has_ademe_right and not has_dreal_right:
+                from biomethane.services.ademe import AdemeService
+
+                condition &= AdemeService.get_ademe_contract_filter(
+                    contract_prefix="biomethane_contract__",
+                )
+            filter_condition |= condition
 
         return entities.filter(filter_condition)
 
@@ -233,6 +247,7 @@ class ExternalAdminRights(models.Model):
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
     BIOFUEL = "BIOFUEL"
     DREAL = "DREAL"
+    ADEME = "ADEME"
     DGDDI = "DGDDI"
 
     RIGHTS = (
@@ -244,6 +259,7 @@ class ExternalAdminRights(models.Model):
         (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
         (BIOFUEL, BIOFUEL),
         (DREAL, DREAL),
+        (ADEME, ADEME),
         (DGDDI, DGDDI),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)

@@ -3,9 +3,10 @@ from unittest.mock import Mock
 from django.test import TestCase
 
 from biomethane.factories.production_unit import BiomethaneDigestateStorageFactory, BiomethaneProductionUnitFactory
-from biomethane.models import BiomethaneProductionUnit
+from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
 from biomethane.services.production_unit import (
     BiomethaneProductionUnitService,
+    ProductionUnitContext,
     _build_production_unit_clearing_rules,
     _build_production_unit_optional_rules,
 )
@@ -26,7 +27,9 @@ class ProductionUnitRulesConfigurationTests(TestCase):
             "no_hygienization_exemption",
             "no_phase_separation",
             "spreading_not_selected",
+            "isdnd",
             "STEP_unit_type",
+            "ISDND_unit_type",
         ]
         actual_rule_names = [rule.name for rule in self.rules + self.optional_rules]
         self.assertEqual(expected_rule_names, actual_rule_names)
@@ -38,10 +41,10 @@ class ProductionUnitRulesConfigurationTests(TestCase):
 
         mock_instance = Mock()
         mock_instance.has_sanitary_approval = False
-        self.assertTrue(rule.condition(mock_instance))
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
         mock_instance.has_sanitary_approval = True
-        self.assertFalse(rule.condition(mock_instance))
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
     def test_no_hygienization_exemption_rule_fields_and_condition(self):
         """Test no_hygienization_exemption rule has correct fields and condition logic."""
@@ -50,10 +53,10 @@ class ProductionUnitRulesConfigurationTests(TestCase):
 
         mock_instance = Mock()
         mock_instance.has_hygienization_exemption = False
-        self.assertTrue(rule.condition(mock_instance))
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
         mock_instance.has_hygienization_exemption = True
-        self.assertFalse(rule.condition(mock_instance))
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
     def test_no_phase_separation_rule_fields_and_condition(self):
         """Test no_phase_separation rule has correct fields and condition logic."""
@@ -62,10 +65,10 @@ class ProductionUnitRulesConfigurationTests(TestCase):
 
         mock_instance = Mock()
         mock_instance.has_digestate_phase_separation = False
-        self.assertTrue(rule.condition(mock_instance))
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
         mock_instance.has_digestate_phase_separation = True
-        self.assertFalse(rule.condition(mock_instance))
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
     def test_spreading_not_selected_rule_fields_and_condition(self):
         """Test spreading_not_selected rule has correct fields and condition logic."""
@@ -75,20 +78,47 @@ class ProductionUnitRulesConfigurationTests(TestCase):
         mock_instance = Mock()
         # Should trigger when SPREADING is not in the list
         mock_instance.digestate_valorization_methods = [BiomethaneProductionUnit.COMPOSTING]
-        self.assertTrue(rule.condition(mock_instance))
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
         mock_instance.digestate_valorization_methods = []
-        self.assertTrue(rule.condition(mock_instance))
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
         # Should not trigger when SPREADING is selected
         mock_instance.digestate_valorization_methods = [BiomethaneProductionUnit.SPREADING]
-        self.assertFalse(rule.condition(mock_instance))
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
         mock_instance.digestate_valorization_methods = [
             BiomethaneProductionUnit.SPREADING,
             BiomethaneProductionUnit.COMPOSTING,
         ]
-        self.assertFalse(rule.condition(mock_instance))
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
+
+    def test_isdnd_rule_fields_and_condition(self):
+        """Test isdnd rule has correct fields and condition logic."""
+        rule = next(r for r in self.rules if r.name == "isdnd")
+        self.assertEqual(rule.fields, BiomethaneProductionUnitService.ISDND_RELATED_FIELDS)
+
+        mock_instance = Mock()
+        mock_contract = Mock()
+
+        # Should trigger when unit_type is ISDND
+        mock_instance.unit_type = BiomethaneProductionUnit.ISDND
+        mock_contract.installation_category = BiomethaneContract.INSTALLATION_CATEGORY_1
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance, contract=mock_contract)))
+
+        # Should trigger when installation_category is INSTALLATION_CATEGORY_3
+        mock_instance.unit_type = BiomethaneProductionUnit.OTHER
+        mock_contract.installation_category = BiomethaneContract.INSTALLATION_CATEGORY_3
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance, contract=mock_contract)))
+
+        # Should not trigger when neither condition is met
+        mock_instance.unit_type = BiomethaneProductionUnit.OTHER
+        mock_contract.installation_category = BiomethaneContract.INSTALLATION_CATEGORY_1
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance, contract=mock_contract)))
+
+        # Should not trigger when contract is None and unit_type is not ISDND
+        mock_instance.unit_type = BiomethaneProductionUnit.OTHER
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance, contract=None)))
 
     def test_STEP_unit_type_rule_fields_and_condition(self):
         """Test STEP_unit_type rule has correct fields and condition logic."""
@@ -98,11 +128,25 @@ class ProductionUnitRulesConfigurationTests(TestCase):
         mock_instance = Mock()
         # Should not trigger when unit type is not STEP
         mock_instance.unit_type = BiomethaneProductionUnit.OTHER
-        self.assertFalse(rule.condition(mock_instance))
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
         # Should trigger when unit type is STEP
         mock_instance.unit_type = BiomethaneProductionUnit.STEP
-        self.assertTrue(rule.condition(mock_instance))
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
+
+    def test_ISDND_unit_type_rule_fields_and_condition(self):
+        """Test ISDND_unit_type rule has correct fields and condition logic."""
+        rule = next(r for r in self.optional_rules if r.name == "ISDND_unit_type")
+        self.assertEqual(rule.fields, BiomethaneProductionUnitService.ISDND_OPTIONAL_FIELDS)
+
+        mock_instance = Mock()
+        # Should trigger when unit type is ISDND
+        mock_instance.unit_type = BiomethaneProductionUnit.ISDND
+        self.assertTrue(rule.condition(ProductionUnitContext(instance=mock_instance)))
+
+        # Should not trigger when unit type is not ISDND
+        mock_instance.unit_type = BiomethaneProductionUnit.OTHER
+        self.assertFalse(rule.condition(ProductionUnitContext(instance=mock_instance)))
 
 
 class BiomethaneProductionUnitServiceIntegrationTests(TestCase):
