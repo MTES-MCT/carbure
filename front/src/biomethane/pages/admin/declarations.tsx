@@ -1,5 +1,4 @@
 import { Main } from "common/components/scaffold"
-import { SelectDsfr } from "common/components/selects2"
 import { Text } from "common/components/text"
 import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
@@ -8,6 +7,7 @@ import useEntity from "common/hooks/entity"
 import { useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { Autocomplete } from "common/components/autocomplete2"
 
 const BiomethaneAdminDeclarationsPage = () => {
   const { t } = useTranslation()
@@ -45,11 +45,11 @@ const BiomethaneAdminDeclarationsPage = () => {
           "Veuillez sélectionner un établissement afin de voir ses déclarations et ses informations administratives et de contact."
         )}
       </Text>
-      <SelectDsfr
+      <Autocomplete
         options={producers ?? []}
         onChange={onSelectProducer}
         label={t("Rechercher un établissement")}
-        placeholder={t("Sélectionner un établissement")}
+        placeholder={t("Rechercher un établissement")}
         style={{ maxWidth: "460px" }}
       />
     </Main>

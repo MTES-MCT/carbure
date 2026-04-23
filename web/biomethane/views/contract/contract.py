@@ -5,9 +5,10 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneContract
-from biomethane.permissions import get_biomethane_permissions
+from biomethane.permissions import HasRestrictedAccessContract, get_biomethane_permissions
 from biomethane.serializers.contract import (
     BiomethaneContractInputSerializer,
+    BiomethaneContractRestrictedSerializer,
     BiomethaneContractSerializer,
 )
 from biomethane.views.mixins import RetrieveSingleObjectMixin, WatchedFieldsActionMixin
@@ -43,6 +44,8 @@ class BiomethaneContractViewSet(RetrieveSingleObjectMixin, WatchedFieldsActionMi
     def get_serializer_class(self):
         if self.action == "upsert":
             return BiomethaneContractInputSerializer
+        if self.action == "retrieve" and HasRestrictedAccessContract().has_permission(self.request, self):
+            return BiomethaneContractRestrictedSerializer
         return BiomethaneContractSerializer
 
     @extend_schema(

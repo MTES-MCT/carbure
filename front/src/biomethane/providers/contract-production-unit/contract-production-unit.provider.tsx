@@ -1,10 +1,10 @@
 import { createContext, ReactNode, useContext, useMemo } from "react"
-import { useGetContractInfos } from "biomethane/pages/contract/contract.hooks"
-import { useProductionUnit } from "biomethane/pages/production/production.hooks"
 import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { SettingsNotFilled } from "biomethane/components/settings-not-filled"
 import { useAnnualDeclaration } from "../annual-declaration"
+import { useBiomethaneProductionUnit } from "biomethane/hooks/use-biomethane-production-unit"
+import { useBiomethaneContractInfos } from "biomethane/hooks/use-biomethane-contract-infos"
 
 export interface ContractProductionUnitContextValue {
   /** Contract information for the entity */
@@ -23,10 +23,10 @@ export const ContractProductionUnitContext =
   createContext<ContractProductionUnitContextValue | null>(null)
 
 interface ContractProductionUnitProviderProps {
-  children: ReactNode
+  readonly children: ReactNode
 
   // Whether to allow empty contract and production unit data
-  allowEmpty?: boolean
+  readonly allowEmpty?: boolean
 }
 
 /**
@@ -43,10 +43,9 @@ export function ContractProductionUnitProvider({
   children,
   allowEmpty = false,
 }: ContractProductionUnitProviderProps) {
-  const { result: contractInfos, loading: loadingContract } =
-    useGetContractInfos()
-  const { result: productionUnit, loading: loadingProductionUnit } =
-    useProductionUnit()
+  const { contractInfos, loadingContract } = useBiomethaneContractInfos()
+  const { productionUnit, loadingProductionUnit } =
+    useBiomethaneProductionUnit()
   const { annualDeclarationMissingFieldsData } = useAnnualDeclaration()
 
   const loading = loadingContract || loadingProductionUnit

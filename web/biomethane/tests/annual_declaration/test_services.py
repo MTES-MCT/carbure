@@ -9,8 +9,10 @@ from biomethane.factories.energy import BiomethaneEnergyFactory
 from biomethane.factories.production_unit import BiomethaneDigestateStorageFactory
 from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneDigestate, BiomethaneProductionUnit
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
+from core.models.entity import ExternalAdminRights
 
 
 class BiomethaneAnnualDeclarationServiceTests(TestCase):
@@ -141,6 +143,25 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         """production_unit_missing_fields does not contain 'digestate_storage' when storage exists."""
         BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
         BiomethaneDigestateStorageFactory.create(producer=self.producer_entity)
+
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        missing_fields = BiomethaneAnnualDeclarationService.get_missing_fields(declaration)
+
+        self.assertIsNotNone(missing_fields["production_unit_missing_fields"])
+        self.assertNotIn("digestate_storage", missing_fields["production_unit_missing_fields"])
+
+    def test_get_missing_fields_production_unit_no_digestate_storage_isdnd(self):
+        """production_unit_missing_fields does not contain 'digestate_storage' for ISDND units."""
+        BiomethaneProductionUnitFactory.create(
+            producer=self.producer_entity,
+            unit_type=BiomethaneProductionUnit.ISDND,
+        )
+        # No BiomethaneDigestateStorage created
 
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -428,6 +449,63 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.OVERDUE)
+
+    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    def test_get_declarations_for_entity_filters_for_ademe(self, _):
+        ademe = Entity.objects.create(name="ADEME", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=ademe, right=ExternalAdminRights.ADEME)
+
+        producer_allowed = Entity.objects.create(name="Producer allowed", entity_type=Entity.BIOMETHANE_PRODUCER)
+        producer_filtered = Entity.objects.create(name="Producer filtered", entity_type=Entity.BIOMETHANE_PRODUCER)
+
+        BiomethaneContractFactory.create(
+            producer=producer_allowed,
+            has_complementary_investment_aid=True,
+            complementary_aid_organisms=[BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME],
+            effective_date=date(2022, 1, 1),
+        )
+        BiomethaneContractFactory.create(
+            producer=producer_filtered,
+            has_complementary_investment_aid=False,
+            complementary_aid_organisms=[],
+            effective_date=date(2022, 1, 1),
+        )
+
+        declaration_allowed = BiomethaneAnnualDeclaration.objects.create(
+            producer=producer_allowed,
+            year=2025,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=producer_filtered,
+            year=2025,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        queryset = BiomethaneAnnualDeclaration.objects.all()
+        result = BiomethaneAnnualDeclarationService.get_declarations_for_entity(queryset, ademe)
+
+        self.assertEqual(list(result), [declaration_allowed])
+
+    def test_get_declarations_for_entity_returns_full_queryset_for_non_ademe_entity(self):
+        dreal = Entity.objects.create(name="DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+
+        declaration_1 = BiomethaneAnnualDeclaration.objects.create(
+            producer=Entity.objects.create(name="P1", entity_type=Entity.BIOMETHANE_PRODUCER),
+            year=2025,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+        declaration_2 = BiomethaneAnnualDeclaration.objects.create(
+            producer=Entity.objects.create(name="P2", entity_type=Entity.BIOMETHANE_PRODUCER),
+            year=2025,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        queryset = BiomethaneAnnualDeclaration.objects.order_by("id")
+        result = BiomethaneAnnualDeclarationService.get_declarations_for_entity(queryset, dreal)
+
+        self.assertEqual(list(result), [declaration_1, declaration_2])
 
 
 class GetMissingFieldsTests(TestCase):

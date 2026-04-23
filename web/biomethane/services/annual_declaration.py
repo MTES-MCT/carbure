@@ -10,6 +10,9 @@ from biomethane.models import (
     BiomethaneSupplyPlan,
 )
 from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
+from biomethane.services.ademe import AdemeService
+from biomethane.services.digestate import BiomethaneDigestateService
+from core.models.entity import ExternalAdminRights
 
 
 class BiomethaneAnnualDeclarationService:
@@ -89,12 +92,16 @@ class BiomethaneAnnualDeclarationService:
 
         is_current_declaration = declaration.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
 
-        digestate_missing_fields = (
-            BiomethaneAnnualDeclarationService._get_missing_fields(digestate, is_current_declaration) if digestate else None
+        digestate_missing_fields = BiomethaneDigestateService.build_missing_fields_for_declaration(
+            digestate,
+            is_current_declaration,
+            production_unit,
+            contract,
         )
+
         return {
             # If the declaration is not the current year, there is no fields to fill for digestate
-            "digestate_missing_fields": digestate_missing_fields if is_current_declaration else [],
+            "digestate_missing_fields": digestate_missing_fields,
             "energy_missing_fields": BiomethaneAnnualDeclarationService._get_missing_fields(energy, is_current_declaration)
             if energy
             else None,
@@ -260,3 +267,15 @@ class BiomethaneAnnualDeclarationService:
                 declaration.save(update_fields=["status"])
         except BiomethaneAnnualDeclaration.DoesNotExist:
             pass
+
+    # ADEME only sees the declarations for the first five years of the installation
+    # Ex : effective_date is 02/04/2023, ADEME will see the declarations for the years 2023 to 2027
+    @staticmethod
+    def get_declarations_for_entity(queryset, entity):
+        if entity.has_external_admin_right(ExternalAdminRights.ADEME):
+            queryset = queryset.filter(
+                AdemeService.get_ademe_contract_filter(
+                    contract_prefix="producer__biomethane_contract__",
+                )
+            )
+        return queryset

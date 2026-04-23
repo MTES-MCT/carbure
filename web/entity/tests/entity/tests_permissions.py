@@ -21,6 +21,7 @@ class EntityPermissionTest(TestCase, PermissionTestMixin):
                                 ExternalAdminRights.DOUBLE_COUNTING,
                                 ExternalAdminRights.TRANSFERRED_ELEC,
                                 ExternalAdminRights.DREAL,
+                                ExternalAdminRights.ADEME,
                             ]
                         )
                     ],
