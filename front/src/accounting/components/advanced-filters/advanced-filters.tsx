@@ -60,26 +60,19 @@ export const AdvancedFiltersBalanceCard = ({
 
     // When filters are selected, use the ghg reduction from the range slider
     // Otherwise, use the default ghg reduction from the initial balance
-    getBalance({ ...filters }).then((newBalance) => {
-      // getBalance({ ...filters, gesBoundMin, gesBoundMax }).then((newBalance) => {
+    getBalance({
+      ...filters,
+      gesBoundMin: _isFilterRemoved ? undefined : value.gesBoundMin,
+      gesBoundMax: _isFilterRemoved ? undefined : value.gesBoundMax,
+    }).then((newBalance) => {
       if (newBalance) {
         const { ghgReductionMin, ghgReductionMax } = formatGhgReduction(
           newBalance.ghg_reduction_min,
           newBalance.ghg_reduction_max
         )
 
-        // When a filter is removed or the new balance values are higher/lower than the previous values,
-        // set gesBoundMin/gesBoundMax to the new balance values
-        if (
-          _isFilterRemoved ||
-          (value?.gesBoundMin && value.gesBoundMin < ghgReductionMin)
-        )
-          setField("gesBoundMin", ghgReductionMin)
-        if (
-          _isFilterRemoved ||
-          (value?.gesBoundMax && value.gesBoundMax > ghgReductionMax)
-        )
-          setField("gesBoundMax", ghgReductionMax)
+        setField("gesBoundMin", ghgReductionMin)
+        setField("gesBoundMax", ghgReductionMax)
 
         setBalance({
           ...balance,

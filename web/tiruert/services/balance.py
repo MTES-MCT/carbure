@@ -144,8 +144,8 @@ class BalanceService:
             ges_max = detail_filters.get("ges_bound_max")
             if ges_min is not None and ges_max is not None:
                 details_qs = details_qs.filter(
-                    lot__ghg_reduction_red_ii__gt=float(ges_min),
-                    lot__ghg_reduction_red_ii__lt=float(ges_max),
+                    lot__ghg_reduction_red_ii__gte=float(ges_min),
+                    lot__ghg_reduction_red_ii__lte=float(ges_max),
                 )
 
             feedstock = detail_filters.get("feedstock")

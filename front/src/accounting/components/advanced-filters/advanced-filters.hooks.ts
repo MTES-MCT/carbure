@@ -48,8 +48,8 @@ export const useAdvancedFiltersBalance = ({
         sector: [balance.sector],
         customs_category: [balance.customs_category],
         biofuel: [balance.biofuel?.code],
-        // ges_bound_min: value.gesBoundMin,
-        // ges_bound_max: value.gesBoundMax,
+        ges_bound_min: value.gesBoundMin,
+        ges_bound_max: value.gesBoundMax,
       },
       filter as BalancesFilter
     )
