@@ -58,6 +58,14 @@ def _fields_from_model(instance, field_specs):
     return result
 
 
+def _get_display_value(instance, field_name):
+    """Return the human-readable display value for a field if choices are defined."""
+    display_method = getattr(instance, f"get_{field_name}_display", None)
+    if callable(display_method):
+        return display_method()
+    return getattr(instance, field_name, None)
+
+
 def _format_value(value):
     if value is None:
         return ""
@@ -131,7 +139,7 @@ def _write_supply_inputs_sheet(workbook, supply_plan, header_format):
     inputs = BiomethaneSupplyInput.objects.filter(supply_plan=supply_plan).select_related("feedstock", "origin_country")
     for row_idx, supply_input in enumerate(inputs, start=1):
         for col_idx, (field_name, _) in enumerate(columns):
-            value = getattr(supply_input, field_name, None)
+            value = _get_display_value(supply_input, field_name)
             sheet.write(row_idx, col_idx, _format_value(value))
 
 
@@ -146,7 +154,7 @@ def _write_digestate_storage_sheet(workbook, producer, header_format):
 
     for row_idx, storage in enumerate(BiomethaneDigestateStorage.objects.filter(producer=producer), start=1):
         for col_idx, (field_name, _) in enumerate(columns):
-            value = getattr(storage, field_name, None)
+            value = _get_display_value(storage, field_name)
             sheet.write(row_idx, col_idx, _format_value(value))
 
 
@@ -164,7 +172,7 @@ def _write_digestate_spreading_sheet(workbook, digestate, header_format):
 
     for row_idx, spreading in enumerate(BiomethaneDigestateSpreading.objects.filter(digestate=digestate), start=1):
         for col_idx, (field_name, _) in enumerate(columns):
-            value = getattr(spreading, field_name, None)
+            value = _get_display_value(spreading, field_name)
             sheet.write(row_idx, col_idx, _format_value(value))
 
 
