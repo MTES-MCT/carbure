@@ -1,52 +1,30 @@
 import { Box } from "common/components/scaffold"
 import { Text } from "common/components/text"
 import {
-  hasFiltersSelected,
+  isFilterRemoved,
   useAdvancedFiltersBalance,
+  useBuildFilters,
 } from "./advanced-filters.hooks"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useFormContext } from "common/components/form2"
 import { Balance } from "accounting/types"
-import { useMemo } from "react"
 import { QueryFilters } from "common/hooks/query-builder-2"
-import { GHGRangeForm } from "../ghg-range-form"
+import { formatGhgReduction, GHGRangeForm } from "../ghg-range-form"
 import { AvailableBalance } from "./available-balance"
-import {
-  AdvancedFiltersFormProps,
-  ADVANCED_FILTER_FIELDS,
-  Filters,
-} from "./advanced-filters.types"
+import { AdvancedFiltersFormProps, Filters } from "./advanced-filters.types"
 import { useAvailableBalance } from "./available-balance.hooks"
-
+import { useState } from "react"
 export const AdvancedFiltersBalance = ({
   balance,
   onFiltersChange,
+  selected,
 }: {
   balance: Balance
-  onFiltersChange: (filters: AdvancedFiltersFormProps) => void
+  onFiltersChange: (filters: QueryFilters) => void
+  selected: Filters
 }) => {
   const { getFilterOptions, filterNormalizers, filterLabels } =
     useAdvancedFiltersBalance({ balance })
-
-  const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
-
-  const selected2: Filters = useMemo(
-    () =>
-      Object.fromEntries(
-        ADVANCED_FILTER_FIELDS.map((filterField) => [
-          filterField,
-          value[filterField] ?? [],
-        ])
-      ) as Filters,
-    [value]
-  )
-
-  const onSelect = (filters: QueryFilters) => {
-    Object.entries(filters).forEach(([filter, value]) => {
-      setField(filter as keyof AdvancedFiltersFormProps, value ?? [])
-    })
-    onFiltersChange(filters as unknown as AdvancedFiltersFormProps)
-  }
 
   return (
     <div>
@@ -54,8 +32,8 @@ export const AdvancedFiltersBalance = ({
       <FilterMultiSelect2
         filterLabels={filterLabels}
         getFilterOptions={getFilterOptions}
-        selected={selected2}
-        onSelect={onSelect}
+        selected={selected}
+        onSelect={onFiltersChange}
         normalizers={filterNormalizers}
       />
     </div>
@@ -68,53 +46,70 @@ export const AdvancedFiltersBalanceCard = ({
   balance: Balance
 }) => {
   const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
+  const [_balance, setBalance] = useState<Balance>(balance)
+
   const { loading, getBalance } = useAvailableBalance({
     initialBalance: balance,
   })
 
-  const onFiltersChange = (filters: AdvancedFiltersFormProps) => {
-    const _hasFiltersSelected = hasFiltersSelected(filters)
-
-    const gesBoundMin = _hasFiltersSelected
-      ? value.gesBoundMin
-      : balance?.ghg_reduction_min
-    const gesBoundMax = _hasFiltersSelected
-      ? value.gesBoundMax
-      : balance?.ghg_reduction_max
+  const onFiltersChange = (
+    filters: AdvancedFiltersFormProps,
+    previousFilters: Filters
+  ) => {
+    const _isFilterRemoved = isFilterRemoved(previousFilters, filters)
 
     // When filters are selected, use the ghg reduction from the range slider
     // Otherwise, use the default ghg reduction from the initial balance
-    getBalance({ ...filters, gesBoundMin, gesBoundMax }).then((data) => {
-      // When filters are selected, use the ghg reduction from the new data
-      // Otherwise, use the default ghg reduction from the initial balance
-      if (_hasFiltersSelected) {
-        setField("gesBoundMin", data?.ghg_reduction_min)
-        setField("gesBoundMax", data?.ghg_reduction_max)
-      } else {
-        setField("gesBoundMin", balance?.ghg_reduction_min)
-        setField("gesBoundMax", balance?.ghg_reduction_max)
+    getBalance({ ...filters }).then((newBalance) => {
+      // getBalance({ ...filters, gesBoundMin, gesBoundMax }).then((newBalance) => {
+      if (newBalance) {
+        const { ghgReductionMin, ghgReductionMax } = formatGhgReduction(
+          newBalance.ghg_reduction_min,
+          newBalance.ghg_reduction_max
+        )
+
+        // When a filter is removed or the new balance values are higher/lower than the previous values,
+        // set gesBoundMin/gesBoundMax to the new balance values
+        if (
+          _isFilterRemoved ||
+          (value?.gesBoundMin && value.gesBoundMin < ghgReductionMin)
+        )
+          setField("gesBoundMin", ghgReductionMin)
+        if (
+          _isFilterRemoved ||
+          (value?.gesBoundMax && value.gesBoundMax > ghgReductionMax)
+        )
+          setField("gesBoundMax", ghgReductionMax)
+
+        setBalance({
+          ...balance,
+          ghg_reduction_min: ghgReductionMin,
+          ghg_reduction_max: ghgReductionMax,
+        })
       }
     })
   }
 
+  const { selected, onSelect } = useBuildFilters({ onFiltersChange })
+
   return (
     <Box>
       <AdvancedFiltersBalance
-        balance={balance}
-        onFiltersChange={onFiltersChange}
+        balance={_balance}
+        onFiltersChange={onSelect}
+        selected={selected}
       />
-      <div style={{ maxWidth: "600px" }}>
-        <GHGRangeForm
-          balance={balance}
-          onRangeChange={(gesBoundMin, gesBoundMax) => {
-            getBalance({ ...value, gesBoundMin, gesBoundMax })
-          }}
-        />
-      </div>
+
+      <GHGRangeForm
+        balance={_balance}
+        onRangeChange={(gesBoundMin, gesBoundMax) => {
+          getBalance({ ...value, gesBoundMin, gesBoundMax })
+        }}
+      />
 
       <AvailableBalance
         loading={loading}
-        availableBalance={value.availableBalance ?? balance.available_balance}
+        availableBalance={value.availableBalance ?? _balance.available_balance}
       />
     </Box>
   )

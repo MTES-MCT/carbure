@@ -1,7 +1,7 @@
 import { getBalanceFilters } from "accounting/api/biofuels/balances"
 import { Balance, BalancesFilter, BalancesQueryBuilder } from "accounting/types"
 import { useFormContext } from "common/components/form2"
-import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { QueryFilters, useQueryBuilder } from "common/hooks/query-builder-2"
 import { Normalizer } from "common/utils/normalize"
 import {
   normalizeCountryFilter,
@@ -11,7 +11,9 @@ import {
 import {
   ADVANCED_FILTER_FIELDS,
   AdvancedFiltersFormProps,
+  Filters,
 } from "./advanced-filters.types"
+import { useMemo } from "react"
 
 export const useAdvancedFiltersBalance = ({
   balance,
@@ -46,8 +48,8 @@ export const useAdvancedFiltersBalance = ({
         sector: [balance.sector],
         customs_category: [balance.customs_category],
         biofuel: [balance.biofuel?.code],
-        ges_bound_min: value.gesBoundMin,
-        ges_bound_max: value.gesBoundMax,
+        // ges_bound_min: value.gesBoundMin,
+        // ges_bound_max: value.gesBoundMax,
       },
       filter as BalancesFilter
     )
@@ -66,8 +68,49 @@ export const useAdvancedFiltersBalance = ({
   }
 }
 
-export const hasFiltersSelected = (value: AdvancedFiltersFormProps) => {
-  return ADVANCED_FILTER_FIELDS.some((filterField) => {
-    return (value[filterField] ?? []).length > 0
-  })
+export const useBuildFilters = ({
+  onFiltersChange,
+}: {
+  onFiltersChange?: (
+    filters: AdvancedFiltersFormProps,
+    previousFilters: Filters
+  ) => void
+}) => {
+  const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
+
+  const selected = useMemo(
+    () =>
+      Object.fromEntries(
+        ADVANCED_FILTER_FIELDS.map((filterField) => [
+          filterField,
+          value[filterField] ?? [],
+        ])
+      ) as Filters,
+    [value]
+  )
+
+  const onSelect = (filters: QueryFilters) => {
+    const previousFilters = { ...selected }
+    Object.entries(filters).forEach(([filter, value]) => {
+      setField(filter as keyof AdvancedFiltersFormProps, value ?? [])
+    })
+    onFiltersChange?.(
+      filters as unknown as AdvancedFiltersFormProps,
+      previousFilters
+    )
+  }
+
+  return { selected, onSelect }
+}
+
+/**
+ * Function to check if a filter has been removed
+ */
+export const isFilterRemoved = (
+  previousFilters: Filters,
+  newFilters: Filters
+) => {
+  const previousFiltersValues = Object.values(previousFilters).flat()
+  const newFiltersValues = Object.values(newFilters).flat()
+  return previousFiltersValues.length > newFiltersValues.length
 }

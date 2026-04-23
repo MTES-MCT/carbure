@@ -64,8 +64,12 @@ export type BalancesQueryBuilder = QueryBuilder<OperationsStatus[]>
 export type BalancesQuery = BalancesQueryBuilder["query"] & {
   [BalancesFilter.sector]?: OperationSector[]
   [BalancesFilter.customs_category]?: OperationBiofuelCategory[]
+  [BalancesFilter.durability_period]?: string[]
+  [BalancesFilter.origin_country]?: string[]
   [BalancesFilter.biofuel]?: string[]
   [BalancesFilter.feedstock]?: string[]
+  ges_bound_min?: number
+  ges_bound_max?: number
 }
 
 // For operations and balances, we want to display specific views for each sector
