@@ -26,7 +26,7 @@ export const DeclarationDetailHeader = ({
   producers,
 }: DeclarationDetailHeaderProps) => {
   const { selectedEntityId } = useSelectedEntity()
-  const { canEditDeclaration } = useBiomethanePermissions()
+  const { canEditDeclaration, adminPermissions } = useBiomethanePermissions()
   const { annualDeclaration, selectedYear } = useAnnualDeclaration()
   const navigate = useNavigate()
   const routes = useRoutes()
@@ -45,7 +45,7 @@ export const DeclarationDetailHeader = ({
       />
 
       <SelectYears key={selectedEntityId} />
-      {selectedEntityId && (
+      {selectedEntityId && adminPermissions.canDownloadDeclaration && (
         <DownloadDeclarationButton
           year={selectedYear}
           producerId={selectedEntityId}

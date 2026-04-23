@@ -137,9 +137,9 @@ const BiomethaneRoutesContent = () => {
 
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer } = useEntity()
-  const { canAccessAdmin } = useBiomethanePermissions()
+  const { adminPermissions } = useBiomethanePermissions()
 
-  if (canAccessAdmin) return <BiomethaneAdminRoutes />
+  if (adminPermissions.canAccessAdmin) return <BiomethaneAdminRoutes />
 
   if (!isBiomethaneProducer) return null
 
@@ -174,7 +174,7 @@ export const BiomethaneSettingsRoutes = () => {
 }
 
 export const BiomethaneAdminRoutes = () => {
-  const { canAccessSupplyPlanAdmin } = useBiomethanePermissions()
+  const { adminPermissions } = useBiomethanePermissions()
   return (
     <Routes>
       <Route path="admin" element={<Outlet />}>
@@ -204,7 +204,7 @@ export const BiomethaneAdminRoutes = () => {
         />
         <Route path="dashboard" element={<BiomethaneAdminDashboardPage />} />
 
-        {canAccessSupplyPlanAdmin && (
+        {adminPermissions.canAccessSupplyPlan && (
           <>
             <Route
               path="supply-plan"
