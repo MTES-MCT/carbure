@@ -3813,10 +3813,17 @@ export interface components {
             injection_impossibility_hours?: number | null;
         };
         BiomethaneEnergyMonthlyReport: {
+            /** Mois */
             month: number;
-            /** Format: double */
+            /**
+             * Volume injecté (Nm3)
+             * Format: double
+             */
             injected_volume_nm3?: number;
-            /** Format: double */
+            /**
+             * Débit moyen mensuel (Nm3/h)
+             * Format: double
+             */
             average_monthly_flow_nm3_per_hour?: number;
             energy: number;
         };
@@ -5259,9 +5266,9 @@ export interface components {
          */
         IcpeRegimeEnum: IcpeRegimeEnum;
         /**
-         * @description * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
-         *     * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
-         *     * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
+         * @description * `INSTALLATION_CATEGORY_1` - Méthanisation en digesteur de produits ou déchets non dangereux, hors matières résultant du traitement des eaux usées urbaines ou industrielles
+         *     * `INSTALLATION_CATEGORY_2` - Méthanisation en digesteur de produits ou déchets non dangereux, y compris des matières résultant du traitement des eaux usées urbaines ou industrielles
+         *     * `INSTALLATION_CATEGORY_3` - Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés
          * @enum {string}
          */
         InstallationCategoryEnum: InstallationCategoryEnum;
@@ -7862,12 +7869,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
+            /** @description Fichier Excel généré */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": File;
+                };
             };
         };
     };

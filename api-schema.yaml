@@ -1835,7 +1835,12 @@ paths:
         - basicAuth: []
       responses:
         "200":
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Fichier Excel généré
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
@@ -12971,12 +12976,15 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
+          title: Mois
         injected_volume_nm3:
           type: number
           format: double
+          title: Volume injecté (Nm3)
         average_monthly_flow_nm3_per_hour:
           type: number
           format: double
+          title: Débit moyen mensuel (Nm3/h)
         energy:
           type: integer
       required:
@@ -16530,10 +16538,17 @@ components:
         - INSTALLATION_CATEGORY_2
         - INSTALLATION_CATEGORY_3
       type: string
-      description: |-
-        * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
-        * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
-        * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
+      description: >-
+        * `INSTALLATION_CATEGORY_1` - Méthanisation en digesteur de produits ou
+        déchets non dangereux, hors matières résultant du traitement des eaux
+        usées urbaines ou industrielles
+
+        * `INSTALLATION_CATEGORY_2` - Méthanisation en digesteur de produits ou
+        déchets non dangereux, y compris des matières résultant du traitement
+        des eaux usées urbaines ou industrielles
+
+        * `INSTALLATION_CATEGORY_3` - Installations de stockage de déchets non
+        dangereux à partir de déchets ménagers et assimilés
     InstalledMetersEnum:
       enum:
         - BIOGAS_PRODUCTION_FLOWMETER

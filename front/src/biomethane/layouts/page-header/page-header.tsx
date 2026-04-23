@@ -55,7 +55,6 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
         </Row>
         <AnnualDeclarationStatusBadge status={status} />
       </Row>
-      <Row></Row>
       {annualDeclaration?.is_open && entity.canWrite() && (
         <Notice
           variant={
