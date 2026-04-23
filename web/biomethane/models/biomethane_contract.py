@@ -7,6 +7,7 @@ from django.utils.text import slugify
 
 from core import private_storage
 from core.models import Entity
+from core.models.fields import JSONChoiceField
 
 
 def rename_conditions_file(instance, filename):
@@ -37,9 +38,20 @@ class BiomethaneContract(models.Model):
     # Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés
     INSTALLATION_CATEGORY_3 = "INSTALLATION_CATEGORY_3"
     INSTALLATION_CATEGORIES = (
-        (INSTALLATION_CATEGORY_1, INSTALLATION_CATEGORY_1),
-        (INSTALLATION_CATEGORY_2, INSTALLATION_CATEGORY_2),
-        (INSTALLATION_CATEGORY_3, INSTALLATION_CATEGORY_3),
+        (
+            INSTALLATION_CATEGORY_1,
+            "Méthanisation en digesteur de produits ou déchets non dangereux, hors matières résultant du traitement des "
+            "eaux usées urbaines ou industrielles",
+        ),
+        (
+            INSTALLATION_CATEGORY_2,
+            "Méthanisation en digesteur de produits ou déchets non dangereux, y compris des matières résultant du "
+            "traitement des eaux usées urbaines ou industrielles",
+        ),
+        (
+            INSTALLATION_CATEGORY_3,
+            "Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés",
+        ),
     )
 
     tariff_reference = models.CharField(
@@ -92,8 +104,12 @@ class BiomethaneContract(models.Model):
     )
 
     # Préciser l'organisme qui a attribué l'aide complémentaire (Ademe, Région, Autre)
-    complementary_aid_organisms = models.JSONField(
-        verbose_name="Aide complémentaire attribuée par", null=True, blank=True, default=list
+    complementary_aid_organisms = JSONChoiceField(
+        verbose_name="Aide complémentaire attribuée par",
+        null=True,
+        blank=True,
+        default=list,
+        choices=COMPLEMENTARY_AID_ORGANISMS_CHOICES,
     )
 
     # Précisez le nom du ou des organismes publics ayant octroyé l'aide (si "Autre" est sélectionné)

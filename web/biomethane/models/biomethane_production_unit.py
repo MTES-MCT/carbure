@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from core.models import Department, Entity
+from core.models.fields import JSONChoiceField
 from transactions.models import Site
 
 
@@ -22,17 +23,19 @@ class BiomethaneProductionUnit(Site):
     ISDND = "ISDND"
     STEP = "STEP"
 
+    UNIT_TYPE_CHOICES = [
+        (AGRICULTURAL_AUTONOMOUS, "Agricole autonome"),
+        (AGRICULTURAL_TERRITORIAL, "Agricole territorial"),
+        (INDUSTRIAL_TERRITORIAL, "Industriel territorial"),
+        (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
+        (STEP, "STEP"),
+        (ISDND, "ISDND"),
+    ]
+
     unit_type = models.CharField(
         verbose_name="Type d'installation",
         max_length=32,
-        choices=[
-            (AGRICULTURAL_AUTONOMOUS, "Agricole autonome"),
-            (AGRICULTURAL_TERRITORIAL, "Agricole territorial"),
-            (INDUSTRIAL_TERRITORIAL, "Industriel territorial"),
-            (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
-            (STEP, "STEP"),
-            (ISDND, "ISDND"),
-        ],
+        choices=UNIT_TYPE_CHOICES,
         null=True,
         blank=True,
     )
@@ -54,13 +57,15 @@ class BiomethaneProductionUnit(Site):
     TOTAL = "TOTAL"
     PARTIAL = "PARTIAL"
 
+    HYGIENIZATION_EXEMPTION_TYPE_CHOICES = [
+        (TOTAL, "Totale"),
+        (PARTIAL, "Partielle"),
+    ]
+
     hygienization_exemption_type = models.CharField(
         verbose_name="Si oui, dérogation à l'hygiénisation :",
         max_length=16,
-        choices=[
-            (TOTAL, "Totale"),
-            (PARTIAL, "Partielle"),
-        ],
+        choices=HYGIENIZATION_EXEMPTION_TYPE_CHOICES,
         null=True,
         blank=True,
     )
@@ -73,14 +78,16 @@ class BiomethaneProductionUnit(Site):
     REGISTRATION = "REGISTRATION"
     DECLARATION_PERIODIC_CONTROLS = "DECLARATION_PERIODIC_CONTROLS"
 
+    ICPE_REGIME_CHOICES = [
+        (AUTHORIZATION, "Autorisation"),
+        (REGISTRATION, "Enregistrement"),
+        (DECLARATION_PERIODIC_CONTROLS, "Déclaration (avec contrôles périodiques)"),
+    ]
+
     icpe_regime = models.CharField(
         verbose_name="Régime ICPE",
         max_length=32,
-        choices=[
-            (AUTHORIZATION, "Autorisation"),
-            (REGISTRATION, "Enregistrement"),
-            (DECLARATION_PERIODIC_CONTROLS, "Déclaration (avec contrôles périodiques)"),
-        ],
+        choices=ICPE_REGIME_CHOICES,
         null=True,
         blank=True,
     )
@@ -89,13 +96,15 @@ class BiomethaneProductionUnit(Site):
     LIQUID_PROCESS = "LIQUID_PROCESS"
     DRY_PROCESS = "DRY_PROCESS"
 
+    PROCESS_TYPE_CHOICES = [
+        (LIQUID_PROCESS, "Voie liquide"),
+        (DRY_PROCESS, "Voie sèche"),
+    ]
+
     process_type = models.CharField(
         verbose_name="Type de voie",
         max_length=16,
-        choices=[
-            (LIQUID_PROCESS, "Voie liquide"),
-            (DRY_PROCESS, "Voie sèche"),
-        ],
+        choices=PROCESS_TYPE_CHOICES,
         null=True,
         blank=True,
     )
@@ -105,14 +114,16 @@ class BiomethaneProductionUnit(Site):
     PLUG_FLOW_SEMI_CONTINUOUS = "PLUG_FLOW_SEMI_CONTINUOUS"  # En piston (semi-continu)
     BATCH_SILOS = "BATCH_SILOS"  # En silos (batch)
 
+    METHANIZATION_PROCESS_CHOICES = [
+        (CONTINUOUS_INFINITELY_MIXED, "Continu (infiniment mélangé)"),
+        (PLUG_FLOW_SEMI_CONTINUOUS, "En piston (semi-continu)"),
+        (BATCH_SILOS, "En silos (batch)"),
+    ]
+
     methanization_process = models.CharField(
         verbose_name="Procédé méthanisation",
         max_length=32,
-        choices=[
-            (CONTINUOUS_INFINITELY_MIXED, "Continu (infiniment mélangé)"),
-            (PLUG_FLOW_SEMI_CONTINUOUS, "En piston (semi-continu)"),
-            (BATCH_SILOS, "En silos (batch)"),
-        ],
+        choices=METHANIZATION_PROCESS_CHOICES,
         null=True,
         blank=True,
     )
@@ -142,7 +153,9 @@ class BiomethaneProductionUnit(Site):
         (GLOBAL_ELECTRICAL_METER, "Compteur dédié à la consommation électrique de l'ensemble de l'unité de production"),
     ]
 
-    installed_meters = models.JSONField(verbose_name="Débitmètre présent sur votre installation", default=list, blank=True)
+    installed_meters = JSONChoiceField(
+        verbose_name="Débitmètre présent sur votre installation", default=list, blank=True, choices=INSTALLED_METERS_CHOICES
+    )
 
     # Présence d'un hygiénisateur ?
     has_hygienization_unit = models.BooleanField(verbose_name="Présence d'un hygiénisateur", default=False)
@@ -183,8 +196,11 @@ class BiomethaneProductionUnit(Site):
         (INCINERATION_LANDFILLING, "Incinération / Enfouissement"),
     ]
 
-    digestate_valorization_methods = models.JSONField(
-        verbose_name="Mode de valorisation du digestat", default=list, blank=True
+    digestate_valorization_methods = JSONChoiceField(
+        verbose_name="Mode de valorisation du digestat",
+        default=list,
+        blank=True,
+        choices=DIGESTATE_VALORIZATION_METHODS_CHOICES,
     )
 
     # Gestion de l'épandage
@@ -200,7 +216,12 @@ class BiomethaneProductionUnit(Site):
         (SALE, "Vente"),
     ]
 
-    spreading_management_methods = models.JSONField(verbose_name="Gestion de l'épandage", default=list, blank=True)
+    spreading_management_methods = JSONChoiceField(
+        verbose_name="Gestion de l'épandage",
+        default=list,
+        blank=True,
+        choices=SPREADING_MANAGEMENT_METHODS_CHOICES,
+    )
 
     # Sous quel(s) statut(s) est valorisé le digestat
     SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE"
@@ -217,8 +238,11 @@ class BiomethaneProductionUnit(Site):
         (CDC_DIG, "Cahier des Charges CDC Dig"),
     ]
 
-    digestate_sale_types = models.JSONField(
-        verbose_name="Sous quel(s) statut(s) est valorisé le digestat ?", default=list, blank=True
+    digestate_sale_types = JSONChoiceField(
+        verbose_name="Sous quel(s) statut(s) est valorisé le digestat ?",
+        default=list,
+        blank=True,
+        choices=DIGESTATE_SALE_TYPES_CHOICES,
     )
 
     class Meta:

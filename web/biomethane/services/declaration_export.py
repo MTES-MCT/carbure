@@ -50,15 +50,9 @@ def _fields_from_model(instance, field_specs):
         else:
             label, field_name = spec
         value = getattr(instance, field_name, None)
-
-        field = model._meta.get_field(field_name)
-        # If the field has choices, get the label associated to the value (value can be a simple value or an array of values)
-        if field.choices:
-            choices_map = dict(field.choices)
-            if isinstance(value, list):
-                value = [choices_map.get(v, v) for v in value]
-            else:
-                value = choices_map.get(value, value)
+        display_method = getattr(instance, f"get_{field_name}_display", None)
+        if callable(display_method):
+            value = display_method()
 
         result.append((label, value))
     return result

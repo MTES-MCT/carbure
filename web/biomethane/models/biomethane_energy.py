@@ -4,6 +4,7 @@ from django.dispatch import receiver
 
 from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
 from core.models import Entity
+from core.models.fields import JSONChoiceField
 
 
 class BiomethaneEnergy(models.Model):
@@ -46,7 +47,7 @@ class BiomethaneEnergy(models.Model):
 
     MALFUNCTION_TYPE_CONCEPTION = "CONCEPTION"
 
-    MALFUNCTION_TYPES = [
+    MALFUNCTION_TYPES_CHOICES = [
         (MALFUNCTION_TYPE_CONCEPTION, "Conception"),
     ]
 
@@ -64,7 +65,7 @@ class BiomethaneEnergy(models.Model):
     ENERGY_TYPE_FOSSIL = "FOSSIL"
     ENERGY_TYPE_OTHER = "OTHER"
 
-    ENERGY_TYPES = [
+    ENERGY_TYPES_CHOICES = [
         (ENERGY_TYPE_PRODUCED_BIOGAS, "Biogaz produit par l'installation"),
         (ENERGY_TYPE_PRODUCED_BIOMETHANE, "Biométhane produit par l'installation"),
         (
@@ -98,11 +99,12 @@ class BiomethaneEnergy(models.Model):
     # Type d'énergie utilisée pour le chauffage du digesteur
     # Type d'énergie utilisée pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
     # le chauffage du digesteur et l'épuration du biogaz
-    energy_types = models.JSONField(
+    energy_types = JSONChoiceField(
         verbose_name="Nature de l'énergie utilisée pour les besoins de l'installation",
         null=True,
         blank=True,
         default=list,
+        choices=ENERGY_TYPES_CHOICES,
     )
 
     # Précisions
@@ -178,7 +180,7 @@ class BiomethaneEnergy(models.Model):
     MALFUNCTION_TYPE_INPUTS = "INPUTS"
     MALFUNCTION_TYPE_OTHER = "OTHER"
 
-    MALFUNCTION_TYPES = [
+    MALFUNCTION_TYPES_CHOICES = [
         (MALFUNCTION_TYPE_CONCEPTION, "Conception"),
         (MALFUNCTION_TYPE_MAINTENANCE, "Entretien/Maintenance"),
         (MALFUNCTION_TYPE_BIOLOGICAL, "Biologique"),
@@ -190,7 +192,9 @@ class BiomethaneEnergy(models.Model):
     ]
 
     # Types de dysfonctionnement (peut contenir plusieurs valeurs)
-    malfunction_types = models.JSONField(verbose_name="Types de dysfonctionnement", null=True, blank=True, default=list)
+    malfunction_types = JSONChoiceField(
+        verbose_name="Types de dysfonctionnement", null=True, blank=True, default=list, choices=MALFUNCTION_TYPES_CHOICES
+    )
 
     # Précisions sur les dysfonctionnements
     malfunction_details = models.TextField(verbose_name="Précisions sur les dysfonctionnements", null=True, blank=True)

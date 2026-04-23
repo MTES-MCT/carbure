@@ -4,6 +4,7 @@ from django.dispatch import receiver
 
 from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
 from core.models import Entity
+from core.models.fields import JSONChoiceField
 
 
 class BiomethaneDigestate(models.Model):
@@ -34,12 +35,14 @@ class BiomethaneDigestate(models.Model):
     ON_SITE = "ON_SITE"
     EXTERNAL_PLATFORM = "EXTERNAL_PLATFORM"
 
-    COMPOSTING_LOCATIONS = [
+    COMPOSTING_LOCATIONS_CHOICES = [
         (ON_SITE, "Sur site"),
         (EXTERNAL_PLATFORM, "Plateforme externe"),
     ]
     # Lieux de compostage
-    composting_locations = models.JSONField(verbose_name="Lieu du compostage", default=list)
+    composting_locations = JSONChoiceField(
+        verbose_name="Lieu du compostage", default=list, choices=COMPOSTING_LOCATIONS_CHOICES
+    )
     # Nom de la plateforme externe
     external_platform_name = models.CharField(
         verbose_name="Nom de la plateforme externe", max_length=255, null=True, blank=True

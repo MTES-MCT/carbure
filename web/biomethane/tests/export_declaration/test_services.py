@@ -6,6 +6,7 @@ from openpyxl import load_workbook
 from biomethane.factories import (
     BiomethaneDigestateFactory,
     BiomethaneDigestateSpreadingFactory,
+    BiomethaneProductionUnitFactory,
     BiomethaneSupplyInputFactory,
     BiomethaneSupplyPlanFactory,
 )
@@ -14,6 +15,7 @@ from biomethane.models import (
     BiomethaneContract,
     BiomethaneEnergy,
     BiomethaneEnergyMonthlyReport,
+    BiomethaneProductionUnit,
 )
 from biomethane.services.declaration_export import _format_value, generate_annual_export
 from core.models import Entity
@@ -61,6 +63,12 @@ class GenerateAnnualExportTests(TestCase):
         data = file.read()
         file.close()
         return load_workbook(io.BytesIO(data))
+
+    def _find_value_by_label(self, worksheet, label):
+        for row_idx in range(2, worksheet.max_row + 1):
+            if worksheet.cell(row=row_idx, column=1).value == label:
+                return worksheet.cell(row=row_idx, column=2).value
+        return None
 
     def test_returns_readable_file(self):
         """generate_annual_export returns a readable BufferedReader."""
@@ -155,6 +163,34 @@ class GenerateAnnualExportTests(TestCase):
         self.assertEqual(wb["Énergie mensuelle"]["D1"].value, "Heures d'injection (h)")
         self.assertEqual(wb["Énergie mensuelle"]["D2"].value, 10.0)
         self.assertEqual(wb["Énergie mensuelle"]["D3"].value, 10.0)
+
+    def test_contract_json_list_choices_are_exported_with_labels(self):
+        BiomethaneContract.objects.create(
+            producer=self.producer,
+            has_complementary_investment_aid=True,
+            complementary_aid_organisms=[
+                BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_ADEME,
+                BiomethaneContract.COMPLEMENTARY_AID_ORGANISM_OTHER,
+            ],
+        )
+
+        file = generate_annual_export(self.producer, self.YEAR)
+        wb = self._load_workbook(file)
+
+        value = self._find_value_by_label(wb["Contrat"], "Aide complémentaire attribuée par")
+        self.assertEqual(value, "Ademe, Autre")
+
+    def test_production_unit_choice_is_exported_with_label(self):
+        BiomethaneProductionUnitFactory.create(
+            producer=self.producer,
+            methanization_process=BiomethaneProductionUnit.PLUG_FLOW_SEMI_CONTINUOUS,
+        )
+
+        file = generate_annual_export(self.producer, self.YEAR)
+        wb = self._load_workbook(file)
+
+        value = self._find_value_by_label(wb["Unité de production"], "Procédé méthanisation")
+        self.assertEqual(value, "En piston (semi-continu)")
 
     def test_empty_producer_has_only_headers(self):
         """When no data exists, all sheets contain only the header row."""
