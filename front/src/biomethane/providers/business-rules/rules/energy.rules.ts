@@ -15,13 +15,21 @@ export const buildEnergyRules = (
 ): EnergyBusinessRules => {
   const commonRules = buildCommonRules(ctx)
 
+  const isISDNDInstallationAndNot2011Or2020Or2021 =
+    commonRules.isISDNDInstallation &&
+    !commonRules.isTariffReference2011Or2020Or2021
+
   return {
     installationEnergyNeeds: {
-      displaySection: !commonRules.isTariffReference2011Or2020Or2021,
+      // Display section if not ISDND installation or if ISDND installation and not 2011, 2020 or 2021 tariff reference
+      displaySection:
+        !commonRules.isISDNDInstallation ||
+        isISDNDInstallationAndNot2011Or2020Or2021,
     },
     energyEfficiency: {
       displaySelfConsumedBiogasOrBiomethaneField:
-        !commonRules.isTariffReference2011Or2020Or2021,
+        !commonRules.isISDNDInstallation ||
+        isISDNDInstallationAndNot2011Or2020Or2021,
     },
   }
 }
