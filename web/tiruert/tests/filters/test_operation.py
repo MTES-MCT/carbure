@@ -190,6 +190,18 @@ class BaseFilterTest(TestCase):
 
         queryset.filter.return_value.distinct.assert_called_once()
 
+    def test_filter_durability_period_multiple_values(self):
+        """Test durability_period filter calls queryset.filter with all given periods."""
+        queryset = Mock()
+        queryset.filter.return_value = queryset
+
+        request = self.factory.get("/test/?durability_period=202401&durability_period=202406")
+
+        filterset = BaseFilter({}, queryset=queryset, request=request)
+        filterset.filters["durability_period"].filter(queryset, ["202401", "202406"])
+
+        queryset.filter.assert_called_once_with(durability_period__in=["202401", "202406"])
+
 
 class OperationFilterForBalanceTest(TestCase):
     """Unit tests for OperationFilterForBalance."""

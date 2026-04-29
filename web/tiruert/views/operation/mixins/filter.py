@@ -71,6 +71,7 @@ class FilterActionMixin:
             "depot": "_depot",
             "type": "_transaction",
             "period": "created_at",
+            "durability_period": "durability_period",
         }
 
         column = filters.get(filter)

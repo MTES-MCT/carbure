@@ -31,6 +31,7 @@ class BaseFilter(FilterSet):
     period = CharFilter(method="filter_period")
     customs_category = MultipleChoiceFilter(choices=MatierePremiere.MP_CATEGORIES)
     status = MultipleChoiceFilter(choices=Operation.OPERATION_STATUSES)
+    durability_period = AllValuesMultipleFilter(field_name="durability_period")
 
     order_by = CustomOrderingFilter(
         fields=(
@@ -43,6 +44,7 @@ class BaseFilter(FilterSet):
             ("_depot", "depot"),
             ("_entity", "from_to"),
             ("_quantity", "quantity"),
+            ("durability_period", "durability_period"),
         ),
         extra_valid_fields=[
             "available_balance",
@@ -106,21 +108,6 @@ class BaseFilter(FilterSet):
             q_objects |= Q(created_at__gte=start_date, created_at__lt=end_date)
 
         return queryset.filter(q_objects).distinct()
-
-    class Meta:
-        model = Operation
-        fields = [
-            "biofuel",
-            "customs_category",
-            "sector",
-            "from_to",
-            "depot",
-            "type",
-            "operation",
-            "status",
-            "entity_id",
-            "period",
-        ]
 
 
 class OperationFilter(BaseFilter):
