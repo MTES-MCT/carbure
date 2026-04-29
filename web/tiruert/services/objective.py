@@ -106,8 +106,6 @@ class ObjectiveService:
                 if objective_type == Objective.SECTOR:
                     balance[key]["energy_basis"] = 0
 
-            keys_with_objective.add(key)
-
             # Calculate energy basis for this objective
             if objective_type == Objective.SECTOR and mac_queryset:
                 # Sector-specific energy basis: filter MAC by fuel_category
@@ -121,6 +119,8 @@ class ObjectiveService:
 
             if not objective_energy_basis:
                 continue
+
+            keys_with_objective.add(key)
 
             # Calculate target and penalty using appropriate energy basis
             target = ObjectiveService._calculate_target_for_objective(objective.target, objective_energy_basis)
