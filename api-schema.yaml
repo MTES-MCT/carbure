@@ -9904,6 +9904,15 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -9959,6 +9968,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -9971,6 +9981,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -9999,6 +10010,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -10542,6 +10555,15 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -10615,6 +10637,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -10627,6 +10650,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -10655,6 +10679,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -10814,6 +10840,15 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -10879,6 +10914,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -10891,6 +10927,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -10919,6 +10956,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -11125,6 +11164,15 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -11138,6 +11186,7 @@ paths:
               - biofuel
               - customs_category
               - depot
+              - durability_period
               - from_to
               - operation
               - period
@@ -11196,6 +11245,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -11208,6 +11258,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -11236,6 +11287,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
