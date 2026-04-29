@@ -28,6 +28,7 @@ def try_get_certificate(certificate):
         "found": False,
         "certificate_id": certificate,
         "certificate_type": "",
+        "status": "",
     }
     matches = GenericCertificate.objects.filter(certificate_id=certificate)
     count = matches.count()
@@ -44,6 +45,7 @@ def try_get_certificate(certificate):
         d["valid_until"] = c.valid_until
         d["valid_from"] = c.valid_from
         d["certificate_type"] = c.certificate_type
+        d["status"] = c.status
     return d
 
 
@@ -56,6 +58,7 @@ def try_get_double_counting_certificate(cert, production_site):
         "found": False,
         "certificate_type": "DC",
         "certificate_id": cert,
+        "status": "",
     }
 
     match = None
@@ -82,6 +85,7 @@ def try_get_double_counting_certificate(cert, production_site):
     d["holder"] = match.certificate_holder
     d["valid_from"] = match.valid_from
     d["valid_until"] = match.valid_until
+    d["status"] = match.status
     return d
 
 

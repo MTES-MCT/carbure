@@ -64,6 +64,7 @@ export interface LotCertificate {
   found: boolean
   certificate_id: string
   certificate_type: string
+  status: string
 }
 
 export interface LotScore {
