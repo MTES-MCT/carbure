@@ -359,7 +359,6 @@ class TeneurService:
             Operation.objects.filter(
                 biofuel=data["biofuel"],
                 customs_category=data["customs_category"],
-                # created_at__gte=data["date_from"],
             )
             .filter((Q(credited_entity=debited_entity) | Q(debited_entity=debited_entity)))
             .distinct()
@@ -378,9 +377,10 @@ class TeneurService:
             debited_entity.id,
             "lot",
             "l",
-            None,
-            ges_bound_min,
-            ges_bound_max,
+            detail_filters={
+                "ges_bound_min": ges_bound_min,
+                "ges_bound_max": ges_bound_max,
+            },
         )
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums

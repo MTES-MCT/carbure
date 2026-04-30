@@ -12566,6 +12566,7 @@ export interface operations {
                 durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 from_to?: string;
                 /**
                  * @description * `INCORPORATION` - INCORPORATION
@@ -12615,6 +12616,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -12924,6 +12926,7 @@ export interface operations {
                 durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string;
                 from_to?: string;
                 ges_bound_max?: number;
                 ges_bound_min?: number;
@@ -12977,6 +12980,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -13042,6 +13046,7 @@ export interface operations {
                 durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter;
                 from_to?: string;
@@ -13093,6 +13098,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string[];
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
@@ -13178,6 +13184,7 @@ export interface operations {
                 durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter;
                 from_to?: string;
@@ -13229,6 +13236,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string[];
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
@@ -13857,6 +13865,9 @@ export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
 export enum PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter {
     biofuel = "biofuel",
     customs_category = "customs_category",
+    durability_period = "durability_period",
+    feedstock = "feedstock",
+    origin_country = "origin_country",
     sector = "sector"
 }
 export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {

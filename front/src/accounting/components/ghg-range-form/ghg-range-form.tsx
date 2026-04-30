@@ -1,132 +1,73 @@
-import { getBalances } from "accounting/api/biofuels/balances"
 import { Balance } from "accounting/types"
 import { useFormContext } from "common/components/form2"
-import { Notice } from "common/components/notice"
-import { useQuery } from "common/hooks/async"
-import useEntity from "common/hooks/entity"
-import { useUnit } from "common/hooks/unit"
-import { debounce } from "common/utils/functions"
+
 import { useTranslation } from "react-i18next"
 import { GHGRangeFormProps } from "./ghg-range-form.types"
 import { ceilNumber, floorNumber } from "common/utils/formatters"
 import { DoubleRange } from "common/components/inputs2"
 import { useEffect } from "react"
 
-type GHGRangeFormComponentProps = {
-  balance: Balance
+export const formatGhgReduction = (
+  ghg_reduction_min: number,
+  ghg_reduction_max: number
+) => {
+  if (ghg_reduction_min === ghg_reduction_max) {
+    return {
+      ghgReductionMin: ghg_reduction_min,
+      ghgReductionMax: ghg_reduction_max,
+    }
+  }
+  return {
+    ghgReductionMin: floorNumber(ghg_reduction_min, 2),
+    ghgReductionMax: ceilNumber(ghg_reduction_max, 2),
+  }
 }
 
-const debouncedGetBalance = debounce(
-  (
-    entityId,
-    biofuel,
-    sector,
-    category,
-    ghgReductionMin,
-    ghgReductionMax,
-    unit
-  ) =>
-    getBalances({
-      page: 1,
-      biofuel,
-      sector,
-      customs_category: category,
-      entity_id: entityId,
-      ges_bound_min: ghgReductionMin,
-      ges_bound_max: ghgReductionMax,
-      unit,
-    }).then((res) =>
-      res.data.results.length > 0 ? res.data.results[0] : undefined
-    ),
-  200
-)
+type GHGRangeFormComponentProps = {
+  balance: Balance
+  onRangeChange?: (gesBoundMin: number, gesBoundMax: number) => void
+}
 
-export const GHGRangeForm = ({ balance }: GHGRangeFormComponentProps) => {
+export const GHGRangeForm = ({
+  balance,
+  onRangeChange,
+}: GHGRangeFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit, unit } = useUnit()
-  const entity = useEntity()
-  const { value, setField, bind, setValue } =
-    useFormContext<GHGRangeFormProps>()
-
-  const ghgReductionMin = floorNumber(balance?.ghg_reduction_min ?? 50, 1)
-  const ghgReductionMax = ceilNumber(balance?.ghg_reduction_max ?? 100, 1)
-
-  // Use the available balance from the form if it exists, otherwise use the balance from the props
-  const availableBalance = value.availableBalance ?? balance.available_balance
-
-  useQuery(debouncedGetBalance, {
-    key: "balance-ghg-min-max",
-    params: [
-      entity.id,
-      balance.biofuel?.code,
-      balance.sector,
-      balance.customs_category,
-      value.gesBoundMin ?? balance.ghg_reduction_min,
-      value.gesBoundMax ?? balance.ghg_reduction_max,
-      unit,
-    ],
-    executeOnMount: false,
-    onSuccess: (data) => {
-      if (data) {
-        setField("availableBalance", data.available_balance)
-      }
-    },
-  })
+  const { value, bind, setValue } = useFormContext<GHGRangeFormProps>()
+  const { ghgReductionMin, ghgReductionMax } = formatGhgReduction(
+    balance?.ghg_reduction_min ?? 50,
+    balance?.ghg_reduction_max ?? 100
+  )
 
   // When the component is mounted, init form values with the balance values only if they are not already set
   useEffect(() => {
     const formValue = {
       ...value,
       availableBalance: value.availableBalance ?? balance.available_balance,
-      gesBoundMin: value.gesBoundMin ?? Math.floor(balance.ghg_reduction_min),
-      gesBoundMax: value.gesBoundMax ?? Math.ceil(balance.ghg_reduction_max),
+      gesBoundMin: value.gesBoundMin ?? ghgReductionMin,
+      gesBoundMax: value.gesBoundMax ?? ghgReductionMax,
     }
 
     setValue(formValue)
   }, [])
 
   return (
-    <>
-      {ghgReductionMin !== ghgReductionMax ? (
-        <>
-          <DoubleRange
-            step={0.1}
-            suffix="%"
-            label={t("Définissez le taux de réduction GES des lots à prélever")}
-            minRange={bind("gesBoundMin")}
-            maxRange={bind("gesBoundMax")}
-            min={ghgReductionMin}
-            max={ghgReductionMax}
-          />
-          <Notice noColor variant="info">
-            <div>
-              {t("Solde disponible pour ces taux de réduction")}
-              {" : "}
-              <b>
-                {formatUnit(availableBalance, {
-                  fractionDigits: 0,
-                })}
-              </b>
-            </div>
-          </Notice>
-        </>
-      ) : (
-        <Notice noColor variant="info">
-          <div>
-            {t("Solde disponible")}
-            {" : "}
-            <b>
-              {formatUnit(availableBalance, {
-                fractionDigits: 0,
-              })}
-            </b>
-            <br />
-            {t("Pour un taux de réduction GES de")}
-            {" : "}
-            <b>{ghgReductionMin}%</b>
-          </div>
-        </Notice>
-      )}
-    </>
+    <DoubleRange
+      step={0.01}
+      suffix="%"
+      label={t("Définissez le taux de réduction GES des lots à prélever")}
+      minRange={bind("gesBoundMin", {
+        onChange: onRangeChange
+          ? (_value) => onRangeChange(_value!, value.gesBoundMax!)
+          : undefined,
+      })}
+      maxRange={bind("gesBoundMax", {
+        onChange: onRangeChange
+          ? (_value) => onRangeChange(value.gesBoundMin!, _value!)
+          : undefined,
+      })}
+      min={ghgReductionMin}
+      max={ghgReductionMax}
+    />
   )
 }
