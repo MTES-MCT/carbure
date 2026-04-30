@@ -258,7 +258,7 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
         self.production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
-        self.contract = BiomethaneContractFactory.create(producer=self.producer_entity)
+        self.contract = BiomethaneContractFactory.create(producer=self.producer_entity, tariff_reference="2023")
 
     def test_full_integration_malfunction_rules(self):
         """Smoke test: verify malfunction rules work end-to-end."""
