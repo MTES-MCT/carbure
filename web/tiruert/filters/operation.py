@@ -46,6 +46,7 @@ class BaseFilter(FilterSet):
             ("_depot", "depot"),
             ("_entity", "from_to"),
             ("_quantity", "quantity"),
+            ("durability_period", "durability_period"),
         ),
         extra_valid_fields=[
             "available_balance",
@@ -109,21 +110,6 @@ class BaseFilter(FilterSet):
             q_objects |= Q(created_at__gte=start_date, created_at__lt=end_date)
 
         return queryset.filter(q_objects).distinct()
-
-    class Meta:
-        model = Operation
-        fields = [
-            "biofuel",
-            "customs_category",
-            "sector",
-            "from_to",
-            "depot",
-            "type",
-            "operation",
-            "status",
-            "entity_id",
-            "period",
-        ]
 
 
 class OperationFilter(BaseFilter):

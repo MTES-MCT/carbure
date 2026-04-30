@@ -5,6 +5,7 @@ import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
 import { LotCertificate } from "transaction-details/types"
 import { useTranslation } from "react-i18next"
+import i18next from "i18next"
 
 interface CertificateProps {
   certificate: LotCertificate | undefined
@@ -41,6 +42,10 @@ export const CertificateIcon = ({ certificate }: CertificateProps) => {
                     <span>{certificate.certificate_id}</span>
                   </li>
                   <li>
+                    <b>{t("Statut")}:</b>{" "}
+                    <span>{getCertificateStatusLabel(certificate.status)}</span>
+                  </li>
+                  <li>
                     <b>{t("Détenteur")}:</b> <span>{certificate.holder}</span>
                   </li>
                   <li>
@@ -62,6 +67,27 @@ export const CertificateIcon = ({ certificate }: CertificateProps) => {
       }
     />
   )
+}
+
+function getCertificateStatusLabel(status: string) {
+  switch (status) {
+    case "PENDING":
+      return i18next.t("En attente")
+    case "VALID":
+    case "ACTIVE":
+    case "EXPIRES_SOON":
+      return i18next.t("Valide")
+    case "SUSPENDED":
+      return i18next.t("Suspendu")
+    case "WITHDRAWN":
+      return i18next.t("Retiré")
+    case "TERMINATED":
+      return i18next.t("Interrompu")
+    case "EXPIRED":
+      return i18next.t("Expiré")
+    default:
+      return status
+  }
 }
 
 export default CertificateIcon

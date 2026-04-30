@@ -9976,6 +9976,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -9988,6 +9989,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -10016,6 +10018,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -10653,6 +10657,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -10665,6 +10670,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -10693,6 +10699,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -10941,6 +10949,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -10953,6 +10962,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -10981,6 +10991,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -11225,6 +11237,7 @@ paths:
               - biofuel
               - customs_category
               - depot
+              - durability_period
               - from_to
               - operation
               - period
@@ -11283,6 +11296,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -11295,6 +11309,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -11323,6 +11338,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
