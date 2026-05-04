@@ -4,10 +4,9 @@ import { useFormContext } from "common/components/form2"
 import { Step } from "common/components/stepper"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { CategoryEnum, Unit } from "common/types"
+import { CategoryEnum, ExtendedUnit } from "common/types"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
-import { CONVERSIONS } from "common/utils/formatters"
 import { Balance } from "accounting/types"
 
 import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filters/advanced-filters"
@@ -27,9 +26,11 @@ type BiofuelFormComponentProps = {
 export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
-  const { setField } = useFormContext<BiofuelFormProps>()
+  const { value, setField } = useFormContext<BiofuelFormProps>()
 
-  const [fullBalance, setFullBalance] = useState<Balance | undefined>(undefined)
+  const [fullBalance, setFullBalance] = useState<Balance | undefined>(
+    value.balance ?? undefined
+  )
 
   // run the balance query without filtering GHG reduction to get the full range
   const fullBalances = useQuery(getBalancesCategory, {
@@ -46,18 +47,14 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
       balance.ghg_reduction_max
     )
 
-    const availableBalance = CONVERSIONS.energy.MJ_TO_GJ(
-      balance.available_balance
-    )
-
     setFullBalance(balance)
 
-    setField("availableBalance", availableBalance)
+    setField("availableBalance", balance.available_balance)
     setField("gesBoundMin", ghgReductionMin)
     setField("gesBoundMax", ghgReductionMax)
 
     // Used to know which balance is currently selected
-    setField("balance", { ...balance, available_balance: availableBalance })
+    setField("balance", balance)
   }
 
   return (
@@ -79,7 +76,10 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
         />
       </Box>
       {fullBalance && (
-        <AdvancedFiltersBalanceCard balance={fullBalance} unit={Unit.GJ} />
+        <AdvancedFiltersBalanceCard
+          balance={fullBalance}
+          unit={ExtendedUnit.GJ}
+        />
       )}
     </>
   )

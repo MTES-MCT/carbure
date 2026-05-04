@@ -15,7 +15,7 @@ class BalanceService:
     GROUP_BY_ALL = [GROUP_BY_SECTOR, GROUP_BY_CATEGORY, GROUP_BY_LOT, GROUP_BY_DEPOT]
     UNIT_CONVERSION_RULES = {
         "mj": ("pci_litre", 1),
-        "gj": ("pci_litre", 1000),
+        "gj": ("pci_litre", 0.001),
         "kg": ("masse_volumique", 1),
     }
 

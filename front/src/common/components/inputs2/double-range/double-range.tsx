@@ -3,6 +3,8 @@ import {
   RangeProps as BaseRangeProps,
 } from "@codegouvfr/react-dsfr/Range"
 import { ComponentProps } from "react"
+import css from "./double-range.module.css"
+import cl from "clsx"
 
 type BoundaryProps = Omit<ComponentProps<"input">, "value" | "onChange"> & {
   value?: number
@@ -25,6 +27,7 @@ export const DoubleRange = ({
   return (
     <BaseRange
       {...props}
+      className={cl(min === max && css["same-value"], props.className)}
       double
       min={min}
       max={max}

@@ -1,4 +1,4 @@
-import { ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnit } from "common/types"
 import { QuantityFormProps } from "./quantity-form.types"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
@@ -10,7 +10,7 @@ export const QuantitySummary = ({
   unit,
 }: {
   values: QuantityFormProps
-  unit?: Unit | ExtendedUnit
+  unit?: ExtendedUnit
 }) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit(unit)

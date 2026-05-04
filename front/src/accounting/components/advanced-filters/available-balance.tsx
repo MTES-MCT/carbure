@@ -3,7 +3,7 @@ import { Notice } from "common/components/notice"
 import { useUnit } from "common/hooks/unit"
 import { useTranslation } from "react-i18next"
 import { Icon } from "common/components/icon"
-import { Unit } from "common/types"
+import { ExtendedUnitType } from "common/types"
 
 export const AvailableBalance = ({
   loading,
@@ -12,7 +12,7 @@ export const AvailableBalance = ({
 }: {
   loading: boolean
   availableBalance: number
-  unit?: Unit
+  unit?: ExtendedUnitType
 }) => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit(unit)
@@ -28,6 +28,7 @@ export const AvailableBalance = ({
           <b>
             {formatUnit(availableBalance, {
               fractionDigits: 0,
+              mode: "floor",
             })}
           </b>
         )}

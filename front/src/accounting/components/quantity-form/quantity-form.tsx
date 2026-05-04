@@ -12,7 +12,7 @@ import {
   useFocusOnAvoidedEmissions,
   useQuantityForm,
 } from "./quantity-form.hooks"
-import { ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnitType } from "common/types"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -23,13 +23,7 @@ export type QuantityFormComponentProps = {
   type: CreateOperationType
 
   // Unit of the quantity displayed to the user (default is the entity preferred unit)
-  unit?: Unit | ExtendedUnit
-
-  // Unit of the quantity used by the backend (default is the entity preferred unit)
-  backendUnit?: Unit | ExtendedUnit
-
-  // Custom conversion function for the backend (default is the value passed as parameter)
-  converter?: (value: number) => number
+  unit?: ExtendedUnitType
 
   // Lot GHG min and max bounds
   gesBoundMin?: number
@@ -70,15 +64,13 @@ const QuantitySection = ({
   balance,
   quantityMax,
   type,
-  unit: customUnit,
-  backendUnit: customBackendUnit,
+  unit: overrideUnit,
   gesBoundMin,
   gesBoundMax,
-  converter,
   onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit(customUnit)
+  const { formatUnit, unit } = useUnit(overrideUnit)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } =
@@ -86,8 +78,7 @@ const QuantitySection = ({
   const mutation = useQuantityForm({
     balance,
     values: value,
-    unit: customBackendUnit,
-    converter,
+    unit,
     gesBoundMin,
     gesBoundMax,
   })

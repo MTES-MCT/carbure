@@ -1,0 +1,6 @@
+.same-value
+  :global(
+    .fr-range--double[data-fr-js-range] input[type="range"]:nth-of-type(2)
+  ) {
+  width: var(--thumb-size);
+}

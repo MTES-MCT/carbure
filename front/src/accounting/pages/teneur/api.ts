@@ -1,6 +1,6 @@
 import { getBalances } from "accounting/api/biofuels/balances"
 import { getElecBalances } from "accounting/api/elec/balances"
-import { CategoryEnum, Unit } from "common/types"
+import { CategoryEnum } from "common/types"
 import {
   CategoryObjective,
   Objectives,
@@ -9,6 +9,7 @@ import {
 import { api, getDownloadUrl } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS } from "common/utils/formatters"
+import { OperationUnit } from "accounting/types"
 
 function parseObjectivesResponse(objectives?: apiTypes["ObjectiveOutput"]) {
   const baseObjective = {
@@ -138,7 +139,7 @@ export const getBalancesCategory = async (
     entity_id,
     page: 1,
     customs_category: [category],
-    unit: Unit.MJ,
+    unit: OperationUnit.GJ,
     ges_bound_min: gesBoundMin,
     ges_bound_max: gesBoundMax,
   })
@@ -147,7 +148,7 @@ export const getBalancesCategory = async (
 export const getBiofuelBalance = async (entity_id: number) => {
   return getBalances<apiTypes["Balance"]>({
     entity_id,
-    unit: Unit.MJ,
+    unit: OperationUnit.GJ,
   })
 }
 

@@ -3,11 +3,11 @@ import { OperationText } from "../operation-text"
 import { formatSector } from "accounting/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { Grid } from "common/components/scaffold"
-import { ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnit } from "common/types"
 
 type RecapOperationProps = {
   balance: Balance
-  unit?: Unit | ExtendedUnit
+  unit?: ExtendedUnit
 }
 
 export const RecapOperation = ({ balance }: RecapOperationProps) => {
