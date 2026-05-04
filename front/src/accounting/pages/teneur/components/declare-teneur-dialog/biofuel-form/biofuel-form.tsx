@@ -4,7 +4,7 @@ import { useFormContext } from "common/components/form2"
 import { Step } from "common/components/stepper"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { CategoryEnum } from "common/types"
+import { CategoryEnum, Unit } from "common/types"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
 import { CONVERSIONS } from "common/utils/formatters"
@@ -78,7 +78,9 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
           onChange={onBalanceChange}
         />
       </Box>
-      {fullBalance && <AdvancedFiltersBalanceCard balance={fullBalance} />}
+      {fullBalance && (
+        <AdvancedFiltersBalanceCard balance={fullBalance} unit={Unit.GJ} />
+      )}
     </>
   )
 }

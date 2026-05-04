@@ -15,6 +15,7 @@ import { AdvancedFiltersFormProps, Filters } from "./advanced-filters.types"
 import { useAvailableBalance } from "./available-balance.hooks"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Unit } from "common/types"
 
 export const AdvancedFiltersBalance = ({
   balance,
@@ -45,14 +46,18 @@ export const AdvancedFiltersBalance = ({
 
 export const AdvancedFiltersBalanceCard = ({
   balance,
+  unit,
 }: {
   balance: Balance
+  // By default, the unit is the entity preferred unit, but in some cases, it can be overridden
+  unit?: Unit
 }) => {
   const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
   const [_balance, setBalance] = useState<Balance>(balance)
 
   const { loading, getBalance } = useAvailableBalance({
     initialBalance: _balance,
+    unit,
   })
 
   const onFiltersChange = (
@@ -114,6 +119,7 @@ export const AdvancedFiltersBalanceCard = ({
       <AvailableBalance
         loading={loading}
         availableBalance={value.availableBalance ?? _balance.available_balance}
+        unit={unit}
       />
     </Box>
   )

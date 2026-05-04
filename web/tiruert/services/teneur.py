@@ -431,6 +431,8 @@ class TeneurService:
     def _convert_in_liters(quantity, unit, biofuel):
         if unit == "mj":
             return quantity / biofuel.pci_litre
+        if unit == "gj":
+            return quantity / biofuel.pci_litre / 1000
         elif unit == "kg":
             return quantity / biofuel.masse_volumique
         else:

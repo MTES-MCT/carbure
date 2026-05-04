@@ -13,6 +13,11 @@ class BalanceService:
     GROUP_BY_LOT = "lot"
     GROUP_BY_DEPOT = "depot"
     GROUP_BY_ALL = [GROUP_BY_SECTOR, GROUP_BY_CATEGORY, GROUP_BY_LOT, GROUP_BY_DEPOT]
+    UNIT_CONVERSION_RULES = {
+        "mj": ("pci_litre", 1),
+        "gj": ("pci_litre", 1000),
+        "kg": ("masse_volumique", 1),
+    }
 
     @staticmethod
     def _get_key(operation, group_by, detail=None, depot=None):
@@ -40,16 +45,16 @@ class BalanceService:
         """
         Calculates the conversion factor based on the requested unit
         """
-        conversion_factor_name = BalanceService._define_conversion_factor(unit)
-        return getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
+        conversion_factor_name, multiplier = BalanceService._define_conversion_rule(unit)
+        conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
+        return conversion_factor * multiplier
 
     @staticmethod
-    def _define_conversion_factor(unit):
+    def _define_conversion_rule(unit):
         """
-        Determines the conversion factor based on the unit
+        Determines the conversion field and multiplier based on the unit
         """
-        conversion_factors = {"mj": "pci_litre", "kg": "masse_volumique"}
-        return conversion_factors.get(unit)
+        return BalanceService.UNIT_CONVERSION_RULES.get(unit, (None, 1))
 
     @staticmethod
     def _init_balance_entry(unit, operation=None, group_by=None):

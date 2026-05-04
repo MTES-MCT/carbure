@@ -7,6 +7,7 @@ import { useUnit } from "common/hooks/unit"
 import { debounce } from "common/utils/functions"
 
 import { AdvancedFiltersFormProps } from "./advanced-filters.types"
+import { Unit } from "common/types"
 
 const pickFilters = (filters: AdvancedFiltersFormProps) => {
   return {
@@ -35,12 +36,14 @@ const debouncedGetBalance = debounce(
 
 export const useAvailableBalance = ({
   initialBalance,
+  unit: overrideUnit,
 }: {
   initialBalance: Balance
+  unit?: Unit
 }) => {
-  const { unit } = useUnit()
   const entity = useEntity()
   const { setField } = useFormContext<AdvancedFiltersFormProps>()
+  const { unit } = useUnit(overrideUnit)
 
   const query = useQuery(
     (filters?: AdvancedFiltersFormProps) =>

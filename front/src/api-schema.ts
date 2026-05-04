@@ -5552,7 +5552,7 @@ export interface components {
          *     * `MJ` - MJ
          * @enum {string}
          */
-        PreferredUnitEnum: PathsApiTiruertOperationsGetParametersQueryUnit;
+        PreferredUnitEnum: PreferredUnitEnum;
         /**
          * @description * `LIQUID_PROCESS` - Voie liquide
          *     * `DRY_PROCESS` - Voie sèche
@@ -13853,6 +13853,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     VALIDATED = "VALIDATED"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
+    GJ = "GJ",
     MJ = "MJ",
     kg = "kg",
     l = "l"
@@ -14106,6 +14107,11 @@ export enum OwnershipTypeEnum {
     OWN = "OWN",
     THIRD_PARTY = "THIRD_PARTY",
     PROCESSING = "PROCESSING"
+}
+export enum PreferredUnitEnum {
+    l = "l",
+    kg = "kg",
+    MJ = "MJ"
 }
 export enum ProcessTypeEnum {
     LIQUID_PROCESS = "LIQUID_PROCESS",

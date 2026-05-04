@@ -10128,6 +10128,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10175,6 +10176,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10241,6 +10243,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10294,6 +10297,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10358,6 +10362,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10392,6 +10397,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10443,6 +10449,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10499,6 +10506,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -10813,6 +10821,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -11097,6 +11106,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -11156,6 +11166,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -11444,6 +11455,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -11487,6 +11499,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -11531,6 +11544,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l
@@ -11575,6 +11589,7 @@ paths:
           schema:
             type: string
             enum:
+              - GJ
               - MJ
               - kg
               - l

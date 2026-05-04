@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from core.models import Entity
 from core.pagination import MetadataPageNumberPagination
 from entity.permissions import HasDgddiWriteRights
 from saf.models.constants import SAF_BIOFUEL_TYPES
@@ -47,7 +46,7 @@ class OperationPagination(MetadataPageNumberPagination):
         OpenApiParameter(
             name="unit",
             type=str,
-            enum=[choice[0] for choice in Entity.UNIT_CHOICE],
+            enum=[choice[0] for choice in Operation.OPERATION_UNIT_CHOICE],
             location=OpenApiParameter.QUERY,
             description="Specify the volume unit.",
         ),
