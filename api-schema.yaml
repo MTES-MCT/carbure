@@ -16166,6 +16166,8 @@ components:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
           type: boolean
+        is_industrial_waste:
+          type: boolean
       required:
         - code
         - name
@@ -16185,6 +16187,8 @@ components:
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
+          type: boolean
+        is_industrial_waste:
           type: boolean
         classification:
           allOf:
@@ -16213,6 +16217,8 @@ components:
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
+          type: boolean
+        is_industrial_waste:
           type: boolean
       required:
         - code
