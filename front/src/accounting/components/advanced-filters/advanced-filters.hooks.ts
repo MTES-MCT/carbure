@@ -13,7 +13,7 @@ import {
   AdvancedFiltersFormProps,
   Filters,
 } from "./advanced-filters.types"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 
 export const useAdvancedFiltersBalance = ({
   balance,
@@ -100,17 +100,23 @@ export const useBuildFilters = ({
     )
   }
 
-  return { selected, onSelect }
+  const resetFilters = useCallback(() => {
+    ADVANCED_FILTER_FIELDS.forEach((filter) => {
+      setField(filter, [])
+    })
+  }, [setField])
+
+  return { selected, onSelect, resetFilters }
 }
 
 /**
  * Function to check if a filter has been removed
  */
 export const isFilterRemoved = (
-  previousFilters: Filters,
-  newFilters: Filters
+  previousFilters: Partial<Filters>,
+  newFilters: Partial<Filters>
 ) => {
-  const previousFiltersValues = Object.values(previousFilters).flat()
-  const newFiltersValues = Object.values(newFilters).flat()
+  const previousFiltersValues = Object.values(previousFilters ?? {}).flat()
+  const newFiltersValues = Object.values(newFilters ?? {}).flat()
   return previousFiltersValues.length > newFiltersValues.length
 }

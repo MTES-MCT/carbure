@@ -10588,7 +10588,11 @@ paths:
         - in: query
           name: feedstock
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: from_to
           schema:
@@ -10718,7 +10722,11 @@ paths:
         - in: query
           name: origin_country
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query

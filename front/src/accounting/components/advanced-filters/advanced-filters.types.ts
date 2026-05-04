@@ -11,4 +11,4 @@ type AdvancedFilterField = (typeof ADVANCED_FILTER_FIELDS)[number]
 
 export type Filters = Record<AdvancedFilterField, string[]>
 
-export type AdvancedFiltersFormProps = Filters & GHGRangeFormProps
+export type AdvancedFiltersFormProps = Partial<Filters> & GHGRangeFormProps

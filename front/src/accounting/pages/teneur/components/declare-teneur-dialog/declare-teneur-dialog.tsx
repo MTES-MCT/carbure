@@ -192,9 +192,7 @@ const DeclareTeneurDialogContent = ({
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="declare-teneur-dialog">
             {currentStep?.key === biofuelFormStepKey && (
-              <Box spacing="md">
-                <BiofuelForm category={objective.code} />
-              </Box>
+              <BiofuelForm category={objective.code} />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <>
@@ -250,10 +248,7 @@ const DeclareTeneurDialogContent = ({
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
 
-  const form = useForm<DeclareTeneurDialogForm>({
-    gesBoundMin: undefined,
-    gesBoundMax: undefined,
-  })
+  const form = useForm<DeclareTeneurDialogForm>({})
 
   const backendUnit = Unit.MJ
 

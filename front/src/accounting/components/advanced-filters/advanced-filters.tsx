@@ -13,7 +13,9 @@ import { formatGhgReduction, GHGRangeForm } from "../ghg-range-form"
 import { AvailableBalance } from "./available-balance"
 import { AdvancedFiltersFormProps, Filters } from "./advanced-filters.types"
 import { useAvailableBalance } from "./available-balance.hooks"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+
 export const AdvancedFiltersBalance = ({
   balance,
   onFiltersChange,
@@ -23,12 +25,13 @@ export const AdvancedFiltersBalance = ({
   onFiltersChange: (filters: QueryFilters) => void
   selected: Filters
 }) => {
+  const { t } = useTranslation()
   const { getFilterOptions, filterNormalizers, filterLabels } =
     useAdvancedFiltersBalance({ balance })
 
   return (
     <div>
-      <Text margin> Filtres avancés </Text>
+      <Text margin> {t("Filtres avancés")} </Text>
       <FilterMultiSelect2
         filterLabels={filterLabels}
         getFilterOptions={getFilterOptions}
@@ -49,7 +52,7 @@ export const AdvancedFiltersBalanceCard = ({
   const [_balance, setBalance] = useState<Balance>(balance)
 
   const { loading, getBalance } = useAvailableBalance({
-    initialBalance: balance,
+    initialBalance: _balance,
   })
 
   const onFiltersChange = (
@@ -83,7 +86,15 @@ export const AdvancedFiltersBalanceCard = ({
     })
   }
 
-  const { selected, onSelect } = useBuildFilters({ onFiltersChange })
+  const { selected, onSelect, resetFilters } = useBuildFilters({
+    onFiltersChange,
+  })
+
+  // When the balance prop changes, reset the local balance state and the filters
+  useEffect(() => {
+    setBalance(balance)
+    resetFilters()
+  }, [balance, resetFilters, getBalance])
 
   return (
     <Box>

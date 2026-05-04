@@ -12926,7 +12926,7 @@ export interface operations {
                 durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                feedstock?: string;
+                feedstock?: string[];
                 from_to?: string;
                 ges_bound_max?: number;
                 ges_bound_min?: number;
@@ -12980,7 +12980,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                origin_country?: string;
+                origin_country?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
