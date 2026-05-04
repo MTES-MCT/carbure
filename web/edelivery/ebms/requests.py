@@ -4,7 +4,9 @@ from os import environ
 
 from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.adapters.zip_utils import zip_and_stream_udb_request
-from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse, GetCertificateResponse
+from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
+from edelivery.ebms.request_responses.eo_get_transaction_response import EOGetTransactionResponse
+from edelivery.ebms.request_responses.get_certificate_response import GetCertificateResponse
 
 
 class BaseRequest:

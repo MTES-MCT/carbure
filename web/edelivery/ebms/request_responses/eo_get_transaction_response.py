@@ -1,5 +1,3 @@
-import xml.etree.ElementTree as ET
-
 from django.core.exceptions import ObjectDoesNotExist
 
 from adapters.logger import log_error
@@ -8,18 +6,7 @@ from edelivery.ebms.converters import UDBConversionError
 from edelivery.ebms.transaction import Transaction
 from transactions.services.lots import LotCreationFailure, LotUpdateFailure, create_lot, do_update_lot
 
-
-class BaseRequestResponse:
-    def __init__(self, payload):
-        self.payload = payload
-        self.parsed_XML = ET.fromstring(payload)
-
-    def request_id(self):
-        response_header_element = self.parsed_XML.find("./RESPONSE_HEADER")
-        return response_header_element.attrib["REQUEST_ID"]
-
-    def post_retrieval_action_result(self):
-        pass
+from .base_request_response import BaseRequestResponse
 
 
 class EOGetTransactionResponse(BaseRequestResponse):
@@ -81,8 +68,3 @@ class EOGetTransactionResponse(BaseRequestResponse):
         existing_lot.lot_status = transaction.carbure_status()
         existing_lot.save()
         return {"newLotCreated": new_lot_created, "id": existing_lot.id}
-
-
-class GetCertificateResponse(BaseRequestResponse):
-    def post_retrieval_action_result(self):
-        return self.payload
