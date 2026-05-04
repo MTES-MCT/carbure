@@ -84,8 +84,8 @@ class BalanceServiceGetConversionFactorTest(TestCase):
 class BalanceServiceInitBalanceEntryTest(TestCase):
     """Unit tests for BalanceService._init_balance_entry() method."""
 
-    def test_init_balance_entry_with_no_operation(self):
-        """Test _init_balance_entry creates entry with None values when no operation provided."""
+    def test_init_balance_entry(self):
+        """Test _init_balance_entry creates entry with None values and correct defaults."""
         result = BalanceService._init_balance_entry("mj")
 
         self.assertIsNone(result["sector"])
@@ -97,20 +97,6 @@ class BalanceServiceInitBalanceEntryTest(TestCase):
         self.assertEqual(result["declared_teneur"], 0)
         self.assertEqual(result["available_balance"], 0)
         self.assertEqual(result["saved_emissions"], 0)
-
-    def test_init_balance_entry_with_operation(self):
-        """Test _init_balance_entry populates sector, category, biofuel from operation."""
-        mock_operation = Mock()
-        mock_operation.sector = "ESSENCE"
-        mock_operation.customs_category = MatierePremiere.CONV
-        mock_operation.biofuel = Mock(code="ETH")
-
-        result = BalanceService._init_balance_entry("mj", operation=mock_operation)
-
-        self.assertEqual(result["sector"], "ESSENCE")
-        self.assertEqual(result["customs_category"], MatierePremiere.CONV)
-        self.assertEqual(result["biofuel"], mock_operation.biofuel)
-        self.assertEqual(result["unit"], "mj")
 
 
 class BalanceServiceGetKeyTest(TestCase):
