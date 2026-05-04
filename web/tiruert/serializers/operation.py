@@ -60,6 +60,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "type",
             "status",
             "sector",
+            "objective_sector",
             "customs_category",
             "biofuel",
             "renewable_energy_share",
@@ -85,6 +86,7 @@ class OperationSerializer(BaseOperationSerializer):
             "type",
             "status",
             "sector",
+            "objective_sector",
             "customs_category",
             "biofuel",
             "renewable_energy_share",
@@ -135,6 +137,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "to_depot",
             "export_country",
             "export_recipient",
+            "objective_sector",
             "lots",
             "status",
         ]
@@ -153,6 +156,13 @@ class OperationInputSerializer(serializers.ModelSerializer):
         if value not in Operation.API_CREATABLE_TYPES:
             raise serializers.ValidationError("error : OPERATION_TYPE_NOT_AUTHORIZED")
         return value
+
+    def validate(self, data):
+        if data.get("objective_sector") and data.get("type") != Operation.TENEUR:
+            raise serializers.ValidationError(
+                {"declared_sector": "objective_sector ne peut être défini que pour les opérations de type TENEUR"}
+            )
+        return data
 
     def create(self, validated_data):
         with transaction.atomic():
