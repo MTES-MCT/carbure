@@ -137,6 +137,7 @@
       "category": "ANN-IX-A",
       "dgddi_category": null,
       "is_biofuel_feedstock": true,
+      "is_industrial_waste": true,
       "is_methanogenic": false
     }
   },
