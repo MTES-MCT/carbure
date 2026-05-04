@@ -112,7 +112,7 @@ class Operation(models.Model):
         (CARBUREACTEUR, CARBUREACTEUR),
     )
 
-    OPERATION_UNIT_CHOICE = Entity.UNIT_CHOICE + (("GJ", "GJ"),)
+    OPERATION_UNIT_CHOICE = Entity.UNIT_CHOICE + (("gj", "gj"),)
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
     status = models.CharField(max_length=12, choices=OPERATION_STATUSES, default=PENDING)

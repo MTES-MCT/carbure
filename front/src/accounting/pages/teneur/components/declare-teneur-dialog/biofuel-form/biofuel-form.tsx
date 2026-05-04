@@ -13,11 +13,10 @@ import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filte
 import { Box } from "common/components/scaffold"
 import { AdvancedFiltersFormProps } from "accounting/components/advanced-filters/advanced-filters.types"
 import { formatGhgReduction } from "accounting/components/ghg-range-form"
-import { useState } from "react"
+import { useBuildFilters } from "accounting/components/advanced-filters/advanced-filters.hooks"
+import { useMemo } from "react"
 
-export type BiofuelFormProps = AdvancedFiltersFormProps & {
-  balance?: Balance
-}
+export type BiofuelFormProps = AdvancedFiltersFormProps
 
 type BiofuelFormComponentProps = {
   category: CategoryEnum
@@ -26,17 +25,29 @@ type BiofuelFormComponentProps = {
 export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
-  const { value, setField } = useFormContext<BiofuelFormProps>()
 
-  const [fullBalance, setFullBalance] = useState<Balance | undefined>(
-    value.balance ?? undefined
-  )
+  const { resetFilters } = useBuildFilters({})
+  const { value, setField } = useFormContext<BiofuelFormProps>()
 
   // run the balance query without filtering GHG reduction to get the full range
   const fullBalances = useQuery(getBalancesCategory, {
     key: "biofuels-category",
     params: [entity.id, category],
   })
+
+  // Keep the autocomplete value aligned with currently available options,
+  // otherwise label resolution can fail after step transitions.
+  const selectedBalance = useMemo(() => {
+    const balances = fullBalances.result?.data?.results ?? []
+    const selectedBiofuelCode = value.balance?.biofuel?.code
+    if (!selectedBiofuelCode) return undefined
+
+    return (
+      balances.find(
+        (balance) => balance.biofuel?.code === selectedBiofuelCode
+      ) ?? value.balance
+    )
+  }, [fullBalances.result?.data?.results, value.balance])
 
   // When a biofuel is select, reset the current balance to be used for the advanced filters,
   // and reset the bounds for the GHG range slider + available balance
@@ -47,7 +58,7 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
       balance.ghg_reduction_max
     )
 
-    setFullBalance(balance)
+    // setFullBalance(balance)
 
     setField("availableBalance", balance.available_balance)
     setField("gesBoundMin", ghgReductionMin)
@@ -55,6 +66,7 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
 
     // Used to know which balance is currently selected
     setField("balance", balance)
+    resetFilters()
   }
 
   return (
@@ -71,16 +83,11 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
           loading={fullBalances.loading}
           required
           filter={() => true} // show all options
-          value={fullBalance}
+          value={selectedBalance}
           onChange={onBalanceChange}
         />
       </Box>
-      {fullBalance && (
-        <AdvancedFiltersBalanceCard
-          balance={fullBalance}
-          unit={ExtendedUnit.GJ}
-        />
-      )}
+      {value.balance && <AdvancedFiltersBalanceCard unit={ExtendedUnit.GJ} />}
     </>
   )
 }

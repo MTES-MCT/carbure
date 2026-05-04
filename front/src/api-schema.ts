@@ -13853,8 +13853,8 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     VALIDATED = "VALIDATED"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
-    GJ = "GJ",
     MJ = "MJ",
+    gj = "gj",
     kg = "kg",
     l = "l"
 }

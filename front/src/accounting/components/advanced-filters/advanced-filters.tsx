@@ -7,28 +7,29 @@ import {
 } from "./advanced-filters.hooks"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { useFormContext } from "common/components/form2"
-import { Balance } from "accounting/types"
 import { QueryFilters } from "common/hooks/query-builder-2"
 import { formatGhgReduction, GHGRangeForm } from "../ghg-range-form"
 import { AvailableBalance } from "./available-balance"
-import { AdvancedFiltersFormProps, Filters } from "./advanced-filters.types"
+import {
+  AdvancedFiltersFormProps,
+  AdvancedFiltersWithBalanceFormProps,
+  Filters,
+} from "./advanced-filters.types"
 import { useAvailableBalance } from "./available-balance.hooks"
-import { useEffect, useState } from "react"
+
 import { useTranslation } from "react-i18next"
 import { ExtendedUnitType } from "common/types"
 
 export const AdvancedFiltersBalance = ({
-  balance,
   onFiltersChange,
   selected,
 }: {
-  balance: Balance
   onFiltersChange: (filters: QueryFilters) => void
   selected: Filters
 }) => {
   const { t } = useTranslation()
   const { getFilterOptions, filterNormalizers, filterLabels } =
-    useAdvancedFiltersBalance({ balance })
+    useAdvancedFiltersBalance()
 
   return (
     <div>
@@ -45,18 +46,15 @@ export const AdvancedFiltersBalance = ({
 }
 
 export const AdvancedFiltersBalanceCard = ({
-  balance,
   unit,
 }: {
-  balance: Balance
   // By default, the unit is the entity preferred unit, but in some cases, it can be overridden
   unit?: ExtendedUnitType
 }) => {
-  const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
-  const [_balance, setBalance] = useState<Balance>(balance)
+  const { value, setField } =
+    useFormContext<AdvancedFiltersWithBalanceFormProps>()
 
   const { loading, getBalance } = useAvailableBalance({
-    initialBalance: _balance,
     unit,
   })
 
@@ -82,8 +80,8 @@ export const AdvancedFiltersBalanceCard = ({
         setField("gesBoundMin", ghgReductionMin)
         setField("gesBoundMax", ghgReductionMax)
 
-        setBalance({
-          ...balance,
+        setField("balance", {
+          ...newBalance,
           ghg_reduction_min: ghgReductionMin,
           ghg_reduction_max: ghgReductionMax,
         })
@@ -91,26 +89,16 @@ export const AdvancedFiltersBalanceCard = ({
     })
   }
 
-  const { selected, onSelect, resetFilters } = useBuildFilters({
+  const { selected, onSelect } = useBuildFilters({
     onFiltersChange,
   })
 
-  // When the balance prop changes, reset the local balance state and the filters
-  useEffect(() => {
-    setBalance(balance)
-    resetFilters()
-  }, [balance, resetFilters, getBalance])
-
   return (
     <Box>
-      <AdvancedFiltersBalance
-        balance={_balance}
-        onFiltersChange={onSelect}
-        selected={selected}
-      />
+      <AdvancedFiltersBalance onFiltersChange={onSelect} selected={selected} />
 
       <GHGRangeForm
-        balance={_balance}
+        balance={value.balance}
         onRangeChange={(gesBoundMin, gesBoundMax) => {
           getBalance({ ...value, gesBoundMin, gesBoundMax })
         }}
@@ -118,7 +106,9 @@ export const AdvancedFiltersBalanceCard = ({
 
       <AvailableBalance
         loading={loading}
-        availableBalance={value.availableBalance ?? _balance.available_balance}
+        availableBalance={
+          value.availableBalance ?? value.balance.available_balance
+        }
         unit={unit}
       />
     </Box>

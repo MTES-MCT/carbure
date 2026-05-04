@@ -10128,8 +10128,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10176,8 +10176,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10243,8 +10243,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10297,8 +10297,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10362,8 +10362,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10397,8 +10397,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10449,8 +10449,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10506,8 +10506,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10821,8 +10821,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11106,8 +11106,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11166,8 +11166,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11455,8 +11455,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11499,8 +11499,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11544,8 +11544,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11589,8 +11589,8 @@ paths:
           schema:
             type: string
             enum:
-              - GJ
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.

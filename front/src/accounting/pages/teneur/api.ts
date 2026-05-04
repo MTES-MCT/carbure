@@ -139,7 +139,7 @@ export const getBalancesCategory = async (
     entity_id,
     page: 1,
     customs_category: [category],
-    unit: OperationUnit.GJ,
+    unit: OperationUnit.gj,
     ges_bound_min: gesBoundMin,
     ges_bound_max: gesBoundMax,
   })
@@ -148,7 +148,7 @@ export const getBalancesCategory = async (
 export const getBiofuelBalance = async (entity_id: number) => {
   return getBalances<apiTypes["Balance"]>({
     entity_id,
-    unit: OperationUnit.GJ,
+    unit: OperationUnit.gj,
   })
 }
 

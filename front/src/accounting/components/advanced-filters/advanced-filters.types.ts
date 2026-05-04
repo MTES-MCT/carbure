@@ -1,4 +1,4 @@
-import { BalancesFilter } from "accounting/types"
+import { Balance, BalancesFilter } from "accounting/types"
 import { GHGRangeFormProps } from "../ghg-range-form"
 
 export const ADVANCED_FILTER_FIELDS = [
@@ -11,4 +11,11 @@ type AdvancedFilterField = (typeof ADVANCED_FILTER_FIELDS)[number]
 
 export type Filters = Record<AdvancedFilterField, string[]>
 
-export type AdvancedFiltersFormProps = Partial<Filters> & GHGRangeFormProps
+export type AdvancedFiltersFormProps = Partial<Filters> &
+  GHGRangeFormProps & {
+    balance?: Balance
+  }
+
+export type AdvancedFiltersWithBalanceFormProps = AdvancedFiltersFormProps & {
+  balance: Balance
+}

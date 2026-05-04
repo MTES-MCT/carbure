@@ -78,7 +78,7 @@ export { CategoryEnum }
 
 // Add units that are used in specific modules
 export enum ExtendedUnit {
-  GJ = "GJ",
+  GJ = "gj",
   MWh = "MWh",
 }
 export type ExtendedUnitType = Unit | ExtendedUnit

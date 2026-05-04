@@ -24,6 +24,7 @@ import {
   RecipientSummary,
 } from "accounting/components/recipient-form"
 import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filters/advanced-filters"
+import { useEffect } from "react"
 
 interface TransfertDialogProps {
   onClose: () => void
@@ -60,6 +61,11 @@ export const TransfertDialogContent = ({
           available_balance: form.value.availableBalance!,
         }
       : balance
+
+  // When the component is mounted, set the balance in the form
+  useEffect(() => {
+    form.setField("balance", balance)
+  }, [])
 
   return (
     <Dialog
@@ -111,7 +117,7 @@ export const TransfertDialogContent = ({
                 <Box>
                   <RecipientForm />
                 </Box>
-                <AdvancedFiltersBalanceCard balance={balance} />
+                {form.value.balance && <AdvancedFiltersBalanceCard />}
               </>
             )}
             {currentStep?.key === quantityFormStepKey && (
