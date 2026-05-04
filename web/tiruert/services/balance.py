@@ -58,14 +58,14 @@ class BalanceService:
         return conversion_factors.get(unit)
 
     @staticmethod
-    def _init_balance_entry(unit, operation=None, group_by=None):
+    def _init_balance_entry(unit):
         """
         Initializes a balance entry with default values
         """
         entry = {
-            "sector": None if not operation else operation.sector,
-            "customs_category": None if not operation else operation.customs_category,
-            "biofuel": None if not operation else operation.biofuel,
+            "sector": None,
+            "customs_category": None,
+            "biofuel": None,
             "quantity": {"credit": 0, "debit": 0},
             "emission_rate_per_mj": 0,
             "pending_teneur": 0,
