@@ -1,9 +1,9 @@
 import {
-  FromDepotForm,
-  fromDepotStep,
-  fromDepotStepKey,
-  FromDepotSummary,
-} from "accounting/components/from-depot-form"
+  FromDepotFiltersForm,
+  fromDepotFiltersStep,
+  fromDepotFiltersStepKey,
+  FromDepotFiltersSummary,
+} from "./from-depot-filters-form"
 import {
   RecapOperation,
   RecapOperationGrid,
@@ -23,13 +23,13 @@ import {
 import { Button } from "common/components/button2"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import { useExportationDialog } from "./exportation-dialog.hooks"
-import { GHGRangeForm } from "accounting/components/ghg-range-form"
 import {
   QuantityForm,
   quantityFormStepKey,
   QuantitySummary,
   useQuantityFormStep,
 } from "accounting/components/quantity-form"
+import { useEffect } from "react"
 
 interface ExportationDialogProps {
   onClose: () => void
@@ -64,6 +64,12 @@ export const ExportationDialogContent = ({
           available_balance: form.value.availableBalance!,
         }
       : balance
+
+  // When the component is mounted, set the balance in the form
+  useEffect(() => {
+    form.setField("balance", balance)
+  }, [])
+
   return (
     <Dialog
       fullWidth
@@ -104,22 +110,17 @@ export const ExportationDialogContent = ({
         <Box>
           <RecapOperationGrid>
             <RecapOperation balance={currentBalance} />
-            {currentStepIndex > 1 && <FromDepotSummary values={form.value} />}
+            {currentStepIndex > 1 && (
+              <FromDepotFiltersSummary values={form.value} />
+            )}
             {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
             {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
           </RecapOperationGrid>
         </Box>
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="exportation-dialog">
-            {currentStep?.key === fromDepotStepKey && (
-              <>
-                <Box>
-                  <FromDepotForm />
-                </Box>
-                <Box>
-                  <GHGRangeForm balance={balance} />
-                </Box>
-              </>
+            {currentStep?.key === fromDepotFiltersStepKey && (
+              <FromDepotFiltersForm />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <Box>
@@ -158,7 +159,7 @@ export const ExportationDialog = (props: ExportationDialogProps) => {
   })
 
   const steps = [
-    fromDepotStep,
+    fromDepotFiltersStep(form.value),
     exportationQuantityFormStep,
     countryFormStep,
     { key: "recap", title: t("Récapitulatif") },
