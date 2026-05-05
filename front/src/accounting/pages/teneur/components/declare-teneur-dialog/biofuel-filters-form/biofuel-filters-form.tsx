@@ -15,19 +15,22 @@ import { AdvancedFiltersFormProps } from "accounting/components/advanced-filters
 import { formatGhgReduction } from "accounting/components/ghg-range-form"
 import { useBuildFilters } from "accounting/components/advanced-filters/advanced-filters.hooks"
 import { useMemo } from "react"
+import { showNextStepAdvancedFilters } from "accounting/components/advanced-filters/advanced-filters.utils"
 
-export type BiofuelFormProps = AdvancedFiltersFormProps
+export type BiofuelFiltersFormProps = AdvancedFiltersFormProps
 
-type BiofuelFormComponentProps = {
+type BiofuelFiltersFormComponentProps = {
   category: CategoryEnum
 }
 
-export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
+export const BiofuelFiltersForm = ({
+  category,
+}: BiofuelFiltersFormComponentProps) => {
   const entity = useEntity()
   const { t } = useTranslation()
 
   const { resetFilters } = useBuildFilters({})
-  const { value, setField } = useFormContext<BiofuelFormProps>()
+  const { value, setField } = useFormContext<BiofuelFiltersFormProps>()
 
   // run the balance query without filtering GHG reduction to get the full range
   const fullBalances = useQuery(getBalancesCategory, {
@@ -92,14 +95,15 @@ export const BiofuelForm = ({ category }: BiofuelFormComponentProps) => {
   )
 }
 
-export const biofuelFormStepKey = "biofuel"
-type BiofuelFormStepKey = typeof biofuelFormStepKey
+export const biofuelFiltersFormStepKey = "biofuel-filters"
+type BiofuelFiltersFormStepKey = typeof biofuelFiltersFormStepKey
 
-export const biofuelFormStep: (
-  values: BiofuelFormProps
-) => Step<BiofuelFormStepKey> = () => {
+export const biofuelFiltersFormStep: (
+  values: BiofuelFiltersFormProps
+) => Step<BiofuelFiltersFormStepKey> = (values) => {
   return {
-    key: biofuelFormStepKey,
+    key: biofuelFiltersFormStepKey,
     title: i18next.t("Biocarburant"),
+    allowNextStep: showNextStepAdvancedFilters(values),
   }
 }

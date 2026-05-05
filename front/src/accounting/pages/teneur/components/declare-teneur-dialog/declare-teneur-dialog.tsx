@@ -11,10 +11,10 @@ import {
 } from "accounting/components/quantity-form"
 import { Box, Main } from "common/components/scaffold"
 import {
-  BiofuelForm,
-  biofuelFormStep,
-  biofuelFormStepKey,
-} from "./biofuel-form"
+  BiofuelFiltersForm,
+  biofuelFiltersFormStep,
+  biofuelFiltersFormStepKey,
+} from "./biofuel-filters-form"
 import { ExtendedUnit } from "common/types"
 import { CreateOperationType } from "accounting/types"
 import { RecapData } from "../recap-data"
@@ -129,7 +129,7 @@ const DeclareTeneurDialogContent = ({
     >
       <Main>
         <Stepper />
-        {currentStep?.key !== biofuelFormStepKey && (
+        {currentStep?.key !== biofuelFiltersFormStepKey && (
           <>
             <Box spacing="md">
               <RecapOperationGrid>
@@ -191,8 +191,8 @@ const DeclareTeneurDialogContent = ({
         )}
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="declare-teneur-dialog">
-            {currentStep?.key === biofuelFormStepKey && (
-              <BiofuelForm category={objective.code} />
+            {currentStep?.key === biofuelFiltersFormStepKey && (
+              <BiofuelFiltersForm category={objective.code} />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <>
@@ -254,7 +254,7 @@ export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   })
 
   const steps = [
-    biofuelFormStep(form.value),
+    biofuelFiltersFormStep(form.value),
     quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]
