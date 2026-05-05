@@ -17,14 +17,14 @@ import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
-import {
-  RecipientForm,
-  recipientStep,
-  recipientStepKey,
-  RecipientSummary,
-} from "accounting/components/recipient-form"
-import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filters/advanced-filters"
+
 import { useEffect } from "react"
+import {
+  RecipientFiltersForm,
+  recipientFiltersStep,
+  recipientFiltersStepKey,
+  RecipientFiltersSummary,
+} from "./recipient-filters-form"
 
 interface TransfertDialogProps {
   onClose: () => void
@@ -105,20 +105,17 @@ export const TransfertDialogContent = ({
         <Box>
           <RecapOperationGrid>
             <RecapOperation balance={currentBalance} />
-            {currentStepIndex > 1 && <RecipientSummary values={form.value} />}
+            {currentStepIndex > 1 && (
+              <RecipientFiltersSummary values={form.value} />
+            )}
             {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
           </RecapOperationGrid>
         </Box>
 
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="transfert-dialog">
-            {currentStep?.key === recipientStepKey && (
-              <>
-                <Box>
-                  <RecipientForm />
-                </Box>
-                {form.value.balance && <AdvancedFiltersBalanceCard />}
-              </>
+            {currentStep?.key === recipientFiltersStepKey && (
+              <RecipientFiltersForm />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <Box>
@@ -152,7 +149,7 @@ export const TransfertDialog = (props: TransfertDialogProps) => {
   })
 
   const steps = [
-    recipientStep,
+    recipientFiltersStep(form.value),
     quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]

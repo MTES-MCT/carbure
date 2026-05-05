@@ -18,7 +18,7 @@ export const AvailableBalance = ({
   const { formatUnit } = useUnit(unit)
 
   return (
-    <Notice noColor variant="info">
+    <Notice noColor variant={availableBalance === 0 ? "warning" : "info"}>
       <div>
         {t("Solde disponible pour les filtres sélectionnés")}
         {" : "}

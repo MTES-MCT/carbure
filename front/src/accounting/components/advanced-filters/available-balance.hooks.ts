@@ -30,9 +30,11 @@ const debouncedGetBalance = debounce(
       entity_id: entityId,
       ...pickFilters(filters),
       unit,
-    }).then((res) =>
-      res.data.results.length > 0 ? res.data.results[0] : undefined
-    ),
+    }).then((res) => {
+      if (res.data.total_quantity === 0) return undefined
+
+      return res.data.results.length > 0 ? res.data.results[0] : undefined
+    }),
   200
 )
 
@@ -62,9 +64,9 @@ export const useAvailableBalance = ({
       executeOnMount: false,
       executeOnUpdate: false,
       onSuccess: (data) => {
-        if (data) {
-          setField("availableBalance", data.available_balance)
-        }
+        const availablebalance = data?.available_balance ?? 0
+
+        setField("availableBalance", availablebalance)
       },
     }
   )
