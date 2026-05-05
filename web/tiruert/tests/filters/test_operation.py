@@ -238,3 +238,37 @@ class OperationFilterForBalanceTest(TestCase):
 
         # Verify queryset is returned unchanged
         self.assertEqual(result, queryset)
+
+    def test_ges_bound_accepts_values_in_valid_range(self):
+        """Test ges_bound filters accept values in the valid 0–100 range."""
+        queryset = Operation.objects.none()
+        request = self.factory.get("/test/")
+
+        for value in ["0", "50", "100"]:
+            with self.subTest(value=value):
+                filterset = OperationFilterForBalance(
+                    {"ges_bound_min": value, "ges_bound_max": value}, queryset=queryset, request=request
+                )
+                self.assertTrue(filterset.form.is_valid(), f"Expected {value} to be valid")
+
+    def test_ges_bound_rejects_negative_values(self):
+        """Test ges_bound filters reject values below 0."""
+        queryset = Operation.objects.none()
+        request = self.factory.get("/test/")
+
+        for field in ["ges_bound_min", "ges_bound_max"]:
+            with self.subTest(field=field):
+                filterset = OperationFilterForBalance({field: "-1"}, queryset=queryset, request=request)
+                self.assertFalse(filterset.form.is_valid(), f"Expected -1 to be invalid for {field}")
+                self.assertIn(field, filterset.form.errors)
+
+    def test_ges_bound_rejects_values_above_100(self):
+        """Test ges_bound filters reject values above 100."""
+        queryset = Operation.objects.none()
+        request = self.factory.get("/test/")
+
+        for field in ["ges_bound_min", "ges_bound_max"]:
+            with self.subTest(field=field):
+                filterset = OperationFilterForBalance({field: "101"}, queryset=queryset, request=request)
+                self.assertFalse(filterset.form.is_valid(), f"Expected 101 to be invalid for {field}")
+                self.assertIn(field, filterset.form.errors)

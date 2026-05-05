@@ -149,11 +149,32 @@ class SimulateActionMixinTest(TestCase):
         data["max_n_batches"] = 5
         data["enforced_volumes"] = [100, 200]
         data["unit"] = "mj"
+        data["durability_period"] = ["2024", "2025"]
+        data["origin_country"] = ["FR", "DE"]
+        data["feedstock"] = ["COLZA", "TOURNESOL"]
 
         request = self._create_request(data)
         response = self.view.simulate(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
+    def test_simulate_passes_new_filters_to_service(self, mock_service):
+        """Test that simulate passes durability_period, origin_country, feedstock to service"""
+        mock_service.return_value = ({0: 1000.0}, np.array([10]), 0.5)
+
+        data = self._create_valid_data()
+        data["durability_period"] = ["2024"]
+        data["origin_country"] = ["FR"]
+        data["feedstock"] = ["COLZA"]
+
+        request = self._create_request(data)
+        self.view.simulate(request)
+
+        call_data = mock_service.call_args[0][0]
+        self.assertEqual(call_data["durability_period"], ["2024"])
+        self.assertEqual(call_data["origin_country"], ["FR"])
+        self.assertEqual(call_data["feedstock"], ["COLZA"])
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
     def test_simulate_with_empty_result(self, mock_service):
@@ -305,8 +326,29 @@ class SimulateMinMaxActionMixinTest(TestCase):
         data["from_depot"] = self.depot.id
         data["ges_bound_min"] = 0.5
         data["ges_bound_max"] = 2.0
+        data["feedstock"] = ["COLZA", "TOURNESOL"]
+        data["origin_country"] = ["FR", "DE"]
+        data["durability_period"] = ["2024", "2025"]
 
         request = self._create_request(data)
         response = self.view.simulate_min_max(request)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @patch("tiruert.views.operation.mixins.simulate.TeneurService.get_min_and_max_emissions")
+    def test_simulate_min_max_passes_new_filters_to_service(self, mock_service):
+        """Test that simulate_min_max passes feedstock, origin_country, durability_period to service"""
+        mock_service.return_value = (1.5, 3.2)
+
+        data = self._create_valid_data()
+        data["feedstock"] = ["COLZA"]
+        data["origin_country"] = ["FR"]
+        data["durability_period"] = ["2024"]
+
+        request = self._create_request(data)
+        self.view.simulate_min_max(request)
+
+        call_data = mock_service.call_args[0][0]
+        self.assertEqual(call_data["feedstock"], ["COLZA"])
+        self.assertEqual(call_data["origin_country"], ["FR"])
+        self.assertEqual(call_data["durability_period"], ["2024"])

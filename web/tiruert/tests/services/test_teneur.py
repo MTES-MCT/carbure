@@ -318,6 +318,125 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         patched_log_warning.assert_called_with(expected_logged_message, expected_additional_informations)
 
 
+class TeneurServicePrepareDataTest(SimpleTestCase):
+    """Unit tests for TeneurService.prepare_data() new filter parameters."""
+
+    def _make_data(self, **extra):
+        mock_entity = Mock()
+        mock_entity.id = 1
+        mock_biofuel = Mock()
+        mock_biofuel.pci_litre = 35.5
+        return {
+            "biofuel": mock_biofuel,
+            "customs_category": "CONV",
+            "debited_entity": mock_entity,
+            **extra,
+        }
+
+    def _mock_operations_chain(self):
+        mock_qs = Mock()
+        mock_qs.filter.return_value = mock_qs
+        mock_qs.distinct.return_value = mock_qs
+        return mock_qs
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    @patch("tiruert.services.teneur.Operation.objects")
+    def test_prepare_data_passes_feedstock_to_detail_filters(self, mock_objects, mock_balance):
+        """Test that feedstock is passed to BalanceService.calculate_balance detail_filters."""
+        mock_qs = self._mock_operations_chain()
+        mock_objects.filter.return_value = mock_qs
+        mock_balance.return_value = {}
+
+        data = self._make_data(feedstock=["COLZA", "TOURNESOL"])
+
+        TeneurService.prepare_data(data, "l")
+
+        _, call_kwargs = mock_balance.call_args
+        self.assertEqual(call_kwargs["detail_filters"]["feedstock"], ["COLZA", "TOURNESOL"])
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    @patch("tiruert.services.teneur.Operation.objects")
+    def test_prepare_data_passes_origin_country_to_detail_filters(self, mock_objects, mock_balance):
+        """Test that origin_country is passed to BalanceService.calculate_balance detail_filters."""
+        mock_qs = self._mock_operations_chain()
+        mock_objects.filter.return_value = mock_qs
+        mock_balance.return_value = {}
+
+        data = self._make_data(origin_country=["FR", "DE"])
+
+        TeneurService.prepare_data(data, "l")
+
+        _, call_kwargs = mock_balance.call_args
+        self.assertEqual(call_kwargs["detail_filters"]["origin_country"], ["FR", "DE"])
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    @patch("tiruert.services.teneur.Operation.objects")
+    def test_prepare_data_passes_none_when_feedstock_not_provided(self, mock_objects, mock_balance):
+        """Test that feedstock is None in detail_filters when not present in data."""
+        mock_qs = self._mock_operations_chain()
+        mock_objects.filter.return_value = mock_qs
+        mock_balance.return_value = {}
+
+        data = self._make_data()
+
+        TeneurService.prepare_data(data, "l")
+
+        _, call_kwargs = mock_balance.call_args
+        self.assertIsNone(call_kwargs["detail_filters"]["feedstock"])
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    @patch("tiruert.services.teneur.Operation.objects")
+    def test_prepare_data_passes_none_when_origin_country_not_provided(self, mock_objects, mock_balance):
+        """Test that origin_country is None in detail_filters when not present in data."""
+        mock_qs = self._mock_operations_chain()
+        mock_objects.filter.return_value = mock_qs
+        mock_balance.return_value = {}
+
+        data = self._make_data()
+
+        TeneurService.prepare_data(data, "l")
+
+        _, call_kwargs = mock_balance.call_args
+        self.assertIsNone(call_kwargs["detail_filters"]["origin_country"])
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    @patch("tiruert.services.teneur.Operation.objects")
+    def test_prepare_data_filters_operations_by_durability_period(self, mock_objects, mock_balance):
+        """Test that durability_period causes an extra queryset filter."""
+        mock_qs = self._mock_operations_chain()
+        mock_objects.filter.return_value = mock_qs
+        mock_balance.return_value = {}
+
+        data = self._make_data(durability_period=["2024", "2025"])
+
+        TeneurService.prepare_data(data, "l")
+
+        # Verify that filter was called with durability_period__in
+        filter_calls = [str(call) for call in mock_qs.filter.call_args_list]
+        self.assertTrue(
+            any("durability_period__in" in c for c in filter_calls),
+            "Expected a filter call with durability_period__in",
+        )
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    @patch("tiruert.services.teneur.Operation.objects")
+    def test_prepare_data_no_durability_period_filter_when_not_provided(self, mock_objects, mock_balance):
+        """Test that no durability_period filter is applied when not in data."""
+        mock_qs = self._mock_operations_chain()
+        mock_objects.filter.return_value = mock_qs
+        mock_balance.return_value = {}
+
+        data = self._make_data()
+
+        TeneurService.prepare_data(data, "l")
+
+        filter_calls = [str(call) for call in mock_qs.filter.call_args_list]
+        self.assertFalse(
+            any("durability_period__in" in c for c in filter_calls),
+            "Expected no filter call with durability_period__in",
+        )
+
+
 class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):
     """Test TeneurService.get_min_and_max_emissions() method"""
 
