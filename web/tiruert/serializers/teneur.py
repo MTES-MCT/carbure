@@ -18,6 +18,9 @@ class SimulationInputSerializer(serializers.ModelSerializer):
             "from_depot",
             "ges_bound_min",
             "ges_bound_max",
+            "durability_period",
+            "origin_country",
+            "feedstock",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
@@ -33,6 +36,9 @@ class SimulationInputSerializer(serializers.ModelSerializer):
     unit = serializers.CharField(required=False)
     ges_bound_min = serializers.FloatField(required=False)
     ges_bound_max = serializers.FloatField(required=False)
+    durability_period = serializers.ListField(child=serializers.CharField(), required=False)
+    origin_country = serializers.ListField(child=serializers.CharField(), required=False)
+    feedstock = serializers.ListField(child=serializers.CharField(), required=False)
 
 
 class SimulationLotOutputSerializer(serializers.Serializer):
@@ -57,6 +63,9 @@ class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
             "from_depot",
             "ges_bound_min",
             "ges_bound_max",
+            "feedstock",
+            "origin_country",
+            "durability_period",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},
@@ -69,6 +78,9 @@ class SimulationMinMaxInputSerializer(serializers.ModelSerializer):
     unit = serializers.CharField(required=False)
     ges_bound_min = serializers.FloatField(required=False)
     ges_bound_max = serializers.FloatField(required=False)
+    feedstock = serializers.ListField(child=serializers.CharField(), required=False)
+    origin_country = serializers.ListField(child=serializers.CharField(), required=False)
+    durability_period = serializers.ListField(child=serializers.CharField(), required=False)
 
 
 class SimulationMinMaxOutputSerializer(serializers.Serializer):

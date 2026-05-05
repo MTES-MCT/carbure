@@ -119,8 +119,8 @@ class OperationFilter(BaseFilter):
 
 class OperationFilterForBalance(BaseFilter):
     # Lot-level filters are handled by Prefetch in BalanceService, not at the Operation queryset level
-    ges_bound_min = NumberFilter(method="ignore")
-    ges_bound_max = NumberFilter(method="ignore")
+    ges_bound_min = NumberFilter(method="ignore", min_value=0, max_value=100)
+    ges_bound_max = NumberFilter(method="ignore", min_value=0, max_value=100)
     feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code", method="ignore")
     origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays", method="ignore")
 
