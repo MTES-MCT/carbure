@@ -3,7 +3,7 @@ import { Form, useForm } from "common/components/form2"
 import { AdvancedFiltersBalanceCard } from "./advanced-filters"
 import { balance } from "accounting/__test__/data/balances"
 import { userEvent, waitFor, within } from "@storybook/test"
-import { fillGHGRangeForm } from "../ghg-range-form/ghg-range-form.stories.utils"
+import { setGHGRangeValue } from "../ghg-range-form/ghg-range-form.stories.utils"
 import {
   okGetBalances,
   okGetBalancesWithZeroAvailableBalance,
@@ -49,7 +49,11 @@ export const AvailableBalanceZeroWhenRangeChanges: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    await fillGHGRangeForm(canvasElement)
+    await setGHGRangeValue({
+      canvasElement,
+      cursorIndex: 0,
+      value: "50",
+    })
     await waitFor(() => {
       within(canvasElement).getByText(/0\s+litre/i)
     })

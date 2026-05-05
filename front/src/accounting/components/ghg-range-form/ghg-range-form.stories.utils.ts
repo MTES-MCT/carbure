@@ -20,17 +20,6 @@ export const setGHGRangeValue = async ({
   await fireEvent.change(cursor, { target: { value } })
 }
 
-export const fillGHGRangeForm = async (canvasElement: HTMLElement) => {
-  const { getByText } = within(canvasElement)
-  await setGHGRangeValue({
-    canvasElement,
-    cursorIndex: 0,
-    value: "50",
-  })
-
-  await waitFor(() => getByText("2 500 litres"))
-}
-
 export const getBalancesWithUpdatedAvailableBalance = http.get(
   "/api/tiruert/operations/balance/",
   () => {

@@ -5,7 +5,6 @@ import { balance } from "accounting/__test__/data/balances"
 import { okFindEligibleTiruertEntities } from "accounting/components/recipient-form/__test__/api"
 import {
   getBalancesWithUpdatedAvailableBalance,
-  fillGHGRangeForm,
   setGHGRangeValue,
 } from "accounting/components/ghg-range-form/ghg-range-form.stories.utils"
 import { expect, userEvent, waitFor, within } from "@storybook/test"
@@ -30,7 +29,14 @@ const clickNextStepButton = async (canvasElement: HTMLElement) => {
 
 const fillFirstStep = async (canvasElement: HTMLElement) => {
   await fillRecipientForm(canvasElement)
-  await fillGHGRangeForm(canvasElement)
+  await setGHGRangeValue({
+    canvasElement,
+    cursorIndex: 0,
+    value: "50",
+  })
+  await waitFor(() => {
+    within(canvasElement).getByText("2 500 litres")
+  })
 }
 
 const baseHandlers = [
