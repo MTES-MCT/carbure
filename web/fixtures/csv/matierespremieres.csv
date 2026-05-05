@@ -64,7 +64,7 @@ HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE,Huiles acides neutra
 GRAISSES_BRUNES,Graisses brunes,0,1,1,1,0,1,ANN-IX-A
 GRAISSES_D_INSECTES,Graisses d'insectes,0,1,1,1,0,1,ANN-IX-A
 LEVURES_USAGEES,Levures usagées,1,0,1,1,0,1,ANN-IX-A
-POUSSIÈRES_DE_MAIS_CONTAMINEES,Poussières de maïs contaminées,1,0,1,1,0,1,ANN-IX-A
+POUSSIERES_DE_MAIS_CONTAMINEES,Poussières de maïs contaminées,1,0,1,1,0,1,ANN-IX-A
 DECHETS_ALCOOLIQUES_ISSUS_DU_TRAITEMENT_DE_PLASMA_SANGUIN,Déchets alcooliques issus du traitement de plasma sanguin,1,0,1,1,0,1,ANN-IX-A
 ACIDES_GRAS_DE_NOIX_DE_COCO_DISTILLES,Acides gras de noix de coco distillés,0,1,1,1,0,1,ANN-IX-A
 RAFLES_DE_FRUITS_VIDES,Rafles de fruits vides,0,1,1,1,0,1,ANN-IX-A

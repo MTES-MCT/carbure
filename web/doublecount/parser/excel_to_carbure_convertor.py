@@ -65,7 +65,7 @@ dc_feedstock_to_carbure_feedstock = {
     "graisses brunes": "GRAISSES_BRUNES",
     "graisses d'insectes": "GRAISSES_D_INSECTES",
     "levures usagées": "LEVURES_USAGEES",
-    "poussières de maïs contaminées": "POUSSIÈRES_DE_MAIS_CONTAMINEES",
+    "poussières de maïs contaminées": "POUSSIERES_DE_MAIS_CONTAMINEES",
     "déchets alcooliques issus du traitement de plasma sanguin": "DECHETS_ALCOOLIQUES_ISSUS_DU_TRAITEMENT_DE_PLASMA_SANGUIN",
     "acides gras de noix de coco distillés": "ACIDES_GRAS_DE_NOIX_DE_COCO_DISTILLES",
     "rafles de fruits vides": "RAFLES_DE_FRUITS_VIDES",
