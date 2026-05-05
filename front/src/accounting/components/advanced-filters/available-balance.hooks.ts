@@ -63,9 +63,13 @@ export const useAvailableBalance = ({
       executeOnMount: false,
       executeOnUpdate: false,
       onSuccess: (data) => {
-        const availablebalance = data?.available_balance ?? 0
+        const availableBalance = data?.available_balance ?? 0
 
-        setField("availableBalance", availablebalance)
+        setField("availableBalance", availableBalance)
+        setField("balance", {
+          ...balance,
+          available_balance: availableBalance,
+        })
       },
     }
   )
