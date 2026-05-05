@@ -43,7 +43,6 @@ export const GHGRangeForm = ({
   useEffect(() => {
     const formValue = {
       ...value,
-      availableBalance: value.availableBalance ?? balance.available_balance,
       gesBoundMin: value.gesBoundMin ?? ghgReductionMin,
       gesBoundMax: value.gesBoundMax ?? ghgReductionMax,
     }
@@ -56,6 +55,7 @@ export const GHGRangeForm = ({
       step={0.01}
       suffix="%"
       label={t("Définissez le taux de réduction GES des lots à prélever")}
+      animateOn={`${ghgReductionMin}-${ghgReductionMax}`}
       minRange={bind("gesBoundMin", {
         onChange: onRangeChange
           ? (_value) => onRangeChange(_value!, value.gesBoundMax!)

@@ -4,3 +4,20 @@
   ) {
   width: var(--thumb-size);
 }
+
+.animate-values :global(.fr-range__min),
+.animate-values :global(.fr-range__max),
+.animate-values :global(.fr-range__output) {
+  font-weight: bold;
+  font-size: 0.9rem;
+  background-color: var(--background-open-blue-france);
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+:global(.fr-range__min),
+:global(.fr-range__max),
+:global(.fr-range__output) {
+  transition: all 0.3s ease-out;
+}
