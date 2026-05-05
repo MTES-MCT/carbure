@@ -18727,6 +18727,21 @@ components:
         ges_bound_max:
           type: number
           format: double
+        durability_period:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        origin_country:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        feedstock:
+          type: array
+          items:
+            type: string
+            minLength: 1
       required:
         - biofuel
         - customs_category
@@ -18770,6 +18785,21 @@ components:
         ges_bound_max:
           type: number
           format: double
+        feedstock:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        origin_country:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        durability_period:
+          type: array
+          items:
+            type: string
+            minLength: 1
       required:
         - biofuel
         - customs_category

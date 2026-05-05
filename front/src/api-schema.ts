@@ -5938,6 +5938,9 @@ export interface components {
             ges_bound_min?: number;
             /** Format: double */
             ges_bound_max?: number;
+            durability_period?: string[];
+            origin_country?: string[];
+            feedstock?: string[];
         };
         SimulationLotOutput: {
             lot_id: number;
@@ -5956,6 +5959,9 @@ export interface components {
             ges_bound_min?: number;
             /** Format: double */
             ges_bound_max?: number;
+            feedstock?: string[];
+            origin_country?: string[];
+            durability_period?: string[];
         };
         SimulationMinMaxOutput: {
             /** Format: double */
