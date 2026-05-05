@@ -4,7 +4,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
@@ -152,6 +152,14 @@ const QuantitySection = ({
   const quantityMaxLabel = quantityMax
     ? `(${t("solde")}: ${formatUnit(quantityMax, { fractionDigits: 0, mode: "floor" })})`
     : undefined
+
+  // When the component is mounted, reset the quantity declared if the quantity is greater than the quantity max
+  useEffect(() => {
+    if (quantityMax && value.quantity && value.quantity > quantityMax) {
+      resetQuantityDeclared()
+      setField("quantity", undefined)
+    }
+  }, [])
 
   return (
     <>

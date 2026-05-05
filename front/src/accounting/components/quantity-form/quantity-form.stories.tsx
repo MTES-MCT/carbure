@@ -12,6 +12,22 @@ import {
 import { baseHandlers } from "./quantity-form.stories.utils"
 import { getViewport } from "@storybook/mocks/utils"
 
+const QuantityFormStory = ({
+  args,
+  initialValues = {},
+}: {
+  args: React.ComponentProps<typeof QuantityForm>
+  initialValues?: Record<string, unknown>
+}) => {
+  const form = useForm(initialValues)
+
+  return (
+    <Form form={form}>
+      <QuantityForm {...args} />
+    </Form>
+  )
+}
+
 const meta: Meta<typeof QuantityForm> = {
   component: QuantityForm,
   title: "modules/accounting/components/QuantityForm",
@@ -25,15 +41,7 @@ const meta: Meta<typeof QuantityForm> = {
       handlers: baseHandlers,
     },
   },
-  render: (args) => {
-    const form = useForm({})
-
-    return (
-      <Form form={form}>
-        <QuantityForm {...args} />
-      </Form>
-    )
-  },
+  render: (args) => <QuantityFormStory args={args} />,
 }
 type Story = StoryObj<typeof QuantityForm>
 
@@ -144,4 +152,26 @@ export const ResetQuantityDeclared: Story = {
 
     await userEvent.click(button)
   },
+}
+
+export const ResetQuantityWhenInitialValueExceedsQuantityMax: Story = {
+  parameters: {
+    docs: {
+      description:
+        "Reset quantity and declared state when initial quantity exceeds available balance (special step 2 case).",
+    },
+  },
+  args: {
+    quantityMax: 100,
+  },
+  render: (args) => (
+    <QuantityFormStory
+      args={args}
+      initialValues={{
+        quantity: 1000,
+        avoided_emissions_min: 10,
+        avoided_emissions_max: 20,
+      }}
+    />
+  ),
 }
