@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next"
 import { GHGRangeFormProps } from "./ghg-range-form.types"
 import { ceilNumber, floorNumber } from "common/utils/formatters"
 import { DoubleRange } from "common/components/inputs2"
-import { useEffect } from "react"
 
 export const formatGhgReduction = (
   ghg_reduction_min: number,
@@ -33,22 +32,13 @@ export const GHGRangeForm = ({
   onRangeChange,
 }: GHGRangeFormComponentProps) => {
   const { t } = useTranslation()
-  const { value, bind, setValue } = useFormContext<GHGRangeFormProps>()
+  const { value, bind } = useFormContext<GHGRangeFormProps>()
   const { ghgReductionMin, ghgReductionMax } = formatGhgReduction(
     balance?.ghg_reduction_min ?? 50,
     balance?.ghg_reduction_max ?? 100
   )
-
-  // When the component is mounted, init form values with the balance values only if they are not already set
-  useEffect(() => {
-    const formValue = {
-      ...value,
-      gesBoundMin: value.gesBoundMin ?? ghgReductionMin,
-      gesBoundMax: value.gesBoundMax ?? ghgReductionMax,
-    }
-
-    setValue(formValue)
-  }, [])
+  const gesBoundMin = value.gesBoundMin ?? ghgReductionMin
+  const gesBoundMax = value.gesBoundMax ?? ghgReductionMax
 
   return (
     <DoubleRange
@@ -57,13 +47,15 @@ export const GHGRangeForm = ({
       label={t("Définissez le taux de réduction GES des lots à prélever")}
       animateOn={`${ghgReductionMin}-${ghgReductionMax}`}
       minRange={bind("gesBoundMin", {
+        value: gesBoundMin,
         onChange: onRangeChange
-          ? (_value) => onRangeChange(_value!, value.gesBoundMax!)
+          ? (_value) => onRangeChange(_value!, gesBoundMax)
           : undefined,
       })}
       maxRange={bind("gesBoundMax", {
+        value: gesBoundMax,
         onChange: onRangeChange
-          ? (_value) => onRangeChange(value.gesBoundMin!, _value!)
+          ? (_value) => onRangeChange(gesBoundMin, _value!)
           : undefined,
       })}
       min={ghgReductionMin}
