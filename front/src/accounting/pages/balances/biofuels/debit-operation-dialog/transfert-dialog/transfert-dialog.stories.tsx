@@ -6,8 +6,9 @@ import { okFindEligibleTiruertEntities } from "accounting/components/recipient-f
 import {
   getBalancesWithUpdatedAvailableBalance,
   fillGHGRangeForm,
+  setGHGRangeValue,
 } from "accounting/components/ghg-range-form/ghg-range-form.stories.utils"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { expect, userEvent, waitFor, within } from "@storybook/test"
 import { getViewport } from "@storybook/mocks/utils"
 import {
   baseHandlers as quantityBaseHandlers,
@@ -15,13 +16,21 @@ import {
   fillQuantityInput,
 } from "accounting/components/quantity-form/quantity-form.stories.utils"
 import { fillRecipientForm } from "accounting/components/recipient-form/recipient-form.stories.utils"
+import { okGetBalancesWithZeroAvailableBalance } from "accounting/__test__/api/biofuels/balances"
+
+const getNextStepButton = async (canvasElement: HTMLElement) => {
+  const { getByRole } = within(canvasElement)
+  return waitFor(() => getByRole("button", { name: "Suivant" }))
+}
 
 const clickNextStepButton = async (canvasElement: HTMLElement) => {
-  const { getByRole } = within(canvasElement)
-  const nextStepButton = await waitFor(() =>
-    getByRole("button", { name: "Suivant" })
-  )
+  const nextStepButton = await getNextStepButton(canvasElement)
   await userEvent.click(nextStepButton)
+}
+
+const fillFirstStep = async (canvasElement: HTMLElement) => {
+  await fillRecipientForm(canvasElement)
+  await fillGHGRangeForm(canvasElement)
 }
 
 const baseHandlers = [
@@ -48,32 +57,51 @@ type Story = StoryObj<typeof TransfertDialog>
 export default meta
 
 export const FirstStep: Story = {
-  play: async (canvas) => {
-    const { canvasElement, step } = canvas
-
-    await step("Fill the recipient input", async () => {
-      await fillRecipientForm(canvasElement)
-    })
-
-    await step("Fill the GHG range input", async () => {
-      await fillGHGRangeForm(canvasElement)
-    })
+  play: async ({ canvasElement }) => {
+    await fillFirstStep(canvasElement)
   },
 }
 
 export const SecondStep: Story = {
-  play: async (canvas) => {
-    const { canvasElement } = canvas
-
-    // Fill the first step
-    await FirstStep.play?.(canvas)
-    // Click on the next step button
+  play: async ({ canvasElement }) => {
+    await fillFirstStep(canvasElement)
     await clickNextStepButton(canvasElement)
 
-    // Fill the second step
     await fillQuantityForm(canvasElement)
   },
 }
+
+export const FirstStepNextStepButtonDisabledWhenAvailableBalanceIsZero: Story =
+  {
+    parameters: {
+      docs: {
+        description:
+          "First step - Disable next step when available balance is 0 after slider change.",
+      },
+      msw: {
+        handlers: [
+          okFindEligibleTiruertEntities,
+          okGetBalancesWithZeroAvailableBalance,
+          ...quantityBaseHandlers,
+        ],
+      },
+    },
+    play: async ({ canvasElement }) => {
+      await fillRecipientForm(canvasElement)
+      await setGHGRangeValue({
+        canvasElement,
+        cursorIndex: 0,
+        value: "50",
+      })
+
+      await waitFor(() => {
+        within(canvasElement).getByText(/0\s+litre/i)
+      })
+
+      const nextStepButton = await getNextStepButton(canvasElement)
+      await expect(nextStepButton).toBeDisabled()
+    },
+  }
 
 export const SecondStepNextStepButtonDisabled: Story = {
   ...SecondStep,
@@ -86,17 +114,13 @@ export const SecondStepNextStepButtonDisabled: Story = {
       handlers: [...baseHandlers, ...quantityBaseHandlers],
     },
   },
-  play: async (canvas) => {
-    // Fill the first step
-    await FirstStep.play?.(canvas)
-    // Click on the next step button
-    await clickNextStepButton(canvas.canvasElement)
+  play: async ({ canvasElement }) => {
+    await fillFirstStep(canvasElement)
+    await clickNextStepButton(canvasElement)
 
-    // Fill the quantity input
-    await fillQuantityInput(canvas.canvasElement, "1000")
+    await fillQuantityInput(canvasElement, "1000")
 
-    // Click on the next step button
-    await clickNextStepButton(canvas.canvasElement)
+    await clickNextStepButton(canvasElement)
   },
 }
 

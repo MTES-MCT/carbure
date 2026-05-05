@@ -3,13 +3,30 @@ import { balance } from "accounting/__test__/data/balances"
 import { apiTypes } from "common/services/api-fetch.types"
 import { http, HttpResponse } from "msw"
 
-export const fillGHGRangeForm = async (canvasElement: HTMLElement) => {
-  const { getAllByRole, getByText } = within(canvasElement)
+export const setGHGRangeValue = async ({
+  canvasElement,
+  cursorIndex,
+  value,
+}: {
+  canvasElement: HTMLElement
+  cursorIndex: number
+  value: string
+}) => {
+  const { getAllByRole } = within(canvasElement)
   const range = await waitFor(() => getAllByRole("slider"))
-  const firstCursor = range[0]
-  if (!firstCursor) throw new Error("First cursor not found")
+  const cursor = range[cursorIndex]
+  if (!cursor) throw new Error(`Cursor at index ${cursorIndex} not found`)
 
-  await fireEvent.change(firstCursor, { target: { value: "50" } })
+  await fireEvent.change(cursor, { target: { value } })
+}
+
+export const fillGHGRangeForm = async (canvasElement: HTMLElement) => {
+  const { getByText } = within(canvasElement)
+  await setGHGRangeValue({
+    canvasElement,
+    cursorIndex: 0,
+    value: "50",
+  })
 
   await waitFor(() => getByText("2 500 litres"))
 }

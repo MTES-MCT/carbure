@@ -5,7 +5,7 @@ import useEntity from "common/hooks/entity"
 import { QuantityFormProps } from "./quantity-form.types"
 import { ExtendedUnit, ExtendedUnitType } from "common/types"
 import { useUnit } from "common/hooks/unit"
-import { FormManager } from "common/components/form2"
+import { FormManager, useFormContext } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
 import { GHGRangeFormProps } from "../ghg-range-form"
 import { useRef } from "react"
@@ -14,31 +14,30 @@ import { mapAdvancedFiltersForPayload } from "../advanced-filters/advanced-filte
 
 type UseQuantityFormProps = {
   balance: Balance
-  values: QuantityFormProps & AdvancedFiltersFormProps
   unit?: ExtendedUnitType
   depotId?: number
-  gesBoundMin?: number
-  gesBoundMax?: number
 }
 export const useQuantityForm = ({
   balance,
-  values,
   unit: overrideUnit,
   depotId,
 }: UseQuantityFormProps) => {
   const entity = useEntity()
   const { unit } = useUnit(overrideUnit)
+  const { value } = useFormContext<
+    QuantityFormProps & AdvancedFiltersFormProps
+  >()
 
   const declareQuantity = () =>
     simulateMinMax(entity.id, {
       biofuel: balance.biofuel?.id ?? null,
       customs_category: balance.customs_category,
       debited_entity: entity.id,
-      target_volume: values.quantity!,
+      target_volume: value.quantity!,
       target_emission: 0,
       unit,
       from_depot: depotId,
-      ...mapAdvancedFiltersForPayload(values),
+      ...mapAdvancedFiltersForPayload(value),
     })
 
   const mutation = useMutation(declareQuantity)

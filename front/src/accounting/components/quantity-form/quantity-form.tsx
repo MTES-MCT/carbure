@@ -13,6 +13,7 @@ import {
   useQuantityForm,
 } from "./quantity-form.hooks"
 import { ExtendedUnitType } from "common/types"
+import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -65,22 +66,18 @@ const QuantitySection = ({
   quantityMax,
   type,
   unit: overrideUnit,
-  gesBoundMin,
-  gesBoundMax,
   onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
   const { formatUnit, unit } = useUnit(overrideUnit)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
-  const { value, bind, setField, setFieldError } =
-    useFormContext<QuantityFormProps>()
+  const { value, bind, setField, setFieldError } = useFormContext<
+    QuantityFormProps & AdvancedFiltersFormProps
+  >()
   const mutation = useQuantityForm({
     balance,
-    values: value,
     unit,
-    gesBoundMin,
-    gesBoundMax,
   })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
@@ -149,8 +146,8 @@ const QuantitySection = ({
     },
   })
 
-  const quantityMaxLabel = quantityMax
-    ? `(${t("solde")}: ${formatUnit(quantityMax, { fractionDigits: 0, mode: "floor" })})`
+  const quantityMaxLabel = value.availableBalance
+    ? `(${t("solde")}: ${formatUnit(value.availableBalance, { fractionDigits: 0, mode: "floor" })})`
     : undefined
 
   // When the component is mounted, reset the quantity declared if the quantity is greater than the quantity max
