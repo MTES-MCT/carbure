@@ -52,15 +52,6 @@ export const TransfertDialogContent = ({
     onOperationCreated,
   })
 
-  // Change the available balance value only if the GHG range step is completed
-  const currentBalance =
-    currentStepIndex > 1
-      ? {
-          ...balance,
-          available_balance: form.value.availableBalance!,
-        }
-      : balance
-
   return (
     <Dialog
       fullWidth
@@ -98,7 +89,7 @@ export const TransfertDialogContent = ({
         <Stepper />
         <Box>
           <RecapOperationGrid>
-            <RecapOperation balance={currentBalance} />
+            <RecapOperation balance={balance} />
             {currentStepIndex > 1 && (
               <RecipientFiltersSummary values={form.value} />
             )}
@@ -114,7 +105,7 @@ export const TransfertDialogContent = ({
             {currentStep?.key === quantityFormStepKey && (
               <Box>
                 <QuantityForm
-                  balance={currentBalance}
+                  balance={balance}
                   quantityMax={form.value.availableBalance ?? 0}
                   type={CreateOperationType.TRANSFERT}
                   gesBoundMin={form.value.gesBoundMin}

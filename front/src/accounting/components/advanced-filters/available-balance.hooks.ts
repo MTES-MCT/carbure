@@ -8,6 +8,7 @@ import { debounce } from "common/utils/functions"
 
 import { AdvancedFiltersFormProps } from "./advanced-filters.types"
 import { ExtendedUnitType } from "common/types"
+import { useEffect } from "react"
 
 const pickFilters = (filters: AdvancedFiltersFormProps) => {
   return {
@@ -44,7 +45,7 @@ export const useAvailableBalance = ({
   balance: Balance
 }) => {
   const entity = useEntity()
-  const { setField } = useFormContext<AdvancedFiltersFormProps>()
+  const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
   const { unit } = useUnit(overrideUnit)
 
   const query = useQuery(
@@ -73,6 +74,12 @@ export const useAvailableBalance = ({
       },
     }
   )
+
+  // When the component is mounted, set the available balance in the form only if it is not already set
+  useEffect(() => {
+    if (!value.availableBalance)
+      setField("availableBalance", balance.available_balance)
+  }, [])
 
   return {
     loading: query.loading,

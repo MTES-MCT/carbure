@@ -55,15 +55,6 @@ export const ExportationDialogContent = ({
     onOperationCreated,
   })
 
-  // Change the available balance value only if the GHG range step is completed
-  const currentBalance =
-    currentStepIndex > 1
-      ? {
-          ...balance,
-          available_balance: form.value.availableBalance!,
-        }
-      : balance
-
   return (
     <Dialog
       fullWidth
@@ -103,7 +94,7 @@ export const ExportationDialogContent = ({
         <Stepper />
         <Box>
           <RecapOperationGrid>
-            <RecapOperation balance={currentBalance} />
+            <RecapOperation balance={balance} />
             {currentStepIndex > 1 && (
               <FromDepotFiltersSummary values={form.value} />
             )}
@@ -119,7 +110,7 @@ export const ExportationDialogContent = ({
             {currentStep?.key === quantityFormStepKey && (
               <Box>
                 <QuantityForm
-                  balance={currentBalance}
+                  balance={balance}
                   quantityMax={form.value.availableBalance ?? 0}
                   type={CreateOperationType.EXPORTATION}
                   gesBoundMin={form.value.gesBoundMin}
