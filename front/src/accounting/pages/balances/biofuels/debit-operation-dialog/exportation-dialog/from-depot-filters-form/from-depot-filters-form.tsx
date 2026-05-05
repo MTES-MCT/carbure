@@ -5,22 +5,20 @@ import {
   FromDepotForm,
   FromDepotFormProps,
 } from "accounting/components/from-depot-form"
-import { useFormContext } from "common/components/form2"
+import { Balance } from "accounting/types"
 import { Box } from "common/components/scaffold"
 import { Step } from "common/components/stepper"
 import i18next from "i18next"
 
 type FromDepotFiltersFormProps = FromDepotFormProps & AdvancedFiltersFormProps
 
-export const FromDepotFiltersForm = () => {
-  const form = useFormContext<FromDepotFiltersFormProps>()
-
+export const FromDepotFiltersForm = ({ balance }: { balance: Balance }) => {
   return (
     <>
       <Box>
         <FromDepotForm />
       </Box>
-      {form.value.balance && <AdvancedFiltersBalanceCard />}
+      <AdvancedFiltersBalanceCard initialBalance={balance} />
     </>
   )
 }

@@ -1,5 +1,5 @@
 import { getBalanceFilters } from "accounting/api/biofuels/balances"
-import { BalancesFilter, BalancesQueryBuilder } from "accounting/types"
+import { Balance, BalancesFilter, BalancesQueryBuilder } from "accounting/types"
 import { useFormContext } from "common/components/form2"
 import { QueryFilters, useQueryBuilder } from "common/hooks/query-builder-2"
 import { Normalizer } from "common/utils/normalize"
@@ -11,12 +11,11 @@ import {
 import {
   ADVANCED_FILTER_FIELDS,
   AdvancedFiltersFormProps,
-  AdvancedFiltersWithBalanceFormProps,
   Filters,
 } from "./advanced-filters.types"
 import { useCallback, useMemo } from "react"
 
-export const useAdvancedFiltersBalance = () => {
+export const useAdvancedFiltersBalance = (balance: Balance) => {
   const filterNormalizers: Partial<Record<BalancesFilter, Normalizer<string>>> =
     {
       [BalancesFilter.feedstock]: normalizeFeedstockFilter,
@@ -30,7 +29,7 @@ export const useAdvancedFiltersBalance = () => {
     [BalancesFilter.origin_country]: "Pays d'origine",
   }
 
-  const { value } = useFormContext<AdvancedFiltersWithBalanceFormProps>()
+  const { value } = useFormContext<AdvancedFiltersFormProps>()
 
   // getBalanceFilters is waiting for a BalancesQuery, so we need to build the query from the form values
   const { query } = useQueryBuilder<BalancesQueryBuilder["config"]>()
@@ -42,9 +41,9 @@ export const useAdvancedFiltersBalance = () => {
         [BalancesFilter.feedstock]: value.feedstock ?? [],
         [BalancesFilter.durability_period]: value.durability_period ?? [],
         [BalancesFilter.origin_country]: value.origin_country ?? [],
-        sector: [value.balance.sector],
-        customs_category: [value.balance.customs_category],
-        biofuel: [value.balance.biofuel?.code],
+        sector: [balance.sector],
+        customs_category: [balance.customs_category],
+        biofuel: [balance.biofuel?.code],
         ges_bound_min: value.gesBoundMin,
         ges_bound_max: value.gesBoundMax,
       },

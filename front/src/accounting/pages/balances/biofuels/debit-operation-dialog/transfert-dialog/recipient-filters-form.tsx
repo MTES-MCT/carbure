@@ -3,8 +3,8 @@ import {
   RecipientForm,
   RecipientFormProps,
 } from "accounting/components/recipient-form"
+import { Balance } from "accounting/types"
 import { AdvancedFiltersFormProps } from "accounting/components/advanced-filters/advanced-filters.types"
-import { useFormContext } from "common/components/form2"
 import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filters/advanced-filters"
 import { Step } from "common/components/stepper"
 import i18next from "i18next"
@@ -12,14 +12,13 @@ import { showNextStepAdvancedFilters } from "accounting/components/advanced-filt
 
 type RecipientFiltersFormProps = RecipientFormProps & AdvancedFiltersFormProps
 
-export const RecipientFiltersForm = () => {
-  const form = useFormContext<RecipientFiltersFormProps>()
+export const RecipientFiltersForm = ({ balance }: { balance: Balance }) => {
   return (
     <>
       <Box>
         <RecipientForm />
       </Box>
-      {form.value.balance && <AdvancedFiltersBalanceCard />}
+      <AdvancedFiltersBalanceCard initialBalance={balance} />
     </>
   )
 }

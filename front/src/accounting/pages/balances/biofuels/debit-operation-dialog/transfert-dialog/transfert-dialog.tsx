@@ -18,7 +18,6 @@ import {
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
 
-import { useEffect } from "react"
 import {
   RecipientFiltersForm,
   recipientFiltersStep,
@@ -61,11 +60,6 @@ export const TransfertDialogContent = ({
           available_balance: form.value.availableBalance!,
         }
       : balance
-
-  // When the component is mounted, set the balance in the form
-  useEffect(() => {
-    form.setField("balance", balance)
-  }, [])
 
   return (
     <Dialog
@@ -115,7 +109,7 @@ export const TransfertDialogContent = ({
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="transfert-dialog">
             {currentStep?.key === recipientFiltersStepKey && (
-              <RecipientFiltersForm />
+              <RecipientFiltersForm balance={balance} />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <Box>

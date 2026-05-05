@@ -29,7 +29,6 @@ import {
   QuantitySummary,
   useQuantityFormStep,
 } from "accounting/components/quantity-form"
-import { useEffect } from "react"
 
 interface ExportationDialogProps {
   onClose: () => void
@@ -64,11 +63,6 @@ export const ExportationDialogContent = ({
           available_balance: form.value.availableBalance!,
         }
       : balance
-
-  // When the component is mounted, set the balance in the form
-  useEffect(() => {
-    form.setField("balance", balance)
-  }, [])
 
   return (
     <Dialog
@@ -120,7 +114,7 @@ export const ExportationDialogContent = ({
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="exportation-dialog">
             {currentStep?.key === fromDepotFiltersStepKey && (
-              <FromDepotFiltersForm />
+              <FromDepotFiltersForm balance={balance} />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <Box>
