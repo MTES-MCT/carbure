@@ -202,8 +202,6 @@ const DeclareTeneurDialogContent = ({
                     type={CreateOperationType.TENEUR}
                     quantityMax={depotQuantityMax}
                     unit={ExtendedUnit.GJ}
-                    gesBoundMin={form.value.gesBoundMin}
-                    gesBoundMax={form.value.gesBoundMax}
                     onQuantityDeclared={handleQuantityDeclared}
                   />
                 </Box>

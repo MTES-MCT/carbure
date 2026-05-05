@@ -108,8 +108,6 @@ export const TransfertDialogContent = ({
                   balance={balance}
                   quantityMax={form.value.availableBalance ?? 0}
                   type={CreateOperationType.TRANSFERT}
-                  gesBoundMin={form.value.gesBoundMin}
-                  gesBoundMax={form.value.gesBoundMax}
                 />
               </Box>
             )}

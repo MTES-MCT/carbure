@@ -19,3 +19,11 @@ export type AdvancedFiltersFormProps = Partial<Filters> &
 export type AdvancedFiltersWithBalanceFormProps = AdvancedFiltersFormProps & {
   balance: Balance
 }
+
+export type AdvancedFiltersPayload = {
+  feedstock?: string[]
+  origin_country?: string[]
+  durability_period?: string[]
+  ges_bound_min?: number
+  ges_bound_max?: number
+}

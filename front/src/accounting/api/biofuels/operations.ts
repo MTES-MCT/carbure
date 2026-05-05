@@ -71,6 +71,9 @@ export const simulateMinMax = (
     from_depot,
     ges_bound_min,
     ges_bound_max,
+    feedstock,
+    origin_country,
+    durability_period,
   }: apiTypes["SimulationInputRequest"]
 ) => {
   return api.POST("/tiruert/operations/simulate/min_max/", {
@@ -84,6 +87,9 @@ export const simulateMinMax = (
       from_depot,
       ges_bound_min,
       ges_bound_max,
+      feedstock,
+      origin_country,
+      durability_period,
     },
   })
 }
@@ -120,60 +126,6 @@ export const createOperation = (
       })),
     },
     bodySerializer: (data) => JSON.stringify(data), // Body contains array of objects, our backend could not handle it in a formData
-  })
-}
-
-/**
- * In the case of transfers and teneurs, we need to simulate the lots before creating the operation
- *
- */
-export const createOperationWithSimulation = (
-  entityId: number,
-  {
-    simulation,
-    operation,
-    customs_category,
-    biofuel,
-    debited_entity,
-    from_depot,
-  }: Pick<
-    apiTypes["OperationInputRequest"],
-    "customs_category" | "biofuel" | "debited_entity" | "from_depot"
-  > & {
-    simulation: Pick<
-      apiTypes["SimulationInputRequest"],
-      "target_volume" | "target_emission" | "unit"
-    >
-    operation: Pick<
-      apiTypes["OperationInputRequest"],
-      "type" | "from_depot" | "to_depot" | "credited_entity" | "status"
-    >
-  }
-) => {
-  return simulate(entityId, {
-    customs_category,
-    biofuel,
-    debited_entity,
-    target_emission: simulation.target_emission,
-    target_volume: simulation.target_volume,
-    unit: simulation.unit,
-    from_depot,
-  }).then((response) => {
-    const lots = response.data?.selected_lots
-    if (lots) {
-      return createOperation(entityId, {
-        ...operation,
-        lots,
-        biofuel,
-        customs_category,
-        debited_entity,
-        type: operation.type,
-        from_depot: operation.from_depot,
-        to_depot: operation.to_depot,
-        credited_entity: operation.credited_entity,
-        status: operation.status,
-      })
-    }
   })
 }
 

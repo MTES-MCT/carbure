@@ -9,16 +9,8 @@ import { debounce } from "common/utils/functions"
 import { AdvancedFiltersFormProps } from "./advanced-filters.types"
 import { ExtendedUnitType } from "common/types"
 import { useEffect } from "react"
+import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
 
-const pickFilters = (filters: AdvancedFiltersFormProps) => {
-  return {
-    ges_bound_min: filters.gesBoundMin,
-    ges_bound_max: filters.gesBoundMax,
-    feedstock: filters.feedstock,
-    durability_period: filters.durability_period,
-    origin_country: filters.origin_country,
-  }
-}
 const debouncedGetBalance = debounce(
   (entityId, biofuel, sector, category, filters, unit) =>
     getBalances({
@@ -27,7 +19,7 @@ const debouncedGetBalance = debounce(
       sector,
       customs_category: category,
       entity_id: entityId,
-      ...pickFilters(filters),
+      ...mapAdvancedFiltersForPayload(filters),
       unit,
     }).then((res) => {
       if (res.data.total_quantity === 0) return undefined

@@ -113,8 +113,6 @@ export const ExportationDialogContent = ({
                   balance={balance}
                   quantityMax={form.value.availableBalance ?? 0}
                   type={CreateOperationType.EXPORTATION}
-                  gesBoundMin={form.value.gesBoundMin}
-                  gesBoundMax={form.value.gesBoundMax}
                 />
               </Box>
             )}

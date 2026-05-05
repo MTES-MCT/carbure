@@ -14,6 +14,7 @@ import {
   Filters,
 } from "./advanced-filters.types"
 import { useCallback, useMemo } from "react"
+import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
 
 export const useAdvancedFiltersBalance = (balance: Balance) => {
   const filterNormalizers: Partial<Record<BalancesFilter, Normalizer<string>>> =
@@ -38,14 +39,10 @@ export const useAdvancedFiltersBalance = (balance: Balance) => {
     const { data } = await getBalanceFilters(
       {
         ...query,
-        [BalancesFilter.feedstock]: value.feedstock ?? [],
-        [BalancesFilter.durability_period]: value.durability_period ?? [],
-        [BalancesFilter.origin_country]: value.origin_country ?? [],
+        ...mapAdvancedFiltersForPayload(value),
         sector: [balance.sector],
         customs_category: [balance.customs_category],
         biofuel: [balance.biofuel?.code],
-        ges_bound_min: value.gesBoundMin,
-        ges_bound_max: value.gesBoundMax,
       },
       filter as BalancesFilter
     )

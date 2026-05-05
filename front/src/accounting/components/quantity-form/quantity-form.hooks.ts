@@ -9,11 +9,12 @@ import { FormManager } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
 import { GHGRangeFormProps } from "../ghg-range-form"
 import { useRef } from "react"
-// import { GHGRangeFormProps } from "../ghg-range-form"
+import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
+import { mapAdvancedFiltersForPayload } from "../advanced-filters/advanced-filters.utils"
 
 type UseQuantityFormProps = {
   balance: Balance
-  values: QuantityFormProps
+  values: QuantityFormProps & AdvancedFiltersFormProps
   unit?: ExtendedUnitType
   depotId?: number
   gesBoundMin?: number
@@ -24,8 +25,6 @@ export const useQuantityForm = ({
   values,
   unit: overrideUnit,
   depotId,
-  gesBoundMin,
-  gesBoundMax,
 }: UseQuantityFormProps) => {
   const entity = useEntity()
   const { unit } = useUnit(overrideUnit)
@@ -39,8 +38,7 @@ export const useQuantityForm = ({
       target_emission: 0,
       unit,
       from_depot: depotId,
-      ges_bound_min: gesBoundMin,
-      ges_bound_max: gesBoundMax,
+      ...mapAdvancedFiltersForPayload(values),
     })
 
   const mutation = useMutation(declareQuantity)
@@ -80,8 +78,7 @@ export const useQuantityFormStep = ({
         target_volume: form.value.quantity!,
         target_emission: form.value.avoided_emissions ?? 0,
         unit,
-        ges_bound_min: form.value.gesBoundMin,
-        ges_bound_max: form.value.gesBoundMax,
+        ...mapAdvancedFiltersForPayload(form.value),
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)
       })

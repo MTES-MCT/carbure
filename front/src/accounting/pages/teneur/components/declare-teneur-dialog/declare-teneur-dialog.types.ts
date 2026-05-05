@@ -1,4 +1,5 @@
 import { QuantityFormProps } from "accounting/components/quantity-form"
-import { BiofuelFormProps } from "./biofuel-form"
+import { BiofuelFiltersFormProps } from "./biofuel-filters-form"
 
-export type DeclareTeneurDialogForm = QuantityFormProps & BiofuelFormProps
+export type DeclareTeneurDialogForm = QuantityFormProps &
+  BiofuelFiltersFormProps
