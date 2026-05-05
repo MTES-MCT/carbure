@@ -41,7 +41,12 @@ const meta: Meta<typeof QuantityForm> = {
       handlers: baseHandlers,
     },
   },
-  render: (args) => <QuantityFormStory args={args} />,
+  render: (args) => (
+    <QuantityFormStory
+      args={args}
+      initialValues={{ availableBalance: balance.available_balance }}
+    />
+  ),
 }
 type Story = StoryObj<typeof QuantityForm>
 
