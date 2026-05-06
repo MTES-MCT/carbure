@@ -81,6 +81,7 @@ class MatierePremiere(models.Model):
     is_methanogenic = models.BooleanField(default=False)
     is_biofuel_feedstock = models.BooleanField(default=False)
     classification = models.ForeignKey("feedstocks.Classification", on_delete=models.SET_NULL, null=True, blank=True)
+    is_industrial_waste = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

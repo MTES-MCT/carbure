@@ -5,7 +5,7 @@ import { balance } from "accounting/__test__/data/balances"
 import { okFindEligibleTiruertEntities } from "accounting/components/recipient-form/__test__/api"
 import {
   getBalancesWithUpdatedAvailableBalance,
-  fillGHGRangeForm,
+  setGHGRangeValue,
 } from "accounting/components/ghg-range-form/ghg-range-form.stories.utils"
 import { userEvent, waitFor, within } from "@storybook/test"
 import { getViewport } from "@storybook/mocks/utils"
@@ -56,7 +56,14 @@ export default meta
 export const FirstStep: Story = {
   play: async (canvas) => {
     await fillFromDepotForm(canvas.canvasElement)
-    await fillGHGRangeForm(canvas.canvasElement)
+    await setGHGRangeValue({
+      canvasElement: canvas.canvasElement,
+      cursorIndex: 0,
+      value: "50",
+    })
+    await waitFor(() => {
+      within(canvas.canvasElement).getByText("2 500 litres")
+    })
   },
 }
 

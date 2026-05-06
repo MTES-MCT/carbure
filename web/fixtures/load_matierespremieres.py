@@ -24,7 +24,8 @@ with open(filename) as csvfile:
         is_double_compte = row[4]
         is_huile_vegetale = row[5]
         is_displayed = row[6]
-        category = row[7]
+        is_industrial_waste = row[7]
+        category = row[8]
         obj, created = MatierePremiere.objects.update_or_create(
             code=code,
             defaults={
@@ -35,6 +36,8 @@ with open(filename) as csvfile:
                 "is_double_compte": is_double_compte,
                 "is_huile_vegetale": is_huile_vegetale,
                 "is_displayed": is_displayed,
+                "is_industrial_waste": is_industrial_waste,
                 "category": category,
+                "is_biofuel_feedstock": True,
             },
         )

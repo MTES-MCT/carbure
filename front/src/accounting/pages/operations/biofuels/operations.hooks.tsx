@@ -147,7 +147,7 @@ export const useGetFilterOptions = (query: OperationsQuery) => {
   const { t } = useTranslation()
   const normalizeSector = useNormalizeSector()
 
-  const getFilterOptions = async (filter: string) => {
+  const getFilterOptions = async (filter: OperationsFilter) => {
     const { data } = await api.getOperationsFilters(filter, query)
 
     if (!data) {
@@ -179,7 +179,11 @@ export const useGetFilterOptions = (query: OperationsQuery) => {
       }))
     }
 
-    if (filter === OperationsFilter.period) {
+    if (
+      [OperationsFilter.period, OperationsFilter.durability_period].includes(
+        filter
+      )
+    ) {
       return data?.map((item) => ({
         label: formatPeriod(item),
         value: item,

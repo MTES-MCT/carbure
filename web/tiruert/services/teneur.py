@@ -359,18 +359,18 @@ class TeneurService:
             Operation.objects.filter(
                 biofuel=data["biofuel"],
                 customs_category=data["customs_category"],
-                # created_at__gte=data["date_from"],
             )
-            .filter((Q(credited_entity=debited_entity) | Q(debited_entity=debited_entity)))
+            .filter(Q(credited_entity=debited_entity) | Q(debited_entity=debited_entity))
             .distinct()
         )
 
-        # Commented out because we don't want to filter by depot anymore (for now)
-        # if data.get("from_depot") is not None:
-        #     operations = operations.filter(to_depot=data["from_depot"])
+        if durability_period := data.get("durability_period"):
+            operations = operations.filter(durability_period__in=durability_period)
 
         ges_bound_min = data.get("ges_bound_min", None)
         ges_bound_max = data.get("ges_bound_max", None)
+        feedstock = data.get("feedstock", None)
+        origin_country = data.get("origin_country", None)
 
         # Calculate balance of debited entity, for each lot, always in liters
         balance = BalanceService.calculate_balance(
@@ -378,9 +378,12 @@ class TeneurService:
             debited_entity.id,
             "lot",
             "l",
-            None,
-            ges_bound_min,
-            ges_bound_max,
+            detail_filters={
+                "ges_bound_min": ges_bound_min,
+                "ges_bound_max": ges_bound_max,
+                "feedstock": feedstock,
+                "origin_country": origin_country,
+            },
         )
 
         # Rearrange balance in an array of all volumes sums and an array of all ghg sums
@@ -431,6 +434,8 @@ class TeneurService:
     def _convert_in_liters(quantity, unit, biofuel):
         if unit == "mj":
             return quantity / biofuel.pci_litre
+        if unit == "gj":
+            return quantity / biofuel.pci_litre * 1000
         elif unit == "kg":
             return quantity / biofuel.masse_volumique
         else:

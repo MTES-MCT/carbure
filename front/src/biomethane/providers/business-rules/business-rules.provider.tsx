@@ -3,6 +3,7 @@ import { useGetContractInfos } from "biomethane/pages/contract/contract.hooks"
 import { useProductionUnit } from "biomethane/pages/production/production.hooks"
 import { BiomethaneBusinessRulesManager, buildRules } from "./rules"
 import { LoaderOverlay } from "common/components/scaffold"
+import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
 
 const BiomethaneBusinessRulesContext =
   createContext<BiomethaneBusinessRulesManager | null>(null)
@@ -48,9 +49,10 @@ export const BiomethaneBusinessRulesProvider = ({
 }
 
 export const useBiomethaneBusinessRules = () => {
+  const { canAccessModule } = useBiomethanePermissions()
   const rules = useContext(BiomethaneBusinessRulesContext)
   const context = useConstructBiomethaneBusinessRules({
-    runQueries: !rules,
+    runQueries: canAccessModule && !rules,
   })
 
   return rules ?? context.rules

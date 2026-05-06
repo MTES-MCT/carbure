@@ -9904,11 +9904,28 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: from_to
           schema:
@@ -9959,6 +9976,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -9971,6 +9989,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -9999,6 +10018,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -10013,6 +10034,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -10100,6 +10129,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10147,6 +10177,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10213,6 +10244,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10266,6 +10298,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10330,6 +10363,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10364,6 +10398,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10415,6 +10450,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10471,6 +10507,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10542,11 +10579,28 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: from_to
           schema:
@@ -10615,6 +10669,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -10627,6 +10682,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -10655,6 +10711,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -10669,6 +10727,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -10756,6 +10822,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10814,11 +10881,28 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: filter
           schema:
@@ -10826,6 +10910,9 @@ paths:
             enum:
               - biofuel
               - customs_category
+              - durability_period
+              - feedstock
+              - origin_country
               - sector
           description: Filter string to apply
           required: true
@@ -10879,6 +10966,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -10891,6 +10979,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -10919,6 +11008,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -10933,6 +11024,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -11008,6 +11107,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11067,6 +11167,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11125,11 +11226,28 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: durability_period
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: feedstock
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: filter
           schema:
@@ -11138,6 +11256,7 @@ paths:
               - biofuel
               - customs_category
               - depot
+              - durability_period
               - from_to
               - operation
               - period
@@ -11196,6 +11315,7 @@ paths:
                 - -created_at
                 - -customs_category
                 - -depot
+                - -durability_period
                 - -from_to
                 - -pending_operations
                 - -quantity
@@ -11208,6 +11328,7 @@ paths:
                 - created_at
                 - customs_category
                 - depot
+                - durability_period
                 - from_to
                 - pending_operations
                 - quantity
@@ -11236,6 +11357,8 @@ paths:
             * `-from_to` - From to (décroissant)
             * `quantity` - Quantity
             * `-quantity` - Quantity (décroissant)
+            * `durability_period` - Durability period
+            * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
             * `-available_balance` - available_balance (descending)
             * `pending_operations` - pending_operations
@@ -11250,6 +11373,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: period
           schema:
@@ -11325,6 +11456,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11368,6 +11500,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11412,6 +11545,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11456,6 +11590,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -16031,6 +16166,8 @@ components:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
           type: boolean
+        is_industrial_waste:
+          type: boolean
       required:
         - code
         - name
@@ -16050,6 +16187,8 @@ components:
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
+          type: boolean
+        is_industrial_waste:
           type: boolean
         classification:
           allOf:
@@ -16078,6 +16217,8 @@ components:
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
+          type: boolean
+        is_industrial_waste:
           type: boolean
       required:
         - code
@@ -18592,6 +18733,21 @@ components:
         ges_bound_max:
           type: number
           format: double
+        durability_period:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        origin_country:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        feedstock:
+          type: array
+          items:
+            type: string
+            minLength: 1
       required:
         - biofuel
         - customs_category
@@ -18635,6 +18791,21 @@ components:
         ges_bound_max:
           type: number
           format: double
+        feedstock:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        origin_country:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        durability_period:
+          type: array
+          items:
+            type: string
+            minLength: 1
       required:
         - biofuel
         - customs_category

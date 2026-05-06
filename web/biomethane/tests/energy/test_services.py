@@ -259,11 +259,14 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
+
         self.production_unit = BiomethaneProductionUnitFactory.create(
             producer=self.producer_entity, unit_type=BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS
         )
         self.contract = BiomethaneContractFactory.create(
-            producer=self.producer_entity, installation_category=BiomethaneContract.INSTALLATION_CATEGORY_2
+            producer=self.producer_entity,
+            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_2,
+            tariff_reference="2023",
         )
 
     def test_full_integration_malfunction_rules(self):

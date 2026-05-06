@@ -7,28 +7,33 @@ from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
 
-class BalanceServiceDefineConversionFactorTest(TestCase):
-    """Unit tests for BalanceService._define_conversion_factor() method."""
+class BalanceServiceDefineConversionRuleTest(TestCase):
+    """Unit tests for BalanceService._define_conversion_rule() method."""
 
-    def test_define_conversion_factor_returns_pci_litre_for_mj(self):
-        """Test _define_conversion_factor returns 'pci_litre' for 'mj' unit."""
-        result = BalanceService._define_conversion_factor("mj")
-        self.assertEqual(result, "pci_litre")
+    def test_define_conversion_rule_returns_pci_litre_with_multiplier_1_for_mj(self):
+        """Test _define_conversion_rule returns ('pci_litre', 1) for 'mj' unit."""
+        result = BalanceService._define_conversion_rule("mj")
+        self.assertEqual(result, ("pci_litre", 1))
 
-    def test_define_conversion_factor_returns_masse_volumique_for_kg(self):
-        """Test _define_conversion_factor returns 'masse_volumique' for 'kg' unit."""
-        result = BalanceService._define_conversion_factor("kg")
-        self.assertEqual(result, "masse_volumique")
+    def test_define_conversion_rule_returns_pci_litre_with_multiplier_0001_for_gj(self):
+        """Test _define_conversion_rule returns ('pci_litre', 0.001) for 'gj' unit."""
+        result = BalanceService._define_conversion_rule("gj")
+        self.assertEqual(result, ("pci_litre", 0.001))
 
-    def test_define_conversion_factor_returns_none_for_unknown_unit(self):
-        """Test _define_conversion_factor returns None for unknown units."""
-        result = BalanceService._define_conversion_factor("liters")
-        self.assertIsNone(result)
+    def test_define_conversion_rule_returns_masse_volumique_with_multiplier_1_for_kg(self):
+        """Test _define_conversion_rule returns ('masse_volumique', 1) for 'kg' unit."""
+        result = BalanceService._define_conversion_rule("kg")
+        self.assertEqual(result, ("masse_volumique", 1))
 
-    def test_define_conversion_factor_returns_none_for_empty_string(self):
-        """Test _define_conversion_factor returns None for empty string."""
-        result = BalanceService._define_conversion_factor("")
-        self.assertIsNone(result)
+    def test_define_conversion_rule_returns_none_field_for_unknown_unit(self):
+        """Test _define_conversion_rule returns (None, 1) for unknown units."""
+        result = BalanceService._define_conversion_rule("liters")
+        self.assertEqual(result, (None, 1))
+
+    def test_define_conversion_rule_returns_none_field_for_empty_string(self):
+        """Test _define_conversion_rule returns (None, 1) for empty string."""
+        result = BalanceService._define_conversion_rule("")
+        self.assertEqual(result, (None, 1))
 
 
 class BalanceServiceGetConversionFactorTest(TestCase):
@@ -582,7 +587,11 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
 
         # Filter to exclude high GHG (keep only 50-70%)
         result = BalanceService.calculate_balance(
-            operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "liters", ges_bound_min=50.0, ges_bound_max=70.0
+            operations,
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "liters",
+            detail_filters={"ges_bound_min": 50.0, "ges_bound_max": 70.0},
         )
 
         # Operations should be excluded, so all quantities should be 0

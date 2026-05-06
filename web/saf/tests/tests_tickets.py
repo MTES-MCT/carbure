@@ -83,6 +83,7 @@ class SafTicketsTest(TestCase):
                 "code": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
                 "category": "ANN-IX-B",
                 "is_double_compte": True,
+                "is_industrial_waste": False,
             },
             "biofuel": {
                 "name": "Huiles co-traitées - Kérosène",

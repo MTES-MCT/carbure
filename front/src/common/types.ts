@@ -2,7 +2,7 @@ import {
   EntityTypeEnum as EntityType,
   SiteTypeEnum as SiteType,
   GesOptionEnum as GESOption,
-  PathsApiTiruertOperationsGetParametersQueryUnit as Unit,
+  PreferredUnitEnum as Unit,
   UserRightsRequestsStatusEnum as UserRightStatus,
   RoleEnum as UserRole,
   ExtAdminPagesEnum as ExternalAdminPages,
@@ -76,11 +76,12 @@ export { OwnershipType }
 
 export { CategoryEnum }
 
-// Add units that are not defined in the schema
+// Add units that are used in specific modules
 export enum ExtendedUnit {
-  GJ = "GJ",
+  GJ = "gj",
   MWh = "MWh",
 }
+export type ExtendedUnitType = Unit | ExtendedUnit
 
 export { Unit }
 /**
