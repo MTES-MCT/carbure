@@ -22,7 +22,7 @@ class Command(BaseCommand):
         year_configs = YearConfig.objects.values("year", "renewable_share")
         enr_ratio_by_year = {config["year"]: config["renewable_share"] / 100 for config in year_configs}
 
-        certificates = ElecProvisionCertificate.objects.all().only("id", "year", "enr_ratio")
+        certificates = ElecProvisionCertificate.objects.all().only("id", "year", "enr_ratio").filter(enr_ratio__isnull=True)
         certificates_to_update = []
         missing_years = set()
 
