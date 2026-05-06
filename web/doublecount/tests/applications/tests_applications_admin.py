@@ -84,6 +84,24 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
         return app, sourcing1, production1, sourcing1, production2
 
+    def test_has_dechets_industriels_uses_feedstock_flag(self):
+        application, _, production, _, _ = self.create_application()
+        feedstock = MatierePremiere.objects.create(
+            name="Déchet industriel détaillé",
+            name_en="Detailed industrial waste",
+            description="",
+            code="DECHET_INDUSTRIEL_DETAILLE",
+            compatible_alcool=True,
+            compatible_graisse=True,
+            is_double_compte=True,
+            is_industrial_waste=True,
+            category="ANN-IX-A",
+        )
+        production.feedstock = feedstock
+        production.save()
+
+        assert check_has_dechets_industriels(application)
+
     def test_list_applications(self):
         self.create_application()
 

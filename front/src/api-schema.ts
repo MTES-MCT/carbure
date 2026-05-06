@@ -4830,6 +4830,7 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
+            is_industrial_waste?: boolean;
         };
         FeedStockClassification: {
             name: string;
@@ -4837,6 +4838,7 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
+            is_industrial_waste?: boolean;
             classification: components["schemas"]["Classification"] | null;
         };
         FeedStockRequest: {
@@ -4845,6 +4847,7 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
+            is_industrial_waste?: boolean;
         };
         FieldData: {
             name: string;
