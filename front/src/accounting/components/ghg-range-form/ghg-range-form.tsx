@@ -33,37 +33,40 @@ export const GHGRangeForm = ({
   onRangeChange,
 }: GHGRangeFormComponentProps) => {
   const { t } = useTranslation()
-  const { value, bind, setValue } = useFormContext<GHGRangeFormProps>()
+  const { value, bind, setField } = useFormContext<GHGRangeFormProps>()
   const { ghgReductionMin, ghgReductionMax } = formatGhgReduction(
     balance?.ghg_reduction_min ?? 50,
     balance?.ghg_reduction_max ?? 100
   )
+  const gesBoundMin = value.gesBoundMin ?? ghgReductionMin
+  const gesBoundMax = value.gesBoundMax ?? ghgReductionMax
 
-  // When the component is mounted, init form values with the balance values only if they are not already set
+  // When the component is mounted, set the gesBoundMin and gesBoundMax in the form only if they are not already set
   useEffect(() => {
-    const formValue = {
-      ...value,
-      availableBalance: value.availableBalance ?? balance.available_balance,
-      gesBoundMin: value.gesBoundMin ?? ghgReductionMin,
-      gesBoundMax: value.gesBoundMax ?? ghgReductionMax,
+    if (value.gesBoundMin === undefined) {
+      setField("gesBoundMin", ghgReductionMin)
     }
-
-    setValue(formValue)
-  }, [])
+    if (value.gesBoundMax === undefined) {
+      setField("gesBoundMax", ghgReductionMax)
+    }
+  }, [gesBoundMin, gesBoundMax, ghgReductionMin, ghgReductionMax])
 
   return (
     <DoubleRange
       step={0.01}
       suffix="%"
       label={t("Définissez le taux de réduction GES des lots à prélever")}
+      animateOn={`${ghgReductionMin}-${ghgReductionMax}`}
       minRange={bind("gesBoundMin", {
+        value: gesBoundMin,
         onChange: onRangeChange
-          ? (_value) => onRangeChange(_value!, value.gesBoundMax!)
+          ? (_value) => onRangeChange(_value!, gesBoundMax)
           : undefined,
       })}
       maxRange={bind("gesBoundMax", {
+        value: gesBoundMax,
         onChange: onRangeChange
-          ? (_value) => onRangeChange(value.gesBoundMin!, _value!)
+          ? (_value) => onRangeChange(gesBoundMin, _value!)
           : undefined,
       })}
       min={ghgReductionMin}

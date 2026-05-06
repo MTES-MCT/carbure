@@ -56,11 +56,51 @@ class SimulationInputSerializerTest(TestCase):
             "from_depot": self.depot.id,
             "ges_bound_min": 0.5,
             "ges_bound_max": 2.0,
+            "durability_period": ["2024", "2025"],
+            "origin_country": ["FR", "DE"],
+            "feedstock": ["COLZA", "TOURNESOL"],
         }
 
         serializer = SimulationInputSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
+
+    def test_new_list_filters_are_optional(self):
+        """Test that durability_period, origin_country, feedstock are optional."""
+        data = {
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "target_volume": 1000.0,
+            "target_emission": 1.5,
+        }
+
+        serializer = SimulationInputSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertNotIn("durability_period", serializer.validated_data)
+        self.assertNotIn("origin_country", serializer.validated_data)
+        self.assertNotIn("feedstock", serializer.validated_data)
+
+    def test_new_list_filters_accept_list_of_strings(self):
+        """Test that new list filters accept list of strings."""
+        data = {
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "target_volume": 1000.0,
+            "target_emission": 1.5,
+            "durability_period": ["2024"],
+            "origin_country": ["FR"],
+            "feedstock": ["COLZA"],
+        }
+
+        serializer = SimulationInputSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["durability_period"], ["2024"])
+        self.assertEqual(serializer.validated_data["origin_country"], ["FR"])
+        self.assertEqual(serializer.validated_data["feedstock"], ["COLZA"])
 
     def test_missing_required_fields_are_invalid(self):
         """Test that missing required fields raise validation errors."""
@@ -212,11 +252,49 @@ class SimulationMinMaxInputSerializerTest(TestCase):
             "from_depot": self.depot.id,
             "ges_bound_min": 0.5,
             "ges_bound_max": 2.0,
+            "feedstock": ["COLZA", "TOURNESOL"],
+            "origin_country": ["FR", "DE"],
+            "durability_period": ["2024", "2025"],
         }
 
         serializer = SimulationMinMaxInputSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
+
+    def test_new_list_filters_are_optional(self):
+        """Test that feedstock, origin_country, durability_period are optional."""
+        data = {
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "target_volume": 1000.0,
+        }
+
+        serializer = SimulationMinMaxInputSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertNotIn("feedstock", serializer.validated_data)
+        self.assertNotIn("origin_country", serializer.validated_data)
+        self.assertNotIn("durability_period", serializer.validated_data)
+
+    def test_new_list_filters_accept_list_of_strings(self):
+        """Test that new list filters accept list of strings."""
+        data = {
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "target_volume": 1000.0,
+            "feedstock": ["COLZA"],
+            "origin_country": ["FR"],
+            "durability_period": ["2024"],
+        }
+
+        serializer = SimulationMinMaxInputSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["feedstock"], ["COLZA"])
+        self.assertEqual(serializer.validated_data["origin_country"], ["FR"])
+        self.assertEqual(serializer.validated_data["durability_period"], ["2024"])
 
     def test_missing_required_fields_are_invalid(self):
         """Test that missing required fields raise validation errors."""

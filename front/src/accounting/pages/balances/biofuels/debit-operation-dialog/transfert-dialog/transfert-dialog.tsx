@@ -17,13 +17,13 @@ import {
   RecapOperation,
   RecapOperationGrid,
 } from "accounting/components/recap-operation"
+
 import {
-  RecipientForm,
-  recipientStep,
-  recipientStepKey,
-  RecipientSummary,
-} from "accounting/components/recipient-form"
-import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filters/advanced-filters"
+  RecipientFiltersForm,
+  recipientFiltersStep,
+  recipientFiltersStepKey,
+  RecipientFiltersSummary,
+} from "./recipient-filters-form"
 
 interface TransfertDialogProps {
   onClose: () => void
@@ -51,15 +51,6 @@ export const TransfertDialogContent = ({
     onClose,
     onOperationCreated,
   })
-
-  // Change the available balance value only if the GHG range step is completed
-  const currentBalance =
-    currentStepIndex > 1
-      ? {
-          ...balance,
-          available_balance: form.value.availableBalance!,
-        }
-      : balance
 
   return (
     <Dialog
@@ -98,30 +89,25 @@ export const TransfertDialogContent = ({
         <Stepper />
         <Box>
           <RecapOperationGrid>
-            <RecapOperation balance={currentBalance} />
-            {currentStepIndex > 1 && <RecipientSummary values={form.value} />}
+            <RecapOperation balance={balance} />
+            {currentStepIndex > 1 && (
+              <RecipientFiltersSummary values={form.value} />
+            )}
             {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
           </RecapOperationGrid>
         </Box>
 
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="transfert-dialog">
-            {currentStep?.key === recipientStepKey && (
-              <>
-                <Box>
-                  <RecipientForm />
-                </Box>
-                <AdvancedFiltersBalanceCard balance={balance} />
-              </>
+            {currentStep?.key === recipientFiltersStepKey && (
+              <RecipientFiltersForm balance={balance} />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <Box>
                 <QuantityForm
-                  balance={currentBalance}
+                  balance={balance}
                   quantityMax={form.value.availableBalance ?? 0}
                   type={CreateOperationType.TRANSFERT}
-                  gesBoundMin={form.value.gesBoundMin}
-                  gesBoundMax={form.value.gesBoundMax}
                 />
               </Box>
             )}
@@ -146,7 +132,7 @@ export const TransfertDialog = (props: TransfertDialogProps) => {
   })
 
   const steps = [
-    recipientStep,
+    recipientFiltersStep(form.value),
     quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]

@@ -1,6 +1,7 @@
 from django.db import models
 
 from core.models import MatierePremiere, Pays
+from core.models.entity import Entity
 from saf.models.constants import SAF_BIOFUEL_TYPES
 
 
@@ -110,6 +111,8 @@ class Operation(models.Model):
         (GAZOLE, GAZOLE),
         (CARBUREACTEUR, CARBUREACTEUR),
     )
+
+    OPERATION_UNIT_CHOICE = Entity.UNIT_CHOICE + (("gj", "gj"),)
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
     status = models.CharField(max_length=12, choices=OPERATION_STATUSES, default=PENDING)

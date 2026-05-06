@@ -5552,7 +5552,7 @@ export interface components {
          *     * `MJ` - MJ
          * @enum {string}
          */
-        PreferredUnitEnum: PathsApiTiruertOperationsGetParametersQueryUnit;
+        PreferredUnitEnum: PreferredUnitEnum;
         /**
          * @description * `LIQUID_PROCESS` - Voie liquide
          *     * `DRY_PROCESS` - Voie sèche
@@ -5938,6 +5938,9 @@ export interface components {
             ges_bound_min?: number;
             /** Format: double */
             ges_bound_max?: number;
+            durability_period?: string[];
+            origin_country?: string[];
+            feedstock?: string[];
         };
         SimulationLotOutput: {
             lot_id: number;
@@ -5956,6 +5959,9 @@ export interface components {
             ges_bound_min?: number;
             /** Format: double */
             ges_bound_max?: number;
+            feedstock?: string[];
+            origin_country?: string[];
+            durability_period?: string[];
         };
         SimulationMinMaxOutput: {
             /** Format: double */
@@ -12926,7 +12932,7 @@ export interface operations {
                 durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                feedstock?: string;
+                feedstock?: string[];
                 from_to?: string;
                 ges_bound_max?: number;
                 ges_bound_min?: number;
@@ -12980,7 +12986,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                origin_country?: string;
+                origin_country?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -13854,6 +13860,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
     MJ = "MJ",
+    gj = "gj",
     kg = "kg",
     l = "l"
 }
@@ -14106,6 +14113,11 @@ export enum OwnershipTypeEnum {
     OWN = "OWN",
     THIRD_PARTY = "THIRD_PARTY",
     PROCESSING = "PROCESSING"
+}
+export enum PreferredUnitEnum {
+    l = "l",
+    kg = "kg",
+    MJ = "MJ"
 }
 export enum ProcessTypeEnum {
     LIQUID_PROCESS = "LIQUID_PROCESS",

@@ -10129,6 +10129,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10176,6 +10177,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10242,6 +10244,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10295,6 +10298,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10359,6 +10363,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10393,6 +10398,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10444,6 +10450,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10500,6 +10507,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -10588,7 +10596,11 @@ paths:
         - in: query
           name: feedstock
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - in: query
           name: from_to
           schema:
@@ -10718,7 +10730,11 @@ paths:
         - in: query
           name: origin_country
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -10806,6 +10822,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11090,6 +11107,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11149,6 +11167,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11437,6 +11456,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11480,6 +11500,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11524,6 +11545,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -11568,6 +11590,7 @@ paths:
             type: string
             enum:
               - MJ
+              - gj
               - kg
               - l
           description: Specify the volume unit.
@@ -18704,6 +18727,21 @@ components:
         ges_bound_max:
           type: number
           format: double
+        durability_period:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        origin_country:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        feedstock:
+          type: array
+          items:
+            type: string
+            minLength: 1
       required:
         - biofuel
         - customs_category
@@ -18747,6 +18785,21 @@ components:
         ges_bound_max:
           type: number
           format: double
+        feedstock:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        origin_country:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        durability_period:
+          type: array
+          items:
+            type: string
+            minLength: 1
       required:
         - biofuel
         - customs_category

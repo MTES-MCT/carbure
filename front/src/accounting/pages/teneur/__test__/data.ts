@@ -1,7 +1,10 @@
 import { CategoryEnum } from "common/types"
+import { OperationSector } from "accounting/types"
 import {
   CategoryObjective,
   MainObjective,
+  SectorObjective,
+  TargetType,
   UnconstrainedCategoryObjective,
 } from "../types"
 
@@ -59,3 +62,37 @@ export const overallObjective: MainObjective = {
   penalty: 0,
   energy_basis: 0,
 }
+
+export const defaultCategoryObjective: CategoryObjective = {
+  code: CategoryEnum.CONV,
+  target: 300,
+  teneur_declared: 20,
+  teneur_declared_month: 10,
+  quantity_available: 1000,
+  target_percent: 10,
+  penalty: 0,
+}
+
+export const defaultSectorObjectives: SectorObjective[] = [
+  {
+    code: OperationSector.ESSENCE,
+    target: 400,
+    teneur_declared: 30,
+    teneur_declared_month: 20,
+    quantity_available: 1200,
+    target_percent: 12,
+    penalty: 0,
+  },
+]
+
+export const defaultMainObjective: MainObjective = {
+  target: 150,
+  teneur_declared: 20,
+  teneur_declared_month: 10,
+  quantity_available: 500,
+  target_percent: 5,
+  penalty: 0,
+  energy_basis: 1000,
+}
+
+export const defaultTargetType = TargetType.CAP

@@ -1,5 +1,5 @@
 import useEntity from "common/hooks/entity"
-import { ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnitType } from "common/types"
 import {
   FormatNumberOptions,
   formatUnit,
@@ -12,7 +12,7 @@ import {
  * a value based on the unit.
  * If a custom unit is provided, it will be used instead of the entity's preferred unit.
  */
-export const useUnit = (customUnit?: Unit | ExtendedUnit) => {
+export const useUnit = (customUnit?: ExtendedUnitType) => {
   const entity = useEntity()
   const unit = customUnit ?? entity.preferred_unit
 
@@ -26,7 +26,7 @@ export const useUnit = (customUnit?: Unit | ExtendedUnit) => {
       {
         unit: unitParam,
         ...options
-      }: { unit?: Unit | ExtendedUnit } & FormatNumberOptions = {}
+      }: { unit?: ExtendedUnitType } & FormatNumberOptions = {}
     ) => formatUnit(value, unitParam ?? unit, options),
   }
 }

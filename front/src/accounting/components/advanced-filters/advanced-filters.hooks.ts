@@ -13,13 +13,10 @@ import {
   AdvancedFiltersFormProps,
   Filters,
 } from "./advanced-filters.types"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
+import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
 
-export const useAdvancedFiltersBalance = ({
-  balance,
-}: {
-  balance: Balance
-}) => {
+export const useAdvancedFiltersBalance = (balance: Balance) => {
   const filterNormalizers: Partial<Record<BalancesFilter, Normalizer<string>>> =
     {
       [BalancesFilter.feedstock]: normalizeFeedstockFilter,
@@ -42,14 +39,10 @@ export const useAdvancedFiltersBalance = ({
     const { data } = await getBalanceFilters(
       {
         ...query,
-        [BalancesFilter.feedstock]: value.feedstock ?? [],
-        [BalancesFilter.durability_period]: value.durability_period ?? [],
-        [BalancesFilter.origin_country]: value.origin_country ?? [],
+        ...mapAdvancedFiltersForPayload(value),
         sector: [balance.sector],
         customs_category: [balance.customs_category],
         biofuel: [balance.biofuel?.code],
-        ges_bound_min: value.gesBoundMin,
-        ges_bound_max: value.gesBoundMax,
       },
       filter as BalancesFilter
     )
@@ -77,7 +70,6 @@ export const useBuildFilters = ({
   ) => void
 }) => {
   const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
-
   const selected = useMemo(
     () =>
       Object.fromEntries(
@@ -100,17 +92,23 @@ export const useBuildFilters = ({
     )
   }
 
-  return { selected, onSelect }
+  const resetFilters = useCallback(() => {
+    ADVANCED_FILTER_FIELDS.forEach((filter) => {
+      setField(filter, [])
+    })
+  }, [setField])
+
+  return { selected, onSelect, resetFilters }
 }
 
 /**
  * Function to check if a filter has been removed
  */
 export const isFilterRemoved = (
-  previousFilters: Filters,
-  newFilters: Filters
+  previousFilters: Partial<Filters>,
+  newFilters: Partial<Filters>
 ) => {
-  const previousFiltersValues = Object.values(previousFilters).flat()
-  const newFiltersValues = Object.values(newFilters).flat()
+  const previousFiltersValues = Object.values(previousFilters ?? {}).flat()
+  const newFiltersValues = Object.values(newFilters ?? {}).flat()
   return previousFiltersValues.length > newFiltersValues.length
 }

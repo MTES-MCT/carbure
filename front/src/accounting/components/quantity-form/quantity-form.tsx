@@ -4,7 +4,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { Notice } from "common/components/notice"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import { getQuantityInputLabel } from "./quantity-form.utils"
@@ -12,7 +12,8 @@ import {
   useFocusOnAvoidedEmissions,
   useQuantityForm,
 } from "./quantity-form.hooks"
-import { ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnitType } from "common/types"
+import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -23,13 +24,7 @@ export type QuantityFormComponentProps = {
   type: CreateOperationType
 
   // Unit of the quantity displayed to the user (default is the entity preferred unit)
-  unit?: Unit | ExtendedUnit
-
-  // Unit of the quantity used by the backend (default is the entity preferred unit)
-  backendUnit?: Unit | ExtendedUnit
-
-  // Custom conversion function for the backend (default is the value passed as parameter)
-  converter?: (value: number) => number
+  unit?: ExtendedUnitType
 
   // Lot GHG min and max bounds
   gesBoundMin?: number
@@ -70,26 +65,19 @@ const QuantitySection = ({
   balance,
   quantityMax,
   type,
-  unit: customUnit,
-  backendUnit: customBackendUnit,
-  gesBoundMin,
-  gesBoundMax,
-  converter,
+  unit: overrideUnit,
   onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit(customUnit)
+  const { formatUnit, unit } = useUnit(overrideUnit)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
-  const { value, bind, setField, setFieldError } =
-    useFormContext<QuantityFormProps>()
+  const { value, bind, setField, setFieldError } = useFormContext<
+    QuantityFormProps & AdvancedFiltersFormProps
+  >()
   const mutation = useQuantityForm({
     balance,
-    values: value,
-    unit: customBackendUnit,
-    converter,
-    gesBoundMin,
-    gesBoundMax,
+    unit,
   })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
@@ -158,9 +146,17 @@ const QuantitySection = ({
     },
   })
 
-  const quantityMaxLabel = quantityMax
-    ? `(${t("solde")}: ${formatUnit(balance.available_balance, { fractionDigits: 0, mode: "floor" })})`
+  const quantityMaxLabel = value.availableBalance
+    ? `(${t("solde")}: ${formatUnit(value.availableBalance, { fractionDigits: 0, mode: "floor" })})`
     : undefined
+
+  // When the component is mounted, reset the quantity declared if the quantity is greater than the quantity max
+  useEffect(() => {
+    if (quantityMax && value.quantity && value.quantity > quantityMax) {
+      resetQuantityDeclared()
+      setField("quantity", undefined)
+    }
+  }, [])
 
   return (
     <>

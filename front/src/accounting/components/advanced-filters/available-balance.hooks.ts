@@ -7,16 +7,10 @@ import { useUnit } from "common/hooks/unit"
 import { debounce } from "common/utils/functions"
 
 import { AdvancedFiltersFormProps } from "./advanced-filters.types"
+import { ExtendedUnitType } from "common/types"
+import { useEffect } from "react"
+import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
 
-const pickFilters = (filters: AdvancedFiltersFormProps) => {
-  return {
-    ges_bound_min: filters.gesBoundMin,
-    ges_bound_max: filters.gesBoundMax,
-    feedstock: filters.feedstock,
-    durability_period: filters.durability_period,
-    origin_country: filters.origin_country,
-  }
-}
 const debouncedGetBalance = debounce(
   (entityId, biofuel, sector, category, filters, unit) =>
     getBalances({
@@ -25,30 +19,34 @@ const debouncedGetBalance = debounce(
       sector,
       customs_category: category,
       entity_id: entityId,
-      ...pickFilters(filters),
+      ...mapAdvancedFiltersForPayload(filters),
       unit,
-    }).then((res) =>
-      res.data.results.length > 0 ? res.data.results[0] : undefined
-    ),
+    }).then((res) => {
+      if (res.data.total_quantity === 0) return undefined
+
+      return res.data.results.length > 0 ? res.data.results[0] : undefined
+    }),
   200
 )
 
 export const useAvailableBalance = ({
-  initialBalance,
+  unit: overrideUnit,
+  balance,
 }: {
-  initialBalance: Balance
+  unit?: ExtendedUnitType
+  balance: Balance
 }) => {
-  const { unit } = useUnit()
   const entity = useEntity()
-  const { setField } = useFormContext<AdvancedFiltersFormProps>()
+  const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
+  const { unit } = useUnit(overrideUnit)
 
   const query = useQuery(
     (filters?: AdvancedFiltersFormProps) =>
       debouncedGetBalance(
         entity.id,
-        initialBalance.biofuel?.code,
-        initialBalance.sector,
-        initialBalance.customs_category,
+        balance.biofuel?.code,
+        balance.sector,
+        balance.customs_category,
         filters ?? {},
         unit
       ),
@@ -58,12 +56,22 @@ export const useAvailableBalance = ({
       executeOnMount: false,
       executeOnUpdate: false,
       onSuccess: (data) => {
-        if (data) {
-          setField("availableBalance", data.available_balance)
-        }
+        const availableBalance = data?.available_balance ?? 0
+
+        setField("availableBalance", availableBalance)
+        setField("balance", {
+          ...balance,
+          available_balance: availableBalance,
+        })
       },
     }
   )
+
+  // When the component is mounted, set the available balance in the form only if it is not already set
+  useEffect(() => {
+    if (!value.availableBalance)
+      setField("availableBalance", balance.available_balance)
+  }, [])
 
   return {
     loading: query.loading,
