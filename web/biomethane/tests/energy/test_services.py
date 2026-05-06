@@ -5,7 +5,9 @@ from django.test import TestCase
 from biomethane.factories import BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.energy import BiomethaneEnergyMonthlyReportFactory
+from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_energy import BiomethaneEnergy
+from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
 from biomethane.services.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 from core.models import Entity
 
@@ -257,8 +259,15 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
             name="Test Producer",
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
-        self.production_unit = BiomethaneProductionUnitFactory.create(producer=self.producer_entity)
-        self.contract = BiomethaneContractFactory.create(producer=self.producer_entity, tariff_reference="2023")
+
+        self.production_unit = BiomethaneProductionUnitFactory.create(
+            producer=self.producer_entity, unit_type=BiomethaneProductionUnit.AGRICULTURAL_AUTONOMOUS
+        )
+        self.contract = BiomethaneContractFactory.create(
+            producer=self.producer_entity,
+            installation_category=BiomethaneContract.INSTALLATION_CATEGORY_2,
+            tariff_reference="2023",
+        )
 
     def test_full_integration_malfunction_rules(self):
         """Smoke test: verify malfunction rules work end-to-end."""
