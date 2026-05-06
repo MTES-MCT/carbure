@@ -246,3 +246,15 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         response = self.client.get(self.url_base, params)
 
         self.assertEqual(response.status_code, 403)
+
+    def test_list_supply_inputs_error_with_producer_using_producer_id_param(self):
+        """Test that a producer cannot use producer_id param to access another producer's data (IDOR protection)."""
+        create_supply_plan_and_inputs(self.producer_entity, 2020)
+        create_supply_plan_and_inputs(self.producer_entity_2, 2020)
+
+        # Authenticated as producer_entity but requesting producer_entity_2's data via producer_id
+        params = {"entity_id": self.producer_entity.id, "producer_id": self.producer_entity_2.id, "year": 2020}
+
+        response = self.client.get(self.url_base, params)
+
+        self.assertEqual(response.status_code, 403)

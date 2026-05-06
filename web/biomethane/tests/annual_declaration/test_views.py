@@ -1,15 +1,18 @@
 from datetime import date
 from unittest.mock import patch
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
+from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
 from biomethane.models.biomethane_declaration_period import BiomethaneDeclarationPeriod
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
-from core.models import Entity
+from core.models import Department, Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
+from entity.models import EntityScope
 
 
 class BiomethaneAnnualDeclarationViewSetTests(TestCase):
@@ -214,3 +217,41 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         )
 
         self.assertTrue(declaration.is_open)
+
+    def test_retrieve_annual_declaration_error_with_producer_using_producer_id_param(self):
+        """Test that a producer cannot use producer_id param to access another producer's data (IDOR protection)."""
+        producer_entity_2 = Entity.objects.create(
+            name="Test Producer 2",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+
+        params = {"entity_id": self.producer_entity.id, "producer_id": producer_entity_2.id}
+        response = self.client.get(self.annual_declaration_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_retrieve_annual_declaration_with_dreal_and_producer_id(self):
+        """Test DREAL can access annual declaration filtered by producer_id."""
+        department = Department.objects.create(code_dept="31", name="Haute-Garonne")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_declaration_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        dreal = Entity.objects.create(name="Test DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        setup_current_user(self, "dreal@carbure.local", "DREAL", "gogogo", [(dreal, "ADMIN")])
+
+        params = {"entity_id": dreal.id, "producer_id": self.producer_entity.id}
+        response = self.client.get(self.annual_declaration_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["year"], self.current_declaration_year)
