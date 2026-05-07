@@ -27,7 +27,8 @@ class ElecOperationPagination(MetadataPageNumberPagination):
         metadata = {"total_quantity": 0}
         for operation in self.queryset:
             # _quantity is annotated and signed (positive=credit, negative=debit)
-            metadata["total_quantity"] += operation._quantity
+            if operation.status != ElecOperation.REJECTED:
+                metadata["total_quantity"] += operation._quantity
         return metadata
 
 
