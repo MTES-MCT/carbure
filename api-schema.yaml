@@ -7292,6 +7292,29 @@ paths:
                 items:
                   $ref: "#/components/schemas/FeedStockClassification"
           description: ""
+  /api/resources/fossil-fuels:
+    get:
+      operationId: resources_fossil_fuels_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `label` and `nomenclature`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FossilFuel"
+          description: ""
   /api/resources/production-sites:
     get:
       operationId: resources_production_sites_list
@@ -16726,6 +16749,22 @@ components:
         * `EXCEL` - EXCEL
         * `EXTRA` - EXTRA
         * `DECISION` - DECISION
+    FossilFuel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        label:
+          type: string
+          maxLength: 255
+        nomenclature:
+          type: string
+          maxLength: 255
+      required:
+        - id
+        - label
+        - nomenclature
     GenericCertificate:
       type: object
       properties:

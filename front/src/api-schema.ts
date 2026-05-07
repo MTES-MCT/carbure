@@ -2250,6 +2250,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/fossil-fuels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["resources_fossil_fuels_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/resources/production-sites": {
         parameters: {
             query?: never;
@@ -5259,6 +5275,11 @@ export interface components {
          * @enum {string}
          */
         FileTypeEnum: FileTypeEnum;
+        FossilFuel: {
+            readonly id: number;
+            label: string;
+            nomenclature: string;
+        };
         GenericCertificate: {
             certificate_id: string;
             certificate_type: components["schemas"]["CertificateTypeEnum"];
@@ -11610,6 +11631,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FeedStockClassification"][];
+                };
+            };
+        };
+    };
+    resources_fossil_fuels_list: {
+        parameters: {
+            query?: {
+                /** @description Search within the fields `label` and `nomenclature` */
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FossilFuel"][];
                 };
             };
         };
