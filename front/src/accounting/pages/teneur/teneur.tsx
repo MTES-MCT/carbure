@@ -68,7 +68,9 @@ const Teneur = () => {
   }
 
   const onMacClick = () => {
-    portal((close) => <MacDialog onClose={close} year={selectedYear} />)
+    portal((close) => (
+      <MacDialog onClose={close} entityId={entity.id} year={selectedYear} />
+    ))
   }
 
   return (
