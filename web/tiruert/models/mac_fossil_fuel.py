@@ -47,9 +47,9 @@ class MacFossilFuel(models.Model):
         db_table = "fossil_fuel_mac"
         verbose_name = "Fossil Fuel MAC"
         verbose_name_plural = "Fossil Fuels MACs"
-        # constraints = [
-        #    models.UniqueConstraint(
-        #        fields=["operator", "fuel", "period"],
-        #        name="unicity",
-        #    ),
-        # ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["operator", "fuel", "period"],
+                name="unique_mac_fossil_fuel_operator_fuel_period",
+            ),
+        ]
