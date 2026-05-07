@@ -51,7 +51,16 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         YearConfig.objects.create(year=2022, renewable_share=ENR_RATIO * 100)
         YearConfig.objects.create(year=2023, renewable_share=ENR_RATIO * 100)
 
-    def setup_meter_reading(self, quarter, year, reading_energy, reading_date, certificate_energy, meter=None):
+    def setup_meter_reading(
+        self,
+        quarter,
+        year,
+        reading_energy,
+        reading_date,
+        certificate_energy,
+        meter=None,
+        operating_unit="FRBLA",
+    ):
         application = ElecMeterReadingApplication.objects.create(
             status=ElecMeterReadingApplication.ACCEPTED,
             quarter=quarter,
@@ -66,13 +75,14 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=application,
             meter=meter or self.meter,
             enr_ratio=ENR_RATIO,
+            operating_unit=operating_unit,
         )
 
         ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
-            quarter=1,
-            year=2024,
-            operating_unit="FRBLA",
+            quarter=quarter,
+            year=year,
+            operating_unit=operating_unit,
             source=ElecProvisionCertificate.METER_READINGS,
             energy_amount=certificate_energy,
         )
@@ -214,6 +224,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             cpo=self.cpo,
             quarter=1,
             year=2023,
+            operating_unit="FRBLA",
             energy_amount=10000 * ENR_RATIO / 1000,
             source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION,
         )

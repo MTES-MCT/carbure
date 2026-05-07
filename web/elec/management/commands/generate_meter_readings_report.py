@@ -2,35 +2,72 @@ import json
 
 import pandas as pd
 from django.core.management.base import BaseCommand
-from django.db import connection
 from django.db.models.aggregates import Sum
 
 from elec.models import ElecCertificateReadjustment, ElecMeterReading, ElecProvisionCertificate
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
-def _get_real_total_energy_declared(cpo_id):
-    result = (
-        ElecMeterReading.extended_objects.select_related("application")
-        .filter(cpo_id=cpo_id, application__status=ElecMeterReadingApplication.ACCEPTED)
-        .aggregate(Sum("renewable_energy"))
+def _get_real_energy_declared_by_group(cpo_ids=None, year=None):
+    readings = ElecMeterReading.extended_objects.select_related("application").filter(
+        application__status=ElecMeterReadingApplication.ACCEPTED
+    )
+    if cpo_ids:
+        readings = readings.filter(cpo_id__in=cpo_ids)
+    if year is not None:
+        readings = readings.filter(application__year=year)
+
+    grouped_readings = (
+        readings.order_by()
+        .values("cpo_id", "application__year", "application__quarter", "operating_unit")
+        .annotate(energy_amount=Sum("renewable_energy"))
     )
 
-    return result["renewable_energy__sum"] or 0
-
-
-def _get_certificates_energy_amount(cpo_id):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT SUM(energy_amount) FROM elec_provision_certificate epc
-            WHERE epc.cpo_id = %s AND epc.source = "METER_READINGS"
-            """,
-            [cpo_id],
+    return {
+        (reading["cpo_id"], reading["application__year"], reading["application__quarter"], reading["operating_unit"]): (
+            reading["energy_amount"] or 0
         )
-        result = cursor.fetchone()
+        for reading in grouped_readings
+    }
 
-        return result[0] * 1000 if result and result[0] is not None else 0
+
+def _get_admin_error_by_group(cpo_ids=None, year=None):
+    admin_error_certificates = ElecProvisionCertificate.objects.filter(
+        source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION
+    )
+    if cpo_ids:
+        admin_error_certificates = admin_error_certificates.filter(cpo_id__in=cpo_ids)
+    if year is not None:
+        admin_error_certificates = admin_error_certificates.filter(year=year)
+
+    grouped_admin_error = admin_error_certificates.values("cpo_id", "year", "quarter", "operating_unit").annotate(
+        energy_amount=Sum("energy_amount")
+    )
+
+    return {
+        (certificate["cpo_id"], certificate["year"], certificate["quarter"], certificate["operating_unit"]): (
+            certificate["energy_amount"] or 0
+        )
+        * 1000
+        for certificate in grouped_admin_error
+    }
+
+
+def _get_readjustments_by_certificate(certificate_ids):
+    grouped_readjustments = (
+        ElecCertificateReadjustment.objects.filter(
+            error_source=ElecCertificateReadjustment.METER_READINGS,
+            provision_certificate_id__in=certificate_ids,
+        )
+        .values("provision_certificate_id")
+        .annotate(energy_amount=Sum("energy_amount"))
+    )
+
+    return {
+        item["provision_certificate_id"]: (item["energy_amount"] or 0) * 1000
+        for item in grouped_readjustments
+        if item["provision_certificate_id"] is not None
+    }
 
 
 class Command(BaseCommand):
@@ -71,62 +108,95 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         log = options.get("log")
         csv = options.get("csv")
-        cpo = options.get("cpo")
+        cpo_filter = options.get("cpo")
+        year_filter = options.get("year")
         apply_readjustments = options.get("apply")
 
-        cpo_with_readings = ElecMeterReading.objects.select_related("cpo").values("cpo_id", "cpo__name")
-
-        if cpo is not None:
-            cpo_with_readings = cpo_with_readings.filter(cpo_id=cpo)
-
-        cpo_with_readings = cpo_with_readings.distinct()
+        certificates = ElecProvisionCertificate.objects.select_related("cpo").filter(
+            source=ElecProvisionCertificate.METER_READINGS
+        )
+        if cpo_filter is not None:
+            certificates = certificates.filter(cpo_id=cpo_filter)
+        if year_filter is not None:
+            certificates = certificates.filter(year=year_filter)
+        certificates = list(certificates)
 
         report = {}
         total_surplus = 0
+        certificates_to_create = []
+        unmatched_certificate_keys = []
+        unmatched_reading_keys = []
 
-        for cpo in cpo_with_readings:
-            total_meter_reading_energy = _get_real_total_energy_declared(cpo["cpo_id"])
-            total_provision_certificate_energy = _get_certificates_energy_amount(cpo["cpo_id"])
+        cpo_ids = {certificate.cpo_id for certificate in certificates}
+        real_energy_by_group = _get_real_energy_declared_by_group(cpo_ids=cpo_ids, year=year_filter)
 
-            total_admin_error_readjustment_dict = ElecProvisionCertificate.objects.filter(
-                cpo_id=cpo["cpo_id"], source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION
-            ).aggregate(Sum("energy_amount"))
-            total_admin_error_readjustment = (
-                total_admin_error_readjustment_dict.get("energy_amount__sum") or 0
-            ) * 1000  # back to kWh to match meter reading energy values
+        admin_error_by_group = _get_admin_error_by_group(cpo_ids=cpo_ids, year=year_filter)
+        readjustment_by_certificate = _get_readjustments_by_certificate([certificate.id for certificate in certificates])
+        certificates_by_cpo = {}
+        for certificate in certificates:
+            certificates_by_cpo.setdefault(certificate.cpo_id, []).append(certificate)
 
-            total_cpo_readjustment_dict = ElecCertificateReadjustment.objects.filter(
-                cpo_id=cpo["cpo_id"], error_source=ElecCertificateReadjustment.METER_READINGS
-            ).aggregate(Sum("energy_amount"))
-            total_cpo_readjustment = (
-                total_cpo_readjustment_dict.get("energy_amount__sum") or 0
-            ) * 1000  # back to kWh to match meter reading energy values
+        for cpo_id, cpo_certificates in certificates_by_cpo.items():
+            cpo_name = cpo_certificates[0].cpo.name if cpo_certificates[0].cpo_id else str(cpo_id)
 
-            diff = (
-                total_provision_certificate_energy
-                - total_meter_reading_energy
-                - total_cpo_readjustment
-                + total_admin_error_readjustment
-            )
+            total_meter_reading_energy = 0
+            total_provision_certificate_energy = 0
+            total_diff = 0
+            certificate_diffs = []
+            certificate_keys = set()
 
-            # if diff is more than 100 kWh, it's a significant difference
-            if abs(diff) >= 100:
-                total_surplus += diff
-                report[cpo["cpo__name"]] = {
+            for certificate in cpo_certificates:
+                group_key = (certificate.cpo_id, certificate.year, certificate.quarter, certificate.operating_unit)
+                certificate_keys.add(group_key)
+                if group_key not in real_energy_by_group:
+                    unmatched_certificate_keys.append(group_key)
+                    continue
+
+                certificate_energy = certificate.energy_amount * 1000
+
+                meter_reading_energy = real_energy_by_group.get(group_key, 0)
+                admin_error_energy = admin_error_by_group.get(group_key, 0)
+                already_readjusted_energy = readjustment_by_certificate.get(certificate.id, 0)
+
+                diff = certificate_energy - meter_reading_energy - already_readjusted_energy + admin_error_energy
+                certificate_diffs.append((certificate, diff))
+
+                total_provision_certificate_energy += certificate_energy
+                total_meter_reading_energy += meter_reading_energy
+                total_diff += diff
+
+            reading_keys_for_cpo = {key for key in real_energy_by_group.keys() if key[0] == cpo_id}
+            unmatched_reading_keys.extend(sorted(reading_keys_for_cpo - certificate_keys))
+
+            # if total diff is more than 100 kWh for the cpo, it's a significant difference
+            if abs(total_diff) >= 100:
+                total_surplus += total_diff
+                report[cpo_name] = {
                     "certificats": total_provision_certificate_energy,
                     "real_energy_must_be_declared": total_meter_reading_energy,
-                    "surplus": round(diff, 3),
+                    "surplus": round(total_diff, 3),
                 }
 
-                # create a readjustment only if the cpo has a positive surplus
-                if apply_readjustments and diff > 0:
-                    ElecCertificateReadjustment.objects.create(
-                        cpo_id=cpo["cpo_id"],
-                        error_source=ElecCertificateReadjustment.METER_READINGS,
-                        # back to MWh to match the energy_amount field
-                        energy_amount=round(diff / 1000, 2),
-                        reason="Différence entre l'énergie générée par certificats et l'énergie déclarée dans les relevés",
-                    )
+                # create a readjustment only for certificates with a positive delta
+                if apply_readjustments:
+                    for certificate, diff in certificate_diffs:
+                        if diff > 0:
+                            certificates_to_create.append(
+                                ElecCertificateReadjustment(
+                                    cpo_id=cpo_id,
+                                    provision_certificate_id=certificate.id,
+                                    error_source=ElecCertificateReadjustment.METER_READINGS,
+                                    # back to MWh to match the energy_amount field
+                                    energy_amount=round(diff / 1000, 2),
+                                    reason=(
+                                        "Différence entre l'énergie générée par certificats "
+                                        "et l'énergie déclarée dans les relevés"
+                                    ),
+                                )
+                            )
+
+        if apply_readjustments and certificates_to_create:
+            ElecCertificateReadjustment.objects.bulk_create(certificates_to_create, batch_size=1000)
 
         if log:
             items = []
@@ -146,6 +216,18 @@ class Command(BaseCommand):
             pd.options.display.float_format = "{:,.3f}".format
             print(df.to_string(index=False))
             print(f"Soit un total de {round(total_surplus / 1000, 1):,} MWh\n")
+
+            if unmatched_certificate_keys or unmatched_reading_keys:
+                print("Clés non appariées ignorées (cpo_id, year, quarter, operating_unit)")
+                if unmatched_certificate_keys:
+                    print(" - Certificats sans relevés :")
+                    for key in sorted(set(unmatched_certificate_keys)):
+                        print(f"   {key}")
+                if unmatched_reading_keys:
+                    print(" - Relevés sans certificats :")
+                    for key in sorted(set(unmatched_reading_keys)):
+                        print(f"   {key}")
+                print("")
 
         if csv:
             arr = []
