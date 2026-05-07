@@ -19,6 +19,7 @@ import {
 import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
 import { ObjectivesContent } from "./components/objectives-content"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { MacDialog } from "./components/mac-dialog"
 
 const Teneur = () => {
   const entity = useEntity()
@@ -66,6 +67,10 @@ const Teneur = () => {
     portal((close) => <ValidatePendingTeneurDialog onClose={close} />)
   }
 
+  const onMacClick = () => {
+    portal((close) => <MacDialog onClose={close} year={selectedYear} />)
+  }
+
   return (
     <>
       <Notice noColor variant="info">
@@ -91,6 +96,20 @@ const Teneur = () => {
           </Row>
         </Notice>
       )}
+      <Notice noColor variant="info">
+        <Row style={{ alignItems: "center", width: "100%" }}>
+          <Col spread>
+            <p>
+              {t(
+                "Renseignez vos mises à consommation de carburants fossiles pour nous permettre de calculer l'assiette de vos objectifs."
+              )}
+            </p>
+          </Col>
+          <Button priority="primary" onClick={onMacClick}>
+            {t("Renseigner mes MàC")}
+          </Button>
+        </Row>
+      </Notice>
 
       <ObjectivesContent
         objectivesData={objectivesData}
