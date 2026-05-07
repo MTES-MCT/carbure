@@ -24,6 +24,3 @@ class BiomethaneContractAmendmentFilter(FilterSet):
 
     def ignore(self, queryset, name, value):
         return queryset
-
-    class Meta:
-        fields = ["entity_id", "producer_id"]
