@@ -6,9 +6,7 @@ from django.test import TestCase
 
 from core.models import Entity
 from core.tests_utils import assert_object_contains_data
-from elec.management.commands import compensate_elec_provision_certificate as command_module
 from elec.models import ElecProvisionCertificate
-from elec.tests.utils import setup_cpo_with_meter_readings
 from entity.factories.entity import EntityFactory
 
 COMPENSATION_YEAR = 2025
@@ -128,12 +126,36 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
             },
         )
 
-    def test_excludes_meter_readings_source_from_base_calculation(self):
-        self.create_certificate(source=ElecProvisionCertificate.METER_READINGS, quarter=1, energy_amount=1.0, enr_ratio=0.25)
+    def test_excludes_enr_ratio_compensation_source_from_base_calculation(self):
+        self.create_certificate(
+            source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
+            quarter=1,
+            energy_amount=1.0,
+            enr_ratio=0.25,
+        )
 
         result = run_command(enr_ratio=30)
 
         self.assertEqual(result, [])
+
+    def test_includes_meter_readings_source_in_base_calculation(self):
+        self.create_certificate(source=ElecProvisionCertificate.METER_READINGS, quarter=1, energy_amount=1.0, enr_ratio=0.25)
+
+        result = run_command(enr_ratio=30)
+
+        self.assertEqual(len(result), 1)
+        assert_object_contains_data(
+            self,
+            result[0],
+            {
+                "cpo_id": self.cpo1.id,
+                "quarter": 1,
+                "year": 2025,
+                "operating_unit": "00001",
+                "energy_amount": 0.2,
+                "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
+            },
+        )
 
     def test_returns_no_certificate_when_certificate_already_created(self):
         self.create_certificate(source=ElecProvisionCertificate.MANUAL, quarter=1, energy_amount=1.0, enr_ratio=0.25)
@@ -147,86 +169,3 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
         new_result = run_command(enr_ratio=35, apply=True)
 
         self.assertEqual(new_result, [])
-
-    def test_returns_certificates_for_quarterly_meter_readings(self):
-        setup_cpo_with_meter_readings(self.cpo1, charge_points_count=1, years=[2025], quarters=[1, 2])
-
-        result = run_command(enr_ratio=30)
-
-        self.assertEqual(len(result), 2)
-        expected_data = [
-            {
-                "cpo_id": self.cpo1.id,
-                "quarter": 1,
-                "year": 2025,
-                "operating_unit": "00001",
-                "energy_amount": 0.01,
-                "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
-            },
-            {
-                "cpo_id": self.cpo1.id,
-                "quarter": 2,
-                "year": 2025,
-                "operating_unit": "00001",
-                "energy_amount": 0.01,
-                "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
-            },
-        ]
-        for i, cert in enumerate(result):
-            assert_object_contains_data(self, cert, expected_data[i])
-
-    def test_returns_no_certificate_for_meter_readings_when_delta_negative(self):
-        setup_cpo_with_meter_readings(self.cpo1, charge_points_count=1, years=[2025], quarters=[1, 2])
-
-        result = run_command(enr_ratio=20)
-
-        self.assertEqual(result, [])
-
-    def test_returns_no_certificate_for_meter_readings_when_compensation_already_exists(self):
-        setup_cpo_with_meter_readings(self.cpo1, charge_points_count=1, years=[2025], quarters=[1])
-        ElecProvisionCertificate.objects.create(
-            cpo=self.cpo1,
-            quarter=1,
-            year=2025,
-            operating_unit="00001",
-            source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
-            energy_amount=0.01,
-            enr_ratio=0.30,
-        )
-
-        result = run_command(enr_ratio=30)
-
-        self.assertEqual(result, [])
-
-
-class CompensateElecProvisionCertificateHelpersTest(TestCase):
-    def setUp(self):
-        self.cpo = EntityFactory.create(entity_type=Entity.CPO, name="CPO Test")
-
-    def test_build_certificate_key(self):
-        key = command_module._build_certificate_key(self.cpo.id, 1, COMPENSATION_YEAR, "00001")
-        self.assertEqual(key, f"{self.cpo.id}-1-{COMPENSATION_YEAR}-00001")
-
-    def test_get_existing_compensation_keys_only_returns_compensation_source(self):
-        ElecProvisionCertificate.objects.create(
-            cpo=self.cpo,
-            quarter=1,
-            year=COMPENSATION_YEAR,
-            operating_unit="00001",
-            source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
-            energy_amount=1.0,
-            enr_ratio=0.30,
-        )
-        ElecProvisionCertificate.objects.create(
-            cpo=self.cpo,
-            quarter=2,
-            year=COMPENSATION_YEAR,
-            operating_unit="00001",
-            source=ElecProvisionCertificate.MANUAL,
-            energy_amount=2.0,
-            enr_ratio=0.25,
-        )
-
-        keys = command_module._get_existing_compensation_keys(COMPENSATION_YEAR)
-
-        self.assertEqual(keys, {f"{self.cpo.id}-1-{COMPENSATION_YEAR}-00001"})

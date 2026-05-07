@@ -2,15 +2,10 @@ import json
 from collections import defaultdict
 
 from django.core.management.base import BaseCommand
-from django.db.models import Exists, ExpressionWrapper, F, FloatField, OuterRef, Sum, Value
+from django.db.models import Exists, ExpressionWrapper, F, FloatField, OuterRef, Value
 from django.db.models.functions import Round
 
 from elec.models import ElecProvisionCertificate
-from elec.models.elec_meter_reading import ElecMeterReading
-
-
-def _build_certificate_key(cpo_id, quarter, year, operating_unit):
-    return f"{cpo_id}-{quarter}-{year}-{operating_unit}"
 
 
 def _build_compensation_certificate(cpo_id, quarter, year, operating_unit, energy_amount, new_enr_ratio, cpo_name=None):
@@ -27,19 +22,7 @@ def _build_compensation_certificate(cpo_id, quarter, year, operating_unit, energ
     return certificate
 
 
-def _get_existing_compensation_keys(year):
-    # Used by both flows to keep the command idempotent on (cpo, quarter, year, operating_unit).
-    existing_compensations = ElecProvisionCertificate.objects.filter(
-        year=year,
-        source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
-    ).values_list("cpo_id", "quarter", "year", "operating_unit")
-    return {
-        _build_certificate_key(cpo_id, quarter, year, operating_unit)
-        for cpo_id, quarter, year, operating_unit in existing_compensations
-    }
-
-
-def _get_non_meter_reading_certificates_with_delta(year, new_enr_ratio):
+def _get_certificates_with_delta(year, new_enr_ratio):
     compensation_certificates = ElecProvisionCertificate.objects.filter(
         year=year,
         source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
@@ -57,8 +40,6 @@ def _get_non_meter_reading_certificates_with_delta(year, new_enr_ratio):
         ElecProvisionCertificate.objects.filter(year=year)
         .exclude(
             source__in=[
-                # Quarterly meter readings are handled in a dedicated flow below.
-                ElecProvisionCertificate.METER_READINGS,
                 ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
                 ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION,
             ]
@@ -94,61 +75,9 @@ def _build_compensation_certificates(certificates_with_delta, new_enr_ratio):
     ]
 
 
-def _get_meter_reading_compensation_certificates(year, new_enr_ratio):
-    meter_readings = (
-        ElecMeterReading.extended_objects.prefetch_related("application", "cpo")
-        .filter(application__year=year)
-        .values(
-            "cpo__id",
-            "cpo__name",
-            "operating_unit",
-            "application__year",
-            "application__quarter",
-        )
-        .annotate(
-            total_energy_used=Round(Sum((F("current_index") - F("prev_index")) * F("enr_ratio")), 3),
-            recalculated_energy_amount=Round(Sum((F("current_index") - F("prev_index")) * new_enr_ratio), 3),
-        )
-        .order_by("cpo__name", "operating_unit", "application_id")
-    )
-
-    certificates_already_created = _get_existing_compensation_keys(year)
-
-    certificates = []
-    for meter_reading in meter_readings:
-        # Meter readings are stored in kWh, certificates in MWh.
-        delta_in_kwh = float(meter_reading["recalculated_energy_amount"] - meter_reading["total_energy_used"])
-        delta_in_mwh = round(delta_in_kwh / 1000, 2)
-
-        key = _build_certificate_key(
-            cpo_id=meter_reading["cpo__id"],
-            quarter=meter_reading["application__quarter"],
-            year=meter_reading["application__year"],
-            operating_unit=meter_reading["operating_unit"],
-        )
-        if delta_in_mwh > 0 and key not in certificates_already_created:
-            certificates.append(
-                _build_compensation_certificate(
-                    cpo_id=meter_reading["cpo__id"],
-                    quarter=meter_reading["application__quarter"],
-                    year=year,
-                    operating_unit=meter_reading["operating_unit"],
-                    energy_amount=delta_in_mwh,
-                    new_enr_ratio=new_enr_ratio,
-                    cpo_name=meter_reading["cpo__name"],
-                )
-            )
-            certificates_already_created.add(key)
-
-    return certificates
-
-
 def _get_compensation_certificates_to_create(year, new_enr_ratio):
-    # Merge both business sources into one list so apply/log/return share the same behavior.
-    certificates_with_delta = _get_non_meter_reading_certificates_with_delta(year, new_enr_ratio)
-    non_certificates = _build_compensation_certificates(certificates_with_delta, new_enr_ratio)
-    meter_reading_certificates = _get_meter_reading_compensation_certificates(year, new_enr_ratio)
-    return non_certificates + meter_reading_certificates
+    certificates_with_delta = _get_certificates_with_delta(year, new_enr_ratio)
+    return _build_compensation_certificates(certificates_with_delta, new_enr_ratio)
 
 
 def _log_compensation_summary(stdout, certificates):
@@ -230,7 +159,7 @@ class Command(BaseCommand):
 
         if options["apply"]:
             if elec_provision_certificates:
-                ElecProvisionCertificate.objects.bulk_create(elec_provision_certificates, batch_size=10)
+                ElecProvisionCertificate.objects.bulk_create(elec_provision_certificates, batch_size=1000)
                 if options["log"]:
                     print(f"Created {len(elec_provision_certificates)} new certificates")
             elif options["log"]:
