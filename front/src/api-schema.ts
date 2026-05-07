@@ -12148,6 +12148,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
             };
@@ -12411,6 +12412,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
             };
@@ -12459,6 +12461,7 @@ export interface operations {
                  */
                 order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[];
                 period?: string[];
+                selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
             };
@@ -12639,6 +12642,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13003,6 +13007,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13117,6 +13122,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13255,6 +13261,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13526,10 +13533,8 @@ export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
     department = "department",
     feedstock = "feedstock",
-    producer_id = "producer_id",
     producer_name = "producer_name",
-    source = "source",
-    year = "year"
+    source = "source"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",

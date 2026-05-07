@@ -2388,10 +2388,8 @@ paths:
             enum:
               - department
               - feedstock
-              - producer_id
               - producer_name
               - source
-              - year
           description: Filter string to apply
           required: true
         - name: ordering
@@ -2459,7 +2457,6 @@ paths:
                   value:
                     - department
                     - feedstock
-                    - producer_id
                     - producer_name
                     - source
                   summary: Example of filters response.
@@ -7007,7 +7004,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -9027,7 +9023,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -9065,7 +9060,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -9180,6 +9174,10 @@ paths:
             items:
               type: string
               minLength: 1
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: number
         - in: query
           name: status
           schema:
@@ -9552,6 +9550,10 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: selected_entity_id
+          schema:
+            type: number
+        - in: query
           name: status
           schema:
             type: array
@@ -9690,6 +9692,10 @@ paths:
               type: string
               minLength: 1
         - in: query
+          name: selected_entity_id
+          schema:
+            type: number
+        - in: query
           name: status
           schema:
             type: array
@@ -9786,7 +9792,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -10083,6 +10088,10 @@ paths:
             * `CARBURÉACTEUR` - CARBURÉACTEUR
           explode: true
           style: form
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: number
         - in: query
           name: status
           schema:
@@ -10777,6 +10786,10 @@ paths:
           explode: true
           style: form
         - in: query
+          name: selected_entity_id
+          schema:
+            type: number
+        - in: query
           name: status
           schema:
             type: array
@@ -11061,6 +11074,10 @@ paths:
             * `CARBURÉACTEUR` - CARBURÉACTEUR
           explode: true
           style: form
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: number
         - in: query
           name: status
           schema:
@@ -11410,6 +11427,10 @@ paths:
             * `CARBURÉACTEUR` - CARBURÉACTEUR
           explode: true
           style: form
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: number
         - in: query
           name: status
           schema:

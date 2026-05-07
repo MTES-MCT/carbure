@@ -19,10 +19,12 @@ import { ActionBar } from "common/components/scaffold"
 import { ExportButton } from "common/components/export"
 import { Notice } from "common/components/notice"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
+  const { selectedEntityId } = useSelectedEntity()
   const filterLabels = {
     [OperationsFilter.status]: t("Statut"),
     [OperationsFilter.operation]: t("Opération"),
@@ -39,8 +41,8 @@ const OperationsBiofuels = () => {
     useQueryBuilder<OperationsQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(api.getOperations, {
-    key: "operations",
-    params: [query],
+    key: `operations-${selectedEntityId}`,
+    params: [query, selectedEntityId],
   })
 
   const columns = useOperationsBiofuelsColumns({
@@ -52,7 +54,7 @@ const OperationsBiofuels = () => {
     },
   })
 
-  const getFilterOptions = useGetFilterOptions(query)
+  const getFilterOptions = useGetFilterOptions(query, selectedEntityId)
 
   return (
     <>

@@ -9,6 +9,8 @@ import { TeneurLayout } from "./layouts/teneur-layout"
 import { useLastSectorVisited } from "./hooks/last-sector-visited"
 import { ObjectivesLayout } from "./pages/admin/objectives/objectives-layout"
 import { Objectives } from "./pages/admin/objectives/objectives"
+import { AdminOperationsLayout } from "./pages/admin/operations/admin-operations-layout"
+import { AdminOperations } from "./pages/admin/operations/admin-operations"
 import {
   AnnualDeclarationTiruertProvider,
   useAnnualDeclarationTiruert,
@@ -64,6 +66,12 @@ const MaterialAccounting = () => {
           >
             <Route index element={<Objectives />} />
             <Route path=":entityId" element={<Objectives />} />
+          </Route>
+        )}
+        {(isAdmin || allowAccounting) && (
+          <Route path="admin/operations" element={<AdminOperationsLayout />}>
+            <Route path=":category" element={<AdminOperations />} />
+            <Route index element={<AdminOperations />} />
           </Route>
         )}
         <Route path="*" element={<Navigate replace to="operations" />} />

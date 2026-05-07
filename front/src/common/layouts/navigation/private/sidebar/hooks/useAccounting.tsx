@@ -24,11 +24,14 @@ export const useAccounting = () => {
         condition: !isAdmin && !hasAdminRight("TIRIB"),
       },
       {
-        path: routes.ACCOUNTING.OPERATIONS.ROOT,
+        path:
+          isAdmin || hasAdminRight("TIRIB")
+            ? routes.ACCOUNTING.ADMIN.OPERATIONS
+            : routes.ACCOUNTING.OPERATIONS.ROOT,
         title: t("Opérations"),
         icon: "ri-bar-chart-2-line",
         iconActive: "ri-bar-chart-2-fill",
-        condition: !isAdmin && !hasAdminRight("TIRIB"),
+        condition: true,
       },
       {
         path: isAdmin
