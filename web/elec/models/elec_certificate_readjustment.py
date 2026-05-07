@@ -6,6 +6,7 @@ from core.models import Entity
 
 class ElecCertificateReadjustment(models.Model):
     cpo = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    provision_certificate = models.ForeignKey("elec.ElecProvisionCertificate", on_delete=models.CASCADE, null=True)
     energy_amount = models.FloatField(validators=[MinValueValidator(0.0)])  # MWh
     created_at = models.DateField(auto_now_add=True)
 
