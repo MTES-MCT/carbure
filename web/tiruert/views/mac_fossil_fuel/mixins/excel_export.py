@@ -5,42 +5,32 @@ from django.http import HttpResponse
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from openpyxl.utils import get_column_letter
 from rest_framework.decorators import action
-from rest_framework.viewsets import GenericViewSet
-
-from tiruert.filters import MacFilter
-from tiruert.models import MacFossilFuel
-from tiruert.permissions import HasTiruertRightsObjectives
 
 
-@extend_schema(
-    parameters=[
-        OpenApiParameter(
-            name="entity_id",
-            type=int,
-            location=OpenApiParameter.QUERY,
-            description="Authorised entity ID.",
-            required=True,
-        ),
-    ],
-    examples=[
-        OpenApiExample(
-            "Example of export response.",
-            value="mac_export.xlsx",
-            request_only=False,
-            response_only=True,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        ),
-    ],
-    responses={
-        (200, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"): OpenApiTypes.STR,
-    },
-)
-class MacFossilFuelExportViewSet(GenericViewSet):
-    queryset = MacFossilFuel.objects.all()
-    filterset_class = MacFilter
-    serializer_class = None
-    permission_classes = [HasTiruertRightsObjectives]
-
+class ExcelExportActionMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="entity_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Authorised entity ID.",
+                required=True,
+            ),
+        ],
+        examples=[
+            OpenApiExample(
+                "Example of export response.",
+                value="mac_export.xlsx",
+                request_only=False,
+                response_only=True,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ),
+        ],
+        responses={
+            (200, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"): OpenApiTypes.STR,
+        },
+    )
     @action(detail=False, methods=["get"], url_path="export")
     def export_macfossilfuel_to_excel(self, request, *args, **kwargs):
         macs = self.filter_queryset(self.get_queryset())

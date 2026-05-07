@@ -95,6 +95,15 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         self.assertEqual(sheet.max_row, 2)
         self.assertEqual(sheet.cell(row=2, column=2).value, self.allowed_entity.name)
 
+    def test_authenticated_user_can_list_own_entity_macs(self):
+        response = self.client.get("/api/tiruert/mac-fossil-fuel/", {"entity_id": self.allowed_entity.id, "year": 2023})
+
+        self.assertEqual(response.status_code, 200)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["operator"], self.allowed_entity.name)
+        self.assertEqual(results[0]["volume"], 100.0)
+
 
 class MacFossilFuelExportViewSetPermissionsTest(TestCase, PermissionTestMixin):
     def test_mac_fossil_fuel_export_uses_objectives_permission(self):
@@ -102,7 +111,7 @@ class MacFossilFuelExportViewSetPermissionsTest(TestCase, PermissionTestMixin):
             MacFossilFuelExportViewSet,
             [
                 (
-                    ["export_macfossilfuel_to_excel"],
+                    ["export_macfossilfuel_to_excel", "list"],
                     [HasTiruertRightsObjectives()],
                 ),
             ],

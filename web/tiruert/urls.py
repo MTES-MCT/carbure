@@ -3,7 +3,7 @@ from rest_framework_nested.routers import SimpleRouter
 
 from .views import (
     ElecOperationViewSet,
-    MacFossilFuelExportViewSet,
+    MacFossilFuelViewSet,
     ObjectiveViewSet,
     OperationViewSet,
     curent_declaration_period,
@@ -13,7 +13,7 @@ from .views import (
 router = SimpleRouter()
 router.register("operations", OperationViewSet, basename="operations")
 router.register("elec-operations", ElecOperationViewSet, basename="elec-operations")
-router.register("mac-fossil-fuel", MacFossilFuelExportViewSet, basename="mac-fossil-fuel")
+router.register("mac-fossil-fuel", MacFossilFuelViewSet, basename="mac-fossil-fuel")
 
 objectives = ObjectiveViewSet.as_view({"get": "get_objectives"})
 
