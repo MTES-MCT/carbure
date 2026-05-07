@@ -9820,6 +9820,54 @@ paths:
               schema:
                 error: NOTHING_TO_DECLARE
           description: Error message
+  /api/tiruert/mac-fossil-fuel/:
+    get:
+      operationId: tiruert_mac_fossil_fuel_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedMacFossilFuelList"
+          description: ""
   /api/tiruert/mac-fossil-fuel/export/:
     get:
       operationId: tiruert_mac_fossil_fuel_export_retrieve
@@ -16782,6 +16830,45 @@ components:
         * `TALLOL` - Tallol
         * `OTHER` - Autre
         * `EP2AM` - EP2AM
+    MacFossilFuel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        fuel:
+          type: string
+        operator:
+          type: string
+        volume:
+          type: number
+          format: double
+        period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        depot:
+          type: string
+          nullable: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+        - depot
+        - end_date
+        - fuel
+        - id
+        - operator
+        - period
+        - start_date
+        - year
     MainObjective:
       type: object
       properties:
@@ -17699,6 +17786,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityProductionSite"
+    PaginatedMacFossilFuelList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/MacFossilFuel"
     PaginatedOperationListList:
       type: object
       required:
