@@ -7,7 +7,7 @@ from django.test import TestCase
 from core.models import Entity, UserRights
 from core.tests_utils import PermissionTestMixin, setup_current_user
 from tiruert.models import FossilFuel, FossilFuelCategory, MacFossilFuel
-from tiruert.permissions import HasTiruertRightsObjectives
+from tiruert.permissions import HasTiruertRightsObjectives, HasTiruertWriteRights
 from tiruert.views import MacFossilFuelExportViewSet
 
 
@@ -104,6 +104,29 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         self.assertEqual(results[0]["operator"], self.allowed_entity.name)
         self.assertEqual(results[0]["volume"], 100.0)
 
+    def test_authenticated_user_can_replace_own_entity_macs(self):
+        response = self.client.put(
+            "/api/tiruert/mac-fossil-fuel/replace/",
+            data=[
+                {"fuel": "SP95", "month": 1, "volume": 300.0},
+                {"fuel": "SP95", "month": 2, "volume": 400.0},
+            ],
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.allowed_entity.id}&year=2023",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MacFossilFuel.objects.filter(operator=self.allowed_entity, year=2023).count(), 2)
+        self.assertTrue(MacFossilFuel.objects.filter(operator=self.other_entity, year=2023, volume=200.0).exists())
+        self.assertEqual(
+            list(
+                MacFossilFuel.objects.filter(operator=self.allowed_entity, year=2023)
+                .order_by("period")
+                .values_list("period", "volume")
+            ),
+            [(202301, 300.0), (202302, 400.0)],
+        )
+
 
 class MacFossilFuelExportViewSetPermissionsTest(TestCase, PermissionTestMixin):
     def test_mac_fossil_fuel_export_uses_objectives_permission(self):
@@ -113,6 +136,10 @@ class MacFossilFuelExportViewSetPermissionsTest(TestCase, PermissionTestMixin):
                 (
                     ["export_macfossilfuel_to_excel", "list"],
                     [HasTiruertRightsObjectives()],
+                ),
+                (
+                    ["replace"],
+                    [HasTiruertWriteRights()],
                 ),
             ],
         )

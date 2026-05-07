@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from tiruert.models import MacFossilFuel
+from tiruert.models import FossilFuel, MacFossilFuel
 
 
 class MacFossilFuelSerializer(serializers.ModelSerializer):
@@ -21,3 +21,9 @@ class MacFossilFuelSerializer(serializers.ModelSerializer):
             "start_date",
             "end_date",
         ]
+
+
+class MacFossilFuelInputSerializer(serializers.Serializer):
+    fuel = serializers.SlugRelatedField(slug_field="nomenclature", queryset=FossilFuel.objects.all())
+    month = serializers.IntegerField(min_value=1, max_value=12)
+    volume = serializers.FloatField(min_value=0)
