@@ -10,13 +10,8 @@ from rest_framework.mixins import (
 )
 from rest_framework.viewsets import GenericViewSet
 
-from biomethane.filters import (
-    BaseBiomethaneSupplyInputFilter,
-    BiomethaneSupplyInputCreateFilter,
-    BiomethaneSupplyInputFilter,
-)
-from biomethane.models import BiomethaneSupplyInput
-from biomethane.models.biomethane_contract import BiomethaneContract
+from biomethane.filters import BiomethaneSupplyInputFilter, BiomethaneSupplyInputYearFilter
+from biomethane.models import BiomethaneContract, BiomethaneSupplyInput
 from biomethane.permissions import get_biomethane_permissions
 from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputCreateSerializer,
@@ -110,12 +105,9 @@ class BiomethaneSupplyInputViewSet(
         return context
 
     def get_filterset_class(self):
-        if self.action in ["destroy", "retrieve", "update", "partial_update"]:
-            return BaseBiomethaneSupplyInputFilter
-        elif self.action in ["create"]:
-            return BiomethaneSupplyInputCreateFilter
-        else:
-            return BiomethaneSupplyInputFilter
+        if self.action not in ["destroy", "retrieve", "update", "partial_update"]:
+            return BiomethaneSupplyInputYearFilter
+        return BiomethaneSupplyInputFilter
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
