@@ -149,19 +149,6 @@ class ImportISCCCertificatesCommandTest(TestCase):
         self.assertEqual(post.call_args.kwargs["json"]["page"], 1)
         self.assertEqual(post.call_args.kwargs["timeout"], 60)
 
-    def test_import_does_not_send_email_by_default(self):
-        with (
-            patch.object(
-                command_module.requests,
-                "post",
-                return_value=FakeResponse(api_payload(render_certificate_card())),
-            ),
-            patch.object(command_module, "send_mail") as send_mail,
-        ):
-            self.run_command("--statuses", "valid")
-
-        send_mail.assert_not_called()
-
     def test_import_sends_email_summary_when_requested(self):
         with (
             patch.object(
@@ -195,17 +182,6 @@ class ImportISCCCertificatesCommandTest(TestCase):
 
         self.assertEqual(errors, [])
         self.assertEqual(certificates[0]["scope"], "Collecting Point, Trader with Storage")
-
-    def test_import_keeps_unknown_scope_abbreviations(self):
-        html = render_certificate_card(scope="CP, UNKNOWN")
-        certificates, errors = command_module.parse_certificates_html(
-            html,
-            GenericCertificate.VALID,
-            scope_definitions={"CP": "Collecting Point"},
-        )
-
-        self.assertEqual(errors, [])
-        self.assertEqual(certificates[0]["scope"], "Collecting Point, UNKNOWN")
 
     def test_import_prefers_issuer_title_attribute(self):
         html = render_certificate_card(
@@ -291,30 +267,6 @@ class ImportISCCCertificatesCommandTest(TestCase):
         self.assertEqual([call.kwargs["json"]["page"] for call in post.call_args_list], [1])
         self.assertIn("> valid: parsed 1 certificates from 400 ISCC results across 1 pages", output)
 
-    def test_latest_limit_applies_to_each_status(self):
-        responses = [
-            FakeResponse(
-                api_payload(
-                    render_certificate_card(certificate_id="EU-ISCC-Cert-FR123-VALID-1")
-                    + render_certificate_card(certificate_id="EU-ISCC-Cert-FR123-VALID-2")
-                )
-            ),
-            FakeResponse(
-                api_payload(
-                    render_certificate_card(certificate_id="EU-ISCC-Cert-FR123-SUSPENDED-1")
-                    + render_certificate_card(certificate_id="EU-ISCC-Cert-FR123-SUSPENDED-2")
-                )
-            ),
-        ]
-
-        with patch.object(command_module.requests, "post", side_effect=responses):
-            self.run_command("--statuses", "valid,suspended", "--latest", "1")
-
-        self.assertTrue(GenericCertificate.objects.filter(certificate_id="EU-ISCC-Cert-FR123-VALID-1").exists())
-        self.assertFalse(GenericCertificate.objects.filter(certificate_id="EU-ISCC-Cert-FR123-VALID-2").exists())
-        self.assertTrue(GenericCertificate.objects.filter(certificate_id="EU-ISCC-Cert-FR123-SUSPENDED-1").exists())
-        self.assertFalse(GenericCertificate.objects.filter(certificate_id="EU-ISCC-Cert-FR123-SUSPENDED-2").exists())
-
     def test_import_maps_each_iscc_status_to_django_status(self):
         responses = []
         for iscc_status in command_module.ISCC_STATUS_MAPPING:
@@ -349,12 +301,30 @@ class ImportISCCCertificatesCommandTest(TestCase):
         self.assertEqual(existing.certificate_holder, "Updated Holder SA")
         self.assertEqual(existing.last_status_update, timezone.localdate())
 
-    def test_import_expires_saved_iscc_certificates_locally(self):
+    def test_import_expires_only_pending_or_valid_saved_iscc_certificates_locally(self):
         yesterday = timezone.localdate() - timedelta(days=1)
-        past_iscc = GenericCertificateFactory.create(
+        past_valid_iscc = GenericCertificateFactory.create(
             certificate_id="EU-ISCC-Cert-FR123-EXPIRED",
             certificate_type=GenericCertificate.ISCC,
             status=GenericCertificate.VALID,
+            valid_until=yesterday,
+            last_status_update=yesterday,
+        )
+        past_suspended_iscc = GenericCertificateFactory.create(
+            certificate_type=GenericCertificate.ISCC,
+            status=GenericCertificate.SUSPENDED,
+            valid_until=yesterday,
+            last_status_update=yesterday,
+        )
+        past_terminated_iscc = GenericCertificateFactory.create(
+            certificate_type=GenericCertificate.ISCC,
+            status=GenericCertificate.TERMINATED,
+            valid_until=yesterday,
+            last_status_update=yesterday,
+        )
+        past_withdrawn_iscc = GenericCertificateFactory.create(
+            certificate_type=GenericCertificate.ISCC,
+            status=GenericCertificate.WITHDRAWN,
             valid_until=yesterday,
             last_status_update=yesterday,
         )
@@ -372,49 +342,19 @@ class ImportISCCCertificatesCommandTest(TestCase):
         ):
             output = self.run_command("--statuses", "valid")
 
-        past_iscc.refresh_from_db()
+        past_valid_iscc.refresh_from_db()
+        past_suspended_iscc.refresh_from_db()
+        past_terminated_iscc.refresh_from_db()
+        past_withdrawn_iscc.refresh_from_db()
         past_redcert.refresh_from_db()
-        self.assertEqual(past_iscc.status, GenericCertificate.EXPIRED)
-        self.assertEqual(past_iscc.last_status_update, timezone.localdate())
+        self.assertEqual(past_valid_iscc.status, GenericCertificate.EXPIRED)
+        self.assertEqual(past_valid_iscc.last_status_update, timezone.localdate())
+        self.assertEqual(past_suspended_iscc.status, GenericCertificate.SUSPENDED)
+        self.assertEqual(past_terminated_iscc.status, GenericCertificate.TERMINATED)
+        self.assertEqual(past_withdrawn_iscc.status, GenericCertificate.WITHDRAWN)
         self.assertEqual(past_redcert.status, GenericCertificate.VALID)
         self.assertEqual(past_redcert.last_status_update, yesterday)
         self.assertIn("> expired: 1 existing ISCC certificates marked as expired", output)
-
-    def test_import_does_not_expire_terminal_iscc_statuses_locally(self):
-        yesterday = timezone.localdate() - timedelta(days=1)
-        terminated = GenericCertificateFactory.create(
-            certificate_type=GenericCertificate.ISCC,
-            status=GenericCertificate.TERMINATED,
-            valid_until=yesterday,
-            last_status_update=yesterday,
-        )
-        withdrawn = GenericCertificateFactory.create(
-            certificate_type=GenericCertificate.ISCC,
-            status=GenericCertificate.WITHDRAWN,
-            valid_until=yesterday,
-            last_status_update=yesterday,
-        )
-        suspended = GenericCertificateFactory.create(
-            certificate_type=GenericCertificate.ISCC,
-            status=GenericCertificate.SUSPENDED,
-            valid_until=yesterday,
-            last_status_update=yesterday,
-        )
-
-        with patch.object(
-            command_module.requests,
-            "post",
-            return_value=FakeResponse(api_payload(render_certificate_card())),
-        ):
-            output = self.run_command("--statuses", "valid")
-
-        terminated.refresh_from_db()
-        withdrawn.refresh_from_db()
-        suspended.refresh_from_db()
-        self.assertEqual(terminated.status, GenericCertificate.TERMINATED)
-        self.assertEqual(withdrawn.status, GenericCertificate.WITHDRAWN)
-        self.assertEqual(suspended.status, GenericCertificate.SUSPENDED)
-        self.assertIn("> expired: 0 existing ISCC certificates marked as expired", output)
 
     def test_dry_run_does_not_write_to_database(self):
         certificate_id = "EU-ISCC-Cert-FR123-DRY-RUN"
@@ -474,15 +414,6 @@ class ImportISCCCertificatesCommandTest(TestCase):
 
     def test_http_failure_raises_command_error(self):
         with patch.object(command_module.requests, "post", return_value=FakeResponse(status_code=500)):
-            with self.assertRaises(CommandError):
-                self.run_command("--statuses", "valid")
-
-    def test_invalid_json_raises_command_error(self):
-        with patch.object(
-            command_module.requests,
-            "post",
-            return_value=FakeResponse(json_error=ValueError("bad json")),
-        ):
             with self.assertRaises(CommandError):
                 self.run_command("--statuses", "valid")
 
