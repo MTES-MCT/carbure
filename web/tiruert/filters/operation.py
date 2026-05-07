@@ -11,6 +11,7 @@ from django_filters import (
     MultipleChoiceFilter,
 )
 from drf_spectacular.utils import extend_schema_field
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import CharField, ListField
 
 from core.models import Entity, ExternalAdminRights, MatierePremiere
@@ -20,6 +21,7 @@ from tiruert.models.operation import Operation
 
 class BaseFilter(FilterSet):
     entity_id = CharFilter(method="filter_entity")
+    selected_entity_id = NumberFilter(method="ignore")
     operation = MultipleChoiceFilter(
         choices=Operation.OPERATION_TYPES + (("ACQUISITION", "ACQUISITION"),), field_name="type"
     )
@@ -58,12 +60,14 @@ class BaseFilter(FilterSet):
     def filter_entity(self, queryset, name, value):
         entity = getattr(self.request, "entity", None)
 
+        # DGEC case: ignore entity_id for filtering, entity_id is just for permissions
+        if "selected_entity_id" in self.data:
+            if not entity.entity_type == Entity.ADMIN:
+                raise PermissionDenied()
+            value = self.data["selected_entity_id"]
+
         # For DGDDI external admins, filter by accessible depots
-        if (
-            entity
-            and entity.entity_type == Entity.EXTERNAL_ADMIN
-            and entity.has_external_admin_right(ExternalAdminRights.DGDDI)
-        ):
+        if entity.has_external_admin_right(ExternalAdminRights.DGDDI):
             accessible_depot_ids = entity.get_accessible_depots().values_list("id", flat=True)
             depot_filter = Q(to_depot_id__in=accessible_depot_ids)
             return queryset.filter(depot_filter)
@@ -110,6 +114,9 @@ class BaseFilter(FilterSet):
             q_objects |= Q(created_at__gte=start_date, created_at__lt=end_date)
 
         return queryset.filter(q_objects).distinct()
+
+    def ignore(self, queryset, name, value):
+        return queryset
 
 
 class OperationFilter(BaseFilter):

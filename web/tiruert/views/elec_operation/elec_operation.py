@@ -3,15 +3,13 @@ from django.db.models.functions import Cast, Concat, ExtractMonth, ExtractYear
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from core.models import Entity, UserRights
 from core.pagination import MetadataPageNumberPagination
-from core.permissions import HasUserRights
 from tiruert.filters import ElecOperationFilter
 from tiruert.models import ElecOperation
+from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights, TiruertAdminRights
 from tiruert.serializers import (
     ElecOperationInputSerializer,
     ElecOperationListSerializer,
@@ -28,9 +26,8 @@ class ElecOperationPagination(MetadataPageNumberPagination):
     def get_extra_metadata(self):
         metadata = {"total_quantity": 0}
         for operation in self.queryset:
-            sign = 1 if operation.is_credit(self.request.entity.id) else -1
-            value = operation.quantity * sign if operation.status != ElecOperation.REJECTED else 0
-            metadata["total_quantity"] += value
+            # _quantity is annotated and signed (positive=credit, negative=debit)
+            metadata["total_quantity"] += operation._quantity
         return metadata
 
 
@@ -48,10 +45,6 @@ class ElecOperationPagination(MetadataPageNumberPagination):
 class ElecOperationViewSet(ModelViewSet, ActionMixin):
     queryset = ElecOperation.objects.all().order_by("pk")
     serializer_class = ElecOperationListSerializer
-    permission_classes = (
-        IsAuthenticated,
-        HasUserRights(None, [Entity.OPERATOR]),
-    )
     filterset_class = ElecOperationFilter
     filter_backends = [DjangoFilterBackend]
     http_method_names = ["get", "post", "patch", "delete"]
@@ -59,10 +52,9 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
 
     def get_permissions(self):
         if self.action in ["reject", "accept", "create", "destroy"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RW])]
-        elif self.action in ["balance"]:
-            return [HasUserRights([UserRights.ADMIN, UserRights.RO, UserRights.RW])]
-        return super().get_permissions()
+            return [HasTiruertWriteRights()]
+        else:
+            return [(HasTiruertRightsBalanceAndOperations | TiruertAdminRights)()]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -71,7 +63,9 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
         return context
 
     def get_queryset(self):
-        entity_id = self.request.entity.id
+        # Permissions to use selected_entity_id here are handled in the filter_entity() method of the ElecOperationFilter
+        entity_id = self.request.query_params.get("selected_entity_id") or self.request.entity.id
+
         return (
             super()
             .get_queryset()
