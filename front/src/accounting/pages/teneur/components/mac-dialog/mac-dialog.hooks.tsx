@@ -15,6 +15,7 @@ type MacTableRow = {
 export const useMacTable = (
   year: number,
   macData: MacFossilFuel[],
+  fuels: string[],
   setMacData: Dispatch<SetStateAction<MacFossilFuel[]>>
 ) => {
   const { t } = useTranslation()
@@ -37,8 +38,6 @@ export const useMacTable = (
       return [...existingMacData, { fuel, volume, year, month }]
     })
   }
-
-  const fuels = Array.from(new Set(macData.map((mac) => mac.fuel)))
 
   const rows = Array.from({ length: 12 }, (_, index) => {
     const month = index + 1
