@@ -2,12 +2,16 @@ import { Button } from "common/components/button2"
 import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { Table } from "common/components/table2"
-import { useQuery } from "common/hooks/async"
-import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { getMacFossilFuels, MacFossilFuel } from "../../api"
-import { useMacTable } from "./mac-dialog.hooks"
 import css from "./mac-dialog.module.css"
+import { useMutation, useQuery } from "common/hooks/async"
+import {
+  getMacFossilFuels,
+  MacFossilFuel,
+  replaceMacFossilFuels,
+} from "../../api"
+import { useEffect, useState } from "react"
+import { useMacTable } from "./mac-dialog.hooks"
 
 type MacDialogProps = {
   onClose: () => void
@@ -17,10 +21,16 @@ type MacDialogProps = {
 
 export const MacDialog = ({ onClose, entityId, year }: MacDialogProps) => {
   const { t } = useTranslation()
+
   const { result: loadedMacData, loading } = useQuery(getMacFossilFuels, {
     key: "mac-fossil-fuels",
     params: [entityId, year],
   })
+
+  const mutation = useMutation(replaceMacFossilFuels, {
+    invalidates: ["mac-fossil-fuels", "teneur-objectives"],
+  })
+
   const [macData, setMacData] = useState<MacFossilFuel[]>([])
 
   useEffect(() => {
@@ -29,34 +39,19 @@ export const MacDialog = ({ onClose, entityId, year }: MacDialogProps) => {
     }
   }, [loadedMacData])
 
-  const updateVolume = (
-    fuel: string,
-    month: number,
-    volume: number | undefined
-  ) => {
-    setMacData((macData) => {
-      const existingMacData = macData.filter(
-        (mac) =>
-          !(mac.fuel === fuel && mac.year === year && mac.month === month)
-      )
+  const table = useMacTable(year, macData, setMacData)
 
-      if (volume === undefined) {
-        return existingMacData
-      }
-
-      return [
-        ...existingMacData,
-        {
-          fuel,
-          volume,
-          year,
-          month,
-        },
-      ]
-    })
+  const saveMacData = () => {
+    mutation.execute(
+      entityId,
+      year,
+      macData.map((mac) => ({
+        fuel: mac.fuel,
+        month: mac.month,
+        volume: mac.volume,
+      }))
+    )
   }
-
-  const { columns, rows } = useMacTable(year, macData, updateVolume)
 
   return (
     <Portal>
@@ -68,13 +63,21 @@ export const MacDialog = ({ onClose, entityId, year }: MacDialogProps) => {
             {t("Renseigner mes mises à consommation") + ` (${year})`}
           </Dialog.Title>
         }
-        footer={<Button onClick={onClose}>{t("Fermer")}</Button>}
+        footer={
+          <Button
+            priority="primary"
+            onClick={saveMacData}
+            loading={mutation.loading}
+          >
+            {t("Sauvegarder")}
+          </Button>
+        }
         fullWidth
       >
         <Table
           className={css.table}
-          columns={columns}
-          rows={rows}
+          columns={table.columns}
+          rows={table.rows}
           loading={loading}
         />
       </Dialog>

@@ -209,3 +209,20 @@ export const getMacFossilFuels = async (
         })) ?? []
     )
 }
+
+export const replaceMacFossilFuels = async (
+  entity_id: number,
+  year: number,
+  macs: apiTypes["MacFossilFuelInputRequest"][]
+) => {
+  return api.PUT("/tiruert/mac-fossil-fuel/replace/", {
+    params: {
+      query: {
+        entity_id,
+        year,
+      },
+    },
+    body: macs,
+    bodySerializer: JSON.stringify,
+  })
+}

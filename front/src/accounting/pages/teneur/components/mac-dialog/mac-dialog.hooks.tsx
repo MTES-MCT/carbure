@@ -1,6 +1,7 @@
 import { NumberInput } from "common/components/inputs2"
 import { Column } from "common/components/table2"
 import { formatDate } from "common/utils/formatters"
+import { Dispatch, SetStateAction } from "react"
 import { useTranslation } from "react-i18next"
 import { MacFossilFuel } from "../../api"
 import css from "./mac-dialog.module.css"
@@ -14,13 +15,28 @@ type MacTableRow = {
 export const useMacTable = (
   year: number,
   macData: MacFossilFuel[],
-  onVolumeChange: (
+  setMacData: Dispatch<SetStateAction<MacFossilFuel[]>>
+) => {
+  const { t } = useTranslation()
+
+  const updateVolume = (
     fuel: string,
     month: number,
     volume: number | undefined
-  ) => void
-) => {
-  const { t } = useTranslation()
+  ) => {
+    setMacData((macData) => {
+      const existingMacData = macData.filter(
+        (mac) =>
+          !(mac.fuel === fuel && mac.year === year && mac.month === month)
+      )
+
+      if (volume === undefined) {
+        return existingMacData
+      }
+
+      return [...existingMacData, { fuel, volume, year, month }]
+    })
+  }
 
   const fuels = Array.from(new Set(macData.map((mac) => mac.fuel)))
 
@@ -56,7 +72,7 @@ export const useMacTable = (
           label=""
           min={0}
           value={row.volumes[fuel]}
-          onChange={(volume) => onVolumeChange(fuel, row.month, volume)}
+          onChange={(volume) => updateVolume(fuel, row.month, volume)}
         />
       ),
     })),
