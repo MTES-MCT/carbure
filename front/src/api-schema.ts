@@ -2758,6 +2758,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/mac-fossil-fuel/replace/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["tiruert_mac_fossil_fuel_replace_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/objectives/": {
         parameters: {
             query?: never;
@@ -5339,6 +5355,12 @@ export interface components {
             start_date: string;
             /** Format: date */
             end_date: string;
+        };
+        MacFossilFuelInputRequest: {
+            fuel: string;
+            month: number;
+            /** Format: double */
+            volume: number;
         };
         MainObjective: {
             /** Format: double */
@@ -12974,6 +12996,44 @@ export interface operations {
                 };
                 content: {
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    tiruert_mac_fossil_fuel_replace_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                /** @description MAC year. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MacFossilFuelInputRequest"][];
+                "application/x-www-form-urlencoded": components["schemas"]["MacFossilFuelInputRequest"][];
+                "multipart/form-data": components["schemas"]["MacFossilFuelInputRequest"][];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMacFossilFuelList"];
                 };
             };
         };

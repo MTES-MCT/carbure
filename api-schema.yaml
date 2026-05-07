@@ -9894,6 +9894,76 @@ paths:
                   value: mac_export.xlsx
                   summary: Example of export response.
           description: ""
+  /api/tiruert/mac-fossil-fuel/replace/:
+    put:
+      operationId: tiruert_mac_fossil_fuel_replace_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: MAC year.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MacFossilFuelInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MacFossilFuelInputRequest"
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MacFossilFuelInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedMacFossilFuelList"
+          description: ""
   /api/tiruert/objectives/:
     get:
       operationId: tiruert_objectives_retrieve
@@ -16869,6 +16939,24 @@ components:
         - period
         - start_date
         - year
+    MacFossilFuelInputRequest:
+      type: object
+      properties:
+        fuel:
+          type: string
+          minLength: 1
+        month:
+          type: integer
+          maximum: 12
+          minimum: 1
+        volume:
+          type: number
+          format: double
+          minimum: 0
+      required:
+        - fuel
+        - month
+        - volume
     MainObjective:
       type: object
       properties:
