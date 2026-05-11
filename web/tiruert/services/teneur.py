@@ -365,7 +365,9 @@ class TeneurService:
         )
 
         if durability_period := data.get("durability_period"):
-            operations = operations.filter(durability_period__in=durability_period)
+            # Include debit operations (durability_period=None) so they are not excluded
+            # from the balance calculation when filtering by durability period
+            operations = operations.filter(Q(durability_period__in=durability_period) | Q(durability_period__isnull=True))
 
         ges_bound_min = data.get("ges_bound_min", None)
         ges_bound_max = data.get("ges_bound_max", None)
