@@ -1,8 +1,9 @@
 from unittest.mock import Mock, patch
 
 import numpy as np
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
+from tiruert.models import Operation
 from tiruert.services.teneur import TeneurService, TeneurServiceErrors
 
 
@@ -435,6 +436,76 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
             any("durability_period__in" in c for c in filter_calls),
             "Expected no filter call with durability_period__in",
         )
+
+
+class TeneurServicePrepareDataDurabilityFilterTest(TestCase):
+    """Integration test: verify that filtering by durability_period does not exclude
+    debit operations (durability_period=None) from the balance calculation."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    def setUp(self):
+        from core.models import Biocarburant, Entity
+        from entity.factories.entity import EntityFactory
+        from tiruert.factories.operation import OperationFactory
+
+        self.entity = EntityFactory.create(entity_type=Entity.OPERATOR)
+        self.biofuel = Biocarburant.objects.first()
+        self.common = {
+            "biofuel": self.biofuel,
+            "customs_category": "CONV",
+            "status": Operation.VALIDATED,
+        }
+        # Credit operation with matching durability_period → must be included
+        self.op_with_period = OperationFactory.create(
+            credited_entity=self.entity,
+            durability_period="2024",
+            **self.common,
+        )
+        # Debit operation without durability_period (e.g. TENEUR) → must be included
+        self.op_without_period = OperationFactory.create(
+            debited_entity=self.entity,
+            durability_period=None,
+            **self.common,
+        )
+        # Credit operation with a different durability_period → must be excluded
+        self.op_other_period = OperationFactory.create(
+            credited_entity=self.entity,
+            durability_period="2025",
+            **self.common,
+        )
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    def test_durability_period_filter_includes_matching_and_null_operations(self, mock_balance):
+        """When filtering by durability_period=['2024']:
+        - the credit operation with durability_period='2024' is included,
+        - the debit operation with durability_period=None is included (avoids inflated balance),
+        - the credit operation with durability_period='2025' is excluded.
+        """
+        mock_balance.return_value = {}
+        data = {
+            "biofuel": self.biofuel,
+            "customs_category": "CONV",
+            "debited_entity": self.entity,
+            "durability_period": ["2024"],
+        }
+
+        TeneurService.prepare_data(data, "l")
+
+        # First positional arg of calculate_balance is the filtered operations queryset
+        operations_qs = mock_balance.call_args[0][0]
+        operation_ids = set(operations_qs.values_list("id", flat=True))
+
+        self.assertIn(self.op_with_period.id, operation_ids, "Operation with durability_period='2024' must be included")
+        self.assertIn(self.op_without_period.id, operation_ids, "Operation with durability_period=None must be included")
+        self.assertNotIn(self.op_other_period.id, operation_ids, "Operation with durability_period='2025' must be excluded")
 
 
 class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):

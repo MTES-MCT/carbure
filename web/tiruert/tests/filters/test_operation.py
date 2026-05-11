@@ -238,3 +238,22 @@ class OperationFilterForBalanceTest(TestCase):
 
         # Verify queryset is returned unchanged
         self.assertEqual(result, queryset)
+
+    def test_filter_durability_period_includes_null_durability_operations(self):
+        """Test that filter_durability_period includes debit operations (durability_period=None)
+        so they are not excluded from the balance calculation."""
+        queryset = Mock()
+        queryset.filter.return_value = queryset
+
+        request = self.factory.get("/test/?durability_period=202401")
+
+        filterset = OperationFilterForBalance({}, queryset=queryset, request=request)
+        filterset.filter_durability_period(queryset, "durability_period", ["202501"])
+
+        queryset.filter.assert_called_once()
+        q_filter = queryset.filter.call_args[0][0]
+
+        # Should be an OR filter: durability_period__in OR durability_period__isnull
+        self.assertEqual(q_filter.connector, "OR")
+        self.assertIn(("durability_period__in", ["202501"]), q_filter.children)
+        self.assertIn(("durability_period__isnull", True), q_filter.children)
