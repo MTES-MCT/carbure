@@ -28,8 +28,8 @@ Bien cordialement,
 L'équipe CarbuRe
     """
 
-    lots = CarbureLot.objects.filter(Q(carbure_production_site=site) | Q(carbure_delivery_site=site))
-    tickets = SafTicket.objects.filter(reception_airport=site)
+    lots = CarbureLot.objects.filter(Q(carbure_production_site_id=site.pk) | Q(carbure_delivery_site_id=site.pk))
+    tickets = SafTicket.objects.filter(reception_airport_id=site.pk)
 
     site_entities = site.entitysite_set.values_list("entity_id", flat=True).distinct()
     lot_suppliers = lots.values_list("carbure_supplier_id", flat=True).distinct()
