@@ -4842,6 +4842,7 @@ export interface components {
             debited_entity?: number | null;
             /** Format: double */
             quantity?: number;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
         };
         ElecOperationList: {
             readonly id: number;
