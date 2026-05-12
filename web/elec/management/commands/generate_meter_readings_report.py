@@ -1,7 +1,7 @@
 import json
 
 import pandas as pd
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db.models.aggregates import Sum
 
 from elec.models import ElecCertificateReadjustment, ElecMeterReading, ElecProvisionCertificate
@@ -87,10 +87,16 @@ class Command(BaseCommand):
             help="Print logs during execution",
         )
         parser.add_argument(
+            "--detail",
+            default=False,
+            action="store_true",
+            help="Avec --log, affiche aussi le détail du calcul par certificat",
+        )
+        parser.add_argument(
             "--csv",
             default=False,
             action="store_true",
-            help="Store meter reading details in a CSV file at /tmp/readings.csv",
+            help="Store summary at /tmp/readings.csv and per-certificate detail at /tmp/readings_by_certificate.csv",
         )
         parser.add_argument(
             "--cpo",
@@ -107,6 +113,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         log = options.get("log")
+        log_detail = options.get("detail")
+        if log_detail and not log:
+            raise CommandError("--detail nécessite --log")
         csv = options.get("csv")
         cpo_filter = options.get("cpo")
         year_filter = options.get("year")
@@ -143,13 +152,14 @@ class Command(BaseCommand):
             total_provision_certificate_energy = 0
             total_diff = 0
             certificate_diffs = []
+            certificate_details = []
             certificate_keys = set()
 
             for certificate in cpo_certificates:
                 group_key = (certificate.cpo_id, certificate.year, certificate.quarter, certificate.operating_unit)
                 certificate_keys.add(group_key)
                 if group_key not in real_energy_by_group:
-                    unmatched_certificate_keys.append(group_key)
+                    unmatched_certificate_keys.append((cpo_name, *group_key))
                     continue
 
                 certificate_energy = certificate.energy_amount * 1000
@@ -160,13 +170,26 @@ class Command(BaseCommand):
 
                 diff = certificate_energy - meter_reading_energy - already_readjusted_energy + admin_error_energy
                 certificate_diffs.append((certificate, diff))
+                certificate_details.append(
+                    {
+                        "provision_certificate_id": certificate.id,
+                        "year": certificate.year,
+                        "quarter": certificate.quarter,
+                        "operating_unit": certificate.operating_unit,
+                        "certificate_energy_kwh": certificate_energy,
+                        "meter_reading_energy_kwh": meter_reading_energy,
+                        "already_readjusted_energy_kwh": already_readjusted_energy,
+                        "admin_error_energy_kwh": admin_error_energy,
+                        "difference_kwh": diff,
+                    }
+                )
 
                 total_provision_certificate_energy += certificate_energy
                 total_meter_reading_energy += meter_reading_energy
                 total_diff += diff
 
             reading_keys_for_cpo = {key for key in real_energy_by_group.keys() if key[0] == cpo_id}
-            unmatched_reading_keys.extend(sorted(reading_keys_for_cpo - certificate_keys))
+            unmatched_reading_keys.extend((cpo_name, *key) for key in sorted(reading_keys_for_cpo - certificate_keys))
 
             # if total diff is more than 100 kWh for the cpo, it's a significant difference
             if abs(total_diff) >= 100:
@@ -175,6 +198,7 @@ class Command(BaseCommand):
                     "certificats": total_provision_certificate_energy,
                     "real_energy_must_be_declared": total_meter_reading_energy,
                     "surplus": round(total_diff, 3),
+                    "detail_par_certificat": certificate_details,
                 }
 
                 # create a readjustment only for certificates with a positive delta
@@ -217,8 +241,36 @@ class Command(BaseCommand):
             print(df.to_string(index=False))
             print(f"Soit un total de {round(total_surplus / 1000, 1):,} MWh\n")
 
+            if log_detail:
+                detail_rows = []
+                for cpo, data in report.items():
+                    for row in data.get("detail_par_certificat", []):
+                        detail_rows.append(
+                            {
+                                "Aménageur": cpo,
+                                "ID certificat": row["provision_certificate_id"],
+                                "Année": row["year"],
+                                "Trimestre": row["quarter"],
+                                "UO": row["operating_unit"],
+                                "Énergie certificat (kWh)": row["certificate_energy_kwh"],
+                                "Énergie relevés (kWh)": row["meter_reading_energy_kwh"],
+                                "Déjà ajusté (kWh)": row["already_readjusted_energy_kwh"],
+                                "Compensation erreur admin (kWh)": row["admin_error_energy_kwh"],
+                                "Différence (kWh)": row["difference_kwh"],
+                            }
+                        )
+                if detail_rows:
+                    print(
+                        "Détail par certificat : différence = énergie certificat "
+                        "- énergie relevés - déjà ajusté + compensation erreur admin\n"
+                    )
+                    detail_df = pd.DataFrame(detail_rows)
+                    detail_df = detail_df.sort_values(["Aménageur", "Année", "Trimestre", "UO", "ID certificat"])
+                    print(detail_df.to_string(index=False))
+                    print("")
+
             if unmatched_certificate_keys or unmatched_reading_keys:
-                print("Clés non appariées ignorées (cpo_id, year, quarter, operating_unit)")
+                print("Clés non appariées ignorées (cpo_name, cpo_id, year, quarter, operating_unit)")
                 if unmatched_certificate_keys:
                     print(" - Certificats sans relevés :")
                     for key in sorted(set(unmatched_certificate_keys)):
@@ -238,5 +290,40 @@ class Command(BaseCommand):
                 columns=["Aménageur", "Energie générée par certificats (kWh)", "Énergie déclarée (kWh)", "Surplus (kWh)"],
             )
             df.to_csv("/tmp/readings.csv", index=False)
+
+            detail_arr = []
+            for cpo, data in report.items():
+                for row in data.get("detail_par_certificat", []):
+                    detail_arr.append(
+                        [
+                            cpo,
+                            row["provision_certificate_id"],
+                            row["year"],
+                            row["quarter"],
+                            row["operating_unit"],
+                            row["certificate_energy_kwh"],
+                            row["meter_reading_energy_kwh"],
+                            row["already_readjusted_energy_kwh"],
+                            row["admin_error_energy_kwh"],
+                            row["difference_kwh"],
+                        ]
+                    )
+            if detail_arr:
+                detail_df = pd.DataFrame(
+                    detail_arr,
+                    columns=[
+                        "Aménageur",
+                        "ID certificat",
+                        "Année",
+                        "Trimestre",
+                        "UO",
+                        "Énergie certificat (kWh)",
+                        "Énergie relevés (kWh)",
+                        "Déjà ajusté (kWh)",
+                        "Compensation erreur admin (kWh)",
+                        "Différence (kWh)",
+                    ],
+                )
+                detail_df.to_csv("/tmp/readings_by_certificate.csv", index=False)
 
         return json.dumps({cpo: data["surplus"] for cpo, data in report.items()})
