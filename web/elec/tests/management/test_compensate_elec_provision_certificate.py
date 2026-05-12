@@ -60,8 +60,8 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
 
         result = run_command(enr_ratio=30)
 
-        # One compensation certificate per quarter when delta is positive.
-        self.assertEqual(len(result), 2)
+        # One compensation certificate per year when delta is positive
+        self.assertEqual(len(result), 1)
 
         # Energy amount in certificate is already renewable energy.
         # So we first recompute total energy with old ratio, then re-apply new ratio:
@@ -72,16 +72,8 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
                 "cpo_id": self.cpo1.id,
                 "quarter": 1,
                 "year": 2025,
-                "operating_unit": "00001",
-                "energy_amount": 0.2,
-                "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
-            },
-            {
-                "cpo_id": self.cpo1.id,
-                "quarter": 2,
-                "year": 2025,
-                "operating_unit": "00001",
-                "energy_amount": 0.3,
+                "operating_unit": "ALL",
+                "energy_amount": 0.5,
                 "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
             },
         ]
@@ -113,6 +105,7 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
 
         # Only MANUAL contributes to base computation: expected delta = 1.0 * (0.30 / 0.25 - 1) = 0.2
         self.assertEqual(len(result), 1)
+
         assert_object_contains_data(
             self,
             result[0],
@@ -120,7 +113,7 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
                 "cpo_id": self.cpo1.id,
                 "quarter": 1,
                 "year": 2025,
-                "operating_unit": "00001",
+                "operating_unit": "ALL",
                 "energy_amount": 0.2,
                 "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
             },
@@ -151,7 +144,7 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
                 "cpo_id": self.cpo1.id,
                 "quarter": 1,
                 "year": 2025,
-                "operating_unit": "00001",
+                "operating_unit": "ALL",
                 "energy_amount": 0.2,
                 "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
             },

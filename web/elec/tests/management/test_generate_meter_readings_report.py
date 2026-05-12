@@ -107,7 +107,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         charge_point.save(update_fields=["current_meter"])
         return meter
 
-    def run_command(self, year=None, apply_readjustments=False):
+    def run_command(self, year=2023, apply_readjustments=False):
         report = call_command("generate_meter_readings_report", year=year, apply=apply_readjustments, stdout=StringIO())
         return json.loads(report)
 

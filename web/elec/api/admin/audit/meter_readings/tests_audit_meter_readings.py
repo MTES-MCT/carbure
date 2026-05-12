@@ -100,6 +100,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             application=meter_readings_application,
             cpo=self.cpo,
             enr_ratio=0.25,
+            operating_unit="FR001",
         )
 
         meter_reading2 = ElecMeterReading.objects.create(
@@ -109,6 +110,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             application=meter_readings_application,
             cpo=self.cpo,
             enr_ratio=0.25,
+            operating_unit="FR001",
         )
 
         meter_reading3 = ElecMeterReading.objects.create(
@@ -118,6 +120,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
             application=meter_readings_application,
             cpo=self.cpo,
             enr_ratio=0.25,
+            operating_unit="FR002",
         )
         return meter_readings_application, [meter_reading1, meter_reading2, meter_reading3]
 
@@ -166,6 +169,7 @@ class ElecAdminAuditMeterReadingsTest(TestCase):
 
         # provision certificate should have been created
         certificates = ElecProvisionCertificate.objects.filter(cpo=self.cpo, quarter=3, year=2023)
+
         assert len(certificates) == 2
         # renewable_energy is now calculated via ElecMeterReadingVirtual:
         # (current_index - prev_index) * enr_ratio
