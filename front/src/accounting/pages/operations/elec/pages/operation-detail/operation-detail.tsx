@@ -82,7 +82,7 @@ export const OperationDetail = () => {
           )}`,
         },
         {
-          label: t("Tonnes CO2 eq evitées"),
+          label: t("Tonnes CO2 éq evitées"),
           value: formatNumber(operation.avoided_emissions, {
             fractionDigits: 0,
           }),
