@@ -8,16 +8,16 @@ class BiomethaneDigestateStorage(models.Model):
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_digestate_storage")
 
     # Type de stockage
-    type = models.CharField(max_length=32)
+    type = models.CharField(verbose_name="Type de stockage", max_length=32)
 
     # Capacité de stockage (m3)
-    capacity = models.FloatField()
+    capacity = models.FloatField(verbose_name="Capacité de stockage (m3)")
 
     # Couverture du stockage
-    has_cover = models.BooleanField(default=False)
+    has_cover = models.BooleanField(verbose_name="Couverture du stockage", default=False)
 
     # Récupération du biogaz
-    has_biogas_recovery = models.BooleanField(default=False)
+    has_biogas_recovery = models.BooleanField(verbose_name="Récupération du biogaz", default=False)
 
     class Meta:
         db_table = "biomethane_digestate_storage"

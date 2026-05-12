@@ -51,7 +51,9 @@ describe("useBiomethanePermissions", () => {
 
       const { result } = renderHook(() => useBiomethanePermissions())
 
-      expect(result.current.canAccessAdmin).toBe(allowedPages.has(page))
+      expect(result.current.adminPermissions.canAccessAdmin).toBe(
+        allowedPages.has(page)
+      )
     }
   })
 
@@ -63,6 +65,6 @@ describe("useBiomethanePermissions", () => {
 
     const { result } = renderHook(() => useBiomethanePermissions())
 
-    expect(result.current.canAccessAdmin).toBe(false)
+    expect(result.current.adminPermissions.canAccessAdmin).toBe(false)
   })
 })

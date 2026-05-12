@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from core.models import Department, Entity
+from core.models.fields import JSONChoiceField
 from transactions.models import Site
 
 
@@ -11,8 +12,8 @@ class BiomethaneProductionUnit(Site):
     producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_production_unit")
 
     # Département
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
-    insee_code = models.CharField(max_length=5, null=True, blank=True)
+    department = models.ForeignKey(Department, verbose_name="Département", on_delete=models.SET_NULL, null=True, blank=True)
+    insee_code = models.CharField(verbose_name="Code INSEE", max_length=5, null=True, blank=True)
 
     # légende
     AGRICULTURAL_AUTONOMOUS = "AGRICULTURAL_AUTONOMOUS"
@@ -22,58 +23,71 @@ class BiomethaneProductionUnit(Site):
     ISDND = "ISDND"
     STEP = "STEP"
 
+    UNIT_TYPE_CHOICES = [
+        (AGRICULTURAL_AUTONOMOUS, "Agricole autonome"),
+        (AGRICULTURAL_TERRITORIAL, "Agricole territorial"),
+        (INDUSTRIAL_TERRITORIAL, "Industriel territorial"),
+        (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
+        (STEP, "STEP"),
+        (ISDND, "ISDND"),
+    ]
+
     unit_type = models.CharField(
+        verbose_name="Type d'installation",
         max_length=32,
-        choices=[
-            (AGRICULTURAL_AUTONOMOUS, "Agricole autonome"),
-            (AGRICULTURAL_TERRITORIAL, "Agricole territorial"),
-            (INDUSTRIAL_TERRITORIAL, "Industriel territorial"),
-            (HOUSEHOLD_WASTE_BIOWASTE, "Déchets ménagers et biodéchets"),
-            (STEP, "STEP"),
-            (ISDND, "ISDND"),
-        ],
+        choices=UNIT_TYPE_CHOICES,
         null=True,
         blank=True,
     )
 
     # Votre site dispose-t-il d’un agrément sanitaire ?
-    has_sanitary_approval = models.BooleanField(default=False)
+    has_sanitary_approval = models.BooleanField(
+        verbose_name="Votre site dispose-t-il d'un agrément sanitaire ?", default=False
+    )
 
     # N˚ agrément sanitaire
-    sanitary_approval_number = models.CharField(max_length=32, null=True, blank=True)
+    sanitary_approval_number = models.CharField(verbose_name="N° Agrément sanitaire", max_length=32, null=True, blank=True)
 
-    # Disposez vous d’une dérogation à l’hygiénisation?
-    has_hygienization_exemption = models.BooleanField(default=False)
+    # Disposez vous d'une dérogation à l'hygiénisation?
+    has_hygienization_exemption = models.BooleanField(
+        verbose_name="Disposez vous d'une dérogation à l'hygiénisation?", default=False
+    )
 
     # Dérogation à l'hygiénisation
     TOTAL = "TOTAL"
     PARTIAL = "PARTIAL"
 
+    HYGIENIZATION_EXEMPTION_TYPE_CHOICES = [
+        (TOTAL, "Totale"),
+        (PARTIAL, "Partielle"),
+    ]
+
     hygienization_exemption_type = models.CharField(
+        verbose_name="Si oui, dérogation à l'hygiénisation :",
         max_length=16,
-        choices=[
-            (TOTAL, "Totale"),
-            (PARTIAL, "Partielle"),
-        ],
+        choices=HYGIENIZATION_EXEMPTION_TYPE_CHOICES,
         null=True,
         blank=True,
     )
 
     # N˚ ICPE
-    icpe_number = models.CharField(max_length=32, null=True, blank=True)
+    icpe_number = models.CharField(verbose_name="N° ICPE", max_length=32, null=True, blank=True)
 
     # Régime ICPE
     AUTHORIZATION = "AUTHORIZATION"
     REGISTRATION = "REGISTRATION"
     DECLARATION_PERIODIC_CONTROLS = "DECLARATION_PERIODIC_CONTROLS"
 
+    ICPE_REGIME_CHOICES = [
+        (AUTHORIZATION, "Autorisation"),
+        (REGISTRATION, "Enregistrement"),
+        (DECLARATION_PERIODIC_CONTROLS, "Déclaration (avec contrôles périodiques)"),
+    ]
+
     icpe_regime = models.CharField(
+        verbose_name="Régime ICPE",
         max_length=32,
-        choices=[
-            (AUTHORIZATION, "Autorisation"),
-            (REGISTRATION, "Enregistrement"),
-            (DECLARATION_PERIODIC_CONTROLS, "Déclaration (avec contrôles périodiques)"),
-        ],
+        choices=ICPE_REGIME_CHOICES,
         null=True,
         blank=True,
     )
@@ -82,12 +96,15 @@ class BiomethaneProductionUnit(Site):
     LIQUID_PROCESS = "LIQUID_PROCESS"
     DRY_PROCESS = "DRY_PROCESS"
 
+    PROCESS_TYPE_CHOICES = [
+        (LIQUID_PROCESS, "Voie liquide"),
+        (DRY_PROCESS, "Voie sèche"),
+    ]
+
     process_type = models.CharField(
+        verbose_name="Type de voie",
         max_length=16,
-        choices=[
-            (LIQUID_PROCESS, "Voie liquide"),
-            (DRY_PROCESS, "Voie sèche"),
-        ],
+        choices=PROCESS_TYPE_CHOICES,
         null=True,
         blank=True,
     )
@@ -97,19 +114,24 @@ class BiomethaneProductionUnit(Site):
     PLUG_FLOW_SEMI_CONTINUOUS = "PLUG_FLOW_SEMI_CONTINUOUS"  # En piston (semi-continu)
     BATCH_SILOS = "BATCH_SILOS"  # En silos (batch)
 
+    METHANIZATION_PROCESS_CHOICES = [
+        (CONTINUOUS_INFINITELY_MIXED, "Continu (infiniment mélangé)"),
+        (PLUG_FLOW_SEMI_CONTINUOUS, "En piston (semi-continu)"),
+        (BATCH_SILOS, "En silos (batch)"),
+    ]
+
     methanization_process = models.CharField(
+        verbose_name="Procédé méthanisation",
         max_length=32,
-        choices=[
-            (CONTINUOUS_INFINITELY_MIXED, "Continu (infiniment mélangé)"),
-            (PLUG_FLOW_SEMI_CONTINUOUS, "En piston (semi-continu)"),
-            (BATCH_SILOS, "En silos (batch)"),
-        ],
+        choices=METHANIZATION_PROCESS_CHOICES,
         null=True,
         blank=True,
     )
 
     # Rendement moyen de l'épurateur de l'installation %
-    production_efficiency = models.FloatField(null=True, blank=True)
+    production_efficiency = models.FloatField(
+        verbose_name="Rendement moyen de l'épurateur de l'installation (%)", null=True, blank=True
+    )
 
     # Équipements installés (débitmètres et compteurs)
     BIOGAS_PRODUCTION_FLOWMETER = "BIOGAS_PRODUCTION_FLOWMETER"
@@ -131,25 +153,37 @@ class BiomethaneProductionUnit(Site):
         (GLOBAL_ELECTRICAL_METER, "Compteur dédié à la consommation électrique de l'ensemble de l'unité de production"),
     ]
 
-    installed_meters = models.JSONField(default=list, blank=True)
+    installed_meters = JSONChoiceField(
+        verbose_name="Débitmètre présent sur votre installation", default=list, blank=True, choices=INSTALLED_METERS_CHOICES
+    )
 
     # Présence d'un hygiénisateur ?
-    has_hygienization_unit = models.BooleanField(default=False)
+    has_hygienization_unit = models.BooleanField(verbose_name="Présence d'un hygiénisateur", default=False)
 
     # Existence d'un procédé de valorisation du CO2 ?
-    has_co2_valorization_process = models.BooleanField(default=False)
+    has_co2_valorization_process = models.BooleanField(
+        verbose_name="Existence d'un procédé de valorisation du CO2 ?", default=False
+    )
 
     # Séparation de phase du digestat ?
-    has_digestate_phase_separation = models.BooleanField(default=False)
+    has_digestate_phase_separation = models.BooleanField(
+        verbose_name="Le digestat subit-il une séparation de phase?", default=False
+    )
 
     # Étapes complémentaires de traitement du digestat brut
-    raw_digestate_treatment_steps = models.CharField(max_length=128, null=True, blank=True)
+    raw_digestate_treatment_steps = models.CharField(
+        verbose_name="Étapes complémentaires de traitement du digestat brut", max_length=128, null=True, blank=True
+    )
 
     # Étape(s) complémentaire(s) de traitement de la phase liquide
-    liquid_phase_treatment_steps = models.CharField(max_length=128, null=True, blank=True)
+    liquid_phase_treatment_steps = models.CharField(
+        verbose_name="Étape(s) complémentaire(s) de traitement de la phase liquide", max_length=128, null=True, blank=True
+    )
 
     # Étape(s) complémentaire(s) de traitement de la phase solide
-    solid_phase_treatment_steps = models.CharField(max_length=128, null=True, blank=True)
+    solid_phase_treatment_steps = models.CharField(
+        verbose_name="Étape(s) complémentaire(s) de traitement de la phase solide", max_length=128, null=True, blank=True
+    )
 
     # Mode de valorisation du digestat
     SPREADING = "SPREADING"
@@ -162,7 +196,12 @@ class BiomethaneProductionUnit(Site):
         (INCINERATION_LANDFILLING, "Incinération / Enfouissement"),
     ]
 
-    digestate_valorization_methods = models.JSONField(default=list, blank=True)
+    digestate_valorization_methods = JSONChoiceField(
+        verbose_name="Mode de valorisation du digestat",
+        default=list,
+        blank=True,
+        choices=DIGESTATE_VALORIZATION_METHODS_CHOICES,
+    )
 
     # Gestion de l'épandage
     DIRECT_SPREADING = "DIRECT_SPREADING"
@@ -177,7 +216,12 @@ class BiomethaneProductionUnit(Site):
         (SALE, "Vente"),
     ]
 
-    spreading_management_methods = models.JSONField(default=list, blank=True)
+    spreading_management_methods = JSONChoiceField(
+        verbose_name="Gestion de l'épandage",
+        default=list,
+        blank=True,
+        choices=SPREADING_MANAGEMENT_METHODS_CHOICES,
+    )
 
     # Sous quel(s) statut(s) est valorisé le digestat
     SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE"
@@ -194,7 +238,12 @@ class BiomethaneProductionUnit(Site):
         (CDC_DIG, "Cahier des Charges CDC Dig"),
     ]
 
-    digestate_sale_types = models.JSONField(default=list, blank=True)
+    digestate_sale_types = JSONChoiceField(
+        verbose_name="Sous quel(s) statut(s) est valorisé le digestat ?",
+        default=list,
+        blank=True,
+        choices=DIGESTATE_SALE_TYPES_CHOICES,
+    )
 
     class Meta:
         db_table = "sites_biomethaneproductionunits"

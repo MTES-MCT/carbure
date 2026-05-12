@@ -17,6 +17,7 @@ from .views import (
     BiomethaneSupplyInputViewSet,
     BiomethaneSupplyPlanViewSet,
     download_template,
+    export_annual_declaration,
 )
 
 router = SimpleRouter()
@@ -178,5 +179,6 @@ urlpatterns = [
     path("annual-declaration/", annual_declaration_viewset, name="biomethane-annual-declaration"),
     path("annual-declaration/validate/", annual_declaration_validate_viewset, name="biomethane-annual-declaration-validate"),
     path("annual-declaration/years/", annual_declaration_years_viewset, name="biomethane-annual-declaration-years"),
+    path("export/", export_annual_declaration, name="biomethane-annual-export"),
     *router.urls,
 ]

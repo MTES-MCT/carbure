@@ -518,6 +518,7 @@ paths:
             items:
               type: string
               nullable: true
+              title: Référence de l'arrêté tarifaire
               enum:
                 - "2011"
                 - "2020"
@@ -605,6 +606,7 @@ paths:
             items:
               type: string
               nullable: true
+              title: Référence de l'arrêté tarifaire
               enum:
                 - "2011"
                 - "2020"
@@ -1802,6 +1804,43 @@ paths:
           description: ""
         "404":
           description: Not found for this entity.
+  /api/biomethane/export/:
+    get:
+      operationId: biomethane_export_retrieve
+      description: Export all biomethane data for a producer and a given year as an
+        Excel file.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the declaration.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Fichier Excel généré
   /api/biomethane/injection-site/:
     get:
       operationId: biomethane_injection_site_retrieve
@@ -1973,6 +2012,7 @@ paths:
             items:
               type: string
               nullable: true
+              title: Département d'origine
           explode: true
           style: form
         - in: query
@@ -2034,6 +2074,7 @@ paths:
             items:
               type: string
               nullable: true
+              title: Provenance
               enum:
                 - EXTERNAL
                 - INTERNAL
@@ -2365,6 +2406,7 @@ paths:
             items:
               type: string
               nullable: true
+              title: Département d'origine
           explode: true
           style: form
         - in: query
@@ -2427,6 +2469,7 @@ paths:
             items:
               type: string
               nullable: true
+              title: Provenance
               enum:
                 - EXTERNAL
                 - INTERNAL
@@ -12278,33 +12321,41 @@ components:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
           nullable: true
+          title: Référence de l'arrêté tarifaire
         installation_category:
           allOf:
             - $ref: "#/components/schemas/InstallationCategoryEnum"
           nullable: true
+          title: Catégorie d'installation
         cmax:
           type: number
           format: double
           nullable: true
+          title: Cmax (Nm³/h)
         cmax_annualized:
           type: boolean
           nullable: true
+          title: Annualisation du contrôle de la Cmax
         cmax_annualized_value:
           type: number
           format: double
           nullable: true
+          title: Cmax annualisée (GWhPCS/an)
         pap_contracted:
           type: number
           format: double
           nullable: true
+          title: PAP contractualisée (GWhPCS/an)
         signature_date:
           type: string
           format: date
           nullable: true
+          title: Date de signature
         effective_date:
           type: string
           format: date
           nullable: true
+          title: Date de prise d'effet
         conditions_file:
           type: string
           format: uri
@@ -12312,13 +12363,17 @@ components:
         has_complementary_investment_aid:
           type: boolean
           nullable: true
+          title: Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s)
+            complémentaire(s) à l'investissement?
         complementary_aid_other_organism_name:
           type: string
           nullable: true
+          title: Précisez le nom du ou des organismes publics ayant octroyé l'aide
           maxLength: 255
         buyer:
           type: integer
           nullable: true
+          title: Acheteur
         producer:
           type: integer
       required:
@@ -12426,30 +12481,37 @@ components:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
           nullable: true
+          title: Référence de l'arrêté tarifaire
         installation_category:
           allOf:
             - $ref: "#/components/schemas/InstallationCategoryEnum"
           nullable: true
+          title: Catégorie d'installation
         cmax:
           type: number
           format: double
           nullable: true
+          title: Cmax (Nm³/h)
         cmax_annualized_value:
           type: number
           format: double
           nullable: true
+          title: Cmax annualisée (GWhPCS/an)
         pap_contracted:
           type: number
           format: double
           nullable: true
+          title: PAP contractualisée (GWhPCS/an)
         signature_date:
           type: string
           format: date
           nullable: true
+          title: Date de signature
         effective_date:
           type: string
           format: date
           nullable: true
+          title: Date de prise d'effet
         conditions_file:
           type: string
           format: binary
@@ -12458,13 +12520,17 @@ components:
         has_complementary_investment_aid:
           type: boolean
           nullable: true
+          title: Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s)
+            complémentaire(s) à l'investissement?
         complementary_aid_other_organism_name:
           type: string
           nullable: true
+          title: Précisez le nom du ou des organismes publics ayant octroyé l'aide
           maxLength: 255
         buyer:
           type: integer
           nullable: true
+          title: Acheteur
     BiomethaneDigestate:
       type: object
       properties:
@@ -12484,65 +12550,82 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
+          title: Année
         raw_digestate_tonnage_produced:
           type: number
           format: double
           nullable: true
+          title: Tonnage digestat brut produit (t)
         raw_digestate_dry_matter_rate:
           type: number
           format: double
           nullable: true
+          title: Taux de MS du digestat brut (%)
         solid_digestate_tonnage:
           type: number
           format: double
           nullable: true
+          title: Tonnage de digestat solide (t)
         liquid_digestate_quantity:
           type: number
           format: double
           nullable: true
+          title: Quantité digestat liquide (t)
         average_spreading_valorization_distance:
           type: number
           format: double
           nullable: true
+          title: Distance moyenne de valorisation d'épandage (km)
         external_platform_name:
           type: string
           nullable: true
+          title: Nom de la plateforme externe
           maxLength: 255
         external_platform_digestate_volume:
           type: number
           format: double
           nullable: true
+          title: Volume de digestat composté sur la plateforme externe (t)
         external_platform_department:
           type: string
           nullable: true
+          title: Département de la plateforme externe
           maxLength: 3
         external_platform_municipality:
           type: string
           nullable: true
+          title: Commune de la plateforme externe
           maxLength: 255
         on_site_composted_digestate_volume:
           type: number
           format: double
           nullable: true
+          title: Volume de digestat composté sur site (t)
         annual_eliminated_volume:
           type: number
           format: double
           nullable: true
+          title: Volume annuel éliminé (t)
         incinerator_landfill_center_name:
           type: string
           nullable: true
+          title: Indiquer le nom de l'incinérateur ou du centre d'enfouissement
           maxLength: 255
         wwtp_materials_to_incineration:
           type: number
           format: double
           nullable: true
+          title: Quantité de matières totales traitées par la STEP allant en incinération
+            (t)
         acquiring_companies:
           type: string
           nullable: true
+          title: Entreprise(s) acquérant le digestat
         sold_volume:
           type: number
           format: double
           nullable: true
+          title: Volume vendu (t)
         producer:
           type: integer
       required:
@@ -12561,61 +12644,77 @@ components:
           type: number
           format: double
           nullable: true
+          title: Tonnage digestat brut produit (t)
         raw_digestate_dry_matter_rate:
           type: number
           format: double
           nullable: true
+          title: Taux de MS du digestat brut (%)
         solid_digestate_tonnage:
           type: number
           format: double
           nullable: true
+          title: Tonnage de digestat solide (t)
         liquid_digestate_quantity:
           type: number
           format: double
           nullable: true
+          title: Quantité digestat liquide (t)
         average_spreading_valorization_distance:
           type: number
           format: double
           nullable: true
+          title: Distance moyenne de valorisation d'épandage (km)
         external_platform_name:
           type: string
           nullable: true
+          title: Nom de la plateforme externe
           maxLength: 255
         external_platform_digestate_volume:
           type: number
           format: double
           nullable: true
+          title: Volume de digestat composté sur la plateforme externe (t)
         external_platform_department:
           type: string
           nullable: true
+          title: Département de la plateforme externe
           maxLength: 3
         external_platform_municipality:
           type: string
           nullable: true
+          title: Commune de la plateforme externe
           maxLength: 255
         on_site_composted_digestate_volume:
           type: number
           format: double
           nullable: true
+          title: Volume de digestat composté sur site (t)
         annual_eliminated_volume:
           type: number
           format: double
           nullable: true
+          title: Volume annuel éliminé (t)
         incinerator_landfill_center_name:
           type: string
           nullable: true
+          title: Indiquer le nom de l'incinérateur ou du centre d'enfouissement
           maxLength: 255
         wwtp_materials_to_incineration:
           type: number
           format: double
           nullable: true
+          title: Quantité de matières totales traitées par la STEP allant en incinération
+            (t)
         acquiring_companies:
           type: string
           nullable: true
+          title: Entreprise(s) acquérant le digestat
         sold_volume:
           type: number
           format: double
           nullable: true
+          title: Volume vendu (t)
     BiomethaneDigestateSpreading:
       type: object
       properties:
@@ -12624,13 +12723,16 @@ components:
           readOnly: true
         spreading_department:
           type: string
+          title: Département d'épandage
           maxLength: 3
         spread_quantity:
           type: number
           format: double
+          title: Quantité épandue (t)
         spread_parcels_area:
           type: number
           format: double
+          title: Superficie des parcelles épandues (ha)
         digestate:
           type: integer
       required:
@@ -12647,13 +12749,16 @@ components:
           readOnly: true
         spreading_department:
           type: string
+          title: Département d'épandage
           maxLength: 3
         spread_quantity:
           type: number
           format: double
+          title: Quantité épandue (t)
         spread_parcels_area:
           type: number
           format: double
+          title: Superficie des parcelles épandues (ha)
       required:
         - id
         - spread_parcels_area
@@ -12668,13 +12773,16 @@ components:
         spreading_department:
           type: string
           minLength: 1
+          title: Département d'épandage
           maxLength: 3
         spread_quantity:
           type: number
           format: double
+          title: Quantité épandue (t)
         spread_parcels_area:
           type: number
           format: double
+          title: Superficie des parcelles épandues (ha)
       required:
         - spread_parcels_area
         - spread_quantity
@@ -12688,14 +12796,18 @@ components:
           readOnly: true
         type:
           type: string
+          title: Type de stockage
           maxLength: 32
         capacity:
           type: number
           format: double
+          title: Capacité de stockage (m3)
         has_cover:
           type: boolean
+          title: Couverture du stockage
         has_biogas_recovery:
           type: boolean
+          title: Récupération du biogaz
         producer:
           type: integer
       required:
@@ -12711,14 +12823,18 @@ components:
           readOnly: true
         type:
           type: string
+          title: Type de stockage
           maxLength: 32
         capacity:
           type: number
           format: double
+          title: Capacité de stockage (m3)
         has_cover:
           type: boolean
+          title: Couverture du stockage
         has_biogas_recovery:
           type: boolean
+          title: Récupération du biogaz
       required:
         - capacity
         - id
@@ -12729,14 +12845,18 @@ components:
         type:
           type: string
           minLength: 1
+          title: Type de stockage
           maxLength: 32
         capacity:
           type: number
           format: double
+          title: Capacité de stockage (m3)
         has_cover:
           type: boolean
+          title: Couverture du stockage
         has_biogas_recovery:
           type: boolean
+          title: Récupération du biogaz
       required:
         - capacity
         - type
@@ -12763,35 +12883,45 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
+          title: Année
         injected_biomethane_gwh_pcs_per_year:
           type: number
           format: double
           nullable: true
+          title: Quantité de biométhane injecté (GWhPCS/an)
         injected_biomethane_ch4_rate_percent:
           type: number
           format: double
           nullable: true
+          title: Taux de CH4 dans le biométhane injecté (%)
         injected_biomethane_pcs_kwh_per_nm3:
           type: number
           format: double
           nullable: true
+          title: PCS du biométhane injecté (kWh/Nm3)
         produced_biogas_nm3_per_year:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz produit (Nm3/an)
         flared_biogas_nm3_per_year:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz torché (Nm3/an)
         flaring_operating_hours:
           type: number
           format: double
           nullable: true
+          title: Nombre d'heures de fonctionnement de la torchère (h)
         attest_no_fossil_for_energy:
           type: boolean
+          title: J'atteste que les besoins en énergie cités ci-dessus ne sont pas
+            satisfaits par une énergie d'origine fossile
         energy_details:
           type: string
           nullable: true
+          title: Précisions
         purified_biogas_quantity_nm3:
           type: number
           format: double
@@ -12812,36 +12942,49 @@ components:
           type: number
           format: double
           nullable: true
+          title: Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
         butane_or_propane_addition:
           type: boolean
+          title: Addition de butane ou propane lors de l'injection du biométhane dans le
+            réseau
         fossil_fuel_consumed_kwh:
           type: number
           format: double
           nullable: true
+          title: Quantité de combustible fossile consommé (kWh)
         has_opposition_or_complaints_acceptability:
           type: boolean
+          title: L'exploitation de votre unité de méthanisation fait-elle l'objet
+            actuellement d'une opposition ou de plaintes de voisinage ?
         estimated_work_days_acceptability:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
+          title: Nombre d'ETP estimé pour l'activité de méthanisation sur l'année
         has_malfunctions:
           type: boolean
+          title: Y'a t-il eu des dysfonctionnements ?
         malfunction_cumulative_duration_days:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
+          title: Durée cumulée du dysfonctionnement (en jours)
         malfunction_details:
           type: string
           nullable: true
+          title: Précisions sur les dysfonctionnements
         has_injection_difficulties_due_to_network_saturation:
           type: boolean
+          title: Difficultés pour l'injection dans le réseau de gaz en raison de périodes
+            de saturation des réseaux
         injection_impossibility_hours:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
+          title: Nombre d'heures d'impossibilité d'injection (h)
         producer:
           type: integer
       required:
@@ -12864,31 +13007,40 @@ components:
           type: number
           format: double
           nullable: true
+          title: Quantité de biométhane injecté (GWhPCS/an)
         injected_biomethane_ch4_rate_percent:
           type: number
           format: double
           nullable: true
+          title: Taux de CH4 dans le biométhane injecté (%)
         injected_biomethane_pcs_kwh_per_nm3:
           type: number
           format: double
           nullable: true
+          title: PCS du biométhane injecté (kWh/Nm3)
         produced_biogas_nm3_per_year:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz produit (Nm3/an)
         flared_biogas_nm3_per_year:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz torché (Nm3/an)
         flaring_operating_hours:
           type: number
           format: double
           nullable: true
+          title: Nombre d'heures de fonctionnement de la torchère (h)
         attest_no_fossil_for_energy:
           type: boolean
+          title: J'atteste que les besoins en énergie cités ci-dessus ne sont pas
+            satisfaits par une énergie d'origine fossile
         energy_details:
           type: string
           nullable: true
+          title: Précisions
         purified_biogas_quantity_nm3:
           type: number
           format: double
@@ -12909,36 +13061,49 @@ components:
           type: number
           format: double
           nullable: true
+          title: Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
         butane_or_propane_addition:
           type: boolean
+          title: Addition de butane ou propane lors de l'injection du biométhane dans le
+            réseau
         fossil_fuel_consumed_kwh:
           type: number
           format: double
           nullable: true
+          title: Quantité de combustible fossile consommé (kWh)
         has_opposition_or_complaints_acceptability:
           type: boolean
+          title: L'exploitation de votre unité de méthanisation fait-elle l'objet
+            actuellement d'une opposition ou de plaintes de voisinage ?
         estimated_work_days_acceptability:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
+          title: Nombre d'ETP estimé pour l'activité de méthanisation sur l'année
         has_malfunctions:
           type: boolean
+          title: Y'a t-il eu des dysfonctionnements ?
         malfunction_cumulative_duration_days:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
+          title: Durée cumulée du dysfonctionnement (en jours)
         malfunction_details:
           type: string
           nullable: true
+          title: Précisions sur les dysfonctionnements
         has_injection_difficulties_due_to_network_saturation:
           type: boolean
+          title: Difficultés pour l'injection dans le réseau de gaz en raison de périodes
+            de saturation des réseaux
         injection_impossibility_hours:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
           nullable: true
+          title: Nombre d'heures d'impossibilité d'injection (h)
     BiomethaneEnergyMonthlyReport:
       type: object
       properties:
@@ -12946,12 +13111,15 @@ components:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
+          title: Mois
         injected_volume_nm3:
           type: number
           format: double
+          title: Volume injecté (Nm3)
         average_monthly_flow_nm3_per_hour:
           type: number
           format: double
+          title: Débit moyen mensuel (Nm3/h)
         energy:
           type: integer
       required:
@@ -12965,34 +13133,43 @@ components:
           readOnly: true
         unique_identification_number:
           type: string
+          title: Numéro d'identifiant unique du site d'injection
           maxLength: 32
         is_shared_injection_site:
           type: boolean
+          title: Raccordement à un site d'injection mutualisé
         meter_number:
           type: string
           nullable: true
+          title: N° de compteur associé au site d'injection
           maxLength: 32
         is_different_from_production_site:
           type: boolean
+          title: Le site d'injection est différent du site de production
         company_address:
           type: string
           nullable: true
+          title: Adresse du site d'injection (Numéro et rue)
           maxLength: 255
         city:
           type: string
           nullable: true
+          title: Commune
           maxLength: 100
         postal_code:
           type: string
           nullable: true
+          title: Code postal
           maxLength: 10
         network_type:
           allOf:
             - $ref: "#/components/schemas/NetworkTypeEnum"
           nullable: true
+          title: Type de réseau
         network_manager_name:
           type: string
           nullable: true
+          title: Nom du gestionnaire de réseau
           maxLength: 100
         producer:
           type: integer
@@ -13006,34 +13183,43 @@ components:
         unique_identification_number:
           type: string
           minLength: 1
+          title: Numéro d'identifiant unique du site d'injection
           maxLength: 32
         is_shared_injection_site:
           type: boolean
+          title: Raccordement à un site d'injection mutualisé
         meter_number:
           type: string
           nullable: true
+          title: N° de compteur associé au site d'injection
           maxLength: 32
         is_different_from_production_site:
           type: boolean
+          title: Le site d'injection est différent du site de production
         company_address:
           type: string
           nullable: true
+          title: Adresse du site d'injection (Numéro et rue)
           maxLength: 255
         city:
           type: string
           nullable: true
+          title: Commune
           maxLength: 100
         postal_code:
           type: string
           nullable: true
+          title: Code postal
           maxLength: 10
         network_type:
           allOf:
             - $ref: "#/components/schemas/NetworkTypeEnum"
           nullable: true
+          title: Type de réseau
         network_manager_name:
           type: string
           nullable: true
+          title: Nom du gestionnaire de réseau
           maxLength: 100
       required:
         - network_manager_name
@@ -13103,60 +13289,77 @@ components:
         insee_code:
           type: string
           nullable: true
+          title: Code INSEE
           maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
           nullable: true
+          title: Type d'installation
         has_sanitary_approval:
           type: boolean
+          title: Votre site dispose-t-il d'un agrément sanitaire ?
         sanitary_approval_number:
           type: string
           nullable: true
+          title: N° Agrément sanitaire
           maxLength: 32
         has_hygienization_exemption:
           type: boolean
+          title: Disposez vous d'une dérogation à l'hygiénisation?
         hygienization_exemption_type:
           allOf:
             - $ref: "#/components/schemas/HygienizationExemptionTypeEnum"
           nullable: true
+          title: "Si oui, dérogation à l'hygiénisation :"
         icpe_number:
           type: string
           nullable: true
+          title: N° ICPE
           maxLength: 32
         icpe_regime:
           allOf:
             - $ref: "#/components/schemas/IcpeRegimeEnum"
           nullable: true
+          title: Régime ICPE
         process_type:
           allOf:
             - $ref: "#/components/schemas/ProcessTypeEnum"
           nullable: true
+          title: Type de voie
         methanization_process:
           allOf:
             - $ref: "#/components/schemas/MethanizationProcessEnum"
           nullable: true
+          title: Procédé méthanisation
         production_efficiency:
           type: number
           format: double
           nullable: true
+          title: Rendement moyen de l'épurateur de l'installation (%)
         has_hygienization_unit:
           type: boolean
+          title: Présence d'un hygiénisateur
         has_co2_valorization_process:
           type: boolean
+          title: Existence d'un procédé de valorisation du CO2 ?
         has_digestate_phase_separation:
           type: boolean
+          title: Le digestat subit-il une séparation de phase?
         raw_digestate_treatment_steps:
           type: string
           nullable: true
+          title: Étapes complémentaires de traitement du digestat brut
           maxLength: 128
         liquid_phase_treatment_steps:
           type: string
           nullable: true
+          title: Étape(s) complémentaire(s) de traitement de la phase liquide
           maxLength: 128
         solid_phase_treatment_steps:
           type: string
           nullable: true
+          title: Étape(s) complémentaire(s) de traitement de la phase solide
           maxLength: 128
         country:
           type: integer
@@ -13221,60 +13424,77 @@ components:
         insee_code:
           type: string
           nullable: true
+          title: Code INSEE
           maxLength: 5
         unit_type:
           allOf:
             - $ref: "#/components/schemas/UnitTypeEnum"
           nullable: true
+          title: Type d'installation
         has_sanitary_approval:
           type: boolean
+          title: Votre site dispose-t-il d'un agrément sanitaire ?
         sanitary_approval_number:
           type: string
           nullable: true
+          title: N° Agrément sanitaire
           maxLength: 32
         has_hygienization_exemption:
           type: boolean
+          title: Disposez vous d'une dérogation à l'hygiénisation?
         hygienization_exemption_type:
           allOf:
             - $ref: "#/components/schemas/HygienizationExemptionTypeEnum"
           nullable: true
+          title: "Si oui, dérogation à l'hygiénisation :"
         icpe_number:
           type: string
           nullable: true
+          title: N° ICPE
           maxLength: 32
         icpe_regime:
           allOf:
             - $ref: "#/components/schemas/IcpeRegimeEnum"
           nullable: true
+          title: Régime ICPE
         process_type:
           allOf:
             - $ref: "#/components/schemas/ProcessTypeEnum"
           nullable: true
+          title: Type de voie
         methanization_process:
           allOf:
             - $ref: "#/components/schemas/MethanizationProcessEnum"
           nullable: true
+          title: Procédé méthanisation
         production_efficiency:
           type: number
           format: double
           nullable: true
+          title: Rendement moyen de l'épurateur de l'installation (%)
         has_hygienization_unit:
           type: boolean
+          title: Présence d'un hygiénisateur
         has_co2_valorization_process:
           type: boolean
+          title: Existence d'un procédé de valorisation du CO2 ?
         has_digestate_phase_separation:
           type: boolean
+          title: Le digestat subit-il une séparation de phase?
         raw_digestate_treatment_steps:
           type: string
           nullable: true
+          title: Étapes complémentaires de traitement du digestat brut
           maxLength: 128
         liquid_phase_treatment_steps:
           type: string
           nullable: true
+          title: Étape(s) complémentaire(s) de traitement de la phase liquide
           maxLength: 128
         solid_phase_treatment_steps:
           type: string
           nullable: true
+          title: Étape(s) complémentaire(s) de traitement de la phase solide
           maxLength: 128
         country:
           type: integer
@@ -13300,42 +13520,52 @@ components:
           allOf:
             - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
           nullable: true
+          title: Provenance
         type_cive:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
           nullable: true
+          title: Type de CIVE
         culture_details:
           type: string
           nullable: true
+          title: Précisez la culture
           maxLength: 255
         collection_type:
           allOf:
             - $ref: "#/components/schemas/CollectionTypeEnum"
           nullable: true
+          title: Type de collecte
         material_unit:
           allOf:
             - $ref: "#/components/schemas/MaterialUnitEnum"
           nullable: true
+          title: Unité matière
         dry_matter_ratio_percent:
           type: number
           format: double
           nullable: true
+          title: Ratio de matière sèche - tMS/tMS (%)
         volume:
           type: number
           format: double
           nullable: true
+          title: Tonnage
         origin_department:
           type: string
           nullable: true
+          title: Département d'origine
           maxLength: 3
         average_weighted_distance_km:
           type: number
           format: double
           nullable: true
+          title: Distance moyenne pondérée d'approvisionnement (km)
         maximum_distance_km:
           type: number
           format: double
           nullable: true
+          title: Distance maximale (km)
         supply_plan:
           type: integer
       required:
@@ -13393,6 +13623,7 @@ components:
         origin_department:
           type: string
           nullable: true
+          title: Département d'origine
           maxLength: 3
       required:
         - feedstock
@@ -13446,6 +13677,7 @@ components:
         origin_department:
           type: string
           nullable: true
+          title: Département d'origine
           maxLength: 3
       required:
         - feedstock
@@ -13481,27 +13713,33 @@ components:
         culture_details:
           type: string
           nullable: true
+          title: Précisez la culture
           maxLength: 255
         dry_matter_ratio_percent:
           type: number
           format: double
           nullable: true
+          title: Ratio de matière sèche - tMS/tMS (%)
         volume:
           type: number
           format: double
           nullable: true
+          title: Tonnage
         origin_department:
           type: string
           nullable: true
+          title: Département d'origine
           maxLength: 3
         average_weighted_distance_km:
           type: number
           format: double
           nullable: true
+          title: Distance moyenne pondérée d'approvisionnement (km)
         maximum_distance_km:
           type: number
           format: double
           nullable: true
+          title: Distance maximale (km)
       required:
         - collection_type
         - feedstock
@@ -16441,10 +16679,17 @@ components:
         - INSTALLATION_CATEGORY_2
         - INSTALLATION_CATEGORY_3
       type: string
-      description: |-
-        * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
-        * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
-        * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
+      description: >-
+        * `INSTALLATION_CATEGORY_1` - Méthanisation en digesteur de produits ou
+        déchets non dangereux, hors matières résultant du traitement des eaux
+        usées urbaines ou industrielles
+
+        * `INSTALLATION_CATEGORY_2` - Méthanisation en digesteur de produits ou
+        déchets non dangereux, y compris des matières résultant du traitement
+        des eaux usées urbaines ou industrielles
+
+        * `INSTALLATION_CATEGORY_3` - Installations de stockage de déchets non
+        dangereux à partir de déchets ménagers et assimilés
     InstalledMetersEnum:
       enum:
         - BIOGAS_PRODUCTION_FLOWMETER
@@ -17527,14 +17772,18 @@ components:
         type:
           type: string
           minLength: 1
+          title: Type de stockage
           maxLength: 32
         capacity:
           type: number
           format: double
+          title: Capacité de stockage (m3)
         has_cover:
           type: boolean
+          title: Couverture du stockage
         has_biogas_recovery:
           type: boolean
+          title: Récupération du biogaz
     PatchedBiomethaneSupplyInputCreateRequest:
       type: object
       properties:
@@ -17583,6 +17832,7 @@ components:
         origin_department:
           type: string
           nullable: true
+          title: Département d'origine
           maxLength: 3
     PatchedDoubleCountingApplicationUpdateRequest:
       type: object

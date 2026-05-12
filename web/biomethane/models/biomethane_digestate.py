@@ -4,6 +4,7 @@ from django.dispatch import receiver
 
 from biomethane.models import BiomethaneContract, BiomethaneProductionUnit
 from core.models import Entity
+from core.models.fields import JSONChoiceField
 
 
 class BiomethaneDigestate(models.Model):
@@ -11,57 +12,82 @@ class BiomethaneDigestate(models.Model):
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_digestates")
 
     # Année de déclaration des informations
-    year = models.IntegerField()
+    year = models.IntegerField(verbose_name="Année")
 
     ## Production de digestat
 
     # Tonnage digestat brut produit (t)
-    raw_digestate_tonnage_produced = models.FloatField(null=True, blank=True)
+    raw_digestate_tonnage_produced = models.FloatField(
+        verbose_name="Tonnage digestat brut produit (t)", null=True, blank=True
+    )
     # Taux de MS du digestat brut
-    raw_digestate_dry_matter_rate = models.FloatField(null=True, blank=True)
+    raw_digestate_dry_matter_rate = models.FloatField(verbose_name="Taux de MS du digestat brut (%)", null=True, blank=True)
     # Tonnage de digestat solide (t)
-    solid_digestate_tonnage = models.FloatField(null=True, blank=True)
+    solid_digestate_tonnage = models.FloatField(verbose_name="Tonnage de digestat solide (t)", null=True, blank=True)
     # Quantité digestat liquide (t)
-    liquid_digestate_quantity = models.FloatField(null=True, blank=True)
+    liquid_digestate_quantity = models.FloatField(verbose_name="Quantité digestat liquide (t)", null=True, blank=True)
     # Distance moyenne de valorisation d'épandage (km)
-    average_spreading_valorization_distance = models.FloatField(null=True, blank=True)
+    average_spreading_valorization_distance = models.FloatField(
+        verbose_name="Distance moyenne de valorisation d'épandage (km)", null=True, blank=True
+    )
 
     ## Compostage
     ON_SITE = "ON_SITE"
     EXTERNAL_PLATFORM = "EXTERNAL_PLATFORM"
 
-    COMPOSTING_LOCATIONS = [
+    COMPOSTING_LOCATIONS_CHOICES = [
         (ON_SITE, "Sur site"),
         (EXTERNAL_PLATFORM, "Plateforme externe"),
     ]
     # Lieux de compostage
-    composting_locations = models.JSONField(default=list)
+    composting_locations = JSONChoiceField(
+        verbose_name="Lieu du compostage", default=list, choices=COMPOSTING_LOCATIONS_CHOICES
+    )
     # Nom de la plateforme externe
-    external_platform_name = models.CharField(max_length=255, null=True, blank=True)
+    external_platform_name = models.CharField(
+        verbose_name="Nom de la plateforme externe", max_length=255, null=True, blank=True
+    )
     # Volume de digestat composté sur la plateforme externe (t)
-    external_platform_digestate_volume = models.FloatField(null=True, blank=True)
+    external_platform_digestate_volume = models.FloatField(
+        verbose_name="Volume de digestat composté sur la plateforme externe (t)", null=True, blank=True
+    )
     # Département de la plateforme externe
-    external_platform_department = models.CharField(max_length=3, null=True, blank=True)
+    external_platform_department = models.CharField(
+        verbose_name="Département de la plateforme externe", max_length=3, null=True, blank=True
+    )
     # Commune de la plateforme externe
-    external_platform_municipality = models.CharField(max_length=255, null=True, blank=True)
+    external_platform_municipality = models.CharField(
+        verbose_name="Commune de la plateforme externe", max_length=255, null=True, blank=True
+    )
     # Volume de digestat composté sur site (t)
-    on_site_composted_digestate_volume = models.FloatField(null=True, blank=True)
+    on_site_composted_digestate_volume = models.FloatField(
+        verbose_name="Volume de digestat composté sur site (t)", null=True, blank=True
+    )
 
     ## Incinération / Enfouissement
 
     # Volume annuel éliminé (tonnes)
-    annual_eliminated_volume = models.FloatField(null=True, blank=True)
+    annual_eliminated_volume = models.FloatField(verbose_name="Volume annuel éliminé (t)", null=True, blank=True)
     # Nom de l'incinérateur ou du centre d'enfouissement
-    incinerator_landfill_center_name = models.CharField(max_length=255, null=True, blank=True)
+    incinerator_landfill_center_name = models.CharField(
+        verbose_name="Indiquer le nom de l'incinérateur ou du centre d'enfouissement",
+        max_length=255,
+        null=True,
+        blank=True,
+    )
     # Quantité de matières totales traitées par la STEP allant en incinération (tonnes)
-    wwtp_materials_to_incineration = models.FloatField(null=True, blank=True)
+    wwtp_materials_to_incineration = models.FloatField(
+        verbose_name="Quantité de matières totales traitées par la STEP allant en incinération (t)",
+        null=True,
+        blank=True,
+    )
 
     ## Vente
 
     # Entreprise(s) acquérant le digestat
-    acquiring_companies = models.TextField(null=True, blank=True)
+    acquiring_companies = models.TextField(verbose_name="Entreprise(s) acquérant le digestat", null=True, blank=True)
     # Volume vendu (tonnes)
-    sold_volume = models.FloatField(null=True, blank=True)
+    sold_volume = models.FloatField(verbose_name="Volume vendu (t)", null=True, blank=True)
 
     class Meta:
         db_table = "biomethane_digestate"

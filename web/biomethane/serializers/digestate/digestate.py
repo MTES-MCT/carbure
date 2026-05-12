@@ -6,7 +6,7 @@ from biomethane.serializers.digestate.spreading import BiomethaneDigestateSpread
 
 class BaseBiomethaneDigestateSerializer(serializers.ModelSerializer):
     composting_locations = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneDigestate.COMPOSTING_LOCATIONS),
+        child=serializers.ChoiceField(choices=BiomethaneDigestate.COMPOSTING_LOCATIONS_CHOICES),
         required=False,
     )
 

@@ -294,8 +294,8 @@ class BiomethaneEnergyServiceIntegrationTests(TestCase):
         fields = BiomethaneEnergyService.get_fields_to_clear(energy)
         self.assertNotIn("malfunction_details", fields)
 
-    def test_full_integration_tariff_rules(self):
-        """Smoke test: verify tariff rules work end-to-end."""
+    def test_full_integration_fossil_energy_rule(self):
+        """Smoke test: verify the no_fossil_for_energy rule works end-to-end."""
         energy = BiomethaneEnergyFactory.create(
             producer=self.producer_entity,
             energy_types=[BiomethaneEnergy.ENERGY_TYPE_FOSSIL],
