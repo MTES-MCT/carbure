@@ -27,22 +27,18 @@ def _get_certificates_with_delta(year, new_enr_ratio):
     Calcule, par CPO et pour une année donnée, le volume de compensation ENR (MWh renouvelable)
     à créer en une requête agrégée.
 
-    Idée métier (toutes les quantités ci-dessous sont en MWh *renouvelable* sauf mention) :
-      1) On somme l'énergie des certificats de base du CPO sur l'année (hors compensation / erreur admin).
-      2) On retranche la somme des réajustements déjà enregistrés pour ce CPO et cette année
-         (champ year sur elec_certificate_readjustment). C'est la base *nette* après remboursements.
-      3) On applique le changement de ratio ENR sur cette base nette :
-           delta = (net / enr_ancien) * enr_nouveau - net
+    Idée métier :
+      1) Repartir de l'énergie non renouvelable par certificat:
+           non_renewable_i = renewable_energy_i / enr_ratio_i
+      2) Agréger par CPO/année :
+           total_non_renewable = somme(non_renewable_i)
+           total_renewable = somme(renewable_energy_i)
+      3) Retrancher les réajustements annuels (même CPO, même année) du total non_renewable :
+           non_renewable_net = total_non_renewable - total_readjustments
+      4) Appliquer le nouveau ratio puis retirer le déjà-certifié renouvelable :
+           delta = non_renewable_net * enr_nouveau - total_renewable
 
-    Exemple chiffré (enr ancien = 0,25 = 25 %, enr nouveau = 0,30 = 30 %) :
-      - Total certificats renouvelable = 100 ; réajustements = 90 → net = 10 MWh.
-      - 10 / 0,25 = 40
-      - 40 * 0,30 = 12 MWh renouvelable « attendu » au nouveau ratio pour ce bloc
-      - delta compensation = 12 - 10 = 2 MWh (c’est ce qu’on crée sur le certificat de rattrapage).
-
-    Limite du modèle agrégé : la requête suppose un seul enr_ratio pertinent par ligne de groupement
-    . Si un même CPO mélange des certificats avec des enr_ratio différents,
-    le calcul devrait être fait ligne à ligne puis sommé (fenêtre / sous-requête par certificat).
+    Cette approche est robuste si un CPO a plusieurs certificats avec des enr_ratio différents.
     """
     # Étape A — Ne pas recréer une compensation annuelle déjà présente (clé métier : même CPO, année, source).
     compensation_certificates = ElecProvisionCertificate.objects.filter(
@@ -51,12 +47,12 @@ def _get_certificates_with_delta(year, new_enr_ratio):
         cpo_id=OuterRef("cpo_id"),
     )
 
-    # Étape B — Formule du delta sur la base nette (voir docstring).
-    #   net = total_energy_certificates - total_energy_readjustments
-    #   delta = (net / enr_ratio) * new_enr_ratio - net
+    # Étape B — Formule du delta sur base "non_renewable" (voir docstring).
+    #   non_renewable_net = total_non_renewable_energy - total_energy_readjustments
+    #   delta = non_renewable_net * new_enr_ratio - total_energy_certificates
     delta_expression = ExpressionWrapper(
-        (((F("total_energy_certificates") - F("total_energy_readjustments")) / F("enr_ratio")) * Value(new_enr_ratio))
-        - (F("total_energy_certificates") - F("total_energy_readjustments")),
+        ((F("total_non_renewable_energy") - F("total_energy_readjustments")) * Value(new_enr_ratio))
+        - F("total_energy_certificates"),
         output_field=FloatField(),
     )
 
@@ -73,6 +69,7 @@ def _get_certificates_with_delta(year, new_enr_ratio):
 
     # Étape D — Filtre des lignes certificat éligibles, puis agrégation par (cpo_id, nom, année).
     #   - exclusion des sources hors périmètre et des ratios invalides ;
+    #   - somme des energy_amount/enr_ratio → total_non_renewable_energy ;
     #   - somme des energy_amount → total_energy_certificates ;
     #   - jointure logique du total des réajustements → total_energy_readjustments ;
     #   - application de delta_expression puis arrondi à 2 décimales.
@@ -94,6 +91,9 @@ def _get_certificates_with_delta(year, new_enr_ratio):
             total_energy_readjustments=Coalesce(
                 Subquery(readjustments_for_year, output_field=FloatField()),
                 Value(0.0),
+            ),
+            total_non_renewable_energy=Sum(
+                ExpressionWrapper(F("energy_amount") / F("enr_ratio"), output_field=FloatField())
             ),
         )
         .annotate(total_energy_certificates=Sum(F("energy_amount")))
