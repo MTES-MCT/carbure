@@ -50,11 +50,14 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
             enr_ratio=enr_ratio,
         )
 
-    def create_readjustment(self, *, energy_amount, year=None, cpo=None):
+    def create_readjustment(self, *, energy_amount, non_renewable_energy_amount=None, year=None, cpo=None):
         return ElecCertificateReadjustment.objects.create(
             cpo=cpo or self.cpo1,
             year=year or self.last_year,
             energy_amount=energy_amount,
+            non_renewable_energy_amount=(
+                non_renewable_energy_amount if non_renewable_energy_amount is not None else energy_amount
+            ),
             error_source=ElecCertificateReadjustment.MANUAL,
         )
 
@@ -267,12 +270,16 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
     def test_computes_delta_with_mixed_enr_ratio_and_readjustment_amount(self):
         self.create_certificate(source=ElecProvisionCertificate.MANUAL, quarter=1, energy_amount=100.0, enr_ratio=0.25)
         self.create_certificate(source=ElecProvisionCertificate.MANUAL, quarter=2, energy_amount=200.0, enr_ratio=0.28)
-        self.create_readjustment(energy_amount=50.0, year=COMPENSATION_YEAR)
+        self.create_readjustment(
+            energy_amount=500.0,  # Renewable amount should not be used by compensate command
+            non_renewable_energy_amount=50.0,
+            year=COMPENSATION_YEAR,
+        )
 
         result = run_command(enr_ratio=30)
 
         self.assertEqual(len(result), 1)
-        # Expected formula from non-renewable base:
+        # Expected formula from non-renewable base using non_renewable_energy_amount:
         # (100 / 0.25 + 200 / 0.28 - 50) * 0.30 - (100 + 200) = 19.29
         assert_object_contains_data(
             self,
