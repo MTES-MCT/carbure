@@ -13,6 +13,7 @@ import { ExtendedUnit } from "common/types"
 import { DeclareTeneurProgressBar } from "../declare-teneur-dialog/declare-teneur-progress-bar"
 import { RecapData } from "../recap-data"
 import { Notice } from "common/components/notice"
+import { ObjectiveSectorPicker } from "../objective-sector-picker"
 
 interface DeclareElecTeneurDialogProps {
   objective: ElecCategoryObjective
@@ -71,6 +72,10 @@ export const DeclareElecTeneurDialog = ({
             onSubmit={() => mutation.execute()}
           >
             <Box>
+              <ObjectiveSectorPicker {...form.bind("objective_sector")} />
+            </Box>
+
+            <Box>
               <NumberInput
                 label={t("Quantité déclarée en teneur (GJ)")}
                 min={1}
@@ -89,6 +94,7 @@ export const DeclareElecTeneurDialog = ({
                 </b>
               </Notice>
             </Box>
+
             <Box>
               <NumberInput
                 label={t("Tonnes de CO2 évitées")}
@@ -105,6 +111,7 @@ export const DeclareElecTeneurDialog = ({
                   label={t("Objectif global")}
                 />
               )}
+
               {mainObjective && (
                 <RecapData.RemainingQuantityBegoreCO2Objective
                   value={formatNumber(remainingCO2, {
