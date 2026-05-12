@@ -40,7 +40,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
           value: formatQuantityDisplay(operation, formatUnit, true),
         },
       {
-        label: t("Tonnes CO2 eq evitées"),
+        label: t("Tonnes CO2 eq évitées"),
         value: formatNumber(
           formatValue(operation, operation.avoided_emissions),
           {
@@ -72,6 +72,10 @@ export const useOperationDetailFields = (operation?: Operation) => {
       typeof operation.year === "number" && {
         label: t("Année"),
         value: operation.year,
+      },
+      operation.type === OperationType.TENEUR && {
+        label: t("Objectif de filière IRICC"),
+        value: formatSector(operation.objective_sector ?? operation.sector),
       },
     ])
 
