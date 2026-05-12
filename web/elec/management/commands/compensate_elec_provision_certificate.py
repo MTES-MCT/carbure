@@ -2,10 +2,10 @@ import json
 from collections import defaultdict
 
 from django.core.management.base import BaseCommand
-from django.db.models import Exists, ExpressionWrapper, F, FloatField, OuterRef, Value
-from django.db.models.functions import Round
+from django.db.models import Exists, ExpressionWrapper, F, FloatField, OuterRef, Subquery, Sum, Value
+from django.db.models.functions import Coalesce, Round
 
-from elec.models import ElecProvisionCertificate
+from elec.models import ElecCertificateReadjustment, ElecProvisionCertificate
 
 
 def _build_compensation_certificate(cpo_id, quarter, year, operating_unit, energy_amount, new_enr_ratio, cpo_name=None):
@@ -23,20 +23,61 @@ def _build_compensation_certificate(cpo_id, quarter, year, operating_unit, energ
 
 
 def _get_certificates_with_delta(year, new_enr_ratio):
+    """
+    Calcule, par CPO et pour une année donnée, le volume de compensation ENR (MWh renouvelable)
+    à créer en une requête agrégée.
+
+    Idée métier (toutes les quantités ci-dessous sont en MWh *renouvelable* sauf mention) :
+      1) On somme l'énergie des certificats de base du CPO sur l'année (hors compensation / erreur admin).
+      2) On retranche la somme des réajustements déjà enregistrés pour ce CPO et cette année
+         (champ year sur elec_certificate_readjustment). C'est la base *nette* après remboursements.
+      3) On applique le changement de ratio ENR sur cette base nette :
+           delta = (net / enr_ancien) * enr_nouveau - net
+
+    Exemple chiffré (enr ancien = 0,25 = 25 %, enr nouveau = 0,30 = 30 %) :
+      - Total certificats renouvelable = 100 ; réajustements = 90 → net = 10 MWh.
+      - 10 / 0,25 = 40
+      - 40 * 0,30 = 12 MWh renouvelable « attendu » au nouveau ratio pour ce bloc
+      - delta compensation = 12 - 10 = 2 MWh (c’est ce qu’on crée sur le certificat de rattrapage).
+
+    Limite du modèle agrégé : la requête suppose un seul enr_ratio pertinent par ligne de groupement
+    . Si un même CPO mélange des certificats avec des enr_ratio différents,
+    le calcul devrait être fait ligne à ligne puis sommé (fenêtre / sous-requête par certificat).
+    """
+    # Étape A — Ne pas recréer une compensation annuelle déjà présente (clé métier : même CPO, année, source).
     compensation_certificates = ElecProvisionCertificate.objects.filter(
         year=year,
         source=ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
         cpo_id=OuterRef("cpo_id"),
-        quarter=OuterRef("quarter"),
-        operating_unit=OuterRef("operating_unit"),
     )
 
+    # Étape B — Formule du delta sur la base nette (voir docstring).
+    #   net = total_energy_certificates - total_energy_readjustments
+    #   delta = (net / enr_ratio) * new_enr_ratio - net
     delta_expression = ExpressionWrapper(
-        ((F("energy_amount") / F("enr_ratio")) * Value(new_enr_ratio)) - F("energy_amount"),
+        (((F("total_energy_certificates") - F("total_energy_readjustments")) / F("enr_ratio")) * Value(new_enr_ratio))
+        - (F("total_energy_certificates") - F("total_energy_readjustments")),
         output_field=FloatField(),
     )
 
-    return (
+    # Étape C — Total des réajustements (MWh) pour ce CPO et cette année (sous-requête corrélée).
+    readjustments_for_year = (
+        ElecCertificateReadjustment.objects.filter(
+            cpo_id=OuterRef("cpo_id"),
+            year=year,
+        )
+        .values("cpo_id")
+        .annotate(total=Sum("energy_amount"))
+        .values("total")[:1]
+    )
+
+    # Étape D — Filtre des lignes certificat éligibles, puis agrégation par (cpo_id, nom, année).
+    #   - exclusion des sources hors périmètre et des ratios invalides ;
+    #   - somme des energy_amount → total_energy_certificates ;
+    #   - jointure logique du total des réajustements → total_energy_readjustments ;
+    #   - application de delta_expression puis arrondi à 2 décimales.
+    # Étape E — Ne garder que les CPO où la compensation est strictement positive.
+    q = (
         ElecProvisionCertificate.objects.filter(year=year)
         .exclude(
             source__in=[
@@ -48,25 +89,27 @@ def _get_certificates_with_delta(year, new_enr_ratio):
         .filter(has_compensation=False)
         .exclude(enr_ratio__isnull=True)
         .exclude(enr_ratio=0)
-        .values(
-            "cpo_id",
-            "cpo__name",
-            "quarter",
-            "year",
-            "operating_unit",
+        .values("cpo_id", "cpo__name", "year")
+        .annotate(
+            total_energy_readjustments=Coalesce(
+                Subquery(readjustments_for_year, output_field=FloatField()),
+                Value(0.0),
+            ),
         )
+        .annotate(total_energy_certificates=Sum(F("energy_amount")))
         .annotate(delta=Round(delta_expression, 2))
         .filter(delta__gt=0)
     )
+    return q
 
 
 def _build_compensation_certificates(certificates_with_delta, new_enr_ratio):
     return [
         _build_compensation_certificate(
             cpo_id=certificate["cpo_id"],
-            quarter=certificate["quarter"],
+            quarter=1,
             year=certificate["year"],
-            operating_unit=certificate["operating_unit"],
+            operating_unit="ALL",
             energy_amount=certificate["delta"],
             new_enr_ratio=new_enr_ratio,
             cpo_name=certificate["cpo__name"],
