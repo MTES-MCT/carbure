@@ -31,6 +31,9 @@ class BaseFilter(FilterSet):
     period = CharFilter(method="filter_period")
     customs_category = MultipleChoiceFilter(choices=MatierePremiere.MP_CATEGORIES)
     status = MultipleChoiceFilter(choices=Operation.OPERATION_STATUSES)
+    feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code")
+    origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays")
+    durability_period = AllValuesMultipleFilter(field_name="durability_period")
 
     order_by = CustomOrderingFilter(
         fields=(
@@ -43,6 +46,7 @@ class BaseFilter(FilterSet):
             ("_depot", "depot"),
             ("_entity", "from_to"),
             ("_quantity", "quantity"),
+            ("durability_period", "durability_period"),
         ),
         extra_valid_fields=[
             "available_balance",
@@ -107,21 +111,6 @@ class BaseFilter(FilterSet):
 
         return queryset.filter(q_objects).distinct()
 
-    class Meta:
-        model = Operation
-        fields = [
-            "biofuel",
-            "customs_category",
-            "sector",
-            "from_to",
-            "depot",
-            "type",
-            "operation",
-            "status",
-            "entity_id",
-            "period",
-        ]
-
 
 class OperationFilter(BaseFilter):
     # date_from = DateFilter(field_name="created_at", lookup_expr="gte")
@@ -129,8 +118,13 @@ class OperationFilter(BaseFilter):
 
 
 class OperationFilterForBalance(BaseFilter):
+    # Lot-level filters are handled by Prefetch in BalanceService, not at the Operation queryset level
     ges_bound_min = NumberFilter(method="ignore")
     ges_bound_max = NumberFilter(method="ignore")
+    feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code", method="ignore")
+    origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays", method="ignore")
+    # durability_period is resolved to specific lot_ids in the view and passed via detail_filters
+    durability_period = AllValuesMultipleFilter(method="ignore")
 
     def ignore(self, queryset, name, value):
         return queryset

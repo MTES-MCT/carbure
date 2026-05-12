@@ -1,12 +1,15 @@
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
+from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneEnergy, BiomethaneEnergyMonthlyReport
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.energy.monthly_report import BiomethaneEnergyMonthlyReportViewSet
-from core.models import Entity
+from core.models import Department, Entity, ExternalAdminRights
 from core.tests_utils import assert_object_contains_data, setup_current_user
+from entity.models import EntityScope
 
 
 class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
@@ -110,3 +113,41 @@ class BiomethaneEnergyMonthlyReportViewSetTests(TestCase):
         self.assertEqual(reports.count(), 2)
         assert_object_contains_data(self, reports[0], updated_monthly_reports_data[0])
         assert_object_contains_data(self, reports[1], self.valid_monthly_reports_data[1])
+
+    def test_list_monthly_reports_error_with_producer_using_producer_id_param(self):
+        """Test that a producer cannot use producer_id param to access another producer's reports (IDOR protection)."""
+        producer_entity_2 = Entity.objects.create(
+            name="Test Producer 2",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+
+        # Authenticated as self.producer_entity but requesting producer_entity_2's data via producer_id
+        params = {**self.base_params, "producer_id": producer_entity_2.id}
+
+        response = self.client.get(self.monthly_report_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_list_monthly_reports_with_dreal_and_producer_id(self):
+        """Test DREAL can access monthly reports filtered by producer_id."""
+        department = Department.objects.create(code_dept="77", name="Seine-et-Marne")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+
+        dreal = Entity.objects.create(name="Test DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        for report in self.valid_monthly_reports_data:
+            BiomethaneEnergyMonthlyReport.objects.create(energy=self.energy, **report)
+
+        setup_current_user(self, "dreal@carbure.local", "DREAL", "gogogo", [(dreal, "ADMIN")])
+
+        params = {"entity_id": dreal.id, "year": self.current_year, "producer_id": self.producer_entity.id}
+        response = self.client.get(self.monthly_report_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)

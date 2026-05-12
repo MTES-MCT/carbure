@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
 from biomethane.factories.injection_site import BiomethaneInjectionSiteFactory
+from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneInjectionSite
-from core.models import Entity
+from core.models import Department, Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
+from entity.models import EntityScope
 
 User = get_user_model()
 
@@ -111,3 +114,37 @@ class BiomethaneInjectionSiteViewsTests(TestCase):
         response = self.client.get(self.injection_site_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_retrieve_injection_site_error_with_producer_using_producer_id_param(self):
+        """Test that a producer cannot use producer_id param to access another producer's data (IDOR protection)."""
+        producer_entity_2 = Entity.objects.create(
+            name="Test Producer 2",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+
+        params = {"entity_id": self.producer_entity.id, "producer_id": producer_entity_2.id}
+        response = self.client.get(self.injection_site_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_retrieve_injection_site_with_dreal_and_producer_id(self):
+        """Test DREAL can access injection site filtered by producer_id."""
+        department = Department.objects.create(code_dept="34", name="Hérault")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+        injection_site = BiomethaneInjectionSiteFactory.create(producer=self.producer_entity)
+
+        dreal = Entity.objects.create(name="Test DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        setup_current_user(self, "dreal@carbure.local", "DREAL", "gogogo", [(dreal, "ADMIN")])
+
+        params = {"entity_id": dreal.id, "producer_id": self.producer_entity.id}
+        response = self.client.get(self.injection_site_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], injection_site.id)

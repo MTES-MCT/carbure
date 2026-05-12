@@ -193,8 +193,9 @@ class BalanceActionMixinTest(TestCase):
 
         mock_calculate_balance.assert_called_once()
         call_args = mock_calculate_balance.call_args[0]
-        self.assertEqual(call_args[5], "50.0")  # ges_bound_min
-        self.assertEqual(call_args[6], "80.0")  # ges_bound_max
+        detail_filters = call_args[5]
+        self.assertEqual(detail_filters["ges_bound_min"], "50.0")
+        self.assertEqual(detail_filters["ges_bound_max"], "80.0")
 
     @patch("tiruert.services.balance.BalanceService.calculate_balance")
     def test_balance_action_with_order_by_available_balance(self, mock_calculate_balance):

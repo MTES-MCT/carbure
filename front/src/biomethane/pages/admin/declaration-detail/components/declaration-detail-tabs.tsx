@@ -11,7 +11,6 @@ export const DeclarationDetailTabs = () => {
 
   return (
     <Tabs
-      scrollable
       tabs={compact([
         {
           key: "digestate",

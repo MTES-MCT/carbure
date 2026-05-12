@@ -3,8 +3,8 @@ import { GHGRangeForm } from "./ghg-range-form"
 import { Form, useForm } from "common/components/form2"
 import { balance } from "accounting/__test__/data/balances"
 import {
-  fillGHGRangeForm,
   getBalancesWithUpdatedAvailableBalance,
+  setGHGRangeValue,
 } from "./ghg-range-form.stories.utils"
 
 const meta: Meta<typeof GHGRangeForm> = {
@@ -51,6 +51,10 @@ export const AvailableBalanceWhenRangeIsChanged: Story = {
     // For an unknown reason, the test pass but the range is not visually updated in the screenshot
     // However, this range is also used in another story, and it works there, so it's not a problem with the range itself
     // The result of the screenshot is not correct
-    await fillGHGRangeForm(canvasElement)
+    await setGHGRangeValue({
+      canvasElement,
+      cursorIndex: 0,
+      value: "50",
+    })
   },
 }

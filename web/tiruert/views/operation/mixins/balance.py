@@ -75,11 +75,22 @@ class BalanceActionMixin:
         group_by = request.query_params.get("group_by", None)
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
-        ges_bound_min = request.query_params.get("ges_bound_min", None)
-        ges_bound_max = request.query_params.get("ges_bound_max", None)
+        durability_period = request.query_params.getlist("durability_period") or None
+        detail_filters = {
+            "ges_bound_min": request.query_params.get("ges_bound_min"),
+            "ges_bound_max": request.query_params.get("ges_bound_max"),
+            "feedstock": request.query_params.getlist("feedstock") or None,
+            "origin_country": request.query_params.getlist("origin_country") or None,
+        }
         order_by = request.query_params.get("order_by", None)
 
         operations = self.filter_queryset(self.get_queryset())
+
+        if durability_period:
+            # Resolve durability_period to the lot_ids from credit operations of that period.
+            # All operations referencing those lots (including debits like TENEUR) will then
+            # be included via the Prefetch filter, giving the real balance for those lots.
+            detail_filters["lot_ids"] = BalanceService.resolve_lot_ids_for_durability_period(operations, durability_period)
 
         balance = BalanceService.calculate_balance(
             operations,
@@ -87,8 +98,7 @@ class BalanceActionMixin:
             group_by,
             unit,
             date_from,
-            ges_bound_min,
-            ges_bound_max,
+            detail_filters,
         )
 
         # Convert balance to a list of dictionaries for serialization

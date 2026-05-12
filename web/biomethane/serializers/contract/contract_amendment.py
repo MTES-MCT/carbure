@@ -36,13 +36,6 @@ class BiomethaneContractAmendmentAddSerializer(BaseBiomethaneContractAmendmentSe
         if BiomethaneContractAmendment.OTHER in validated_data.get("amendment_object"):
             check_fields_required(validated_data, ["amendment_details"])
 
-        signature_date = validated_data.get("signature_date")
-        effective_date = validated_data.get("effective_date")
-        if signature_date and effective_date and effective_date < signature_date:
-            raise serializers.ValidationError(
-                {"effective_date": [_("La date d'effet doit être postérieure à la date de signature.")]}
-            )
-
         return validated_data
 
     def create(self, validated_data):

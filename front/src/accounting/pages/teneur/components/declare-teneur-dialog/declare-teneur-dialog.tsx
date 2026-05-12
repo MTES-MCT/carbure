@@ -11,11 +11,11 @@ import {
 } from "accounting/components/quantity-form"
 import { Box, Main } from "common/components/scaffold"
 import {
-  BiofuelForm,
-  biofuelFormStep,
-  biofuelFormStepKey,
-} from "./biofuel-form"
-import { ExtendedUnit, Unit } from "common/types"
+  BiofuelFiltersForm,
+  biofuelFiltersFormStep,
+  biofuelFiltersFormStepKey,
+} from "./biofuel-filters-form"
+import { ExtendedUnit } from "common/types"
 import { CreateOperationType } from "accounting/types"
 import { RecapData } from "../recap-data"
 import {
@@ -29,7 +29,7 @@ import {
   SectorObjective,
   TargetType,
 } from "../../types"
-import { CONVERSIONS, floorNumber, formatUnit } from "common/utils/formatters"
+import { floorNumber, formatUnit } from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
@@ -129,7 +129,7 @@ const DeclareTeneurDialogContent = ({
     >
       <Main>
         <Stepper />
-        {currentStep?.key !== biofuelFormStepKey && (
+        {currentStep?.key !== biofuelFiltersFormStepKey && (
           <>
             <Box spacing="md">
               <RecapOperationGrid>
@@ -191,10 +191,8 @@ const DeclareTeneurDialogContent = ({
         )}
         {currentStep?.key !== "recap" && (
           <Stepper.Form form={form} id="declare-teneur-dialog">
-            {currentStep?.key === biofuelFormStepKey && (
-              <Box spacing="md">
-                <BiofuelForm category={objective.code} />
-              </Box>
+            {currentStep?.key === biofuelFiltersFormStepKey && (
+              <BiofuelFiltersForm category={objective.code} />
             )}
             {currentStep?.key === quantityFormStepKey && (
               <>
@@ -204,11 +202,6 @@ const DeclareTeneurDialogContent = ({
                     type={CreateOperationType.TENEUR}
                     quantityMax={depotQuantityMax}
                     unit={ExtendedUnit.GJ}
-                    backendUnit={Unit.MJ}
-                    // Send to the backend the quantity declared / the part of renewable energy share of the biofuel (converted to MJ)
-                    converter={CONVERSIONS.energy.GJ_TO_MJ}
-                    gesBoundMin={form.value.gesBoundMin}
-                    gesBoundMax={form.value.gesBoundMax}
                     onQuantityDeclared={handleQuantityDeclared}
                   />
                 </Box>
@@ -250,22 +243,16 @@ const DeclareTeneurDialogContent = ({
 export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
   const { t } = useTranslation()
 
-  const form = useForm<DeclareTeneurDialogForm>({
-    gesBoundMin: undefined,
-    gesBoundMax: undefined,
-  })
-
-  const backendUnit = Unit.MJ
+  const form = useForm<DeclareTeneurDialogForm>({})
 
   const quantityFormStep = useQuantityFormStep({
     balance: form.value.balance,
-    converter: CONVERSIONS.energy.GJ_TO_MJ,
+    unit: ExtendedUnit.GJ,
     form,
-    backendUnit,
   })
 
   const steps = [
-    biofuelFormStep(form.value),
+    biofuelFiltersFormStep(form.value),
     quantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
   ]

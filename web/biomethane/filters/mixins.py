@@ -1,4 +1,7 @@
 from django_filters import CharFilter, FilterSet, NumberFilter
+from rest_framework.exceptions import PermissionDenied
+
+from biomethane.permissions import is_entity_related_to_biomethane_external_admin
 
 
 class EntityProducerFilter(FilterSet):
@@ -16,7 +19,7 @@ class EntityProducerFilter(FilterSet):
     """
 
     entity_id = CharFilter(method="filter_by_entity")
-    producer_id = CharFilter(field_name="producer__id", lookup_expr="exact")
+    producer_id = CharFilter(method="ignore")  # for typing purposes only
 
     def filter_by_entity(self, queryset, name, value):
         """
@@ -25,18 +28,16 @@ class EntityProducerFilter(FilterSet):
         - Otherwise (Producer case), filter by producer__id = entity_id
         """
         if "producer_id" in self.data:
-            # DREAL case: ignore entity_id for filtering, entity_id is just for permissions
-            return queryset
-        else:
-            # Producer case
-            return queryset.filter(producer__id=value)
+            entity = getattr(self.request, "entity", None)
+            if not (entity and is_entity_related_to_biomethane_external_admin(entity)):
+                raise PermissionDenied()
+            value = self.data["producer_id"]
 
-    class Meta:
-        fields = ["entity_id", "producer_id"]
+        return queryset.filter(producer__id=value)
+
+    def ignore(self, queryset, name, value):
+        return queryset
 
 
 class EntityProducerYearFilter(EntityProducerFilter):
     year = NumberFilter(field_name="year", lookup_expr="exact", required=True)
-
-    class Meta:
-        fields = ["entity_id", "producer_id", "year"]

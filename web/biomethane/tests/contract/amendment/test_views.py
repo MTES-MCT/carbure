@@ -1,14 +1,17 @@
 from datetime import date
 
+from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
 from biomethane.factories.contract import BiomethaneContractFactory, BiomethaneEntityConfigAmendmentFactory
+from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneContractAmendment
-from core.models import Entity
+from core.models import Department, Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
+from entity.models import EntityScope
 
 
 class BiomethaneContractAmendmentViewSetTests(TestCase):
@@ -255,3 +258,59 @@ class BiomethaneContractAmendmentViewSetTests(TestCase):
         response = self.client.post(self.amendment_create_url, data, query_params=self.base_params, format="multipart")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("amendment_object", response.data)
+
+    def test_list_amendments_error_with_producer_using_producer_id_param(self):
+        """Test that a producer cannot use producer_id param to access another producer's amendments (IDOR protection)."""
+        producer_entity_2 = Entity.objects.create(
+            name="Test Producer 2",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+        contract_2 = BiomethaneContractFactory.create(
+            producer=producer_entity_2,
+            buyer=self.buyer_entity,
+            tariff_reference="2021",
+            pap_contracted=50.0,
+        )
+        BiomethaneEntityConfigAmendmentFactory.create(contract=contract_2)
+
+        # Authenticated as self.producer_entity but requesting producer_entity_2's amendments via producer_id
+        params = {"entity_id": self.producer_entity.id, "producer_id": producer_entity_2.id}
+
+        response = self.client.get(self.amendment_list_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_list_amendments_with_dreal_and_producer_id(self):
+        """Test DREAL can access amendments filtered by producer_id."""
+        department = Department.objects.create(code_dept="42", name="Loire")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+
+        dreal = Entity.objects.create(name="Test DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        # Amendments for self.producer_entity (accessible to DREAL)
+        amendment_1 = BiomethaneEntityConfigAmendmentFactory.create(contract=self.contract)
+        amendment_2 = BiomethaneEntityConfigAmendmentFactory.create(contract=self.contract)
+
+        # Amendment for another producer not in DREAL's scope (should not be returned)
+        producer_entity_2 = Entity.objects.create(name="Test Producer 2", entity_type=Entity.BIOMETHANE_PRODUCER)
+        contract_2 = BiomethaneContractFactory.create(
+            producer=producer_entity_2, buyer=self.buyer_entity, tariff_reference="2021", pap_contracted=50.0
+        )
+        BiomethaneEntityConfigAmendmentFactory.create(contract=contract_2)
+
+        setup_current_user(self, "dreal@carbure.local", "DREAL", "gogogo", [(dreal, "ADMIN")])
+
+        params = {"entity_id": dreal.id, "producer_id": self.producer_entity.id}
+        response = self.client.get(self.amendment_list_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 2)
+        returned_ids = [r["id"] for r in response.data["results"]]
+        self.assertIn(amendment_1.id, returned_ids)
+        self.assertIn(amendment_2.id, returned_ids)

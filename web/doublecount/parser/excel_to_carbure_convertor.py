@@ -50,6 +50,27 @@ dc_feedstock_to_carbure_feedstock = {
     "méthanol brut issu de la pâte kraft obtenue à partir de la pulpe de bois": "RAW_METHANOL_KRAFT_PULPING",
     "culture intermédiaire": "CIVE",
     "carinata": "CARINATA",
+    "huiles de fusel": "HUILES_DE_FUSEL",
+    "alcools mauvais goûts": "MAUVAIS_GOUTS",
+    "huiles acides de plumes de volailles": "HUILES_ACIDES_DE_PLUMES_DE_VOLAILLES",
+    "huiles acides de pâtes de neutralisation": "PATES_DE_NEUTRALISATION",
+    "huiles de terres de blanchiment usagée": "HUILES_DE_TERRES_DE_BLANCHIMENT_USAGEE",
+    "résidus de cristallisation d'hydrolysats de dextrose": "RESIDUS_DE_CRISTALLISATION_D_HYDROLYSATS_DE_DEXTROSE",
+    "rétentats de microfiltration de solution de glucose": "RETENTATS_DE_MICROFILTRATION_DE_SOLUTION_DE_GLUCOSE",
+    "huile de coque de noix de cajou": "HUILE_DE_COQUE_DE_NOIX_DE_CAJOU",
+    "ethanol de rinçage de lignes de production de l'industrie cosmétique": "ETHANOL_DE_RINÇAGE",
+    "alcool résiduel de synthèse pharmaceutique": "ALCOOL_DE_SYNTHESE_PHARMACEUTIQUE",
+    "résidus de transestérification d'huiles": "RESIDUS_DE_TRANSESTERIFICATION_D_HUILES",
+    "huiles acides neutralisées ayant une haute teneur en soufre": "HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE",  # noqa: E501
+    "graisses brunes": "GRAISSES_BRUNES",
+    "graisses d'insectes": "GRAISSES_D_INSECTES",
+    "levures usagées": "LEVURES_USAGEES",
+    "poussières de maïs contaminées": "POUSSIERES_DE_MAIS_CONTAMINEES",
+    "déchets alcooliques issus du traitement de plasma sanguin": "DECHETS_ALCOOLIQUES_ISSUS_DU_TRAITEMENT_DE_PLASMA_SANGUIN",
+    "acides gras de noix de coco distillés": "ACIDES_GRAS_DE_NOIX_DE_COCO_DISTILLES",
+    "rafles de fruits vides": "RAFLES_DE_FRUITS_VIDES",
+    "sucres déchets contenant de l'amidon": "SUCRES_DECHETS_CONTENANT_DE_L_AMIDON",
+    "fraction lourde issue de la fabrication de farine": "FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE",
 }
 
 
