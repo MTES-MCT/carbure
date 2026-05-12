@@ -2,6 +2,7 @@ import { Dialog } from "common/components/dialog2"
 import { useTranslation } from "react-i18next"
 import {
   getBiofuelBalance,
+  getBiofuelBalancePerSector,
   getElecBalance,
   validateTeneurBiofuel,
   validateTeneurElec,
@@ -10,6 +11,7 @@ import { useMutation, useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import {
   useBiofuelTeneurColumns,
+  useBiofuelTeneurSectorColumns,
   useElecTeneurColumns,
 } from "./validate-pending-teneur-dialog.hooks"
 import { NoResult } from "common/components/no-result2"
@@ -20,6 +22,7 @@ import { compact } from "common/utils/collection"
 import { SectorTabs } from "accounting/types"
 import { useState } from "react"
 import { Table } from "common/components/table2"
+import { Title } from "common/components/title"
 
 export const ValidatePendingTeneurDialog = ({
   onClose,
@@ -31,11 +34,17 @@ export const ValidatePendingTeneurDialog = ({
   const notify = useNotify()
 
   const biofuelColumns = useBiofuelTeneurColumns()
+  const biofuelSectorColumns = useBiofuelTeneurSectorColumns()
   const elecColumns = useElecTeneurColumns()
 
   const [tab, setTab] = useState<string>(SectorTabs.BIOFUELS)
 
   const biofuel = useQuery(getBiofuelBalance, {
+    key: "balances",
+    params: [entity.id],
+  })
+
+  const biofuelSector = useQuery(getBiofuelBalancePerSector, {
     key: "balances-by-sector",
     params: [entity.id],
   })
@@ -49,6 +58,7 @@ export const ValidatePendingTeneurDialog = ({
 
   const biofuelsRes = biofuel.result?.data.results ?? []
   const elecRes = elec.result?.data?.results ?? []
+  const biofuelSectorRes = biofuelSector.result?.data?.results ?? []
 
   const results = [...biofuelsRes, ...elecRes]
 
@@ -123,11 +133,20 @@ export const ValidatePendingTeneurDialog = ({
       ) : (
         <>
           {tab === SectorTabs.BIOFUELS && (
-            <Table
-              loading={loading}
-              columns={biofuelColumns}
-              rows={biofuelsRes}
-            />
+            <>
+              <Title is="h6">{t("Teneurs par filière")}</Title>
+              <Table
+                loading={loading}
+                columns={biofuelSectorColumns}
+                rows={biofuelSectorRes}
+              />
+              <Title is="h6">{t("Teneurs par biocarburant / catégorie")}</Title>
+              <Table
+                loading={loading}
+                columns={biofuelColumns}
+                rows={biofuelsRes}
+              />
+            </>
           )}
           {tab === SectorTabs.ELEC && (
             <Table //

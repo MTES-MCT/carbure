@@ -1,5 +1,6 @@
 import { getBalances } from "accounting/api/biofuels/balances"
 import { getElecBalances } from "accounting/api/elec/balances"
+import { PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by } from "api-schema"
 import { CategoryEnum, Unit } from "common/types"
 import {
   CategoryObjective,
@@ -148,6 +149,14 @@ export const getBiofuelBalance = async (entity_id: number) => {
   return getBalances<apiTypes["Balance"]>({
     entity_id,
     unit: Unit.MJ,
+  })
+}
+
+export const getBiofuelBalancePerSector = async (entity_id: number) => {
+  return getBalances<apiTypes["BalanceBySector"]>({
+    entity_id,
+    unit: Unit.MJ,
+    group_by: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by.sector,
   })
 }
 
