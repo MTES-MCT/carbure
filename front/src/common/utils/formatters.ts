@@ -1,7 +1,7 @@
 import i18n from "i18n"
 import { format as formatTime, formatDistanceToNow } from "date-fns"
 import { fr, enGB as en } from "date-fns/locale"
-import { ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnit, ExtendedUnitType, Unit } from "common/types"
 import i18next from "i18next"
 
 export function formatPeriod(period: number | string) {
@@ -76,7 +76,7 @@ export function formatCelsiusDegree(num: number) {
 
 export function formatUnit(
   num: number,
-  unit: Unit | ExtendedUnit,
+  unit: ExtendedUnitType,
   customOptions: FormatNumberOptions = {}
 ) {
   const defaultOptions: FormatNumberOptions = {
@@ -94,7 +94,7 @@ export function formatUnit(
   return `${formatNumber(num, options)} ${unitLabel[unit]}`
 }
 
-export function formatUnitOnly(unit: Unit | ExtendedUnit, count = 2) {
+export function formatUnitOnly(unit: ExtendedUnitType, count = 2) {
   const unitLabel = {
     [Unit.l]: i18next.t("litres", { count }),
     [Unit.kg]: i18next.t("kg"),

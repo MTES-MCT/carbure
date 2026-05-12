@@ -5164,6 +5164,7 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
+            is_industrial_waste?: boolean;
         };
         FeedStockClassification: {
             name: string;
@@ -5171,6 +5172,7 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
+            is_industrial_waste?: boolean;
             classification: components["schemas"]["Classification"] | null;
         };
         FeedStockRequest: {
@@ -5179,6 +5181,7 @@ export interface components {
             code: string;
             category?: components["schemas"]["MPCategoriesEnum"];
             is_double_compte?: boolean;
+            is_industrial_waste?: boolean;
         };
         FieldData: {
             name: string;
@@ -5893,7 +5896,7 @@ export interface components {
          *     * `MJ` - MJ
          * @enum {string}
          */
-        PreferredUnitEnum: PathsApiTiruertOperationsGetParametersQueryUnit;
+        PreferredUnitEnum: PreferredUnitEnum;
         /**
          * @description * `LIQUID_PROCESS` - Voie liquide
          *     * `DRY_PROCESS` - Voie sèche
@@ -6279,6 +6282,9 @@ export interface components {
             ges_bound_min?: number;
             /** Format: double */
             ges_bound_max?: number;
+            durability_period?: string[];
+            origin_country?: string[];
+            feedstock?: string[];
         };
         SimulationLotOutput: {
             lot_id: number;
@@ -6297,6 +6303,9 @@ export interface components {
             ges_bound_min?: number;
             /** Format: double */
             ges_bound_max?: number;
+            feedstock?: string[];
+            origin_country?: string[];
+            durability_period?: string[];
         };
         SimulationMinMaxOutput: {
             /** Format: double */
@@ -12931,8 +12940,10 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
+                durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 from_to?: string;
                 /**
                  * @description * `INCORPORATION` - INCORPORATION
@@ -12970,6 +12981,8 @@ export interface operations {
                  *     * `-from_to` - From to (décroissant)
                  *     * `quantity` - Quantity
                  *     * `-quantity` - Quantity (décroissant)
+                 *     * `durability_period` - Durability period
+                 *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
                  *     * `-available_balance` - available_balance (descending)
                  *     * `pending_operations` - pending_operations
@@ -12980,6 +12993,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -13286,8 +13300,10 @@ export interface operations {
                 /** @description Date from where to calculate teneur and quantity */
                 date_from?: string;
                 depot?: string[];
+                durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 from_to?: string;
                 ges_bound_max?: number;
                 ges_bound_min?: number;
@@ -13329,6 +13345,8 @@ export interface operations {
                  *     * `-from_to` - From to (décroissant)
                  *     * `quantity` - Quantity
                  *     * `-quantity` - Quantity (décroissant)
+                 *     * `durability_period` - Durability period
+                 *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
                  *     * `-available_balance` - available_balance (descending)
                  *     * `pending_operations` - pending_operations
@@ -13339,6 +13357,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -13401,8 +13420,10 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
+                durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter;
                 from_to?: string;
@@ -13442,6 +13463,8 @@ export interface operations {
                  *     * `-from_to` - From to (décroissant)
                  *     * `quantity` - Quantity
                  *     * `-quantity` - Quantity (décroissant)
+                 *     * `durability_period` - Durability period
+                 *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
                  *     * `-available_balance` - available_balance (descending)
                  *     * `pending_operations` - pending_operations
@@ -13452,6 +13475,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string[];
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
@@ -13534,8 +13558,10 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
+                durability_period?: (string | null)[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiTiruertOperationsFiltersGetParametersQueryFilter;
                 from_to?: string;
@@ -13575,6 +13601,8 @@ export interface operations {
                  *     * `-from_to` - From to (décroissant)
                  *     * `quantity` - Quantity
                  *     * `-quantity` - Quantity (décroissant)
+                 *     * `durability_period` - Durability period
+                 *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
                  *     * `-available_balance` - available_balance (descending)
                  *     * `pending_operations` - pending_operations
@@ -13585,6 +13613,7 @@ export interface operations {
                 order_by?: PathsApiTiruertOperationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_country?: string[];
                 period?: string[];
                 /** @description A search term. */
                 search?: string;
@@ -14163,6 +14192,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     ValueMinuscreated_at = "-created_at",
     ValueMinuscustoms_category = "-customs_category",
     ValueMinusdepot = "-depot",
+    ValueMinusdurability_period = "-durability_period",
     ValueMinusfrom_to = "-from_to",
     ValueMinuspending_operations = "-pending_operations",
     ValueMinusquantity = "-quantity",
@@ -14175,6 +14205,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     created_at = "created_at",
     customs_category = "customs_category",
     depot = "depot",
+    durability_period = "durability_period",
     from_to = "from_to",
     pending_operations = "pending_operations",
     quantity = "quantity",
@@ -14200,6 +14231,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
 }
 export enum PathsApiTiruertOperationsGetParametersQueryUnit {
     MJ = "MJ",
+    gj = "gj",
     kg = "kg",
     l = "l"
 }
@@ -14211,12 +14243,16 @@ export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
 export enum PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter {
     biofuel = "biofuel",
     customs_category = "customs_category",
+    durability_period = "durability_period",
+    feedstock = "feedstock",
+    origin_country = "origin_country",
     sector = "sector"
 }
 export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     biofuel = "biofuel",
     customs_category = "customs_category",
     depot = "depot",
+    durability_period = "durability_period",
     from_to = "from_to",
     operation = "operation",
     period = "period",
@@ -14448,6 +14484,11 @@ export enum OwnershipTypeEnum {
     OWN = "OWN",
     THIRD_PARTY = "THIRD_PARTY",
     PROCESSING = "PROCESSING"
+}
+export enum PreferredUnitEnum {
+    l = "l",
+    kg = "kg",
+    MJ = "MJ"
 }
 export enum ProcessTypeEnum {
     LIQUID_PROCESS = "LIQUID_PROCESS",

@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 
+from core.services.notify_site_change import notify_site_change
 from entity.services import enable_depot
 from transactions.models import Airport, Depot, EntitySite, ProductionSite, Site
 
@@ -36,6 +37,12 @@ class SiteAdmin(admin.ModelAdmin):
     list_filter = ("site_type", "country")
     actions = ["enable_site"]
     inlines = [EntitySiteInline]
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        if change and form.changed_data:
+            notify_site_change(obj, form)
 
     def enable_site(self, request, queryset):
         for site in queryset:

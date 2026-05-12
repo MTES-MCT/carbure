@@ -1,4 +1,4 @@
 from .contract_amendment import BiomethaneContractAmendmentFilter
-from .supply_input import BaseBiomethaneSupplyInputFilter, BiomethaneSupplyInputCreateFilter, BiomethaneSupplyInputFilter
+from .supply_input import BiomethaneSupplyInputFilter, BiomethaneSupplyInputYearFilter
 from .mixins import EntityProducerFilter, EntityProducerYearFilter
 from .energy_monthly_report import BiomethaneEnergyMonthlyReportFilter, BiomethaneEnergyMonthlyReportYearFilter

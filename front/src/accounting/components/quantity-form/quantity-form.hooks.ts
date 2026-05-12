@@ -3,49 +3,41 @@ import { Balance } from "accounting/types"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { QuantityFormProps } from "./quantity-form.types"
-import { ExtendedUnit, Unit } from "common/types"
+import { ExtendedUnit, ExtendedUnitType } from "common/types"
 import { useUnit } from "common/hooks/unit"
-import { FormManager } from "common/components/form2"
+import { FormManager, useFormContext } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
 import { GHGRangeFormProps } from "../ghg-range-form"
 import { useRef } from "react"
-// import { GHGRangeFormProps } from "../ghg-range-form"
+import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
+import { mapAdvancedFiltersForPayload } from "../advanced-filters/advanced-filters.utils"
 
 type UseQuantityFormProps = {
   balance: Balance
-  values: QuantityFormProps
-  unit?: Unit | ExtendedUnit
-  // Custom conversion function for the backend (default is the value passed as parameter)
-  converter?: (value: number) => number
-
+  unit?: ExtendedUnitType
   depotId?: number
-  gesBoundMin?: number
-  gesBoundMax?: number
 }
 export const useQuantityForm = ({
   balance,
-  values,
-  unit: customUnit,
-  converter = (value) => value,
+  unit: overrideUnit,
   depotId,
-  gesBoundMin,
-  gesBoundMax,
 }: UseQuantityFormProps) => {
   const entity = useEntity()
-  const { unit } = useUnit(customUnit)
+  const { unit } = useUnit(overrideUnit)
+  const { value } = useFormContext<
+    QuantityFormProps & AdvancedFiltersFormProps
+  >()
 
   const declareQuantity = () =>
     simulateMinMax(entity.id, {
       biofuel: balance.biofuel?.id ?? null,
       customs_category: balance.customs_category,
       debited_entity: entity.id,
-      // In some cases the quantity is in MJ in the backend, but we want to display in GJ
-      target_volume: converter(values.quantity!),
+      target_volume: value.quantity!,
       target_emission: 0,
-      unit: unit,
+      unit,
       from_depot: depotId,
-      ges_bound_min: gesBoundMin,
-      ges_bound_max: gesBoundMax,
+      ...mapAdvancedFiltersForPayload(value),
     })
 
   const mutation = useMutation(declareQuantity)
@@ -55,23 +47,20 @@ export const useQuantityForm = ({
 
 type UseQuantityFormStepProps = {
   balance?: Balance
-  // Unit of the quantity used by the backend (default is the entity preferred unit)
-  backendUnit?: Unit | ExtendedUnit
-
-  // Custom conversion function for the backend (default is the value passed as parameter)
-  converter?: (value: number) => number
+  // Override the unit (default is the entity preferred unit)
+  unit?: ExtendedUnit
   form: FormManager<QuantityFormProps & GHGRangeFormProps>
   overrides?: Parameters<typeof quantityFormStep>[1]
 }
 
 export const useQuantityFormStep = ({
   balance,
-  converter = (value) => value,
+  unit: overrideUnit,
   form,
-  backendUnit,
   overrides,
 }: UseQuantityFormStepProps) => {
   const entity = useEntity()
+  const { unit } = useUnit(overrideUnit)
 
   return quantityFormStep(form.value, {
     ...overrides,
@@ -85,11 +74,10 @@ export const useQuantityFormStep = ({
         biofuel: balance.biofuel.id,
         customs_category: balance.customs_category,
         debited_entity: entity.id,
-        target_volume: converter(form.value.quantity!),
+        target_volume: form.value.quantity!,
         target_emission: form.value.avoided_emissions ?? 0,
-        unit: backendUnit,
-        ges_bound_min: form.value.gesBoundMin,
-        ges_bound_max: form.value.gesBoundMax,
+        unit,
+        ...mapAdvancedFiltersForPayload(form.value),
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)
       })

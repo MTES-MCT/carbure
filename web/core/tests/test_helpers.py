@@ -55,3 +55,45 @@ class SendMailTest(TestCase):
             ["carbure@beta.gouv.fr"],
             cc=None,
         )
+
+    def test_prepare_email_to_be_sent_without_request(self):
+        self.patched_settings.WITH_EMAIL_DECORATED_AS_TEST = False
+        self.patched_EmailMultiAlternatives.assert_not_called()
+
+        send_mail(
+            request=None,
+            subject="A subject",
+            message="A message",
+            from_email="carbure@example.com",
+            recipient_list=["user@example.com"],
+            cc="additional_recipient@example.com",
+        )
+
+        self.patched_EmailMultiAlternatives.assert_called_with(
+            "A subject",
+            "A message",
+            "carbure@example.com",
+            ["user@example.com"],
+            cc="additional_recipient@example.com",
+        )
+
+    def test_decorates_email_when_sending_without_request(self):
+        self.patched_settings.WITH_EMAIL_DECORATED_AS_TEST = True
+        self.patched_EmailMultiAlternatives.assert_not_called()
+
+        send_mail(
+            request=None,
+            subject="A subject",
+            message="A message",
+            from_email="carbure@example.com",
+            recipient_list=["user@example.com"],
+            cc="additional_recipient@example.com",
+        )
+
+        self.patched_EmailMultiAlternatives.assert_called_with(
+            "[TEST] A subject",
+            "A message \n\n ['user@example.com']",
+            "carbure@example.com",
+            ["carbure@beta.gouv.fr"],
+            cc=None,
+        )

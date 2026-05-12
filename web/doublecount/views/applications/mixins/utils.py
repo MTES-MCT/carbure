@@ -116,9 +116,7 @@ def application_to_json(application, dechets_industriels="-"):
         application.production.filter(year__in=[year_n, year_n_1]).values_list("biofuel__name", flat=True).distinct()
     )
     filtered_biofuels = list(
-        application.production.filter(
-            year__in=[year_n, year_n_1], feedstock__code__in=["DECHETS_INDUSTRIELS", "AMIDON_RESIDUEL_DECHETS"]
-        )
+        application.production.filter(year__in=[year_n, year_n_1], feedstock__is_industrial_waste=True)
         .values_list("biofuel__name", flat=True)
         .distinct()
     )

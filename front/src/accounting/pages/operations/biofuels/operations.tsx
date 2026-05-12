@@ -30,7 +30,8 @@ const OperationsBiofuels = () => {
     [OperationsFilter.sector]: t("Filière"),
     [OperationsFilter.customs_category]: t("Catégorie"),
     [OperationsFilter.biofuel]: t("Biocarburants"),
-    [OperationsFilter.period]: t("Date"),
+    [OperationsFilter.durability_period]: t("Période de durabilité"),
+    [OperationsFilter.period]: t("Date de création"),
     [OperationsFilter.type]: t("Débit / Crédit"),
     [OperationsFilter.from_to]: t("Destinataire"),
   }

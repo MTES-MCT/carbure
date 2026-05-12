@@ -28,7 +28,7 @@ from transactions.models import Airport, Depot, ProductionSite
 class FeedStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatierePremiere
-        fields = ["name", "name_en", "code", "category", "is_double_compte"]
+        fields = ["name", "name_en", "code", "category", "is_double_compte", "is_industrial_waste"]
 
 
 class BiofuelSerializer(serializers.ModelSerializer):

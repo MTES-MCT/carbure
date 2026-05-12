@@ -42,6 +42,7 @@ class UserViewSet(UserActionMixin, viewsets.GenericViewSet):
                         ExternalAdminRights.TRANSFERRED_ELEC,
                         ExternalAdminRights.DOUBLE_COUNTING,
                         ExternalAdminRights.DREAL,
+                        ExternalAdminRights.ADEME,
                     ]
                 )
             ]
