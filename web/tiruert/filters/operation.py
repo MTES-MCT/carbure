@@ -123,12 +123,8 @@ class OperationFilterForBalance(BaseFilter):
     ges_bound_max = NumberFilter(method="ignore")
     feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code", method="ignore")
     origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays", method="ignore")
-    durability_period = AllValuesMultipleFilter(method="filter_durability_period")
+    # durability_period is resolved to specific lot_ids in the view and passed via detail_filters
+    durability_period = AllValuesMultipleFilter(method="ignore")
 
     def ignore(self, queryset, name, value):
         return queryset
-
-    def filter_durability_period(self, queryset, name, value):
-        # Include debit operations (durability_period=None) so they are not excluded
-        # from the balance calculation when filtering by durability period
-        return queryset.filter(Q(durability_period__in=value) | Q(durability_period__isnull=True))

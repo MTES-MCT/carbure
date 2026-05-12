@@ -137,10 +137,22 @@ class BalanceService:
         )
 
     @staticmethod
+    @staticmethod
+    def resolve_lot_ids_for_durability_period(operations, durability_period):
+        """
+        Returns the list of lot_ids belonging to credit operations with the given durability_period.
+        These lot_ids are then passed as a detail_filter so that all operations referencing
+        those lots (including debits like TENEUR) are included in the balance calculation.
+        """
+        return list(
+            operations.filter(durability_period__in=durability_period).values_list("details__lot_id", flat=True).distinct()
+        )
+
+    @staticmethod
     def _prefetch_filtered_details(operations, detail_filters=None):
         """
         Pre-filter OperationDetails at DB level using Prefetch.
-        detail_filters keys: ges_bound_min, ges_bound_max, feedstock, origin_country
+        detail_filters keys: ges_bound_min, ges_bound_max, feedstock, origin_country, lot_ids
         """
         details_qs = OperationDetail.objects.select_related("lot")
 
@@ -160,6 +172,10 @@ class BalanceService:
             origin_country = detail_filters.get("origin_country")
             if origin_country:
                 details_qs = details_qs.filter(lot__country_of_origin__code_pays__in=origin_country)
+
+            lot_ids = detail_filters.get("lot_ids")
+            if lot_ids is not None:
+                details_qs = details_qs.filter(lot_id__in=lot_ids)
 
         return operations.prefetch_related(Prefetch("details", queryset=details_qs, to_attr="prefetched_details"))
 
