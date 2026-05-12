@@ -85,6 +85,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             operating_unit=operating_unit,
             source=ElecProvisionCertificate.METER_READINGS,
             energy_amount=certificate_energy,
+            enr_ratio=ENR_RATIO,
         )
 
         return meter_reading
@@ -175,6 +176,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         )
 
         expected_readjustment_energy = (1500 - 900) * ENR_RATIO
+        expected_non_renewable_readjustment_energy = 1500 - 900
 
         self.assertEqual(
             self.run_command(apply_readjustments=True),
@@ -186,6 +188,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         ).get()
 
         self.assertEqual(readjustment.energy_amount, expected_readjustment_energy / 1000)
+        self.assertEqual(readjustment.non_renewable_energy_amount, expected_non_renewable_readjustment_energy / 1000)
 
     def test_report_takes_already_defined_readjustments_into_account(self):
         self.setup_meter_reading(
@@ -227,6 +230,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             operating_unit="FRBLA",
             energy_amount=10000 * ENR_RATIO / 1000,
             source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION,
+            enr_ratio=ENR_RATIO,
         )
 
         self.assertEqual(
