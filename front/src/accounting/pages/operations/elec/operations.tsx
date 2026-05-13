@@ -16,10 +16,12 @@ import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
 import { Unit } from "common/types"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 const OperationsElec = () => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
+  const { selectedEntityId } = useSelectedEntity()
   const filterLabels = {
     [OperationsFilter.status]: t("Statut"),
     [OperationsFilter.period]: t("Date"),
@@ -32,13 +34,13 @@ const OperationsElec = () => {
     useQueryBuilder<ElecOperationsQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(api.getOperations, {
-    key: "elec-operations",
-    params: [query],
+    key: `elec-operations-${selectedEntityId}`,
+    params: [query, selectedEntityId],
   })
 
   const columns = useOperationsElecColumns()
 
-  const getFilterOptions = useGetFilterOptions(query)
+  const getFilterOptions = useGetFilterOptions(query, selectedEntityId)
 
   return (
     <>

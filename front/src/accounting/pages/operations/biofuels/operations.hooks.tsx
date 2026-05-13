@@ -143,12 +143,19 @@ export const useOperationsBiofuelsColumns = ({
   return columns
 }
 
-export const useGetFilterOptions = (query: OperationsQuery) => {
+export const useGetFilterOptions = (
+  query: OperationsQuery,
+  selectedEntityId?: number
+) => {
   const { t } = useTranslation()
   const normalizeSector = useNormalizeSector()
 
   const getFilterOptions = async (filter: OperationsFilter) => {
-    const { data } = await api.getOperationsFilters(filter, query)
+    const { data } = await api.getOperationsFilters(
+      filter,
+      query,
+      selectedEntityId
+    )
 
     if (!data) {
       return []

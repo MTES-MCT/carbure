@@ -9,7 +9,7 @@ from entity.permissions import HasDgddiWriteRights
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
 from tiruert.models import Operation
-from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights
+from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights, TiruertAdminRights
 from tiruert.serializers import (
     OperationInputSerializer,
     OperationListSerializer,
@@ -29,6 +29,7 @@ class OperationPagination(MetadataPageNumberPagination):
         metadata = {"total_quantity": 0}
 
         for operation in self.queryset:
+            # _quantity is annotated and signed (positive=credit, negative=debit)
             quantity = operation.quantity(unit=self.request.unit) * operation.renewable_energy_share
             metadata["total_quantity"] += quantity
         return metadata
@@ -75,7 +76,7 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
             return [HasTiruertWriteRights()]
         elif self.action == "correct":
             return [HasDgddiWriteRights()]
-        return [(HasTiruertRightsBalanceAndOperations | HasDgddiWriteRights)()]
+        return [(HasTiruertRightsBalanceAndOperations | HasDgddiWriteRights | TiruertAdminRights)()]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -99,7 +100,8 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
             "kg": "biofuel__masse_volumique",
         }
         multiplicator = multiplicators.get(self.request.unit, None)
-        entity_id = self.request.entity.id
+        # Permissions to use selected_entity_id here are handled in the filter_entity() method of the OperationFilter
+        entity_id = self.request.query_params.get("selected_entity_id") or self.request.entity.id
 
         queryset = (
             super()

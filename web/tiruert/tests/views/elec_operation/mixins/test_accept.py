@@ -80,8 +80,12 @@ class ElecDeclareTeneurActionMixinTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.entity = Entity.objects.create(name="Elec Operator", entity_type=Entity.OPERATOR, has_elec=True)
-        cls.other_entity = Entity.objects.create(name="Other Operator", entity_type=Entity.OPERATOR, has_elec=True)
+        cls.entity = Entity.objects.create(
+            name="Elec Operator", entity_type=Entity.OPERATOR, has_elec=True, accise_number="ACC001"
+        )
+        cls.other_entity = Entity.objects.create(
+            name="Other Operator", entity_type=Entity.OPERATOR, has_elec=True, accise_number="ACC002"
+        )
 
     def setUp(self):
         setup_current_user(self, "user@carbure.local", "User", "password", [(self.entity, "ADMIN")])

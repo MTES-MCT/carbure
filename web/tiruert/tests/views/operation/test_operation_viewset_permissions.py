@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from core.tests_utils import PermissionTestMixin
 from entity.permissions import HasDgddiWriteRights
-from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights
+from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights, TiruertAdminRights
 from tiruert.views.operation import OperationViewSet
 
 
@@ -38,7 +38,7 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                 # Read actions require HasTiruertRightsBalanceAndOperations OR HasDgddiWriteRights
                 (
                     ["list", "retrieve", "balance", "filters", "filters_balance"],
-                    [(HasTiruertRightsBalanceAndOperations | HasDgddiWriteRights)()],
+                    [(HasTiruertRightsBalanceAndOperations | HasDgddiWriteRights | TiruertAdminRights)()],
                 ),
             ],
         )
