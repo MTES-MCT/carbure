@@ -64,7 +64,12 @@ const Teneur = () => {
   }
 
   const onValidatePendingTeneurClick = () => {
-    portal((close) => <ValidatePendingTeneurDialog onClose={close} />)
+    portal((close) => (
+      <ValidatePendingTeneurDialog
+        sectorObjectives={objectivesData?.sectors ?? []}
+        onClose={close}
+      />
+    ))
   }
 
   return (

@@ -1,9 +1,9 @@
 import { Balance, ElecBalance } from "accounting/types"
 import { formatSector } from "accounting/utils/formatters"
 import { Column, Cell } from "common/components/table2"
-import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS, floorNumber, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
+import { SectorObjective } from "../../types"
 
 const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
   <span>
@@ -60,31 +60,32 @@ export const useBiofuelTeneurColumns = () => {
 
 export const useBiofuelTeneurSectorColumns = () => {
   const { t } = useTranslation()
-  const columns: Column<apiTypes["BalanceBySector"]>[] = [
+  const columns: Column<SectorObjective>[] = [
     {
       header: t("Filière"),
-      cell: (item) => <Cell text={formatSector(item.sector)} />,
+      cell: (item) => <Cell text={formatSector(item.code)} />,
     },
     {
-      header: <HeaderWithSup>{t("Solde initial")}</HeaderWithSup>,
+      header: <HeaderWithSup>{t("Avancement initial")}</HeaderWithSup>,
       cell: (item) => (
         <Cell
-          text={formatNumber(
-            floorValue(item.available_balance + item.pending_teneur),
-            {
-              fractionDigits: 0,
-            }
-          )}
+          text={formatNumber(item.teneur_declared, {
+            fractionDigits: 0,
+          })}
         />
       ),
     },
     {
       header: <HeaderWithSup>{t("Teneur à valider")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatValue(item.pending_teneur)} />,
+      cell: (item) => <Cell text={formatNumber(item.teneur_declared_month)} />,
     },
     {
-      header: <HeaderWithSup>{t("Solde final")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatValue(item.available_balance)} />,
+      header: <HeaderWithSup>{t("Avancement final")}</HeaderWithSup>,
+      cell: (item) => (
+        <Cell
+          text={formatNumber(item.teneur_declared + item.teneur_declared_month)}
+        />
+      ),
     },
   ]
 
