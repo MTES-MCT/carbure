@@ -1,18 +1,20 @@
 import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
-import { downloadAnnualDeclaration } from "biomethane/api"
+import {
+  downloadAnnualDeclaration,
+  downloadDrealAnnualDeclaration,
+} from "biomethane/api"
 import useEntity from "common/hooks/entity"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationStatus } from "biomethane/types"
+import { ExternalAdminPages } from "common/types"
 
 interface DownloadDeclarationButtonProps {
   year: number
-  producerId?: number
 }
 
 export const DownloadDeclarationButton = ({
   year,
-  producerId,
 }: DownloadDeclarationButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -22,11 +24,16 @@ export const DownloadDeclarationButton = ({
     return null
   }
 
+  const isDreal = entity.hasAnyAdminRight([ExternalAdminPages.DREAL])
+  const handleDownload = isDreal
+    ? () => downloadDrealAnnualDeclaration(entity.id, year)
+    : () => downloadAnnualDeclaration(entity.id, year)
+
   return (
     <Button
       iconId="ri-download-line"
       priority="secondary"
-      onClick={() => downloadAnnualDeclaration(entity.id, year, producerId)}
+      onClick={handleDownload}
     >
       {t("Télécharger la déclaration")}
     </Button>
