@@ -7,6 +7,7 @@ from elec.models import ElecMeterReading
 
 
 class Command(BaseCommand):
+    # Command : python web/manage.py update_meter_readings_operating_unit_from_history --year 2025 --apply
     help = "Compare operating_unit from meter readings with charge point history and optionally update mismatches."
 
     def add_arguments(self, parser):
@@ -101,7 +102,7 @@ class Command(BaseCommand):
                 .reset_index(name="count")
                 .sort_values(["cpo_name", "year", "quarter", "current_operating_unit", "expected_operating_unit"])
             )
-            print(grouped_df.to_string(index=False))
+            self.stdout.write(grouped_df.to_string(index=False))
         else:
             self.stdout.write("No operating_unit mismatch found.")
 
