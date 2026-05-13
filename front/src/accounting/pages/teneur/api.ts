@@ -175,8 +175,8 @@ export const validateTeneurElec = async (entity_id: number) => {
   })
 }
 
-export const downloadMacFossilFuel = (entity_id: number) =>
-  getDownloadUrl("/tiruert/mac-fossil-fuel/export/", { entity_id })
+export const downloadMacFossilFuel = (entity_id: number, year: number) =>
+  getDownloadUrl("/tiruert/mac-fossil-fuel/export/", { entity_id, year })
 
 export type MacFossilFuel = {
   fuel: string

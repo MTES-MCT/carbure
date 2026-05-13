@@ -39,9 +39,9 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
                 components={{
                   a: (
                     <Download
-                      label={t("mises à consommation") + " 2023"}
+                      label={t("mises à consommation")}
                       linkProps={{
-                        href: downloadMacFossilFuel(entity.id),
+                        href: downloadMacFossilFuel(entity.id, selectedYear),
                       }}
                     />
                   ),
