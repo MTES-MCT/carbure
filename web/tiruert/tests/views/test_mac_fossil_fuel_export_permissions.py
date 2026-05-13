@@ -1,5 +1,6 @@
 from datetime import date
 from io import BytesIO
+from unittest.mock import patch
 
 import openpyxl
 from django.test import TestCase
@@ -116,7 +117,10 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         self.assertEqual(results[0]["operator"], self.allowed_entity.name)
         self.assertEqual(results[0]["volume"], 100.0)
 
-    def test_authenticated_user_can_replace_own_entity_macs(self):
+    @patch("tiruert.views.mac_fossil_fuel.mixins.replace.DeclarationPeriodService.get_current_declaration_year")
+    def test_authenticated_user_can_replace_own_entity_macs(self, get_current_declaration_year):
+        get_current_declaration_year.return_value = 2023
+
         response = self.client.put(
             "/api/tiruert/mac-fossil-fuel/replace/",
             data=[
@@ -138,6 +142,26 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
             ),
             [(202301, 300.0), (202302, 400.0)],
         )
+
+    @patch("tiruert.views.mac_fossil_fuel.mixins.replace.DeclarationPeriodService.get_current_declaration_year")
+    def test_authenticated_user_cannot_replace_macs_for_non_current_declaration_year(self, get_current_declaration_year):
+        get_current_declaration_year.return_value = 2024
+
+        response = self.client.put(
+            "/api/tiruert/mac-fossil-fuel/replace/",
+            data=[
+                {"fuel": "SP95", "month": 1, "volume": 300.0},
+            ],
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.allowed_entity.id}&year=2023",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json(),
+            {"year": "MACs can only be modified for the currently active declaration year"},
+        )
+        self.assertTrue(MacFossilFuel.objects.filter(operator=self.allowed_entity, year=2023, volume=100.0).exists())
 
 
 class MacFossilFuelExportViewSetPermissionsTest(TestCase, PermissionTestMixin):

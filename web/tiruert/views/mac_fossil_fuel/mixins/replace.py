@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from tiruert.filters.mac import MacFilter
 from tiruert.models import MacFossilFuel
 from tiruert.serializers import MacFossilFuelInputSerializer, MacFossilFuelSerializer
+from tiruert.services.declaration_period import DeclarationPeriodService
 
 
 class ReplaceActionMixin:
@@ -43,6 +44,11 @@ class ReplaceActionMixin:
             raise ValidationError(filterset.errors)
 
         year = int(filterset.form.cleaned_data["year"])
+        declaration_year = DeclarationPeriodService.get_current_declaration_year()
+
+        if year != declaration_year:
+            raise ValidationError({"year": "MACs can only be modified for the currently active declaration year"})
+
         macs = serializer.validated_data
 
         with transaction.atomic():
