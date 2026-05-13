@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from tiruert.filters.mac import MacFilter
 from tiruert.models import MacFossilFuel
 from tiruert.serializers import MacFossilFuelInputSerializer, MacFossilFuelSerializer
 
@@ -37,11 +38,11 @@ class ReplaceActionMixin:
         serializer = MacFossilFuelInputSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
 
-        try:
-            year = int(request.query_params["year"])
-        except (KeyError, ValueError):
-            raise ValidationError({"year": "A valid year query parameter is required."})
+        filterset = MacFilter(data=request.query_params)
+        if not filterset.is_valid():
+            raise ValidationError(filterset.errors)
 
+        year = int(filterset.form.cleaned_data["year"])
         macs = serializer.validated_data
 
         with transaction.atomic():
