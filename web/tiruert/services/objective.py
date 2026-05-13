@@ -157,6 +157,22 @@ class ObjectiveService:
         return elec_category
 
     @staticmethod
+    def add_elec_teneur_to_objectives_per_sector(objective_per_sector, elec_ops, entity_id, date_from_dt):
+        elec_balance_per_sector = ElecBalanceService.calculate_balance_per_sector(elec_ops, entity_id, date_from_dt)
+
+        for sector_objective in objective_per_sector:
+            sector = sector_objective["code"]
+            elec_balance = elec_balance_per_sector.get(sector)
+
+            if not elec_balance:
+                continue
+
+            sector_objective["pending_teneur"] += elec_balance["pending_teneur"]
+            sector_objective["declared_teneur"] += elec_balance["declared_teneur"]
+
+        return objective_per_sector
+
+    @staticmethod
     def get_global_objective_and_penalty(objective_queryset, energy_basis):
         """
         Calculate the global objective of CO2 emissions reduction
@@ -361,7 +377,12 @@ class ObjectiveService:
         # 5. Calculate elec category
         elec_category = ObjectiveService.get_elec_category(elec_ops, entity_id, date_from_dt)
 
-        # 6. Calculate the global objective (aggregated from sectors + elec)
+        # 6. Merge elec operations attributed to other sectors
+        objective_per_sector = ObjectiveService.add_elec_teneur_to_objectives_per_sector(
+            objective_per_sector, elec_ops, entity_id, date_from_dt
+        )
+
+        # 7. Calculate the global objective (aggregated from sectors + elec)
         global_objective = ObjectiveService.calculate_global_objective(
             objective_per_sector, elec_category, objectives, energy_basis
         )
