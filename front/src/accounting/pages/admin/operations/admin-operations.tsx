@@ -1,5 +1,5 @@
-import { lazy, useEffect } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { lazy } from "react"
+import { useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { SectorTabs } from "accounting/types"
@@ -12,13 +12,8 @@ const OperationsElec = lazy(() => import("accounting/pages/operations/elec"))
 
 export const AdminOperations = () => {
   const { category } = useParams()
-  const navigate = useNavigate()
   const { t } = useTranslation()
   const { hasSelectedEntity } = useSelectedEntity()
-
-  useEffect(() => {
-    if (!category) navigate(SectorTabs.BIOFUELS)
-  }, [category, navigate])
 
   if (!hasSelectedEntity) {
     return (

@@ -16,6 +16,7 @@ import {
   useAnnualDeclarationTiruert,
 } from "./providers/annual-declaration-tiruert.provider"
 import { useRoutes } from "common/hooks/routes"
+import { SectorTabs } from "./types"
 
 const MaterialAccounting = () => {
   const entity = useEntity()
@@ -56,23 +57,30 @@ const MaterialAccounting = () => {
           </Route>
         )}
         {(isAdmin || allowAccounting) && (
-          <Route
-            path="admin/objectives"
-            element={
-              <AnnualDeclarationTiruertProvider>
-                <ObjectivesLayout />
-              </AnnualDeclarationTiruertProvider>
-            }
-          >
-            <Route index element={<Objectives />} />
-            <Route path=":entityId" element={<Objectives />} />
-          </Route>
-        )}
-        {(isAdmin || allowAccounting) && (
-          <Route path="admin/operations" element={<AdminOperationsLayout />}>
-            <Route path=":category" element={<AdminOperations />} />
-            <Route index element={<AdminOperations />} />
-          </Route>
+          <>
+            <Route
+              path="admin/objectives"
+              element={
+                <AnnualDeclarationTiruertProvider>
+                  <ObjectivesLayout />
+                </AnnualDeclarationTiruertProvider>
+              }
+            >
+              <Route index element={<Objectives />} />
+              <Route path=":entityId" element={<Objectives />} />
+            </Route>
+            <Route path="admin/operations" element={<AdminOperationsLayout />}>
+              <Route index element={<AdminOperations />} />
+              <Route
+                path=":selectedEntityId/:category"
+                element={<AdminOperations />}
+              />
+              <Route
+                path=":selectedEntityId"
+                element={<Navigate replace to={SectorTabs.BIOFUELS} />}
+              />
+            </Route>
+          </>
         )}
         <Route path="*" element={<Navigate replace to="operations" />} />
       </Routes>
