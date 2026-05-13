@@ -47,6 +47,7 @@ const Teneur = () => {
         <DeclareElecTeneurDialog
           onClose={close}
           objective={objective}
+          sectorObjectives={objectivesData?.sectors ?? []}
           mainObjective={objectivesData?.global}
         />
       ))
