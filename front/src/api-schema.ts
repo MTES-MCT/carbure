@@ -12993,8 +12993,8 @@ export interface operations {
     };
     tiruert_mac_fossil_fuel_list: {
         parameters: {
-            query?: {
-                entity_id?: string;
+            query: {
+                entity_id: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -13003,7 +13003,7 @@ export interface operations {
                 page_size?: number;
                 /** @description A search term. */
                 search?: string;
-                year?: number;
+                year: number;
             };
             header?: never;
             path?: never;
@@ -13026,6 +13026,8 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Filter RFCs by year */
+                year: number;
             };
             header?: never;
             path?: never;
