@@ -1,1 +1,1 @@
-from .mac_fossiel_fuel import MacFossilFuelExportViewSet, MacFossilFuelViewSet
+from .mac_fossiel_fuel import MacFossilFuelViewSet

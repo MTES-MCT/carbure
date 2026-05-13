@@ -19,6 +19,3 @@ class MacFossilFuelViewSet(ExcelExportActionMixin, ReplaceActionMixin, ListModel
         if self.action == "replace":
             return [HasTiruertWriteRights()]
         return super().get_permissions()
-
-
-MacFossilFuelExportViewSet = MacFossilFuelViewSet
