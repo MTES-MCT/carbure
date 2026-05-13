@@ -1,6 +1,7 @@
 import time
 
 import openpyxl
+from django.db.models import Sum
 from django.http import HttpResponse
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiTypes, extend_schema
 from openpyxl.utils import get_column_letter
@@ -15,6 +16,13 @@ class ExcelExportActionMixin:
                 type=int,
                 location=OpenApiParameter.QUERY,
                 description="Authorised entity ID.",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="year",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Filter RFCs by year",
                 required=True,
             ),
         ],
@@ -35,6 +43,17 @@ class ExcelExportActionMixin:
     def export_macfossilfuel_to_excel(self, request, *args, **kwargs):
         macs = self.filter_queryset(self.get_queryset())
 
+        aggregated_macs = (
+            macs.values(
+                "operator__registration_id",
+                "operator__name",
+                "fuel__nomenclature",
+                "year",
+            )
+            .annotate(volume=Sum("volume"))
+            .order_by("year", "operator__name", "fuel__nomenclature")
+        )
+
         workbook = openpyxl.Workbook()
         sheet = workbook.active
         sheet.title = "MAC Fossil Fuel Export"
@@ -49,12 +68,12 @@ class ExcelExportActionMixin:
         for col_num, header in enumerate(headers, 1):
             sheet.cell(row=1, column=col_num, value=header)
 
-        for row_num, mac in enumerate(macs, 2):
-            sheet.cell(row=row_num, column=1, value=mac.operator.registration_id if mac.operator else "")
-            sheet.cell(row=row_num, column=2, value=mac.operator.name if mac.operator else "")
-            sheet.cell(row=row_num, column=3, value=mac.fuel.nomenclature if mac.fuel else "")
-            sheet.cell(row=row_num, column=4, value=mac.volume)
-            sheet.cell(row=row_num, column=5, value="2023")
+        for row_num, mac in enumerate(aggregated_macs, 2):
+            sheet.cell(row=row_num, column=1, value=mac["operator__registration_id"] or "")
+            sheet.cell(row=row_num, column=2, value=mac["operator__name"] or "")
+            sheet.cell(row=row_num, column=3, value=mac["fuel__nomenclature"] or "")
+            sheet.cell(row=row_num, column=4, value=mac["volume"])
+            sheet.cell(row=row_num, column=5, value=mac["year"])
 
         for col_num in range(1, len(headers) + 1):
             sheet.column_dimensions[get_column_letter(col_num)].width = 20
