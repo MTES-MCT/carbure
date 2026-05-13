@@ -16,6 +16,7 @@ class ElecOperationManager(models.Manager):
                 "status",
                 "created_at",
                 "quantity",
+                "objective_sector",
                 # Relations nécessaires
                 "credited_entity_id",
                 "debited_entity_id",

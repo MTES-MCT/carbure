@@ -6,7 +6,7 @@ from django.utils import timezone
 from core.models import Entity
 from entity.factories import EntityFactory
 from tiruert.factories import ElecOperationFactory
-from tiruert.models import ElecOperation
+from tiruert.models import ElecOperation, Operation
 from tiruert.services.elec_balance import ElecBalanceService
 
 
@@ -168,3 +168,102 @@ class ElecBalanceServiceTest(TestCase):
         self.assertEqual(balance["quantity"]["credit"], 60)
         self.assertEqual(balance["quantity"]["debit"], 10)
         self.assertEqual(balance["available_balance"], 50)
+
+    def test_calculate_balance_per_sector_groups_by_objective_sector(self):
+        now = timezone.now()
+        old_time = now - timedelta(days=10)
+        recent_time = now - timedelta(days=2)
+        date_from = now - timedelta(days=5)
+
+        ElecOperationFactory.create_credit(
+            self.operator,
+            quantity=100,
+            type=ElecOperation.CESSION,
+            status=ElecOperation.ACCEPTED,
+        )
+        ElecOperationFactory.create_credit(
+            self.operator,
+            quantity=60,
+            type=ElecOperation.ACQUISITION_FROM_CPO,
+            status=ElecOperation.ACCEPTED,
+        )
+        ElecOperationFactory.create_debit(
+            self.operator,
+            quantity=40,
+            status=ElecOperation.ACCEPTED,
+        )
+        pending_teneur = ElecOperationFactory.create_teneur(
+            self.operator,
+            quantity=5,
+            status=ElecOperation.PENDING,
+            objective_sector=Operation.ESSENCE,
+        )
+        declared_teneur = ElecOperationFactory.create_teneur(
+            self.operator,
+            quantity=3,
+            status=ElecOperation.DECLARED,
+            objective_sector=Operation.ESSENCE,
+        )
+        old_declared_teneur = ElecOperationFactory.create_teneur(
+            self.operator,
+            quantity=11,
+            status=ElecOperation.DECLARED,
+            objective_sector=Operation.ESSENCE,
+        )
+        pending_cession = ElecOperationFactory.create_debit(
+            self.operator,
+            quantity=12,
+            status=ElecOperation.PENDING,
+        )
+
+        gazole_teneur = ElecOperationFactory.create_teneur(
+            self.operator,
+            quantity=4,
+            status=ElecOperation.DECLARED,
+            objective_sector=Operation.GAZOLE,
+        )
+        ElecOperationFactory.create_credit(
+            self.operator,
+            quantity=999,
+            status=ElecOperation.ACCEPTED,
+        )
+        ElecOperationFactory.create_credit(
+            self.operator,
+            quantity=200,
+            status=ElecOperation.REJECTED,
+        )
+
+        ElecOperation.objects.filter(id__in=[pending_cession.id, old_declared_teneur.id]).update(created_at=old_time)
+        ElecOperation.objects.filter(id__in=[pending_teneur.id, declared_teneur.id, gazole_teneur.id]).update(
+            created_at=recent_time
+        )
+
+        balance = ElecBalanceService.calculate_balance_per_sector(
+            ElecOperation.objects.all(),
+            entity_id=self.operator.id,
+            date_from=date_from,
+        )
+
+        self.assertEqual(set(balance.keys()), {Operation.ESSENCE, Operation.GAZOLE})
+
+        essence_balance = balance[Operation.ESSENCE]
+        self.assertEqual(essence_balance["sector"], Operation.ESSENCE)
+        self.assertEqual(essence_balance["emission_rate_per_mj"], ElecOperation.EMISSION_RATE_PER_MJ)
+        self.assertEqual(essence_balance["quantity"]["credit"], 0)
+        self.assertEqual(essence_balance["quantity"]["debit"], 8)
+        self.assertEqual(essence_balance["pending_operations"], 1)
+        self.assertEqual(essence_balance["pending_teneur"], 5)
+        self.assertEqual(essence_balance["declared_teneur"], 3)
+        self.assertEqual(essence_balance["available_balance"], -19)
+
+        gazole_balance = balance[Operation.GAZOLE]
+        self.assertEqual(gazole_balance["sector"], Operation.GAZOLE)
+        self.assertEqual(gazole_balance["quantity"]["credit"], 0)
+        self.assertEqual(gazole_balance["quantity"]["debit"], 4)
+        self.assertEqual(gazole_balance["declared_teneur"], 4)
+        self.assertEqual(gazole_balance["available_balance"], -4)
+
+    def test_calculate_balance_per_sector_returns_empty_when_no_operations(self):
+        balance = ElecBalanceService.calculate_balance_per_sector(ElecOperation.objects.none(), entity_id=self.operator.id)
+
+        self.assertEqual(balance, {})
