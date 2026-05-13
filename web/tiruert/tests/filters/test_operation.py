@@ -238,3 +238,18 @@ class OperationFilterForBalanceTest(TestCase):
 
         # Verify queryset is returned unchanged
         self.assertEqual(result, queryset)
+
+    def test_durability_period_is_ignored_in_balance_filter(self):
+        """Test that durability_period does not modify the operations queryset in OperationFilterForBalance.
+        The conversion to lot_ids is handled in the view and passed via detail_filters."""
+        queryset = Mock()
+        queryset.filter.return_value = queryset
+
+        request = self.factory.get("/test/?durability_period=202401")
+
+        filterset = OperationFilterForBalance({}, queryset=queryset, request=request)
+        result = filterset.ignore(queryset, "durability_period", ["202401"])
+
+        # Verify queryset is returned unchanged — durability_period must not filter operations
+        self.assertEqual(result, queryset)
+        queryset.filter.assert_not_called()

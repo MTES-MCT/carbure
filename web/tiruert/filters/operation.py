@@ -123,6 +123,8 @@ class OperationFilterForBalance(BaseFilter):
     ges_bound_max = NumberFilter(method="ignore")
     feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code", method="ignore")
     origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays", method="ignore")
+    # durability_period is resolved to specific lot_ids in the view and passed via detail_filters
+    durability_period = AllValuesMultipleFilter(method="ignore")
 
     def ignore(self, queryset, name, value):
         return queryset

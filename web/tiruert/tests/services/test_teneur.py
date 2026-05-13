@@ -1,8 +1,9 @@
 from unittest.mock import Mock, patch
 
 import numpy as np
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
+from tiruert.models import Operation
 from tiruert.services.teneur import TeneurService, TeneurServiceErrors
 
 
@@ -399,29 +400,29 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
         _, call_kwargs = mock_balance.call_args
         self.assertIsNone(call_kwargs["detail_filters"]["origin_country"])
 
+    @patch("tiruert.services.teneur.BalanceService.resolve_lot_ids_for_durability_period")
     @patch("tiruert.services.teneur.BalanceService.calculate_balance")
     @patch("tiruert.services.teneur.Operation.objects")
-    def test_prepare_data_filters_operations_by_durability_period(self, mock_objects, mock_balance):
-        """Test that durability_period causes an extra queryset filter."""
+    def test_prepare_data_passes_lot_ids_when_durability_period_provided(self, mock_objects, mock_balance, mock_resolve):
+        """Test that when durability_period is provided, lot_ids is resolved via
+        BalanceService.resolve_lot_ids_for_durability_period and passed to calculate_balance."""
         mock_qs = self._mock_operations_chain()
         mock_objects.filter.return_value = mock_qs
         mock_balance.return_value = {}
+        mock_resolve.return_value = [10, 20, 30]
 
         data = self._make_data(durability_period=["2024", "2025"])
 
         TeneurService.prepare_data(data, "l")
 
-        # Verify that filter was called with durability_period__in
-        filter_calls = [str(call) for call in mock_qs.filter.call_args_list]
-        self.assertTrue(
-            any("durability_period__in" in c for c in filter_calls),
-            "Expected a filter call with durability_period__in",
-        )
+        mock_resolve.assert_called_once()
+        _, call_kwargs = mock_balance.call_args
+        self.assertEqual(call_kwargs["detail_filters"]["lot_ids"], [10, 20, 30])
 
     @patch("tiruert.services.teneur.BalanceService.calculate_balance")
     @patch("tiruert.services.teneur.Operation.objects")
-    def test_prepare_data_no_durability_period_filter_when_not_provided(self, mock_objects, mock_balance):
-        """Test that no durability_period filter is applied when not in data."""
+    def test_prepare_data_no_lot_ids_when_durability_period_not_provided(self, mock_objects, mock_balance):
+        """Test that lot_ids is None in detail_filters when no durability_period is provided."""
         mock_qs = self._mock_operations_chain()
         mock_objects.filter.return_value = mock_qs
         mock_balance.return_value = {}
@@ -430,11 +431,88 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
 
         TeneurService.prepare_data(data, "l")
 
-        filter_calls = [str(call) for call in mock_qs.filter.call_args_list]
-        self.assertFalse(
-            any("durability_period__in" in c for c in filter_calls),
-            "Expected no filter call with durability_period__in",
+        _, call_kwargs = mock_balance.call_args
+        self.assertIsNone(call_kwargs["detail_filters"]["lot_ids"])
+
+
+class TeneurServicePrepareDataDurabilityFilterTest(TestCase):
+    """Integration test: verify that filtering by durability_period resolves to lot_ids
+    from credit operations of that period, so the balance is computed on those specific lots
+    (including all debit operations that consumed them)."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    def setUp(self):
+        from core.models import Biocarburant, Entity
+        from entity.factories.entity import EntityFactory
+        from tiruert.factories.operation import OperationDetailFactory, OperationFactory
+
+        self.entity = EntityFactory.create(entity_type=Entity.OPERATOR)
+        self.biofuel = Biocarburant.objects.first()
+        self.common = {
+            "biofuel": self.biofuel,
+            "customs_category": "CONV",
+            "status": Operation.VALIDATED,
+        }
+        # Credit operation for period 2024 with a detail (lot)
+        self.op_2024 = OperationFactory.create(
+            credited_entity=self.entity,
+            durability_period="2024",
+            **self.common,
         )
+        self.detail_2024 = OperationDetailFactory.create_for_operation(self.op_2024)
+
+        # Credit operation for period 2025 with a different lot
+        self.op_2025 = OperationFactory.create(
+            credited_entity=self.entity,
+            durability_period="2025",
+            **self.common,
+        )
+        self.detail_2025 = OperationDetailFactory.create_for_operation(self.op_2025)
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    def test_durability_period_resolves_to_lot_ids_of_that_period(self, mock_balance):
+        """When filtering by durability_period=['2024'], the lot_ids passed to
+        calculate_balance must only include lots from operations with durability_period='2024',
+        not those from '2025'."""
+        mock_balance.return_value = {}
+        data = {
+            "biofuel": self.biofuel,
+            "customs_category": "CONV",
+            "debited_entity": self.entity,
+            "durability_period": ["2024"],
+        }
+
+        TeneurService.prepare_data(data, "l")
+
+        _, call_kwargs = mock_balance.call_args
+        lot_ids = call_kwargs["detail_filters"]["lot_ids"]
+
+        self.assertIn(self.detail_2024.lot_id, lot_ids, "Lot from period 2024 must be in lot_ids")
+        self.assertNotIn(self.detail_2025.lot_id, lot_ids, "Lot from period 2025 must not be in lot_ids")
+
+    @patch("tiruert.services.teneur.BalanceService.calculate_balance")
+    def test_no_durability_period_passes_no_lot_ids_filter(self, mock_balance):
+        """When no durability_period is provided, lot_ids in detail_filters must be None
+        so all lots are considered."""
+        mock_balance.return_value = {}
+        data = {
+            "biofuel": self.biofuel,
+            "customs_category": "CONV",
+            "debited_entity": self.entity,
+        }
+
+        TeneurService.prepare_data(data, "l")
+
+        _, call_kwargs = mock_balance.call_args
+        self.assertIsNone(call_kwargs["detail_filters"]["lot_ids"])
 
 
 class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):

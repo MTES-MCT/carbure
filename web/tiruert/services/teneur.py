@@ -365,7 +365,12 @@ class TeneurService:
         )
 
         if durability_period := data.get("durability_period"):
-            operations = operations.filter(durability_period__in=durability_period)
+            # Resolve durability_period to the lot_ids from credit operations of that period.
+            # All operations referencing those lots (including debits like TENEUR) will then
+            # be included via the Prefetch filter, giving the real available balance for those lots.
+            lot_ids = BalanceService.resolve_lot_ids_for_durability_period(operations, durability_period)
+        else:
+            lot_ids = None
 
         ges_bound_min = data.get("ges_bound_min", None)
         ges_bound_max = data.get("ges_bound_max", None)
@@ -383,6 +388,7 @@ class TeneurService:
                 "ges_bound_max": ges_bound_max,
                 "feedstock": feedstock,
                 "origin_country": origin_country,
+                "lot_ids": lot_ids,
             },
         )
 
