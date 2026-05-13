@@ -14,14 +14,21 @@ import {
 import { useEffect, useState } from "react"
 import { MacFuelSelectionDialog } from "./mac-fuel-selection-dialog"
 import { useMacTable } from "./mac-dialog.hooks"
+import { Notice } from "common/components/notice"
 
 type MacDialogProps = {
   onClose: () => void
+  readOnly?: boolean
   entityId: number
   year: number
 }
 
-export const MacDialog = ({ onClose, entityId, year }: MacDialogProps) => {
+export const MacDialog = ({
+  onClose,
+  readOnly,
+  entityId,
+  year,
+}: MacDialogProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -44,7 +51,7 @@ export const MacDialog = ({ onClose, entityId, year }: MacDialogProps) => {
     }
   }, [loadedMacData])
 
-  const table = useMacTable(year, macData, fuels, setMacData)
+  const table = useMacTable(year, macData, fuels, setMacData, readOnly)
 
   const addFuels = (fuelsToAdd: string[]) => {
     setFuels((fuels) => Array.from(new Set([...fuels, ...fuelsToAdd])))
@@ -78,7 +85,6 @@ export const MacDialog = ({ onClose, entityId, year }: MacDialogProps) => {
   return (
     <Portal>
       <Dialog
-        fullscreen
         className={css.dialog}
         onClose={onClose}
         header={
@@ -87,31 +93,42 @@ export const MacDialog = ({ onClose, entityId, year }: MacDialogProps) => {
           </Dialog.Title>
         }
         footer={
-          <div className={css.footer}>
-            <Button
-              priority="secondary"
-              iconId="ri-add-fill"
-              onClick={openFuelSelectionDialog}
-            >
-              {t("Ajouter des carburants")}
-            </Button>
-            <Button
-              priority="primary"
-              onClick={saveMacData}
-              loading={mutation.loading}
-            >
-              {t("Sauvegarder")}
-            </Button>
-          </div>
+          !readOnly && (
+            <div className={css.footer}>
+              <Button
+                priority="secondary"
+                iconId="ri-add-fill"
+                onClick={openFuelSelectionDialog}
+              >
+                {t("Ajouter des carburants")}
+              </Button>
+              <Button
+                priority="primary"
+                onClick={saveMacData}
+                loading={mutation.loading}
+              >
+                {t("Sauvegarder")}
+              </Button>
+            </div>
+          )
         }
         fullWidth
       >
-        <Table
-          className={css.table}
-          columns={table.columns}
-          rows={table.rows}
-          loading={loading}
-        />
+        {table.columns.length <= 1 && (
+          <Notice noColor variant="info">
+            {t(
+              "Aucune information de mise à consommation disponible pour cette année."
+            )}
+          </Notice>
+        )}
+        {table.columns.length > 1 && (
+          <Table
+            className={css.table}
+            columns={table.columns}
+            rows={table.rows}
+            loading={loading}
+          />
+        )}
       </Dialog>
     </Portal>
   )

@@ -24,7 +24,8 @@ export const useMacTable = (
   year: number,
   macData: MacFossilFuel[],
   fuels: string[],
-  setMacData: Dispatch<SetStateAction<MacFossilFuel[]>>
+  setMacData: Dispatch<SetStateAction<MacFossilFuel[]>>,
+  readOnly?: boolean
 ) => {
   const { t } = useTranslation()
 
@@ -98,6 +99,7 @@ export const useMacTable = (
           <strong>{formatNumber(row.volumes[fuel] ?? 0)}</strong>
         ) : (
           <NumberInput
+            readOnly={readOnly}
             label=""
             min={0}
             value={row.volumes[fuel]}

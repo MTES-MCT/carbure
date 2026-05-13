@@ -32,7 +32,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
       title={t("Avancement global")}
       description={
         <>
-          {isDeclarationInCurrentPeriod && !isAdminOrExternal && (
+          {!isAdminOrExternal && (
             <>
               <Trans
                 i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d'un PCI théorique."
