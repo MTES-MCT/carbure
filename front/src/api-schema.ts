@@ -529,6 +529,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/dreal-export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Export all biomethane declarations for a given year as a flat Excel file, filtered by DREAL department access. */
+        get: operations["biomethane_dreal_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/energy/": {
         parameters: {
             query?: never;
@@ -7911,6 +7928,31 @@ export interface operations {
             };
         };
     };
+    biomethane_dreal_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised DREAL entity ID. */
+                entity_id: number;
+                /** @description Year of the declarations. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fichier Excel généré */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": File;
+                };
+            };
+        };
+    };
     biomethane_energy_retrieve: {
         parameters: {
             query: {
@@ -8082,8 +8124,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
-                producer_id?: number;
                 /** @description Year of the declaration. */
                 year: number;
             };

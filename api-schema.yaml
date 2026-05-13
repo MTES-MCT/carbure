@@ -1604,6 +1604,37 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/biomethane/dreal-export/:
+    get:
+      operationId: biomethane_dreal_export_retrieve
+      description: Export all biomethane declarations for a given year as a flat Excel
+        file, filtered by DREAL department access.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised DREAL entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the declarations.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Fichier Excel généré
   /api/biomethane/energy/:
     get:
       operationId: biomethane_energy_retrieve
@@ -1834,12 +1865,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: producer_id
-          schema:
-            type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
-            producer).
         - in: query
           name: year
           schema:
