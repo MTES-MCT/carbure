@@ -1,6 +1,5 @@
 import { Autocomplete } from "common/components/autocomplete2"
 import { Content, Row } from "common/components/scaffold"
-import { Tabs } from "common/components/tabs2"
 import { useState } from "react"
 import { Outlet } from "react-router-dom"
 import { useTranslation } from "react-i18next"
@@ -11,7 +10,7 @@ import { findEligibleTiruertEntities } from "accounting/components/recipient-for
 import { SelectedEntityProvider } from "common/providers/selected-entity-provider"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { BetaPage } from "common/molecules/beta-page"
-import { SectorTabs } from "accounting/types"
+import { AccountingSectorTabs } from "accounting/components/accounting-sector-tabs"
 
 export const AdminOperationsLayout = () => {
   const { t } = useTranslation()
@@ -40,22 +39,7 @@ export const AdminOperationsLayout = () => {
           />
         </div>
       </Row>
-      <Tabs
-        tabs={[
-          {
-            key: SectorTabs.BIOFUELS,
-            label: t("Biocarburants"),
-            path: SectorTabs.BIOFUELS,
-            icon: "fr-icon-gas-station-fill",
-          },
-          {
-            key: SectorTabs.ELEC,
-            label: t("Électricité"),
-            path: SectorTabs.ELEC,
-            icon: "fr-icon-charging-pile-2-fill",
-          },
-        ]}
-      />
+      <AccountingSectorTabs />
       <Content>
         <Outlet />
       </Content>
