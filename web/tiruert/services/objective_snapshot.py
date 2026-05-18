@@ -1,14 +1,12 @@
-import logging
 from datetime import datetime, time
 
 from django.db.models import Q
 from django.utils.timezone import make_aware
 
+from adapters.logger import log_info
 from tiruert.models import MacFossilFuel, Objective, ObjectiveSnapshot, Operation
 from tiruert.models.elec_operation import ElecOperation
 from tiruert.services.objective import ObjectiveService
-
-logger = logging.getLogger(__name__)
 
 
 class ObjectiveSnapshotService:
@@ -29,7 +27,7 @@ class ObjectiveSnapshotService:
 
         period = DeclarationPeriodService.get_period_by_year(year)
         if period is None:
-            logger.info("No declaration period found for year %s, skipping snapshot for entity %s.", year, entity_id)
+            log_info(f"No declaration period found for year {year}, skipping snapshot for entity {entity_id}.")
             return None
 
         date_from = period.start_date
@@ -37,13 +35,13 @@ class ObjectiveSnapshotService:
         # Objectives
         objectives = Objective.objects.filter(year=year)
         if not objectives.exists():
-            logger.info("No objectives found for year %s, skipping snapshot for entity %s.", year, entity_id)
+            log_info(f"No objectives found for year {year}, skipping snapshot for entity {entity_id}.")
             return None
 
         # MacFossilFuel
         macs = MacFossilFuel.objects.filter(operator_id=entity_id, year=year)
         if not macs.exists():
-            logger.info("No MacFossilFuel found for entity %s / year %s, skipping snapshot.", entity_id, year)
+            log_info(f"No MacFossilFuel found for entity {entity_id} / year {year}, skipping snapshot.")
             return None
 
         # Operations (all history up to period end — balance is computed from all history)
@@ -53,7 +51,7 @@ class ObjectiveSnapshotService:
         ).distinct()
 
         if not operations.exists():
-            logger.info("No operations found for entity %s up to %s, skipping snapshot.", entity_id, date_to)
+            log_info(f"No operations found for entity {entity_id} up to {date_to}, skipping snapshot.")
             return None
 
         elec_ops = ElecOperation.objects.filter(
@@ -83,7 +81,7 @@ class ObjectiveSnapshotService:
 
         period = DeclarationPeriodService.get_period_by_year(year)
         if period is None:
-            logger.info("No declaration period found for year %s, cannot create snapshot.", year)
+            log_info(f"No declaration period found for year {year}, cannot create snapshot.")
             return None
 
         data = ObjectiveSnapshotService.compute(entity_id, year)
@@ -96,7 +94,7 @@ class ObjectiveSnapshotService:
             defaults={"data": data, "date_from": period.start_date, "date_to": period.end_date},
         )
         action = "Created" if created else "Updated"
-        logger.info("%s objective snapshot for entity %s / year %s.", action, entity_id, year)
+        log_info(f"{action} objective snapshot for entity {entity_id} / year {year}.")
         return snapshot
 
     @staticmethod
