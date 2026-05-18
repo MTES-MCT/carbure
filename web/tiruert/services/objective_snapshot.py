@@ -1,9 +1,10 @@
 from datetime import datetime, time
 
+from django.core.cache import cache
 from django.db.models import Q
 from django.utils.timezone import make_aware
 
-from adapters.logger import log_info
+from adapters.logger import log_info, log_warning
 from tiruert.models import MacFossilFuel, Objective, ObjectiveSnapshot, Operation
 from tiruert.models.elec_operation import ElecOperation
 from tiruert.services.objective import ObjectiveService
@@ -107,3 +108,57 @@ class ObjectiveSnapshotService:
             return snapshot.data
         except ObjectiveSnapshot.DoesNotExist:
             return None
+
+    # ------------------------------------------------------------------
+    # Aggregated objectives cache (all tiruert-liable entities combined)
+    # ------------------------------------------------------------------
+
+    _AGGREGATED_CACHE_KEY = "tiruert:aggregated_objectives:{year}"
+    _AGGREGATED_CACHE_TIMEOUT = 60 * 60 * 36  # 36 hours, data should be generated every 24h by a periodic task
+
+    @staticmethod
+    def get_cached_aggregated(year: int):
+        """Return cached aggregated objectives for a given year, or None on cache miss."""
+        return cache.get(ObjectiveSnapshotService._AGGREGATED_CACHE_KEY.format(year=year))
+
+    @staticmethod
+    def compute_and_cache_aggregated(year: int):
+        """
+        Compute aggregated objectives for all tiruert-liable entities for a given year
+        and store the result in the Django cache.
+
+        For each entity:
+        - Uses the DB snapshot if one exists (past declaration years).
+        - Falls back to a fresh computation otherwise (current year).
+
+        Args:
+            year: Declaration year (int)
+
+        Returns:
+            Aggregated objectives dict, or None if no data is available.
+        """
+        from core.models import Entity
+
+        tiruert_liable_entities = Entity.objects.filter(is_tiruert_liable=True)
+        if not tiruert_liable_entities.exists():
+            log_warning(f"compute_and_cache_aggregated: no tiruert-liable entities found for year {year}.")
+            return None
+
+        objectives_list = []
+        for entity in tiruert_liable_entities:
+            # Prefer the persisted snapshot (fast DB read), fall back to live computation
+            data = ObjectiveSnapshotService.get_snapshot(entity.id, year)
+            if data is None:
+                data = ObjectiveSnapshotService.compute(entity.id, year)
+            if data:
+                objectives_list.append(data)
+
+        if not objectives_list:
+            log_warning(f"compute_and_cache_aggregated: no data collected for year {year}.")
+            return None
+
+        result = ObjectiveService.aggregate_objectives(objectives_list)
+        cache_key = ObjectiveSnapshotService._AGGREGATED_CACHE_KEY.format(year=year)
+        cache.set(cache_key, result, ObjectiveSnapshotService._AGGREGATED_CACHE_TIMEOUT)
+        log_info(f"Cached aggregated objectives for year {year} ({len(objectives_list)} entities).")
+        return result

@@ -128,6 +128,16 @@ if env.get("IMAGE_TAG") == "prod":
         # Only runs if cancel_teneur_operations succeeds (no exception raised)
         call_command("set_operations_expired")
 
+    # Tiruert aggregated objectives cache
+    @db_periodic_task(crontab(hour=3, minute=0))
+    def periodic_cache_tiruert_aggregated_objectives() -> None:
+        from tiruert.models import TiruertDeclarationPeriod
+        from tiruert.services.objective_snapshot import ObjectiveSnapshotService
+
+        years = TiruertDeclarationPeriod.objects.values_list("year", flat=True).distinct()
+        for year in years:
+            ObjectiveSnapshotService.compute_and_cache_aggregated(year)
+
 
 if env.get("IMAGE_TAG") == "staging":
 

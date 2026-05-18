@@ -102,28 +102,16 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
 
     def _get_aggregated_objectives(self, request):
         """Aggregate objectives for all tiruert-liable entities (admin view)."""
-        tiruert_liable_entities = Entity.objects.filter(is_tiruert_liable=True)
-        if not tiruert_liable_entities.exists():
-            return Response({"error": "No Tiruert liable entities found."}, status=status.HTTP_404_NOT_FOUND)
+        year = int(request.GET.get("year"))
 
-        # Collect objectives for each entity
-        objectives_list = []
-        for entity in tiruert_liable_entities:
-            try:
-                entity_objectives = self._get_objectives(request, entity.id)
-                if entity_objectives:
-                    objectives_list.append(entity_objectives)
-            except Http404:
-                # Case where no objectives are found for the entity, we simply skip it
-                continue
+        cached = ObjectiveSnapshotService.get_cached_aggregated(year)
+        if cached is None:
+            return Response(
+                {"error": "Aggregated objectives are not yet available. Please try again later."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
-        if not objectives_list:
-            return Response({}, status=status.HTTP_200_OK)
-
-        # Aggregate all objectives
-        result = ObjectiveService.aggregate_objectives(objectives_list)
-
-        serializer = self.get_serializer(result)
+        serializer = self.get_serializer(cached)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def _get_objectives(self, request, target_entity_id):
