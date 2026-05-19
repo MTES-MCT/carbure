@@ -1,5 +1,5 @@
 # Use the official Ubuntu image as the base image
-FROM ubuntu:latest
+FROM ubuntu:noble
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
