@@ -2263,5 +2263,9 @@
   "Renseigner mes mises à consommation": "Fill in my releases for consumption",
   "Ajouter des carburants": "Add fuels",
   "Veuillez choisir dans le menu ci-dessous les carburants que vous souhaitez inclure dans vos déclarations de mises à consommation. Ils s'afficheront ensuite dans le tableau, où vous pourrez en préciser les volumes.": "Please select from the menu below the fuels you wish to include in your declarations of release for consumption. They will then appear in the table, where you can specify their volumes.",
-  "Choisissez des carburants": "Pick fuels"
+  "Choisissez des carburants": "Pick fuels",
+  "Mises à consommation": "Releases for consumption",
+  "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique.": "The basis for your targets will be calculated using the fossil fuel quantities you reported as released for consumption, along with a theoretical lower heating value (LHV).",
+  "Télécharger mes mises à consommation {{year}}": "Download my releases for consumption of {{year}}",
+  "Aucune information de mise à consommation disponible pour cette année.": "No release for consumption data available for that year."
 }

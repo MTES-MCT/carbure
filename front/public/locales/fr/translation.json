@@ -2341,7 +2341,11 @@
   "Renseignez vos mises à consommation de carburants fossiles pour nous permettre de calculer l'assiette de vos objectifs.": "Renseignez vos mises à consommation de carburants fossiles pour nous permettre de calculer l'assiette de vos objectifs.",
   "Renseigner mes MàC": "Renseigner mes MàC",
   "Renseigner mes mises à consommation": "Renseigner mes mises à consommation",
-  "Ajouter des carburants": "Add fuels",
+  "Ajouter des carburants": "Ajouter des carburants",
   "Veuillez choisir dans le menu ci-dessous les carburants que vous souhaitez inclure dans vos déclarations de mises à consommation. Ils s'afficheront ensuite dans le tableau, où vous pourrez en préciser les volumes.": "Veuillez choisir dans le menu ci-dessous les carburants que vous souhaitez inclure dans vos déclarations de mises à consommation. Ils s'afficheront ensuite dans le tableau, où vous pourrez en préciser les volumes.",
-  "Choisissez des carburants": "Choisissez des carburants"
+  "Choisissez des carburants": "Choisissez des carburants",
+  "Mises à consommation": "Mises à consommation",
+  "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique.": "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique.",
+  "Télécharger mes mises à consommation {{year}}": "Télécharger mes mises à consommation {{year}}",
+  "Aucune information de mise à consommation disponible pour cette année.": "Aucune information de mise à consommation disponible pour cette année."
 }
