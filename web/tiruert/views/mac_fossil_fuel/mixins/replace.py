@@ -46,8 +46,8 @@ class ReplaceActionMixin:
         year = int(filterset.form.cleaned_data["year"])
         declaration_year = DeclarationPeriodService.get_current_declaration_year()
 
-        if year != declaration_year:
-            raise ValidationError({"year": "MACs can only be modified for the currently active declaration year"})
+        if year < declaration_year:
+            raise ValidationError({"year": "MACs can only be modified for the currently active declaration year onward"})
 
         macs = serializer.validated_data
 
