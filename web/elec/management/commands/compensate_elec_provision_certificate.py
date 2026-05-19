@@ -8,6 +8,60 @@ from django.db.models.functions import Coalesce, Round
 from elec.models import ElecCertificateReadjustment, ElecProvisionCertificate
 
 
+class Command(BaseCommand):
+    # python web/manage.py compensate_elec_provision_certificate --enr_ratio 25 --apply --log --year 2025
+    help = "Compensate elec provision certificate"
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--enr_ratio",
+            type=float,
+            help="Current ENR ratio in % (ex: 25 for 25%)",
+            required=True,
+        )
+        parser.add_argument(
+            "--apply",
+            action="store_true",
+            default=False,
+            help="Apply the compensation",
+        )
+        parser.add_argument(
+            "--log",
+            action="store_true",
+            default=True,
+            help="Log the compensation",
+        )
+        parser.add_argument(
+            "--year",
+            type=int,
+            help="Year to compensate",
+            required=True,
+        )
+
+    def handle(self, *args, **options):
+        enr_ratio = options["enr_ratio"]
+        year = options["year"]
+        if options["log"]:
+            print(f" -- Running with ENR ratio = {enr_ratio}%.")
+
+        new_enr_ratio = enr_ratio / 100  # 25 -> 0.25
+
+        elec_provision_certificates = _get_compensation_certificates_to_create(year, new_enr_ratio)
+
+        if options["log"]:
+            _log_compensation_summary(self.stdout, elec_provision_certificates)
+
+        if options["apply"]:
+            if elec_provision_certificates:
+                ElecProvisionCertificate.objects.bulk_create(elec_provision_certificates, batch_size=1000)
+                if options["log"]:
+                    print(f"Created {len(elec_provision_certificates)} new certificates")
+            elif options["log"]:
+                print("No new certificates to create")
+
+        return json.dumps(_build_result_payload(elec_provision_certificates))
+
+
 def _build_compensation_certificate(cpo_id, quarter, year, operating_unit, energy_amount, new_enr_ratio, cpo_name=None):
     certificate = ElecProvisionCertificate(
         cpo_id=cpo_id,
@@ -67,13 +121,7 @@ def _get_certificates_with_delta(year, new_enr_ratio):
         .values("total")[:1]
     )
 
-    # Étape D — Filtre des lignes certificat éligibles, puis agrégation par (cpo_id, nom, année).
-    #   - exclusion des sources hors périmètre et des ratios invalides ;
-    #   - somme des energy_amount/enr_ratio → total_non_renewable_energy ;
-    #   - somme des energy_amount → total_energy_certificates ;
-    #   - jointure logique du total des réajustements non-renouvelables → total_non_renewable_readjustments ;
-    #   - application de delta_expression puis arrondi à 2 décimales.
-    # Étape E — Ne garder que les CPO où la compensation est strictement positive.
+    # Étape D — Récupération des certificats sur lesquels appliquer un rattrapage ENR
     q = (
         ElecProvisionCertificate.objects.filter(year=year)
         .exclude(
@@ -100,6 +148,7 @@ def _get_certificates_with_delta(year, new_enr_ratio):
         .annotate(delta=Round(delta_expression, 2))
         .filter(delta__gt=0)
     )
+
     return q
 
 
@@ -156,56 +205,3 @@ def _build_result_payload(certificates):
         }
         for c in certificates
     ]
-
-
-class Command(BaseCommand):
-    help = "Compensate elec provision certificate"
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--enr_ratio",
-            type=float,
-            help="Current ENR ratio",
-            required=True,
-        )
-        parser.add_argument(
-            "--apply",
-            action="store_true",
-            default=False,
-            help="Apply the compensation",
-        )
-        parser.add_argument(
-            "--log",
-            action="store_true",
-            default=True,
-            help="Log the compensation",
-        )
-        parser.add_argument(
-            "--year",
-            type=int,
-            help="Year to compensate",
-            required=True,
-        )
-
-    def handle(self, *args, **options):
-        enr_ratio = options["enr_ratio"]
-        year = options["year"]
-        if options["log"]:
-            print(f" -- Running with ENR ratio = {enr_ratio}%.")
-
-        new_enr_ratio = enr_ratio / 100  # 25 -> 0.25
-
-        elec_provision_certificates = _get_compensation_certificates_to_create(year, new_enr_ratio)
-
-        if options["log"]:
-            _log_compensation_summary(self.stdout, elec_provision_certificates)
-
-        if options["apply"]:
-            if elec_provision_certificates:
-                ElecProvisionCertificate.objects.bulk_create(elec_provision_certificates, batch_size=1000)
-                if options["log"]:
-                    print(f"Created {len(elec_provision_certificates)} new certificates")
-            elif options["log"]:
-                print("No new certificates to create")
-
-        return json.dumps(_build_result_payload(elec_provision_certificates))
