@@ -110,5 +110,7 @@ def _get_translation_model_key(model):
 
     Spaces are replaced with underscores.
     """
-    raw_key = getattr(model, "translation_model_key", model._meta.model_name)
+    raw_key = getattr(model, "translation_model_key", None)
+    if raw_key is None:
+        raw_key = model._meta.model_name
     return str(raw_key).replace(" ", "_")
