@@ -13,6 +13,7 @@ import {
 } from "biomethane/pages/contract/types"
 import { getSignatureDateConstraints } from "./add-contract.utils"
 import { CONTRACT_FILE_MAX_SIZE } from "biomethane/config"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type AddContractForm = ReplaceNullWithUndefined<
   Pick<
@@ -37,6 +38,7 @@ const AddContractContent = ({
   contract,
 }: AddContractContentProps) => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { currentStep, mutation: addContractFiles } = useStepper()
 
   const signatureDateConstraints = getSignatureDateConstraints(
@@ -71,13 +73,13 @@ const AddContractContent = ({
           {currentStep?.key === "dates" && (
             <Grid cols={2} gap="lg">
               <DateInput
-                label={t("Date de signature")}
+                label={tBiomethaneInput("contract.signature_date")}
                 required
                 {...form.bind("signature_date")}
                 {...signatureDateConstraints}
               />
               <DateInput
-                label={t("Date de prise d'effet")}
+                label={tBiomethaneInput("contract.effective_date")}
                 required
                 min={form.value.signature_date}
                 {...form.bind("effective_date")}

@@ -14,6 +14,7 @@ import { addSpreadingDepartment } from "../../api"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { useMemo } from "react"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 const departmentOptions = getDepartmentOptions()
 
@@ -32,6 +33,7 @@ export const AddSpreadingDepartment = ({
   annualDeclarationKey: string
 }) => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const entity = useEntity()
   const { bind, value } = useForm<AddSpreadingDepartmentForm>({})
 
@@ -79,13 +81,13 @@ export const AddSpreadingDepartment = ({
         <Form id="add-spreading-department-form" onSubmit={handleSubmit}>
           <SelectDsfr
             options={options}
-            label={t("Département")}
+            label={tBiomethaneInput("digestate_spreading.spreading_department")}
             placeholder={t("Sélectionner un département")}
             {...bind("spreading_department")}
             required
           />
           <NumberInput
-            label={t("Quantité épandue (t)")}
+            label={tBiomethaneInput("digestate_spreading.spread_quantity")}
             placeholder={t("Quantité épandue (t)")}
             min={0}
             step={0.01}
@@ -93,7 +95,7 @@ export const AddSpreadingDepartment = ({
             required
           />
           <NumberInput
-            label={t("Superficie des parcelles épandues (ha)")}
+            label={tBiomethaneInput("digestate_spreading.spread_parcels_area")}
             placeholder={t("Superficie des parcelles épandues (ha)")}
             min={0}
             step={0.01}

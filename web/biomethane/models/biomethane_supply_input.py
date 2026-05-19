@@ -5,6 +5,7 @@ from core.models import Pays
 
 
 class BiomethaneSupplyInput(models.Model):
+    translation_model_key = "supply_input"
     # Plan d'approvisionnement associé
     supply_plan = models.ForeignKey(BiomethaneSupplyPlan, on_delete=models.CASCADE, related_name="supply_inputs")
 
@@ -73,11 +74,11 @@ class BiomethaneSupplyInput(models.Model):
 
     # Distance moyenne pondérée d'approvisionnement (Km)
     average_weighted_distance_km = models.FloatField(
-        verbose_name="Distance moyenne pondérée d'approvisionnement (km)", null=True, blank=True
+        verbose_name="Distance moyenne pondérée d'approvisionnement (Km)", null=True, blank=True
     )
 
     # Distance maximale (Km)
-    maximum_distance_km = models.FloatField(verbose_name="Distance maximale (km)", null=True, blank=True)
+    maximum_distance_km = models.FloatField(verbose_name="Distance maximale (Km)", null=True, blank=True)
 
     class Meta:
         db_table = "biomethane_supply_input"

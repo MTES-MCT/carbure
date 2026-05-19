@@ -12,6 +12,7 @@ import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useAttestNoFossilForEnergy } from "./installation-energy-needs.hooks"
 import { EnergyTypes } from "./energy-types"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type InstallationEnergyNeedsForm = Pick<
   BiomethaneEnergyInputRequest,
@@ -31,6 +32,7 @@ export function InstallationEnergyNeeds({
   contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
 
   const form = useFormContext<InstallationEnergyNeedsForm>()
   const { bind, value } = form
@@ -69,7 +71,7 @@ export function InstallationEnergyNeeds({
               {displayDetailsField && (
                 <TextInput
                   readOnly={!isEditing}
-                  label={t("Précisions")}
+                  label={tBiomethaneInput("energy.energy_details")}
                   {...bind("energy_details")}
                   required
                 />

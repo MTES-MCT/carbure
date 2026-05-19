@@ -4,6 +4,7 @@ from core.models import Entity
 
 
 class BiomethaneDigestateStorage(models.Model):
+    translation_model_key = "digestate_storage"
     # Propriétaire de l'unité de stockage
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_digestate_storage")
 

@@ -22,6 +22,8 @@ def rename_file(filename, base_filename):
 
 
 class BiomethaneContract(models.Model):
+    translation_model_key = "contract"
+
     TARIFF_RULE_1 = ["2011", "2020"]
     TARIFF_RULE_2 = ["2021", "2023"]
 

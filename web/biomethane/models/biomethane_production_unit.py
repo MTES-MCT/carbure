@@ -8,6 +8,8 @@ from transactions.models import Site
 
 
 class BiomethaneProductionUnit(Site):
+    translation_model_key = "production"
+
     # Propriétaire de l'unité de production
     producer = models.OneToOneField(Entity, on_delete=models.CASCADE, related_name="biomethane_production_unit")
 

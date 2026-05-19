@@ -12,6 +12,7 @@ import {
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type IncinerationLandfillForm = DeepPartial<
   Pick<
@@ -36,6 +37,7 @@ export function IncinerationLandfill({
   contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<IncinerationLandfillForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
@@ -53,7 +55,7 @@ export function IncinerationLandfill({
           <Grid cols={2} gap="lg">
             <NumberInput
               readOnly={!isEditing}
-              label={t("Volume annuel éliminé (t)")}
+              label={tBiomethaneInput("digestate.annual_eliminated_volume")}
               type="number"
               min={0}
               {...bind("annual_eliminated_volume")}
@@ -62,8 +64,8 @@ export function IncinerationLandfill({
             />
             <TextInput
               readOnly={!isEditing}
-              label={t(
-                "Indiquer le nom de l'incinérateur ou du centre d'enfouissement"
+              label={tBiomethaneInput(
+                "digestate.incinerator_landfill_center_name"
               )}
               {...bind("incinerator_landfill_center_name")}
               required
@@ -73,8 +75,8 @@ export function IncinerationLandfill({
             InstallationCategory.INSTALLATION_CATEGORY_2 && (
             <NumberInput
               readOnly={!isEditing}
-              label={t(
-                "Quantité de matières totales traitées par la STEP allant en incinération (t)"
+              label={tBiomethaneInput(
+                "digestate.wwtp_materials_to_incineration"
               )}
               type="number"
               min={0}

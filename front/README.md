@@ -159,6 +159,9 @@ This workflow ensures strong type safety between the frontend and backend, catch
 Translation files are placed inside the `front/public/locales` folder. Each direct subfolder there should be named after a language code (ex: fr, en).
 Inside those subfolders, there should be `.json` files, that contain a simple object with only key/value pairs.
 
+Backend-generated translation labels (from Django `verbose_name`) are documented in the root README section
+[Labels traduits du backend vers le frontend](../README.md#labels-traduits-du-backend-vers-le-frontend).
+
 To use translations in frontend code, you have two methods:
 
 - using the react-i18next hook

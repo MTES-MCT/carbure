@@ -14,6 +14,7 @@ import {
 import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type DigestateProcessingForm = Pick<
   ProductionUnitForm,
@@ -43,6 +44,7 @@ export function DigestateProcessing({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<DigestateProcessingForm>()
@@ -120,7 +122,9 @@ export function DigestateProcessing({
             <RadioGroup
               required
               readOnly={!isEditing}
-              label={t("Le digestat subit-il une séparation de phase?")}
+              label={tBiomethaneInput(
+                "production.has_digestate_phase_separation"
+              )}
               options={getYesNoOptions()}
               orientation="horizontal"
               {...bind("has_digestate_phase_separation")}
@@ -128,8 +132,8 @@ export function DigestateProcessing({
             {!value.has_digestate_phase_separation && (
               <TextInput
                 readOnly={!isEditing}
-                label={t(
-                  "Étapes complémentaires de traitement du digestat brut"
+                label={tBiomethaneInput(
+                  "production.raw_digestate_treatment_steps"
                 )}
                 {...bind("raw_digestate_treatment_steps")}
               />
@@ -139,8 +143,8 @@ export function DigestateProcessing({
             {value.has_digestate_phase_separation && (
               <TextInput
                 readOnly={!isEditing}
-                label={t(
-                  "Étape(s) complémentaire(s) de traitement de la phase liquide"
+                label={tBiomethaneInput(
+                  "production.liquid_phase_treatment_steps"
                 )}
                 {...bind("liquid_phase_treatment_steps")}
               />
@@ -148,8 +152,8 @@ export function DigestateProcessing({
             {value.has_digestate_phase_separation && (
               <TextInput
                 readOnly={!isEditing}
-                label={t(
-                  "Étape(s) complémentaire(s) de traitement de la phase solide"
+                label={tBiomethaneInput(
+                  "production.solid_phase_treatment_steps"
                 )}
                 {...bind("solid_phase_treatment_steps")}
               />
@@ -157,7 +161,9 @@ export function DigestateProcessing({
             <CheckboxGroup
               required
               readOnly={!isEditing}
-              label={t("Mode de valorisation du digestat")}
+              label={tBiomethaneInput(
+                "production.digestate_valorization_methods"
+              )}
               options={digestateValorizationOptions}
               {...bind("digestate_valorization_methods")}
             />
@@ -168,14 +174,16 @@ export function DigestateProcessing({
                 <CheckboxGroup
                   required
                   readOnly={!isEditing}
-                  label={t("Gestion de l'épandage")}
+                  label={tBiomethaneInput(
+                    "production.spreading_management_methods"
+                  )}
                   options={spreadingManagementOptions}
                   {...bind("spreading_management_methods")}
                 />
                 <CheckboxGroup
                   required
                   readOnly={!isEditing}
-                  label={t("Sous quel(s) statut(s) est valorisé le digestat ?")}
+                  label={tBiomethaneInput("production.digestate_sale_types")}
                   options={digestateSaleTypesOptions}
                   {...bind("digestate_sale_types")}
                 />

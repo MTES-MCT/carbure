@@ -8,6 +8,8 @@ from core.models.fields import JSONChoiceField
 
 
 class BiomethaneDigestate(models.Model):
+    translation_model_key = "digestate"
+
     # Propriétaire du digestat
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_digestates")
 
