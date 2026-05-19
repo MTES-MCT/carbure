@@ -144,7 +144,9 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         )
 
     @patch("tiruert.views.mac_fossil_fuel.mixins.replace.DeclarationPeriodService.get_current_declaration_year")
-    def test_authenticated_user_cannot_replace_macs_for_non_current_declaration_year(self, get_current_declaration_year):
+    def test_authenticated_user_cannot_replace_macs_for_years_before_current_declaration_year(
+        self, get_current_declaration_year
+    ):
         get_current_declaration_year.return_value = 2024
 
         response = self.client.put(
@@ -159,7 +161,7 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.json(),
-            {"year": "MACs can only be modified for the currently active declaration year"},
+            {"year": "MACs can only be modified for the currently active declaration year onward"},
         )
         self.assertTrue(MacFossilFuel.objects.filter(operator=self.allowed_entity, year=2023, volume=100.0).exists())
 
