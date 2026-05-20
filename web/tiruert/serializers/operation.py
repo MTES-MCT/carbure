@@ -34,6 +34,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     renewable_energy_share = serializers.FloatField()
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
+    avoided_emissions = serializers.SerializerMethodField()
 
     def get_volume_l(self, instance) -> float:
         return instance.volume_l
@@ -44,6 +45,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
     def get_unit(self, instance) -> str:
         return self.context.get("unit")
+
+    def get_avoided_emissions(self, instance) -> float:
+        return instance.avoided_emissions
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -74,6 +78,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "quantity",
             "unit",
             "details",
+            "avoided_emissions",
         ]
 
 
@@ -106,12 +111,8 @@ class OperationSerializer(BaseOperationSerializer):
             "details",
         ]
 
-    avoided_emissions = serializers.SerializerMethodField()
     quantity_mj = serializers.SerializerMethodField()
     export_country = CountrySerializer(read_only=True)
-
-    def get_avoided_emissions(self, instance) -> float:
-        return instance.avoided_emissions
 
     def get_quantity_mj(self, instance) -> float:
         return instance.quantity(unit="mj", force=True)

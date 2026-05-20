@@ -3157,12 +3157,16 @@ export interface components {
         Airport: {
             readonly id: number;
             name: string;
+            /** Commune */
             city?: string;
             icao_code?: string;
             readonly country: components["schemas"]["Country"];
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             is_ue_airport?: boolean;
         };
@@ -3881,11 +3885,16 @@ export interface components {
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
             name: string;
+            /** SIRET */
             site_siret?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Commune */
             city?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
@@ -3926,6 +3935,7 @@ export interface components {
             liquid_phase_treatment_steps?: string | null;
             /** Étape(s) complémentaire(s) de traitement de la phase solide */
             solid_phase_treatment_steps?: string | null;
+            /** Pays */
             country?: number | null;
             created_by?: number | null;
             producer: number;
@@ -3937,11 +3947,16 @@ export interface components {
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
             name: string;
+            /** SIRET */
             site_siret?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Commune */
             city?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
@@ -3982,6 +3997,7 @@ export interface components {
             liquid_phase_treatment_steps?: string | null;
             /** Étape(s) complémentaire(s) de traitement de la phase solide */
             solid_phase_treatment_steps?: string | null;
+            /** Pays */
             country?: number | null;
             created_by?: number | null;
         };
@@ -4013,12 +4029,12 @@ export interface components {
             /** Département d'origine */
             origin_department?: string | null;
             /**
-             * Distance moyenne pondérée d'approvisionnement (km)
+             * Distance moyenne pondérée d'approvisionnement (Km)
              * Format: double
              */
             average_weighted_distance_km?: number | null;
             /**
-             * Distance maximale (km)
+             * Distance maximale (Km)
              * Format: double
              */
             maximum_distance_km?: number | null;
@@ -4088,12 +4104,12 @@ export interface components {
             /** Département d'origine */
             origin_department?: string | null;
             /**
-             * Distance moyenne pondérée d'approvisionnement (km)
+             * Distance moyenne pondérée d'approvisionnement (Km)
              * Format: double
              */
             average_weighted_distance_km?: number | null;
             /**
-             * Distance maximale (km)
+             * Distance maximale (Km)
              * Format: double
              */
             maximum_distance_km?: number | null;
@@ -4366,11 +4382,16 @@ export interface components {
             blending_is_outsourced: boolean;
             blending_entity_id?: number;
             name: string;
+            /** SIRET */
             site_siret?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Commune */
             city?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
@@ -4391,6 +4412,7 @@ export interface components {
              * @description En degrés Celsius
              */
             useful_temperature?: number | null;
+            /** Pays */
             country?: number | null;
             created_by?: number | null;
         };
@@ -4431,12 +4453,16 @@ export interface components {
         Depot: {
             readonly id: number;
             name: string;
+            /** Commune */
             city?: string;
             customs_id?: string;
             readonly country: components["schemas"]["Country"];
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             accise?: string;
             /**
@@ -4456,13 +4482,16 @@ export interface components {
             useful_temperature?: number | null;
         };
         DepotProductionSite: {
+            /** Adresse */
             address?: string;
             name: string;
             country: components["schemas"]["Pays"];
             readonly id: number;
             /** Format: date */
             date_mise_en_service?: string | null;
+            /** SIRET */
             site_siret?: string;
+            /** Code postal */
             postal_code?: string;
             manager_name?: string;
             manager_phone?: string;
@@ -4471,6 +4500,7 @@ export interface components {
             eligible_dc?: boolean;
             dc_reference?: string;
             dc_number?: string;
+            /** Commune */
             city?: string;
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
@@ -4605,10 +4635,15 @@ export interface components {
             ges_option?: components["schemas"]["GesOptionEnum"];
             eligible_dc?: boolean;
             dc_reference?: string;
+            /** SIRET */
             site_siret?: string;
+            /** Adresse */
             address?: string;
+            /** Commune */
             city?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             manager_name?: string;
             manager_phone?: string;
@@ -4628,10 +4663,15 @@ export interface components {
             ges_option?: components["schemas"]["GesOptionEnum"];
             eligible_dc?: boolean;
             dc_reference?: string;
+            /** SIRET */
             site_siret?: string;
+            /** Adresse */
             address?: string;
+            /** Commune */
             city?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             manager_name?: string;
             manager_phone?: string;
@@ -4965,10 +5005,13 @@ export interface components {
             readonly id: number;
             customs_id?: string;
             name: string;
+            /** Commune */
             city?: string;
             country: components["schemas"]["Pays"];
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
             /**
              * Format: double
@@ -5010,12 +5053,15 @@ export interface components {
         };
         EntityProductionSite: {
             readonly id: number;
+            /** Adresse */
             address?: string;
             name: string;
             readonly country: components["schemas"]["Country"];
             /** Format: date */
             date_mise_en_service?: string | null;
+            /** SIRET */
             site_siret?: string;
+            /** Code postal */
             postal_code?: string;
             manager_name?: string;
             manager_phone?: string;
@@ -5024,14 +5070,17 @@ export interface components {
             eligible_dc?: boolean;
             dc_reference?: string;
             dc_number?: string;
+            /** Commune */
             city?: string;
             readonly certificates: components["schemas"]["GenericCertificate"][];
             readonly inputs: components["schemas"]["FeedStock"][];
             readonly outputs: components["schemas"]["Biofuel"][];
         };
         EntityProductionSiteWrite: {
+            /** Adresse */
             address?: string;
             certificates: string[];
+            /** Commune */
             city?: string;
             country_code: string;
             /** Format: date */
@@ -5045,12 +5094,16 @@ export interface components {
             manager_phone?: string;
             name: string;
             outputs: string[];
+            /** Code postal */
             postal_code?: string;
+            /** SIRET */
             site_siret?: string;
         };
         EntityProductionSiteWriteRequest: {
+            /** Adresse */
             address?: string;
             certificates: string[];
+            /** Commune */
             city?: string;
             country_code: string;
             /** Format: date */
@@ -5064,7 +5117,9 @@ export interface components {
             manager_phone?: string;
             name: string;
             outputs: string[];
+            /** Code postal */
             postal_code?: string;
+            /** SIRET */
             site_siret?: string;
         };
         EntityRequest: {
@@ -5531,6 +5586,8 @@ export interface components {
             readonly quantity: number;
             readonly unit: string;
             details?: components["schemas"]["OperationDetail"][];
+            /** Format: double */
+            readonly avoided_emissions: number;
         };
         OperationLot: {
             id: number;
@@ -5862,8 +5919,10 @@ export interface components {
             quantity?: number;
         };
         PatchedEntityProductionSiteWriteRequest: {
+            /** Adresse */
             address?: string;
             certificates?: string[];
+            /** Commune */
             city?: string;
             country_code?: string;
             /** Format: date */
@@ -5877,7 +5936,9 @@ export interface components {
             manager_phone?: string;
             name?: string;
             outputs?: string[];
+            /** Code postal */
             postal_code?: string;
+            /** SIRET */
             site_siret?: string;
         };
         PatchedOperationUpdateRequest: {
@@ -5913,10 +5974,15 @@ export interface components {
             ges_option?: components["schemas"]["GesOptionEnum"];
             eligible_dc?: boolean;
             dc_reference?: string;
+            /** SIRET */
             site_siret?: string;
+            /** Adresse */
             address?: string;
+            /** Commune */
             city?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             manager_name?: string;
             manager_phone?: string;

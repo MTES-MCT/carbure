@@ -28,6 +28,26 @@ import { useUnit } from "common/hooks/unit"
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
 }
+
+const getOperationQuantity = (
+  operation: OperationList,
+  operator: "+" | "-"
+) => {
+  const quantity = formatNumber(
+    operation.type === OperationType.INCORPORATION
+      ? operation.quantity_renewable
+      : operation.quantity,
+    {
+      fractionDigits: 0,
+    }
+  )
+  return `${operator}${quantity} / ${operator}${formatNumber(
+    operation.avoided_emissions,
+    {
+      fractionDigits: 0,
+    }
+  )}`
+}
 export const useOperationsBiofuelsColumns = ({
   onClickSector,
 }: UseOperationsColumnsProps) => {
@@ -95,7 +115,7 @@ export const useOperationsBiofuelsColumns = ({
     },
     {
       key: OperationOrder.quantity,
-      header: `${t("Quantité")} (${unit.toUpperCase()})`,
+      header: `${t("Quantité")} (${unit.toUpperCase()} / TCO2)`,
       cell: (item) =>
         isSendingOperation(item.quantity) ? (
           <Text
@@ -107,14 +127,7 @@ export const useOperationsBiofuelsColumns = ({
                 styles["operation--rejected"]
             )}
           >
-            {formatNumber(
-              item.type === OperationType.INCORPORATION
-                ? item.quantity_renewable
-                : item.quantity,
-              {
-                fractionDigits: 0,
-              }
-            )}
+            {getOperationQuantity(item, "-")}
           </Text>
         ) : (
           <Text
@@ -126,15 +139,7 @@ export const useOperationsBiofuelsColumns = ({
                 styles["operation--rejected"]
             )}
           >
-            +
-            {formatNumber(
-              item.type === OperationType.INCORPORATION
-                ? item.quantity_renewable
-                : item.quantity,
-              {
-                fractionDigits: 0,
-              }
-            )}
+            {getOperationQuantity(item, "+")}
           </Text>
         ),
     },
