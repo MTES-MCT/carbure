@@ -287,3 +287,38 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
                 year=self.current_declaration_year,
             ).exists()
         )
+
+    def test_retrieve_creates_declaration_with_producer_id_not_dreal_id(self):
+        """
+        Test that when a DREAL accesses a non-existing declaration, it is created
+        with the producer's ID, not the DREAL's ID.
+        """
+        department = Department.objects.create(code_dept="75", name="Paris")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+
+        dreal = Entity.objects.create(name="Test DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        setup_current_user(self, "dreal2@carbure.local", "DREAL", "gogogo", [(dreal, "ADMIN")])
+
+        params = {"entity_id": dreal.id, "producer_id": self.producer_entity.id}
+
+        with (
+            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("core.models.declaration_period.date") as mock_date_model,
+        ):
+            mock_date_service.today.return_value = date(self.current_year, 2, 15)
+            mock_date_model.today.return_value = date(self.current_year, 2, 15)
+
+            response = self.client.get(self.annual_declaration_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        declaration = BiomethaneAnnualDeclaration.objects.get(year=self.current_declaration_year)
+        self.assertEqual(declaration.producer, self.producer_entity)
+        self.assertNotEqual(declaration.producer, dreal)
