@@ -75,7 +75,9 @@ export const CompanyForm = ({
       <Autocomplete
         label={t("Pays")}
         placeholder={t("Rechercher un pays...")}
-        getOptions={(query) => findCountries(query, { exclude_france: true })}
+        getOptions={(query) =>
+          findCountries(query, { exclude_france: isForeignCompany })
+        }
         normalize={normalizeCountry}
         {...companyForm.bind("registered_country")}
         required={isForeignCompany}

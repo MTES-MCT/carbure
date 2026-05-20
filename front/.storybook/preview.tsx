@@ -11,6 +11,8 @@ import useUserManager, { UserContext } from "../src/common/hooks/user"
 import { EntityContext, useEntityManager } from "../src/common/hooks/entity"
 import { PortalProvider } from "../src/common/components/portal"
 import { MatomoProvider } from "../src/matomo"
+import { QueryClientProvider } from "../src/common/hooks/async-rq"
+import { createQueryClient } from "../src/common/hooks/query-client"
 
 import "../src/setup-dsfr"
 import "@codegouvfr/react-dsfr/main.css"
@@ -31,6 +33,8 @@ initialize({
   },
 })
 
+const storybookQueryClient = createQueryClient()
+
 const withI18next = (Story, context) => {
   const { locale } = context.globals
 
@@ -45,7 +49,7 @@ const withI18next = (Story, context) => {
   )
 }
 
-const withData = (Story, { parameters }) => {
+const DataDecorator = ({ Story, parameters }) => {
   const user = useUserManager()
   const entityId = user?.user?.rights[0]?.entity.id
   const entity = useEntityManager(user, entityId)
@@ -62,9 +66,7 @@ const withData = (Story, { parameters }) => {
             <PortalProvider>
               <div className="new-dsfr">
                 {storyHasDescription && !isChromatic() && (
-                  <StoryDescription
-                    description={parameters?.docs?.description}
-                  />
+                  <StoryDescription description={parameters?.docs?.description} />
                 )}
                 <Story />
               </div>
@@ -73,6 +75,14 @@ const withData = (Story, { parameters }) => {
         </UserContext.Provider>
       </MatomoProvider>
     </Suspense>
+  )
+}
+
+const withData = (Story, { parameters }) => {
+  return (
+    <QueryClientProvider client={storybookQueryClient}>
+      <DataDecorator Story={Story} parameters={parameters} />
+    </QueryClientProvider>
   )
 }
 

@@ -8,6 +8,8 @@ import "./common/assets/css/index.css"
 import Carbure from "./common"
 import { MatomoProvider } from "./matomo"
 import { SentryProvider, initSentry } from "./sentry"
+import { QueryClientProvider } from "common/hooks/async-rq"
+import { queryClient } from "common/hooks/query-client"
 import "./setup-dsfr"
 
 initSentry()
@@ -33,11 +35,13 @@ enableMocking().then(() =>
   createRoot(document.getElementById("root")!).render(
     <SentryProvider>
       <React.StrictMode>
-        <BrowserRouter>
-          <MatomoProvider>
-            <Carbure />
-          </MatomoProvider>
-        </BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <MatomoProvider>
+              <Carbure />
+            </MatomoProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
       </React.StrictMode>
     </SentryProvider>
   )

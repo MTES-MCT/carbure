@@ -1,7 +1,8 @@
-import { useMutation } from "common/hooks/async"
+import { useMutation } from "common/hooks/async-rq"
 import { useTranslation } from "react-i18next"
 import {
   BiomethaneContract,
+  BiomethaneContractPatchRequest,
   InstallationCategory,
   TariffReference,
 } from "biomethane/pages/contract/types"
@@ -85,14 +86,15 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
     annualDeclarationMissingFieldsData,
   } = useAnnualDeclaration()
 
-  const mutation = useMutation(
-    (data) =>
-      saveContract(entity.id, data).then(() => {
+  const mutation = useMutation({
+    mutationFn: (data: BiomethaneContractPatchRequest) =>
+      saveContract(entity.id, data).then((updatedContract) => {
         // If the pages contract/production/injection have missing fields, we should not reset the annual declaration)
         if (
           contract &&
+          updatedContract &&
           !annualDeclarationMissingFieldsData.hasBiomethaneSettingsMissingObjects &&
-          hasWatchedFieldsChanged(contract, data)
+          hasWatchedFieldsChanged(contract, updatedContract)
         ) {
           portal((close) => (
             <AnnualDeclarationResetDialog
@@ -103,16 +105,14 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
           ))
         }
       }),
-    {
-      invalidates: ["contract-infos", "user-settings", annualDeclarationKey],
-      onSuccess: () => {
-        notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
-      },
-      onError: (e) => {
-        notifyError(e)
-      },
-    }
-  )
+    invalidates: ["contract-infos", "user-settings", annualDeclarationKey],
+    onSuccess: () => {
+      notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
+    },
+    onError: (e) => {
+      notifyError(e)
+    },
+  })
 
   return mutation
 }

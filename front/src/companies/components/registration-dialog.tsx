@@ -115,7 +115,7 @@ export const CompanyRegistrationDialog = () => {
         footer={
           <Button
             asideX
-            loading={registerCompanyRequest.loading}
+            loading={registerCompanyRequest.isPending}
             disabled={!prefetchedCompany}
             iconId="ri-add-line"
             type="submit"

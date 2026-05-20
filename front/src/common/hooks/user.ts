@@ -1,8 +1,10 @@
-import { createContext, useContext } from "react"
-import { useQuery } from "common/hooks/async"
+import { createContext, useContext, useEffect } from "react"
+import { useQuery } from "common/hooks/async-rq"
 import { Entity, User, UserRight, UserRightRequest } from "common/types"
 import * as api from "common/api"
 import * as Sentry from "@sentry/react"
+
+const userSettingsQueryKey = ["user-settings"] as const
 export interface UserManager {
   loading: boolean
   email: string
@@ -21,20 +23,21 @@ export interface UserManager {
 }
 
 export function useUserManager(): UserManager {
-  const settings = useQuery(api.getUserSettings, {
-    key: "user-settings",
-    params: [],
-    onSuccess: (response) => {
-      if (response.data?.email) {
-        Sentry.setUser({ email: response.data.email })
-      }
-    },
+  const settings = useQuery({
+    queryKey: userSettingsQueryKey,
+    queryFn: api.getUserSettings,
   })
 
-  const res = settings.result?.data
+  const res = settings.data?.data
   const email = res?.email ?? ""
   const rights = res?.rights ?? []
   const requests = res?.requests ?? []
+
+  useEffect(() => {
+    if (res?.email) {
+      Sentry.setUser({ email: res.email })
+    }
+  }, [res?.email])
 
   function getRights(entityID: number) {
     return rights?.find((r) => r.entity.id === entityID) ?? null
@@ -57,11 +60,11 @@ export function useUserManager(): UserManager {
   }
 
   function isAuthenticated() {
-    return settings.result !== undefined && settings.error === undefined
+    return settings.data !== undefined && settings.error == null
   }
 
   return {
-    loading: settings.loading,
+    loading: settings.isPending,
     email,
     rights,
     requests,

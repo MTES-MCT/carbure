@@ -25,3 +25,26 @@ export interface CompanyRegistrationFormValue extends CompanyFormValue {
   certificate: Certificate | undefined
   entity_type: EntityType | undefined
 }
+
+type WithRequired<T, K extends keyof T> = T & {
+  [P in K]-?: Exclude<T[P], undefined>
+}
+
+export interface RegisterCompanyPayload extends WithRequired<
+  CompanyRegistrationFormValue,
+  | "activity_description"
+  | "entity_type"
+  | "legal_name"
+  | "name"
+  | "registered_address"
+  | "registered_city"
+  | "registered_country"
+  | "registered_zipcode"
+  | "registration_id"
+  | "sustainability_officer_email"
+  | "sustainability_officer_phone_number"
+  | "sustainability_officer"
+> {
+  certificate_id?: Certificate["certificate_id"]
+  certificate_type?: Certificate["certificate_type"]
+}

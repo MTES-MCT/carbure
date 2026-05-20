@@ -6,7 +6,8 @@ import { Lock, Return, UserCheck } from "common/components/icons"
 import { TextInput } from "common/components/input"
 import { Container } from "./login"
 import { useNotify } from "common/components/notifications"
-import { useMutation } from "common/hooks/async"
+import { useMutation as useLegacyMutation } from "common/hooks/async"
+import { useMutation } from "common/hooks/async-rq"
 import * as api from "../api"
 import { useEffect } from "react"
 import { HttpError } from "common/services/api-fetch"
@@ -19,9 +20,9 @@ const OTP = () => {
 
   const { value, bind } = useForm({ otp: "" as string | undefined })
 
-  const verifyOTP = useMutation(api.verifyOTP, {
+  const verifyOTP = useMutation({
+    mutationFn: api.verifyOTP,
     invalidates: ["user-settings"],
-
     onSuccess: () => {
       notify(t("Vous êtes connecté !"), { variant: "success" })
       navigate("/")
@@ -36,7 +37,7 @@ const OTP = () => {
     },
   })
 
-  const requestOTP = useMutation(api.requestOTP, {
+  const requestOTP = useLegacyMutation(api.requestOTP, {
     onSuccess: () => {
       notify(t("Un nouveau code vous a été envoyé !"), { variant: "success" })
     },
@@ -47,7 +48,7 @@ const OTP = () => {
   })
 
   // if a code is specified in the url, automatically call the api with it
-  const execVerifyOTP = verifyOTP.execute
+  const execVerifyOTP = verifyOTP.mutateAsync
   useEffect(() => {
     if (searchParams.has("token")) {
       execVerifyOTP(searchParams.get("token")!)
@@ -65,7 +66,7 @@ const OTP = () => {
       </section>
 
       <section>
-        <Form id="otp" onSubmit={() => verifyOTP.execute(value.otp!)}>
+        <Form id="otp" onSubmit={() => verifyOTP.mutate(value.otp!)}>
           <TextInput
             autoFocus
             variant="solid"
@@ -92,7 +93,7 @@ const OTP = () => {
       <footer>
         <Button
           center
-          loading={verifyOTP.loading}
+          loading={verifyOTP.isPending}
           disabled={!value.otp}
           variant="primary"
           icon={UserCheck}

@@ -61,7 +61,8 @@ export const ContractInfos = ({
   const { bind, value } = useFormContext<ContractInfosForm>()
   const tariffReferenceOptions = useTariffReferenceOptions()
   const installationCategoryOptions = useInstallationCategoryOptions()
-  const { execute: updateContract, loading } = useMutateContractInfos(contract)
+  const { mutateAsync: updateContract, isPending: loading } =
+    useMutateContractInfos(contract)
   const { setSectionExpanded, isSectionExpanded } = useSectionsManager()
 
   const isEditing = isSectionExpanded(CONTRACT_INFOS_SECTION_ID)

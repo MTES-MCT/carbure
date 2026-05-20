@@ -3,7 +3,8 @@ import { Trans, useTranslation } from "react-i18next"
 import * as api from "../api/certificates"
 import useEntity, { useRights } from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
-import { useQuery, useMutation } from "common/hooks/async"
+import { useQuery, useMutation as useLegacyMutation } from "common/hooks/async"
+import { useMutation } from "common/hooks/async-rq"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
 import { Row } from "common/components/scaffold"
@@ -35,7 +36,7 @@ const Certificates = () => {
     params: [entity.id],
   })
 
-  const deleteCertificate = useMutation(api.deleteCertificate, {
+  const deleteCertificate = useLegacyMutation(api.deleteCertificate, {
     invalidates: ["my-certificates"],
     onSuccess: () => {
       notify(t("Le certificat a bien été supprimé !"), { variant: "success" })
@@ -47,10 +48,11 @@ const Certificates = () => {
     },
   })
 
-  const setDefaultCertificate = useMutation(
-    (cert: string | undefined) => api.setDefaultCertificate(entity.id, cert!),
-    { invalidates: ["user-settings"] }
-  )
+  const setDefaultCertificate = useMutation({
+    mutationFn: (cert: string | undefined) =>
+      api.setDefaultCertificate(entity.id, cert!),
+    invalidates: ["user-settings"],
+  })
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const certificateData = certificates.result?.data ?? []
@@ -78,7 +80,7 @@ const Certificates = () => {
         label={t("Certificat par défaut")}
         placeholder={t("Sélectionner un certificat")}
         value={entity.default_certificate ?? undefined}
-        onChange={setDefaultCertificate.execute}
+        onChange={setDefaultCertificate.mutate}
         options={validCertificates}
         normalize={normalizeEntityCertificate}
         style={{ flex: 1 }}
@@ -201,7 +203,7 @@ const CertificateAddDialog = ({ onClose }: CertificateAddDialogProps) => {
     undefined
   )
 
-  const addCertificate = useMutation(api.addCertificate, {
+  const addCertificate = useLegacyMutation(api.addCertificate, {
     invalidates: ["my-certificates"],
     onSuccess: () => {
       notify(t("Le certificat a bien été ajouté !"), { variant: "success" })
@@ -362,7 +364,7 @@ const CertificateUpdateDialog = ({
     undefined
   )
 
-  const updateCertificate = useMutation(api.updateCertificate, {
+  const updateCertificate = useLegacyMutation(api.updateCertificate, {
     invalidates: ["my-certificates"],
     onSuccess: () => {
       notify(t("Le certificat a bien été mis à jour !"), { variant: "success" })

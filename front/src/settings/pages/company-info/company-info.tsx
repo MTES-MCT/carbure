@@ -3,7 +3,7 @@ import { Country, Entity, UserRole } from "common/types"
 import { useForm, Form } from "common/components/form2"
 import { TextArea, TextInput } from "common/components/inputs2"
 import { Grid, LoaderOverlay } from "common/components/scaffold"
-import { useMutation } from "common/hooks/async"
+import { useMutation } from "common/hooks/async-rq"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api/company"
 import { CompanyFormValue, SearchCompanyPreview } from "companies/types"
@@ -37,7 +37,23 @@ const CompanyInfo = ({
     !_readOnly &&
     (!company || loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite))
 
-  const updateEntity = useMutation(api.updateEntity, {
+  const updateEntity = useMutation({
+    mutationFn: (payload: { entityId: number; formValue: CompanyFormValue }) =>
+      api.updateEntity(
+        payload.entityId,
+        payload.formValue.activity_description!,
+        payload.formValue.legal_name!,
+        payload.formValue.registered_address!,
+        payload.formValue.registered_city!,
+        payload.formValue.registered_country?.code_pays || "",
+        payload.formValue.registered_zipcode!,
+        payload.formValue.registration_id!,
+        payload.formValue.sustainability_officer_email!,
+        payload.formValue.sustainability_officer_phone_number!.trim(),
+        payload.formValue.sustainability_officer!,
+        payload.formValue.website!,
+        payload.formValue.vat_number!
+      ),
     invalidates: ["user-settings"],
   })
   const companyForm = useCompanyForm(entity)
@@ -46,21 +62,7 @@ const CompanyInfo = ({
 
   const onSubmitForm = async (formValue: CompanyFormValue | undefined) => {
     if (formValue && canSave) {
-      await updateEntity.execute(
-        entity.id,
-        formValue.activity_description!,
-        formValue.legal_name!,
-        formValue.registered_address!,
-        formValue.registered_city!,
-        formValue.registered_country?.code_pays || "",
-        formValue.registered_zipcode!,
-        formValue.registration_id!,
-        formValue.sustainability_officer_email!,
-        formValue.sustainability_officer_phone_number!.trim(),
-        formValue.sustainability_officer!,
-        formValue.website!,
-        formValue.vat_number!
-      )
+      await updateEntity.mutateAsync({ entityId: entity.id, formValue })
       setIsEditingCompanyAddress(false)
     }
   }
@@ -197,7 +199,7 @@ const CompanyInfo = ({
           )}
         </Form>
 
-        {updateEntity.loading && <LoaderOverlay />}
+        {updateEntity.isPending && <LoaderOverlay />}
       </EditableCard>
       <EditableCard
         title={t("Coordonnées du contact principal")}

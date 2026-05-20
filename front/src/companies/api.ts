@@ -1,43 +1,26 @@
 import { api as apiFetch } from "common/services/api-fetch"
-import { EntityType } from "common/types"
-import { CertificateTypeEnum } from "api-schema"
+import { RegisterCompanyPayload } from "./types"
 
-export function registerCompany(
-  activity_description: string,
-  entity_type: EntityType,
-  legal_name: string,
-  name: string,
-  registered_address: string,
-  registered_city: string,
-  registered_country_code: string,
-  registered_zipcode: string,
-  registration_id: string,
-  sustainability_officer_email: string,
-  sustainability_officer_phone_number: string,
-  sustainability_officer: string,
-  website?: string,
-  vat_number?: string,
-  certificate_id?: string,
-  certificate_type?: CertificateTypeEnum
-) {
+export function registerCompany(payload: RegisterCompanyPayload) {
   return apiFetch.POST("/entities/add-company", {
     body: {
-      activity_description,
-      entity_type,
-      legal_name,
-      name,
-      registered_address,
-      registered_city,
-      registered_country: registered_country_code,
-      registered_zipcode,
-      registration_id,
-      sustainability_officer_email,
-      sustainability_officer_phone_number,
-      sustainability_officer,
-      website,
-      vat_number,
-      certificate_id,
-      certificate_type,
+      activity_description: payload.activity_description,
+      entity_type: payload.entity_type,
+      legal_name: payload.legal_name,
+      name: payload.name,
+      registered_address: payload.registered_address,
+      registered_city: payload.registered_city,
+      registered_country: payload.registered_country.code_pays,
+      registered_zipcode: payload.registered_zipcode,
+      registration_id: payload.registration_id,
+      sustainability_officer_email: payload.sustainability_officer_email,
+      sustainability_officer_phone_number:
+        payload.sustainability_officer_phone_number,
+      sustainability_officer: payload.sustainability_officer,
+      website: payload.website,
+      vat_number: payload.vat_number,
+      certificate_id: payload.certificate_id,
+      certificate_type: payload.certificate_type,
     },
   })
 }

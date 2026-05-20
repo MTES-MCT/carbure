@@ -1,7 +1,7 @@
+import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { useQuery } from "common/hooks/async"
 import { LoaderOverlay } from "common/components/scaffold"
-import { invalidate } from "common/hooks/invalidate"
+import { useMutation } from "common/hooks/async-rq"
 import * as api from "../api"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
@@ -10,13 +10,12 @@ export const Logout = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
+  const hasTriggeredLogout = useRef(false)
 
-  // automatically run logout request when this component is loaded
-  useQuery(api.logout, {
-    key: "logout",
-    params: [],
+  const logoutMutation = useMutation({
+    mutationFn: api.logout,
+    invalidates: ["user-settings"],
     onSuccess: () => {
-      invalidate("user-settings")
       notify(t("Vous êtes déconnecté !"), { variant: "success" })
       navigate("/")
     },
@@ -24,6 +23,13 @@ export const Logout = () => {
       notify(t("La déconnexion a échoué !"), { variant: "danger" })
     },
   })
+
+  useEffect(() => {
+    // Prevent duplicate mutation calls in React StrictMode.
+    if (hasTriggeredLogout.current) return
+    hasTriggeredLogout.current = true
+    logoutMutation.mutate()
+  }, [logoutMutation])
 
   return <LoaderOverlay />
 }

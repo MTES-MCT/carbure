@@ -1,9 +1,12 @@
-import { useMutation } from "common/hooks/async"
+import { useMutation } from "common/hooks/async-rq"
 import * as api from "../api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { AxiosError } from "axios"
-import { CompanyRegistrationFormValue } from "companies/types"
+import {
+  CompanyRegistrationFormValue,
+  RegisterCompanyPayload,
+} from "companies/types"
 
 type RegisterCompanyProps = {
   closeDialog?: () => void
@@ -17,27 +20,12 @@ export const useRegisterCompany = ({ closeDialog }: RegisterCompanyProps) => {
   const onSubmitForm = (
     formValue: CompanyRegistrationFormValue | undefined
   ) => {
-    if (!formValue) return
-    registerCompanyRequest.execute(
-      formValue.activity_description!,
-      formValue.entity_type!,
-      formValue.legal_name!,
-      formValue.name!,
-      formValue.registered_address!,
-      formValue.registered_city!,
-      formValue.registered_country?.code_pays || "",
-      formValue.registered_zipcode!,
-      formValue.registration_id!,
-      formValue.sustainability_officer_email!,
-      formValue.sustainability_officer_phone_number!.trim(),
-      formValue.sustainability_officer!,
-      formValue.website!,
-      formValue.vat_number!,
-      formValue.certificate?.certificate_id,
-      formValue.certificate?.certificate_type
-    )
+    const payload = toRegisterCompanyPayload(formValue)
+    if (!payload) return
+    registerCompanyRequest.mutate(payload)
   }
-  const registerCompanyRequest = useMutation(api.registerCompany, {
+  const registerCompanyRequest = useMutation({
+    mutationFn: api.registerCompany,
     invalidates: ["user-settings"],
     onSuccess: () => {
       notify(t("Votre demande d'inscription a bien été envoyée !"), {
@@ -60,4 +48,37 @@ export const useRegisterCompany = ({ closeDialog }: RegisterCompanyProps) => {
   })
 
   return { registerCompanyRequest, onSubmitForm }
+}
+
+function toRegisterCompanyPayload(
+  formValue: CompanyRegistrationFormValue | undefined
+): RegisterCompanyPayload | undefined {
+  if (!formValue || !canBuildRegisterCompanyPayload(formValue)) return
+
+  return {
+    ...formValue,
+    registration_id: formValue.registration_id ?? "",
+    sustainability_officer_phone_number:
+      formValue.sustainability_officer_phone_number.trim(),
+    certificate_id: formValue.certificate?.certificate_id,
+    certificate_type: formValue.certificate?.certificate_type,
+  }
+}
+
+function canBuildRegisterCompanyPayload(
+  formValue: CompanyRegistrationFormValue
+): formValue is RegisterCompanyPayload {
+  return Boolean(
+    formValue.activity_description &&
+    formValue.entity_type &&
+    formValue.legal_name &&
+    formValue.name &&
+    formValue.registered_address &&
+    formValue.registered_city &&
+    formValue.registered_country &&
+    formValue.registered_zipcode &&
+    formValue.sustainability_officer_email &&
+    formValue.sustainability_officer_phone_number &&
+    formValue.sustainability_officer
+  )
 }

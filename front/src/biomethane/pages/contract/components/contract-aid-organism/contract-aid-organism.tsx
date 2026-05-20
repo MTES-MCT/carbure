@@ -41,7 +41,7 @@ export const ContractAidOrganism = ({
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<ContractAidOrganismForm>()
-  const { execute: updateContractAidOrganism, loading } =
+  const { mutate: updateContractAidOrganism, isPending: loading } =
     useMutateContractInfos(contract)
 
   const complementaryAidOrganismOptions = useContractAidOrganismOptions()

@@ -25,7 +25,7 @@ export const ForeignCompanyDialog = ({ close }: ForeignCompanyDialogProps) => {
       footer={
         <Button
           asideX
-          loading={registerCompanyRequest.loading}
+          loading={registerCompanyRequest.isPending}
           iconId="ri-add-line"
           type="submit"
           nativeButtonProps={{

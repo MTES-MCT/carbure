@@ -1,5 +1,5 @@
 import { useNotify } from "common/components/notifications"
-import { useMutation } from "common/hooks/async"
+import { useMutation } from "common/hooks/async-rq"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "../../../api"
@@ -23,7 +23,14 @@ export const EmailConfirmationModal = ({
   const notify = useNotify()
   const [otpCode, setOtpCode] = useState("")
 
-  const confirmEmailMutation = useMutation(api.confirmEmailChange, {
+  const confirmEmailMutation = useMutation({
+    mutationFn: ({
+      newEmail,
+      otpCode,
+    }: {
+      newEmail: string
+      otpCode: string
+    }) => api.confirmEmailChange(newEmail, otpCode),
     invalidates: ["user-settings"],
     onSuccess: () => {
       notify(t("L'adresse email a été mise à jour avec succès !"), {
@@ -69,7 +76,7 @@ export const EmailConfirmationModal = ({
 
   const handleConfirm = () => {
     if (otpCode.trim()) {
-      confirmEmailMutation.execute(newEmail, otpCode.trim())
+      confirmEmailMutation.mutate({ newEmail, otpCode: otpCode.trim() })
     }
   }
 
@@ -82,7 +89,7 @@ export const EmailConfirmationModal = ({
       footer={
         <Button
           iconId="ri-check-line"
-          loading={confirmEmailMutation.loading}
+          loading={confirmEmailMutation.isPending}
           disabled={!otpCode.trim()}
           type="submit"
           nativeButtonProps={{

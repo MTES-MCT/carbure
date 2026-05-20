@@ -10,7 +10,7 @@ import { useUser } from "common/hooks/user"
 
 import * as api from "../api"
 import * as common from "common/api"
-import { useMutation } from "common/hooks/async"
+import { useMutation } from "common/hooks/async-rq"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
 import {
@@ -42,11 +42,12 @@ export const AccountAccesRights = () => {
 
   const user = useUser()
 
-  const revokeMyself = useMutation(api.revokeMyself, {
+  const revokeMyself = useMutation({
+    mutationFn: api.revokeMyself,
     invalidates: ["user-settings"],
   })
 
-  const loading = user.loading || revokeMyself.loading
+  const loading = user.loading || revokeMyself.isPending
 
   return (
     <EditableCard
@@ -125,7 +126,9 @@ export const AccountAccesRights = () => {
                         title={t("Annuler mes accès")}
                         description={t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: right.entity.name })} // prettier-ignore
                         confirm={t("Révoquer")}
-                        onConfirm={() => revokeMyself.execute(right.entity.id)}
+                        onConfirm={async () => {
+                          await revokeMyself.mutateAsync(right.entity.id)
+                        }}
                         onClose={close}
                         hideCancel
                       />
@@ -176,10 +179,13 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
   const [entity, setEntity] = useState<EntityPreview | undefined>(undefined)
   const [role, setRole] = useState<UserRole | undefined>(UserRole.ReadOnly)
 
-  const requestAccess = useMutation(api.requestAccess, {
+  const requestAccess = useMutation({
+    mutationFn: ({ entityId, role }: { entityId: number; role: UserRole }) =>
+      api.requestAccess(entityId, role),
     invalidates: ["user-settings"],
-    onSuccess: () =>
-      notify(t("La société a été ajoutée !"), { variant: "success" }),
+    onSuccess: () => {
+      notify(t("La société a été ajoutée !"), { variant: "success" })
+    },
     onError: () =>
       notify(t("La société n'a pas pu être ajoutée !"), { variant: "danger" }),
   })
@@ -204,7 +210,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
       }
       footer={
         <Button
-          loading={requestAccess.loading}
+          loading={requestAccess.isPending}
           iconId="ri-add-line"
           disabled={!entity || !role}
           type="submit"
@@ -221,7 +227,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
         id="access-right"
         onSubmit={async () => {
           matomo.push(["trackEvent", "account", "add-access-right"])
-          await requestAccess.execute(entity!.id, role!)
+          await requestAccess.mutateAsync({ entityId: entity!.id, role: role! })
           setEntity(undefined)
         }}
       >
