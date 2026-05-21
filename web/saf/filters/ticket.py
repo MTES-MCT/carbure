@@ -14,6 +14,7 @@ class TicketFilter(django_filters.FilterSet):
     period = django_filters.AllValuesMultipleFilter(field_name="assignment_period")
     feedstock = django_filters.AllValuesMultipleFilter(field_name="feedstock__code")
     country_of_origin = django_filters.AllValuesMultipleFilter(field_name="country_of_origin__code_pays")
+    export_country = django_filters.AllValuesMultipleFilter(field_name="export_country__code_pays")
     production_site = django_filters.AllValuesMultipleFilter(field_name="carbure_production_site__name")
     consumption_type = django_filters.MultipleChoiceFilter(
         field_name="consumption_type", choices=SafTicket.CONSUMPTION_TYPES
@@ -33,6 +34,7 @@ class TicketFilter(django_filters.FilterSet):
             ("supplier__name", "supplier"),
             ("consumption_type", "consumption_type"),
             ("reception_airport__name", "reception_airport"),
+            ("export_country__name", "export_country"),
         )
     )
 
@@ -57,6 +59,7 @@ class TicketFilter(django_filters.FilterSet):
             "period",
             "feedstock",
             "country_of_origin",
+            "export_country",
             "production_site",
             "consumption_type",
             "ets_status",
