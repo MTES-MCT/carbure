@@ -38,6 +38,14 @@ class SafSnapshotTest(TestCase):
             status=SafTicket.ACCEPTED,
         )
         SafTicketFactory.create_batch(
+            3,
+            year=2022,
+            supplier_id=self.entity.id,
+            client_id=None,
+            unknown_airline_client="Foreign client",
+            status=SafTicket.EXPORTED,
+        )
+        SafTicketFactory.create_batch(
             5,
             year=2022,
             supplier_id=self.entity.id,
@@ -58,6 +66,7 @@ class SafSnapshotTest(TestCase):
             "tickets_assigned_pending": 0,
             "tickets_assigned_rejected": 0,
             "tickets_assigned_accepted": 0,
+            "tickets_assigned_exported": 0,
             "tickets_received": 0,
             "tickets_received_pending": 0,
             "tickets_received_accepted": 0,
@@ -75,10 +84,11 @@ class SafSnapshotTest(TestCase):
         expected = {
             "ticket_sources_available": 10,
             "ticket_sources_history": 20,
-            "tickets_assigned": 30,
+            "tickets_assigned": 33,
             "tickets_assigned_pending": 15,
             "tickets_assigned_rejected": 5,
             "tickets_assigned_accepted": 10,
+            "tickets_assigned_exported": 3,
             "tickets_received": 0,
             "tickets_received_pending": 0,
             "tickets_received_accepted": 0,

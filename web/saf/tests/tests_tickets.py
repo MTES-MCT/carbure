@@ -76,6 +76,8 @@ class SafTicketsTest(TestCase):
             "agreement_date": "2022-06-20",
             "supplier": "Atlantique Terminals",
             "client": "Metro Refining",
+            "unknown_airline_client": None,
+            "export_country": None,
             "volume": 30000.0,
             "feedstock": {
                 "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
@@ -108,3 +110,53 @@ class SafTicketsTest(TestCase):
         self.maxDiff = None
         self.assertEqual(data, expected_ticket)
         self.assertEqual(response.json()["count"], 2)
+
+    def test_assigned_exported_tickets_have_dedicated_status_filter(self):
+        SafTicket.objects.create(
+            carbure_id="carbure-id-t-003",
+            year=2022,
+            assignment_period=202201,
+            status=SafTicket.ACCEPTED,
+            volume=10000,
+            feedstock=MatierePremiere.biofuel.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
+            biofuel=Biocarburant.objects.get(code="HCC"),
+            country_of_origin=Pays.objects.get(name="Espagne"),
+            supplier=self.entity,
+            client=self.ticket_client,
+            consumption_type=SafTicket.MAC,
+        )
+        SafTicket.objects.create(
+            carbure_id="carbure-id-t-004",
+            year=2022,
+            assignment_period=202201,
+            status=SafTicket.EXPORTED,
+            volume=10000,
+            feedstock=MatierePremiere.biofuel.get(code="HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2"),
+            biofuel=Biocarburant.objects.get(code="HCC"),
+            country_of_origin=Pays.objects.get(name="Espagne"),
+            supplier=self.entity,
+            client=None,
+            unknown_airline_client="Foreign client",
+            consumption_type=SafTicket.MAC,
+        )
+
+        query = {
+            "entity_id": self.entity.id,
+            "year": 2022,
+            "status": SafTicket.ACCEPTED,
+            "type": "assigned",
+        }
+
+        response = self.client.get(reverse("saf-tickets-list"), query)
+
+        assert response.status_code == 200
+        assert response.json()["count"] == 1
+        assert response.json()["results"][0]["status"] == SafTicket.ACCEPTED
+
+        query["status"] = SafTicket.EXPORTED
+
+        response = self.client.get(reverse("saf-tickets-list"), query)
+
+        assert response.status_code == 200
+        assert response.json()["count"] == 1
+        assert response.json()["results"][0]["status"] == SafTicket.EXPORTED

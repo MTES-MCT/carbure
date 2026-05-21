@@ -145,6 +145,8 @@ class SafTicketSourceDetailsTest(TestCase):
                     "assignment_period": 202201,
                     "carbure_id": "carbure-id-t-001",
                     "client": self.ticket_client.name,
+                    "unknown_airline_client": None,
+                    "export_country": None,
                     "id": 4321,
                     "status": "PENDING",
                     "volume": 30000.0,

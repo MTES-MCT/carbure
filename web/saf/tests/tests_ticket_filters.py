@@ -52,6 +52,7 @@ class SafTicketFiltersTest(TestCase, FiltersActionTestMixin):
                 "feedstock": [self.hau.code, self.hga.code],
                 "period": [202201, 202202],
                 "country_of_origin": [self.fr.code_pays],
+                "export_country": [],
                 "production_site": [self.psite.name],
                 "consumption_type": [],
                 "reception_airport": [],
