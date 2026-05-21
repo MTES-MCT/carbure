@@ -229,6 +229,7 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
             cpo=self.cpo,
             year=2024,
             energy_amount=500,  # MWh
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
 

@@ -9,7 +9,7 @@ from elec.models import ElecCertificateReadjustment, ElecProvisionCertificate
 
 
 class Command(BaseCommand):
-    # python web/manage.py compensate_elec_provision_certificate --enr_ratio 25 --apply --log --year 2025
+    # python web/manage.py compensate_elec_provision_certificate --enr_ratio 30.81 --log --year 2025
     help = "Compensate elec provision certificate"
 
     def add_arguments(self, parser):
@@ -82,17 +82,14 @@ def _get_certificates_with_delta(year, new_enr_ratio):
     à créer en une requête agrégée.
 
     Idée métier :
-      1) Repartir de l'énergie non renouvelable par certificat:
+      1) Repartir de l'énergie non renouvelable par certificat et réajustement:
            non_renewable_i = renewable_energy_i / enr_ratio_i
-      2) Agréger par CPO/année :
-           total_non_renewable = somme(non_renewable_i)
-           total_renewable = somme(renewable_energy_i)
-      3) Retrancher les réajustements annuels (même CPO, même année) du total non_renewable :
-           non_renewable_net = total_non_renewable - total_non_renewable_readjustments
-      4) Appliquer le nouveau ratio puis retirer le déjà-certifié renouvelable :
-           delta = non_renewable_net * enr_nouveau - total_renewable
+      2) Agréger par CPO/année séparément pour certificats et réajustements
+      3) Calculer le delta renouvelable de chaque bloc avec le nouveau ratio :
+           delta_certificats = total_non_renewable_certificats * enr_nouveau - total_renewable_certificats
+           delta_readjustments = total_non_renewable_readjustments * enr_nouveau - total_renewable_readjustments
+      4) Compensation nette = delta_certificats - delta_readjustments
 
-    Cette approche est robuste si un CPO a plusieurs certificats avec des enr_ratio différents.
     """
     # Étape A — Ne pas recréer une compensation annuelle déjà présente (clé métier : même CPO, année, source).
     compensation_certificates = ElecProvisionCertificate.objects.filter(
@@ -101,23 +98,32 @@ def _get_certificates_with_delta(year, new_enr_ratio):
         cpo_id=OuterRef("cpo_id"),
     )
 
-    # Étape B — Formule du delta sur base "non_renewable" (voir docstring).
-    #   non_renewable_net = total_non_renewable_energy - total_non_renewable_readjustments
-    #   delta = non_renewable_net * new_enr_ratio - total_energy_certificates
+    # Étape B — Formule du delta (voir docstring).
+    #   delta = (non_renewable_certificates * new_ratio - renewable_certificates) -
+    # (non_renewable_readjustments * new_ratio - renewable_readjustments)
     delta_expression = ExpressionWrapper(
-        ((F("total_non_renewable_energy") - F("total_non_renewable_readjustments")) * Value(new_enr_ratio))
-        - F("total_energy_certificates"),
+        (F("total_non_renewable_certificates") * Value(new_enr_ratio) - F("total_renewable_certificates"))
+        - (F("total_non_renewable_readjustments") * Value(new_enr_ratio) - F("total_renewable_readjustments")),
         output_field=FloatField(),
     )
 
-    # Étape C — Total des réajustements non-renouvelables (MWh) pour ce CPO et cette année.
-    readjustments_for_year = (
+    # Étape C — Totaux des réajustements (MWh) pour ce CPO et cette année.
+    readjustments_non_renewable_for_year = (
         ElecCertificateReadjustment.objects.filter(
             cpo_id=OuterRef("cpo_id"),
             year=year,
         )
         .values("cpo_id")
-        .annotate(total=Sum("non_renewable_energy_amount"))
+        .annotate(total=Sum(F("energy_amount") / F("enr_ratio")))
+        .values("total")[:1]
+    )
+    readjustments_renewable_for_year = (
+        ElecCertificateReadjustment.objects.filter(
+            cpo_id=OuterRef("cpo_id"),
+            year=year,
+        )
+        .values("cpo_id")
+        .annotate(total=Sum("energy_amount"))
         .values("total")[:1]
     )
 
@@ -137,14 +143,18 @@ def _get_certificates_with_delta(year, new_enr_ratio):
         .values("cpo_id", "cpo__name", "year")
         .annotate(
             total_non_renewable_readjustments=Coalesce(
-                Subquery(readjustments_for_year, output_field=FloatField()),
+                Subquery(readjustments_non_renewable_for_year, output_field=FloatField()),
                 Value(0.0),
             ),
-            total_non_renewable_energy=Sum(
+            total_renewable_readjustments=Coalesce(
+                Subquery(readjustments_renewable_for_year, output_field=FloatField()),
+                Value(0.0),
+            ),
+            total_non_renewable_certificates=Sum(
                 ExpressionWrapper(F("energy_amount") / F("enr_ratio"), output_field=FloatField())
             ),
         )
-        .annotate(total_energy_certificates=Sum(F("energy_amount")))
+        .annotate(total_renewable_certificates=Sum(F("energy_amount")))
         .annotate(delta=Round(delta_expression, 2))
         .filter(delta__gt=0)
     )

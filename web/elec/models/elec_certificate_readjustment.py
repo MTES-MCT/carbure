@@ -8,11 +8,7 @@ class ElecCertificateReadjustment(models.Model):
     cpo = models.ForeignKey(Entity, on_delete=models.CASCADE)
     year = models.IntegerField()
     energy_amount = models.FloatField(validators=[MinValueValidator(0.0)])  # MWh
-    non_renewable_energy_amount = models.FloatField(  # MWh
-        validators=[MinValueValidator(0.0)],
-        null=True,
-        blank=True,
-    )
+    enr_ratio = models.FloatField()
     created_at = models.DateField(auto_now_add=True)
 
     METER_READINGS = "METER_READINGS"

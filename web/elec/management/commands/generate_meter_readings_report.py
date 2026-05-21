@@ -67,7 +67,7 @@ def _get_meter_readings_readjustment_energy(cpo_id, year):
         renewable_energy=Coalesce(Sum("energy_amount"), 0.0),
         non_renewable_energy=Coalesce(
             ExpressionWrapper(
-                Sum(Coalesce(F("non_renewable_energy_amount"), F("energy_amount"))),
+                Sum(F("energy_amount") / F("enr_ratio")),
                 output_field=FloatField(),
             ),
             0.0,
@@ -172,12 +172,15 @@ class Command(BaseCommand):
 
                 # create a readjustment only if the cpo has a positive surplus
                 if apply_readjustments and diff > 0:
+                    renewable_mwh = round(diff / 1000, 2)
+                    non_renewable_mwh = round(non_renewable_diff / 1000, 2)
+                    enr_ratio = round(renewable_mwh / non_renewable_mwh, 4) if non_renewable_mwh else 0.25
+
                     ElecCertificateReadjustment.objects.create(
                         cpo_id=cpo["cpo_id"],
                         error_source=ElecCertificateReadjustment.METER_READINGS,
-                        # back to MWh to match the energy_amount field
-                        energy_amount=round(diff / 1000, 2),
-                        non_renewable_energy_amount=round(non_renewable_diff / 1000, 2),
+                        energy_amount=renewable_mwh,
+                        enr_ratio=enr_ratio,
                         reason="Différence entre l'énergie générée par certificats et l'énergie déclarée dans les relevés",
                         year=year,
                     )

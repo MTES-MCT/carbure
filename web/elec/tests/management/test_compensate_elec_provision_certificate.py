@@ -50,14 +50,12 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
             enr_ratio=enr_ratio,
         )
 
-    def create_readjustment(self, *, energy_amount, non_renewable_energy_amount=None, year=None, cpo=None):
+    def create_readjustment(self, *, energy_amount, enr_ratio=0.25, year=None, cpo=None):
         return ElecCertificateReadjustment.objects.create(
             cpo=cpo or self.cpo1,
             year=year or self.last_year,
             energy_amount=energy_amount,
-            non_renewable_energy_amount=(
-                non_renewable_energy_amount if non_renewable_energy_amount is not None else energy_amount
-            ),
+            enr_ratio=enr_ratio,
             error_source=ElecCertificateReadjustment.MANUAL,
         )
 
@@ -271,16 +269,17 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
         self.create_certificate(source=ElecProvisionCertificate.MANUAL, quarter=1, energy_amount=100.0, enr_ratio=0.25)
         self.create_certificate(source=ElecProvisionCertificate.MANUAL, quarter=2, energy_amount=200.0, enr_ratio=0.28)
         self.create_readjustment(
-            energy_amount=500.0,  # Renewable amount should not be used by compensate command
-            non_renewable_energy_amount=50.0,
+            energy_amount=50.0,
+            enr_ratio=0.25,  # non-renewable base = 50 / 0.25 = 200 MWh
             year=COMPENSATION_YEAR,
         )
 
         result = run_command(enr_ratio=30)
 
         self.assertEqual(len(result), 1)
-        # Expected formula from non-renewable base using non_renewable_energy_amount:
-        # (100 / 0.25 + 200 / 0.28 - 50) * 0.30 - (100 + 200) = 19.29
+        # delta certificats = (100 / 0.25 + 200 / 0.28) * 0.30 - (100 + 200) = 34.29
+        # delta réajustements = (50 / 0.25) * 0.30 - 50 = 10.00
+        # compensation nette = 34.29 - 10.00 = 24.29
         assert_object_contains_data(
             self,
             result[0],
@@ -289,7 +288,63 @@ class CompensateElecProvisionCertificateCommandTest(TestCase):
                 "quarter": 1,
                 "year": 2025,
                 "operating_unit": "ALL",
-                "energy_amount": 19.29,
+                "energy_amount": 24.29,
+                "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
+            },
+        )
+
+    def test_computes_compensation_with_real_world_volumes_and_readjustments(self):
+        """
+        Cas réel : certificats renouvelables + réajustements, passage de 25 % à 30,81 %.
+
+        Entrées :
+        - certificats renouvelables : 2 931 MWh (enr_ratio = 0,25)
+        - réajustements renouvelables : 532,51 MWh (enr_ratio = 0,25)
+        - nouveau ratio : 0,3081 (30,81 %)
+
+        Calcul attendu (par bloc, puis net) :
+        - non renouvelable certificats = 2 931 / 0,25 = 11 724,00 MWh
+        - non renouvelable réajustements = 532,51 / 0,25 = 2 130,04 MWh
+        - delta certificats = 11 724,00 * 0,3081 - 2 931,00 = 681,16 MWh
+        - delta réajustements = 2 130,04 * 0,3081 - 532,51 = 123,76 MWh
+        - compensation nette = 681,16 - 123,76 = 557,41 MWh (arrondi final sur le net)
+        """
+        renewable_certificates_mwh = 2931.0
+        renewable_readjustments_mwh = 532.51
+        old_enr_ratio = 0.25
+        new_enr_ratio = 0.3081
+
+        non_renewable_certificates_mwh = renewable_certificates_mwh / old_enr_ratio
+        non_renewable_readjustments_mwh = renewable_readjustments_mwh / old_enr_ratio
+
+        certificates_delta_mwh = non_renewable_certificates_mwh * new_enr_ratio - renewable_certificates_mwh
+        readjustments_delta_mwh = non_renewable_readjustments_mwh * new_enr_ratio - renewable_readjustments_mwh
+        expected_compensation_mwh = round(certificates_delta_mwh - readjustments_delta_mwh, 2)
+
+        self.create_certificate(
+            source=ElecProvisionCertificate.MANUAL,
+            quarter=1,
+            energy_amount=renewable_certificates_mwh,
+            enr_ratio=old_enr_ratio,
+        )
+        self.create_readjustment(
+            energy_amount=renewable_readjustments_mwh,
+            enr_ratio=old_enr_ratio,
+            year=COMPENSATION_YEAR,
+        )
+
+        result = run_command(enr_ratio=new_enr_ratio * 100)
+
+        self.assertEqual(len(result), 1)
+        assert_object_contains_data(
+            self,
+            result[0],
+            {
+                "cpo_id": self.cpo1.id,
+                "quarter": 1,
+                "year": COMPENSATION_YEAR,
+                "operating_unit": "ALL",
+                "energy_amount": expected_compensation_mwh,
                 "source": ElecProvisionCertificate.ENR_RATIO_COMPENSATION,
             },
         )

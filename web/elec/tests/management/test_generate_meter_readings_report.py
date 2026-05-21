@@ -176,7 +176,6 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         )
 
         expected_readjustment_energy = (1500 - 900) * ENR_RATIO
-        expected_non_renewable_readjustment_energy = 1500 - 900
 
         self.assertEqual(
             self.run_command(apply_readjustments=True),
@@ -188,7 +187,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         ).get()
 
         self.assertEqual(readjustment.energy_amount, expected_readjustment_energy / 1000)
-        self.assertEqual(readjustment.non_renewable_energy_amount, expected_non_renewable_readjustment_energy / 1000)
+        self.assertEqual(readjustment.enr_ratio, ENR_RATIO)
 
     def test_report_takes_already_defined_readjustments_into_account(self):
         self.setup_meter_reading(

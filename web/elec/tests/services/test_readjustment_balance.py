@@ -22,12 +22,14 @@ class ReadjustmentBalanceTest(TestCase):
             cpo=self.cpo,
             year=2024,
             energy_amount=100,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
         ElecCertificateReadjustment.objects.create(
             cpo=self.cpo,
             year=2024,
             energy_amount=40,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.MANUAL,
         )
         # Should be ignored (different supplier)
@@ -35,6 +37,7 @@ class ReadjustmentBalanceTest(TestCase):
             cpo=self.other_cpo,
             year=2024,
             energy_amount=500,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
 
@@ -72,6 +75,7 @@ class ReadjustmentBalanceTest(TestCase):
             cpo=self.cpo,
             year=2024,
             energy_amount=50,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
         ElecTransferCertificate.objects.create(
