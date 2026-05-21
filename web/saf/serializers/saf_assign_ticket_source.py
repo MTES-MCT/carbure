@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Entity
+from core.models import Entity, Pays
 from saf.models.saf_logistics import SafLogistics
 from saf.models.saf_ticket import SafTicket
 from transactions.models.airport import Airport
@@ -48,3 +48,10 @@ class SafTicketSourceGroupAssignmentSerializer(SafTicketSourceAssignmentSerializ
         if not value:
             raise serializers.ValidationError("Ticket sources ids cannot be empty.")
         return value
+
+
+class SafTicketSourceExportSerializer(serializers.Serializer):
+    volume = serializers.FloatField(required=True, min_value=1)
+    assignment_period = serializers.IntegerField(required=True)
+    export_country = serializers.SlugRelatedField(queryset=Pays.objects.all(), required=True, slug_field="code_pays")
+    unknown_airline_client = serializers.CharField(required=True, allow_blank=False, max_length=128)

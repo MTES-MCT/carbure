@@ -34,6 +34,7 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
     supplier = serializers.SlugRelatedField(read_only=True, slug_field="name")
     client = serializers.SlugRelatedField(read_only=True, slug_field="name")
     reception_airport = AirportSerializer(read_only=True, required=False)
+    export_country = CountrySerializer(read_only=True, required=False, allow_null=True)
 
     class Meta:
         model = SafTicket
@@ -46,6 +47,8 @@ class SafTicketPreviewSerializer(serializers.ModelSerializer):
             "agreement_date",
             "supplier",
             "client",
+            "unknown_airline_client",
+            "export_country",
             "volume",
             "feedstock",
             "biofuel",

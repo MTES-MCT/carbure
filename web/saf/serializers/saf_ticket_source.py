@@ -34,12 +34,16 @@ class SafParentTicketSerializer(serializers.ModelSerializer):
 
 
 class SafAssignedTicketSerializer(serializers.ModelSerializer):
+    export_country = CountrySerializer(read_only=True, required=False, allow_null=True)
+
     class Meta:
         model = SafTicket
         fields = [
             "id",
             "carbure_id",
             "client",
+            "unknown_airline_client",
+            "export_country",
             "agreement_date",
             "volume",
             "status",
