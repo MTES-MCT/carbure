@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from edelivery.ebms.requests import BaseRequest
+from edelivery.ebms.requests.base_request import BaseRequest
 from edelivery.soap.actions import EdeliveryError, ListPendingMessages, RetrieveMessage, SubmitMessage
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 

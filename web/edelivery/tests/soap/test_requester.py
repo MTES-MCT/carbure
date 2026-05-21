@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
-from edelivery.ebms.requests import BaseRequest
+from edelivery.ebms.requests.base_request import BaseRequest
 from edelivery.soap.requester import Requester
 
 
@@ -26,7 +26,7 @@ class RequesterTest(TestCase):
         self.patched_SubmitMessage = patch("edelivery.soap.requester.SubmitMessage").start()
         self.patched_PubSubAdapter.return_value.next_message.return_value = "<response/>"
 
-        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
+        self.patched_new_uuid = patch("edelivery.ebms.requests.base_request.new_uuid").start()
         self.patched_new_uuid.return_value = "111"
 
         self.patched_ResponseFactory = patch("edelivery.soap.requester.ResponseFactory").start()
@@ -98,7 +98,7 @@ class RequesterTest(TestCase):
         result = requester.do_request()
         self.assertEqual("Some result", result)
 
-    @patch("edelivery.ebms.requests.new_uuid")
+    @patch("edelivery.ebms.requests.base_request.new_uuid")
     def test_checks_whether_request_ids_correspond(self, patched_new_uuid):
         self.patched_ResponseFactory.return_value.response.return_value = MockResponse("different_request_id", "Some result")
         request = BaseRequest("<request/>")

@@ -1,54 +1,15 @@
 from datetime import datetime
-from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
 from edelivery.ebms.request_responses.eo_get_transaction_response import EOGetTransactionResponse
 from edelivery.ebms.request_responses.get_certificate_response import GetCertificateResponse
-from edelivery.ebms.requests import (
-    BaseRequest,
+from edelivery.ebms.requests_temp import (
     EOGetTransactionRequest,
     GetCertificateRequest,
     GetSourcingContactByIdRequest,
 )
 
-
-class BaseRequestTest(TestCase):
-    def setUp(self):
-        self.patched_new_uuid = patch("edelivery.ebms.requests.new_uuid").start()
-        self.patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
-
-    def tearDown(self):
-        patch.stopall()
-
-    def test_inserts_request_id(self):
-        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
-
-        request = BaseRequest("<request/>")
-        expected_body = """\
-<request>
-  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
-</request>"""
-        self.assertEqual(request.body, expected_body)
-
-    @patch("edelivery.ebms.requests.zip_and_stream_udb_request")
-    def test_zips_and_encodes_its_body(self, patched_zip_and_stream_udb_request):
-        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
-
-        patched_zip_and_stream_udb_request.return_value = "abcdef"
-        request = BaseRequest("<request/>")
-
-        encoded_request = request.zipped_encoded()
-        expected_body = """\
-<request>
-  <REQUEST_HEADER REQUEST_ID="12345678-1234-1234-1234-1234567890ab" />
-</request>"""
-        patched_zip_and_stream_udb_request.assert_called_with(expected_body)
-        self.assertEqual("abcdef", encoded_request)
-
-    def test_knows_its_response_class(self):
-        request = BaseRequest("<request/>")
-        self.assertEqual(BaseRequestResponse, request.response_class)
+from .requests.test_base_request import BaseRequestTest
 
 
 @patch.dict("os.environ", {"CARBURE_NTR": "123"})
@@ -104,7 +65,7 @@ class EOGetTransactionRequestTest(BaseRequestTest):
 
         self.assertEqual(expected_body, request.body)
 
-    @patch("edelivery.ebms.requests.datetime")
+    @patch("edelivery.ebms.requests_temp.datetime")
     def test_defaults_to_creation_date_kwarg_to_now_if_from_creation_date_present(self, patched_datetime):
         patched_datetime.now.return_value = datetime(2026, 1, 25, 10, 0)
         request = EOGetTransactionRequest(from_creation_date=datetime(2026, 1, 25, 8, 0))
