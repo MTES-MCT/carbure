@@ -54,7 +54,7 @@ class SafTicketSourceViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet,
     ]
 
     def get_permissions(self):
-        if self.action in ["grouped_assign", "assign"]:
+        if self.action in ["grouped_assign", "assign", "export_foreign"]:
             return [(HasSafOperatorWriteRights | HasSafTraderWriteRights)()]
         return super().get_permissions()
 
