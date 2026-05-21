@@ -20,18 +20,24 @@ class ReadjustmentBalanceTest(TestCase):
     def test_computes_difference_between_expected_and_confirmed(self):
         ElecCertificateReadjustment.objects.create(
             cpo=self.cpo,
+            year=2024,
             energy_amount=100,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
         ElecCertificateReadjustment.objects.create(
             cpo=self.cpo,
+            year=2024,
             energy_amount=40,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.MANUAL,
         )
         # Should be ignored (different supplier)
         ElecCertificateReadjustment.objects.create(
             cpo=self.other_cpo,
+            year=2024,
             energy_amount=500,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
 
@@ -67,7 +73,9 @@ class ReadjustmentBalanceTest(TestCase):
     def test_returns_zero_when_expected_and_confirmed_match(self):
         ElecCertificateReadjustment.objects.create(
             cpo=self.cpo,
+            year=2024,
             energy_amount=50,
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
         ElecTransferCertificate.objects.create(

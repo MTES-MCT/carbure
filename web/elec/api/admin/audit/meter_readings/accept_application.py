@@ -52,10 +52,7 @@ def accept_application(request: HttpRequest):
     ## recuperer tous les MeterReadings de la demande, sauf ceux liés à des PDC de stations DC (gérés par qualicharge)
     meter_readings = ElecMeterReading.extended_objects.filter(application=application)
     data = [
-        {
-            "renewable_energy": meter_reading.renewable_energy,
-            "operating_unit": meter_reading.charge_point.charge_point_id[:5],  # Inclure le charge_point_id
-        }
+        {"renewable_energy": meter_reading.renewable_energy, "operating_unit": meter_reading.operating_unit}
         for meter_reading in meter_readings
     ]
 
