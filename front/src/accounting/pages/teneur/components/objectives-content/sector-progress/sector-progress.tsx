@@ -38,9 +38,9 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 target_percent: formatNumber(sector.target_percent),
               }
             )}
-            mainValue={floorNumber(
+            mainValue={formatNumber(
               sector.teneur_declared + sector.pending_teneur,
-              0
+              { fractionDigits: 0, mode: "floor" }
             )}
             mainText={t("GJ")}
             baseQuantity={floorNumber(sector.teneur_declared, 0)}

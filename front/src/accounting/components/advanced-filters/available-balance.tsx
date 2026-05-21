@@ -4,6 +4,7 @@ import { useUnit } from "common/hooks/unit"
 import { useTranslation } from "react-i18next"
 import { Icon } from "common/components/icon"
 import { ExtendedUnitType } from "common/types"
+import { floorNumber } from "common/utils/formatters"
 
 export const AvailableBalance = ({
   loading,
@@ -17,8 +18,13 @@ export const AvailableBalance = ({
   const { t } = useTranslation()
   const { formatUnit } = useUnit(unit)
 
+  const availableBalanceFormatted = floorNumber(availableBalance, 0)
+
   return (
-    <Notice noColor variant={availableBalance === 0 ? "warning" : "info"}>
+    <Notice
+      noColor
+      variant={availableBalanceFormatted === 0 ? "warning" : "info"}
+    >
       <div>
         {t("Solde disponible pour les filtres sélectionnés")}
         {" : "}

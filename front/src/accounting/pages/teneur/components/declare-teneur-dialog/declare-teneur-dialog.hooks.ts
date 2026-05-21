@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { formatNumber, formatUnit } from "common/utils/formatters"
+import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import {
   CategoryObjective,
@@ -107,4 +107,25 @@ export const useRemainingEnergyBeforeLimitOrObjective = (
       fractionDigits: 0,
     })
   }, [values.quantity, objective])
+}
+
+export const useCalculateQuantityMax = (
+  objective: CategoryObjective,
+  values: DeclareTeneurDialogForm
+) => {
+  const availableBalance = values.balance?.available_balance
+
+  return useMemo(() => {
+    if (availableBalance === undefined) {
+      return 0
+    }
+
+    if (!objective.target) {
+      return floorNumber(availableBalance, 0)
+    }
+
+    const remainingObjectiveEnergy = computeObjectiveEnergy(objective)
+
+    return floorNumber(Math.min(availableBalance, remainingObjectiveEnergy), 0)
+  }, [objective, availableBalance])
 }
