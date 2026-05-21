@@ -1,4 +1,9 @@
-import { Operation, OperationDebitOrCredit } from "accounting/types"
+import {
+  Operation,
+  OperationDebitOrCredit,
+  OperationList,
+  OperationType,
+} from "accounting/types"
 
 export const formatOperationCreditOrDebit = (type: string) => {
   switch (type) {
@@ -22,4 +27,16 @@ export const getOperationQuantity = (
     return formattedQuantity
   }
   return `+${formattedQuantity}`
+}
+
+// Format the value only for the incorporation operation
+export const formatValue = (
+  operation: Operation | OperationList,
+  value: number
+) => {
+  if (!operation) return 0
+
+  return operation.type === OperationType.INCORPORATION
+    ? value * operation.renewable_energy_share
+    : value
 }

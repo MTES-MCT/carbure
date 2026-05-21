@@ -2,13 +2,11 @@ import { Operation, OperationType } from "accounting/types"
 import { formatSector } from "accounting/utils/formatters"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  formatQuantityDisplay,
-  formatValue,
-} from "./operation-detail-fields.utils"
+import { formatQuantityDisplay } from "./operation-detail-fields.utils"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { useUnit } from "common/hooks/unit"
 import { compact } from "common/utils/collection"
+import { formatValue } from "../../../operations.utils"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const { t } = useTranslation()

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import { isSendingOperation } from "./operations.utils"
+import { formatValue, isSendingOperation } from "./operations.utils"
 import * as api from "accounting/api/biofuels/operations"
 import {
   OperationDebitOrCredit,
@@ -29,24 +29,38 @@ type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
 }
 
-const getOperationQuantity = (
-  operation: OperationList,
-  operator: "+" | "-"
+const displayValueDebitOrCredit = (
+  value: number | string,
+  isOperationDebit: boolean,
+  isOperationRejected: boolean
 ) => {
-  const quantity = formatNumber(
-    operation.type === OperationType.INCORPORATION
-      ? operation.quantity_renewable
-      : operation.quantity,
-    {
-      fractionDigits: 0,
-    }
+  const operator = isOperationDebit ? "-" : "+"
+
+  return isOperationDebit ? (
+    <Text
+      size="sm"
+      fontWeight="semibold"
+      className={cl(
+        styles["operation-debit"],
+        isOperationRejected && styles["operation--rejected"]
+      )}
+    >
+      {operator}
+      {value}
+    </Text>
+  ) : (
+    <Text
+      size="sm"
+      fontWeight="semibold"
+      className={cl(
+        styles["operation-credit"],
+        isOperationRejected && styles["operation--rejected"]
+      )}
+    >
+      {operator}
+      {value}
+    </Text>
   )
-  return `${operator}${quantity} / ${operator}${formatNumber(
-    operation.avoided_emissions,
-    {
-      fractionDigits: 0,
-    }
-  )}`
 }
 export const useOperationsBiofuelsColumns = ({
   onClickSector,
@@ -115,33 +129,43 @@ export const useOperationsBiofuelsColumns = ({
     },
     {
       key: OperationOrder.quantity,
-      header: `${t("Quantité")} (${unit.toUpperCase()} / TCO2)`,
-      cell: (item) =>
-        isSendingOperation(item.quantity) ? (
-          <Text
-            size="sm"
-            fontWeight="semibold"
-            className={cl(
-              styles["operation-debit"],
-              item.status === OperationsStatus.REJECTED &&
-                styles["operation--rejected"]
-            )}
-          >
-            {getOperationQuantity(item, "-")}
-          </Text>
-        ) : (
-          <Text
-            size="sm"
-            fontWeight="semibold"
-            className={cl(
-              styles["operation-credit"],
-              item.status === OperationsStatus.REJECTED &&
-                styles["operation--rejected"]
-            )}
-          >
-            {getOperationQuantity(item, "+")}
-          </Text>
-        ),
+      header: `${t("Quantité")} (${unit.toUpperCase()})`,
+      style: {
+        minWidth: "140px",
+      },
+      cell: (item) => {
+        const calculatedQuantity = Math.abs(formatValue(item, item.quantity))
+        const formattedQuantity = formatNumber(calculatedQuantity, {
+          fractionDigits: 0,
+        })
+        return displayValueDebitOrCredit(
+          formattedQuantity,
+          isSendingOperation(item.quantity),
+          item.status === OperationsStatus.REJECTED
+        )
+      },
+    },
+    {
+      header: `${t("tCO2 évitées")}`,
+      cell: (item) => {
+        const calculatedAvoidedEmissions = Math.abs(
+          formatValue(item, item.avoided_emissions)
+        )
+        const formattedAvoidedEmissions = formatNumber(
+          calculatedAvoidedEmissions,
+          {
+            fractionDigits: 0,
+          }
+        )
+        return displayValueDebitOrCredit(
+          formattedAvoidedEmissions,
+          isSendingOperation(item.quantity),
+          item.status === OperationsStatus.REJECTED
+        )
+      },
+      style: {
+        minWidth: "140px",
+      },
     },
   ]
 
