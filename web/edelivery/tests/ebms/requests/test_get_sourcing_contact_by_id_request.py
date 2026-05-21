@@ -1,6 +1,6 @@
-from edelivery.ebms.requests_temp import GetSourcingContactByIdRequest
+from edelivery.ebms.requests.get_sourcing_contact_by_id_request import GetSourcingContactByIdRequest
 
-from .requests.test_base_request import BaseRequestTest
+from .test_base_request import BaseRequestTest
 
 
 class GetSourcingContactByIdRequestTest(BaseRequestTest):

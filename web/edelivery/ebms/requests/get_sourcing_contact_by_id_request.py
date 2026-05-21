@@ -1,4 +1,4 @@
-from edelivery.ebms.requests.base_request import BaseRequest
+from .base_request import BaseRequest
 
 
 class GetSourcingContactByIdRequest(BaseRequest):
