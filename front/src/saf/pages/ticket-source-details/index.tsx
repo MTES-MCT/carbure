@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "../../api"
 import { TicketAssignment } from "saf/components/assignment/simple-assignment"
+import { ExportForeignTicket } from "saf/components/assignment/export-foreign-ticket"
 import TicketSourceTag from "../../components/ticket-source-tag"
 import AssignedTickets from "./components/assigned-tickets"
 import TicketSourceFields from "./components/fields"
@@ -72,6 +73,16 @@ export const TicketSourceDetails = ({
     )
   }
 
+  const handleTicketExported = (volume: number, clientName: string) => {
+    notify(
+      t("{{volume}} litres ont bien été exportés vers {{clientName}}.", {
+        volume,
+        clientName,
+      }),
+      { variant: "success" }
+    )
+  }
+
   const showAssignement = () => {
     portal((close) => (
       <TicketAssignment
@@ -81,6 +92,21 @@ export const TicketSourceDetails = ({
       />
     ))
   }
+
+  const showExport = () => {
+    portal((close) => (
+      <ExportForeignTicket
+        ticketSource={ticketSource!}
+        onClose={close}
+        onTicketExported={handleTicketExported}
+      />
+    ))
+  }
+
+  const canExport =
+    isOwner &&
+    ((entity.isOperator && entity.has_saf) || entity.isSafTrader) &&
+    entity.canWrite()
 
   return (
     <Portal onClose={closeDialog}>
@@ -107,13 +133,24 @@ export const TicketSourceDetails = ({
               />
             )}
             {isOwner && hasRemainingVolume && (
-              <Button
-                iconId="ri-send-plane-line"
-                priority="primary"
-                onClick={showAssignement}
-              >
-                {t("Affecter")}
-              </Button>
+              <>
+                {canExport && (
+                  <Button
+                    iconId="ri-send-plane-line"
+                    priority="secondary"
+                    onClick={showExport}
+                  >
+                    {t("Exporter")}
+                  </Button>
+                )}
+                <Button
+                  iconId="ri-send-plane-line"
+                  priority="primary"
+                  onClick={showAssignement}
+                >
+                  {t("Affecter")}
+                </Button>
+              </>
             )}
           </>
         }

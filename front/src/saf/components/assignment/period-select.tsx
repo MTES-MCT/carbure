@@ -6,11 +6,13 @@ import { useTranslation } from "react-i18next"
 
 interface PeriodSelectProps {
   deliveryPeriod: number
+  label?: string
   onChange: (value: number) => void
 }
 
 export const PeriodSelect = ({
   deliveryPeriod,
+  label,
   onChange,
 }: PeriodSelectProps) => {
   const { t } = useTranslation()
@@ -51,7 +53,7 @@ export const PeriodSelect = ({
 
   return (
     <Autocomplete
-      label={t("Période d'affectation")}
+      label={label ?? t("Période d'affectation")}
       placeholder={t("Choisissez une année")}
       value={period}
       onChange={(period) => setPeriod(period!)}

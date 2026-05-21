@@ -37,6 +37,7 @@ export enum SafFilter {
   client = SafTicketSourceFilter.client,
   added_by = SafTicketSourceFilter.added_by,
   country_of_origin = SafTicketSourceFilter.country_of_origin,
+  export_country = SafTicketFilter.export_country,
   production_site = SafTicketSourceFilter.production_site,
   origin_depot = SafTicketSourceFilter.origin_depot,
   consumption_type = SafTicketFilter.consumption_type,
@@ -52,6 +53,7 @@ export interface SafSnapshot {
   ticket_sources_history: number
   tickets_assigned: number
   tickets_assigned_accepted: number
+  tickets_assigned_exported: number
   tickets_assigned_pending: number
   tickets_assigned_rejected: number
   tickets_received: number
@@ -121,6 +123,7 @@ export type SafTicketQuery = SafTicketQueryBuilder["query"] & {
   [SafTicketFilter.feedstock]?: string[]
   [SafTicketFilter.period]?: number[]
   [SafTicketFilter.client]?: string[]
+  [SafTicketFilter.export_country]?: string[]
   [SafTicketFilter.consumption_type]?: ConsumptionType[]
 }
 

@@ -1,5 +1,5 @@
 import { api, download } from "common/services/api-fetch"
-import { EntityPreview } from "common/types"
+import { Country, EntityPreview } from "common/types"
 import {
   SafTicketQuery,
   ConsumptionType,
@@ -194,6 +194,32 @@ export function assignSafTicket(
       has_intermediary_depot: has_intermediary_depot ?? false,
       consumption_type,
       pos_number,
+    },
+  })
+}
+
+export function exportSafTicketSource(
+  entity_id: number,
+  ticket_source_id: number,
+  volume: number,
+  assignment_period: number,
+  export_country: Country,
+  unknown_airline_client: string
+) {
+  return api.POST("/saf/ticket-sources/{id}/export-foreign/", {
+    params: {
+      path: {
+        id: ticket_source_id,
+      },
+      query: {
+        entity_id,
+      },
+    },
+    body: {
+      volume,
+      assignment_period,
+      export_country: export_country.code_pays,
+      unknown_airline_client,
     },
   })
 }
