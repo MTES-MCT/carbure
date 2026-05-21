@@ -34,13 +34,15 @@ def pos_data_fragment(etd):
 </POS_DATA>"""
 
 
-def transaction_data(
+def transaction_xml_data(
     biofuel=None,
     client_id="FR_SIREN_CD222222222",
     delivery_date="2025-01-30T00:00:00.000Z",
     etd=None,
     feedstock=None,
     loading_date="2025-01-26T00:00:00.000Z",
+    loading_site_name="TestSite004",
+    loading_site_zipcode="12345",
     quantity=None,
     status="ACCEPTED",
     supplier_id="FR_SIREN_CD111111111",
@@ -61,8 +63,8 @@ def transaction_data(
   <SELLER_CERTIFICATE_NUMBER>EU-ISCC-Cert-Test-FR004</SELLER_CERTIFICATE_NUMBER>
   <BUYER_ECONOMIC_OPERATOR_NUMBER>{client_id}</BUYER_ECONOMIC_OPERATOR_NUMBER>
   <LOADING_DATE>{loading_date}</LOADING_DATE>
-  <PLACE_OF_LOADING_NAME>TestSite004</PLACE_OF_LOADING_NAME>
-  <PLACE_OF_LOADING_POSTCODE>1004</PLACE_OF_LOADING_POSTCODE>
+  <PLACE_OF_LOADING_NAME>{loading_site_name}</PLACE_OF_LOADING_NAME>
+  <PLACE_OF_LOADING_POSTCODE>{loading_site_zipcode}</PLACE_OF_LOADING_POSTCODE>
   {delivery_date_xml_fragment}
   <REFERENCE_NUMBER>SOME_REFERENCE</REFERENCE_NUMBER>
   <TRADE_DATE>2025-12-22T00:00:00.000Z</TRADE_DATE>

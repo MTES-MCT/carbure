@@ -1,18 +1,11 @@
 from datetime import datetime
-from xml.etree import ElementTree as ET
 
 from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter
 from edelivery.ebms.ntr import from_national_trade_register
+from edelivery.ebms.udb_element import UDBElement
 
 
-class Transaction:
-    @classmethod
-    def from_xml(cls, xml_data):
-        return cls(ET.fromstring(xml_data))
-
-    def __init__(self, xml_root_element):
-        self.xml_root_element = xml_root_element
-
+class Transaction(UDBElement):
     def biofuel_code(self):
         return self.xml_root_element.find("./MATERIAL_CODE").text
 
@@ -44,6 +37,12 @@ class Transaction:
     def loading_date(self):
         loading_date_text = self.xml_root_element.find("./LOADING_DATE").text
         return datetime.fromisoformat(loading_date_text).date()
+
+    def loading_site_name(self):
+        return self.xml_root_element.find("./PLACE_OF_LOADING_NAME").text
+
+    def loading_site_zipcode(self):
+        return self.xml_root_element.find("./PLACE_OF_LOADING_POSTCODE").text
 
     def status(self):
         return self.xml_root_element.find("./STATUS").text

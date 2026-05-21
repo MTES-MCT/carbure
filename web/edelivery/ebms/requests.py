@@ -4,7 +4,9 @@ from os import environ
 
 from edelivery.adapters.uuid_generator import new_uuid
 from edelivery.adapters.zip_utils import zip_and_stream_udb_request
-from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
+from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
+from edelivery.ebms.request_responses.eo_get_transaction_response import EOGetTransactionResponse
+from edelivery.ebms.request_responses.get_certificate_response import GetCertificateResponse
 
 
 class BaseRequest:
@@ -24,18 +26,6 @@ class BaseRequest:
 
     def zipped_encoded(self):
         return zip_and_stream_udb_request(self.body)
-
-
-class GetSourcingContactByIdRequest(BaseRequest):
-    def __init__(self, sourcing_contact_id):
-        super().__init__(f"""\
-<udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <SC_ID_HEADER>
-    <SC_ID>
-      <SOURCING_CONTACT_NUMBER>{sourcing_contact_id}</SOURCING_CONTACT_NUMBER>
-    </SC_ID>
-  </SC_ID_HEADER>
-</udb:GetSourcingContactByIDRequest>""")
 
 
 class EOGetTransactionRequest(BaseRequest):
@@ -69,3 +59,23 @@ class EOGetTransactionRequest(BaseRequest):
 <EO_TRANSACTION>
   {xml_fragment}
 </EO_TRANSACTION>"""
+
+
+class GetCertificateRequest(BaseRequest):
+    def __init__(self):
+        body = """\
+<udb:GetCertificateRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+</udb:GetCertificateRequest>"""
+        super().__init__(body, GetCertificateResponse)
+
+
+class GetSourcingContactByIdRequest(BaseRequest):
+    def __init__(self, sourcing_contact_id):
+        super().__init__(f"""\
+<udb:GetSourcingContactByIDRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <SC_ID_HEADER>
+    <SC_ID>
+      <SOURCING_CONTACT_NUMBER>{sourcing_contact_id}</SOURCING_CONTACT_NUMBER>
+    </SC_ID>
+  </SC_ID_HEADER>
+</udb:GetSourcingContactByIDRequest>""")

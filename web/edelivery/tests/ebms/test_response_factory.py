@@ -6,7 +6,7 @@ from edelivery.ebms.error_responses import (
     NotFoundErrorResponse,
     UnknownStatusErrorResponse,
 )
-from edelivery.ebms.request_responses import BaseRequestResponse
+from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
 from edelivery.ebms.response_factory import ResponseFactory
 
 
