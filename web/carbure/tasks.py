@@ -10,7 +10,6 @@ from huey.contrib.djhuey import db_periodic_task, db_task, periodic_task
 from carbure.scripts.create_declaration_reminder import create_declaration_reminder
 from carbure.scripts.send_notification_emails import send_notification_emails
 from carbure.scripts.update_2bs_certificates import update_2bs_certificates
-from carbure.scripts.update_iscc_certificates import update_iscc_certificates
 from carbure.scripts.update_redcert_certificates import update_redcert_certificates
 from elec.scripts.create_meter_readings_application_deadline_reminder import (
     create_meter_readings_application_deadline_reminder,
@@ -55,7 +54,7 @@ if env.get("IMAGE_TAG") == "prod":
 
     @db_periodic_task(crontab(day_of_week=7, hour=4, minute=0))
     def periodic_update_iscc_certificates() -> None:
-        update_iscc_certificates(email=True, latest=True)
+        call_command("import_iscc_certificates", email=True, latest=2000)
 
     @db_periodic_task(crontab(day_of_week=7, hour=5, minute=0))
     def periodic_update_redcert_certificates() -> None:
