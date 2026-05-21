@@ -72,6 +72,13 @@ export const StatusSwitcher = ({
         label: `${t("Accepté")} (${count?.tickets_assigned_accepted ?? 0})`,
         icon: "fr-icon-check-line",
         iconActive: "fr-icon-check-line",
+      },
+      {
+        key: SafTicketStatus.EXPORTED,
+        path: `../tickets-assigned/exported`,
+        label: `${t("Exporté")} (${count?.tickets_assigned_exported ?? 0})`,
+        icon: "fr-icon-send-plane-line",
+        iconActive: "fr-icon-send-plane-fill",
       }
     )
   }

@@ -31,6 +31,11 @@ export const TicketTag = ({ status, ets, small = false }: TicketTagProps) => {
       variant = "error"
       break
 
+    case SafTicketStatus.EXPORTED:
+      label = t("Exporté")
+      variant = "new"
+      break
+
     default:
       label = t("N/A")
       variant = "info"

@@ -35,6 +35,7 @@ export const TicketsTable = memo(
     ticketsData,
     order,
     client,
+    status,
     rowLink,
   }: TicketsTableProps) => {
     const entity = useEntity()
@@ -61,6 +62,7 @@ export const TicketsTable = memo(
                 !isAdmin && (client ? columns.supplier : columns.client),
                 isAdmin && columns.supplier,
                 isAdmin && columns.client,
+                status === SafTicketStatus.EXPORTED && columns.exportCountry,
                 columns.availableVolume,
                 columns.period,
                 columns.feedstock,
@@ -111,7 +113,23 @@ export function useColumns() {
     client: {
       key: "client",
       header: t("Client"),
-      cell: (ticket) => <Cell text={ticket.client} />,
+      cell: (ticket) => (
+        <Cell text={ticket.client ?? ticket.unknown_airline_client ?? "-"} />
+      ),
+    },
+
+    exportCountry: {
+      key: "export_country",
+      header: t("Pays d'export"),
+      cell: (ticket) => (
+        <Cell
+          text={
+            ticket.export_country
+              ? t(ticket.export_country.code_pays, { ns: "countries" })
+              : "-"
+          }
+        />
+      ),
     },
 
     supplier: {

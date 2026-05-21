@@ -10,6 +10,7 @@ import {
   SafFilter,
   SafSnapshot,
   SafTicketQuery,
+  SafTicketStatus,
   SafTicketType,
   SafTicketPreview,
 } from "saf/types"
@@ -48,6 +49,10 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
   const { query, state, actions } = useSafTicketsQueryBuilder({ type, year })
   const apiGetTickets = (query: SafTicketQuery) => getTickets(query)
 
+  const isAdmin = entity.isAdmin || entity.hasAdminRight("AIRLINE")
+  const isAirline = entity.isAirline
+  const filters = getFilters({ isAdmin, isAirline, type, status })
+
   const ticketsResponse = useQuery(apiGetTickets, {
     key: "tickets",
     params: [query],
@@ -73,18 +78,6 @@ export const SafTickets = ({ type, year, snapshot }: TicketsProps) => {
     })
 
     return response.data?.results ?? []
-  }
-
-  const isAdmin = entity.isAdmin || entity.hasAdminRight("AIRLINE")
-  const isAirline = entity.isAirline
-
-  let filters: SafFilter[] = []
-  if (isAdmin) filters = ADMIN_FILTERS
-  else if (type === "received") filters = RECEIVED_FILTERS
-  else if (type === "assigned") filters = ASSIGNED_FILTERS
-
-  if (isAdmin || isAirline) {
-    filters = [...filters, SafFilter.ets_status]
   }
 
   return (
@@ -175,3 +168,39 @@ const ADMIN_FILTERS = [
   SafFilter.client_type,
   ...TICKET_FILTERS,
 ]
+
+const EXPORTED_FILTERS = [
+  SafFilter.period,
+  SafFilter.feedstock,
+  SafFilter.country_of_origin,
+  SafFilter.export_country,
+  SafFilter.production_site,
+]
+
+function getFilters({
+  isAdmin,
+  isAirline,
+  type,
+  status,
+}: {
+  isAdmin: boolean
+  isAirline: boolean
+  type: SafTicketType
+  status?: SafTicketStatus
+}) {
+  let filters: SafFilter[] = []
+
+  if (type === "assigned" && status === SafTicketStatus.EXPORTED) {
+    filters = isAdmin
+      ? [SafFilter.supplier, ...EXPORTED_FILTERS]
+      : EXPORTED_FILTERS
+  } else if (isAdmin) filters = ADMIN_FILTERS
+  else if (type === "received") filters = RECEIVED_FILTERS
+  else if (type === "assigned") filters = ASSIGNED_FILTERS
+
+  if (status !== SafTicketStatus.EXPORTED && (isAdmin || isAirline)) {
+    filters = [...filters, SafFilter.ets_status]
+  }
+
+  return filters
+}
