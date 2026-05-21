@@ -380,6 +380,7 @@ def fetch_iscc_html(status, page):
             timeout=REQUEST_TIMEOUT,
         )
         response.raise_for_status()
+        response.encoding = "utf-8-sig"
         payload = response.json()
     except requests.RequestException as exc:
         raise CommandError(f"Could not fetch ISCC certificates for status {status} page {page}: {exc}") from exc
