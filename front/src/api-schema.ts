@@ -2378,6 +2378,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/saf/ticket-sources/{id}/export-foreign/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["saf_ticket_sources_export_foreign_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/saf/ticket-sources/export/": {
         parameters: {
             query?: never;
@@ -4918,7 +4934,7 @@ export interface components {
          *     * `REJECTED` - REJECTED
          * @enum {string}
          */
-        ElecTransferCertificateStatusEnum: PathsApiSafTicketsGetParametersQueryStatus;
+        ElecTransferCertificateStatusEnum: ElecTransferCertificateStatusEnum;
         ElecTransferRejectRequest: {
             comment: string;
         };
@@ -6086,6 +6102,8 @@ export interface components {
             readonly id: number;
             carbure_id?: string | null;
             readonly client: string;
+            unknown_airline_client?: string | null;
+            readonly export_country: components["schemas"]["Country"] | null;
             /** Format: date */
             agreement_date?: string | null;
             /** Format: double */
@@ -6122,6 +6140,8 @@ export interface components {
             agreement_date?: string | null;
             readonly supplier: string;
             readonly client: string;
+            unknown_airline_client?: string | null;
+            readonly export_country: components["schemas"]["Country"] | null;
             /** Format: double */
             volume: number;
             readonly feedstock: components["schemas"]["FeedStock"];
@@ -6181,6 +6201,8 @@ export interface components {
             agreement_date?: string | null;
             readonly supplier: string;
             readonly client: string;
+            unknown_airline_client?: string | null;
+            readonly export_country: components["schemas"]["Country"] | null;
             /** Format: double */
             volume: number;
             readonly feedstock: components["schemas"]["FeedStock"];
@@ -6272,6 +6294,20 @@ export interface components {
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
+        };
+        SafTicketSourceExport: {
+            /** Format: double */
+            volume: number;
+            assignment_period: number;
+            export_country: string;
+            unknown_airline_client: string;
+        };
+        SafTicketSourceExportRequest: {
+            /** Format: double */
+            volume: number;
+            assignment_period: number;
+            export_country: string;
+            unknown_airline_client: string;
         };
         SafTicketSourceGroupAssignmentRequest: {
             client_id: number;
@@ -6651,6 +6687,7 @@ export interface components {
          * @description * `PENDING` - En attente
          *     * `ACCEPTED` - Accepté
          *     * `REJECTED` - Refusé
+         *     * `EXPORTED` - Exporté
          * @enum {string}
          */
         "saf.filters.TicketFilter.status": PathsApiSafTicketsGetParametersQueryStatus;
@@ -11734,6 +11771,7 @@ export interface operations {
                         tickets_assigned: number;
                         tickets_assigned_pending: number;
                         tickets_assigned_accepted: number;
+                        tickets_assigned_exported: number;
                         tickets_assigned_rejected: number;
                         tickets_received: number;
                         tickets_received_pending: number;
@@ -11862,6 +11900,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SafTicketSourceAssignment"];
+                };
+            };
+        };
+    };
+    saf_ticket_sources_export_foreign_create: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Tickets source SAF. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SafTicketSourceExportRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SafTicketSourceExportRequest"];
+                "multipart/form-data": components["schemas"]["SafTicketSourceExportRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SafTicketSourceExport"];
                 };
             };
         };
@@ -12048,6 +12117,7 @@ export interface operations {
                  *     * `NOT_CONCERNED` - Non concerné
                  */
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
+                export_country?: string[];
                 feedstock?: string[];
                 /**
                  * @description Ordre
@@ -12070,6 +12140,8 @@ export interface operations {
                  *     * `-consumption_type` - Consumption type (décroissant)
                  *     * `reception_airport` - Reception airport
                  *     * `-reception_airport` - Reception airport (décroissant)
+                 *     * `export_country` - Export country
+                 *     * `-export_country` - Export country (décroissant)
                  */
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
@@ -12088,6 +12160,7 @@ export interface operations {
                  * @description * `PENDING` - En attente
                  *     * `ACCEPTED` - Accepté
                  *     * `REJECTED` - Refusé
+                 *     * `EXPORTED` - Exporté
                  */
                 status?: PathsApiSafTicketsGetParametersQueryStatus;
                 supplier?: string[];
@@ -12310,6 +12383,7 @@ export interface operations {
                  *     * `NOT_CONCERNED` - Non concerné
                  */
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
+                export_country?: string[];
                 feedstock?: string[];
                 /**
                  * @description Ordre
@@ -12332,6 +12406,8 @@ export interface operations {
                  *     * `-consumption_type` - Consumption type (décroissant)
                  *     * `reception_airport` - Reception airport
                  *     * `-reception_airport` - Reception airport (décroissant)
+                 *     * `export_country` - Export country
+                 *     * `-export_country` - Export country (décroissant)
                  */
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
@@ -12346,6 +12422,7 @@ export interface operations {
                  * @description * `PENDING` - En attente
                  *     * `ACCEPTED` - Accepté
                  *     * `REJECTED` - Refusé
+                 *     * `EXPORTED` - Exporté
                  */
                 status?: PathsApiSafTicketsGetParametersQueryStatus;
                 supplier?: string[];
@@ -12401,6 +12478,7 @@ export interface operations {
                  *     * `NOT_CONCERNED` - Non concerné
                  */
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
+                export_country?: string[];
                 feedstock?: string[];
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketsFiltersGetParametersQueryFilter;
@@ -12425,6 +12503,8 @@ export interface operations {
                  *     * `-consumption_type` - Consumption type (décroissant)
                  *     * `reception_airport` - Reception airport
                  *     * `-reception_airport` - Reception airport (décroissant)
+                 *     * `export_country` - Export country
+                 *     * `-export_country` - Export country (décroissant)
                  */
                 order_by?: PathsApiSafTicketsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
@@ -12439,6 +12519,7 @@ export interface operations {
                  * @description * `PENDING` - En attente
                  *     * `ACCEPTED` - Accepté
                  *     * `REJECTED` - Refusé
+                 *     * `EXPORTED` - Exporté
                  */
                 status?: PathsApiSafTicketsGetParametersQueryStatus;
                 supplier?: string[];
@@ -14160,6 +14241,7 @@ export enum PathsApiSafTicketsGetParametersQueryOrder_by {
     ValueMinusclient = "-client",
     ValueMinusconsumption_type = "-consumption_type",
     ValueMinuscreated_at = "-created_at",
+    ValueMinusexport_country = "-export_country",
     ValueMinusfeedstock = "-feedstock",
     ValueMinusghg_reduction = "-ghg_reduction",
     ValueMinusperiod = "-period",
@@ -14169,6 +14251,7 @@ export enum PathsApiSafTicketsGetParametersQueryOrder_by {
     client = "client",
     consumption_type = "consumption_type",
     created_at = "created_at",
+    export_country = "export_country",
     feedstock = "feedstock",
     ghg_reduction = "ghg_reduction",
     period = "period",
@@ -14178,6 +14261,7 @@ export enum PathsApiSafTicketsGetParametersQueryOrder_by {
 }
 export enum PathsApiSafTicketsGetParametersQueryStatus {
     ACCEPTED = "ACCEPTED",
+    EXPORTED = "EXPORTED",
     PENDING = "PENDING",
     REJECTED = "REJECTED"
 }
@@ -14187,6 +14271,7 @@ export enum PathsApiSafTicketsFiltersGetParametersQueryFilter {
     consumption_type = "consumption_type",
     country_of_origin = "country_of_origin",
     ets_status = "ets_status",
+    export_country = "export_country",
     feedstock = "feedstock",
     order_by = "order_by",
     origin_depot = "origin_depot",
@@ -14435,6 +14520,11 @@ export enum ElecOperationTypeEnum {
     ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",
     CESSION = "CESSION",
     TENEUR = "TENEUR"
+}
+export enum ElecTransferCertificateStatusEnum {
+    PENDING = "PENDING",
+    ACCEPTED = "ACCEPTED",
+    REJECTED = "REJECTED"
 }
 export enum EnergyTypesEnum {
     PRODUCED_BIOGAS = "PRODUCED_BIOGAS",

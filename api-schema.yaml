@@ -7446,6 +7446,8 @@ paths:
                     type: integer
                   tickets_assigned_accepted:
                     type: integer
+                  tickets_assigned_exported:
+                    type: integer
                   tickets_assigned_rejected:
                     type: integer
                   tickets_received:
@@ -7460,6 +7462,7 @@ paths:
                   - tickets_assigned
                   - tickets_assigned_pending
                   - tickets_assigned_accepted
+                  - tickets_assigned_exported
                   - tickets_assigned_rejected
                   - tickets_received
                   - tickets_received_pending
@@ -7707,6 +7710,50 @@ paths:
                 ExampleOfAssignResponse.:
                   value: {}
                   summary: Example of assign response.
+          description: ""
+  /api/saf/ticket-sources/{id}/export-foreign/:
+    post:
+      operationId: saf_ticket_sources_export_foreign_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Tickets source SAF.
+          required: true
+      tags:
+        - saf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceExportRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceExportRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SafTicketSourceExportRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafTicketSourceExport"
+              examples:
+                ExampleOfExportResponse.:
+                  value: {}
+                  summary: Example of export response.
           description: ""
   /api/saf/ticket-sources/export/:
     get:
@@ -8167,6 +8214,14 @@ paths:
           explode: true
           style: form
         - in: query
+          name: export_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: feedstock
           schema:
             type: array
@@ -8184,6 +8239,7 @@ paths:
                 - -client
                 - -consumption_type
                 - -created_at
+                - -export_country
                 - -feedstock
                 - -ghg_reduction
                 - -period
@@ -8193,6 +8249,7 @@ paths:
                 - client
                 - consumption_type
                 - created_at
+                - export_country
                 - feedstock
                 - ghg_reduction
                 - period
@@ -8220,6 +8277,8 @@ paths:
             * `-consumption_type` - Consumption type (décroissant)
             * `reception_airport` - Reception airport
             * `-reception_airport` - Reception airport (décroissant)
+            * `export_country` - Export country
+            * `-export_country` - Export country (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -8286,12 +8345,14 @@ paths:
             type: string
             enum:
               - ACCEPTED
+              - EXPORTED
               - PENDING
               - REJECTED
           description: |-
             * `PENDING` - En attente
             * `ACCEPTED` - Accepté
             * `REJECTED` - Refusé
+            * `EXPORTED` - Exporté
         - in: query
           name: supplier
           schema:
@@ -8605,6 +8666,14 @@ paths:
           explode: true
           style: form
         - in: query
+          name: export_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: feedstock
           schema:
             type: array
@@ -8622,6 +8691,7 @@ paths:
                 - -client
                 - -consumption_type
                 - -created_at
+                - -export_country
                 - -feedstock
                 - -ghg_reduction
                 - -period
@@ -8631,6 +8701,7 @@ paths:
                 - client
                 - consumption_type
                 - created_at
+                - export_country
                 - feedstock
                 - ghg_reduction
                 - period
@@ -8658,6 +8729,8 @@ paths:
             * `-consumption_type` - Consumption type (décroissant)
             * `reception_airport` - Reception airport
             * `-reception_airport` - Reception airport (décroissant)
+            * `export_country` - Export country
+            * `-export_country` - Export country (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -8712,12 +8785,14 @@ paths:
             type: string
             enum:
               - ACCEPTED
+              - EXPORTED
               - PENDING
               - REJECTED
           description: |-
             * `PENDING` - En attente
             * `ACCEPTED` - Accepté
             * `REJECTED` - Refusé
+            * `EXPORTED` - Exporté
         - in: query
           name: supplier
           schema:
@@ -8841,6 +8916,14 @@ paths:
           explode: true
           style: form
         - in: query
+          name: export_country
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: feedstock
           schema:
             type: array
@@ -8858,6 +8941,7 @@ paths:
               - consumption_type
               - country_of_origin
               - ets_status
+              - export_country
               - feedstock
               - order_by
               - origin_depot
@@ -8879,6 +8963,7 @@ paths:
                 - -client
                 - -consumption_type
                 - -created_at
+                - -export_country
                 - -feedstock
                 - -ghg_reduction
                 - -period
@@ -8888,6 +8973,7 @@ paths:
                 - client
                 - consumption_type
                 - created_at
+                - export_country
                 - feedstock
                 - ghg_reduction
                 - period
@@ -8915,6 +9001,8 @@ paths:
             * `-consumption_type` - Consumption type (décroissant)
             * `reception_airport` - Reception airport
             * `-reception_airport` - Reception airport (décroissant)
+            * `export_country` - Export country
+            * `-export_country` - Export country (décroissant)
           explode: false
           style: form
         - name: ordering
@@ -8969,12 +9057,14 @@ paths:
             type: string
             enum:
               - ACCEPTED
+              - EXPORTED
               - PENDING
               - REJECTED
           description: |-
             * `PENDING` - En attente
             * `ACCEPTED` - Accepté
             * `REJECTED` - Refusé
+            * `EXPORTED` - Exporté
         - in: query
           name: supplier
           schema:
@@ -18357,6 +18447,15 @@ components:
         client:
           type: string
           readOnly: true
+        unknown_airline_client:
+          type: string
+          nullable: true
+          maxLength: 128
+        export_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+          nullable: true
         agreement_date:
           type: string
           format: date
@@ -18379,6 +18478,7 @@ components:
         - assignment_period
         - client
         - created_at
+        - export_country
         - id
         - volume
     SafParentLot:
@@ -18458,6 +18558,15 @@ components:
         client:
           type: string
           readOnly: true
+        unknown_airline_client:
+          type: string
+          nullable: true
+          maxLength: 128
+        export_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+          nullable: true
         volume:
           type: number
           format: double
@@ -18588,6 +18697,7 @@ components:
         - client_type
         - country_of_origin
         - created_at
+        - export_country
         - feedstock
         - id
         - parent_ticket_source
@@ -18626,6 +18736,15 @@ components:
         client:
           type: string
           readOnly: true
+        unknown_airline_client:
+          type: string
+          nullable: true
+          maxLength: 128
+        export_country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+          nullable: true
         volume:
           type: number
           format: double
@@ -18667,6 +18786,7 @@ components:
         - client
         - country_of_origin
         - created_at
+        - export_country
         - feedstock
         - id
         - reception_airport
@@ -18874,6 +18994,46 @@ components:
       required:
         - assignment_period
         - client_id
+        - volume
+    SafTicketSourceExport:
+      type: object
+      properties:
+        volume:
+          type: number
+          format: double
+          minimum: 1
+        assignment_period:
+          type: integer
+        export_country:
+          type: string
+        unknown_airline_client:
+          type: string
+          maxLength: 128
+      required:
+        - assignment_period
+        - export_country
+        - unknown_airline_client
+        - volume
+    SafTicketSourceExportRequest:
+      type: object
+      properties:
+        volume:
+          type: number
+          format: double
+          minimum: 1
+        assignment_period:
+          type: integer
+        export_country:
+          type: string
+          minLength: 1
+        unknown_airline_client:
+          type: string
+          minLength: 1
+          maxLength: 128
+      required:
+        - assignment_period
+        - export_country
+        - unknown_airline_client
         - volume
     SafTicketSourceGroupAssignmentRequest:
       type: object
@@ -19800,11 +19960,13 @@ components:
         - PENDING
         - ACCEPTED
         - REJECTED
+        - EXPORTED
       type: string
       description: |-
         * `PENDING` - En attente
         * `ACCEPTED` - Accepté
         * `REJECTED` - Refusé
+        * `EXPORTED` - Exporté
   securitySchemes:
     basicAuth:
       type: http
