@@ -52,7 +52,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             }
           )}
           mainValue={formatNumber(
-            objective.teneur_declared + objective.teneur_declared_month,
+            objective.teneur_declared + objective.pending_teneur,
             {
               fractionDigits: 0,
             }
@@ -60,12 +60,12 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           mainText={t("tCO2 évitées")}
           baseQuantity={floorNumber(objective.teneur_declared, 0)}
           targetQuantity={floorNumber(objective.target, 0)}
-          declaredQuantity={floorNumber(objective.teneur_declared_month, 0)}
+          declaredQuantity={floorNumber(objective.pending_teneur, 0)}
           badge={
             <CardProgress.DefaultBadge
               targetQuantity={objective.target}
               declaredQuantity={
-                objective.teneur_declared + objective.teneur_declared_month
+                objective.teneur_declared + objective.pending_teneur
               }
             />
           }
@@ -76,7 +76,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
               <li>
                 <RecapData.TeneurDeclaredMonth
                   value={t("{{value}} tCO2 évitées", {
-                    value: formatNumber(objective.teneur_declared_month, {
+                    value: formatNumber(objective.pending_teneur, {
                       fractionDigits: 0,
                     }),
                   })}

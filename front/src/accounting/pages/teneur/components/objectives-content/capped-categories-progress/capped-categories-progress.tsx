@@ -37,7 +37,7 @@ export const CappedCategoriesProgress = ({
             key={category.code}
             title={category.code}
             mainValue={floorNumber(
-              category.teneur_declared + category.teneur_declared_month,
+              category.teneur_declared + category.pending_teneur,
               0
             )}
             description={t(
@@ -53,9 +53,9 @@ export const CappedCategoriesProgress = ({
             mainText={t("GJ")}
             baseQuantity={floorNumber(category.teneur_declared, 0)}
             targetQuantity={floorNumber(category.target, 0)}
-            declaredQuantity={floorNumber(category.teneur_declared_month, 0)}
+            declaredQuantity={floorNumber(category.pending_teneur, 0)}
             badge={
-              category.teneur_declared + category.teneur_declared_month >=
+              category.teneur_declared + category.pending_teneur >=
               category.target ? (
                 <Badge severity="error" small>
                   {t("Plafond atteint")}
@@ -74,7 +74,7 @@ export const CappedCategoriesProgress = ({
                 <li>
                   <RecapData.TeneurDeclaredMonth
                     value={formatUnit(
-                      category.teneur_declared_month,
+                      category.pending_teneur,
                       ExtendedUnit.GJ,
                       {
                         fractionDigits: 0,

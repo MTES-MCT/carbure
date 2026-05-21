@@ -38,7 +38,7 @@ export const DeclareElecTeneurDialog = ({
       0,
       mainObjective.target -
         mainObjective.teneur_declared -
-        mainObjective.teneur_declared_month -
+        mainObjective.pending_teneur -
         avoidedEmissions
     )
   }
@@ -99,7 +99,7 @@ export const DeclareElecTeneurDialog = ({
               {mainObjective && (
                 <DeclareTeneurProgressBar
                   teneurDeclared={mainObjective.teneur_declared}
-                  teneurDeclaredMonth={mainObjective.teneur_declared_month}
+                  teneurDeclaredMonth={mainObjective.pending_teneur}
                   target={mainObjective.target}
                   quantity={avoidedEmissions}
                   targetType={TargetType.REACH}

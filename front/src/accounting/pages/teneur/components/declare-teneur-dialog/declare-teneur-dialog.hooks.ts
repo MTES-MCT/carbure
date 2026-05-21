@@ -79,7 +79,7 @@ export const useRemainingCO2Objective = (
       0,
       mainObjective.target -
         mainObjective.teneur_declared -
-        mainObjective.teneur_declared_month -
+        mainObjective.pending_teneur -
         avoidedEmissions
     )
     return formatNumber(remainingCO2, {

@@ -37,7 +37,7 @@ export const UnconstrainedCategoriesProgress = ({
                 : () => onCategoryClick(category)
             }
             mainValue={floorNumber(
-              category.teneur_declared + category.teneur_declared_month,
+              category.teneur_declared + category.pending_teneur,
               0
             )}
             mainText={t("GJ")}
@@ -47,7 +47,7 @@ export const UnconstrainedCategoriesProgress = ({
                 <li>
                   <RecapData.TeneurDeclaredMonth
                     value={formatUnit(
-                      category.teneur_declared_month,
+                      category.pending_teneur,
                       ExtendedUnit.GJ,
                       {
                         fractionDigits: 0,

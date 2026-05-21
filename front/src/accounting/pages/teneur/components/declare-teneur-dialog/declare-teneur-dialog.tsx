@@ -213,9 +213,7 @@ const DeclareTeneurDialogContent = ({
                     {mainObjective && (
                       <DeclareTeneurProgressBar
                         teneurDeclared={mainObjective.teneur_declared}
-                        teneurDeclaredMonth={
-                          mainObjective.teneur_declared_month
-                        }
+                        teneurDeclaredMonth={mainObjective.pending_teneur}
                         target={mainObjective.target}
                         quantity={form.value.avoided_emissions ?? 0}
                         targetType={TargetType.REACH}

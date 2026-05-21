@@ -67,7 +67,7 @@ export const DeclareTeneurProgressBarList = ({
       {categoryObjective && categoryObjective.target && (
         <DeclareTeneurProgressBar
           teneurDeclared={categoryObjective.teneur_declared}
-          teneurDeclaredMonth={categoryObjective.teneur_declared_month}
+          teneurDeclaredMonth={categoryObjective.pending_teneur}
           target={categoryObjective.target}
           quantity={quantity ?? 0}
           targetType={targetType}
@@ -79,7 +79,7 @@ export const DeclareTeneurProgressBarList = ({
       {sectorObjective && (
         <DeclareTeneurProgressBar
           teneurDeclared={sectorObjective?.teneur_declared ?? 0}
-          teneurDeclaredMonth={sectorObjective?.teneur_declared_month ?? 0}
+          teneurDeclaredMonth={sectorObjective?.pending_teneur ?? 0}
           target={sectorObjective?.target ?? 0}
           quantity={quantity ?? 0}
           label={t("Filière {{sector}}", {

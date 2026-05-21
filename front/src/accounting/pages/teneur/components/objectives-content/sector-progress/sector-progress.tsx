@@ -39,18 +39,18 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
               }
             )}
             mainValue={floorNumber(
-              sector.teneur_declared + sector.teneur_declared_month,
+              sector.teneur_declared + sector.pending_teneur,
               0
             )}
             mainText={t("GJ")}
             baseQuantity={floorNumber(sector.teneur_declared, 0)}
             targetQuantity={floorNumber(sector.target, 0)}
-            declaredQuantity={floorNumber(sector.teneur_declared_month, 0)}
+            declaredQuantity={floorNumber(sector.pending_teneur, 0)}
             badge={
               <CardProgress.DefaultBadge
                 targetQuantity={sector.target}
                 declaredQuantity={
-                  sector.teneur_declared + sector.teneur_declared_month
+                  sector.teneur_declared + sector.pending_teneur
                 }
               />
             }
@@ -60,13 +60,9 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
               <ul>
                 <li>
                   <RecapData.TeneurDeclaredMonth
-                    value={formatUnit(
-                      sector.teneur_declared_month,
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
+                    value={formatUnit(sector.pending_teneur, ExtendedUnit.GJ, {
+                      fractionDigits: 0,
+                    })}
                   />
                 </li>
                 <li>

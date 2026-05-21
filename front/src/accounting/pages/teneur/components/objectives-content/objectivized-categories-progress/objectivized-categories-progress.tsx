@@ -39,7 +39,7 @@ export const ObjectivizedCategoriesProgress = ({
             title={category.code}
             mainValue={
               floorNumber(category.teneur_declared, 0) +
-              floorNumber(category.teneur_declared_month, 0)
+              floorNumber(category.pending_teneur, 0)
             }
             mainText={t("GJ")}
             description={t(
@@ -54,13 +54,13 @@ export const ObjectivizedCategoriesProgress = ({
             )}
             baseQuantity={floorNumber(category.teneur_declared, 0)}
             targetQuantity={floorNumber(category.target, 0)}
-            declaredQuantity={floorNumber(category.teneur_declared_month, 0)}
+            declaredQuantity={floorNumber(category.pending_teneur, 0)}
             badge={
               <CardProgress.DefaultBadge
                 targetQuantity={floorNumber(category.target, 0)}
                 declaredQuantity={
                   floorNumber(category.teneur_declared, 0) +
-                  floorNumber(category.teneur_declared_month, 0)
+                  floorNumber(category.pending_teneur, 0)
                 }
               />
             }
@@ -76,7 +76,7 @@ export const ObjectivizedCategoriesProgress = ({
                 <li>
                   <RecapData.TeneurDeclaredMonth
                     value={formatUnit(
-                      category.teneur_declared_month,
+                      category.pending_teneur,
                       ExtendedUnit.GJ,
                       {
                         fractionDigits: 0,

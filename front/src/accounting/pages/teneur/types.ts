@@ -5,7 +5,7 @@ export interface BaseObjective {
   target: number
   teneur_declared: number // GJ
   quantity_available: number // GJ
-  teneur_declared_month: number // GJ
+  pending_teneur: number // GJ
   target_percent: number
   penalty: number // euro cents
 }

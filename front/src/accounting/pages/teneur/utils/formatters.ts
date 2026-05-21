@@ -7,4 +7,4 @@ export const computeObjectiveEnergy = (
 ) =>
   floorNumber(objective.target, 0) -
   floorNumber(objective.teneur_declared, 0) -
-  floorNumber(objective.teneur_declared_month, 0)
+  floorNumber(objective.pending_teneur, 0)

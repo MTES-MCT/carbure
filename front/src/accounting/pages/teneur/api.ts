@@ -16,7 +16,7 @@ function parseObjectivesResponse(objectives?: apiTypes["ObjectiveOutput"]) {
     global: {
       target: objectives?.main.target ?? 0,
       teneur_declared: objectives?.main.declared_teneur ?? 0,
-      teneur_declared_month: objectives?.main.pending_teneur ?? 0,
+      pending_teneur: objectives?.main.pending_teneur ?? 0,
       quantity_available: objectives?.main.available_balance ?? 0,
       target_percent: objectives?.main.target_percent
         ? objectives?.main.target_percent * 100
@@ -31,9 +31,7 @@ function parseObjectivesResponse(objectives?: apiTypes["ObjectiveOutput"]) {
         code: sector.code,
         target: CONVERSIONS.energy.MJ_TO_GJ(sector.objective.target_mj),
         teneur_declared: CONVERSIONS.energy.MJ_TO_GJ(sector.declared_teneur),
-        teneur_declared_month: CONVERSIONS.energy.MJ_TO_GJ(
-          sector.pending_teneur
-        ),
+        pending_teneur: CONVERSIONS.energy.MJ_TO_GJ(sector.pending_teneur),
         quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
           sector.available_balance
         ),
@@ -73,9 +71,7 @@ function parseObjectivesResponse(objectives?: apiTypes["ObjectiveOutput"]) {
           teneur_declared: CONVERSIONS.energy.MJ_TO_GJ(
             category.declared_teneur
           ),
-          teneur_declared_month: CONVERSIONS.energy.MJ_TO_GJ(
-            category.pending_teneur
-          ),
+          pending_teneur: CONVERSIONS.energy.MJ_TO_GJ(category.pending_teneur),
           quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
             category.available_balance
           ),
