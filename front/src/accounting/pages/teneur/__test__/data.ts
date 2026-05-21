@@ -17,6 +17,7 @@ export const cappedCategories: CategoryObjective[] = [
     quantity_available: 4723.8037557404,
     target_percent: 0.67,
     penalty: 0,
+    target_type: TargetType.CAP,
   },
 ]
 
@@ -29,6 +30,7 @@ export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
     quantity_available: 357637.20670999994,
     target_percent: null,
     penalty: 0,
+    target_type: null,
   },
   {
     code: CategoryEnum.ANN_IX_B,
@@ -38,6 +40,7 @@ export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
     quantity_available: 135531.468,
     target_percent: null,
     penalty: 0,
+    target_type: null,
   },
 ]
 
@@ -50,6 +53,7 @@ export const objectivizedCategories: CategoryObjective[] = [
     quantity_available: 541168.905,
     target_percent: 0.67,
     penalty: 0,
+    target_type: TargetType.REACH,
   },
 ]
 
@@ -71,6 +75,7 @@ export const defaultCategoryObjective: CategoryObjective = {
   quantity_available: 1000,
   target_percent: 10,
   penalty: 0,
+  target_type: TargetType.CAP,
 }
 
 export const defaultSectorObjectives: SectorObjective[] = [

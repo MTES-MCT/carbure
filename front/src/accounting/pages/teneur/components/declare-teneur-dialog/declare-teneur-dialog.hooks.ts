@@ -8,8 +8,10 @@ import { CreateOperationType } from "accounting/types"
 import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import {
+  BiofuelUnconstrainedCategoryObjective,
   CategoryObjective,
   MainObjective,
+  TargetType,
   UnconstrainedCategoryObjective,
 } from "../../types"
 import { useMemo } from "react"
@@ -110,7 +112,7 @@ export const useRemainingEnergyBeforeLimitOrObjective = (
 }
 
 export const useCalculateQuantityMax = (
-  objective: CategoryObjective,
+  objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective,
   values: DeclareTeneurDialogForm
 ) => {
   const availableBalance = values.balance?.available_balance
@@ -120,7 +122,8 @@ export const useCalculateQuantityMax = (
       return 0
     }
 
-    if (!objective.target) {
+    // if the objective is a cap or there is no target, the maximum quantity is the available balance
+    if (!objective.target || objective.target_type === TargetType.REACH) {
       return floorNumber(availableBalance, 0)
     }
 

@@ -1,6 +1,7 @@
 import { CategoryEnum } from "common/types"
 import { OperationSector } from "accounting/types"
 import { apiTypes } from "common/services/api-fetch.types"
+import { TargetType } from "../types"
 
 export const objectiveApiResponse: apiTypes["ObjectiveOutput"] = {
   main: {
@@ -23,7 +24,7 @@ export const objectiveApiResponse: apiTypes["ObjectiveOutput"] = {
       energy_basis: 0,
       objective: {
         target_mj: 3_000_000,
-        target_type: "REACH",
+        target_type: TargetType.REACH,
         penalty: 0,
         target_percent: 0.12,
       },
@@ -38,7 +39,7 @@ export const objectiveApiResponse: apiTypes["ObjectiveOutput"] = {
       unit: "MJ",
       objective: {
         target_mj: 4_214_566,
-        target_type: "CAP",
+        target_type: TargetType.CAP,
         penalty: 0,
         target_percent: 0.0067,
       },
@@ -51,7 +52,7 @@ export const objectiveApiResponse: apiTypes["ObjectiveOutput"] = {
       unit: "MJ",
       objective: {
         target_mj: 19_667_973,
-        target_type: "REACH",
+        target_type: TargetType.REACH,
         penalty: 0,
         target_percent: 0.0067,
       },
@@ -64,7 +65,7 @@ export const objectiveApiResponse: apiTypes["ObjectiveOutput"] = {
       unit: "MJ",
       objective: {
         target_mj: 0,
-        target_type: "CAP",
+        target_type: TargetType.CAP,
         penalty: 0,
         target_percent: 0,
       },
@@ -77,7 +78,7 @@ export const objectiveApiResponse: apiTypes["ObjectiveOutput"] = {
       unit: "MJ",
       objective: {
         target_mj: null as unknown as number,
-        target_type: "CAP",
+        target_type: TargetType.CAP,
         penalty: 0,
         target_percent: 0,
       },

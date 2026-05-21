@@ -29,11 +29,12 @@ import {
   SectorObjective,
   TargetType,
 } from "../../types"
-import { floorNumber, formatUnit } from "common/utils/formatters"
+import { formatUnit } from "common/utils/formatters"
 import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
 import {
+  useCalculateQuantityMax,
   useDeclareTeneurDialog,
   useRemainingCO2Objective,
   useRemainingEnergyBeforeLimitOrObjective,
@@ -84,17 +85,8 @@ const DeclareTeneurDialogContent = ({
   // Define the maximum quantity that can be declared for the teneur
   // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
   // Otherwise, the maximum quantity is the available balance
-  const depotQuantityMax = floorNumber(
-    form.value.balance
-      ? objective.target
-        ? Math.min(
-            form.value.balance!.available_balance,
-            computeObjectiveEnergy(objective)
-          )
-        : form.value.balance!.available_balance
-      : 0,
-    0
-  )
+  const depotQuantityMax = useCalculateQuantityMax(objective, form.value)
+  console.log("depotQuantityMax", depotQuantityMax)
   // Get the current sector objective when the biofuel is selected
   const currentSectorObjective = useMemo(() => {
     if (!form.value.balance?.sector) return undefined

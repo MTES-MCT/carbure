@@ -1,11 +1,6 @@
 import { apiTypes } from "common/services/api-fetch.types"
 import { CONVERSIONS } from "common/utils/formatters"
-import {
-  CategoryObjective,
-  MainObjective,
-  Objectives,
-  SectorObjective,
-} from "../types"
+import { MainObjective, Objectives, SectorObjective } from "../types"
 
 type ParsedCategories = Pick<
   Objectives,
@@ -52,6 +47,7 @@ const parseCategoryBase = (category: apiTypes["ObjectiveCategory"]) => ({
   quantity_available: toGj(category.available_balance),
   target_percent: category.objective.target_percent * 100,
   penalty: category.objective.penalty ?? 0,
+  target_type: category.objective.target_type,
 })
 
 const categoryGroupByTargetType = {
@@ -69,11 +65,12 @@ const parseCategories = (
 
     const categoryObjective = parseCategoryBase(category)
 
-    if (!category.objective.target_mj) {
+    if (category.objective.target_mj === null) {
       parsedCategories.unconstrained_categories.push({
         ...categoryObjective,
         target: null,
         target_percent: null,
+        target_type: null,
       })
       return parsedCategories
     }
@@ -83,7 +80,7 @@ const parseCategories = (
         category.objective.target_type as keyof typeof categoryGroupByTargetType
       ]
 
-    parsedCategories[categoryGroup].push(categoryObjective as CategoryObjective)
+    parsedCategories[categoryGroup].push(categoryObjective)
 
     return parsedCategories
   }, emptyCategories())

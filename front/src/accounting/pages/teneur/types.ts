@@ -1,5 +1,8 @@
 import { ElecOperationSector, OperationSector } from "accounting/types"
 import { CategoryEnum } from "common/types"
+import { apiTypes } from "common/services/api-fetch.types"
+
+export { TargetTypeEnum as TargetType } from "api-schema"
 
 export interface BaseObjective {
   target: number
@@ -11,6 +14,7 @@ export interface BaseObjective {
 }
 export interface CategoryObjective extends BaseObjective {
   code: CategoryEnum
+  target_type: apiTypes["Objective"]["target_type"]
 }
 
 export interface SectorObjective extends BaseObjective {
@@ -48,9 +52,4 @@ export interface Objectives {
   capped_categories: CategoryObjective[]
   objectivized_categories: CategoryObjective[]
   unconstrained_categories: UnconstrainedCategoryObjective[]
-}
-
-export enum TargetType {
-  REACH = "REACH",
-  CAP = "CAP",
 }
