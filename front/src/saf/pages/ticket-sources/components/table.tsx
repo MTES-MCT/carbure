@@ -175,7 +175,10 @@ export function useColumns() {
       cell: (ticketSource: SafTicketSourcePreview) => {
         const value =
           ticketSource.assigned_tickets.length > 0
-            ? ticketSource.assigned_tickets.map((t) => t.client).join(", ")
+            ? ticketSource.assigned_tickets
+                .map((t) => t.client ?? t.unknown_airline_client)
+                .filter(Boolean)
+                .join(", ")
             : "-"
         return <Cell text={value} />
       },

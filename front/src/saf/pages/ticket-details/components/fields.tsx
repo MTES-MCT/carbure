@@ -101,7 +101,19 @@ export const TicketFields = ({ ticket }: TicketFieldsProps) => {
       </Dialog.Section>
       <Dialog.Section label={t("Affectation")}>
         <TextInput label={t("Fournisseur")} value={ticket.supplier} readOnly />
-        <TextInput label={t("Client")} value={ticket.client} readOnly />
+        <TextInput
+          label={t("Client")}
+          value={ticket.client ?? ticket.unknown_airline_client ?? "-"}
+          readOnly
+        />
+
+        {ticket.export_country && (
+          <TextInput
+            label={t("Pays d'export")}
+            value={norm.normalizeCountry(ticket.export_country).label}
+            readOnly
+          />
+        )}
 
         {ticket.agreement_reference && (
           <TextInput

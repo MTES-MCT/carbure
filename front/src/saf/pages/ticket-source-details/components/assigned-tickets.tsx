@@ -27,14 +27,16 @@ const AssignedTickets = ({
     >
       <ul>
         {ticketSource.assigned_tickets.map((ticket) => {
+          const client = ticket.client ?? ticket.unknown_airline_client ?? "-"
+
           return (
             <li key={ticket.id}>
               <Button
                 customPriority="link"
                 linkProps={{ href: `#ticket/${ticket?.id}` }}
               >
-                <Ellipsis>{ticket.client}</Ellipsis> -{" "}
-                {formatNumber(ticket.volume)} L -{" "}
+                <Ellipsis>{client}</Ellipsis> - {formatNumber(ticket.volume)} L
+                -{" "}
                 {formatDate(
                   `${formatPeriod(ticket.assignment_period)}-01`,
                   "MM/yyyy"
