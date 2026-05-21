@@ -18,8 +18,9 @@ class SafTicket(models.Model):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
+    EXPORTED = "EXPORTED"
 
-    ticket_statuses = [(PENDING, "En attente"), (ACCEPTED, "Accepté"), (REJECTED, "Refusé")]
+    ticket_statuses = [(PENDING, "En attente"), (ACCEPTED, "Accepté"), (REJECTED, "Refusé"), (EXPORTED, "Exporté")]
     status = models.CharField(max_length=24, choices=ticket_statuses, default=PENDING)
 
     carbure_id = models.CharField(max_length=64, null=True)
@@ -40,6 +41,10 @@ class SafTicket(models.Model):
 
     supplier = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL, related_name="saf_owner")
     client = models.ForeignKey("core.Entity", null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    unknown_airline_client = models.CharField(max_length=128, blank=True, null=True, default=None)
+    export_country = models.ForeignKey(
+        "core.Pays", null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="saf_export_country"
+    )
     free_field = models.TextField(null=True, blank=True, default=None)
 
     carbure_producer = models.ForeignKey(
@@ -179,6 +184,51 @@ def create_ticket_from_source(
         reception_airport=reception_airport,
         consumption_type=consumption_type,
         shipping_method=shipping_method,
+        origin_lot=ticket_source.origin_lot,
+        origin_lot_site=ticket_source.origin_lot_site,
+    )
+
+    ticket.generate_carbure_id()
+    ticket.save()
+
+    return ticket
+
+
+def create_export_ticket_from_source(ticket_source, volume, assignment_period, export_country, unknown_airline_client):
+    year = floor(assignment_period / 100)
+
+    ticket = SafTicket.objects.create(
+        client=None,
+        volume=volume,
+        status=SafTicket.EXPORTED,
+        created_at=ticket_source.created_at,
+        year=year,
+        assignment_period=assignment_period,
+        biofuel=ticket_source.biofuel,
+        feedstock=ticket_source.feedstock,
+        country_of_origin=ticket_source.country_of_origin,
+        supplier_id=ticket_source.added_by_id,
+        unknown_airline_client=unknown_airline_client,
+        export_country=export_country,
+        carbure_producer=ticket_source.carbure_producer,
+        unknown_producer=ticket_source.unknown_producer,
+        carbure_production_site=ticket_source.carbure_production_site,
+        unknown_production_site=ticket_source.unknown_production_site,
+        production_country=ticket_source.production_country,
+        production_site_commissioning_date=ticket_source.production_site_commissioning_date,
+        eec=ticket_source.eec,
+        el=ticket_source.el,
+        ep=ticket_source.ep,
+        etd=ticket_source.etd,
+        eu=ticket_source.eu,
+        esca=ticket_source.esca,
+        eccs=ticket_source.eccs,
+        eccr=ticket_source.eccr,
+        eee=ticket_source.eee,
+        ghg_total=ticket_source.ghg_total,
+        ghg_reference=ticket_source.ghg_reference,
+        ghg_reduction=ticket_source.ghg_reduction,
+        parent_ticket_source=ticket_source,
         origin_lot=ticket_source.origin_lot,
         origin_lot_site=ticket_source.origin_lot_site,
     )
