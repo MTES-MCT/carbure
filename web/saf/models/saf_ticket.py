@@ -146,61 +146,37 @@ def create_ticket_from_source(
     consumption_type,
     shipping_method,
 ):
-    year = floor(assignment_period / 100)
-
-    ticket = SafTicket.objects.create(
+    return _create_ticket_from_source(
+        ticket_source,
+        assignment_period,
         client_id=client_id,
         volume=volume,
         agreement_date=agreement_date,
         agreement_reference=agreement_reference,
         status=SafTicket.PENDING,
-        created_at=ticket_source.created_at,
-        year=year,
-        assignment_period=assignment_period,
-        biofuel=ticket_source.biofuel,
-        feedstock=ticket_source.feedstock,
         free_field=free_field,
-        country_of_origin=ticket_source.country_of_origin,
-        supplier_id=ticket_source.added_by_id,
-        carbure_producer=ticket_source.carbure_producer,
-        unknown_producer=ticket_source.unknown_producer,
-        carbure_production_site=ticket_source.carbure_production_site,
-        unknown_production_site=ticket_source.unknown_production_site,
-        production_country=ticket_source.production_country,
-        production_site_commissioning_date=ticket_source.production_site_commissioning_date,
-        eec=ticket_source.eec,
-        el=ticket_source.el,
-        ep=ticket_source.ep,
-        etd=ticket_source.etd,
-        eu=ticket_source.eu,
-        esca=ticket_source.esca,
-        eccs=ticket_source.eccs,
-        eccr=ticket_source.eccr,
-        eee=ticket_source.eee,
-        ghg_total=ticket_source.ghg_total,
-        ghg_reference=ticket_source.ghg_reference,
-        ghg_reduction=ticket_source.ghg_reduction,
-        parent_ticket_source=ticket_source,
         reception_airport=reception_airport,
         consumption_type=consumption_type,
         shipping_method=shipping_method,
-        origin_lot=ticket_source.origin_lot,
-        origin_lot_site=ticket_source.origin_lot_site,
     )
-
-    ticket.generate_carbure_id()
-    ticket.save()
-
-    return ticket
 
 
 def create_export_ticket_from_source(ticket_source, volume, assignment_period, export_country, unknown_airline_client):
-    year = floor(assignment_period / 100)
-
-    ticket = SafTicket.objects.create(
+    return _create_ticket_from_source(
+        ticket_source,
+        assignment_period,
         client=None,
         volume=volume,
         status=SafTicket.EXPORTED,
+        unknown_airline_client=unknown_airline_client,
+        export_country=export_country,
+    )
+
+
+def _create_ticket_from_source(ticket_source, assignment_period, **specific_fields):
+    year = floor(assignment_period / 100)
+
+    ticket = SafTicket.objects.create(
         created_at=ticket_source.created_at,
         year=year,
         assignment_period=assignment_period,
@@ -208,8 +184,6 @@ def create_export_ticket_from_source(ticket_source, volume, assignment_period, e
         feedstock=ticket_source.feedstock,
         country_of_origin=ticket_source.country_of_origin,
         supplier_id=ticket_source.added_by_id,
-        unknown_airline_client=unknown_airline_client,
-        export_country=export_country,
         carbure_producer=ticket_source.carbure_producer,
         unknown_producer=ticket_source.unknown_producer,
         carbure_production_site=ticket_source.carbure_production_site,
@@ -231,6 +205,7 @@ def create_export_ticket_from_source(ticket_source, volume, assignment_period, e
         parent_ticket_source=ticket_source,
         origin_lot=ticket_source.origin_lot,
         origin_lot_site=ticket_source.origin_lot_site,
+        **specific_fields,
     )
 
     ticket.generate_carbure_id()
