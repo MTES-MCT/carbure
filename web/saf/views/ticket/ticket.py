@@ -55,6 +55,7 @@ class SafTicketViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet, Actio
         "agreement_reference",
         "carbure_production_site__name",
         "unknown_production_site",
+        "unknown_airline_client",
     ]
 
     def get_permissions(self):
