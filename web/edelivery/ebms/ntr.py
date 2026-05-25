@@ -1,10 +1,15 @@
 import re
 
-from core.models import Entity
 
+class NationalTradeRegister:
+    @staticmethod
+    def from_id(ntr_id):
+        country_code, _code_scheme, _code_scheme_end_mark, registration_id = (
+            re.compile(r"([A-Z]{2})_([A-Z_]+)_(CD|MBN)(.+)").search(ntr_id).groups()
+        )
 
-def from_national_trade_register(ntr):
-    country_code, _code_scheme, _code_scheme_end_mark, registration_id = (
-        re.compile(r"([A-Z]{2})_([A-Z_]+)_(CD|MBN)(.+)").search(ntr).groups()
-    )
-    return Entity.objects.filter(registered_country__code_pays=country_code, registration_id=registration_id).last().id
+        return NationalTradeRegister(country_code, registration_id)
+
+    def __init__(self, country_code, registration_id):
+        self.country_code = country_code
+        self.registration_id = registration_id
