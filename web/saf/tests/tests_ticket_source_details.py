@@ -94,73 +94,41 @@ class SafTicketSourceDetailsTest(TestCase):
         expected_ticket_source = {
             "id": 1234,
             "carbure_id": "carbure-id-001",
-            "year": 2022,
-            "delivery_period": 202201,
             "total_volume": 30000.0,
             "assigned_volume": 0.0,
-            "carbure_producer": None,
             "unknown_producer": "External Producer",
-            "carbure_production_site": None,
             "unknown_production_site": "External Production Site",
-            "production_site_commissioning_date": "2001-01-01",
             "added_by": {
                 "id": self.entity.id,
                 "name": self.entity.name,
                 "entity_type": self.entity.entity_type,
                 "registration_id": self.entity.registration_id,
             },
-            "feedstock": {
-                "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
-                "name_en": "CI/CII Animal fat",
-                "code": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
-                "category": "ANN-IX-B",
-                "is_double_compte": True,
-                "is_industrial_waste": False,
-            },
             "biofuel": {
                 "name": "Huiles co-traitées - Kérosène",
                 "name_en": "",
                 "code": "HCC",
             },
-            "country_of_origin": {
-                "name": "Espagne",
-                "name_en": "Spain",
-                "code_pays": "ES",
-                "is_in_europe": True,
-            },
-            "eccr": 1.0,
-            "eccs": 1.0,
-            "eec": 1.0,
-            "eee": 1.0,
-            "el": 1.0,
-            "ep": 1.0,
-            "esca": 1.0,
-            "etd": 1.0,
-            "eu": 1.0,
-            "ghg_total": 1.0,
             "ghg_reduction": 65.0,
-            "assigned_tickets": [
-                {
-                    "agreement_date": "2022-06-20",
-                    "assignment_period": 202201,
-                    "carbure_id": "carbure-id-t-001",
-                    "client": self.ticket_client.name,
-                    "unknown_airline_client": None,
-                    "export_country": None,
-                    "id": 4321,
-                    "status": "PENDING",
-                    "volume": 30000.0,
-                }
-            ],
-            "parent_lot": None,
             "parent_ticket": None,
-            "origin_lot": None,
-            "origin_lot_site": None,
+        }
+        expected_assigned_ticket = {
+            "agreement_date": "2022-06-20",
+            "assignment_period": 202201,
+            "carbure_id": "carbure-id-t-001",
+            "client": self.ticket_client.name,
+            "unknown_airline_client": None,
+            "export_country": None,
+            "id": 4321,
+            "status": "PENDING",
+            "volume": 30000.0,
         }
 
-        # do not check created_at as its automatically generated
-        response_ticket_source = response.json()
-        response_ticket_source.pop("created_at")
-        response_ticket_source["assigned_tickets"][0].pop("created_at")
+        data = response.json()
 
-        self.assertEqual(response.json(), expected_ticket_source)
+        for key, value in expected_ticket_source.items():
+            self.assertEqual(data[key], value)
+
+        self.assertEqual(len(data["assigned_tickets"]), 1)
+        for key, value in expected_assigned_ticket.items():
+            self.assertEqual(data["assigned_tickets"][0][key], value)

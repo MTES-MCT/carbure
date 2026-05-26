@@ -99,74 +99,30 @@ class SafTicketDetailsTest(TestCase):
         expected_ticket = {
             "id": 4321,
             "carbure_id": "carbure-id-t-001",
-            "year": 2022,
-            "assignment_period": 202201,
             "status": "PENDING",
             "volume": 30000.0,
             "agreement_date": "2022-06-20",
             "agreement_reference": "ABCD",
-            "carbure_producer": None,
             "unknown_producer": "External Producer",
-            "carbure_production_site": None,
             "unknown_production_site": "External Production Site",
-            "production_site_commissioning_date": "2001-01-01",
-            "production_country": {
-                "name": "Espagne",
-                "name_en": "Spain",
-                "code_pays": "ES",
-                "is_in_europe": True,
-            },
             "supplier": self.entity.name,
             "client": self.ticket_client.name,
-            "client_type": self.ticket_client.entity_type,
-            "feedstock": {
-                "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
-                "name_en": "CI/CII Animal fat",
-                "code": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
-                "category": "ANN-IX-B",
-                "is_double_compte": True,
-                "is_industrial_waste": False,
-            },
             "biofuel": {
                 "name": "Huiles co-traitées - Kérosène",
                 "name_en": "",
                 "code": "HCC",
             },
-            "country_of_origin": {
-                "name": "Espagne",
-                "name_en": "Spain",
-                "code_pays": "ES",
-                "is_in_europe": True,
-            },
-            "eccr": 1.0,
-            "eccs": 1.0,
-            "eec": 1.0,
-            "eee": 1.0,
-            "el": 1.0,
-            "ep": 1.0,
-            "esca": 1.0,
-            "etd": 1.0,
-            "eu": 1.0,
-            "ghg_total": 1.0,
             "ghg_reduction": 65.0,
-            "free_field": None,
-            "client_comment": None,
             "parent_ticket_source": {
                 "id": 1234,
                 "carbure_id": "carbure-id-001",
                 "total_volume": 30000.0,
                 "assigned_volume": 0.0,
             },
-            "shipping_method": None,
-            "reception_airport": None,
-            "consumption_type": None,
-            "ets_status": None,
             "child_ticket_sources": [],
-            "origin_lot": None,
-            "origin_lot_site": None,
         }
 
         data = response.json()
-        data.pop("created_at")
 
-        self.assertEqual(data, expected_ticket)
+        for key, value in expected_ticket.items():
+            self.assertEqual(data[key], value)

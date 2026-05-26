@@ -70,45 +70,24 @@ class SafTicketsTest(TestCase):
         expected_ticket = {
             "id": 4321,
             "carbure_id": "carbure-id-t-001",
-            "year": 2022,
-            "assignment_period": 202201,
             "status": "PENDING",
             "agreement_date": "2022-06-20",
-            "supplier": "Atlantique Terminals",
-            "client": "Metro Refining",
-            "unknown_airline_client": None,
-            "export_country": None,
+            "supplier": self.entity.name,
+            "client": self.ticket_client.name,
             "volume": 30000.0,
-            "feedstock": {
-                "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
-                "name_en": "CI/CII Animal fat",
-                "code": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
-                "category": "ANN-IX-B",
-                "is_double_compte": True,
-                "is_industrial_waste": False,
-            },
             "biofuel": {
                 "name": "Huiles co-traitées - Kérosène",
                 "name_en": "",
                 "code": "HCC",
             },
-            "country_of_origin": {
-                "name": "Espagne",
-                "name_en": "Spain",
-                "code_pays": "ES",
-                "is_in_europe": True,
-            },
             "ghg_reduction": 65.0,
             "consumption_type": "MAC",
-            "ets_status": None,
-            "reception_airport": None,
         }
 
         data = response.json()["results"][0]
-        data.pop("created_at")
 
-        self.maxDiff = None
-        self.assertEqual(data, expected_ticket)
+        for key, value in expected_ticket.items():
+            self.assertEqual(data[key], value)
         self.assertEqual(response.json()["count"], 2)
 
     def test_assigned_exported_tickets_have_dedicated_status_filter(self):

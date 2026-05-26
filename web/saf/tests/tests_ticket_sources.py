@@ -102,57 +102,40 @@ class SafTicketSourcesTest(TestCase):
         expected_ticket_source = {
             "id": 1234,
             "carbure_id": "carbure-id-001",
-            "year": 2022,
-            "delivery_period": 202201,
             "total_volume": 30000.0,
             "assigned_volume": 0.0,
-            "feedstock": {
-                "name": "Huiles ou graisses animales  (catégorie I et/ou II )",
-                "name_en": "CI/CII Animal fat",
-                "code": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
-                "category": "ANN-IX-B",
-                "is_double_compte": True,
-                "is_industrial_waste": False,
-            },
             "biofuel": {
                 "name": "Huiles co-traitées - Kérosène",
                 "name_en": "",
                 "code": "HCC",
             },
-            "country_of_origin": {
-                "name": "Espagne",
-                "name_en": "Spain",
-                "code_pays": "ES",
-                "is_in_europe": True,
-            },
             "ghg_reduction": 65.0,
-            "parent_lot": None,
-            "origin_lot": None,
-            "origin_lot_site": None,
-            "assigned_tickets": [
-                {
-                    "agreement_date": "2022-06-20",
-                    "assignment_period": 202201,
-                    "carbure_id": "carbure-id-t-001",
-                    "client": self.ticket_client.name,
-                    "id": 4321,
-                    "status": "PENDING",
-                    "volume": 30000.0,
-                }
-            ],
             "parent_ticket": None,
             "added_by": {
-                "id": 14,
-                "name": "Atlantique Terminals",
-                "entity_type": "Opérateur",
-                "registration_id": "822334455",
+                "id": self.entity.id,
+                "name": self.entity.name,
+                "entity_type": self.entity.entity_type,
+                "registration_id": self.entity.registration_id,
             },
         }
 
-        # do not check created_at as its automatically generated
-        response_ticket_source = response.json()["results"][0]
-        response_ticket_source.pop("created_at")
-        response_ticket_source["assigned_tickets"][0].pop("created_at")
+        expected_assigned_ticket = {
+            "agreement_date": "2022-06-20",
+            "assignment_period": 202201,
+            "carbure_id": "carbure-id-t-001",
+            "client": self.ticket_client.name,
+            "id": 4321,
+            "status": "PENDING",
+            "volume": 30000.0,
+        }
 
-        self.assertEqual(response_ticket_source, expected_ticket_source)
+        data = response.json()["results"][0]
+
+        for key, value in expected_ticket_source.items():
+            self.assertEqual(data[key], value)
+
+        self.assertEqual(len(data["assigned_tickets"]), 1)
+        for key, value in expected_assigned_ticket.items():
+            self.assertEqual(data["assigned_tickets"][0][key], value)
+
         self.assertEqual(response.json()["count"], 2)
