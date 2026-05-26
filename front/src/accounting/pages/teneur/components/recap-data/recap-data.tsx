@@ -68,6 +68,7 @@ const RemainingQuantityBeforeObjective = ({
   category?: CategoryEnum
 }) => {
   const { t } = useTranslation()
+
   return (
     <Text size={size} fontWeight={bold ? "bold" : "regular"}>
       {category
