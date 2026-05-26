@@ -1,0 +1,39 @@
+.dialog > div > main {
+  overflow-x: auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.table > header {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.monthColumn {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  flex: 0 0 120px;
+  background: white;
+  text-transform: capitalize;
+}
+
+.table header .monthColumn {
+  background: var(--blue-ecume-975-75);
+}
+
+.fuelColumn {
+  width: 180px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}

@@ -4,9 +4,6 @@ import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
 import { RecapData } from "../../recap-data"
 import { floorNumber, formatDate, formatNumber } from "common/utils/formatters"
-import useEntity from "common/hooks/entity"
-import { downloadMacFossilFuel } from "../../../api"
-import { Download } from "common/components/download"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type OverallProgressProps = {
@@ -15,9 +12,6 @@ type OverallProgressProps = {
 
 export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
-  const { isAdmin } = entity
-  const isAdminOrExternal = isAdmin || entity.isExternal
   const { selectedYear, isDeclarationInCurrentPeriod } =
     useAnnualDeclarationTiruert()
 
@@ -31,36 +25,14 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
     <ObjectiveSection
       title={t("Avancement global")}
       description={
-        <>
-          {isDeclarationInCurrentPeriod && !isAdminOrExternal && (
-            <>
-              <Trans
-                i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d'un PCI théorique."
-                components={{
-                  a: (
-                    <Download
-                      label={t("mises à consommation") + " 2023"}
-                      linkProps={{
-                        href: downloadMacFossilFuel(entity.id),
-                      }}
-                    />
-                  ),
-                }}
-              />
-              <br />
-              <br />
-            </>
-          )}
-
-          <Trans
-            i18nKey="Base calculée : {{energy_basis}} GJ"
-            values={{
-              energy_basis: formatNumber(objective?.energy_basis ?? 0, {
-                fractionDigits: 0,
-              }),
-            }}
-          />
-        </>
+        <Trans
+          i18nKey="Base calculée : {{energy_basis}} GJ"
+          values={{
+            energy_basis: formatNumber(objective?.energy_basis ?? 0, {
+              fractionDigits: 0,
+            }),
+          }}
+        />
       }
     >
       {objective && (

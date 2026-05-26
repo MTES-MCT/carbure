@@ -19,6 +19,7 @@ import {
 import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneur-dialog/validate-pending-teneur-dialog"
 import { ObjectivesContent } from "./components/objectives-content"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { MacSection } from "./components/mac-section"
 
 const Teneur = () => {
   const entity = useEntity()
@@ -68,11 +69,6 @@ const Teneur = () => {
 
   return (
     <>
-      <Notice noColor variant="info">
-        {t(
-          "Bienvenue dans votre espace de teneur et objectifs annuels. Vous pouvez simuler des conversions quantités et tCO2 eq. évitées, ainsi qu'y rentrer vos quantités de teneur afin de clôturer votre comptabilité annuelle."
-        )}
-      </Notice>
       {isDeclarationInCurrentPeriod && (
         <Notice noColor variant="info">
           <Row style={{ alignItems: "center", width: "100%" }}>
@@ -91,6 +87,8 @@ const Teneur = () => {
           </Row>
         </Notice>
       )}
+
+      <MacSection />
 
       <ObjectivesContent
         objectivesData={objectivesData}
