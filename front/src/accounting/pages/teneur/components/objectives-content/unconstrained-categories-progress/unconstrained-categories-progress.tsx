@@ -5,7 +5,7 @@ import { RecapData } from "../../recap-data"
 import { UnconstrainedCategoryObjective } from "../../../types"
 import { CardGrid } from "../../card-grid"
 import { ExtendedUnit } from "common/types"
-import { floorNumber, formatUnit } from "common/utils/formatters"
+import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 import { useFormatters } from "accounting/hooks/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
@@ -15,6 +15,9 @@ type UnconstrainedCategoriesProgressProps = {
   readOnly: boolean
 }
 
+const getTotalTeneurDeclared = (category: UnconstrainedCategoryObjective) => {
+  return floorNumber(category.teneur_declared + category.pending_teneur, 0)
+}
 export const UnconstrainedCategoriesProgress = ({
   categories,
   onCategoryClick,
@@ -36,10 +39,9 @@ export const UnconstrainedCategoriesProgress = ({
                 ? undefined
                 : () => onCategoryClick(category)
             }
-            mainValue={floorNumber(
-              category.teneur_declared + category.pending_teneur,
-              0
-            )}
+            mainValue={formatNumber(getTotalTeneurDeclared(category), {
+              fractionDigits: 0,
+            })}
             mainText={t("GJ")}
           >
             {isDeclarationInCurrentPeriod && (

@@ -16,6 +16,9 @@ type CappedCategoriesProgressProps = {
   readOnly: boolean
 }
 
+export const getTotalTeneurDeclared = (category: CategoryObjective) => {
+  return floorNumber(category.teneur_declared + category.pending_teneur, 0)
+}
 export const CappedCategoriesProgress = ({
   categories,
   onCategoryClick,
@@ -36,10 +39,9 @@ export const CappedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={category.code}
-            mainValue={floorNumber(
-              category.teneur_declared + category.pending_teneur,
-              0
-            )}
+            mainValue={formatNumber(getTotalTeneurDeclared(category), {
+              fractionDigits: 0,
+            })}
             description={t(
               "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
               {

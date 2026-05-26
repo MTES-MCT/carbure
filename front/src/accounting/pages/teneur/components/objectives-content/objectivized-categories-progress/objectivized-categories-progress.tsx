@@ -15,6 +15,12 @@ type ObjectivizedCategoriesProgressProps = {
   readOnly: boolean
 }
 
+export const getTotalTeneurDeclared = (category: CategoryObjective) => {
+  return (
+    floorNumber(category.teneur_declared, 0) +
+    floorNumber(category.pending_teneur, 0)
+  )
+}
 export const ObjectivizedCategoriesProgress = ({
   categories,
   onCategoryClick,
@@ -37,10 +43,9 @@ export const ObjectivizedCategoriesProgress = ({
           <CardProgress
             key={category.code}
             title={category.code}
-            mainValue={
-              floorNumber(category.teneur_declared, 0) +
-              floorNumber(category.pending_teneur, 0)
-            }
+            mainValue={formatNumber(getTotalTeneurDeclared(category), {
+              fractionDigits: 0,
+            })}
             mainText={t("GJ")}
             description={t(
               "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
