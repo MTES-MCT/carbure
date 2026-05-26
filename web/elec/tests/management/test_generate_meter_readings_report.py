@@ -51,7 +51,16 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         YearConfig.objects.create(year=2022, renewable_share=ENR_RATIO * 100)
         YearConfig.objects.create(year=2023, renewable_share=ENR_RATIO * 100)
 
-    def setup_meter_reading(self, quarter, year, reading_energy, reading_date, certificate_energy, meter=None):
+    def setup_meter_reading(
+        self,
+        quarter,
+        year,
+        reading_energy,
+        reading_date,
+        certificate_energy,
+        meter=None,
+        operating_unit="FRBLA",
+    ):
         application = ElecMeterReadingApplication.objects.create(
             status=ElecMeterReadingApplication.ACCEPTED,
             quarter=quarter,
@@ -66,15 +75,17 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             application=application,
             meter=meter or self.meter,
             enr_ratio=ENR_RATIO,
+            operating_unit=operating_unit,
         )
 
         ElecProvisionCertificate.objects.create(
             cpo=self.cpo,
-            quarter=1,
-            year=2024,
-            operating_unit="FRBLA",
+            quarter=quarter,
+            year=year,
+            operating_unit=operating_unit,
             source=ElecProvisionCertificate.METER_READINGS,
             energy_amount=certificate_energy,
+            enr_ratio=ENR_RATIO,
         )
 
         return meter_reading
@@ -97,7 +108,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         charge_point.save(update_fields=["current_meter"])
         return meter
 
-    def run_command(self, year=None, apply_readjustments=False):
+    def run_command(self, year=2023, apply_readjustments=False):
         report = call_command("generate_meter_readings_report", year=year, apply=apply_readjustments, stdout=StringIO())
         return json.loads(report)
 
@@ -176,6 +187,7 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
         ).get()
 
         self.assertEqual(readjustment.energy_amount, expected_readjustment_energy / 1000)
+        self.assertEqual(readjustment.enr_ratio, ENR_RATIO)
 
     def test_report_takes_already_defined_readjustments_into_account(self):
         self.setup_meter_reading(
@@ -214,8 +226,10 @@ class GenerateMeterReadingsReportCommandTest(TestCase):
             cpo=self.cpo,
             quarter=1,
             year=2023,
+            operating_unit="FRBLA",
             energy_amount=10000 * ENR_RATIO / 1000,
             source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION,
+            enr_ratio=ENR_RATIO,
         )
 
         self.assertEqual(

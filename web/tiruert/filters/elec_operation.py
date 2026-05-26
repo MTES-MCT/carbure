@@ -1,14 +1,17 @@
 from django.db.models import Q
-from django_filters import CharFilter, DateFilter, FilterSet
+from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter
 from drf_spectacular.utils import extend_schema_field
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
+from core.models import Entity
 from tiruert.filters.custom_filters import CustomOrderingFilter
 from tiruert.models import ElecOperation
 
 
 class BaseFilter(FilterSet):
     entity_id = CharFilter(method="filter_entity")
+    selected_entity_id = NumberFilter(method="ignore")
     date_to = DateFilter(field_name="created_at", lookup_expr="lte")
     operation = CharFilter(method="filter_operation")
     status = CharFilter(method="filter_status")
@@ -38,6 +41,14 @@ class BaseFilter(FilterSet):
         return self.filter_multiple_values(queryset, "status", "status")
 
     def filter_entity(self, queryset, name, value):
+        entity = getattr(self.request, "entity", None)
+
+        # DGEC case: ignore entity_id for filtering, entity_id is just for permissions
+        if "selected_entity_id" in self.data:
+            if not entity.entity_type == Entity.ADMIN:
+                raise PermissionDenied()
+            value = self.data["selected_entity_id"]
+
         return queryset.filter(Q(credited_entity=value) | Q(debited_entity=value)).distinct()
 
     def filter_from_to(self, queryset, name, value):
@@ -87,6 +98,9 @@ class BaseFilter(FilterSet):
             operations.remove("CESSION")
         q_objects |= Q(type__in=operations)
         return queryset.filter(q_objects).distinct()
+
+    def ignore(self, queryset, name, value):
+        return queryset
 
 
 class ElecOperationFilter(BaseFilter):

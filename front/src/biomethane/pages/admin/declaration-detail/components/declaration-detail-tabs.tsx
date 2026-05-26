@@ -7,7 +7,7 @@ import { compact } from "common/utils/collection"
 export const DeclarationDetailTabs = () => {
   const { t } = useTranslation()
   const declarationDetailRoutes = useDeclarationDetailRoutes()
-  const { canAccessContract, canAccessInjection } = useBiomethanePermissions()
+  const { adminPermissions } = useBiomethanePermissions()
 
   return (
     <Tabs
@@ -27,7 +27,7 @@ export const DeclarationDetailTabs = () => {
           label: t("Approvisionnement"),
           path: declarationDetailRoutes.SUPPLY_PLAN,
         },
-        canAccessContract && {
+        adminPermissions.canAccessContract && {
           key: "contract",
           label: t("Contrat"),
           path: declarationDetailRoutes.CONTRACT,
@@ -37,7 +37,7 @@ export const DeclarationDetailTabs = () => {
           label: t("Production"),
           path: declarationDetailRoutes.PRODUCTION,
         },
-        canAccessInjection && {
+        adminPermissions.canAccessInjection && {
           key: "injection",
           label: t("Site d'injection"),
           path: declarationDetailRoutes.INJECTION,

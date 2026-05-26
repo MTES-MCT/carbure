@@ -11,31 +11,39 @@ export type BiomethanePermissionKey =
   (typeof BIOMETHANE_PERMISSIONS)[keyof typeof BIOMETHANE_PERMISSIONS]
 
 export interface BiomethanePermissionsManager {
-  canAccessAdmin: boolean
-  canAccessContract: boolean
-  canAccessInjection: boolean
   canAccessModule: boolean
 
   // Can edit the declaration if the entity has write rights and is a DREAL
   canEditDeclaration: boolean
 
-  // Can access the supply plan admin endpoint if the entity has ADEME rights
-  canAccessSupplyPlanAdmin: boolean
+  adminPermissions: {
+    canAccessAdmin: boolean
+    // Can access the supply plan admin endpoint if the entity has ADEME rights
+    canAccessSupplyPlan: boolean
+    canAccessContract: boolean
+    canAccessInjection: boolean
+    canDownloadDeclaration: boolean
+  }
 }
 
 export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
   const user = useUser()
   const entity = useEntity()
 
+  const isDreal = entity.hasAnyAdminRight([ExternalAdminPages.DREAL])
+
   const permissions = useMemo(() => {
     if (!user.isAuthenticated())
       return {
-        canAccessAdmin: false,
-        canAccessContract: false,
-        canAccessInjection: false,
         canAccessModule: false,
         canEditDeclaration: false,
-        canAccessSupplyPlanAdmin: false,
+        adminPermissions: {
+          canAccessAdmin: false,
+          canAccessSupplyPlan: false,
+          canAccessContract: false,
+          canAccessInjection: false,
+          canDownloadDeclaration: false,
+        },
       }
     const canAccessAdmin = entity.hasAnyAdminRight([
       ExternalAdminPages.DREAL,
@@ -43,15 +51,17 @@ export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
     ])
 
     return {
-      canAccessAdmin,
-      canAccessContract: entity.hasAdminRight(ExternalAdminPages.DREAL),
-      canAccessInjection: entity.hasAdminRight(ExternalAdminPages.DREAL),
-      canEditDeclaration:
-        entity.canWrite() && entity.hasAdminRight(ExternalAdminPages.DREAL),
       canAccessModule: entity.isBiomethaneProducer || canAccessAdmin,
-      canAccessSupplyPlanAdmin: entity.hasAdminRight(ExternalAdminPages.DREAL),
+      canEditDeclaration: entity.canWrite() && isDreal,
+      adminPermissions: {
+        canAccessAdmin: canAccessAdmin,
+        canAccessSupplyPlan: isDreal,
+        canAccessContract: isDreal,
+        canAccessInjection: isDreal,
+        canDownloadDeclaration: isDreal,
+      },
     }
-  }, [entity, user])
+  }, [entity, user, isDreal])
 
   return permissions
 }

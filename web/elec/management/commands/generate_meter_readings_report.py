@@ -2,45 +2,89 @@ import json
 
 import pandas as pd
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db.models import ExpressionWrapper, F, FloatField
 from django.db.models.aggregates import Sum
+from django.db.models.functions import Coalesce
 
 from elec.models import ElecCertificateReadjustment, ElecMeterReading, ElecProvisionCertificate
 from elec.models.elec_meter_reading_application import ElecMeterReadingApplication
 
 
-def _get_real_total_energy_declared(cpo_id):
-    result = (
+def _get_real_total_energy_declared(cpo_id, year):
+    energy_queryset = (
         ElecMeterReading.extended_objects.select_related("application")
-        .filter(cpo_id=cpo_id, application__status=ElecMeterReadingApplication.ACCEPTED)
-        .aggregate(Sum("renewable_energy"))
+        .filter(cpo_id=cpo_id, application__status=ElecMeterReadingApplication.ACCEPTED, application__year=year)
+        .annotate(
+            renewable_energy_value=ExpressionWrapper(
+                F("renewable_energy"),
+                output_field=FloatField(),
+            ),
+            non_renewable_energy_value=ExpressionWrapper(
+                F("current_index") - F("prev_index"),
+                output_field=FloatField(),
+            ),
+        )
     )
 
-    return result["renewable_energy__sum"] or 0
+    result = energy_queryset.aggregate(
+        renewable_energy=Coalesce(Sum("renewable_energy_value"), 0.0),
+        non_renewable_energy=Coalesce(Sum("non_renewable_energy_value"), 0.0),
+    )
+
+    return result["renewable_energy"], result["non_renewable_energy"]
 
 
-def _get_certificates_energy_amount(cpo_id):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT SUM(energy_amount) FROM elec_provision_certificate epc
-            WHERE epc.cpo_id = %s AND epc.source = "METER_READINGS"
-            """,
-            [cpo_id],
-        )
-        result = cursor.fetchone()
+def _get_certificates_energy_amount_by_source(cpo_id, year, source):
+    certificate_queryset = ElecProvisionCertificate.objects.filter(
+        cpo_id=cpo_id,
+        source=source,
+        year=year,
+    ).annotate(
+        renewable_energy_value=ExpressionWrapper(
+            F("energy_amount"),
+            output_field=FloatField(),
+        ),
+        non_renewable_energy_value=ExpressionWrapper(
+            F("energy_amount") / F("enr_ratio"),
+            output_field=FloatField(),
+        ),
+    )
 
-        return result[0] * 1000 if result and result[0] is not None else 0
+    result = certificate_queryset.aggregate(
+        renewable_energy=Coalesce(Sum("renewable_energy_value"), 0.0),
+        non_renewable_energy=Coalesce(Sum("non_renewable_energy_value"), 0.0),
+    )
+
+    return result["renewable_energy"] * 1000, result["non_renewable_energy"] * 1000
+
+
+def _get_meter_readings_readjustment_energy(cpo_id, year):
+    result = ElecCertificateReadjustment.objects.filter(
+        cpo_id=cpo_id,
+        error_source=ElecCertificateReadjustment.METER_READINGS,
+        year=year,
+    ).aggregate(
+        renewable_energy=Coalesce(Sum("energy_amount"), 0.0),
+        non_renewable_energy=Coalesce(
+            ExpressionWrapper(
+                Sum(F("energy_amount") / F("enr_ratio")),
+                output_field=FloatField(),
+            ),
+            0.0,
+        ),
+    )
+    return result["renewable_energy"] * 1000, result["non_renewable_energy"] * 1000
 
 
 class Command(BaseCommand):
+    # Command : python web/manage.py generate_meter_readings_report --year 2025 --log
     help = "Generate a report for all the meter readings registered in Carbure"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--year",
             type=int,
-            default=None,
+            required=True,
             help="Year of meter readings to include in the report",
         )
         parser.add_argument(
@@ -73,8 +117,11 @@ class Command(BaseCommand):
         csv = options.get("csv")
         cpo = options.get("cpo")
         apply_readjustments = options.get("apply")
+        year = options.get("year")
 
-        cpo_with_readings = ElecMeterReading.objects.select_related("cpo").values("cpo_id", "cpo__name")
+        cpo_with_readings = (
+            ElecMeterReading.objects.select_related("cpo").values("cpo_id", "cpo__name").filter(application__year=year)
+        )
 
         if cpo is not None:
             cpo_with_readings = cpo_with_readings.filter(cpo_id=cpo)
@@ -85,28 +132,33 @@ class Command(BaseCommand):
         total_surplus = 0
 
         for cpo in cpo_with_readings:
-            total_meter_reading_energy = _get_real_total_energy_declared(cpo["cpo_id"])
-            total_provision_certificate_energy = _get_certificates_energy_amount(cpo["cpo_id"])
-
-            total_admin_error_readjustment_dict = ElecProvisionCertificate.objects.filter(
-                cpo_id=cpo["cpo_id"], source=ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION
-            ).aggregate(Sum("energy_amount"))
-            total_admin_error_readjustment = (
-                total_admin_error_readjustment_dict.get("energy_amount__sum") or 0
-            ) * 1000  # back to kWh to match meter reading energy values
-
-            total_cpo_readjustment_dict = ElecCertificateReadjustment.objects.filter(
-                cpo_id=cpo["cpo_id"], error_source=ElecCertificateReadjustment.METER_READINGS
-            ).aggregate(Sum("energy_amount"))
-            total_cpo_readjustment = (
-                total_cpo_readjustment_dict.get("energy_amount__sum") or 0
-            ) * 1000  # back to kWh to match meter reading energy values
+            total_meter_reading_energy, total_non_renewable_meter_reading_energy = _get_real_total_energy_declared(
+                cpo["cpo_id"], year
+            )
+            total_provision_certificate_energy, total_non_renewable_provision_certificate_energy = (
+                _get_certificates_energy_amount_by_source(cpo["cpo_id"], year, ElecProvisionCertificate.METER_READINGS)
+            )
+            total_admin_error_readjustment, total_non_renewable_admin_error_readjustment = (
+                _get_certificates_energy_amount_by_source(
+                    cpo["cpo_id"], year, ElecProvisionCertificate.ADMIN_ERROR_COMPENSATION
+                )
+            )
+            total_cpo_readjustment, total_non_renewable_cpo_readjustment = _get_meter_readings_readjustment_energy(
+                cpo["cpo_id"], year
+            )
 
             diff = (
                 total_provision_certificate_energy
                 - total_meter_reading_energy
                 - total_cpo_readjustment
                 + total_admin_error_readjustment
+            )
+
+            non_renewable_diff = (
+                total_non_renewable_provision_certificate_energy
+                - total_non_renewable_meter_reading_energy
+                - total_non_renewable_cpo_readjustment
+                + total_non_renewable_admin_error_readjustment
             )
 
             # if diff is more than 100 kWh, it's a significant difference
@@ -120,12 +172,17 @@ class Command(BaseCommand):
 
                 # create a readjustment only if the cpo has a positive surplus
                 if apply_readjustments and diff > 0:
+                    renewable_mwh = round(diff / 1000, 2)
+                    non_renewable_mwh = round(non_renewable_diff / 1000, 2)
+                    enr_ratio = round(renewable_mwh / non_renewable_mwh, 4) if non_renewable_mwh else 0.25
+
                     ElecCertificateReadjustment.objects.create(
                         cpo_id=cpo["cpo_id"],
                         error_source=ElecCertificateReadjustment.METER_READINGS,
-                        # back to MWh to match the energy_amount field
-                        energy_amount=round(diff / 1000, 2),
+                        energy_amount=renewable_mwh,
+                        enr_ratio=enr_ratio,
                         reason="Différence entre l'énergie générée par certificats et l'énergie déclarée dans les relevés",
+                        year=year,
                     )
 
         if log:

@@ -11,6 +11,7 @@ import { formatDate } from "common/utils/formatters"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type ContractFile = {
   name: string
@@ -23,6 +24,7 @@ export const ContractFiles = ({
   contract?: BiomethaneContract
 }) => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const portal = usePortal()
   const allowedToEdit = useAllowedToEdit()
   const { annualDeclarationKey } = useAnnualDeclaration()
@@ -96,7 +98,7 @@ export const ContractFiles = ({
                   ? formatDate(contract.signature_date)
                   : ""
               }
-              label={t("Date de signature")}
+              label={tBiomethaneInput("contract.signature_date")}
             />
             <DateInput
               readOnly
@@ -105,7 +107,7 @@ export const ContractFiles = ({
                   ? formatDate(contract.effective_date)
                   : ""
               }
-              label={t("Date de prise d'effet")}
+              label={tBiomethaneInput("contract.effective_date")}
             />
           </Grid>
 

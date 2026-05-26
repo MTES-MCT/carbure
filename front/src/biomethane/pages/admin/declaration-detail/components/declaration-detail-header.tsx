@@ -44,6 +44,7 @@ export const DeclarationDetailHeader = ({
       />
 
       <SelectYears key={selectedEntityId} />
+
       {/* Only display the open badge if the declaration exists */}
       {annualDeclaration?.status && (
         <AnnualDeclarationStatusBadge status={annualDeclaration.status} />

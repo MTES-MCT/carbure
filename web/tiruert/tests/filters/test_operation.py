@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 from django.http import QueryDict
 from django.test import RequestFactory, TestCase
+from rest_framework.exceptions import PermissionDenied
 
 from core.models import Entity
 from tiruert.filters.operation import BaseFilter, OperationFilterForBalance
@@ -61,6 +62,42 @@ class BaseFilterTest(TestCase):
         # Verify it filters by to_depot_id in accessible depot list
         self.assertIn(("to_depot_id__in", [1, 2, 3]), q_filter.children)
         entity.get_accessible_depots.assert_called_once()
+
+    def test_filter_entity_with_selected_entity_id_for_admin(self):
+        """DGEC admin (Entity.ADMIN) can use selected_entity_id to filter by a different entity."""
+        entity = Mock(spec=Entity, id=9, entity_type=Entity.ADMIN)
+        entity.has_external_admin_right.return_value = False
+
+        queryset = Mock()
+        queryset.filter.return_value.distinct.return_value = queryset
+
+        request = self.factory.get("/test/?entity_id=9&selected_entity_id=2")
+        request.entity = entity
+
+        filterset = BaseFilter({"entity_id": "9", "selected_entity_id": "2"}, queryset=queryset, request=request)
+        filterset.filter_entity(queryset, "entity_id", "9")
+
+        # Should filter by selected_entity_id=2, not entity_id=9
+        queryset.filter.assert_called_once()
+        q_filter = queryset.filter.call_args[0][0]
+        self.assertEqual(q_filter.connector, "OR")
+        self.assertIn(("credited_entity", "2"), q_filter.children)
+        self.assertIn(("debited_entity", "2"), q_filter.children)
+
+    def test_filter_entity_with_selected_entity_id_raises_for_non_admin(self):
+        """Non-admin entity cannot use selected_entity_id — PermissionDenied is raised."""
+        entity = Mock(spec=Entity, id=1, entity_type=Entity.OPERATOR)
+        entity.has_external_admin_right.return_value = False
+
+        queryset = Mock()
+
+        request = self.factory.get("/test/?entity_id=1&selected_entity_id=2")
+        request.entity = entity
+
+        filterset = BaseFilter({"entity_id": "1", "selected_entity_id": "2"}, queryset=queryset, request=request)
+
+        with self.assertRaises(PermissionDenied):
+            filterset.filter_entity(queryset, "entity_id", "1")
 
     def test_filter_from_to_with_multiple_entities(self):
         """Test filter_from_to filters by multiple entity names (credited OR debited)."""

@@ -19,6 +19,7 @@ import { useSaveProductionUnit } from "../production.hooks"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type ProductionSiteForm = Pick<
   ProductionUnitForm,
@@ -46,6 +47,7 @@ export function ProductionSite({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<ProductionSiteForm>()
@@ -135,7 +137,7 @@ export function ProductionSite({
             <RadioGroup
               required
               readOnly={!isEditing}
-              label={t("Type de voie")}
+              label={tBiomethaneInput("production.process_type")}
               options={processTypeOptions}
               {...bind("process_type")}
             />
@@ -144,7 +146,7 @@ export function ProductionSite({
             <RadioGroup
               required
               readOnly={!isEditing}
-              label={t("Procédé méthanisation")}
+              label={tBiomethaneInput("production.methanization_process")}
               options={methanizationProcessOptions}
               {...bind("methanization_process")}
             />
@@ -154,13 +156,13 @@ export function ProductionSite({
             readOnly={!isEditing}
             min={0}
             max={100}
-            label={t("Rendement moyen de l'épurateur de l'installation (%)")}
+            label={tBiomethaneInput("production.production_efficiency")}
             step={0.1}
             {...bind("production_efficiency")}
           />
           <CheckboxGroup
             readOnly={!isEditing}
-            label={t("Débitmètre présent sur votre installation :")}
+            label={tBiomethaneInput("production.installed_meters")}
             options={installedMetersOptions}
             {...bind("installed_meters")}
           />
@@ -169,7 +171,7 @@ export function ProductionSite({
               <RadioGroup
                 required
                 readOnly={!isEditing}
-                label={t("Présence d'un hygiénisateur")}
+                label={tBiomethaneInput("production.has_hygienization_unit")}
                 options={getYesNoOptions()}
                 orientation="horizontal"
                 {...bind("has_hygienization_unit")}
@@ -178,7 +180,9 @@ export function ProductionSite({
             <RadioGroup
               required
               readOnly={!isEditing}
-              label={t("Existence d'un procédé de valorisation du CO2 ?")}
+              label={tBiomethaneInput(
+                "production.has_co2_valorization_process"
+              )}
               options={getYesNoOptions()}
               orientation="horizontal"
               {...bind("has_co2_valorization_process")}

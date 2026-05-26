@@ -3,42 +3,27 @@ from unittest.mock import ANY, MagicMock, patch
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from edelivery.ebms.converters import UDBConversionError
-from edelivery.ebms.request_responses import BaseRequestResponse, EOGetTransactionResponse
+from edelivery.ebms.request_responses.eo_get_transaction_response import EOGetTransactionResponse
 from edelivery.tests.ebms.fixtures.payloads import eo_get_transaction_response_payload
-
-
-class BaseRequestResponseTest(TestCase):
-    @staticmethod
-    def payload(request_id):
-        return f"""\
-<?xml version="1.0" encoding="UTF-8"?>
-<udb:GetSourcingContactByIDResponse
-  xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
-  <RESPONSE_HEADER REQUEST_ID="{request_id}"/>
-  <!-- … -->
-</udb:GetSourcingContactByIDResponse>"""
-
-    def test_extract_request_id(self):
-        response = BaseRequestResponse(self.payload("12345"))
-        self.assertEqual("12345", response.request_id())
 
 
 class BaseEOGetTransactionResponseTest(TestCase):
     def setUp(self):
         self.maxDiff = None
-        self.patched_Biocarburant = patch("edelivery.ebms.request_responses.Biocarburant").start()
+        module_name = "edelivery.ebms.request_responses.eo_get_transaction_response"
+        self.patched_Biocarburant = patch(f"{module_name}.Biocarburant").start()
         self.patched_Biocarburant.objects.get.return_value = Biocarburant()
 
-        self.patched_CarbureLot = patch("edelivery.ebms.request_responses.CarbureLot").start()
+        self.patched_CarbureLot = patch(f"{module_name}.CarbureLot").start()
         self.patched_CarbureLot.objects.get.return_value = MagicMock()
 
-        self.patched_Entity = patch("edelivery.ebms.request_responses.Entity").start()
+        self.patched_Entity = patch(f"{module_name}.Entity").start()
         self.patched_Entity.objects.get.return_value = Entity()
 
-        self.patched_MatierePremiere = patch("edelivery.ebms.request_responses.MatierePremiere").start()
+        self.patched_MatierePremiere = patch(f"{module_name}.MatierePremiere").start()
         self.patched_MatierePremiere.objects.get.return_value = MatierePremiere()
 
-        self.patched_Transaction = patch("edelivery.ebms.request_responses.Transaction").start()
+        self.patched_Transaction = patch(f"{module_name}.Transaction").start()
         self.patched_Transaction.return_value.to_lot_attributes.return_value = {
             "biofuel_code": "",
             "carbure_supplier_id": 11111,
@@ -46,9 +31,9 @@ class BaseEOGetTransactionResponseTest(TestCase):
             "lot_status": "",
         }
 
-        self.patched_create_lot = patch("edelivery.ebms.request_responses.create_lot").start()
-        self.patched_do_update_lot = patch("edelivery.ebms.request_responses.do_update_lot").start()
-        self.patched_log_error = patch("edelivery.ebms.request_responses.log_error").start()
+        self.patched_create_lot = patch(f"{module_name}.create_lot").start()
+        self.patched_do_update_lot = patch(f"{module_name}.do_update_lot").start()
+        self.patched_log_error = patch(f"{module_name}.log_error").start()
 
     def tearDown(self):
         patch.stopall()

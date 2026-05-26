@@ -31,6 +31,7 @@ export const getBalancesWithUpdatedAvailableBalance = http.get(
         },
       ],
       count: 1,
+      total_quantity: 2500,
     })
   }
 )

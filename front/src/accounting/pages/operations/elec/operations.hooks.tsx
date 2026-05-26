@@ -105,11 +105,18 @@ export const useOperationsElecColumns = () => {
   return columns
 }
 
-export const useGetFilterOptions = (query: ElecOperationsQuery) => {
+export const useGetFilterOptions = (
+  query: ElecOperationsQuery,
+  selectedEntityId?: number
+) => {
   const { t } = useTranslation()
 
   const getFilterOptions = async (filter: string) => {
-    const { data } = await api.getOperationsFilters(filter, query)
+    const { data } = await api.getOperationsFilters(
+      filter,
+      query,
+      selectedEntityId
+    )
 
     if (!data) {
       return []

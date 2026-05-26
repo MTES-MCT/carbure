@@ -14,6 +14,7 @@ import {
 } from "./quantity-form.hooks"
 import { ExtendedUnitType } from "common/types"
 import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
+import { formatNumber } from "common/utils/formatters"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -221,7 +222,9 @@ const QuantitySection = ({
                   quantity: formatUnit(value.quantity!, {
                     fractionDigits: 10,
                   }),
-                  value: value.avoided_emissions_min,
+                  value: formatNumber(value.avoided_emissions_min, {
+                    fractionDigits: 2,
+                  }),
                 }}
                 defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
               />
@@ -233,8 +236,12 @@ const QuantitySection = ({
                   quantity: formatUnit(value.quantity!, {
                     fractionDigits: 10,
                   }),
-                  min: value.avoided_emissions_min,
-                  max: value.avoided_emissions_max,
+                  min: formatNumber(value.avoided_emissions_min, {
+                    fractionDigits: 2,
+                  }),
+                  max: formatNumber(value.avoided_emissions_max, {
+                    fractionDigits: 2,
+                  }),
                 }}
                 defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
               />

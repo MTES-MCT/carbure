@@ -25,6 +25,7 @@ import {
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { getYesNoOptions } from "common/utils/normalizers"
 import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type EnergyEfficiencyForm = DeepPartial<
   Pick<
@@ -60,6 +61,7 @@ export function EnergyEfficiency({
   readonly contract?: BiomethaneContract
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
 
   const { bind, value } = useFormContext<EnergyEfficiencyForm>()
   const saveEnergy = useSaveEnergy()
@@ -153,8 +155,8 @@ export function EnergyEfficiency({
                     />
                     <NumberInput
                       readOnly={!isEditing}
-                      label={t(
-                        "Consommation électrique soutirée pour l'ensemble de l'unité (kWe)"
+                      label={tBiomethaneInput(
+                        "energy.total_unit_electric_consumption_kwe"
                       )}
                       hintText={t(
                         "Consommation d’électricité soutirée sur le réseau public d’électricité d’une installation de production de biométhane, cumulée le cas échéant avec la consommation de l’installation d’injection associée"
@@ -172,9 +174,7 @@ export function EnergyEfficiency({
             <Grid cols={2} gap="lg">
               <RadioGroup
                 readOnly={!isEditing}
-                label={t(
-                  "Addition de butane ou propane lors de l'injection du biométhane dans le réseau"
-                )}
+                label={tBiomethaneInput("energy.butane_or_propane_addition")}
                 {...bind("butane_or_propane_addition")}
                 required
                 options={getYesNoOptions()}
@@ -182,7 +182,7 @@ export function EnergyEfficiency({
               />
               <NumberInput
                 readOnly={!isEditing}
-                label={t("Quantité de combustible fossile consommé (kWh)")}
+                label={tBiomethaneInput("energy.fossil_fuel_consumed_kwh")}
                 min={0}
                 {...bind("fossil_fuel_consumed_kwh")}
                 required

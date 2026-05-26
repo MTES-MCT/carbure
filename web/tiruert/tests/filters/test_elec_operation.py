@@ -3,7 +3,9 @@ from unittest.mock import Mock
 from django.db.models import Q
 from django.http import QueryDict
 from django.test import RequestFactory, SimpleTestCase
+from rest_framework.exceptions import PermissionDenied
 
+from core.models import Entity
 from tiruert.filters.elec_operation import ElecOperationFilter
 from tiruert.models import ElecOperation
 
@@ -108,3 +110,33 @@ class ElecOperationFilterTest(SimpleTestCase):
         expected = Q(credited_entity__name__in=["A", "B"]) | Q(debited_entity__name__in=["A", "B"])
         self.queryset.filter.assert_called_once_with(expected)
         self.queryset.distinct.assert_called_once()
+
+    def test_filter_entity_with_selected_entity_id_for_admin(self):
+        """DGEC admin (Entity.ADMIN) can use selected_entity_id to filter by a different entity."""
+        entity = Mock(spec=Entity, id=9, entity_type=Entity.ADMIN)
+        request = self.factory.get("/test/?entity_id=9&selected_entity_id=2")
+        request.query_params = request.GET
+        request.entity = entity
+        data = QueryDict("entity_id=9&selected_entity_id=2")
+        filter_set = ElecOperationFilter(data, queryset=self.queryset, request=request)
+
+        filter_set.filter_entity(self.queryset, "entity_id", "9")
+
+        # Should filter by selected_entity_id=2, not entity_id=9
+        self.queryset.filter.assert_called_once()
+        q_filter = self.queryset.filter.call_args[0][0]
+        self.assertEqual(q_filter.connector, "OR")
+        self.assertIn(("credited_entity", "2"), q_filter.children)
+        self.assertIn(("debited_entity", "2"), q_filter.children)
+
+    def test_filter_entity_with_selected_entity_id_raises_for_non_admin(self):
+        """Non-admin entity cannot use selected_entity_id — PermissionDenied is raised."""
+        entity = Mock(spec=Entity, id=1, entity_type=Entity.OPERATOR)
+        request = self.factory.get("/test/?entity_id=1&selected_entity_id=2")
+        request.query_params = request.GET
+        request.entity = entity
+        data = QueryDict("entity_id=1&selected_entity_id=2")
+        filter_set = ElecOperationFilter(data, queryset=self.queryset, request=request)
+
+        with self.assertRaises(PermissionDenied):
+            filter_set.filter_entity(self.queryset, "entity_id", "1")

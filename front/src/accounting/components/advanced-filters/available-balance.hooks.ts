@@ -10,6 +10,7 @@ import { AdvancedFiltersFormProps } from "./advanced-filters.types"
 import { ExtendedUnitType } from "common/types"
 import { useEffect } from "react"
 import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
+import { floorNumber } from "common/utils/formatters"
 
 const debouncedGetBalance = debounce(
   (entityId, biofuel, sector, category, filters, unit) =>
@@ -22,7 +23,9 @@ const debouncedGetBalance = debounce(
       ...mapAdvancedFiltersForPayload(filters),
       unit,
     }).then((res) => {
-      if (res.data.total_quantity === 0) return undefined
+      const quantity = floorNumber(res.data.total_quantity ?? 0, 0)
+
+      if (quantity === 0) return undefined
 
       return res.data.results.length > 0 ? res.data.results[0] : undefined
     }),

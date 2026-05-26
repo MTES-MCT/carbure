@@ -1,4 +1,4 @@
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export const getAnnualDeclarationYears = (entity_id: number) =>
@@ -52,4 +52,15 @@ export const patchAnnualDeclaration = (
       },
     },
     body: data,
+  })
+
+export const downloadAnnualDeclaration = (
+  entity_id: number,
+  year: number,
+  producer_id?: number
+) =>
+  download("/biomethane/export/", {
+    entity_id,
+    year,
+    producer_id,
   })

@@ -274,3 +274,85 @@ class OperationViewSetIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Operation.objects.filter(id=operation.id).exists())
+
+
+class OperationViewSetDGECIntegrationTest(TestCase):
+    """Integration tests for DGEC admin using selected_entity_id."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/entities.json",
+        "json/depots.json",
+        "json/entities_sites.json",
+    ]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.dgec_entity = Entity.objects.create(name="MTE - DGEC", entity_type=Entity.ADMIN)
+        cls.operator = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        cls.other_operator = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=cls.operator.id).first()
+        cls.depot = Depot.objects.first()
+        cls.biofuel_eth = Biocarburant.objects.get(code="ETH")
+
+        # Operations belonging to operator
+        cls.op_credited = Operation.objects.create(
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            customs_category="CONV",
+            biofuel=cls.biofuel_eth,
+            credited_entity=cls.operator,
+            to_depot=cls.depot,
+            renewable_energy_share=1.0,
+        )
+        cls.op_debited = Operation.objects.create(
+            type=Operation.CESSION,
+            status=Operation.PENDING,
+            customs_category="CONV",
+            biofuel=cls.biofuel_eth,
+            debited_entity=cls.operator,
+            credited_entity=cls.other_operator,
+            to_depot=cls.depot,
+            renewable_energy_share=1.0,
+        )
+        # Operation unrelated to operator
+        cls.op_other = Operation.objects.create(
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            customs_category="CONV",
+            biofuel=cls.biofuel_eth,
+            credited_entity=cls.other_operator,
+            to_depot=cls.depot,
+            renewable_energy_share=1.0,
+        )
+
+    def setUp(self):
+        self.user = setup_current_user(
+            self, "dgec@carbure.local", "DGEC", "password", [(self.dgec_entity, "ADMIN")], is_staff=True
+        )
+        self.url = reverse("operations-list")
+
+    def test_dgec_admin_can_list_operations_for_target_entity(self):
+        """DGEC admin using selected_entity_id should see only the target entity's operations."""
+        response = self.client.get(
+            self.url,
+            {"entity_id": self.dgec_entity.id, "selected_entity_id": self.operator.id},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        # Should see op_credited and op_debited, but not op_other
+        self.assertEqual(data["count"], 2)
+
+    def test_operator_cannot_use_selected_entity_id(self):
+        """A regular operator cannot use selected_entity_id — should get 403."""
+        # Re-login as operator
+        setup_current_user(self, "op@carbure.local", "Op", "password", [(self.operator, "ADMIN")])
+
+        response = self.client.get(
+            self.url,
+            {"entity_id": self.operator.id, "selected_entity_id": self.other_operator.id},
+        )
+
+        self.assertEqual(response.status_code, 403)

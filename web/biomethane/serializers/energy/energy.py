@@ -6,11 +6,11 @@ from biomethane.serializers.energy.monthly_report import BiomethaneEnergyMonthly
 
 class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
     energy_types = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneEnergy.ENERGY_TYPES),
+        child=serializers.ChoiceField(choices=BiomethaneEnergy.ENERGY_TYPES_CHOICES),
         required=False,
     )
     malfunction_types = serializers.ListField(
-        child=serializers.ChoiceField(choices=BiomethaneEnergy.MALFUNCTION_TYPES),
+        child=serializers.ChoiceField(choices=BiomethaneEnergy.MALFUNCTION_TYPES_CHOICES),
         required=False,
     )
 

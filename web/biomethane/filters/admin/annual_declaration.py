@@ -11,7 +11,3 @@ class BiomethaneAdminAnnualDeclarationFilter(FilterSet):
 
     department = AllValuesMultipleFilter(field_name="producer__biomethane_production_unit__department__code_dept")
     status = MultipleChoiceFilter(choices=BiomethaneAnnualDeclaration.DECLARATION_STATUS)
-
-    class Meta:
-        model = BiomethaneAnnualDeclaration
-        fields = ["tariff_reference", "department", "status"]

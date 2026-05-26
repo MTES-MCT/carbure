@@ -12,8 +12,7 @@ export const useBiomethane = () => {
   const { t } = useTranslation()
   const loc = useLocation()
   const { isBiomethaneProducer } = useEntity()
-  const { canAccessAdmin, canAccessSupplyPlanAdmin } =
-    useBiomethanePermissions()
+  const { adminPermissions } = useBiomethanePermissions()
 
   const { digestate } = useBiomethaneBusinessRules()
 
@@ -53,7 +52,7 @@ export const useBiomethane = () => {
 
   const biomethaneAdminMenu: MenuSection = {
     title: t("Biométhane"),
-    condition: canAccessAdmin,
+    condition: adminPermissions.canAccessAdmin,
     children: [
       {
         path: routes.BIOMETHANE().ADMIN.DASHBOARD,
@@ -66,7 +65,7 @@ export const useBiomethane = () => {
         title: t("Intrants"),
         icon: "ri-leaf-line",
         iconActive: "ri-leaf-fill",
-        condition: canAccessSupplyPlanAdmin,
+        condition: adminPermissions.canAccessSupplyPlan,
       },
       {
         path: routes.BIOMETHANE().ADMIN.DECLARATIONS,

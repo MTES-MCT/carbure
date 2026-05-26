@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import { isSendingOperation } from "./operations.utils"
+import { formatValue, isSendingOperation } from "./operations.utils"
 import * as api from "accounting/api/biofuels/operations"
 import {
   OperationDebitOrCredit,
@@ -27,6 +27,40 @@ import { useUnit } from "common/hooks/unit"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
+}
+
+const displayValueDebitOrCredit = (
+  value: number | string,
+  isOperationDebit: boolean,
+  isOperationRejected: boolean
+) => {
+  const operator = isOperationDebit ? "-" : "+"
+
+  return isOperationDebit ? (
+    <Text
+      size="sm"
+      fontWeight="semibold"
+      className={cl(
+        styles["operation-debit"],
+        isOperationRejected && styles["operation--rejected"]
+      )}
+    >
+      {operator}
+      {value}
+    </Text>
+  ) : (
+    <Text
+      size="sm"
+      fontWeight="semibold"
+      className={cl(
+        styles["operation-credit"],
+        isOperationRejected && styles["operation--rejected"]
+      )}
+    >
+      {operator}
+      {value}
+    </Text>
+  )
 }
 export const useOperationsBiofuelsColumns = ({
   onClickSector,
@@ -96,59 +130,61 @@ export const useOperationsBiofuelsColumns = ({
     {
       key: OperationOrder.quantity,
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
-      cell: (item) =>
-        isSendingOperation(item.quantity) ? (
-          <Text
-            size="sm"
-            fontWeight="semibold"
-            className={cl(
-              styles["operation-debit"],
-              item.status === OperationsStatus.REJECTED &&
-                styles["operation--rejected"]
-            )}
-          >
-            {formatNumber(
-              item.type === OperationType.INCORPORATION
-                ? item.quantity_renewable
-                : item.quantity,
-              {
-                fractionDigits: 0,
-              }
-            )}
-          </Text>
-        ) : (
-          <Text
-            size="sm"
-            fontWeight="semibold"
-            className={cl(
-              styles["operation-credit"],
-              item.status === OperationsStatus.REJECTED &&
-                styles["operation--rejected"]
-            )}
-          >
-            +
-            {formatNumber(
-              item.type === OperationType.INCORPORATION
-                ? item.quantity_renewable
-                : item.quantity,
-              {
-                fractionDigits: 0,
-              }
-            )}
-          </Text>
-        ),
+      style: {
+        minWidth: "140px",
+      },
+      cell: (item) => {
+        const calculatedQuantity = Math.abs(formatValue(item, item.quantity))
+        const formattedQuantity = formatNumber(calculatedQuantity, {
+          fractionDigits: 0,
+        })
+        return displayValueDebitOrCredit(
+          formattedQuantity,
+          isSendingOperation(item.quantity),
+          item.status === OperationsStatus.REJECTED
+        )
+      },
+    },
+    {
+      header: `${t("tCO2 évitées")}`,
+      cell: (item) => {
+        const calculatedAvoidedEmissions = Math.abs(
+          formatValue(item, item.avoided_emissions)
+        )
+        const formattedAvoidedEmissions = formatNumber(
+          calculatedAvoidedEmissions,
+          {
+            fractionDigits: 0,
+          }
+        )
+        return displayValueDebitOrCredit(
+          formattedAvoidedEmissions,
+          isSendingOperation(item.quantity),
+          item.status === OperationsStatus.REJECTED
+        )
+      },
+      style: {
+        minWidth: "140px",
+      },
     },
   ]
 
   return columns
 }
 
-export const useGetFilterOptions = (query: OperationsQuery) => {
+export const useGetFilterOptions = (
+  query: OperationsQuery,
+  selectedEntityId?: number
+) => {
   const { t } = useTranslation()
   const normalizeSector = useNormalizeSector()
 
   const getFilterOptions = async (filter: OperationsFilter) => {
-    const { data } = await api.getOperationsFilters(filter, query)
+    const { data } = await api.getOperationsFilters(
+      filter,
+      query,
+      selectedEntityId
+    )
 
     if (!data) {
       return []

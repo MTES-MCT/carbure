@@ -10,7 +10,6 @@ from huey.contrib.djhuey import db_periodic_task, db_task, periodic_task
 from carbure.scripts.create_declaration_reminder import create_declaration_reminder
 from carbure.scripts.send_notification_emails import send_notification_emails
 from carbure.scripts.update_2bs_certificates import update_2bs_certificates
-from carbure.scripts.update_iscc_certificates import update_iscc_certificates
 from carbure.scripts.update_redcert_certificates import update_redcert_certificates
 from elec.scripts.create_meter_readings_application_deadline_reminder import (
     create_meter_readings_application_deadline_reminder,
@@ -55,7 +54,7 @@ if env.get("IMAGE_TAG") == "prod":
 
     @db_periodic_task(crontab(day_of_week=7, hour=4, minute=0))
     def periodic_update_iscc_certificates() -> None:
-        update_iscc_certificates(email=True, latest=True)
+        call_command("import_iscc_certificates", email=True, latest=2000)
 
     @db_periodic_task(crontab(day_of_week=7, hour=5, minute=0))
     def periodic_update_redcert_certificates() -> None:
@@ -113,20 +112,35 @@ if env.get("IMAGE_TAG") == "prod":
         call_command("anonymize_inactive_users")
 
     # Biomethane declaration status update
-    @db_periodic_task(crontab(hour=0, minute=1))
+    @db_periodic_task(crontab(hour=0, minute=0))
     def create_new_biomethane_declaration() -> None:
         call_command("create_biomethane_annual_declarations")
 
-    @db_periodic_task(crontab(hour=0, minute=1))
+    @db_periodic_task(crontab(hour=0, minute=0))
     def close_biomethane_declaration_status() -> None:
         call_command("set_biomethane_declarations_open", "--open=false")
 
     # Tiruert update operations
-    @db_periodic_task(crontab(hour=0, minute=1))
+    @db_periodic_task(crontab(hour=0, minute=0))
     def run_tiruert_expiration_tasks() -> None:
         call_command("cancel_teneur_operations")
         # Only runs if cancel_teneur_operations succeeds (no exception raised)
         call_command("set_operations_expired")
+
+    # Tiruert snapshot objectives
+    @db_periodic_task(crontab(hour=0, minute=0))
+    def run_tiruert_snapshot_objectives() -> None:
+        call_command("snapshot_objectives")
+
+    # Tiruert aggregated objectives cache
+    @db_periodic_task(crontab(hour=3, minute=0))
+    def periodic_cache_tiruert_aggregated_objectives() -> None:
+        from tiruert.models import TiruertDeclarationPeriod
+        from tiruert.services.objective_snapshot import ObjectiveSnapshotService
+
+        years = TiruertDeclarationPeriod.objects.values_list("year", flat=True).distinct()
+        for year in years:
+            ObjectiveSnapshotService.compute_and_cache_aggregated(year)
 
 
 if env.get("IMAGE_TAG") == "staging":

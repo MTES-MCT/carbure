@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.ebms.request_responses import BaseRequestResponse
+from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
 from edelivery.ebms.requests import BaseRequest
 from edelivery.soap.requester import Requester
 

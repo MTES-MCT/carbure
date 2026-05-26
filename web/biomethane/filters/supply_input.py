@@ -5,13 +5,12 @@ from biomethane.models import BiomethaneSupplyInput
 from biomethane.permissions import is_entity_related_to_biomethane_external_admin
 
 
-class BaseBiomethaneSupplyInputFilter(FilterSet):
+class BiomethaneSupplyInputFilter(FilterSet):
     entity_id = CharFilter(method="filter_by_entity")
     producer_id = CharFilter(method="ignore")  # for typing purposes only
     feedstock = AllValuesMultipleFilter(field_name="feedstock__name", lookup_expr="exact", required=False)
     source = MultipleChoiceFilter(field_name="source", choices=BiomethaneSupplyInput.SOURCE_CHOICES, required=False)
     department = AllValuesMultipleFilter(field_name="origin_department", lookup_expr="exact", required=False)
-
     # Filter used for admin supply inputs page
     producer_name = AllValuesMultipleFilter(field_name="supply_plan__producer__name", lookup_expr="exact", required=False)
 
@@ -44,15 +43,5 @@ class BaseBiomethaneSupplyInputFilter(FilterSet):
         return queryset
 
 
-class BiomethaneSupplyInputFilter(BaseBiomethaneSupplyInputFilter):
+class BiomethaneSupplyInputYearFilter(BiomethaneSupplyInputFilter):
     year = NumberFilter(field_name="supply_plan__year", lookup_expr="exact", required=True)
-
-    class Meta:
-        model = BiomethaneSupplyInput
-        fields = ["entity_id", "producer_id", "year", "feedstock", "source", "producer_name"]
-
-
-class BiomethaneSupplyInputCreateFilter(BiomethaneSupplyInputFilter):
-    class Meta:
-        model = BiomethaneSupplyInput
-        fields = ["entity_id", "year"]

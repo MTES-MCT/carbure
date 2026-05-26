@@ -8,6 +8,7 @@ import { DeepPartial } from "common/types"
 import { BiomethaneDigestateInputRequest } from "../../types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type SaleForm = DeepPartial<
   Pick<BiomethaneDigestateInputRequest, "acquiring_companies" | "sold_volume">
@@ -22,6 +23,7 @@ const extractValues = (digestate?: SaleForm) => {
 
 export function Sale() {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<SaleForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
@@ -39,14 +41,14 @@ export function Sale() {
           <Grid cols={2} gap="lg">
             <TextInput
               readOnly={!isEditing}
-              label={t("Entreprise(s) acquérant le digestat")}
+              label={tBiomethaneInput("digestate.acquiring_companies")}
               hintText={t("Si plusieurs éléments, séparez par des virgules")}
               {...bind("acquiring_companies")}
               required
             />
             <NumberInput
               readOnly={!isEditing}
-              label={t("Volume vendu (t)")}
+              label={tBiomethaneInput("digestate.sold_volume")}
               type="number"
               min={0}
               {...bind("sold_volume")}

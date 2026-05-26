@@ -1,5 +1,5 @@
 from adapters.logger import log_error
-from edelivery.ebms.request_responses import BaseRequestResponse
+from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
 
 
 class BaseErrorResponse(BaseRequestResponse):

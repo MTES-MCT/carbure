@@ -8,23 +8,29 @@ import {
 
 export const getOperationsFilters = (
   filter: string,
-  query: ElecOperationsQuery
+  query: ElecOperationsQuery,
+  selected_entity_id?: number
 ) => {
   return api.GET("/tiruert/elec-operations/filters/", {
     params: {
       query: {
         ...query,
         filter: filter as ElecOperationsFilter,
+        selected_entity_id,
       },
     },
   })
 }
 
-export const getOperations = (query: ElecOperationsQuery) => {
+export const getOperations = (
+  query: ElecOperationsQuery,
+  selected_entity_id?: number
+) => {
   return api.GET("/tiruert/elec-operations/", {
     params: {
       query: {
         ...query,
+        selected_entity_id,
         order_by:
           query.order_by && query.order_by.length > 0
             ? query.order_by
