@@ -42,7 +42,24 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(f"EXPIRATION operations already exist for period {period}. Skipping."))
             return
 
-        # Step 1: Find all lot_ids from expired period credit operations
+        # Step 1: Cancel PENDING credit operations (INCORPORATION, MAC_BIO, LIVRAISON_DIRECTE)
+        # from the expired durability period. These were never confirmed, so their volume
+        # was never credited — no EXPIRATION needed, but they must not remain open.
+        pending_credit_ops = Operation.objects.filter(
+            type__in=Operation.CREDIT_TYPES,
+            status=Operation.PENDING,
+            durability_period__startswith=str(period),
+        )
+        pending_credit_count = pending_credit_ops.count()
+        if pending_credit_count:
+            pending_credit_ops.update(status=Operation.CANCELED)
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"{pending_credit_count} pending credit operations canceled for durability period {period}."
+                )
+            )
+
+        # Step 2: Find all lot_ids from expired period confirmed credit operations
         expired_lot_ids = list(
             OperationDetail.objects.filter(
                 operation__type__in=Operation.CREDIT_TYPES,
@@ -57,7 +74,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"No active confirmed operations found for period {period}."))
             return
 
-        # Step 2: Cancel all PENDING or DRAFT operations linked to expired_lot_ids
+        # Step 3: Cancel all PENDING or DRAFT operations (any type) linked to expired_lot_ids
         operation_ids_to_cancel = list(
             OperationDetail.objects.filter(
                 lot_id__in=expired_lot_ids,
@@ -67,7 +84,7 @@ class Command(BaseCommand):
         if operation_ids_to_cancel:
             Operation.objects.filter(id__in=operation_ids_to_cancel).update(status=Operation.CANCELED)
 
-        # Step 3: Find all entities that have credits on these lots
+        # Step 4: Find all entities that have credits on these lots
         entity_ids = list(
             OperationDetail.objects.filter(
                 lot_id__in=expired_lot_ids,
@@ -81,7 +98,7 @@ class Command(BaseCommand):
         total_operations_created = 0
         total_details_created = 0
 
-        # Step 4: For each entity, compute remaining volume per lot and create EXPIRATION operations
+        # Step 5: For each entity, compute remaining volume per lot and create EXPIRATION operations
         for entity_id in entity_ids:
             operations_created, details_created = self._process_entity(entity_id, expired_lot_ids, period)
             total_operations_created += operations_created

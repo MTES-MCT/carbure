@@ -379,3 +379,72 @@ class SetOperationsExpiredIntegrationTest(BaseExpirationTestCase):
         # 2025: no EXPIRATION, balance = 800 - 300 = 500
         self.assertFalse(OperationDetail.objects.filter(operation__type=Operation.EXPIRATION, lot=lot_2025).exists())
         self.assertEqual(self._get_lot_balance(self.entity, lot_2025), 500.0)
+
+    def test_pending_credit_ops_of_all_types_are_canceled_step1(self):
+        """
+        Step 1: INCORPORATION, MAC_BIO and LIVRAISON_DIRECTE in PENDING for the expired durability
+        period must all be CANCELED by the command. No EXPIRATION is created for them since
+        their volume was never confirmed.
+        """
+        pending_inc = OperationFactory.create(
+            type=Operation.INCORPORATION,
+            status=Operation.PENDING,
+            customs_category=MatierePremiere.CONV,
+            biofuel=self.biofuel,
+            credited_entity=self.entity,
+            debited_entity=None,
+            renewable_energy_share=1.0,
+            durability_period="202401",
+        )
+        pending_mac = OperationFactory.create(
+            type=Operation.MAC_BIO,
+            status=Operation.PENDING,
+            customs_category=MatierePremiere.CONV,
+            biofuel=self.biofuel,
+            credited_entity=self.entity,
+            debited_entity=None,
+            renewable_energy_share=1.0,
+            durability_period="202406",
+        )
+        pending_livraison = OperationFactory.create(
+            type=Operation.LIVRAISON_DIRECTE,
+            status=Operation.PENDING,
+            customs_category=MatierePremiere.CONV,
+            biofuel=self.biofuel,
+            credited_entity=self.entity,
+            debited_entity=None,
+            renewable_energy_share=1.0,
+            durability_period="202410",
+        )
+
+        output = self._call_command()
+
+        for op in [pending_inc, pending_mac, pending_livraison]:
+            op.refresh_from_db()
+            self.assertEqual(op.status, Operation.CANCELED)
+
+        self.assertIn("3 pending credit operations canceled", output)
+        # No confirmed credits → no EXPIRATION created
+        self.assertFalse(Operation.objects.filter(type=Operation.EXPIRATION).exists())
+
+    def test_pending_credits_from_other_period_are_not_canceled(self):
+        """
+        Step 1 must only cancel PENDING credit ops from the expired durability period (2024),
+        not from other periods (e.g. 2025).
+        """
+        pending_2025 = OperationFactory.create(
+            type=Operation.INCORPORATION,
+            status=Operation.PENDING,
+            customs_category=MatierePremiere.CONV,
+            biofuel=self.biofuel,
+            credited_entity=self.entity,
+            debited_entity=None,
+            renewable_energy_share=1.0,
+            durability_period="202501",
+        )
+        OperationDetailFactory.create_for_operation(pending_2025, volume=300.0, emission_rate_per_mj=10.0)
+
+        self._call_command()
+
+        pending_2025.refresh_from_db()
+        self.assertEqual(pending_2025.status, Operation.PENDING)
