@@ -1,5 +1,5 @@
 import { useNotify } from "common/components/notifications"
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import * as api from "../../../api"
@@ -31,7 +31,7 @@ export const EmailConfirmationModal = ({
       newEmail: string
       otpCode: string
     }) => api.confirmEmailChange(newEmail, otpCode),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("L'adresse email a été mise à jour avec succès !"), {
         variant: "success",

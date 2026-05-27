@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import useEntity from "common/hooks/entity"
 import { Unit, UserRole } from "common/types"
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import { LoaderOverlay } from "common/components/scaffold"
 import * as api from "../api/company"
 import { EditableCard } from "common/molecules/editable-card"
@@ -17,33 +17,33 @@ const CompanyOptions = () => {
 
   const toggleMAC = useMutation({
     mutationFn: (toggle: boolean) => api.toggleMAC(entity.id, toggle),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
   const toggleTrading = useMutation({
     mutationFn: (toggle: boolean) => api.toggleTrading(entity.id, toggle),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
   const toggleElec = useMutation({
     mutationFn: (toggle: boolean) => api.toggleElec(entity.id, toggle),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
   const toggleStocks = useMutation({
     mutationFn: (toggle: boolean) => api.toggleStocks(entity.id, toggle),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
   const toggleDirectDeliveries = useMutation({
     mutationFn: (toggle: boolean) =>
       api.toggleDirectDeliveries(entity.id, toggle),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
   const setPreferredUnit = useMutation({
     mutationFn: ({ entityId, unit }: { entityId: number; unit: Unit }) =>
       api.setEntityPreferredUnit(entityId, unit),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
   const isLoading =

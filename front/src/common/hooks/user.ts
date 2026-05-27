@@ -1,10 +1,9 @@
 import { createContext, useContext, useEffect } from "react"
-import { useQuery } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useQuery } from "common/hooks/async-rq"
 import { Entity, User, UserRight, UserRightRequest } from "common/types"
 import * as api from "common/api"
 import * as Sentry from "@sentry/react"
 
-const userSettingsQueryKey = ["user-settings"] as const
 export interface UserManager {
   loading: boolean
   email: string
@@ -24,7 +23,7 @@ export interface UserManager {
 
 export function useUserManager(): UserManager {
   const settings = useQuery({
-    queryKey: userSettingsQueryKey,
+    queryKey: COMMON_QUERY_KEYS.userSettings,
     queryFn: api.getUserSettings,
   })
 

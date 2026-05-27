@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { LoaderOverlay } from "common/components/scaffold"
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import * as api from "../api"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
@@ -14,7 +14,7 @@ export const Logout = () => {
 
   const logoutMutation = useMutation({
     mutationFn: api.logout,
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("Vous êtes déconnecté !"), { variant: "success" })
       navigate("/")

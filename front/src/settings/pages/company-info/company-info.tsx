@@ -3,7 +3,7 @@ import { Country, Entity, UserRole } from "common/types"
 import { useForm, Form } from "common/components/form2"
 import { TextArea, TextInput } from "common/components/inputs2"
 import { Grid, LoaderOverlay } from "common/components/scaffold"
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import { useTranslation } from "react-i18next"
 import * as api from "../../api/company"
 import { CompanyFormValue, SearchCompanyPreview } from "companies/types"
@@ -54,7 +54,7 @@ const CompanyInfo = ({
         payload.formValue.website!,
         payload.formValue.vat_number!
       ),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
   const companyForm = useCompanyForm(entity)
 

@@ -1,4 +1,4 @@
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import * as api from "../api"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
@@ -26,7 +26,7 @@ export const useRegisterCompany = ({ closeDialog }: RegisterCompanyProps) => {
   }
   const registerCompanyRequest = useMutation({
     mutationFn: api.registerCompany,
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("Votre demande d'inscription a bien été envoyée !"), {
         variant: "success",

@@ -63,3 +63,7 @@ export {
   QueryClientProvider,
 } from "@tanstack/react-query"
 export type { QueryKey, UseQueryOptions } from "@tanstack/react-query"
+
+export const COMMON_QUERY_KEYS = {
+  userSettings: ["user-settings"] as const,
+}

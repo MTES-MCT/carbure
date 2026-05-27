@@ -10,7 +10,7 @@ import { useUser } from "common/hooks/user"
 
 import * as api from "../api"
 import * as common from "common/api"
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
 import {
@@ -44,7 +44,7 @@ export const AccountAccesRights = () => {
 
   const revokeMyself = useMutation({
     mutationFn: api.revokeMyself,
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
   const loading = user.loading || revokeMyself.isPending
@@ -182,7 +182,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
   const requestAccess = useMutation({
     mutationFn: ({ entityId, role }: { entityId: number; role: UserRole }) =>
       api.requestAccess(entityId, role),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("La société a été ajoutée !"), { variant: "success" })
     },

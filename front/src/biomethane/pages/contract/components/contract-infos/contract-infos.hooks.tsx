@@ -1,4 +1,4 @@
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import { useTranslation } from "react-i18next"
 import {
   BiomethaneContract,
@@ -105,7 +105,11 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
           ))
         }
       }),
-    invalidates: ["contract-infos", "user-settings", annualDeclarationKey],
+    invalidates: [
+      "contract-infos",
+      COMMON_QUERY_KEYS.userSettings,
+      annualDeclarationKey,
+    ],
     onSuccess: () => {
       notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
     },

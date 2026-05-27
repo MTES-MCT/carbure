@@ -4,7 +4,7 @@ import * as api from "../api/certificates"
 import useEntity, { useRights } from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useQuery, useMutation as useLegacyMutation } from "common/hooks/async"
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import { usePortal } from "common/components/portal"
 import { formatDate } from "common/utils/formatters"
 import { Row } from "common/components/scaffold"
@@ -51,7 +51,7 @@ const Certificates = () => {
   const setDefaultCertificate = useMutation({
     mutationFn: (cert: string | undefined) =>
       api.setDefaultCertificate(entity.id, cert!),
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)

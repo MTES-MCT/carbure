@@ -7,7 +7,7 @@ import { TextInput } from "common/components/input"
 import { Container } from "./login"
 import { useNotify } from "common/components/notifications"
 import { useMutation as useLegacyMutation } from "common/hooks/async"
-import { useMutation } from "common/hooks/async-rq"
+import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import * as api from "../api"
 import { useEffect } from "react"
 import { HttpError } from "common/services/api-fetch"
@@ -22,7 +22,7 @@ const OTP = () => {
 
   const verifyOTP = useMutation({
     mutationFn: api.verifyOTP,
-    invalidates: ["user-settings"],
+    invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("Vous êtes connecté !"), { variant: "success" })
       navigate("/")
