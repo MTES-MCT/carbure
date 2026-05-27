@@ -3,6 +3,7 @@ import {
   ElecCertificateSnapshot,
   ProvisionCertificate,
   ProvisionCertificateFilter,
+  ProvisionCertificateSource,
   ProvisionCertificateStatus,
 } from "../../types"
 import { formatNumber } from "common/utils/formatters"
@@ -52,6 +53,9 @@ export function useFilters() {
   return filters
 }
 
+const isEnrCompensation = (p: ProvisionCertificate) =>
+  p.source === ProvisionCertificateSource.ENR_RATIO_COMPENSATION
+
 export function useColumns() {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -61,7 +65,9 @@ export function useColumns() {
       key: "quarter",
       header: t("Trimestre"),
       cell: (p) =>
-        t("T{{quarter}} {{year}}", { quarter: p.quarter, year: p.year }),
+        isEnrCompensation(p)
+          ? "-"
+          : t("T{{quarter}} {{year}}", { quarter: p.quarter, year: p.year }),
     },
     {
       key: "month",
@@ -76,7 +82,7 @@ export function useColumns() {
     {
       key: "operating_unit",
       header: t("Unité d'exploitation"),
-      cell: (p) => p.operating_unit,
+      cell: (p) => (isEnrCompensation(p) ? "-" : p.operating_unit),
     },
     {
       key: "source",

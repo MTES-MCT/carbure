@@ -17,6 +17,8 @@ export function getSourceLabel(source: string | null | undefined) {
       return i18next.t("Relevés trimestriels")
     case ProvisionCertificateSource.QUALICHARGE:
       return i18next.t("Qualicharge")
+    case ProvisionCertificateSource.ENR_RATIO_COMPENSATION:
+      return i18next.t("Compensation ENR")
     default:
       return i18next.t("N/A")
   }
