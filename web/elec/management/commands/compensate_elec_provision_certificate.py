@@ -166,9 +166,9 @@ def _build_compensation_certificates(certificates_with_delta, new_enr_ratio):
     return [
         _build_compensation_certificate(
             cpo_id=certificate["cpo_id"],
-            quarter=1,
+            quarter=4,
             year=certificate["year"],
-            operating_unit="ALL",
+            operating_unit="",
             energy_amount=certificate["delta"],
             new_enr_ratio=new_enr_ratio,
             cpo_name=certificate["cpo__name"],

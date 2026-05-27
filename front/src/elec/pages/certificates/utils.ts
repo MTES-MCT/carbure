@@ -14,14 +14,16 @@ export function isEnrRatioCompensation(
 }
 
 export function formatProvisionQuarterCell(certificate: ProvisionPeriodFields) {
-  if (isEnrRatioCompensation(certificate.source)) {
-    return certificate.year == null ? "-" : String(certificate.year)
-  }
-
-  return i18next.t("T{{quarter}} {{year}}", {
+  const options = {
     quarter: certificate.quarter,
     year: certificate.year,
-  })
+  }
+
+  if (isEnrRatioCompensation(certificate.source)) {
+    return i18next.t("T{{quarter}} {{year}} Rattrapage", options)
+  }
+
+  return i18next.t("T{{quarter}} {{year}}", options)
 }
 
 export function formatProvisionMonthCell(certificate: ProvisionPeriodFields) {
@@ -32,14 +34,6 @@ export function formatProvisionMonthCell(certificate: ProvisionPeriodFields) {
   return i18next.t("{{month}}", {
     month: certificate.month ?? i18next.t("-"),
   })
-}
-
-export function formatProvisionPeriodLabel(
-  source: ProvisionCertificate["source"] | null | undefined
-) {
-  return isEnrRatioCompensation(source)
-    ? i18next.t("Année")
-    : i18next.t("Trimestre")
 }
 
 export function shouldShowProvisionOperatingUnit(
@@ -71,7 +65,7 @@ export function getSourceLabel(source: string | null | undefined) {
     case ProvisionCertificateSource.QUALICHARGE:
       return i18next.t("Qualicharge")
     case ProvisionCertificateSource.ENR_RATIO_COMPENSATION:
-      return i18next.t("Compensation ENR")
+      return i18next.t("Rattrapage ENR")
     default:
       return i18next.t("N/A")
   }

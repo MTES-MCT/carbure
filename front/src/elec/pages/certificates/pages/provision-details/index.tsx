@@ -8,10 +8,13 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { getProvisionCertificateDetails } from "../../api"
 import { TextInput } from "common/components/inputs2"
-import { formatUnit, formatDate, formatNumber } from "common/utils/formatters"
+import {
+  formatUnit,
+  formatDate,
+  formatPercentage,
+} from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import {
-  formatProvisionPeriodLabel,
   formatProvisionQuarterCell,
   getSourceLabel,
   shouldShowProvisionOperatingUnit,
@@ -58,7 +61,7 @@ export const ProvisionCertificateDetails = () => {
           />
           <TextInput
             readOnly
-            label={formatProvisionPeriodLabel(provisionCert?.source)}
+            label={t("Période")}
             value={
               provisionCert ? formatProvisionQuarterCell(provisionCert) : ""
             }
@@ -90,10 +93,10 @@ export const ProvisionCertificateDetails = () => {
           />
           <TextInput
             readOnly
-            label={t("Ratio ENR")}
+            label={t("Taux ENR")}
             value={
               provisionCert?.enr_ratio
-                ? formatNumber(provisionCert.enr_ratio, { fractionDigits: 2 })
+                ? formatPercentage(provisionCert.enr_ratio * 100)
                 : ""
             }
           />
