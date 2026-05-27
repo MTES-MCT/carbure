@@ -8,9 +8,15 @@ import { useTranslation } from "react-i18next"
 import { useLocation, useNavigate } from "react-router-dom"
 import { getProvisionCertificateDetails } from "../../api"
 import { TextInput } from "common/components/inputs2"
-import { formatUnit, formatDate } from "common/utils/formatters"
+import { formatUnit, formatDate, formatNumber } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
-import { getSourceLabel } from "../../utils"
+import {
+  formatProvisionPeriodLabel,
+  formatProvisionQuarterCell,
+  getSourceLabel,
+  shouldShowProvisionOperatingUnit,
+  shouldShowProvisionPeriod,
+} from "../../utils"
 
 export const ProvisionCertificateDetails = () => {
   const { t } = useTranslation()
@@ -52,13 +58,15 @@ export const ProvisionCertificateDetails = () => {
           />
           <TextInput
             readOnly
-            label={t("Trimestre")}
-            value={t("T{{quarter}} {{year}}", {
-              quarter: provisionCert?.quarter,
-              year: provisionCert?.year,
-            })}
+            label={formatProvisionPeriodLabel(provisionCert?.source)}
+            value={
+              provisionCert ? formatProvisionQuarterCell(provisionCert) : ""
+            }
           />
-          {provisionCert?.month && (
+          {shouldShowProvisionPeriod(
+            provisionCert?.source,
+            provisionCert?.month
+          ) && (
             <TextInput
               readOnly
               label={t("Période")}
@@ -68,15 +76,26 @@ export const ProvisionCertificateDetails = () => {
               })}
             />
           )}
-          <TextInput
-            readOnly
-            label={t("Unité d'exploitation")}
-            value={provisionCert?.operating_unit}
-          />
+          {shouldShowProvisionOperatingUnit(provisionCert?.source) && (
+            <TextInput
+              readOnly
+              label={t("Unité d'exploitation")}
+              value={provisionCert?.operating_unit}
+            />
+          )}
           <TextInput
             readOnly
             label={t("Source")}
             value={getSourceLabel(provisionCert?.source)}
+          />
+          <TextInput
+            readOnly
+            label={t("Ratio ENR")}
+            value={
+              provisionCert?.enr_ratio
+                ? formatNumber(provisionCert.enr_ratio, { fractionDigits: 2 })
+                : ""
+            }
           />
           <TextInput
             readOnly
