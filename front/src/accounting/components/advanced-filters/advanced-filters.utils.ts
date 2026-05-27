@@ -1,3 +1,4 @@
+import { floorNumber } from "common/utils/formatters"
 import {
   AdvancedFiltersFormProps,
   AdvancedFiltersPayload,
@@ -6,7 +7,10 @@ import {
 export const showNextStepAdvancedFilters = (
   values: AdvancedFiltersFormProps
 ) => {
-  return Boolean(values.availableBalance && values.availableBalance > 0)
+  const availableBalance = values.availableBalance
+    ? floorNumber(values.availableBalance, 0)
+    : 0
+  return Boolean(availableBalance > 0)
 }
 
 export const mapAdvancedFiltersForPayload = (

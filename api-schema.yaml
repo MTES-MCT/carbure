@@ -17214,7 +17214,9 @@ components:
           type: number
           format: double
         target_type:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/TargetTypeEnum"
+          nullable: true
         penalty:
           type: integer
         target_percent:
@@ -19494,6 +19496,14 @@ components:
           type: string
       required:
         - metabase_iframe_url
+    TargetTypeEnum:
+      enum:
+        - REACH
+        - CAP
+      type: string
+      description: |-
+        * `REACH` - Objectif à atteindre
+        * `CAP` - Plafond à ne pas dépasser
     TariffReferenceEnum:
       enum:
         - "2011"

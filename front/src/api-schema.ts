@@ -5513,7 +5513,7 @@ export interface components {
         Objective: {
             /** Format: double */
             target_mj: number;
-            target_type: string;
+            target_type: components["schemas"]["TargetTypeEnum"] | null;
             penalty: number;
             /** Format: double */
             target_percent: number;
@@ -6509,6 +6509,12 @@ export interface components {
         StatsResponse: {
             metabase_iframe_url: string;
         };
+        /**
+         * @description * `REACH` - Objectif à atteindre
+         *     * `CAP` - Plafond à ne pas dépasser
+         * @enum {string}
+         */
+        TargetTypeEnum: TargetTypeEnum;
         /**
          * @description * `2011` - 2011
          *     * `2020` - 2020
@@ -14770,6 +14776,10 @@ export enum SpreadingManagementMethodsEnum {
     SPREADING_VIA_PROVIDER = "SPREADING_VIA_PROVIDER",
     TRANSFER = "TRANSFER",
     SALE = "SALE"
+}
+export enum TargetTypeEnum {
+    REACH = "REACH",
+    CAP = "CAP"
 }
 export enum TrackedAmendmentTypesEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",
