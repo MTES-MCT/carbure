@@ -13,7 +13,8 @@
 - `react` + `react-dom`
 - `react-router-dom`: navigation client
 - `axios`: communication avec l'api
-- `react-async-hook`: intégration de l'async dans react
+- `react-async-hook`: intégration de l'async dans react (legacy, en cours de remplacement)
+- `@tanstack/react-query`: gestion du cache et des requêtes (nouveau standard, voir [common/hooks/README.md](src/common/hooks/README.md))
 - `clsx`: outil pour combiner des classes CSS
 - `i18next`: gestion des traductions
 - `date-fns`: gestion des dates
@@ -62,6 +63,10 @@ The project is structured to facilitate modular development, ensuring that each 
 ### Common Files
 
 - Similar to components, shared `types.ts` and `api.ts` files are also placed in `common/`, adhering to the same organizational principles.
+
+### Data fetching (React Query)
+
+See [common/hooks/README.md](src/common/hooks/README.md) for conventions on queries, mutations, query keys, and migrating from the legacy `async` hooks.
 
 ### Design System
 

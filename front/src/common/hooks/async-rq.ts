@@ -6,6 +6,11 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query"
 
+/**
+ * React Query wrappers for Carbure.
+ * See common/hooks/README.md for usage conventions and migration guide.
+ */
+
 type InvalidateKey = QueryKey | string
 
 export type UseMutationOptions<
