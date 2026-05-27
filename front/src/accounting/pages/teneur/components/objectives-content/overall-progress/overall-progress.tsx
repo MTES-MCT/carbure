@@ -3,7 +3,7 @@ import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
 import { RecapData } from "../../recap-data"
-import { floorNumber, formatDate, formatNumber } from "common/utils/formatters"
+import { formatDate, formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type OverallProgressProps = {
@@ -58,9 +58,9 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             }
           )}
           mainText={t("tCO2 évitées")}
-          baseQuantity={floorNumber(objective.teneur_declared, 0)}
-          targetQuantity={floorNumber(objective.target, 0)}
-          declaredQuantity={floorNumber(objective.pending_teneur, 0)}
+          baseQuantity={objective.progress.base_quantity}
+          targetQuantity={objective.progress.target_quantity}
+          declaredQuantity={objective.progress.declared_quantity}
           badge={
             <CardProgress.DefaultBadge
               targetQuantity={objective.target}

@@ -1,13 +1,8 @@
 import { useTranslation } from "react-i18next"
-import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
-import { RecapData } from "../../recap-data"
 import { CategoryObjective, TargetType } from "../../../types"
 import { CardGrid } from "../../card-grid"
-import { computeObjectiveEnergy } from "../../../utils/formatters"
-import { ExtendedUnit } from "common/types"
-import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
-import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { CategoryObjectiveProgressCard } from "../category-objective-progress-card"
 
 type ObjectivizedCategoriesProgressProps = {
   categories?: CategoryObjective[]
@@ -15,20 +10,12 @@ type ObjectivizedCategoriesProgressProps = {
   readOnly: boolean
 }
 
-export const getTotalTeneurDeclared = (category: CategoryObjective) => {
-  return (
-    floorNumber(category.teneur_declared, 0) +
-    floorNumber(category.pending_teneur, 0)
-  )
-}
 export const ObjectivizedCategoriesProgress = ({
   categories,
   onCategoryClick,
   readOnly,
 }: ObjectivizedCategoriesProgressProps) => {
   const { t } = useTranslation()
-  const { selectedYear, isDeclarationInCurrentPeriod } =
-    useAnnualDeclarationTiruert()
 
   return (
     <ObjectiveSection
@@ -40,80 +27,12 @@ export const ObjectivizedCategoriesProgress = ({
     >
       <CardGrid>
         {categories?.map((category) => (
-          <CardProgress
+          <CategoryObjectiveProgressCard
             key={category.code}
-            title={category.code}
-            mainValue={formatNumber(getTotalTeneurDeclared(category), {
-              fractionDigits: 0,
-            })}
-            mainText={t("GJ")}
-            description={t(
-              "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
-              {
-                date: selectedYear,
-                objective: formatUnit(category.target, ExtendedUnit.GJ, {
-                  fractionDigits: 0,
-                }),
-                target_percent: formatNumber(category.target_percent),
-              }
-            )}
-            baseQuantity={floorNumber(category.teneur_declared, 0)}
-            targetQuantity={floorNumber(category.target, 0)}
-            declaredQuantity={floorNumber(category.pending_teneur, 0)}
-            badge={
-              <CardProgress.DefaultBadge
-                targetQuantity={floorNumber(category.target, 0)}
-                declaredQuantity={
-                  floorNumber(category.teneur_declared, 0) +
-                  floorNumber(category.pending_teneur, 0)
-                }
-              />
-            }
-            penalty={category.penalty}
-            onClick={
-              readOnly || !isDeclarationInCurrentPeriod
-                ? undefined
-                : () => onCategoryClick(category, TargetType.REACH)
-            }
-          >
-            {isDeclarationInCurrentPeriod && (
-              <ul>
-                <li>
-                  <RecapData.TeneurDeclaredMonth
-                    value={formatUnit(
-                      category.pending_teneur,
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                  />
-                </li>
-                <li>
-                  <RecapData.RemainingQuantityBeforeObjective
-                    value={formatUnit(
-                      computeObjectiveEnergy(category),
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                  />
-                </li>
-                <li>
-                  <RecapData.QuantityAvailable
-                    value={formatUnit(
-                      category.quantity_available,
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                  />
-                </li>
-              </ul>
-            )}
-          </CardProgress>
+            category={category}
+            readOnly={readOnly}
+            onCategoryClick={onCategoryClick}
+          />
         ))}
       </CardGrid>
     </ObjectiveSection>
