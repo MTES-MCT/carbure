@@ -13,3 +13,9 @@ class NationalTradeRegister:
     def __init__(self, country_code, registration_id):
         self.country_code = country_code
         self.registration_id = registration_id
+
+    def id(self):
+        if self.country_code != "FR":
+            raise NotImplementedError(f"Country code {self.country_code} is not 'FR'")
+
+        return f"{self.country_code}_SIREN_CD{self.registration_id}"
