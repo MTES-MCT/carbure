@@ -11,7 +11,12 @@ import { Tab } from "common/components/tabs2"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
 import { useParams } from "react-router-dom"
-import { getSourceLabel } from "../../utils"
+import {
+  formatProvisionMonthCell,
+  formatProvisionQuarterCell,
+  getSourceLabel,
+  isEnrRatioCompensation,
+} from "../../utils"
 
 export function useStatus() {
   const params = useParams<"status">()
@@ -60,13 +65,12 @@ export function useColumns() {
     {
       key: "quarter",
       header: t("Trimestre"),
-      cell: (p) =>
-        t("T{{quarter}} {{year}}", { quarter: p.quarter, year: p.year }),
+      cell: (p) => formatProvisionQuarterCell(p),
     },
     {
       key: "month",
       header: t("Mois"),
-      cell: (p) => t("{{month}}", { month: p.month ?? t("-") }),
+      cell: (p) => formatProvisionMonthCell(p),
     },
     (entity.isAdmin || entity.isExternal) && {
       key: "cpo",
@@ -76,7 +80,7 @@ export function useColumns() {
     {
       key: "operating_unit",
       header: t("Unité d'exploitation"),
-      cell: (p) => p.operating_unit,
+      cell: (p) => (isEnrRatioCompensation(p.source) ? "-" : p.operating_unit),
     },
     {
       key: "source",

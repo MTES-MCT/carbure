@@ -4838,6 +4838,8 @@ export interface components {
             energy_amount: number;
             /** Format: date-time */
             readonly created_at: string | null;
+            /** Format: double */
+            enr_ratio?: number | null;
         };
         ElecProvisionCertificateQualicharge: {
             readonly id: number;

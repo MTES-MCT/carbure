@@ -19,6 +19,7 @@ class ElecProvisionCertificateSerializer(serializers.ModelSerializer):
             "operating_unit",
             "energy_amount",
             "created_at",
+            "enr_ratio",
         ]
 
     cpo = EntityPreviewSerializer(read_only=True)
