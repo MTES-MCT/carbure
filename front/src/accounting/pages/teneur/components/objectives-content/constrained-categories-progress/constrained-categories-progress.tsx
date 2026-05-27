@@ -4,23 +4,34 @@ import { CategoryObjective, TargetType } from "../../../types"
 import { CardGrid } from "../../card-grid"
 import { CategoryObjectiveProgressCard } from "../category-objective-progress-card"
 
-type CappedCategoriesProgressProps = {
+type ConstrainedCategoriesVariant = "capped" | "objectivized"
+
+type ConstrainedCategoriesProgressProps = {
+  variant: ConstrainedCategoriesVariant
   categories?: CategoryObjective[]
   onCategoryClick: (category: CategoryObjective, targetType: TargetType) => void
   readOnly: boolean
 }
 
-export const CappedCategoriesProgress = ({
+export const ConstrainedCategoriesProgress = ({
+  variant,
   categories,
   onCategoryClick,
   readOnly,
-}: CappedCategoriesProgressProps) => {
+}: ConstrainedCategoriesProgressProps) => {
   const { t } = useTranslation()
+  const isCapped = variant === "capped"
 
   return (
     <ObjectiveSection
-      title={t("Catégories plafonnées")}
-      description={t("Catégories dans lesquelles un plafond est fixé.")}
+      title={
+        isCapped ? t("Catégories plafonnées") : t("Catégories objectivées")
+      }
+      description={
+        isCapped
+          ? t("Catégories dans lesquelles un plafond est fixé.")
+          : t("Catégories pour lesquelles un objectif minimal est requis.")
+      }
       size="small"
     >
       <CardGrid>
