@@ -14,8 +14,8 @@ Business rules enforced:
   * Operators: INCORPORATION ops only, biofuel/feedstock picked among
     (EMAG, CONV), (ETH, CONV), (ETH, ANN-IX-A), (HOG, ANN-IX-B).
   * Producer: MAC_BIO ops only, always B100 / CONV.
-  * TRANSFERT: producer -> producer or producer -> operator (never the other way).
-  * Operators do NOT create TRANSFERT.
+  * TRANSFERT: producers can transfer to producers or operators.
+    Operators can transfer to other operators only (never to a producer).
   * TENEUR and TRANSFERT only consume volumes the debited entity actually owns
     (received via INCORPORATION/MAC_BIO or via incoming TRANSFERT).
 """
@@ -124,18 +124,21 @@ class Command(BaseCommand):
                     self._create_credit_op(producer, Operation.MAC_BIO, year, producer_pool, inventory)
                 self.stdout.write(f"  [{producer.entity_type}] {producer.name}: {ops_per_year} MAC_BIO ops")
 
-            # 2. Transferts (only producers initiate, towards producer or operator).
-            transfert_targets = producers + operators
-            for producer in producers:
+            # 2. Transferts.
+            # Rule: operators cannot transfer to a producer. Producers can transfer to anyone.
+            for source in producers + operators:
+                if source.entity_type == Entity.PRODUCER:
+                    targets = [e for e in producers + operators if e.id != source.id]
+                else:
+                    targets = [e for e in operators if e.id != source.id]
                 created = 0
                 for _ in range(TRANSFERTS_PER_YEAR_PER_PRODUCER):
-                    candidates = [e for e in transfert_targets if e.id != producer.id]
-                    if not candidates:
+                    if not targets:
                         break
-                    target = random.choice(candidates)
-                    if self._create_transfert(producer, target, year, inventory):
+                    target = random.choice(targets)
+                    if self._create_transfert(source, target, year, inventory):
                         created += 1
-                self.stdout.write(f"  [{producer.entity_type}] {producer.name}: {created} transferts")
+                self.stdout.write(f"  [{source.entity_type}] {source.name}: {created} transferts")
 
             # 3. Teneurs for every entity, restricted to its own inventory.
             for entity in entities:
@@ -262,7 +265,6 @@ class Command(BaseCommand):
 
         lot, remaining = entry
         volume = random.randint(VOLUME_MIN, min(VOLUME_MAX, remaining))
-        period_str = f"{year}{random.randint(1, 12):02d}"
 
         op = Operation.objects.create(
             type=Operation.TENEUR,
@@ -272,7 +274,7 @@ class Command(BaseCommand):
             credited_entity=None,
             debited_entity=entity,
             renewable_energy_share=1.0,
-            durability_period=period_str,
+            durability_period=None,
             declaration_year=year,
             export_recipient=TAG,
         )
@@ -292,7 +294,6 @@ class Command(BaseCommand):
 
         lot, remaining = entry
         volume = random.randint(VOLUME_MIN, min(VOLUME_MAX, remaining))
-        period_str = f"{year}{random.randint(1, 12):02d}"
 
         op = Operation.objects.create(
             type=Operation.TRANSFERT,
@@ -302,7 +303,7 @@ class Command(BaseCommand):
             debited_entity=debited,
             credited_entity=credited,
             renewable_energy_share=1.0,
-            durability_period=period_str,
+            durability_period=None,
             export_recipient=TAG,
         )
         OperationDetail.objects.create(
