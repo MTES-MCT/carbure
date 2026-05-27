@@ -29,15 +29,12 @@ import {
   SectorObjective,
   TargetType,
 } from "../../types"
-import { formatUnit } from "common/utils/formatters"
-import { computeObjectiveEnergy } from "../../utils/formatters"
 import { useMemo } from "react"
 import { Button } from "common/components/button2"
 import {
   useCalculateQuantityMax,
   useDeclareTeneurDialog,
   useRemainingCO2Objective,
-  useRemainingEnergyBeforeLimitOrObjective,
 } from "./declare-teneur-dialog.hooks"
 import {
   DeclareTeneurProgressBar,
@@ -75,18 +72,12 @@ const DeclareTeneurDialogContent = ({
   const { avoidedEmissionsInputRef, handleQuantityDeclared } =
     useFocusOnAvoidedEmissions()
 
-  const remainingEnergyBeforeLimitOrObjective =
-    useRemainingEnergyBeforeLimitOrObjective(objective, form.value)
   const remainingCO2Objective = useRemainingCO2Objective(
     form.value,
     mainObjective
   )
 
-  // Define the maximum quantity that can be declared for the teneur
-  // If a target is defined, the maximum quantity is the minimum between the available balance and the objective
-  // Otherwise, the maximum quantity is the available balance
   const depotQuantityMax = useCalculateQuantityMax(objective, form.value)
-  console.log("depotQuantityMax", depotQuantityMax)
   // Get the current sector objective when the biofuel is selected
   const currentSectorObjective = useMemo(() => {
     if (!form.value.balance?.sector) return undefined
@@ -132,51 +123,13 @@ const DeclareTeneurDialogContent = ({
               </RecapOperationGrid>
             </Box>
             {currentStep?.key !== "recap" && (
-              <Box gap="xs" spacing="md">
+              <Box spacing="md">
                 <DeclareTeneurProgressBarList
                   sectorObjective={currentSectorObjective}
                   categoryObjective={objective}
                   quantity={form.value.quantity ?? 0}
                   targetType={targetType}
                 />
-
-                {targetType && objective.target && (
-                  <>
-                    {targetType === TargetType.CAP && objective.target ? (
-                      <RecapData.RemainingQuantityBeforeLimit
-                        value={remainingEnergyBeforeLimitOrObjective}
-                        bold
-                        size="md"
-                        category={objective.code}
-                      />
-                    ) : null}
-                    {targetType === TargetType.REACH && objective.target ? (
-                      <RecapData.RemainingQuantityBeforeObjective
-                        value={remainingEnergyBeforeLimitOrObjective}
-                        bold
-                        size="md"
-                        category={objective.code}
-                      />
-                    ) : null}
-                  </>
-                )}
-                {!targetType && currentSectorObjective ? (
-                  <RecapData.RemainingQuantityBeforeObjective
-                    value={formatUnit(
-                      Math.max(
-                        0,
-                        computeObjectiveEnergy(currentSectorObjective) -
-                          (form.value.quantity ?? 0)
-                      ),
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                    bold
-                    size="md"
-                  />
-                ) : null}
               </Box>
             )}
           </>
@@ -205,10 +158,9 @@ const DeclareTeneurDialogContent = ({
                     {mainObjective && (
                       <DeclareTeneurProgressBar
                         teneurDeclared={mainObjective.teneur_declared}
-                        teneurDeclaredMonth={mainObjective.pending_teneur}
+                        pendingTeneur={mainObjective.pending_teneur}
                         target={mainObjective.target}
                         quantity={form.value.avoided_emissions ?? 0}
-                        targetType={TargetType.REACH}
                         label={t("Objectif global")}
                       />
                     )}

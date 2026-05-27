@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { ProgressBar } from "../progress-bar"
+import { RecapData } from "../recap-data"
 import {
   CategoryObjective,
   SectorObjective,
@@ -11,22 +12,47 @@ import { formatSector } from "accounting/utils/formatters"
 import { ReactNode } from "react"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import { Grid } from "common/components/scaffold"
+import { CategoryEnum } from "common/types"
+import {
+  computeRemainingEnergyWithAdditionalQuantity,
+  formatObjectiveGJ,
+} from "../../utils/formatters"
 
 interface DeclareTeneurProgressBarProps {
   teneurDeclared: number
-  teneurDeclaredMonth: number
+  pendingTeneur: number
   target: number
   quantity: number
-  targetType?: TargetType
   label?: ReactNode
+  targetType?: TargetType
+  category?: CategoryEnum
 }
+
 export const DeclareTeneurProgressBar = ({
   teneurDeclared,
-  teneurDeclaredMonth,
+  pendingTeneur,
   target,
   quantity,
   label,
+  targetType,
+  category,
 }: DeclareTeneurProgressBarProps) => {
+  const remainingEnergy = targetType
+    ? computeRemainingEnergyWithAdditionalQuantity(
+        {
+          target,
+          teneur_declared: teneurDeclared,
+          pending_teneur: pendingTeneur,
+        },
+        quantity ?? 0
+      )
+    : null
+
+  const RemainingQuantity =
+    targetType === TargetType.CAP
+      ? RecapData.RemainingQuantityBeforeLimit
+      : RecapData.RemainingQuantityBeforeObjective
+
   return (
     <div
       style={{
@@ -43,8 +69,16 @@ export const DeclareTeneurProgressBar = ({
       <ProgressBar
         baseQuantity={floorNumber(teneurDeclared, 0)}
         targetQuantity={floorNumber(target, 0)}
-        declaredQuantity={floorNumber(teneurDeclaredMonth + (quantity ?? 0), 0)}
+        declaredQuantity={floorNumber(pendingTeneur + (quantity ?? 0), 0)}
       />
+      {targetType && remainingEnergy !== null && (
+        <RemainingQuantity
+          value={formatObjectiveGJ(remainingEnergy)}
+          bold
+          size="md"
+          category={category}
+        />
+      )}
     </div>
   )
 }
@@ -55,6 +89,7 @@ type DeclareTeneurProgressBarListProps = {
   quantity: number
   targetType?: TargetType
 }
+
 export const DeclareTeneurProgressBarList = ({
   sectorObjective,
   categoryObjective,
@@ -62,30 +97,32 @@ export const DeclareTeneurProgressBarList = ({
   targetType,
 }: DeclareTeneurProgressBarListProps) => {
   const { t } = useTranslation()
+
   return (
     <Grid gap="xl">
-      {categoryObjective && categoryObjective.target && (
+      {categoryObjective?.target && targetType && (
         <DeclareTeneurProgressBar
           teneurDeclared={categoryObjective.teneur_declared}
-          teneurDeclaredMonth={categoryObjective.pending_teneur}
+          pendingTeneur={categoryObjective.pending_teneur}
           target={categoryObjective.target}
           quantity={quantity ?? 0}
-          targetType={targetType}
           label={t("Catégorie {{category}}", {
             category: categoryObjective.code,
           })}
+          targetType={targetType}
+          category={categoryObjective.code}
         />
       )}
       {sectorObjective && (
         <DeclareTeneurProgressBar
-          teneurDeclared={sectorObjective?.teneur_declared ?? 0}
-          teneurDeclaredMonth={sectorObjective?.pending_teneur ?? 0}
-          target={sectorObjective?.target ?? 0}
+          teneurDeclared={sectorObjective.teneur_declared}
+          pendingTeneur={sectorObjective.pending_teneur}
+          target={sectorObjective.target}
           quantity={quantity ?? 0}
           label={t("Filière {{sector}}", {
-            sector: formatSector(sectorObjective?.code),
+            sector: formatSector(sectorObjective.code),
           })}
-          targetType={targetType}
+          targetType={TargetType.REACH}
         />
       )}
     </Grid>

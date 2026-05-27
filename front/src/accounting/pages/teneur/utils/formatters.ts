@@ -47,6 +47,17 @@ export const formatObjectiveGJ = (value: number) =>
 export const computeObjectiveEnergy = (objective: ObjectiveProgressInput) =>
   computeObjectiveProgress(objective).remaining_energy
 
+/**
+ * Compute the remaining energy after the additional quantity is declared
+ * @param objective - The objective progress
+ * @param additionalQuantity - The additional quantity declared
+ * @returns The remaining energy
+ */
+export const computeRemainingEnergyWithAdditionalQuantity = (
+  objective: ObjectiveProgressInput,
+  additionalQuantity: number
+) => Math.max(0, computeObjectiveEnergy(objective) - additionalQuantity)
+
 export const withObjectiveProgress = <T extends ObjectiveProgressInput>(
   objective: T
 ): T & { progress: ObjectiveProgress } => ({

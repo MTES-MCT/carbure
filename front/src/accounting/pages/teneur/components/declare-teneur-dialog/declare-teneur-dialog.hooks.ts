@@ -12,7 +12,6 @@ import {
   CategoryObjective,
   MainObjective,
   TargetType,
-  UnconstrainedCategoryObjective,
 } from "../../types"
 import { useMemo } from "react"
 import { computeObjectiveEnergy } from "../../utils/formatters"
@@ -89,26 +88,6 @@ export const useRemainingCO2Objective = (
       mode: "ceil",
     })
   }, [mainObjective, values.avoided_emissions])
-}
-
-// Compute the remaining energy before the limit or the objective after the quantity has been declared
-export const useRemainingEnergyBeforeLimitOrObjective = (
-  objective: CategoryObjective | UnconstrainedCategoryObjective,
-  values: DeclareTeneurDialogForm
-) => {
-  return useMemo(() => {
-    // Add quantity declared only if the "declare quantity" button has been clicked
-    const quantity = values.quantity ?? 0
-
-    const remainingEnergy = Math.max(
-      0,
-      objective.target ? computeObjectiveEnergy(objective) - quantity : 0
-    )
-
-    return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
-      fractionDigits: 0,
-    })
-  }, [values.quantity, objective])
 }
 
 export const useCalculateQuantityMax = (
