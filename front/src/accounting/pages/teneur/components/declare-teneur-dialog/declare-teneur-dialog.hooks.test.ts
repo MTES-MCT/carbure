@@ -3,15 +3,20 @@ import { describe, expect, it } from "vitest"
 import { balance } from "accounting/__test__/data/balances"
 import { defaultCategoryObjective } from "../../__test__/data"
 import { CategoryObjective } from "../../types"
+import { computeObjectiveProgress } from "../../utils/formatters"
 import { useCalculateQuantityMax } from "./declare-teneur-dialog.hooks"
 import { DeclareTeneurDialogForm } from "./declare-teneur-dialog.types"
 
 const createObjective = (
   overrides: Partial<CategoryObjective> = {}
-): CategoryObjective => ({
-  ...defaultCategoryObjective,
-  ...overrides,
-})
+): CategoryObjective => {
+  const objective = { ...defaultCategoryObjective, ...overrides }
+
+  return {
+    ...objective,
+    progress: computeObjectiveProgress(objective),
+  }
+}
 
 const createValues = (
   overrides: Partial<DeclareTeneurDialogForm> = {}

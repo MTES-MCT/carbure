@@ -7,9 +7,10 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../types"
+import { withObjectiveProgress } from "../utils/formatters"
 
 export const cappedCategories: CategoryObjective[] = [
-  {
+  withObjectiveProgress({
     code: CategoryEnum.CONV,
     target: 4214.565651000001,
     teneur_declared: 4.988000000000159,
@@ -18,11 +19,11 @@ export const cappedCategories: CategoryObjective[] = [
     target_percent: 0.67,
     penalty: 0,
     target_type: TargetType.CAP,
-  },
+  }),
 ]
 
 export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
-  {
+  withObjectiveProgress({
     code: CategoryEnum.OTHER,
     target: null,
     teneur_declared: 10000,
@@ -31,8 +32,8 @@ export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
     target_percent: null,
     penalty: 0,
     target_type: null,
-  },
-  {
+  }),
+  withObjectiveProgress({
     code: CategoryEnum.ANN_IX_B,
     target: null,
     teneur_declared: 0,
@@ -41,11 +42,11 @@ export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
     target_percent: null,
     penalty: 0,
     target_type: null,
-  },
+  }),
 ]
 
 export const objectivizedCategories: CategoryObjective[] = [
-  {
+  withObjectiveProgress({
     code: CategoryEnum.ANN_IX_A,
     target: 19667.973038,
     teneur_declared: 144.00000000000003,
@@ -54,10 +55,10 @@ export const objectivizedCategories: CategoryObjective[] = [
     target_percent: 0.67,
     penalty: 0,
     target_type: TargetType.REACH,
-  },
+  }),
 ]
 
-export const overallObjective: MainObjective = {
+export const overallObjective: MainObjective = withObjectiveProgress({
   target: 38296.35321542,
   teneur_declared: 954.004872,
   pending_teneur: 45.7,
@@ -65,21 +66,22 @@ export const overallObjective: MainObjective = {
   target_percent: 0.67,
   penalty: 0,
   energy_basis: 0,
-}
+})
 
-export const defaultCategoryObjective: CategoryObjective = {
-  code: CategoryEnum.CONV,
-  target: 300,
-  teneur_declared: 20,
-  pending_teneur: 10,
-  quantity_available: 1000,
-  target_percent: 10,
-  penalty: 0,
-  target_type: TargetType.CAP,
-}
+export const defaultCategoryObjective: CategoryObjective =
+  withObjectiveProgress({
+    code: CategoryEnum.CONV,
+    target: 300,
+    teneur_declared: 20,
+    pending_teneur: 10,
+    quantity_available: 1000,
+    target_percent: 10,
+    penalty: 0,
+    target_type: TargetType.CAP,
+  })
 
 export const defaultSectorObjectives: SectorObjective[] = [
-  {
+  withObjectiveProgress({
     code: OperationSector.ESSENCE,
     target: 400,
     teneur_declared: 30,
@@ -87,10 +89,10 @@ export const defaultSectorObjectives: SectorObjective[] = [
     quantity_available: 1200,
     target_percent: 12,
     penalty: 0,
-  },
+  }),
 ]
 
-export const defaultMainObjective: MainObjective = {
+export const defaultMainObjective: MainObjective = withObjectiveProgress({
   target: 150,
   teneur_declared: 20,
   pending_teneur: 10,
@@ -98,6 +100,6 @@ export const defaultMainObjective: MainObjective = {
   target_percent: 5,
   penalty: 0,
   energy_basis: 1000,
-}
+})
 
 export const defaultTargetType = TargetType.CAP

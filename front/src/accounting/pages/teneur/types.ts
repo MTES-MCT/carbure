@@ -4,6 +4,15 @@ import { apiTypes } from "common/services/api-fetch.types"
 
 export { TargetTypeEnum as TargetType } from "api-schema"
 
+export interface ObjectiveProgress {
+  total_teneur_declared: number
+  base_quantity: number
+  target_quantity: number
+  declared_quantity: number
+  remaining_energy: number
+  is_objective_met: boolean
+}
+
 export interface BaseObjective {
   target: number
   teneur_declared: number // GJ
@@ -11,6 +20,7 @@ export interface BaseObjective {
   pending_teneur: number // GJ
   target_percent: number
   penalty: number // euro cents
+  progress: ObjectiveProgress
 }
 export interface CategoryObjective extends BaseObjective {
   code: CategoryEnum
