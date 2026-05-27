@@ -22,6 +22,18 @@ export const cappedCategories: CategoryObjective[] = [
   }),
 ]
 
+export const cappedCategoryWithLimitReached: CategoryObjective =
+  withObjectiveProgress({
+    code: CategoryEnum.CONV,
+    target: 100,
+    teneur_declared: 80,
+    pending_teneur: 25,
+    quantity_available: 0,
+    target_percent: 0.67,
+    penalty: 0,
+    target_type: TargetType.CAP,
+  })
+
 export const unconstrainedCategories: UnconstrainedCategoryObjective[] = [
   withObjectiveProgress({
     code: CategoryEnum.OTHER,

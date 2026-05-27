@@ -3,10 +3,10 @@ import Badge from "@codegouvfr/react-dsfr/Badge"
 import { ReactNode } from "react"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { formatNumber } from "common/utils/formatters"
-import { CardProgress } from "../card-progress"
-import { CategoryObjective, TargetType } from "../../types"
-import { formatObjectiveGJ } from "../../utils/formatters"
-import { ObjectiveProgressRecap } from "./objective-progress-recap"
+import { CardProgress } from "../../card-progress"
+import { CategoryObjective, TargetType } from "../../../types"
+import { formatObjectiveGJ } from "../../../utils/formatters"
+import { ObjectiveProgressRecap } from "../objective-progress-recap"
 
 type CategoryObjectiveProgressCardProps = {
   category: CategoryObjective
