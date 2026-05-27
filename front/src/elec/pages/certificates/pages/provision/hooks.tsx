@@ -45,7 +45,7 @@ export function useFilters() {
 
   const filters: Record<string, string> = {
     [ProvisionCertificateFilter.cpo]: t("Aménageur"),
-    [ProvisionCertificateFilter.quarter]: t("Trimestre"),
+    [ProvisionCertificateFilter.quarter]: t("Période"),
     [ProvisionCertificateFilter.operating_unit]: t("Unité d'exploitation"),
     [ProvisionCertificateFilter.source]: t("Source"),
   }
@@ -64,7 +64,7 @@ export function useColumns() {
   return compact([
     {
       key: "quarter",
-      header: t("Trimestre"),
+      header: t("Période"),
       cell: (p) => formatProvisionQuarterCell(p),
     },
     {
