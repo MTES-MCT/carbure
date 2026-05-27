@@ -1,12 +1,11 @@
 import { useTranslation } from "react-i18next"
-import { ProgressBar } from "../progress-bar"
-import { RecapData } from "../recap-data"
+import { RecapData } from "../../recap-data"
 import {
   CategoryObjective,
   SectorObjective,
   TargetType,
   UnconstrainedCategoryObjective,
-} from "../../types"
+} from "../../../types"
 import { floorNumber } from "common/utils/formatters"
 import { formatSector } from "accounting/utils/formatters"
 import { ReactNode } from "react"
@@ -16,7 +15,8 @@ import { CategoryEnum } from "common/types"
 import {
   computeRemainingEnergyWithAdditionalQuantity,
   formatObjectiveGJ,
-} from "../../utils/formatters"
+} from "../../../utils/formatters"
+import { ProgressBar } from "../../progress-bar"
 
 interface DeclareTeneurProgressBarProps {
   teneurDeclared: number
