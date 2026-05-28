@@ -135,12 +135,17 @@ export const createOperation = (
   })
 }
 
-export const getOperationDetail = (entity_id: number, id: number) => {
+export const getOperationDetail = (
+  entity_id: number,
+  id: number,
+  selected_entity_id?: number
+) => {
   return api
     .GET(`/tiruert/operations/{id}/`, {
       params: {
         query: {
           entity_id,
+          selected_entity_id,
         },
         path: {
           id,

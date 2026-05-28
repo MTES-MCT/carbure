@@ -13,15 +13,17 @@ import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
 import { formatOperationType } from "accounting/utils/formatters"
 import { useOperationDetailFields } from "./operation-detail-fields"
 import { OperationDetailActions } from "./operation-detail-actions"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
   const entity = useEntity()
   const match = useHashMatch("operation/:id")
+  const { selectedEntityId } = useSelectedEntity()
 
   const { result, loading } = useQuery(api.getOperationDetail, {
     key: "operation-detail",
-    params: [entity.id, parseInt(match?.params.id ?? "")],
+    params: [entity.id, parseInt(match?.params.id ?? ""), selectedEntityId],
   })
 
   const operation = result?.data

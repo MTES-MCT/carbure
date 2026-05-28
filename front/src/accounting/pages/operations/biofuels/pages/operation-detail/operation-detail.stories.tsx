@@ -9,6 +9,8 @@ import {
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
 import { Operation, OperationsStatus, OperationType } from "accounting/types"
 import GLOBAL_MOCKS from "@storybook/mocks"
+import { mockUser } from "common/__test__/helpers"
+import { EntityType } from "common/types"
 
 const getOperationParameters = (
   operation: Operation,
@@ -18,7 +20,11 @@ const getOperationParameters = (
     description: docDescription,
   },
   msw: {
-    handlers: [...GLOBAL_MOCKS, generateGetOperationDetail(operation)],
+    handlers: [
+      mockUser(EntityType.Operator),
+      ...GLOBAL_MOCKS,
+      generateGetOperationDetail(operation),
+    ],
   },
 })
 
@@ -187,4 +193,26 @@ export const SendTeneurOperationDeclared: Story = {
     },
     "Send a teneur operation with a declared status"
   ),
+}
+
+const operationParameters = getOperationParameters(
+  {
+    ...operationCredit,
+    status: OperationsStatus.PENDING,
+  },
+  "Receive a transfert operation with a pending status"
+)
+
+// As MTE Admin
+export const ReceiveTransfertOperationPendingAsMTEAdmin: Story = {
+  name: "Transfert/Receive operation - Pending - As MTE Admin",
+  parameters: {
+    ...operationParameters,
+    msw: {
+      handlers: [
+        mockUser(EntityType.Administration),
+        ...operationParameters.msw.handlers,
+      ],
+    },
+  },
 }
