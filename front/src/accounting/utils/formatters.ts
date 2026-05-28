@@ -59,6 +59,8 @@ export const formatOperationType = (type: string) => {
       return i18next.t("Transfert de droits")
     case ElecOperationType.ACQUISITION_FROM_CPO:
       return i18next.t("Acquisition (aménageurs)")
+    case OperationType.EXPIRATION:
+      return i18next.t("Expiration")
     default:
       return i18next.t("Inconnu")
   }
