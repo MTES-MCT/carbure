@@ -35,5 +35,6 @@ class ElecProvisionCertificate(models.Model):
     operating_unit = models.CharField(max_length=64)
     source = models.CharField(max_length=32, choices=SOURCES)
     energy_amount = models.FloatField()  # unit = MWh
+    enr_ratio = models.FloatField(null=True, blank=True)
     compensation = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True)

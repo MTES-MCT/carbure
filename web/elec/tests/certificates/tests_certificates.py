@@ -227,7 +227,9 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
     def test_transfer_provision_certificate_readjustement_flag(self):
         ElecCertificateReadjustment.objects.create(
             cpo=self.cpo,
+            year=2024,
             energy_amount=500,  # MWh
+            enr_ratio=0.25,
             error_source=ElecCertificateReadjustment.METER_READINGS,
         )
 

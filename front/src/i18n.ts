@@ -11,6 +11,7 @@ i18n
       "errors",
       "errors-api",
       "fields",
+      "backend_inputs",
       "feedstocks",
       "biofuels",
       "countries",

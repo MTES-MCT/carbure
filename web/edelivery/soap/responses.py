@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 from edelivery.adapters.zip_utils import unzip_base64_encoded_stream
-from edelivery.ebms.request_responses import BaseRequestResponse
+from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
 
 
 class BaseEdeliveryResponse:

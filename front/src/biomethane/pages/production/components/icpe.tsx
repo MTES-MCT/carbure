@@ -12,6 +12,7 @@ import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { IcpeNumberHelper } from "./icpe-number-helper"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
 import { UnitTypeEnum } from "api-schema"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type ICPEForm = Pick<ProductionUnitForm, "icpe_number" | "icpe_regime">
 
@@ -26,6 +27,7 @@ export function ICPE({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<ICPEForm>()
@@ -61,7 +63,7 @@ export function ICPE({
           <TextInput
             required={requiredICPEFields}
             readOnly={!isEditing}
-            label={t("N° ICPE")}
+            label={tBiomethaneInput("production.icpe_number")}
             state="info"
             pattern="\d{10}"
             hintText={<IcpeNumberHelper />}
@@ -70,7 +72,7 @@ export function ICPE({
           <RadioGroup
             required={requiredICPEFields}
             readOnly={!isEditing}
-            label={t("Régime ICPE")}
+            label={tBiomethaneInput("production.icpe_regime")}
             orientation="horizontal"
             options={icpeRegimeOptions}
             hintText={t(

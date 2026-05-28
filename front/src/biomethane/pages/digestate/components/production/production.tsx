@@ -9,6 +9,7 @@ import { BiomethaneProductionUnit } from "biomethane/pages/production/types"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type ProductionForm = DeepPartial<
   Pick<
@@ -34,6 +35,7 @@ export function Production({
   productionUnit: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<ProductionForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
@@ -53,7 +55,9 @@ export function Production({
               <>
                 <NumberInput
                   readOnly={!isEditing}
-                  label={t("Tonnage digestat brut produit (t)")}
+                  label={tBiomethaneInput(
+                    "digestate.raw_digestate_tonnage_produced"
+                  )}
                   type="number"
                   min={0}
                   {...bind("raw_digestate_tonnage_produced")}
@@ -62,7 +66,9 @@ export function Production({
                 />
                 <NumberInput
                   readOnly={!isEditing}
-                  label={t("Taux de MS du digestat brut (%)")}
+                  label={tBiomethaneInput(
+                    "digestate.raw_digestate_dry_matter_rate"
+                  )}
                   type="number"
                   min={0}
                   max={100}
@@ -76,7 +82,7 @@ export function Production({
               <>
                 <NumberInput
                   readOnly={!isEditing}
-                  label={t("Tonnage de digestat solide (t)")}
+                  label={tBiomethaneInput("digestate.solid_digestate_tonnage")}
                   type="number"
                   min={0}
                   {...bind("solid_digestate_tonnage")}
@@ -85,7 +91,9 @@ export function Production({
                 />
                 <NumberInput
                   readOnly={!isEditing}
-                  label={t("Quantité digestat liquide (t)")}
+                  label={tBiomethaneInput(
+                    "digestate.liquid_digestate_quantity"
+                  )}
                   type="number"
                   min={0}
                   {...bind("liquid_digestate_quantity")}
@@ -94,7 +102,9 @@ export function Production({
                 />
                 <NumberInput
                   readOnly={!isEditing}
-                  label={t("Tonnage de digestat brut (t)")}
+                  label={tBiomethaneInput(
+                    "digestate.raw_digestate_tonnage_produced"
+                  )}
                   hintText={t(
                     "Quantité éventuelle de digestat brut n'ayant pas subi de séparation de phase"
                   )}

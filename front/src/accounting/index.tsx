@@ -9,11 +9,14 @@ import { TeneurLayout } from "./layouts/teneur-layout"
 import { useLastSectorVisited } from "./hooks/last-sector-visited"
 import { ObjectivesLayout } from "./pages/admin/objectives/objectives-layout"
 import { Objectives } from "./pages/admin/objectives/objectives"
+import { AdminOperationsLayout } from "./pages/admin/operations/admin-operations-layout"
+import { AdminOperations } from "./pages/admin/operations/admin-operations"
 import {
   AnnualDeclarationTiruertProvider,
   useAnnualDeclarationTiruert,
 } from "./providers/annual-declaration-tiruert.provider"
 import { useRoutes } from "common/hooks/routes"
+import { SectorTabs } from "./types"
 
 const MaterialAccounting = () => {
   const entity = useEntity()
@@ -54,17 +57,30 @@ const MaterialAccounting = () => {
           </Route>
         )}
         {(isAdmin || allowAccounting) && (
-          <Route
-            path="admin/objectives"
-            element={
-              <AnnualDeclarationTiruertProvider>
-                <ObjectivesLayout />
-              </AnnualDeclarationTiruertProvider>
-            }
-          >
-            <Route index element={<Objectives />} />
-            <Route path=":entityId" element={<Objectives />} />
-          </Route>
+          <>
+            <Route
+              path="admin/objectives"
+              element={
+                <AnnualDeclarationTiruertProvider>
+                  <ObjectivesLayout />
+                </AnnualDeclarationTiruertProvider>
+              }
+            >
+              <Route index element={<Objectives />} />
+              <Route path=":entityId" element={<Objectives />} />
+            </Route>
+            <Route path="admin/operations" element={<AdminOperationsLayout />}>
+              <Route index element={<AdminOperations />} />
+              <Route
+                path=":selectedEntityId/:category"
+                element={<AdminOperations />}
+              />
+              <Route
+                path=":selectedEntityId"
+                element={<Navigate replace to={SectorTabs.BIOFUELS} />}
+              />
+            </Route>
+          </>
         )}
         <Route path="*" element={<Navigate replace to="operations" />} />
       </Routes>

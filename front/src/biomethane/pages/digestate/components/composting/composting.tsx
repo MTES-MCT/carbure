@@ -16,6 +16,7 @@ import {
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { useSaveDigestate } from "../../digestate.hooks"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type CompostingForm = DeepPartial<
   Pick<
@@ -44,6 +45,7 @@ const extractValues = (digestate?: CompostingForm) => {
 
 export function Composting() {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<CompostingForm>()
   const saveDigestate = useSaveDigestate()
   const { canEditDeclaration } = useAnnualDeclaration()
@@ -81,7 +83,7 @@ export function Composting() {
             options={compostingOptions}
             {...bind("composting_locations")}
             readOnly={!isEditing}
-            label={t("Lieu du compostage")}
+            label={tBiomethaneInput("digestate.composting_locations")}
             orientation="horizontal"
             required
           />
@@ -89,14 +91,14 @@ export function Composting() {
             <Grid cols={2} gap="lg">
               <TextInput
                 readOnly={!isEditing}
-                label={t("Nom de la plateforme externe")}
+                label={tBiomethaneInput("digestate.external_platform_name")}
                 {...bind("external_platform_name")}
                 required
               />
               <NumberInput
                 readOnly={!isEditing}
-                label={t(
-                  "Volume de digestat composté sur la plateforme externe (t)"
+                label={tBiomethaneInput(
+                  "digestate.external_platform_digestate_volume"
                 )}
                 type="number"
                 min={0}
@@ -107,13 +109,17 @@ export function Composting() {
 
               <AutoCompleteDepartments
                 readOnly={!isEditing}
-                label={t("Département de la plateforme externe")}
+                label={tBiomethaneInput(
+                  "digestate.external_platform_department"
+                )}
                 {...bind("external_platform_department")}
                 required
               />
               <TextInput
                 readOnly={!isEditing}
-                label={t("Commune de la plateforme externe")}
+                label={tBiomethaneInput(
+                  "digestate.external_platform_municipality"
+                )}
                 {...bind("external_platform_municipality")}
                 required
               />
@@ -122,7 +128,9 @@ export function Composting() {
           {isOnSiteSelected && (
             <NumberInput
               readOnly={!isEditing}
-              label={t("Volume de digestat composté sur site (t)")}
+              label={tBiomethaneInput(
+                "digestate.on_site_composted_digestate_volume"
+              )}
               min={0}
               {...bind("on_site_composted_digestate_volume")}
               required

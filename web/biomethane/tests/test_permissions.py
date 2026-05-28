@@ -3,6 +3,7 @@ from django.test import TestCase
 from biomethane.permissions import (
     CanAccessAdminModule,
     CanAccessInjection,
+    HasBiomethaneProducerRights,
     HasBiomethaneProducerWriteRights,
     HasDrealRights,
     ReadAccessBiomethane,
@@ -24,6 +25,7 @@ from biomethane.views import (
     BiomethaneSupplyPlanViewSet,
 )
 from biomethane.views.admin.annual_declaration import BiomethaneAdminAnnualDeclarationViewSet
+from biomethane.views.declaration_export import export_annual_declaration
 from core.models import Entity, UserRights
 from core.tests_utils import PermissionTestMixin
 
@@ -187,3 +189,8 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
                 (["list", "filters"], [CanAccessAdminModule()]),
             ],
         )
+
+    def test_export_annual_declaration_permissions(self):
+        """Test export_annual_declaration api_view permission: producer OR DREAL."""
+        permissions = [p() for p in export_annual_declaration.cls.permission_classes]
+        self.assertPermissionsEqual(permissions, [(HasBiomethaneProducerRights | HasDrealRights)()])

@@ -13,6 +13,7 @@ import { BiomethaneContract } from "biomethane/pages/contract/types"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useInjectedBiomethane } from "./injected-biomethane.hooks"
 import { CONVERSIONS } from "common/utils/formatters"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 export type InjectedBiomethaneForm = DeepPartial<
   Pick<
@@ -40,6 +41,7 @@ export function InjectedBiomethane({
   energy?: BiomethaneEnergy
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useFormContext<InjectedBiomethaneForm>()
   const saveEnergy = useSaveEnergy()
   const { canEditDeclaration } = useAnnualDeclaration()
@@ -63,7 +65,9 @@ export function InjectedBiomethane({
         <ManagedEditableCard.Form onSubmit={handleSave}>
           <NumberInput
             readOnly={!isEditing}
-            label={t("Quantité de biométhane injecté (GWhPCS/an)")}
+            label={tBiomethaneInput(
+              "energy.injected_biomethane_gwh_pcs_per_year"
+            )}
             type="number"
             min={0}
             step={0.01}
@@ -72,7 +76,9 @@ export function InjectedBiomethane({
           />
           <NumberInput
             readOnly={!isEditing}
-            label={t("PCS du biométhane injecté (kWh/Nm3)")}
+            label={tBiomethaneInput(
+              "energy.injected_biomethane_pcs_kwh_per_nm3"
+            )}
             hintText={t("Valeur moyenne de l'année de déclaration")}
             type="number"
             min={0}
@@ -98,7 +104,9 @@ export function InjectedBiomethane({
 
           <NumberInput
             readOnly={!isEditing}
-            label={t("Taux de CH4 dans le biométhane injecté (%)")}
+            label={tBiomethaneInput(
+              "energy.injected_biomethane_ch4_rate_percent"
+            )}
             hintText={t("Valeur moyenne de l'année de déclaration")}
             type="number"
             min={0}

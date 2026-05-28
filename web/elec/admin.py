@@ -242,6 +242,7 @@ class ElecProvisionCertificateQualichargeAdmin(admin.ModelAdmin):
 class ElecCertificateReadjustmentAdmin(admin.ModelAdmin):
     list_display = [
         "cpo",
+        "year",
         "created_at",
         "energy_amount",
         "error_source",

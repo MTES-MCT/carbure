@@ -32,7 +32,7 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
     # Nature de l'énergie utilisée
     attest_no_fossil_for_energy = factory.Faker("boolean")
     energy_types = factory.LazyAttribute(
-        lambda obj: random.sample([choice[0] for choice in BiomethaneEnergy.ENERGY_TYPES], k=random.randint(1, 3))
+        lambda obj: random.sample([choice[0] for choice in BiomethaneEnergy.ENERGY_TYPES_CHOICES], k=random.randint(1, 3))
     )
     energy_details = factory.LazyAttribute(lambda obj: faker.text(max_nb_chars=500) if obj.energy_types else None)
 
@@ -55,7 +55,9 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
         lambda obj: faker.random_int(min=1, max=365) if obj.has_malfunctions else None
     )
     malfunction_types = factory.LazyAttribute(
-        lambda obj: random.sample([choice[0] for choice in BiomethaneEnergy.MALFUNCTION_TYPES], k=random.randint(1, 3))
+        lambda obj: random.sample(
+            [choice[0] for choice in BiomethaneEnergy.MALFUNCTION_TYPES_CHOICES], k=random.randint(1, 3)
+        )
         if obj.has_malfunctions
         else None
     )

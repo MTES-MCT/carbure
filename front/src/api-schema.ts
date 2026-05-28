@@ -582,6 +582,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Export all biomethane data for a producer and a given year as an Excel file. */
+        get: operations["biomethane_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/injection-site/": {
         parameters: {
             query?: never;
@@ -3140,12 +3157,16 @@ export interface components {
         Airport: {
             readonly id: number;
             name: string;
+            /** Commune */
             city?: string;
             icao_code?: string;
             readonly country: components["schemas"]["Country"];
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             is_ue_airport?: boolean;
         };
@@ -3310,23 +3331,44 @@ export interface components {
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
             readonly tracked_amendment_types: components["schemas"]["TrackedAmendmentTypesEnum"][];
             complementary_aid_organisms: components["schemas"]["ComplementaryAidOrganismsEnum"][];
+            /** Référence de l'arrêté tarifaire */
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
+            /** Catégorie d'installation */
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
+            /**
+             * Cmax (Nm³/h)
+             * Format: double
+             */
             cmax?: number | null;
+            /** Annualisation du contrôle de la Cmax */
             cmax_annualized?: boolean | null;
-            /** Format: double */
+            /**
+             * Cmax annualisée (GWhPCS/an)
+             * Format: double
+             */
             cmax_annualized_value?: number | null;
-            /** Format: double */
+            /**
+             * PAP contractualisée (GWhPCS/an)
+             * Format: double
+             */
             pap_contracted?: number | null;
-            /** Format: date */
+            /**
+             * Date de signature
+             * Format: date
+             */
             signature_date?: string | null;
-            /** Format: date */
+            /**
+             * Date de prise d'effet
+             * Format: date
+             */
             effective_date?: string | null;
             /** Format: uri */
             conditions_file?: string | null;
+            /** Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement? */
             has_complementary_investment_aid?: boolean | null;
+            /** Précisez le nom du ou des organismes publics ayant octroyé l'aide */
             complementary_aid_other_organism_name?: string | null;
+            /** Acheteur */
             buyer?: number | null;
             producer: number;
         };
@@ -3367,132 +3409,262 @@ export interface components {
             cmax_annualized?: boolean | null;
             is_red_ii?: boolean;
             complementary_aid_organisms?: components["schemas"]["ComplementaryAidOrganismsEnum"][];
+            /** Référence de l'arrêté tarifaire */
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
+            /** Catégorie d'installation */
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
-            /** Format: double */
+            /**
+             * Cmax (Nm³/h)
+             * Format: double
+             */
             cmax?: number | null;
-            /** Format: double */
+            /**
+             * Cmax annualisée (GWhPCS/an)
+             * Format: double
+             */
             cmax_annualized_value?: number | null;
-            /** Format: double */
+            /**
+             * PAP contractualisée (GWhPCS/an)
+             * Format: double
+             */
             pap_contracted?: number | null;
-            /** Format: date */
+            /**
+             * Date de signature
+             * Format: date
+             */
             signature_date?: string | null;
-            /** Format: date */
+            /**
+             * Date de prise d'effet
+             * Format: date
+             */
             effective_date?: string | null;
             /** Format: binary */
             conditions_file?: File | null;
             tracked_amendment_types?: unknown;
+            /** Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement? */
             has_complementary_investment_aid?: boolean | null;
+            /** Précisez le nom du ou des organismes publics ayant octroyé l'aide */
             complementary_aid_other_organism_name?: string | null;
+            /** Acheteur */
             buyer?: number | null;
         };
         BiomethaneDigestate: {
             readonly id: number;
             composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
             readonly spreadings: components["schemas"]["BiomethaneDigestateSpreading"][];
+            /** Année */
             year: number;
-            /** Format: double */
+            /**
+             * Tonnage digestat brut produit (t)
+             * Format: double
+             */
             raw_digestate_tonnage_produced?: number | null;
-            /** Format: double */
+            /**
+             * Taux de MS du digestat brut (%)
+             * Format: double
+             */
             raw_digestate_dry_matter_rate?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage de digestat solide (t)
+             * Format: double
+             */
             solid_digestate_tonnage?: number | null;
-            /** Format: double */
+            /**
+             * Quantité digestat liquide (t)
+             * Format: double
+             */
             liquid_digestate_quantity?: number | null;
-            /** Format: double */
+            /**
+             * Distance moyenne de valorisation d'épandage (km)
+             * Format: double
+             */
             average_spreading_valorization_distance?: number | null;
+            /** Nom de la plateforme externe */
             external_platform_name?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur la plateforme externe (t)
+             * Format: double
+             */
             external_platform_digestate_volume?: number | null;
+            /** Département de la plateforme externe */
             external_platform_department?: string | null;
+            /** Commune de la plateforme externe */
             external_platform_municipality?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur site (t)
+             * Format: double
+             */
             on_site_composted_digestate_volume?: number | null;
-            /** Format: double */
+            /**
+             * Volume annuel éliminé (t)
+             * Format: double
+             */
             annual_eliminated_volume?: number | null;
+            /** Indiquer le nom de l'incinérateur ou du centre d'enfouissement */
             incinerator_landfill_center_name?: string | null;
-            /** Format: double */
+            /**
+             * Quantité de matières totales traitées par la STEP allant en incinération (t)
+             * Format: double
+             */
             wwtp_materials_to_incineration?: number | null;
+            /** Entreprise(s) acquérant le digestat */
             acquiring_companies?: string | null;
-            /** Format: double */
+            /**
+             * Volume vendu (t)
+             * Format: double
+             */
             sold_volume?: number | null;
             producer: number;
         };
         BiomethaneDigestateInputRequest: {
             composting_locations?: components["schemas"]["CompostingLocationsEnum"][];
-            /** Format: double */
+            /**
+             * Tonnage digestat brut produit (t)
+             * Format: double
+             */
             raw_digestate_tonnage_produced?: number | null;
-            /** Format: double */
+            /**
+             * Taux de MS du digestat brut (%)
+             * Format: double
+             */
             raw_digestate_dry_matter_rate?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage de digestat solide (t)
+             * Format: double
+             */
             solid_digestate_tonnage?: number | null;
-            /** Format: double */
+            /**
+             * Quantité digestat liquide (t)
+             * Format: double
+             */
             liquid_digestate_quantity?: number | null;
-            /** Format: double */
+            /**
+             * Distance moyenne de valorisation d'épandage (km)
+             * Format: double
+             */
             average_spreading_valorization_distance?: number | null;
+            /** Nom de la plateforme externe */
             external_platform_name?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur la plateforme externe (t)
+             * Format: double
+             */
             external_platform_digestate_volume?: number | null;
+            /** Département de la plateforme externe */
             external_platform_department?: string | null;
+            /** Commune de la plateforme externe */
             external_platform_municipality?: string | null;
-            /** Format: double */
+            /**
+             * Volume de digestat composté sur site (t)
+             * Format: double
+             */
             on_site_composted_digestate_volume?: number | null;
-            /** Format: double */
+            /**
+             * Volume annuel éliminé (t)
+             * Format: double
+             */
             annual_eliminated_volume?: number | null;
+            /** Indiquer le nom de l'incinérateur ou du centre d'enfouissement */
             incinerator_landfill_center_name?: string | null;
-            /** Format: double */
+            /**
+             * Quantité de matières totales traitées par la STEP allant en incinération (t)
+             * Format: double
+             */
             wwtp_materials_to_incineration?: number | null;
+            /** Entreprise(s) acquérant le digestat */
             acquiring_companies?: string | null;
-            /** Format: double */
+            /**
+             * Volume vendu (t)
+             * Format: double
+             */
             sold_volume?: number | null;
         };
         BiomethaneDigestateSpreading: {
             readonly id: number;
+            /** Département d'épandage */
             spreading_department: string;
-            /** Format: double */
+            /**
+             * Quantité épandue (t)
+             * Format: double
+             */
             spread_quantity: number;
-            /** Format: double */
+            /**
+             * Superficie des parcelles épandues (ha)
+             * Format: double
+             */
             spread_parcels_area: number;
             digestate: number;
         };
         BiomethaneDigestateSpreadingAdd: {
             readonly id: number;
+            /** Département d'épandage */
             spreading_department: string;
-            /** Format: double */
+            /**
+             * Quantité épandue (t)
+             * Format: double
+             */
             spread_quantity: number;
-            /** Format: double */
+            /**
+             * Superficie des parcelles épandues (ha)
+             * Format: double
+             */
             spread_parcels_area: number;
         };
         BiomethaneDigestateSpreadingAddRequest: {
             year: number;
+            /** Département d'épandage */
             spreading_department: string;
-            /** Format: double */
+            /**
+             * Quantité épandue (t)
+             * Format: double
+             */
             spread_quantity: number;
-            /** Format: double */
+            /**
+             * Superficie des parcelles épandues (ha)
+             * Format: double
+             */
             spread_parcels_area: number;
         };
         BiomethaneDigestateStorage: {
             readonly id: number;
+            /** Type de stockage */
             type: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
             producer: number;
         };
         BiomethaneDigestateStorageInput: {
             readonly id: number;
+            /** Type de stockage */
             type: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
         };
         BiomethaneDigestateStorageInputRequest: {
+            /** Type de stockage */
             type: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
         };
         BiomethaneEnergy: {
@@ -3500,20 +3672,41 @@ export interface components {
             energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             readonly monthly_reports: components["schemas"]["BiomethaneEnergyMonthlyReport"][];
+            /** Année */
             year: number;
-            /** Format: double */
+            /**
+             * Quantité de biométhane injecté (GWhPCS/an)
+             * Format: double
+             */
             injected_biomethane_gwh_pcs_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Taux de CH4 dans le biométhane injecté (%)
+             * Format: double
+             */
             injected_biomethane_ch4_rate_percent?: number | null;
-            /** Format: double */
+            /**
+             * PCS du biométhane injecté (kWh/Nm3)
+             * Format: double
+             */
             injected_biomethane_pcs_kwh_per_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz produit (Nm3/an)
+             * Format: double
+             */
             produced_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz torché (Nm3/an)
+             * Format: double
+             */
             flared_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Nombre d'heures de fonctionnement de la torchère (h)
+             * Format: double
+             */
             flaring_operating_hours?: number | null;
+            /** J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d'origine fossile */
             attest_no_fossil_for_energy?: boolean;
+            /** Précisions */
             energy_details?: string | null;
             /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
@@ -3523,36 +3716,70 @@ export interface components {
             self_consumed_biogas_nm3?: number | null;
             /** Format: double */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
+             * Format: double
+             */
             total_unit_electric_consumption_kwe?: number | null;
+            /** Addition de butane ou propane lors de l'injection du biométhane dans le réseau */
             butane_or_propane_addition?: boolean;
-            /** Format: double */
+            /**
+             * Quantité de combustible fossile consommé (kWh)
+             * Format: double
+             */
             fossil_fuel_consumed_kwh?: number | null;
+            /** L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement d'une opposition ou de plaintes de voisinage ? */
             has_opposition_or_complaints_acceptability?: boolean;
+            /** Nombre d'ETP estimé pour l'activité de méthanisation sur l'année */
             estimated_work_days_acceptability?: number | null;
+            /** Y'a t-il eu des dysfonctionnements ? */
             has_malfunctions?: boolean;
+            /** Durée cumulée du dysfonctionnement (en jours) */
             malfunction_cumulative_duration_days?: number | null;
+            /** Précisions sur les dysfonctionnements */
             malfunction_details?: string | null;
+            /** Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux */
             has_injection_difficulties_due_to_network_saturation?: boolean;
+            /** Nombre d'heures d'impossibilité d'injection (h) */
             injection_impossibility_hours?: number | null;
             producer: number;
         };
         BiomethaneEnergyInputRequest: {
             energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
-            /** Format: double */
+            /**
+             * Quantité de biométhane injecté (GWhPCS/an)
+             * Format: double
+             */
             injected_biomethane_gwh_pcs_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Taux de CH4 dans le biométhane injecté (%)
+             * Format: double
+             */
             injected_biomethane_ch4_rate_percent?: number | null;
-            /** Format: double */
+            /**
+             * PCS du biométhane injecté (kWh/Nm3)
+             * Format: double
+             */
             injected_biomethane_pcs_kwh_per_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz produit (Nm3/an)
+             * Format: double
+             */
             produced_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz torché (Nm3/an)
+             * Format: double
+             */
             flared_biogas_nm3_per_year?: number | null;
-            /** Format: double */
+            /**
+             * Nombre d'heures de fonctionnement de la torchère (h)
+             * Format: double
+             */
             flaring_operating_hours?: number | null;
+            /** J'atteste que les besoins en énergie cités ci-dessus ne sont pas satisfaits par une énergie d'origine fossile */
             attest_no_fossil_for_energy?: boolean;
+            /** Précisions */
             energy_details?: string | null;
             /** Format: double */
             purified_biogas_quantity_nm3?: number | null;
@@ -3562,49 +3789,88 @@ export interface components {
             self_consumed_biogas_nm3?: number | null;
             /** Format: double */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
+             * Format: double
+             */
             total_unit_electric_consumption_kwe?: number | null;
+            /** Addition de butane ou propane lors de l'injection du biométhane dans le réseau */
             butane_or_propane_addition?: boolean;
-            /** Format: double */
+            /**
+             * Quantité de combustible fossile consommé (kWh)
+             * Format: double
+             */
             fossil_fuel_consumed_kwh?: number | null;
+            /** L'exploitation de votre unité de méthanisation fait-elle l'objet actuellement d'une opposition ou de plaintes de voisinage ? */
             has_opposition_or_complaints_acceptability?: boolean;
+            /** Nombre d'ETP estimé pour l'activité de méthanisation sur l'année */
             estimated_work_days_acceptability?: number | null;
+            /** Y'a t-il eu des dysfonctionnements ? */
             has_malfunctions?: boolean;
+            /** Durée cumulée du dysfonctionnement (en jours) */
             malfunction_cumulative_duration_days?: number | null;
+            /** Précisions sur les dysfonctionnements */
             malfunction_details?: string | null;
+            /** Difficultés pour l'injection dans le réseau de gaz en raison de périodes de saturation des réseaux */
             has_injection_difficulties_due_to_network_saturation?: boolean;
+            /** Nombre d'heures d'impossibilité d'injection (h) */
             injection_impossibility_hours?: number | null;
         };
         BiomethaneEnergyMonthlyReport: {
+            /** Mois */
             month: number;
-            /** Format: double */
+            /**
+             * Volume injecté (Nm3)
+             * Format: double
+             */
             injected_volume_nm3?: number;
-            /** Format: double */
+            /**
+             * Débit moyen mensuel (Nm3/h)
+             * Format: double
+             */
             average_monthly_flow_nm3_per_hour?: number;
             energy: number;
         };
         BiomethaneInjectionSite: {
             readonly id: number;
+            /** Numéro d'identifiant unique du site d'injection */
             unique_identification_number: string;
+            /** Raccordement à un site d'injection mutualisé */
             is_shared_injection_site?: boolean;
+            /** N° de compteur associé au site d'injection */
             meter_number?: string | null;
+            /** Le site d'injection est différent du site de production */
             is_different_from_production_site?: boolean;
+            /** Adresse du site d'injection (Numéro et rue) */
             company_address?: string | null;
+            /** Commune */
             city?: string | null;
+            /** Code postal */
             postal_code?: string | null;
+            /** Type de réseau */
             network_type?: components["schemas"]["NetworkTypeEnum"] | null;
+            /** Nom du gestionnaire de réseau */
             network_manager_name?: string | null;
             producer: number;
         };
         BiomethaneInjectionSiteInputRequest: {
+            /** Numéro d'identifiant unique du site d'injection */
             unique_identification_number: string;
+            /** Raccordement à un site d'injection mutualisé */
             is_shared_injection_site?: boolean;
+            /** N° de compteur associé au site d'injection */
             meter_number?: string | null;
+            /** Le site d'injection est différent du site de production */
             is_different_from_production_site?: boolean;
+            /** Adresse du site d'injection (Numéro et rue) */
             company_address?: string | null;
+            /** Commune */
             city?: string | null;
+            /** Code postal */
             postal_code?: string | null;
+            /** Type de réseau */
             network_type: components["schemas"]["NetworkTypeEnum"] | null;
+            /** Nom du gestionnaire de réseau */
             network_manager_name: string | null;
         };
         BiomethaneProducer: {
@@ -3619,32 +3885,57 @@ export interface components {
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
             name: string;
+            /** SIRET */
             site_siret?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Commune */
             city?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /** Code INSEE */
             insee_code?: string | null;
+            /** Type d'installation */
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
+            /** Votre site dispose-t-il d'un agrément sanitaire ? */
             has_sanitary_approval?: boolean;
+            /** N° Agrément sanitaire */
             sanitary_approval_number?: string | null;
+            /** Disposez vous d'une dérogation à l'hygiénisation? */
             has_hygienization_exemption?: boolean;
+            /** Si oui, dérogation à l'hygiénisation : */
             hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
+            /** N° ICPE */
             icpe_number?: string | null;
+            /** Régime ICPE */
             icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+            /** Type de voie */
             process_type?: components["schemas"]["ProcessTypeEnum"] | null;
+            /** Procédé méthanisation */
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
-            /** Format: double */
+            /**
+             * Rendement moyen de l'épurateur de l'installation (%)
+             * Format: double
+             */
             production_efficiency?: number | null;
+            /** Présence d'un hygiénisateur */
             has_hygienization_unit?: boolean;
+            /** Existence d'un procédé de valorisation du CO2 ? */
             has_co2_valorization_process?: boolean;
+            /** Le digestat subit-il une séparation de phase? */
             has_digestate_phase_separation?: boolean;
+            /** Étapes complémentaires de traitement du digestat brut */
             raw_digestate_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase liquide */
             liquid_phase_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase solide */
             solid_phase_treatment_steps?: string | null;
+            /** Pays */
             country?: number | null;
             created_by?: number | null;
             producer: number;
@@ -3656,32 +3947,57 @@ export interface components {
             digestate_sale_types?: components["schemas"]["DigestateSaleTypesEnum"][];
             department?: string;
             name: string;
+            /** SIRET */
             site_siret?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Commune */
             city?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /** Code INSEE */
             insee_code?: string | null;
+            /** Type d'installation */
             unit_type?: components["schemas"]["UnitTypeEnum"] | null;
+            /** Votre site dispose-t-il d'un agrément sanitaire ? */
             has_sanitary_approval?: boolean;
+            /** N° Agrément sanitaire */
             sanitary_approval_number?: string | null;
+            /** Disposez vous d'une dérogation à l'hygiénisation? */
             has_hygienization_exemption?: boolean;
+            /** Si oui, dérogation à l'hygiénisation : */
             hygienization_exemption_type?: components["schemas"]["HygienizationExemptionTypeEnum"] | null;
+            /** N° ICPE */
             icpe_number?: string | null;
+            /** Régime ICPE */
             icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+            /** Type de voie */
             process_type?: components["schemas"]["ProcessTypeEnum"] | null;
+            /** Procédé méthanisation */
             methanization_process?: components["schemas"]["MethanizationProcessEnum"] | null;
-            /** Format: double */
+            /**
+             * Rendement moyen de l'épurateur de l'installation (%)
+             * Format: double
+             */
             production_efficiency?: number | null;
+            /** Présence d'un hygiénisateur */
             has_hygienization_unit?: boolean;
+            /** Existence d'un procédé de valorisation du CO2 ? */
             has_co2_valorization_process?: boolean;
+            /** Le digestat subit-il une séparation de phase? */
             has_digestate_phase_separation?: boolean;
+            /** Étapes complémentaires de traitement du digestat brut */
             raw_digestate_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase liquide */
             liquid_phase_treatment_steps?: string | null;
+            /** Étape(s) complémentaire(s) de traitement de la phase solide */
             solid_phase_treatment_steps?: string | null;
+            /** Pays */
             country?: number | null;
             created_by?: number | null;
         };
@@ -3690,19 +4006,37 @@ export interface components {
             origin_country: components["schemas"]["Country"];
             feedstock: components["schemas"]["FeedStockClassification"];
             producer: components["schemas"]["EntityPreview"];
+            /** Provenance */
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
+            /** Type de CIVE */
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
+            /** Précisez la culture */
             culture_details?: string | null;
+            /** Type de collecte */
             collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
+            /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
-            /** Format: double */
+            /**
+             * Ratio de matière sèche - tMS/tMS (%)
+             * Format: double
+             */
             dry_matter_ratio_percent?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage
+             * Format: double
+             */
             volume?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
-            /** Format: double */
+            /**
+             * Distance moyenne pondérée d'approvisionnement (Km)
+             * Format: double
+             */
             average_weighted_distance_km?: number | null;
-            /** Format: double */
+            /**
+             * Distance maximale (Km)
+             * Format: double
+             */
             maximum_distance_km?: number | null;
             supply_plan: number;
         };
@@ -3723,6 +4057,7 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
         };
         BiomethaneSupplyInputCreateRequest: {
@@ -3741,6 +4076,7 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
         };
         /** @description Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche). */
@@ -3753,15 +4089,29 @@ export interface components {
             readonly material_unit: string;
             readonly type_cive: string;
             readonly collection_type: string;
+            /** Précisez la culture */
             culture_details?: string | null;
-            /** Format: double */
+            /**
+             * Ratio de matière sèche - tMS/tMS (%)
+             * Format: double
+             */
             dry_matter_ratio_percent?: number | null;
-            /** Format: double */
+            /**
+             * Tonnage
+             * Format: double
+             */
             volume?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
-            /** Format: double */
+            /**
+             * Distance moyenne pondérée d'approvisionnement (Km)
+             * Format: double
+             */
             average_weighted_distance_km?: number | null;
-            /** Format: double */
+            /**
+             * Distance maximale (Km)
+             * Format: double
+             */
             maximum_distance_km?: number | null;
         };
         /**
@@ -4032,11 +4382,16 @@ export interface components {
             blending_is_outsourced: boolean;
             blending_entity_id?: number;
             name: string;
+            /** SIRET */
             site_siret?: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Commune */
             city?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
@@ -4057,6 +4412,7 @@ export interface components {
              * @description En degrés Celsius
              */
             useful_temperature?: number | null;
+            /** Pays */
             country?: number | null;
             created_by?: number | null;
         };
@@ -4097,12 +4453,16 @@ export interface components {
         Depot: {
             readonly id: number;
             name: string;
+            /** Commune */
             city?: string;
             customs_id?: string;
             readonly country: components["schemas"]["Country"];
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             accise?: string;
             /**
@@ -4122,13 +4482,16 @@ export interface components {
             useful_temperature?: number | null;
         };
         DepotProductionSite: {
+            /** Adresse */
             address?: string;
             name: string;
             country: components["schemas"]["Pays"];
             readonly id: number;
             /** Format: date */
             date_mise_en_service?: string | null;
+            /** SIRET */
             site_siret?: string;
+            /** Code postal */
             postal_code?: string;
             manager_name?: string;
             manager_phone?: string;
@@ -4137,6 +4500,7 @@ export interface components {
             eligible_dc?: boolean;
             dc_reference?: string;
             dc_number?: string;
+            /** Commune */
             city?: string;
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
@@ -4271,10 +4635,15 @@ export interface components {
             ges_option?: components["schemas"]["GesOptionEnum"];
             eligible_dc?: boolean;
             dc_reference?: string;
+            /** SIRET */
             site_siret?: string;
+            /** Adresse */
             address?: string;
+            /** Commune */
             city?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             manager_name?: string;
             manager_phone?: string;
@@ -4294,10 +4663,15 @@ export interface components {
             ges_option?: components["schemas"]["GesOptionEnum"];
             eligible_dc?: boolean;
             dc_reference?: string;
+            /** SIRET */
             site_siret?: string;
+            /** Adresse */
             address?: string;
+            /** Commune */
             city?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             manager_name?: string;
             manager_phone?: string;
@@ -4464,6 +4838,8 @@ export interface components {
             energy_amount: number;
             /** Format: date-time */
             readonly created_at: string | null;
+            /** Format: double */
+            enr_ratio?: number | null;
         };
         ElecProvisionCertificateQualicharge: {
             readonly id: number;
@@ -4631,10 +5007,13 @@ export interface components {
             readonly id: number;
             customs_id?: string;
             name: string;
+            /** Commune */
             city?: string;
             country: components["schemas"]["Pays"];
             site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
             address?: string;
+            /** Code postal */
             postal_code?: string;
             /**
              * Format: double
@@ -4676,12 +5055,15 @@ export interface components {
         };
         EntityProductionSite: {
             readonly id: number;
+            /** Adresse */
             address?: string;
             name: string;
             readonly country: components["schemas"]["Country"];
             /** Format: date */
             date_mise_en_service?: string | null;
+            /** SIRET */
             site_siret?: string;
+            /** Code postal */
             postal_code?: string;
             manager_name?: string;
             manager_phone?: string;
@@ -4690,14 +5072,17 @@ export interface components {
             eligible_dc?: boolean;
             dc_reference?: string;
             dc_number?: string;
+            /** Commune */
             city?: string;
             readonly certificates: components["schemas"]["GenericCertificate"][];
             readonly inputs: components["schemas"]["FeedStock"][];
             readonly outputs: components["schemas"]["Biofuel"][];
         };
         EntityProductionSiteWrite: {
+            /** Adresse */
             address?: string;
             certificates: string[];
+            /** Commune */
             city?: string;
             country_code: string;
             /** Format: date */
@@ -4711,12 +5096,16 @@ export interface components {
             manager_phone?: string;
             name: string;
             outputs: string[];
+            /** Code postal */
             postal_code?: string;
+            /** SIRET */
             site_siret?: string;
         };
         EntityProductionSiteWriteRequest: {
+            /** Adresse */
             address?: string;
             certificates: string[];
+            /** Commune */
             city?: string;
             country_code: string;
             /** Format: date */
@@ -4730,7 +5119,9 @@ export interface components {
             manager_phone?: string;
             name: string;
             outputs: string[];
+            /** Code postal */
             postal_code?: string;
+            /** SIRET */
             site_siret?: string;
         };
         EntityRequest: {
@@ -4935,9 +5326,9 @@ export interface components {
          */
         IcpeRegimeEnum: IcpeRegimeEnum;
         /**
-         * @description * `INSTALLATION_CATEGORY_1` - INSTALLATION_CATEGORY_1
-         *     * `INSTALLATION_CATEGORY_2` - INSTALLATION_CATEGORY_2
-         *     * `INSTALLATION_CATEGORY_3` - INSTALLATION_CATEGORY_3
+         * @description * `INSTALLATION_CATEGORY_1` - Méthanisation en digesteur de produits ou déchets non dangereux, hors matières résultant du traitement des eaux usées urbaines ou industrielles
+         *     * `INSTALLATION_CATEGORY_2` - Méthanisation en digesteur de produits ou déchets non dangereux, y compris des matières résultant du traitement des eaux usées urbaines ou industrielles
+         *     * `INSTALLATION_CATEGORY_3` - Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés
          * @enum {string}
          */
         InstallationCategoryEnum: InstallationCategoryEnum;
@@ -5197,6 +5588,8 @@ export interface components {
             readonly quantity: number;
             readonly unit: string;
             details?: components["schemas"]["OperationDetail"][];
+            /** Format: double */
+            readonly avoided_emissions: number;
         };
         OperationLot: {
             id: number;
@@ -5485,10 +5878,16 @@ export interface components {
             is_open?: boolean;
         };
         PatchedBiomethaneDigestateStorageInputRequest: {
+            /** Type de stockage */
             type?: string;
-            /** Format: double */
+            /**
+             * Capacité de stockage (m3)
+             * Format: double
+             */
             capacity?: number;
+            /** Couverture du stockage */
             has_cover?: boolean;
+            /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
         };
         PatchedBiomethaneSupplyInputCreateRequest: {
@@ -5507,6 +5906,7 @@ export interface components {
             average_weighted_distance_km?: number | null;
             /** Format: double */
             maximum_distance_km?: number | null;
+            /** Département d'origine */
             origin_department?: string | null;
         };
         /** @description Serializer for updating the status of a DoubleCountingApplication. */
@@ -5521,8 +5921,10 @@ export interface components {
             quantity?: number;
         };
         PatchedEntityProductionSiteWriteRequest: {
+            /** Adresse */
             address?: string;
             certificates?: string[];
+            /** Commune */
             city?: string;
             country_code?: string;
             /** Format: date */
@@ -5536,7 +5938,9 @@ export interface components {
             manager_phone?: string;
             name?: string;
             outputs?: string[];
+            /** Code postal */
             postal_code?: string;
+            /** SIRET */
             site_siret?: string;
         };
         PatchedOperationUpdateRequest: {
@@ -5572,10 +5976,15 @@ export interface components {
             ges_option?: components["schemas"]["GesOptionEnum"];
             eligible_dc?: boolean;
             dc_reference?: string;
+            /** SIRET */
             site_siret?: string;
+            /** Adresse */
             address?: string;
+            /** Commune */
             city?: string;
+            /** Code postal */
             postal_code?: string;
+            /** Coordonnées GPS */
             gps_coordinates?: string | null;
             manager_name?: string;
             manager_phone?: string;
@@ -7518,6 +7927,33 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    biomethane_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
+                /** @description Year of the declaration. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fichier Excel généré */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": File;
+                };
             };
         };
     };
@@ -12148,6 +12584,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
             };
@@ -12411,6 +12848,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
             };
@@ -12459,6 +12897,7 @@ export interface operations {
                  */
                 order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[];
                 period?: string[];
+                selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
             };
@@ -12639,6 +13078,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13003,6 +13443,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13117,6 +13558,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13255,6 +13697,7 @@ export interface operations {
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
+                selected_entity_id?: number;
                 /**
                  * @description * `PENDING` - PENDING
                  *     * `ACCEPTED` - ACCEPTED
@@ -13526,10 +13969,8 @@ export enum PathsApiBiomethaneSupplyInputGetParametersQuerySource {
 export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
     department = "department",
     feedstock = "feedstock",
-    producer_id = "producer_id",
     producer_name = "producer_name",
-    source = "source",
-    year = "year"
+    source = "source"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",

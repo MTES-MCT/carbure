@@ -1,8 +1,8 @@
-from edelivery.tests.ebms.fixtures.udb_xml_data import transaction_data
+from edelivery.tests.ebms.fixtures.transaction_xml_data import transaction_xml_data
 
 
 def eo_get_transaction_response_payload(nb_transactions=1, **kwargs):
-    transactions = "".join([transaction_data(**kwargs) for i in range(0, nb_transactions)])
+    transactions = "".join([transaction_xml_data(**kwargs) for i in range(0, nb_transactions)])
 
     return f"""\
 <udb:EOGetTransactionResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">

@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next"
 import { BiomethaneDigestateStorageInputRequest } from "../../types"
 import { useAddDigestateStorage } from "../../production.hooks"
 import { DeepPartial } from "common/types"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type AddDigestateStorageForm =
   DeepPartial<BiomethaneDigestateStorageInputRequest>
@@ -22,6 +23,7 @@ export const AddDigestateStorage = ({
   annualDeclarationKey,
 }: AddDigestateStorageProps) => {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const { bind, value } = useForm<AddDigestateStorageForm>({
     type: "",
     capacity: 0,
@@ -59,27 +61,27 @@ export const AddDigestateStorage = ({
         <Box>
           <TextInput
             required //
-            label={t("Type de stockage")}
+            label={tBiomethaneInput("digestate_storage.type")}
             {...bind("type")}
           />
           <NumberInput
             required
             type="number"
             min={0}
-            label={t("Capacité de stockage (m3)")}
+            label={tBiomethaneInput("digestate_storage.capacity")}
             {...bind("capacity")}
             step={0.01}
           />
           <RadioGroup
             required
-            label={t("Couverture du stockage")}
+            label={tBiomethaneInput("digestate_storage.has_cover")}
             options={getYesNoOptions()}
             orientation="horizontal"
             {...bind("has_cover")}
           />
           <RadioGroup
             required
-            label={t("Récupération du biogaz")}
+            label={tBiomethaneInput("digestate_storage.has_biogas_recovery")}
             options={getYesNoOptions()}
             orientation="horizontal"
             {...bind("has_biogas_recovery")}

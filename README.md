@@ -36,6 +36,43 @@ Pour pouvoir lancer des scripts python en utilisant toutes les dépendances inst
 Pour charger les variables d'environnement listées dans `.env`, rajouter `uv run --env-file .env ...` dans la commande.
 Pour ne pas avoir à réécrire `--env-file .env` sur chaque commande, on peut définir une variable d'environnement `UV_ENV_FILE=.env` à plus haut niveau.
 
+## Labels traduits du backend vers le frontend
+
+Certains labels de champs backend (issus des `verbose_name` Django) peuvent etre exportés vers le frontend pour etre utilisés dans les traductions.
+
+### Fonctionnement
+
+- La génération est faite par la commande Django `export_backend_inputs`.
+- Les clés produites suivent le format `module.model.field`.
+- Le résultat est écrit dans `front/public/locales/<locale>/backend_inputs.json`.
+- Les champs techniques exclus sont configurés dans `web/core/services/model_translation_fields.py` via `EXCLUDED_TRANSLATION_FIELDS` (par défaut: `id`).
+
+### Convention de nom de modèle dans les clés
+
+Par défaut, la partie `model` utilise `model._meta.model_name`.
+
+Si un nom plus lisible est souhaité, un modèle peut définir un attribut:
+
+```python
+translation_model_key = "contract"
+```
+
+Cet attribut est utilisé en priorité lors de la génération des clés de traduction.
+
+### Commandes utiles
+
+Générer les labels pour un module:
+
+```bash
+uv run python web/manage.py export_backend_inputs --modules=biomethane --locales=fr,en
+```
+
+Générer les labels pour plusieurs modules:
+
+```bash
+uv run python web/manage.py export_backend_inputs --modules=biomethane,saf --locales=fr,en
+```
+
 ## Création d'un nom de domaine local personnalisé
 
 Dans le fichier `/etc/hosts` ajouter la ligne `127.0.0.1 carbure.local`

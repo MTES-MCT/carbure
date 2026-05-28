@@ -13,6 +13,7 @@ import { SiretPicker } from "common/molecules/siret-picker"
 import { AutoCompleteDepartments } from "common/molecules/autocomplete-departments"
 import { useAllowedToEdit } from "biomethane/hooks/use-allowed-to-edit"
 import { ManagedEditableCard } from "common/molecules/editable-card/managed-editable-card"
+import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
 
 type GeneralInfoForm = Pick<
   ProductionUnitForm,
@@ -45,6 +46,7 @@ export function GeneralInfo({
   productionUnit?: BiomethaneProductionUnit
 }) {
   const { t } = useTranslation()
+  const tBiomethaneInput = useBiomethaneBackendInputLabel()
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value, setField } = useFormContext<GeneralInfoForm>()
@@ -122,7 +124,7 @@ export function GeneralInfo({
           <Grid cols={2} gap="lg">
             <AutoCompleteDepartments
               readOnly={!isEditing}
-              label={t("Département")}
+              label={tBiomethaneInput("production.department")}
               required
               {...bind("department")}
               onChange={(value) => {
@@ -143,14 +145,14 @@ export function GeneralInfo({
             />
             <TextInput
               readOnly={!isEditing}
-              label={t("Code INSEE")}
+              label={tBiomethaneInput("production.insee_code")}
               required
               {...bind("insee_code")}
             />
           </Grid>
           <RadioGroup
             readOnly={!isEditing}
-            label={t("Type d'installation")}
+            label={tBiomethaneInput("production.unit_type")}
             options={unitTypeOptions}
             required
             {...bind("unit_type")}

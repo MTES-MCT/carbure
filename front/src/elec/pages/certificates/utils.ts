@@ -1,6 +1,53 @@
 import i18next from "i18next"
-import { ProvisionCertificateSource } from "./types"
+import { ProvisionCertificate, ProvisionCertificateSource } from "./types"
 import { HttpError } from "common/services/api-fetch"
+
+type ProvisionPeriodFields = Pick<
+  ProvisionCertificate,
+  "source" | "quarter" | "year" | "month"
+>
+
+export function isEnrRatioCompensation(
+  source: ProvisionCertificate["source"] | null | undefined
+) {
+  return source === ProvisionCertificateSource.ENR_RATIO_COMPENSATION
+}
+
+export function formatProvisionQuarterCell(certificate: ProvisionPeriodFields) {
+  const options = {
+    quarter: certificate.quarter,
+    year: certificate.year,
+  }
+
+  if (isEnrRatioCompensation(certificate.source)) {
+    return i18next.t("T{{quarter}} {{year}} Rattrapage", options)
+  }
+
+  return i18next.t("T{{quarter}} {{year}}", options)
+}
+
+export function formatProvisionMonthCell(certificate: ProvisionPeriodFields) {
+  if (isEnrRatioCompensation(certificate.source)) {
+    return "-"
+  }
+
+  return i18next.t("{{month}}", {
+    month: certificate.month ?? i18next.t("-"),
+  })
+}
+
+export function shouldShowProvisionOperatingUnit(
+  source: ProvisionCertificate["source"] | null | undefined
+) {
+  return !isEnrRatioCompensation(source)
+}
+
+export function shouldShowProvisionPeriod(
+  source: ProvisionCertificate["source"] | null | undefined,
+  month?: ProvisionCertificate["month"] | null
+) {
+  return !isEnrRatioCompensation(source) && !!month
+}
 
 export function normalizeSource(source: string) {
   return {
@@ -17,6 +64,8 @@ export function getSourceLabel(source: string | null | undefined) {
       return i18next.t("Relevés trimestriels")
     case ProvisionCertificateSource.QUALICHARGE:
       return i18next.t("Qualicharge")
+    case ProvisionCertificateSource.ENR_RATIO_COMPENSATION:
+      return i18next.t("Rattrapage ENR")
     default:
       return i18next.t("N/A")
   }

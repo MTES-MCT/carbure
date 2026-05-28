@@ -3,7 +3,7 @@ from datetime import date
 from django.test import TestCase
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
-from edelivery.ebms.request_responses import EOGetTransactionResponse
+from edelivery.ebms.request_responses.eo_get_transaction_response import EOGetTransactionResponse
 from edelivery.tests.ebms.fixtures.payloads import eo_get_transaction_response_payload
 
 

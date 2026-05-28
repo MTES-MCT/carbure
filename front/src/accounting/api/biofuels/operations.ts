@@ -5,24 +5,30 @@ import { formatOperation } from "accounting/utils/formatters"
 
 export const getOperationsFilters = (
   filter: string,
-  query: OperationsQuery
+  query: OperationsQuery,
+  selected_entity_id?: number
 ) => {
   return api.GET("/tiruert/operations/filters/", {
     params: {
       query: {
         ...query,
         filter: filter as OperationsFilter,
+        selected_entity_id,
       },
     },
   })
 }
 
-export const getOperations = (query: OperationsQuery) => {
+export const getOperations = (
+  query: OperationsQuery,
+  selected_entity_id?: number
+) => {
   return api
     .GET("/tiruert/operations/", {
       params: {
         query: {
           ...query,
+          selected_entity_id,
           order_by:
             query.order_by && query.order_by.length > 0
               ? query.order_by
@@ -129,12 +135,17 @@ export const createOperation = (
   })
 }
 
-export const getOperationDetail = (entity_id: number, id: number) => {
+export const getOperationDetail = (
+  entity_id: number,
+  id: number,
+  selected_entity_id?: number
+) => {
   return api
     .GET(`/tiruert/operations/{id}/`, {
       params: {
         query: {
           entity_id,
+          selected_entity_id,
         },
         path: {
           id,
