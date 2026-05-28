@@ -60,8 +60,14 @@ export const useOperationDetailFields = (operation?: Operation) => {
         },
       ...exportationOrExpeditionFields,
       typeof operation.durability_period === "string" && {
-        label: t("Déclaration de durabilité"),
-        value: formatPeriod(operation.durability_period),
+        label:
+          operation.type === OperationType.EXPIRATION
+            ? t("Année de durabilité des volumes expirés")
+            : t("Déclaration de durabilité"),
+        value:
+          operation.type === OperationType.EXPIRATION
+            ? operation.durability_period
+            : formatPeriod(operation.durability_period),
       },
     ])
 
