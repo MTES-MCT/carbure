@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedOnlyDropdownFilter
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
+from import_export.instance_loaders import CachedInstanceLoader
 
 from auth.validators import validate_name
 from core.models import (
@@ -611,6 +612,7 @@ class GenericCertificateResource(resources.ModelResource):
     class Meta:
         model = GenericCertificate
         import_id_fields = ["certificate_id"]
+        instance_loader_class = CachedInstanceLoader
         skip_unchanged = True
         report_skipped = True
 
