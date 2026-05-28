@@ -403,7 +403,7 @@ def fill_vendor_data(lot, data, entity):
         lot.vendor_certificate = None
         lot.carbure_vendor = None
         # patch to deal with people who confuse vendor certificate for supplier certificate
-        if not lot.supplier_certificate and data.get("vendor_certificate", False):
+        if not data.get("supplier_certificate", False) and data.get("vendor_certificate", False):
             # maybe they used vendor_certificate ?
             lot.supplier_certificate = data.get("vendor_certificate", "")
 
