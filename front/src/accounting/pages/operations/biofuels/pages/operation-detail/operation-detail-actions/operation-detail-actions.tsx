@@ -15,7 +15,6 @@ import {
   isReceivingOperation,
   isSendingOperation,
 } from "../../../operations.utils"
-import { useUser } from "common/hooks/user"
 
 export const OperationDetailActions = ({
   operation,
@@ -27,7 +26,6 @@ export const OperationDetailActions = ({
   const entity = useEntity()
   const { t } = useTranslation()
   const canUpdateOperation = entity.canWrite()
-  const { isMTEDGEC } = useUser()
 
   const { execute: deleteOperation, loading: deleteOperationLoading } =
     useDeleteOperation({
@@ -138,7 +136,7 @@ export const OperationDetailActions = ({
     canUpdateOperation,
   ])
 
-  if (!operation || !canUpdateOperation || isMTEDGEC) return null
+  if (!operation || !canUpdateOperation || entity.isAdmin) return null
 
   return buttonsComponent
 }
