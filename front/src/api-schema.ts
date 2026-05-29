@@ -13285,6 +13285,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13650,6 +13651,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13765,6 +13767,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13904,6 +13907,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -14519,7 +14523,8 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     period = "period",
     sector = "sector",
     status = "status",
-    type = "type"
+    type = "type",
+    year = "year"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",

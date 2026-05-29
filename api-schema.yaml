@@ -10334,6 +10334,10 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: number
       tags:
         - tiruert
       security:
@@ -11031,6 +11035,10 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: number
       tags:
         - tiruert
       security:
@@ -11320,6 +11328,10 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: number
       tags:
         - tiruert
       security:
@@ -11472,6 +11484,7 @@ paths:
               - sector
               - status
               - type
+              - year
           description: Filter string to apply
           required: true
         - in: query
@@ -11673,6 +11686,10 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: number
       tags:
         - tiruert
       security:
