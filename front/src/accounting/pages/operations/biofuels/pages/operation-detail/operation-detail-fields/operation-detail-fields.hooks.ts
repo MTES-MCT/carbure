@@ -69,6 +69,10 @@ export const useOperationDetailFields = (operation?: Operation) => {
             ? operation.durability_period
             : formatPeriod(operation.durability_period),
       },
+      typeof operation.year === "number" && {
+        label: t("Année"),
+        value: operation.year,
+      },
     ])
 
     return fields

@@ -5591,6 +5591,7 @@ export interface components {
             readonly avoided_emissions: number;
             readonly unit: string;
             details?: components["schemas"]["OperationDetail"][];
+            readonly year: number;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -5663,6 +5664,7 @@ export interface components {
             details?: components["schemas"]["OperationDetail"][];
             /** Format: double */
             readonly avoided_emissions: number;
+            readonly year: number;
         };
         OperationLot: {
             id: number;

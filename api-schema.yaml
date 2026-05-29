@@ -17388,6 +17388,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationDetail"
+        year:
+          type: integer
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -17406,6 +17409,7 @@ components:
         - to_depot
         - type
         - unit
+        - year
     OperationCorrectionRequest:
       type: object
       properties:
@@ -17588,6 +17592,9 @@ components:
           type: number
           format: double
           readOnly: true
+        year:
+          type: integer
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -17604,6 +17611,7 @@ components:
         - to_depot
         - type
         - unit
+        - year
     OperationLot:
       type: object
       properties:
