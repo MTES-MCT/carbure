@@ -136,7 +136,7 @@ export const OperationDetailActions = ({
     canUpdateOperation,
   ])
 
-  if (!operation || !canUpdateOperation) return null
+  if (!operation || !canUpdateOperation || entity.isAdmin) return null
 
   return buttonsComponent
 }

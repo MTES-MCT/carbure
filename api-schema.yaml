@@ -15688,6 +15688,10 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        enr_ratio:
+          type: number
+          format: double
+          nullable: true
       required:
         - cpo
         - created_at
