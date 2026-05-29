@@ -8,10 +8,15 @@ export const getOperationsFilters = (
   query: OperationsQuery,
   selected_entity_id?: number
 ) => {
+  const { year, ...queryWithoutYear } = query
+  const shouldSendYear =
+    typeof year !== "number" || year !== new Date().getFullYear()
+
   return api.GET("/tiruert/operations/filters/", {
     params: {
       query: {
-        ...query,
+        ...queryWithoutYear,
+        ...(shouldSendYear ? { year } : {}),
         filter: filter as OperationsFilter,
         selected_entity_id,
       },
