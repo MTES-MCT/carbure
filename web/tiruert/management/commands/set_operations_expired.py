@@ -7,6 +7,7 @@ from django.db.models import F, Sum
 from tiruert.models.declaration_period import TiruertDeclarationPeriod
 from tiruert.models.operation import Operation
 from tiruert.models.operation_detail import OperationDetail
+from tiruert.services.declaration_period import DeclarationPeriodService
 
 
 class Command(BaseCommand):
@@ -24,9 +25,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         yesterday = date.today() - timedelta(days=1)
         period_closed_yesterday = TiruertDeclarationPeriod.objects.filter(end_date=yesterday).first()
+        current_declaration_year = DeclarationPeriodService.get_current_declaration_year()
 
         if not period_closed_yesterday:
-            self.stdout.write(self.style.SUCCESS("No declaration period closed yesterday. No operations updated."))
+            self.stdout.write(self.style.WARNING("No declaration period closed yesterday. No operations updated."))
+            return
+
+        if not current_declaration_year:
+            self.stdout.write(self.style.WARNING("No current declaration period. No operations updated."))
             return
 
         period = period_closed_yesterday.year - 1
@@ -100,7 +106,12 @@ class Command(BaseCommand):
 
         # Step 5: For each entity, compute remaining volume per lot and create EXPIRATION operations
         for entity_id in entity_ids:
-            operations_created, details_created = self._process_entity(entity_id, expired_lot_ids, period)
+            operations_created, details_created = self._process_entity(
+                entity_id,
+                expired_lot_ids,
+                period,
+                current_declaration_year,
+            )
             total_operations_created += operations_created
             total_details_created += details_created
 
@@ -111,7 +122,7 @@ class Command(BaseCommand):
             )
         )
 
-    def _process_entity(self, entity_id, expired_lot_ids, period):
+    def _process_entity(self, entity_id, expired_lot_ids, period, declaration_year):
         """
         For a given entity, compute remaining available volume per lot,
         then create EXPIRATION operations grouped by (biofuel, customs_category).
@@ -125,7 +136,7 @@ class Command(BaseCommand):
 
         lot_source_info = self._get_lot_source_info(lots_to_expire, entity_id, period)
         groups = self._group_lots_by_biofuel_and_category(lots_to_expire, lot_source_info)
-        return self._create_expiration_operations(groups, lot_source_info, period)
+        return self._create_expiration_operations(groups, lot_source_info, period, declaration_year)
 
     def _get_credit_volumes(self, entity_id, lot_ids):
         """Compute effective credit volumes per lot for an entity (volume * renewable_energy_share)."""
@@ -206,7 +217,7 @@ class Command(BaseCommand):
         return groups
 
     @staticmethod
-    def _create_expiration_operations(groups, lot_source_info, period):
+    def _create_expiration_operations(groups, lot_source_info, period, declaration_year):
         """Create EXPIRATION operations with their details for each group."""
         operations_created = 0
         details_created = 0
@@ -225,6 +236,7 @@ class Command(BaseCommand):
                 to_depot=None,
                 renewable_energy_share=1,  # Volume already accounts for RES from source operations
                 durability_period=str(period),
+                declaration_year=declaration_year,
             )
 
             details_bulk = [

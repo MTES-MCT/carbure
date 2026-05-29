@@ -5591,6 +5591,7 @@ export interface components {
             readonly avoided_emissions: number;
             readonly unit: string;
             details?: components["schemas"]["OperationDetail"][];
+            readonly year: number;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -5663,6 +5664,7 @@ export interface components {
             details?: components["schemas"]["OperationDetail"][];
             /** Format: double */
             readonly avoided_emissions: number;
+            readonly year: number;
         };
         OperationLot: {
             id: number;
@@ -13283,6 +13285,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13648,6 +13651,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13763,6 +13767,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13902,6 +13907,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -14517,7 +14523,8 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     period = "period",
     sector = "sector",
     status = "status",
-    type = "type"
+    type = "type",
+    year = "year"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",

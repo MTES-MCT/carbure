@@ -35,6 +35,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
+    year = serializers.IntegerField(source="declaration_year", read_only=True)
 
     def get_volume_l(self, instance) -> float:
         return instance.volume_l
@@ -79,6 +80,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "unit",
             "details",
             "avoided_emissions",
+            "year",
         ]
 
 
@@ -109,6 +111,7 @@ class OperationSerializer(BaseOperationSerializer):
             "avoided_emissions",
             "unit",
             "details",
+            "year",
         ]
 
     quantity_mj = serializers.SerializerMethodField()
