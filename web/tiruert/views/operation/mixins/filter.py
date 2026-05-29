@@ -1,5 +1,5 @@
-from django.db.models import Case, CharField, Value, When
-from django.db.models.functions import Cast, Coalesce, Concat, ExtractMonth, ExtractYear
+from django.db.models import Case, CharField, IntegerField, Value, When
+from django.db.models.functions import Cast, Coalesce, Concat, ExtractMonth, ExtractYear, Substr
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -29,6 +29,7 @@ class FilterActionMixin:
                     "operation",
                     "period",
                     "durability_period",
+                    "year",
                 ],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
@@ -84,6 +85,7 @@ class FilterActionMixin:
             "type": "_transaction",
             "period": "created_at",
             "durability_period": "durability_period",
+            "year": "year",
         }
 
         column = filters.get(filter)
@@ -100,6 +102,13 @@ class FilterActionMixin:
                     ),
                     default=ExtractMonth("created_at", output_field=CharField()),
                     output_field=CharField(),
+                ),
+            ),
+            year=Coalesce(
+                "declaration_year",
+                Cast(
+                    Substr("durability_period", 1, 4),
+                    output_field=IntegerField(),
                 ),
             ),
         )
