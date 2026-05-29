@@ -304,6 +304,7 @@ class Command(BaseCommand):
             credited_entity=credited,
             renewable_energy_share=1.0,
             durability_period=None,
+            declaration_year=year,
             export_recipient=TAG,
         )
         OperationDetail.objects.create(
