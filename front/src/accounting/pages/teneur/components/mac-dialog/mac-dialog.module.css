@@ -9,10 +9,26 @@
   min-width: 100%;
 }
 
+.notice {
+  margin-left: auto;
+  padding: var(--spacing-1w) var(--spacing-2w);
+}
+
 .table > header {
   position: sticky;
   top: 0;
   z-index: 4;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 8%);
+}
+
+.table > header > .fuelColumn {
+  padding: var(--spacing-1w);
+}
+
+.monthColumn,
+.fuelColumn {
+  align-self: stretch;
+  align-content: center;
 }
 
 .monthColumn {
@@ -23,20 +39,36 @@
   background: white;
   box-shadow: 4px 0 8px rgb(0 0 0 / 8%);
   text-transform: capitalize;
-  align-self: stretch;
-  align-content: center;
-}
-
-.table header .monthColumn {
-  background: var(--blue-ecume-975-75);
 }
 
 .fuelColumn {
   width: 180px;
+  padding: 0;
+  border-right: 1px solid var(--border-default-grey);
+}
+
+.table > header .monthColumn {
+  background: var(--blue-ecume-975-75);
+}
+
+.table > header > .fuelColumn,
+.fuelColumn input,
+.fuelColumn strong {
+  text-align: right;
+}
+
+.fuelColumn input,
+.fuelColumn strong {
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-1w);
+  justify-content: end;
 }
 
 .footer {
   display: flex;
+  align-items: center;
+  gap: var(--spacing-2w);
   justify-content: space-between;
   width: 100%;
 }
