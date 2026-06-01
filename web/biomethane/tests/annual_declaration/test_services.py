@@ -450,7 +450,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.OVERDUE)
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_get_declarations_for_entity_filters_for_ademe(self, _):
         ademe = Entity.objects.create(name="ADEME", entity_type=Entity.EXTERNAL_ADMIN)
         ExternalAdminRights.objects.create(entity=ademe, right=ExternalAdminRights.ADEME)

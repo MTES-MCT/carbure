@@ -28,7 +28,7 @@ from entity.models import EntityScope
 class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMixin):
     """Tests for BiomethaneAdminAnnualDeclarationViewSet (DREAL list of annual declarations)."""
 
-    dashboard_date_target = "biomethane.services.admin_dashboard.date"
+    dashboard_date_target = "biomethane.services.admin.dashboard.date"
 
     @classmethod
     def setUpTestData(cls):

@@ -10,7 +10,7 @@ from biomethane.models import (
     BiomethaneSupplyPlan,
 )
 from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
-from biomethane.services.ademe import AdemeService
+from biomethane.services.admin.ademe import AdemeService
 from biomethane.services.digestate import BiomethaneDigestateService
 from core.models.entity import ExternalAdminRights
 
