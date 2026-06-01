@@ -111,13 +111,13 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         )
 
     def test_list_returns_only_declarations_from_accessible_departments(self):
-        """list returns only declarations for producers whose unit is in an accessible department."""
-        declaration_dept_01 = BiomethaneAnnualDeclaration.objects.create(
+        """list returns only producers whose unit is in an accessible department."""
+        BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_01,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
-        declaration_dept_02 = BiomethaneAnnualDeclaration.objects.create(
+        BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_02,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
@@ -131,12 +131,12 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        results = data["results"]
-        declaration_ids = [d["id"] for d in results]
-        expected_declaration_ids = [declaration_dept_01.id, declaration_dept_02.id]
+        results = response.json()["results"]
+        producer_ids = [d["producer"]["id"] for d in results]
 
-        self.assertEqual(declaration_ids, expected_declaration_ids)
+        self.assertEqual(set(producer_ids), {self.producer_dept_01.id, self.producer_dept_02.id})
+        for result in results:
+            self.assertEqual(result["year"], self.current_year)
 
     def test_list_includes_producers_without_unit_when_registered_zipcode_in_accessible_dept(self):
         """list includes producers without unit whose registered_zipcode is in the accessible departments list."""
