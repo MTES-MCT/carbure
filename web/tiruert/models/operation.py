@@ -176,6 +176,16 @@ class Operation(models.Model):
     def avoided_emissions(self):
         return round(sum(detail.avoided_emissions for detail in self.details.all()), 2)  # in tCO2
 
+    @property
+    def year(self) -> int | None:
+        from tiruert.services import operation_year
+
+        return operation_year.resolve(
+            self.type,
+            self.durability_period,
+            self.declaration_year,
+        )
+
     class Meta:
         db_table = "tiruert_operations"
         verbose_name = "Opération"
