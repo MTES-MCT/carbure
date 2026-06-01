@@ -266,6 +266,29 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         )
         self.assertTrue(all(result["status"] == BiomethaneAnnualDeclaration.NOT_STARTED for result in results))
 
+    def test_list_filters_by_not_started_status(self):
+        """list can be filtered by the virtual NOT_STARTED status."""
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_01,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        response = self.client.get(
+            self.admin_declarations_url,
+            {
+                "entity_id": self.dreal.id,
+                "status": BiomethaneAnnualDeclaration.NOT_STARTED,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["producer"]["id"], self.producer_dept_02.id)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.NOT_STARTED)
+
     def test_list_applies_five_year_contract_filter_only_for_ademe(self):
         """ADEME only sees producers with contractswhere effective_date year is >= current year - 4."""
         ineligible_effective_date = date(self.current_year - 5, 1, 1)
