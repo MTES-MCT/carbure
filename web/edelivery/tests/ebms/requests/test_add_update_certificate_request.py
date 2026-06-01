@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from edelivery.ebms.requests.add_update_certificate_request import AddUpdateCertificateRequest
 
@@ -15,8 +15,16 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
     def setUp(self):
         super().setUp()
         self.entity = MagicMock(**{"ntr_id.return_value": ""})
-        self.certificate = MagicMock(certificate_id="")
+        self.certificate = MagicMock(certificate_id="", status="EXPIRED")
         self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
+
+        module_to_patch = "edelivery.ebms.requests.add_update_certificate_request"
+        patched_CertificateStatusConverter = patch(f"{module_to_patch}.CertificateStatusConverter").start()
+        self.patched_to_udb = patched_CertificateStatusConverter.return_value.to_udb
+        self.patched_to_udb.return_value = ""
+
+    def tearDown(self):
+        patch.stopall()
 
     def test_knowns_its_body(self):
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
@@ -37,3 +45,13 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
         certificate_number_tag = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CERTIFICATE_NUMBER")
         self.assertEqual("SN_UN_2026_0123", certificate_number_tag.text)
+
+    def test_injects_converted_status(self):
+        self.certificate.status = "VALID"
+        self.patched_to_udb.return_value = "UDB_STATUS"
+
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        self.patched_to_udb.assert_called_with("VALID")
+
+        validity_status_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/VALIDITY_STATUS")
+        self.assertEqual("UDB_STATUS", validity_status_element.text)

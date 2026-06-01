@@ -1,6 +1,12 @@
 from unittest import TestCase
 
-from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter, UDBConversionError
+from edelivery.ebms.converters import (
+    CertificateStatusConverter,
+    MaterialConverter,
+    QuantityConverter,
+    StatusConverter,
+    UDBConversionError,
+)
 
 
 class MaterialConverterTest(TestCase):
@@ -50,3 +56,18 @@ class StatusConverterTest(TestCase):
             converter.from_udb("UNKNOWN_STATUS")
 
         self.assertEqual("Unknown UDB Status: UNKNOWN_STATUS", context.exception.message)
+
+
+class CertificateStatusConverterTest(TestCase):
+    def test_converts_carbure_certificate_status_to_udb_status(self):
+        conversion_mapping = {"UDB_STATUS": "CARBURE_STATUS"}
+        converter = CertificateStatusConverter(conversion_mapping)
+        self.assertEqual("UDB_STATUS", converter.to_udb("CARBURE_STATUS"))
+
+    def test_raises_carbure_conversion_error_if_status_unknown(self):
+        conversion_mapping = {}
+        converter = CertificateStatusConverter(conversion_mapping)
+        with self.assertRaises(UDBConversionError) as context:
+            converter.to_udb("UNKNOWN_STATUS")
+
+        self.assertEqual("Unknown Carbure Status: UNKNOWN_STATUS", context.exception.message)
