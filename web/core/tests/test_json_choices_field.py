@@ -1,3 +1,4 @@
+from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import SimpleTestCase
@@ -31,6 +32,13 @@ class JSONChoiceFieldTests(SimpleTestCase):
     def test_get_labels_returns_display_values(self):
         field = JSONChoiceField(choices=self.CHOICES)
         self.assertEqual(field.get_labels(["A", "B"]), ["Alpha", "Beta"])
+
+    def test_formfield_uses_json_widget_not_select(self):
+        field = JSONChoiceField(choices=self.CHOICES)
+        form_field = field.formfield()
+
+        self.assertIsInstance(form_field, forms.JSONField)
+        self.assertNotIsInstance(form_field, forms.TypedChoiceField)
 
     @isolate_apps("core")
     def test_get_field_display_is_overridden_for_json_list(self):
