@@ -14,6 +14,7 @@ import { BiomethaneAdminDashboardQueryBuilder } from "../types"
 import { Pagination } from "common/components/pagination2"
 import { Content, LoaderOverlay, Main } from "common/components/scaffold"
 import { useRoutes } from "common/hooks/routes"
+import { RecapQuantity } from "common/molecules/recap-quantity"
 
 const currentYear = new Date().getFullYear()
 
@@ -49,6 +50,13 @@ const Dashboard = () => {
           getFilterOptions={getFilterOptions}
           normalizers={normalizers}
         />
+        {!loading && dashboardData && (
+          <RecapQuantity
+            text={t("{{count}} déclarations", {
+              count: dashboardData.count,
+            })}
+          />
+        )}
         {!loading && (!dashboardData || dashboardData?.count === 0) && (
           <NoResult />
         )}

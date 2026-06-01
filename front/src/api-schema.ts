@@ -3365,7 +3365,6 @@ export interface components {
         /** @description Serializer pour la liste admin des déclarations annuelles biométhane (DREAL). */
         BiomethaneAdminAnnualDeclaration: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
-            readonly id: number;
             producer: components["schemas"]["EntityPreview"];
             /** Format: date */
             readonly effective_date: string | null;
@@ -3405,6 +3404,7 @@ export interface components {
          * @description * `IN_PROGRESS` - IN_PROGRESS
          *     * `DECLARED` - DECLARED
          *     * `OVERDUE` - OVERDUE
+         *     * `NOT_STARTED` - NOT_STARTED
          * @enum {string}
          */
         BiomethaneAnnualDeclarationStatusEnum: BiomethaneAnnualDeclarationStatusEnum;
@@ -14259,7 +14259,9 @@ export interface operations {
 }
 export enum PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus {
     DECLARED = "DECLARED",
-    IN_PROGRESS = "IN_PROGRESS"
+    IN_PROGRESS = "IN_PROGRESS",
+    NOT_STARTED = "NOT_STARTED",
+    OVERDUE = "OVERDUE"
 }
 export enum PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference {
     Value2011 = "2011",
@@ -14657,7 +14659,8 @@ export enum AmendmentObjectEnum {
 export enum BiomethaneAnnualDeclarationStatusEnum {
     IN_PROGRESS = "IN_PROGRESS",
     DECLARED = "DECLARED",
-    OVERDUE = "OVERDUE"
+    OVERDUE = "OVERDUE",
+    NOT_STARTED = "NOT_STARTED"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

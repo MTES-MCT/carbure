@@ -14,6 +14,7 @@ export const AnnualDeclarationStatusBadge = ({
     [AnnualDeclarationStatus.IN_PROGRESS]: "info",
     [AnnualDeclarationStatus.DECLARED]: "success",
     [AnnualDeclarationStatus.OVERDUE]: "warning",
+    [AnnualDeclarationStatus.NOT_STARTED]: "warning",
   }
 
   return (
