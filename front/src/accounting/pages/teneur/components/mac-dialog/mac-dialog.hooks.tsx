@@ -92,15 +92,18 @@ export const useMacTable = (
       className: css.monthColumn,
     },
     ...fuels.map<Column<MacTableRow>>((fuel) => ({
-      header: fuel,
+      header: t("{{fuel}} (L)", { fuel }),
       className: css.fuelColumn,
       cell: (row) =>
-        row.isTotal ? (
-          <strong>{formatNumber(row.volumes[fuel] ?? 0)}</strong>
+        row.isTotal || readOnly ? (
+          <strong>
+            {row.volumes[fuel] !== undefined
+              ? formatNumber(row.volumes[fuel])
+              : "-"}
+          </strong>
         ) : (
           <NumberInput
             readOnly={readOnly}
-            label=""
             min={0}
             value={row.volumes[fuel]}
             onChange={(volume) => updateVolume(fuel, row.month, volume)}

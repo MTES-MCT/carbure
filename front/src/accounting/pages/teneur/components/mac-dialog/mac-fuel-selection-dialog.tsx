@@ -55,6 +55,7 @@ export const MacFuelSelectionDialog = ({
         <MultiSelect<FossilFuel, string>
           search
           clear
+          full
           placeholder={t("Choisissez des carburants")}
           value={selectedFuels}
           getOptions={getOptions}
