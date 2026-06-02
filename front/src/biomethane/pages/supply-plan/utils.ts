@@ -58,10 +58,11 @@ export const getSupplyPlanInputCollectionTypeOptions = () => {
   ]
 }
 
+/** Convert dry matter tonnage (tMS) to wet matter (tMB) using dry matter ratio in percent. */
 export const convertSupplyPlanInputVolume = (
   volumeTonsMS: number,
-  ratioTonsMS: number
-) => volumeTonsMS / ratioTonsMS
+  dryMatterRatioPercent: number
+) => volumeTonsMS / (dryMatterRatioPercent / 100)
 
 export const getSupplyPlanInputSource = (
   source: BiomethaneSupplyInputSource
