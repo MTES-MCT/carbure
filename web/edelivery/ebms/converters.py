@@ -67,7 +67,7 @@ class QuantityConverter(BaseConverter):
         return {attribute: conversion_function(quantity)}
 
 
-class StatusConverter(BaseConverter):
+class TransactionStatusConverter(BaseConverter):
     _default_conversion_mapping = {
         "CREATED": "DRAFT",
         "PROVISIONAL": "DRAFT",
