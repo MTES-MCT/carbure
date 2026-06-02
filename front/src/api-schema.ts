@@ -4842,6 +4842,7 @@ export interface components {
             debited_entity?: number | null;
             /** Format: double */
             quantity?: number;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
         };
         ElecOperationList: {
             readonly id: number;
@@ -5564,6 +5565,7 @@ export interface components {
             readonly type: string;
             status?: components["schemas"]["OperationStatusEnum"];
             readonly sector: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
             readonly biofuel: string;
             /** Format: double */
@@ -5622,6 +5624,7 @@ export interface components {
             to_depot?: number | null;
             export_country?: string | null;
             export_recipient?: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLot"][];
             status?: components["schemas"]["OperationStatusEnum"];
         };
@@ -5635,6 +5638,7 @@ export interface components {
             to_depot?: number | null;
             export_country?: string | null;
             export_recipient?: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
         };
@@ -5643,6 +5647,7 @@ export interface components {
             readonly type: string;
             status?: components["schemas"]["OperationStatusEnum"];
             readonly sector: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
             readonly biofuel: string;
             /** Format: double */

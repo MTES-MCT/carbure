@@ -6,6 +6,7 @@ from tiruert.models import ElecOperation
 
 
 class ElecBalance(TypedDict):
+    sector: str
     quantity: dict
     emission_rate_per_mj: float
     pending_teneur: int
@@ -20,13 +21,16 @@ class ElecBalanceService:
         return operations.aggregate(Sum("quantity")).get("quantity__sum") or 0
 
     @staticmethod
-    def calculate_balance(operations: QuerySet[ElecOperation], entity_id, date_from=None) -> ElecBalance:
-        """
-        Calculates balances based on the specified grouping
-        'operations' is a queryset of already filtered operations
-        """
+    def _filter_active_operations(operations: QuerySet[ElecOperation]) -> QuerySet[ElecOperation]:
+        return operations.filter(status__in=[ElecOperation.PENDING, ElecOperation.ACCEPTED, ElecOperation.DECLARED])
 
-        operations = operations.filter(status__in=[ElecOperation.PENDING, ElecOperation.ACCEPTED, ElecOperation.DECLARED])
+    @staticmethod
+    def _calculate_balance(
+        operations: QuerySet[ElecOperation],
+        entity_id,
+        sector: str,
+        date_from=None,
+    ) -> ElecBalance:
         pending_operations = operations.filter(status=ElecOperation.PENDING)
 
         credited_operations = operations.filter(
@@ -66,7 +70,7 @@ class ElecBalanceService:
         total_debit = ElecBalanceService.total(debited_operations)
 
         return {
-            "sector": ElecOperation.SECTOR,
+            "sector": sector,
             "quantity": {
                 "credit": ElecBalanceService.total(period_credited_operations),
                 "debit": ElecBalanceService.total(period_debited_operations),
@@ -76,4 +80,42 @@ class ElecBalanceService:
             "pending_teneur": ElecBalanceService.total(pending_teneur),
             "declared_teneur": ElecBalanceService.total(declared_teneur),
             "available_balance": total_credit - total_debit,
+        }
+
+    @staticmethod
+    def calculate_balance(operations: QuerySet[ElecOperation], entity_id, date_from=None) -> ElecBalance:
+        """
+        Calculates balances based on the specified grouping
+        'operations' is a queryset of already filtered operations
+        """
+
+        operations = ElecBalanceService._filter_active_operations(operations)
+        return ElecBalanceService._calculate_balance(operations, entity_id, ElecOperation.SECTOR, date_from)
+
+    @staticmethod
+    def calculate_balance_per_sector(
+        operations: QuerySet[ElecOperation], entity_id, date_from=None
+    ) -> dict[str, ElecBalance]:
+        """
+        Calculates electrical balances grouped by objective_sector.
+        'operations' is a queryset of already filtered operations.
+        """
+
+        operations = ElecBalanceService._filter_active_operations(operations)
+        sectors = (
+            operations.exclude(objective_sector__isnull=True)
+            .exclude(objective_sector="")
+            .values_list("objective_sector", flat=True)
+            .distinct()
+            .order_by("objective_sector")
+        )
+
+        return {
+            sector: ElecBalanceService._calculate_balance(
+                operations.filter(objective_sector=sector),
+                entity_id,
+                sector,
+                date_from,
+            )
+            for sector in sectors
         }

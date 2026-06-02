@@ -76,6 +76,7 @@ export type BalancesQuery = BalancesQueryBuilder["query"] & {
 
 // For operations and balances, we want to display specific views for each sector
 export enum SectorTabs {
+  GLOBAL = "global",
   BIOFUELS = "biofuels",
   ELEC = "elec",
 }

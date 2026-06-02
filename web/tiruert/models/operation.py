@@ -22,6 +22,9 @@ class OperationManager(models.Manager):
                 "created_at",
                 "renewable_energy_share",
                 "export_recipient",
+                "objective_sector",
+                "durability_period",
+                "declaration_year",
                 # Relations nécessaires
                 "biofuel_id",
                 "credited_entity_id",
@@ -143,6 +146,9 @@ class Operation(models.Model):
     validation_date = models.DateField(null=True, blank=True)
     renewable_energy_share = models.FloatField(default=1)
     durability_period = models.CharField(max_length=6, blank=True, null=True)
+
+    # Allows overriding the sector objective, when the declared sector differs from the natural sector of the biofuel
+    objective_sector = models.CharField(max_length=20, choices=SECTOR_CODE_CHOICES, null=True, blank=True)
 
     objects = OperationManager()
 

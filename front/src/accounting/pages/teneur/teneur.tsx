@@ -47,6 +47,7 @@ const Teneur = () => {
         <DeclareElecTeneurDialog
           onClose={close}
           objective={objective}
+          sectorObjectives={objectivesData?.sectors ?? []}
           mainObjective={objectivesData?.global}
         />
       ))
@@ -64,7 +65,12 @@ const Teneur = () => {
   }
 
   const onValidatePendingTeneurClick = () => {
-    portal((close) => <ValidatePendingTeneurDialog onClose={close} />)
+    portal((close) => (
+      <ValidatePendingTeneurDialog
+        sectorObjectives={objectivesData?.sectors ?? []}
+        onClose={close}
+      />
+    ))
   }
 
   return (

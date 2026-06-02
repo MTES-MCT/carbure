@@ -15608,6 +15608,10 @@ components:
         quantity:
           type: number
           format: double
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
       required:
         - type
     ElecOperationList:
@@ -17343,6 +17347,10 @@ components:
         sector:
           type: string
           readOnly: true
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
@@ -17496,6 +17504,10 @@ components:
         export_recipient:
           type: string
           maxLength: 255
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         lots:
           type: array
           items:
@@ -17537,6 +17549,10 @@ components:
         export_recipient:
           type: string
           maxLength: 255
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         lots:
           type: array
           items:
@@ -17563,6 +17579,10 @@ components:
         sector:
           type: string
           readOnly: true
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:

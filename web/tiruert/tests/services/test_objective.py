@@ -609,6 +609,61 @@ class ObjectiveServiceGetElecCategoryTest(TestCase):
         self.assertIsNone(result["objective"]["penalty"])
 
 
+class ObjectiveServiceAddElecSectorObjectivesTest(TestCase):
+    """Unit tests for ObjectiveService.add_elec_sector_objectives() method."""
+
+    @patch("tiruert.services.objective.ElecBalanceService.calculate_balance_per_sector")
+    def test_add_elec_sector_objectives_merges_matching_sector_balances(self, mock_balance):
+        mock_balance.return_value = {
+            "ESSENCE": {
+                "pending_teneur": 40,
+                "declared_teneur": 60,
+            },
+            "GAZOLE": {
+                "pending_teneur": 10,
+                "declared_teneur": 20,
+            },
+        }
+        objective_per_sector = [
+            {
+                "code": "ESSENCE",
+                "available_balance": 1_000,
+                "pending_teneur": 100,
+                "declared_teneur": 200,
+            },
+            {
+                "code": "CARBURÉACTEUR",
+                "available_balance": 2_000,
+                "pending_teneur": 300,
+                "declared_teneur": 400,
+            },
+        ]
+
+        result = ObjectiveService.add_elec_teneur_to_objectives_per_sector(objective_per_sector, Mock(), 1, "2025-01-01")
+
+        self.assertEqual(result[0]["pending_teneur"], 140)
+        self.assertEqual(result[0]["declared_teneur"], 260)
+        self.assertEqual(result[1]["pending_teneur"], 300)
+        self.assertEqual(result[1]["declared_teneur"], 400)
+        mock_balance.assert_called_once()
+
+    @patch("tiruert.services.objective.ElecBalanceService.calculate_balance_per_sector")
+    def test_add_elec_sector_objectives_returns_unchanged_when_no_elec_balance(self, mock_balance):
+        mock_balance.return_value = {}
+        objective_per_sector = [
+            {
+                "code": "ESSENCE",
+                "available_balance": 1_000,
+                "pending_teneur": 100,
+                "declared_teneur": 200,
+            }
+        ]
+
+        result = ObjectiveService.add_elec_teneur_to_objectives_per_sector(objective_per_sector, Mock(), 1, "2025-01-01")
+
+        self.assertEqual(result, objective_per_sector)
+
+
 class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
     """Unit tests for ObjectiveService.get_balances_for_objectives_calculation() method."""
 
