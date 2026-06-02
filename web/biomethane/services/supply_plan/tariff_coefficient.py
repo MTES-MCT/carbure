@@ -5,18 +5,17 @@ Business rules (single source of truth, applied in SQL):
 - Proportions use wet matter tonnage (tMB), not dry matter (tMS).
 - Coefficient comes from BiomethaneFeedstockTariffCoefficient (feedstock × tariff regime).
 - Regime is derived from the producer contract tariff_reference.
-- Some feedstocks only count when collection_type is LOCAL.
+- When collection_type is set: only LOCAL lines get a coefficient; PRIVATE lines do not.
+  (The field is only collected for some feedstocks, so NULL means the referential applies as-is.)
 """
 
-from django.db.models import Case, CharField, F, FloatField, OuterRef, Q, Subquery, Sum, Value, When
+from django.db.models import Case, CharField, F, FloatField, OuterRef, Subquery, Sum, Value, When
 
 from biomethane.models import BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
-from biomethane.services.supply_plan.supply_input import COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES
 
 Coeff = BiomethaneFeedstockTariffCoefficient
 
 COEFFICIENTS = (Coeff.P1, Coeff.P2, Coeff.P3, Coeff.P, Coeff.PEFF)
-LOCAL_COLLECTION = Q(feedstock__code__in=COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES)
 
 
 def compute_tariff_coefficient_proportions(queryset, tariff_reference: str | None = None) -> dict[str, float]:
@@ -45,10 +44,10 @@ def compute_tariff_coefficient_proportions(queryset, tariff_reference: str | Non
         output_field=CharField(),
     )
 
-    # 3. Apply local-collection rule: some feedstocks only get a coefficient when collection_type is LOCAL.
+    # 3. collection_type is only filled for feedstocks where collecte locale matters.
     effective = Case(
-        When(LOCAL_COLLECTION & Q(collection_type=BiomethaneSupplyInput.LOCAL), then=referential),
-        When(LOCAL_COLLECTION, then=Value(None, output_field=CharField())),
+        When(collection_type=BiomethaneSupplyInput.LOCAL, then=referential),
+        When(collection_type=BiomethaneSupplyInput.PRIVATE, then=Value(None, output_field=CharField())),
         default=referential,
         output_field=CharField(),
     )
