@@ -18,6 +18,8 @@ Coeff = BiomethaneFeedstockTariffCoefficient
 
 COEFFICIENTS = (Coeff.P1, Coeff.P2, Coeff.P3, Coeff.P, Coeff.PEF)
 
+Coeff = BiomethaneFeedstockTariffCoefficient
+
 
 def compute_tariff_coefficient_proportions(
     queryset: QuerySet[BiomethaneSupplyInput], tariff_reference: str | None = None
