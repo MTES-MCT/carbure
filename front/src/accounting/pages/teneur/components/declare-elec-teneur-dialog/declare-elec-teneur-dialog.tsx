@@ -118,15 +118,6 @@ export const DeclareElecTeneurDialog = ({
                 disabled
               />
 
-              {mainObjective && (
-                <DeclareTeneurProgressBar
-                  teneurDeclared={mainObjective.teneur_declared}
-                  pendingTeneur={mainObjective.pending_teneur}
-                  target={mainObjective.target}
-                  quantity={avoidedEmissions}
-                  label={t("Objectif global")}
-                />
-              )}
               <Grid gap="xl">
                 {mainObjective && (
                   <DeclareTeneurProgressBar

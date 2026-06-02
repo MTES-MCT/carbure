@@ -77,14 +77,12 @@ export const useBiofuelTeneurSectorColumns = () => {
     },
     {
       header: <HeaderWithSup>{t("Teneur à valider")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatNumber(item.teneur_declared_month)} />,
+      cell: (item) => <Cell text={formatNumber(item.pending_teneur)} />,
     },
     {
       header: <HeaderWithSup>{t("Avancement final")}</HeaderWithSup>,
       cell: (item) => (
-        <Cell
-          text={formatNumber(item.teneur_declared + item.teneur_declared_month)}
-        />
+        <Cell text={formatNumber(item.teneur_declared + item.pending_teneur)} />
       ),
     },
   ]
