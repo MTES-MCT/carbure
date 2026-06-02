@@ -8,6 +8,7 @@ import core.models.fields
 class Migration(migrations.Migration):
     dependencies = [
         ("biomethane", "0048_alter_biomethanecontract_buyer_and_more"),
+        ("core", "0072_change_feedstock_collation"),
     ]
 
     operations = [
