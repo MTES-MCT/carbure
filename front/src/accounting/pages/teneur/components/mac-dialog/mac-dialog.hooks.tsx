@@ -3,6 +3,7 @@ import { formatDate, formatNumber } from "common/utils/formatters"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { MacFossilFuel } from "../../api"
+import { FossilFuel } from "../../types"
 import css from "./mac-dialog.module.css"
 import { MacInput } from "./mac-input"
 
@@ -24,10 +25,15 @@ export const useMacTable = (
   year: number,
   macData: MacFossilFuel[],
   fuels: string[],
+  fossilFuels: FossilFuel[],
   setMacData: Dispatch<SetStateAction<MacFossilFuel[]>>,
   readOnly?: boolean
 ) => {
   const { t } = useTranslation()
+
+  const fuelLabels = Object.fromEntries(
+    fossilFuels.map((fuel) => [fuel.nomenclature, fuel.label])
+  )
 
   const updateVolume = (
     fuel: string,
@@ -92,7 +98,7 @@ export const useMacTable = (
       className: css.monthColumn,
     },
     ...fuels.map<Column<MacTableRow>>((fuel) => ({
-      header: t("{{fuel}} (L)", { fuel }),
+      header: t("{{fuel}} (L)", { fuel: fuelLabels[fuel] ?? fuel }),
       className: css.fuelColumn,
       cell: (row) =>
         row.isTotal || readOnly ? (

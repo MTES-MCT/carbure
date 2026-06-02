@@ -4,6 +4,8 @@ import { apiTypes } from "common/services/api-fetch.types"
 
 export { TargetTypeEnum as TargetType } from "api-schema"
 
+export type FossilFuel = apiTypes["FossilFuel"]
+
 export interface ObjectiveProgress {
   total_teneur_declared: number
   base_quantity: number

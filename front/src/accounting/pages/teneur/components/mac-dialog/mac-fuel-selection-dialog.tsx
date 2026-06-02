@@ -1,33 +1,25 @@
 import { Button } from "common/components/button2"
 import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
-import { findFossilFuels } from "common/api"
-import { apiTypes } from "common/services/api-fetch.types"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { MultiSelect } from "common/components/selects2/multiselect"
 import { Notice } from "common/components/notice"
+import { FossilFuel } from "../../types"
 
 type MacFuelSelectionDialogProps = {
-  existingFuels: string[]
+  fossilFuels: FossilFuel[]
   onAdd: (fuels: string[]) => void
   onClose: () => void
 }
 
-type FossilFuel = apiTypes["FossilFuel"]
-
 export const MacFuelSelectionDialog = ({
-  existingFuels,
+  fossilFuels,
   onAdd,
   onClose,
 }: MacFuelSelectionDialogProps) => {
   const { t } = useTranslation()
   const [selectedFuels, setSelectedFuels] = useState<string[]>([])
-
-  const getOptions = async () =>
-    (await findFossilFuels()).filter(
-      (fuel) => !existingFuels.includes(fuel.nomenclature)
-    )
 
   return (
     <Portal>
@@ -58,7 +50,7 @@ export const MacFuelSelectionDialog = ({
           full
           placeholder={t("Choisissez des carburants")}
           value={selectedFuels}
-          getOptions={getOptions}
+          options={fossilFuels}
           onChange={(fuels) => setSelectedFuels(fuels ?? [])}
           normalize={(fuel) => ({
             value: fuel.nomenclature,

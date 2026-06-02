@@ -5,6 +5,7 @@ import { usePortal } from "common/components/portal"
 import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import css from "./mac-dialog.module.css"
+import { findFossilFuels } from "common/api"
 import { useMutation, useQuery } from "common/hooks/async"
 import { getMacFossilFuels, replaceMacFossilFuels } from "../../api"
 import { MacFuelSelectionDialog } from "./mac-fuel-selection-dialog"
@@ -32,6 +33,14 @@ export const MacDialog = ({
     params: [entityId, year],
   })
 
+  const { result: fossilFuels = [], loading: fossilFuelsLoading } = useQuery(
+    findFossilFuels,
+    {
+      key: "fossil-fuels",
+      params: [],
+    }
+  )
+
   const { macData, fuels, setMacData, addFuels, clearDraft, hasLocalDraft } =
     useMacDialogDraft(entityId, year, loadedMacData, readOnly)
 
@@ -40,12 +49,23 @@ export const MacDialog = ({
     onSuccess: clearDraft,
   })
 
-  const table = useMacTable(year, macData, fuels, setMacData, readOnly)
+  const selectableFossilFuels = fossilFuels.filter(
+    (fuel) => !fuels.includes(fuel.nomenclature)
+  )
+
+  const table = useMacTable(
+    year,
+    macData,
+    fuels,
+    fossilFuels,
+    setMacData,
+    readOnly
+  )
 
   const openFuelSelectionDialog = () => {
     portal((close) => (
       <MacFuelSelectionDialog
-        existingFuels={fuels}
+        fossilFuels={selectableFossilFuels}
         onAdd={(fuels) => {
           addFuels(fuels)
           close()
@@ -121,7 +141,7 @@ export const MacDialog = ({
             className={css.table}
             columns={table.columns}
             rows={table.rows}
-            loading={loading}
+            loading={loading || fossilFuelsLoading}
           />
         )}
       </Dialog>
