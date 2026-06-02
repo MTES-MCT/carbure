@@ -124,7 +124,7 @@ class TariffCoefficientProportionsTests(TestCase):
 
         self.assertEqual(result["p"], 100.0)
 
-    def test_local_collection_required_for_some_feedstocks(self):
+    def test_private_collection_type_excludes_coefficient(self):
         BiomethaneSupplyInputFactory.create(
             supply_plan=self.supply_plan,
             feedstock=self.feedstock_huiles,
