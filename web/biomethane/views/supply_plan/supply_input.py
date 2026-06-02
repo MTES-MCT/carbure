@@ -1,7 +1,6 @@
 from django.db.models import Sum
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
-from rest_framework.decorators import action
 from rest_framework.mixins import (
     CreateModelMixin,
     DestroyModelMixin,
@@ -9,7 +8,6 @@ from rest_framework.mixins import (
     RetrieveModelMixin,
     UpdateModelMixin,
 )
-from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters import BiomethaneSupplyInputFilter, BiomethaneSupplyInputYearFilter
@@ -21,12 +19,11 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputSerializer,
 )
 from biomethane.serializers.supply_plan.tariff_coefficient_proportions import TariffCoefficientProportionsSerializer
-from biomethane.services.supply_plan.tariff_coefficient import compute_tariff_coefficient_proportions
 from biomethane.views.mixins import ListWithObjectPermissionsMixin
 from core.filters import FiltersActionFactory
 from core.pagination import MetadataPageNumberPagination
 
-from .mixins import ExcelExportActionMixin
+from .mixins import ExcelExportActionMixin, TariffCoefficientProportionsActionMixin
 
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
@@ -73,6 +70,7 @@ class BiomethaneSupplyInputViewSet(
     ListModelMixin,
     RetrieveModelMixin,
     ExcelExportActionMixin,
+    TariffCoefficientProportionsActionMixin,
     FiltersActionFactory(),
 ):
     queryset = BiomethaneSupplyInput.objects.all()
@@ -121,21 +119,3 @@ class BiomethaneSupplyInputViewSet(
         elif self.action == "tariff_coefficient_proportions":
             return TariffCoefficientProportionsSerializer
         return BiomethaneSupplyInputSerializer
-
-    @extend_schema(
-        responses={200: TariffCoefficientProportionsSerializer},
-    )
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path="tariff-coefficient-proportions",
-    )
-    def tariff_coefficient_proportions(self, request, *args, **kwargs):
-        """Volume-weighted P1/P2/P3/P/Peff shares for the filtered supply plan inputs."""
-        queryset = self.filter_queryset(self.get_queryset()).select_related(
-            "feedstock",
-            "supply_plan__producer__biomethane_contract",
-        )
-        data = compute_tariff_coefficient_proportions(queryset)
-        serializer = TariffCoefficientProportionsSerializer(data)
-        return Response(serializer.data)
