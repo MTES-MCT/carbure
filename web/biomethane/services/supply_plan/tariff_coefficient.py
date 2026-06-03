@@ -1,5 +1,5 @@
 """
-Volume-weighted P1 / P2 / P3 / P / Peff shares for declared supply inputs.
+Volume-weighted P1 / P2 / P3 / P / Pef shares for declared supply inputs.
 
 Business rules (single source of truth, applied in SQL):
 - Proportions use wet matter tonnage (tMB), not dry matter (tMS).
@@ -15,12 +15,12 @@ from biomethane.models import BiomethaneFeedstockTariffCoefficient, BiomethaneSu
 
 Coeff = BiomethaneFeedstockTariffCoefficient
 
-COEFFICIENTS = (Coeff.P1, Coeff.P2, Coeff.P3, Coeff.P, Coeff.PEFF)
+COEFFICIENTS = (Coeff.P1, Coeff.P2, Coeff.P3, Coeff.P, Coeff.PEF)
 
 
 def compute_tariff_coefficient_proportions(queryset, tariff_reference: str | None = None) -> dict[str, float]:
     """
-    Return {"p1": …, "p2": …, "p3": …, "p": …, "peff": …} as % of declared wet matter tonnage (tMB).
+    Return {"p1": …, "p2": …, "p3": …, "p": …, "pef": …} as % of declared wet matter tonnage (tMB).
 
     Lines without a coefficient still weigh the denominator; they are not assigned to a bucket.
     """

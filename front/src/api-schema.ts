@@ -773,7 +773,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Volume-weighted P1/P2/P3/P/Peff shares for the filtered supply plan inputs. */
+        /** @description Volume-weighted P1/P2/P3/P/Pef shares for the filtered supply plan inputs. */
         get: operations["biomethane_supply_input_tariff_coefficient_proportions_retrieve"];
         put?: never;
         post?: never;
@@ -6546,7 +6546,7 @@ export interface components {
             /** Format: double */
             readonly p: number;
             /** Format: double */
-            readonly peff: number;
+            readonly pef: number;
         };
         /**
          * @description * `2011` - 2011

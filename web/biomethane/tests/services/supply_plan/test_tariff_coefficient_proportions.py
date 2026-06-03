@@ -60,7 +60,7 @@ class TariffCoefficientProportionsTests(TestCase):
 
         result = compute_tariff_coefficient_proportions(self._inputs())
 
-        self.assertEqual(result, {"p1": 30.0, "p2": 70.0, "p3": 0.0, "p": 0.0, "peff": 0.0})
+        self.assertEqual(result, {"p1": 30.0, "p2": 70.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
 
     def test_ignores_lines_without_volume(self):
         BiomethaneSupplyInputFactory.create(
@@ -147,7 +147,7 @@ class TariffCoefficientProportionsTests(TestCase):
     def test_empty_plan_returns_zeros(self):
         self.assertEqual(
             compute_tariff_coefficient_proportions(BiomethaneSupplyInput.objects.none()),
-            {"p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "peff": 0.0},
+            {"p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0},
         )
 
     def test_converts_dry_matter_tonnage_to_wet_matter(self):
