@@ -16,7 +16,8 @@ class BaseRequest:
         return ET.tostring(xml, encoding="utf-8").decode("utf-8")
 
     def __init__(self, body, response_class=BaseRequestResponse):
-        self.id = new_uuid()
+        self.conversation_id = new_uuid()
+        self.id = self.conversation_id
         self.body = self.with_request_id_inserted(self.id, body)
         self.response_class = response_class
 

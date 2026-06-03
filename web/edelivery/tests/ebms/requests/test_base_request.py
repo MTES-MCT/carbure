@@ -13,6 +13,13 @@ class BaseRequestTest(TestCase):
     def tearDown(self):
         patch.stopall()
 
+    def test_knows_its_id(self):
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
+
+        request = BaseRequest("<request/>")
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.id)
+        self.assertEqual("12345678-1234-1234-1234-1234567890ab", request.conversation_id)
+
     def test_inserts_request_id(self):
         self.assertEqual("12345678-1234-1234-1234-1234567890ab", self.patched_new_uuid())
 
