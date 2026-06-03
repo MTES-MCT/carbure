@@ -1,10 +1,11 @@
-import { NumberInput } from "common/components/inputs2"
 import { Column } from "common/components/table2"
 import { formatDate, formatNumber } from "common/utils/formatters"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { MacFossilFuel } from "../../api"
+import { FossilFuel } from "../../types"
 import css from "./mac-dialog.module.css"
+import { MacInput } from "./mac-input"
 
 type MacTableRow = {
   monthLabel: string
@@ -24,10 +25,15 @@ export const useMacTable = (
   year: number,
   macData: MacFossilFuel[],
   fuels: string[],
+  fossilFuels: FossilFuel[],
   setMacData: Dispatch<SetStateAction<MacFossilFuel[]>>,
   readOnly?: boolean
 ) => {
   const { t } = useTranslation()
+
+  const fuelLabels = Object.fromEntries(
+    fossilFuels.map((fuel) => [fuel.nomenclature, fuel.label])
+  )
 
   const updateVolume = (
     fuel: string,
@@ -40,7 +46,7 @@ export const useMacTable = (
           !(mac.fuel === fuel && mac.year === year && mac.month === month)
       )
 
-      if (volume === undefined) {
+      if (volume === undefined || isNaN(volume)) {
         return existingMacData
       }
 
@@ -92,16 +98,17 @@ export const useMacTable = (
       className: css.monthColumn,
     },
     ...fuels.map<Column<MacTableRow>>((fuel) => ({
-      header: fuel,
+      header: t("{{fuel}} (L)", { fuel: fuelLabels[fuel] ?? fuel }),
       className: css.fuelColumn,
       cell: (row) =>
-        row.isTotal ? (
-          <strong>{formatNumber(row.volumes[fuel] ?? 0)}</strong>
+        row.isTotal || readOnly ? (
+          <strong>
+            {row.volumes[fuel] !== undefined
+              ? formatNumber(row.volumes[fuel])
+              : "-"}
+          </strong>
         ) : (
-          <NumberInput
-            readOnly={readOnly}
-            label=""
-            min={0}
+          <MacInput
             value={row.volumes[fuel]}
             onChange={(volume) => updateVolume(fuel, row.month, volume)}
           />
@@ -112,5 +119,99 @@ export const useMacTable = (
   return {
     columns,
     rows,
+  }
+}
+
+type MacDialogDraft = {
+  macData: MacFossilFuel[]
+  fuels: string[]
+}
+
+function getMacDraftKey(entityId: number, year: number) {
+  return `mac-fossil-fuels:${entityId}:${year}`
+}
+
+function getFuels(macData: MacFossilFuel[]) {
+  return Array.from(new Set(macData.map((mac) => mac.fuel)))
+}
+
+function getMacDraft(key: string): MacDialogDraft | undefined {
+  try {
+    const draft = sessionStorage.getItem(key)
+    return draft ? JSON.parse(draft) : undefined
+  } catch {
+    return undefined
+  }
+}
+
+function saveMacDraft(key: string, draft: MacDialogDraft) {
+  sessionStorage.setItem(key, JSON.stringify(draft))
+}
+
+function clearMacDraft(key: string) {
+  sessionStorage.removeItem(key)
+}
+
+export const useMacDialogDraft = (
+  entityId: number,
+  year: number,
+  loadedMacData: MacFossilFuel[] | undefined,
+  readOnly?: boolean
+) => {
+  const [macData, setMacData] = useState<MacFossilFuel[]>([])
+  const [fuels, setFuels] = useState<string[]>([])
+  const [hasLocalDraft, setHasLocalDraft] = useState(false)
+  const draftKey = getMacDraftKey(entityId, year)
+
+  useEffect(() => {
+    if (loadedMacData) {
+      const draft = readOnly ? undefined : getMacDraft(draftKey)
+
+      setMacData(draft?.macData ?? loadedMacData)
+      setFuels(draft?.fuels ?? getFuels(loadedMacData))
+      setHasLocalDraft(!!draft)
+    }
+  }, [draftKey, loadedMacData, readOnly])
+
+  const saveDraft = (draft: MacDialogDraft) => {
+    if (!readOnly) {
+      saveMacDraft(draftKey, draft)
+      setHasLocalDraft(true)
+    }
+  }
+
+  const setMacDataAndDraft: Dispatch<SetStateAction<MacFossilFuel[]>> = (
+    value
+  ) => {
+    setMacData((currentMacData) => {
+      const nextMacData =
+        typeof value === "function" ? value(currentMacData) : value
+
+      saveDraft({ macData: nextMacData, fuels })
+      return nextMacData
+    })
+  }
+
+  const addFuels = (fuelsToAdd: string[]) => {
+    setFuels((currentFuels) => {
+      const nextFuels = Array.from(new Set([...currentFuels, ...fuelsToAdd]))
+
+      saveDraft({ macData, fuels: nextFuels })
+      return nextFuels
+    })
+  }
+
+  const clearDraft = () => {
+    clearMacDraft(draftKey)
+    setHasLocalDraft(false)
+  }
+
+  return {
+    macData,
+    fuels,
+    setMacData: setMacDataAndDraft,
+    addFuels,
+    clearDraft,
+    hasLocalDraft,
   }
 }

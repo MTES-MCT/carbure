@@ -5,15 +5,11 @@ import { usePortal } from "common/components/portal"
 import { Table } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import css from "./mac-dialog.module.css"
+import { findFossilFuels } from "common/api"
 import { useMutation, useQuery } from "common/hooks/async"
-import {
-  getMacFossilFuels,
-  MacFossilFuel,
-  replaceMacFossilFuels,
-} from "../../api"
-import { useEffect, useState } from "react"
+import { getMacFossilFuels, replaceMacFossilFuels } from "../../api"
 import { MacFuelSelectionDialog } from "./mac-fuel-selection-dialog"
-import { useMacTable } from "./mac-dialog.hooks"
+import { useMacDialogDraft, useMacTable } from "./mac-dialog.hooks"
 import { Notice } from "common/components/notice"
 
 type MacDialogProps = {
@@ -37,30 +33,39 @@ export const MacDialog = ({
     params: [entityId, year],
   })
 
+  const { result: fossilFuels = [], loading: fossilFuelsLoading } = useQuery(
+    findFossilFuels,
+    {
+      key: "fossil-fuels",
+      params: [],
+    }
+  )
+
+  const { macData, fuels, setMacData, addFuels, clearDraft, hasLocalDraft } =
+    useMacDialogDraft(entityId, year, loadedMacData, readOnly)
+
   const mutation = useMutation(replaceMacFossilFuels, {
     invalidates: ["mac-fossil-fuels", "teneur-objectives"],
+    onSuccess: clearDraft,
   })
 
-  const [macData, setMacData] = useState<MacFossilFuel[]>([])
-  const [fuels, setFuels] = useState<string[]>([])
+  const selectableFossilFuels = fossilFuels.filter(
+    (fuel) => !fuels.includes(fuel.nomenclature)
+  )
 
-  useEffect(() => {
-    if (loadedMacData) {
-      setMacData(loadedMacData)
-      setFuels(Array.from(new Set(loadedMacData.map((mac) => mac.fuel))))
-    }
-  }, [loadedMacData])
-
-  const table = useMacTable(year, macData, fuels, setMacData, readOnly)
-
-  const addFuels = (fuelsToAdd: string[]) => {
-    setFuels((fuels) => Array.from(new Set([...fuels, ...fuelsToAdd])))
-  }
+  const table = useMacTable(
+    year,
+    macData,
+    fuels,
+    fossilFuels,
+    setMacData,
+    readOnly
+  )
 
   const openFuelSelectionDialog = () => {
     portal((close) => (
       <MacFuelSelectionDialog
-        existingFuels={fuels}
+        fossilFuels={selectableFossilFuels}
         onAdd={(fuels) => {
           addFuels(fuels)
           close()
@@ -102,9 +107,19 @@ export const MacDialog = ({
               >
                 {t("Ajouter des carburants")}
               </Button>
+              {hasLocalDraft && (
+                <Notice
+                  icon="fr-icon-warning-line"
+                  className={css.notice}
+                  variant="warning"
+                >
+                  {t("Les valeurs affichées ne sont pas encore enregistrées.")}
+                </Notice>
+              )}
               <Button
                 priority="primary"
                 onClick={saveMacData}
+                disabled={!hasLocalDraft}
                 loading={mutation.loading}
               >
                 {t("Sauvegarder")}
@@ -126,7 +141,7 @@ export const MacDialog = ({
             className={css.table}
             columns={table.columns}
             rows={table.rows}
-            loading={loading}
+            loading={loading || fossilFuelsLoading}
           />
         )}
       </Dialog>
