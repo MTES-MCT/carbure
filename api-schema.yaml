@@ -14395,6 +14395,7 @@ components:
           readOnly: true
       required:
         - category
+        - crop_type
         - group
         - subcategory
     ClientTypeEnum:
@@ -14720,9 +14721,8 @@ components:
         - INTERMEDIATE
       type: string
       description: |-
-        * `PRIMARY` - Culture principale
-        * `INTERMEDIATE` - Culture intermédiaire (CIVE)
-      nullable: true
+        * `PRIMARY` - PRIMARY
+        * `INTERMEDIATE` - INTERMEDIATE
     DeleteCertificateRequest:
       type: object
       properties:
@@ -19585,6 +19585,21 @@ components:
         * `CAP` - Plafond à ne pas dépasser
     TariffCoefficientProportions:
       type: object
+      properties:
+        tariff_coefficients:
+          allOf:
+            - $ref: "#/components/schemas/TariffCoefficients"
+          readOnly: true
+        primary_crop:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - primary_crop
+        - tariff_coefficients
+    TariffCoefficients:
+      type: object
+      description: P1 / P2 / P3 / P / Pef shares from the tariff decree referential.
       properties:
         p1:
           type: number

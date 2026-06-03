@@ -10,6 +10,7 @@ export type BiomethaneSupplyInputQuery =
 
 export type BiomethaneSupplyInputForm = apiTypes["BiomethaneSupplyInputCreate"]
 
+export type TariffCoefficients = apiTypes["TariffCoefficients"]
 export type TariffCoefficientProportions =
   apiTypes["TariffCoefficientProportions"]
 

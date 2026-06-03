@@ -276,5 +276,6 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         response = self.client.get(url, self.base_params)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["p2"], 100.0)
-        self.assertEqual(response.data["p1"], 0.0)
+        self.assertEqual(response.data["tariff_coefficients"]["p2"], 100.0)
+        self.assertEqual(response.data["tariff_coefficients"]["p1"], 0.0)
+        self.assertEqual(response.data["primary_crop"], 0.0)
