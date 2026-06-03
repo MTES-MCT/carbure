@@ -5,6 +5,17 @@ import {
   BiomethaneSupplyInputQuery,
 } from "./types"
 
+export const getTariffCoefficientProportions = async (
+  query: BiomethaneSupplyInputQuery,
+  entityId: number,
+  selectedEntityId?: number
+) =>
+  api.GET("/biomethane/supply-input/tariff-coefficient-proportions/", {
+    params: {
+      query: { ...query, entity_id: entityId, producer_id: selectedEntityId },
+    },
+  })
+
 export const getSupplyPlanInputs = async (
   query: BiomethaneSupplyInputQuery,
   selectedEntityId?: number

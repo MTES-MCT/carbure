@@ -2504,6 +2504,42 @@ paths:
                     - source
                   summary: Example of filters response.
           description: ""
+  /api/biomethane/supply-input/tariff-coefficient-proportions/:
+    get:
+      operationId: biomethane_supply_input_tariff_coefficient_proportions_retrieve
+      description: Volume-weighted P1/P2/P3/P/Peff shares for the filtered supply plan
+        inputs.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TariffCoefficientProportions"
+          description: ""
   /api/biomethane/supply-plan/download-template/:
     get:
       operationId: biomethane_supply_plan_download_template_retrieve
@@ -19533,6 +19569,35 @@ components:
       description: |-
         * `REACH` - Objectif à atteindre
         * `CAP` - Plafond à ne pas dépasser
+    TariffCoefficientProportions:
+      type: object
+      properties:
+        p1:
+          type: number
+          format: double
+          readOnly: true
+        p2:
+          type: number
+          format: double
+          readOnly: true
+        p3:
+          type: number
+          format: double
+          readOnly: true
+        p:
+          type: number
+          format: double
+          readOnly: true
+        peff:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - p
+        - p1
+        - p2
+        - p3
+        - peff
     TariffReferenceEnum:
       enum:
         - "2011"

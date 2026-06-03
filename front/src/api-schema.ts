@@ -766,6 +766,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/supply-input/tariff-coefficient-proportions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Volume-weighted P1/P2/P3/P/Peff shares for the filtered supply plan inputs. */
+        get: operations["biomethane_supply_input_tariff_coefficient_proportions_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/supply-plan/download-template/": {
         parameters: {
             query?: never;
@@ -6519,6 +6536,18 @@ export interface components {
          * @enum {string}
          */
         TargetTypeEnum: TargetTypeEnum;
+        TariffCoefficientProportions: {
+            /** Format: double */
+            readonly p1: number;
+            /** Format: double */
+            readonly p2: number;
+            /** Format: double */
+            readonly p3: number;
+            /** Format: double */
+            readonly p: number;
+            /** Format: double */
+            readonly peff: number;
+        };
         /**
          * @description * `2011` - 2011
          *     * `2020` - 2020
@@ -8451,6 +8480,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    biomethane_supply_input_tariff_coefficient_proportions_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TariffCoefficientProportions"];
                 };
             };
         };

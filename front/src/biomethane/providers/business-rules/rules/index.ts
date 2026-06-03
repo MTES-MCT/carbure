@@ -9,7 +9,6 @@ import {
   buildProductionRules,
   ProductionBusinessRules,
 } from "./production.rules"
-
 export * from "./common.rules"
 export * from "./digestate.rules"
 export * from "./production.rules"
