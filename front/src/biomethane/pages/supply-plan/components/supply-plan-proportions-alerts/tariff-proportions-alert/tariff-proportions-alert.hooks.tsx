@@ -1,23 +1,19 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import useEntity from "common/hooks/entity"
-import { useQuery } from "common/hooks/async"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 import { formatPercentage } from "common/utils/formatters"
-import { getTariffCoefficientProportions } from "../../api"
-import {
-  BiomethaneSupplyInputQuery,
-  TariffCoefficientProportions,
-} from "../../types"
 import { TariffReference } from "biomethane/pages/contract/types"
+import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
+import {
+  TariffCoefficientProportions,
+  TariffCoefficients,
+} from "../../../types"
 import {
   isTariffReference2011,
   isTariffReference2020Plus,
 } from "./tariff-proportions-alert.utils"
-import { useContractProductionUnit } from "biomethane/providers/contract-production-unit"
 
-export type TariffProportionKey = keyof TariffCoefficientProportions
+export type TariffProportionKey = keyof TariffCoefficients
 
 const getVisibleCoefficients = (
   tariffReference?: TariffReference | null
@@ -33,12 +29,16 @@ const getVisibleCoefficients = (
   return []
 }
 
-export const useTariffProportionsAlert = (
-  query: BiomethaneSupplyInputQuery
-) => {
+type UseTariffProportionsAlertParams = {
+  loading: boolean
+  proportions?: TariffCoefficientProportions
+}
+
+export const useTariffProportionsAlert = ({
+  loading,
+  proportions,
+}: UseTariffProportionsAlertParams) => {
   const { t } = useTranslation()
-  const entity = useEntity()
-  const { selectedEntityId } = useSelectedEntity()
   const { contractInfos: contract } = useContractProductionUnit()
 
   const visibleCoefficients = useMemo(
@@ -47,14 +47,6 @@ export const useTariffProportionsAlert = (
   )
 
   const shouldDisplay = visibleCoefficients.length > 0
-
-  const { result: proportions, loading } = useQuery(
-    getTariffCoefficientProportions,
-    {
-      key: "tariff-coefficient-proportions",
-      params: [query, entity.id, selectedEntityId],
-    }
-  )
 
   const description = useMemo(() => {
     if (loading) {
@@ -65,10 +57,12 @@ export const useTariffProportionsAlert = (
       return null
     }
 
-    const proportionsData = proportions.data
+    const tariffCoefficients = proportions.tariff_coefficients
 
     return visibleCoefficients
-      .map((key) => `${key} = ${formatPercentage(proportionsData?.[key] ?? 0)}`)
+      .map(
+        (key) => `${key} = ${formatPercentage(tariffCoefficients?.[key] ?? 0)}`
+      )
       .join(", ")
   }, [loading, proportions, visibleCoefficients, t])
 

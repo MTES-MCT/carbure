@@ -4570,11 +4570,11 @@ export interface components {
             site_siret?: string;
         };
         /**
-         * @description * `PRIMARY` - Culture principale
-         *     * `INTERMEDIATE` - Culture intermédiaire (CIVE)
-         * @enum {string|null}
+         * @description * `PRIMARY` - PRIMARY
+         *     * `INTERMEDIATE` - INTERMEDIATE
+         * @enum {string}
          */
-        CropTypeEnum: CropTypeEnum | null;
+        CropTypeEnum: CropTypeEnum;
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -6628,6 +6628,12 @@ export interface components {
          */
         TargetTypeEnum: TargetTypeEnum;
         TariffCoefficientProportions: {
+            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"];
+            /** Format: double */
+            readonly primary_crop: number;
+        };
+        /** @description P1 / P2 / P3 / P / Pef shares from the tariff decree referential. */
+        TariffCoefficients: {
             /** Format: double */
             readonly p1: number;
             /** Format: double */

@@ -1,15 +1,20 @@
 import { Alert } from "common/components/alert2"
-import { BiomethaneSupplyInputQuery } from "../../types"
+import { TariffCoefficientProportions } from "../../../types"
 import { useTariffProportionsAlert } from "./tariff-proportions-alert.hooks"
 
 type TariffProportionsAlertProps = {
-  query: BiomethaneSupplyInputQuery
+  loading: boolean
+  proportions?: TariffCoefficientProportions
 }
 
 export const TariffProportionsAlert = ({
-  query,
+  loading,
+  proportions,
 }: TariffProportionsAlertProps) => {
-  const { shouldDisplay, description } = useTariffProportionsAlert(query)
+  const { shouldDisplay, description } = useTariffProportionsAlert({
+    loading,
+    proportions,
+  })
 
   if (!shouldDisplay || !description) {
     return null
