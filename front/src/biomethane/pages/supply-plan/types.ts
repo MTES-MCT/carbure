@@ -17,6 +17,8 @@ export type BiomethaneSupplyInputQuery =
 
 export type BiomethaneSupplyInputForm = apiTypes["BiomethaneSupplyInputCreate"]
 
+export type TariffCoefficientProportions =
+  apiTypes["TariffCoefficientProportions"]
 export {
   BiomethaneSupplyInputFilter,
   BiomethaneSupplyInputMaterialUnit,
