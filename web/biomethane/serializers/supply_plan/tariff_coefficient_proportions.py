@@ -8,7 +8,7 @@ class TariffCoefficientProportionsSerializer(serializers.Serializer):
     p2 = serializers.FloatField(read_only=True)
     p3 = serializers.FloatField(read_only=True)
     p = serializers.FloatField(read_only=True)
-    peff = serializers.FloatField(read_only=True)
+    pef = serializers.FloatField(read_only=True)
 
     def to_representation(self, queryset):
         return compute_tariff_coefficient_proportions(queryset)

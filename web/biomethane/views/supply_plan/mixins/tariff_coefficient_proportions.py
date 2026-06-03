@@ -13,7 +13,7 @@ class TariffCoefficientProportionsActionMixin:
         url_path="tariff-coefficient-proportions",
     )
     def tariff_coefficient_proportions(self, request, *args, **kwargs):
-        """Volume-weighted P1/P2/P3/P/Peff shares for the filtered supply plan inputs."""
+        """Volume-weighted P1/P2/P3/P/Pef shares for the filtered supply plan inputs."""
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset)
         return Response(serializer.data)

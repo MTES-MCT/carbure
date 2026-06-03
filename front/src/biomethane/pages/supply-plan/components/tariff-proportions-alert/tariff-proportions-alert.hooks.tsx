@@ -27,7 +27,7 @@ const getVisibleCoefficients = (
   }
 
   if (isTariffReference2020Plus(tariffReference)) {
-    return ["p1", "p2", "p3", "p", "peff"]
+    return ["p1", "p2", "p3", "p", "pef"]
   }
 
   return []

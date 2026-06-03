@@ -1,5 +1,5 @@
 """
-Volume-weighted P1 / P2 / P3 / P / Peff shares for declared supply inputs.
+Volume-weighted P1 / P2 / P3 / P / Pef shares for declared supply inputs.
 
 Business rules (single source of truth, applied in SQL):
 - Proportions use wet matter tonnage (tMB), not dry matter (tMS).
@@ -9,18 +9,20 @@ Business rules (single source of truth, applied in SQL):
   (The field is only collected for some feedstocks, so NULL means the referential applies as-is.)
 """
 
-from django.db.models import Case, CharField, F, FloatField, OuterRef, Subquery, Sum, Value, When
+from django.db.models import Case, CharField, F, FloatField, OuterRef, QuerySet, Subquery, Sum, Value, When
 
 from biomethane.models import BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
 
 Coeff = BiomethaneFeedstockTariffCoefficient
 
-COEFFICIENTS = (Coeff.P1, Coeff.P2, Coeff.P3, Coeff.P, Coeff.PEFF)
+COEFFICIENTS = (Coeff.P1, Coeff.P2, Coeff.P3, Coeff.P, Coeff.PEF)
 
 
-def compute_tariff_coefficient_proportions(queryset, tariff_reference: str | None = None) -> dict[str, float]:
+def compute_tariff_coefficient_proportions(
+    queryset: QuerySet[BiomethaneSupplyInput], tariff_reference: str | None = None
+) -> dict[str, float]:
     """
-    Return {"p1": …, "p2": …, "p3": …, "p": …, "peff": …} as % of declared wet matter tonnage (tMB).
+    Return {"p1": …, "p2": …, "p3": …, "p": …, "pef": …} as % of declared wet matter tonnage (tMB).
 
     Lines without a coefficient still weigh the denominator; they are not assigned to a bucket.
     """
@@ -77,7 +79,7 @@ def compute_tariff_coefficient_proportions(queryset, tariff_reference: str | Non
     if not total:
         return _zeros()
 
-    return {coeff.lower(): _pct(rows[coeff.lower()] or 0.0, total) for coeff in COEFFICIENTS}
+    return {coeff.lower(): _percentage(rows[coeff.lower()] or 0.0, total) for coeff in COEFFICIENTS}
 
 
 def _wet_matter_tonnage_expression():
@@ -100,7 +102,7 @@ def _wet_matter_tonnage_expression():
     )
 
 
-def _pct(part: float, total: float) -> float:
+def _percentage(part: float, total: float) -> float:
     return round(part / total * 100, 2)
 
 

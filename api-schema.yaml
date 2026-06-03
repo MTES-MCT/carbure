@@ -2614,7 +2614,7 @@ paths:
   /api/biomethane/supply-input/tariff-coefficient-proportions/:
     get:
       operationId: biomethane_supply_input_tariff_coefficient_proportions_retrieve
-      description: Volume-weighted P1/P2/P3/P/Peff shares for the filtered supply plan
+      description: Volume-weighted P1/P2/P3/P/Pef shares for the filtered supply plan
         inputs.
       parameters:
         - in: query
@@ -19851,7 +19851,7 @@ components:
           type: number
           format: double
           readOnly: true
-        peff:
+        pef:
           type: number
           format: double
           readOnly: true
@@ -19860,7 +19860,7 @@ components:
         - p1
         - p2
         - p3
-        - peff
+        - pef
     TariffReferenceEnum:
       enum:
         - "2011"

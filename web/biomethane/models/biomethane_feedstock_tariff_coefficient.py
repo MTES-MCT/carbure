@@ -3,7 +3,7 @@ from django.db import models
 
 class BiomethaneFeedstockTariffCoefficient(models.Model):
     """
-    Reference data: tariff coefficient (P1, P2, P3, P, Peff) for a feedstock under a given
+    Reference data: tariff coefficient (P1, P2, P3, P, Pef) for a feedstock under a given
     tariff decree regime (extensible granularity, independent of contract TARIFF_RULE groups).
     """
 
@@ -19,14 +19,14 @@ class BiomethaneFeedstockTariffCoefficient(models.Model):
     P2 = "P2"
     P3 = "P3"
     P = "P"
-    PEFF = "PEFF"
+    PEF = "PEF"
 
     COEFFICIENT_CHOICES = (
         (P1, "P1"),
         (P2, "P2"),
         (P3, "P3"),
         (P, "P"),
-        (PEFF, "Peff"),
+        (PEF, "Pef"),
     )
 
     TARIFF_REFERENCE_TO_REGIME = {
