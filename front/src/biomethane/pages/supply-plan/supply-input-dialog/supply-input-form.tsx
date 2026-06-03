@@ -15,6 +15,7 @@ import { Form, useForm } from "common/components/form2"
 import {
   BiomethaneSupplyInput,
   BiomethaneSupplyInputMaterialUnit,
+  CropType,
 } from "../types"
 import { AutoCompleteFeedstocks } from "common/molecules/autocomplete-feedstocks"
 import { useBiomethaneBackendInputLabel } from "biomethane/hooks/use-biomethane-backend-input-label"
@@ -63,8 +64,8 @@ export const SupplyInputForm = ({
             {...bind("feedstock")}
             readOnly={readOnly}
           />
-          {value?.feedstock?.classification?.category ===
-            "Biomasse agricole - Cultures intermédiaires" && (
+          {value?.feedstock?.classification?.crop_type ===
+            CropType.INTERMEDIATE && (
             <RadioGroup
               options={typeCiveOptions}
               label={tBiomethaneInput("supply_input.type_cive")}

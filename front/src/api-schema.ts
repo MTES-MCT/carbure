@@ -4344,6 +4344,7 @@ export interface components {
             group: string;
             category: string;
             subcategory: string;
+            readonly crop_type: components["schemas"]["CropTypeEnum"] | null;
         };
         /**
          * @description * `Producteur` - Producteur
@@ -4494,6 +4495,12 @@ export interface components {
             insee_code?: string;
             site_siret?: string;
         };
+        /**
+         * @description * `PRIMARY` - Culture principale
+         *     * `INTERMEDIATE` - Culture intermédiaire (CIVE)
+         * @enum {string|null}
+         */
+        CropTypeEnum: CropTypeEnum | null;
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -14640,6 +14647,10 @@ export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",
     IN_CORRECTION = "IN_CORRECTION",
     FIXED = "FIXED"
+}
+export enum CropTypeEnum {
+    PRIMARY = "PRIMARY",
+    INTERMEDIATE = "INTERMEDIATE"
 }
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",
