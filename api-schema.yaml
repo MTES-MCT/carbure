@@ -14635,6 +14635,11 @@ components:
         subcategory:
           type: string
           maxLength: 128
+        crop_type:
+          allOf:
+            - $ref: "#/components/schemas/CropTypeEnum"
+          nullable: true
+          readOnly: true
       required:
         - category
         - group
@@ -14926,6 +14931,15 @@ components:
           maxLength: 14
       required:
         - name
+    CropTypeEnum:
+      enum:
+        - PRIMARY
+        - INTERMEDIATE
+      type: string
+      description: |-
+        * `PRIMARY` - Culture principale
+        * `INTERMEDIATE` - Culture intermédiaire (CIVE)
+      nullable: true
     DeleteCertificateRequest:
       type: object
       properties:
