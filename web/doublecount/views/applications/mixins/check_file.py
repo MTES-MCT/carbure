@@ -46,7 +46,7 @@ class CheckFileActionMixin:
         error_count = (
             +len(errors["sourcing_forecast"])
             + len(errors["production"])
-            + len(errors["global"])
+            + len(errors["global_errors"])
             + len(errors["production_history"])
             + len(errors["sourcing_history"])
         )
