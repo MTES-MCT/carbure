@@ -3,7 +3,7 @@ from django.db.models.functions import Cast, Substr
 
 from tiruert.models.operation import Operation
 
-# Nom de l'annotation SQL (distinct de la propriété Operation.year).
+# SQL annotation field name.
 DB_FIELD = "_operation_year"
 
 
@@ -13,9 +13,8 @@ def resolve(
     declaration_year: int | None,
 ) -> int | None:
     """
-    Année affichée / filtrable :
-    - incorporation, MAC bio, livraison directe → année de la période de durabilité ;
-    - autres opérations → année de déclaration Tiruert.
+    - incorporation, MAC bio, livraison directe → year of the durability period ;
+    - other operations → declaration year.
     """
     if operation_type in Operation.CREDIT_TYPES and durability_period:
         return int(durability_period[:4])
@@ -23,7 +22,7 @@ def resolve(
 
 
 def db_annotation():
-    """Expression SQL alignée sur resolve() (filtres et agrégations)."""
+    """SQL expression aligned with resolve() (filters and aggregations)."""
     return Case(
         When(
             type__in=Operation.CREDIT_TYPES,
