@@ -1,9 +1,10 @@
-from .biofuels import get_biofuels
-from .certificates import get_certificates
-from .countries import get_countries
-from .depots import get_depots
-from .entity import get_entities
-from .feedstocks import get_feedstocks
-from .production_sites import get_production_sites
-from .airports import get_airports
-from .systeme_national import get_systeme_national_certificates
+from .airports import get_airports as get_airports
+from .biofuels import get_biofuels as get_biofuels
+from .certificates import get_certificates as get_certificates
+from .countries import get_countries as get_countries
+from .depots import get_depots as get_depots
+from .entity import get_entities as get_entities
+from .feedstocks import get_feedstocks as get_feedstocks
+from .fossil_fuels import get_fossil_fuels as get_fossil_fuels
+from .production_sites import get_production_sites as get_production_sites
+from .systeme_national import get_systeme_national_certificates as get_systeme_national_certificates

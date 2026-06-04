@@ -7292,6 +7292,29 @@ paths:
                 items:
                   $ref: "#/components/schemas/FeedStockClassification"
           description: ""
+  /api/resources/fossil-fuels:
+    get:
+      operationId: resources_fossil_fuels_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `label` and `nomenclature`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FossilFuel"
+          description: ""
   /api/resources/production-sites:
     get:
       operationId: resources_production_sites_list
@@ -9820,6 +9843,56 @@ paths:
               schema:
                 error: NOTHING_TO_DECLARE
           description: Error message
+  /api/tiruert/mac-fossil-fuel/:
+    get:
+      operationId: tiruert_mac_fossil_fuel_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: string
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedMacFossilFuelList"
+          description: ""
   /api/tiruert/mac-fossil-fuel/export/:
     get:
       operationId: tiruert_mac_fossil_fuel_export_retrieve
@@ -9829,6 +9902,12 @@ paths:
           schema:
             type: integer
           description: Authorised entity ID.
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter RFCs by year
           required: true
       tags:
         - tiruert
@@ -9845,6 +9924,76 @@ paths:
                 ExampleOfExportResponse.:
                   value: mac_export.xlsx
                   summary: Example of export response.
+          description: ""
+  /api/tiruert/mac-fossil-fuel/replace/:
+    put:
+      operationId: tiruert_mac_fossil_fuel_replace_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: MAC year.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MacFossilFuelInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MacFossilFuelInputRequest"
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/MacFossilFuelInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedMacFossilFuelList"
           description: ""
   /api/tiruert/objectives/:
     get:
@@ -10185,6 +10334,14 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -11171,6 +11328,14 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -11323,6 +11488,7 @@ paths:
               - sector
               - status
               - type
+              - year
           description: Filter string to apply
           required: true
         - in: query
@@ -11524,6 +11690,14 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -15442,6 +15616,10 @@ components:
         quantity:
           type: number
           format: double
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
       required:
         - type
     ElecOperationList:
@@ -16667,6 +16845,22 @@ components:
         * `EXCEL` - EXCEL
         * `EXTRA` - EXTRA
         * `DECISION` - DECISION
+    FossilFuel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        label:
+          type: string
+          maxLength: 255
+        nomenclature:
+          type: string
+          maxLength: 255
+      required:
+        - id
+        - label
+        - nomenclature
     GenericCertificate:
       type: object
       properties:
@@ -16841,6 +17035,63 @@ components:
         * `TALLOL` - Tallol
         * `OTHER` - Autre
         * `EP2AM` - EP2AM
+    MacFossilFuel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        fuel:
+          type: string
+        operator:
+          type: string
+        volume:
+          type: number
+          format: double
+        period:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        depot:
+          type: string
+          nullable: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+        - depot
+        - end_date
+        - fuel
+        - id
+        - operator
+        - period
+        - start_date
+        - year
+    MacFossilFuelInputRequest:
+      type: object
+      properties:
+        fuel:
+          type: string
+          minLength: 1
+        month:
+          type: integer
+          maximum: 12
+          minimum: 1
+        volume:
+          type: number
+          format: double
+          minimum: 0
+      required:
+        - fuel
+        - month
+        - volume
     MainObjective:
       type: object
       properties:
@@ -16996,7 +17247,9 @@ components:
           type: number
           format: double
         target_type:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/TargetTypeEnum"
+          nullable: true
         penalty:
           type: integer
         target_percent:
@@ -17102,6 +17355,10 @@ components:
         sector:
           type: string
           readOnly: true
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
@@ -17164,6 +17421,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationDetail"
+        year:
+          type: integer
+          nullable: true
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -17182,6 +17443,7 @@ components:
         - to_depot
         - type
         - unit
+        - year
     OperationCorrectionRequest:
       type: object
       properties:
@@ -17251,6 +17513,10 @@ components:
         export_recipient:
           type: string
           maxLength: 255
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         lots:
           type: array
           items:
@@ -17292,6 +17558,10 @@ components:
         export_recipient:
           type: string
           maxLength: 255
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         lots:
           type: array
           items:
@@ -17318,6 +17588,10 @@ components:
         sector:
           type: string
           readOnly: true
+        objective_sector:
+          allOf:
+            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
+          nullable: true
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
@@ -17364,6 +17638,10 @@ components:
           type: number
           format: double
           readOnly: true
+        year:
+          type: integer
+          nullable: true
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -17380,6 +17658,7 @@ components:
         - to_depot
         - type
         - unit
+        - year
     OperationLot:
       type: object
       properties:
@@ -17763,6 +18042,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityProductionSite"
+    PaginatedMacFossilFuelList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/MacFossilFuel"
     PaginatedOperationListList:
       type: object
       required:
@@ -19253,6 +19555,14 @@ components:
           type: string
       required:
         - metabase_iframe_url
+    TargetTypeEnum:
+      enum:
+        - REACH
+        - CAP
+      type: string
+      description: |-
+        * `REACH` - Objectif à atteindre
+        * `CAP` - Plafond à ne pas dépasser
     TariffReferenceEnum:
       enum:
         - "2011"

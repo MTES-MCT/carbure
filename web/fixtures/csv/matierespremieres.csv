@@ -49,25 +49,24 @@ TRITICALE,Triticale,1,0,0,0,1,0,CONV
 AMIDON_RESIDUEL_DECHETS,Amidons résiduels déchets,1,0,1,0,1,1,ANN-IX-A
 RAW_METHANOL_KRAFT_PULPING,Méthanol brut issu de la pâte kraft obtenue à partir de la pulpe de bois,1,0,1,0,1,0,ANN-IX-A
 CIVE,Culture intermédiaire,1,1,1,1,0,0,ANN-IX-B
-HUILES_DE_FUSEL,Huiles de fusel,1,0,1,1,1,1,ANN-IX-A
-MAUVAIS_GOUTS,Alcools mauvais goûts,1,0,1,1,1,1,ANN-IX-A
-HUILES_ACIDES_DE_PLUMES_DE_VOLAILLES,Huiles acides de plumes de volailles,0,1,1,1,1,1,ANN-IX-A
-PATES_DE_NEUTRALISATION,Huiles acides de pâtes de neutralisation ,0,1,1,1,1,1,ANN-IX-A
-HUILES_DE_TERRES_DE_BLANCHIMENT_USAGEE,Huiles de terres de blanchiment usagée,0,1,1,1,1,1,ANN-IX-A
-RESIDUS_DE_CRISTALLISATION_D_HYDROLYSATS_DE_DEXTROSE,Résidus de cristallisation d'hydrolysats de dextrose,1,0,1,1,1,1,ANN-IX-A
-RETENTATS_DE_MICROFILTRATION_DE_SOLUTION_DE_GLUCOSE,Rétentats de microfiltration de solution de glucose,1,0,1,1,1,1,ANN-IX-A
-HUILE_DE_COQUE_DE_NOIX_DE_CAJOU,Huile de coque de noix de cajou,0,1,1,1,1,1,ANN-IX-A
-ETHANOL_DE_RINÇAGE,Ethanol de rinçage de lignes de production de l'industrie cosmétique,1,0,1,1,1,1,ANN-IX-A
-ALCOOL_DE_SYNTHESE_PHARMACEUTIQUE,Alcool résiduel de synthèse pharmaceutique,1,0,1,1,1,1,ANN-IX-A
-RESIDUS_DE_TRANSESTERIFICATION_D_HUILES,Résidus de transestérification d'huiles,0,1,1,1,1,1,ANN-IX-A
-HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE,Huiles acides neutralisées ayant une haute teneur en soufre,0,1,1,1,1,1,ANN-IX-A
-GRAISSES_BRUNES,Graisses brunes,0,1,1,1,1,1,ANN-IX-A
-GRAISSES_D_INSECTES,Graisses d'insectes,0,1,1,1,1,1,ANN-IX-A
-LEVURES_USAGEES,Levures usagées,1,0,1,1,1,1,ANN-IX-A
-POUSSIERES_DE_MAIS_CONTAMINEES,Poussières de maïs contaminées,1,0,1,1,1,1,ANN-IX-A
-DECHETS_ALCOOLIQUES_ISSUS_DU_TRAITEMENT_DE_PLASMA_SANGUIN,Déchets alcooliques issus du traitement de plasma sanguin,1,0,1,1,1,1,ANN-IX-A
-ACIDES_GRAS_DE_NOIX_DE_COCO_DISTILLES,Acides gras de noix de coco distillés,0,1,1,1,1,1,ANN-IX-A
-RAFLES_DE_FRUITS_VIDES,Rafles de fruits vides,0,1,1,1,1,1,ANN-IX-A
-SUCRES_DECHETS_CONTENANT_DE_L_AMIDON,Sucres déchets contenant de l'amidon,1,0,1,1,1,1,ANN-IX-A
-FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE,Fraction lourde issue de la fabrication de farine,1,0,1,1,1,1,ANN-IX-A
-DECHETS_ALIMENTAIRES,Déchets alimentaires,1,1,1,0,1,1,ANN-IX-A
+HUILES_DE_FUSEL,Huiles de fusel,1,0,1,1,0,1,ANN-IX-A
+MAUVAIS_GOUTS,Alcools mauvais goûts,1,0,1,1,0,1,ANN-IX-A
+HUILES_ACIDES_DE_PLUMES_DE_VOLAILLES,Huiles acides de plumes de volailles,0,1,1,1,0,1,ANN-IX-A
+PATES_DE_NEUTRALISATION,Huiles acides de pâtes de neutralisation ,0,1,1,1,0,1,ANN-IX-A
+HUILES_DE_TERRES_DE_BLANCHIMENT_USAGEE,Huiles de terres de blanchiment usagée,0,1,1,1,0,1,ANN-IX-A
+RESIDUS_DE_CRISTALLISATION_D_HYDROLYSATS_DE_DEXTROSE,Résidus de cristallisation d'hydrolysats de dextrose,1,0,1,1,0,1,ANN-IX-A
+RETENTATS_DE_MICROFILTRATION_DE_SOLUTION_DE_GLUCOSE,Rétentats de microfiltration de solution de glucose,1,0,1,1,0,1,ANN-IX-A
+HUILE_DE_COQUE_DE_NOIX_DE_CAJOU,Huile de coque de noix de cajou,0,1,1,1,0,1,ANN-IX-A
+ETHANOL_DE_RINÇAGE,Ethanol de rinçage de lignes de production de l'industrie cosmétique,1,0,1,1,0,1,ANN-IX-A
+ALCOOL_DE_SYNTHESE_PHARMACEUTIQUE,Alcool résiduel de synthèse pharmaceutique,1,0,1,1,0,1,ANN-IX-A
+RESIDUS_DE_TRANSESTERIFICATION_D_HUILES,Résidus de transestérification d'huiles,0,1,1,1,0,1,ANN-IX-A
+HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE,Huiles acides neutralisées ayant une haute teneur en soufre,0,1,1,1,0,1,ANN-IX-A
+GRAISSES_BRUNES,Graisses brunes,0,1,1,1,0,1,ANN-IX-A
+GRAISSES_D_INSECTES,Graisses d'insectes,0,1,1,1,0,1,ANN-IX-A
+LEVURES_USAGEES,Levures usagées,1,0,1,1,0,1,ANN-IX-A
+POUSSIERES_DE_MAIS_CONTAMINEES,Poussières de maïs contaminées,1,0,1,1,0,1,ANN-IX-A
+DECHETS_ALCOOLIQUES_ISSUS_DU_TRAITEMENT_DE_PLASMA_SANGUIN,Déchets alcooliques issus du traitement de plasma sanguin,1,0,1,1,0,1,ANN-IX-A
+ACIDES_GRAS_DE_NOIX_DE_COCO_DISTILLES,Acides gras de noix de coco distillés,0,1,1,1,0,1,ANN-IX-A
+RAFLES_DE_FRUITS_VIDES,Rafles de fruits vides,0,1,1,1,0,1,ANN-IX-A
+SUCRES_DECHETS_CONTENANT_DE_L_AMIDON,Sucres déchets contenant de l'amidon,1,0,1,1,0,1,ANN-IX-A
+FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE,Fraction lourde issue de la fabrication de farine,1,0,1,1,0,1,ANN-IX-A

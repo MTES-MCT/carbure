@@ -16,6 +16,7 @@ import { formatGhgReduction } from "accounting/components/ghg-range-form"
 import { useBuildFilters } from "accounting/components/advanced-filters/advanced-filters.hooks"
 import { useMemo } from "react"
 import { showNextStepAdvancedFilters } from "accounting/components/advanced-filters/advanced-filters.utils"
+import { floorNumber } from "common/utils/formatters"
 
 export type BiofuelFiltersFormProps = AdvancedFiltersFormProps
 
@@ -61,9 +62,11 @@ export const BiofuelFiltersForm = ({
       balance.ghg_reduction_max
     )
 
-    // setFullBalance(balance)
-
-    setField("availableBalance", balance.available_balance)
+    const availableBalance =
+      floorNumber(balance.available_balance, 0) > 0
+        ? balance.available_balance
+        : 0
+    setField("availableBalance", availableBalance)
     setField("gesBoundMin", ghgReductionMin)
     setField("gesBoundMax", ghgReductionMax)
 

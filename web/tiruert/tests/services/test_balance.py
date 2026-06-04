@@ -84,8 +84,8 @@ class BalanceServiceGetConversionFactorTest(TestCase):
 class BalanceServiceInitBalanceEntryTest(TestCase):
     """Unit tests for BalanceService._init_balance_entry() method."""
 
-    def test_init_balance_entry_with_no_operation(self):
-        """Test _init_balance_entry creates entry with None values when no operation provided."""
+    def test_init_balance_entry(self):
+        """Test _init_balance_entry creates entry with None values and correct defaults."""
         result = BalanceService._init_balance_entry("mj")
 
         self.assertIsNone(result["sector"])
@@ -97,20 +97,6 @@ class BalanceServiceInitBalanceEntryTest(TestCase):
         self.assertEqual(result["declared_teneur"], 0)
         self.assertEqual(result["available_balance"], 0)
         self.assertEqual(result["saved_emissions"], 0)
-
-    def test_init_balance_entry_with_operation(self):
-        """Test _init_balance_entry populates sector, category, biofuel from operation."""
-        mock_operation = Mock()
-        mock_operation.sector = "ESSENCE"
-        mock_operation.customs_category = MatierePremiere.CONV
-        mock_operation.biofuel = Mock(code="ETH")
-
-        result = BalanceService._init_balance_entry("mj", operation=mock_operation)
-
-        self.assertEqual(result["sector"], "ESSENCE")
-        self.assertEqual(result["customs_category"], MatierePremiere.CONV)
-        self.assertEqual(result["biofuel"], mock_operation.biofuel)
-        self.assertEqual(result["unit"], "mj")
 
 
 class BalanceServiceGetKeyTest(TestCase):
@@ -210,7 +196,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 20.0
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 30.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 5.0)
@@ -224,7 +210,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 15.0
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, False, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, False, 1.0)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 10.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 20.0)
@@ -239,7 +225,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 10.0
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 15.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 0.0)
@@ -254,7 +240,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 7.0
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 0.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 10.0)
@@ -268,7 +254,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 10.0
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 3.33)
 
@@ -703,3 +689,101 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
 
         # Should have non-zero quantity (conversion applied successfully)
         self.assertGreater(result_mj[sector_key]["quantity"]["debit"], 0)
+
+
+class BalanceServiceObjectiveSectorTest(TestCase):
+    """Tests for objective_sector override in BalanceService.calculate_balance()."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    def setUp(self):
+        from core.models import Biocarburant, Entity
+        from tiruert.factories import OperationDetailFactory, OperationFactory
+
+        self.entity, _ = Entity.objects.get_or_create(
+            name="BalanceDeclaredSectorEntity",
+            entity_type=Entity.OPERATOR,
+        )
+        self.OperationFactory = OperationFactory
+        self.OperationDetailFactory = OperationDetailFactory
+
+        self.biofuel_diesel = Biocarburant.objects.filter(compatible_diesel=True).first()
+        self.biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
+
+    def _create_teneur_with_details(self, biofuel, objective_sector=None, status=Operation.PENDING):
+        op = self.OperationFactory(
+            type=Operation.TENEUR,
+            status=status,
+            debited_entity=self.entity,
+            biofuel=biofuel,
+            objective_sector=objective_sector,
+        )
+        self.OperationDetailFactory.create_for_operation(op)
+        return op
+
+    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
+    def test_objective_sector_overrides_teneur_key_for_sector_groupby(self, mock_convert):
+        """A TENEUR with objective_sector=ESSENCE but biofuel=GAZOLE should count pending_teneur in ESSENCE."""
+        mock_convert.return_value = 0.0
+
+        if not self.biofuel_diesel or not self.biofuel_essence:
+            self.skipTest("Missing biofuel fixtures for GAZOLE or ESSENCE sectors")
+
+        # Natural sector of biofuel is GAZOLE, but operator declares it for ESSENCE
+        op = self._create_teneur_with_details(self.biofuel_diesel, objective_sector=Operation.ESSENCE)
+
+        operations = Operation.objects.filter(id=op.id)
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "mj")
+
+        # pending_teneur should appear in ESSENCE (declared), not GAZOLE (natural)
+        self.assertIn(Operation.ESSENCE, result)
+        self.assertGreater(result[Operation.ESSENCE]["pending_teneur"], 0)
+
+        # GAZOLE entry may not exist, or if it does, pending_teneur must be 0
+        if Operation.GAZOLE in result:
+            self.assertEqual(result[Operation.GAZOLE]["pending_teneur"], 0)
+
+    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
+    def test_available_balance_stays_in_natural_sector(self, mock_convert):
+        """available_balance must stay in the natural sector even when objective_sector differs."""
+        mock_convert.return_value = 0.0
+
+        if not self.biofuel_diesel:
+            self.skipTest("Missing biofuel fixture for GAZOLE sector")
+
+        op = self._create_teneur_with_details(
+            self.biofuel_diesel, objective_sector=Operation.ESSENCE, status=Operation.DECLARED
+        )
+
+        operations = Operation.objects.filter(id=op.id)
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "mj")
+
+        # available_balance debited from stocks is under natural sector (GAZOLE)
+        self.assertIn(Operation.GAZOLE, result)
+        self.assertLess(result[Operation.GAZOLE]["available_balance"], 0)
+
+    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
+    def test_no_objective_sector_falls_back_to_biofuel_sector(self, mock_convert):
+        """Without objective_sector, behaviour is identical to before: teneur counted in natural sector."""
+        mock_convert.return_value = 0.0
+
+        if not self.biofuel_diesel:
+            self.skipTest("Missing biofuel fixture for GAZOLE sector")
+
+        op = self._create_teneur_with_details(self.biofuel_diesel, objective_sector=None)
+
+        operations = Operation.objects.filter(id=op.id)
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "mj")
+
+        self.assertIn(Operation.GAZOLE, result)
+        self.assertGreater(result[Operation.GAZOLE]["pending_teneur"], 0)
+
+        if Operation.ESSENCE in result:
+            self.assertEqual(result[Operation.ESSENCE]["pending_teneur"], 0)

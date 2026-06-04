@@ -17,10 +17,8 @@ export const formatQuantityDisplay = (
     : operation.quantity_mj
 
   return `${getOperationQuantity(
-    operation,
     formatUnit(quantity)
   )} / ${getOperationQuantity(
-    operation,
     formatUnit(CONVERSIONS.energy.MJ_TO_GJ(quantityMj), {
       unit: ExtendedUnit.GJ,
     })

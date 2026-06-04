@@ -28,6 +28,7 @@ export const useElecTeneurDialog = ({
       type: CreateElecOperationType.TENEUR,
       debited_entity: entity.id,
       quantity: CONVERSIONS.energy.GJ_TO_MJ(values.quantity!),
+      objective_sector: values.objective_sector,
     })
 
   return useMutation(operation, {

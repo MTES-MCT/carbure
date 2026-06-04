@@ -71,8 +71,6 @@ dc_feedstock_to_carbure_feedstock = {
     "rafles de fruits vides": "RAFLES_DE_FRUITS_VIDES",
     "sucres déchets contenant de l'amidon": "SUCRES_DECHETS_CONTENANT_DE_L_AMIDON",
     "fraction lourde issue de la fabrication de farine": "FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE",
-    "déchets industriels autres": "DECHETS_INDUSTRIELS",
-    "déchets alimentaires": "DECHETS_ALIMENTAIRES",
 }
 
 

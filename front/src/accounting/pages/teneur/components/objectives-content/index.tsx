@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next"
 import { ObjectiveSection } from "./objective-section"
 import { OverallProgress } from "./overall-progress"
 import { SectorProgress } from "./sector-progress"
-import { CappedCategoriesProgress } from "./capped-categories-progress"
-import { ObjectivizedCategoriesProgress } from "./objectivized-categories-progress"
+import { ConstrainedCategoriesProgress } from "./constrained-categories-progress"
 import { UnconstrainedCategoriesProgress } from "./unconstrained-categories-progress"
 import type {
   CategoryObjective,
@@ -36,12 +35,14 @@ export const ObjectivesContent = ({
       <ObjectiveSection
         title={t("Avancement par catégorie de carburants alternatifs")}
       >
-        <CappedCategoriesProgress
+        <ConstrainedCategoriesProgress
+          variant="capped"
           categories={objectivesData?.capped_categories}
           onCategoryClick={onCategoryClick}
           readOnly={readOnly}
         />
-        <ObjectivizedCategoriesProgress
+        <ConstrainedCategoriesProgress
+          variant="objectivized"
           categories={objectivesData?.objectivized_categories}
           onCategoryClick={onCategoryClick}
           readOnly={readOnly}

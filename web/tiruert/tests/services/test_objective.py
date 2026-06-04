@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
@@ -607,6 +608,134 @@ class ObjectiveServiceGetElecCategoryTest(TestCase):
         self.assertIn("objective", result)
         self.assertIsNone(result["objective"]["target_mj"])
         self.assertIsNone(result["objective"]["penalty"])
+
+
+class ObjectiveServiceAddElecSectorObjectivesTest(TestCase):
+    """Unit tests for ObjectiveService.add_elec_sector_objectives() method."""
+
+    @patch("tiruert.services.objective.ElecBalanceService.calculate_balance_per_sector")
+    def test_add_elec_sector_objectives_merges_matching_sector_balances(self, mock_balance):
+        mock_balance.return_value = {
+            "ESSENCE": {
+                "available_balance": 100,
+                "pending_teneur": 40,
+                "declared_teneur": 60,
+            },
+            "GAZOLE": {
+                "available_balance": 100,
+                "pending_teneur": 10,
+                "declared_teneur": 20,
+            },
+        }
+        objective_per_sector = [
+            {
+                "code": "ESSENCE",
+                "available_balance": 1_000,
+                "pending_teneur": 100,
+                "declared_teneur": 200,
+            },
+            {
+                "code": "GAZOLE",
+                "available_balance": 2_000,
+                "pending_teneur": 300,
+                "declared_teneur": 400,
+            },
+        ]
+
+        result = ObjectiveService.add_elec_teneur_to_objectives_per_sector(objective_per_sector, Mock(), 1, "2025-01-01")
+
+        self.assertEqual(result[0]["pending_teneur"], 140)
+        self.assertEqual(result[0]["declared_teneur"], 260)
+        self.assertEqual(result[0]["available_balance"], 1100)
+        self.assertEqual(result[1]["pending_teneur"], 310)
+        self.assertEqual(result[1]["declared_teneur"], 420)
+        self.assertEqual(result[1]["available_balance"], 2100)
+        mock_balance.assert_called_once()
+
+    @patch("tiruert.services.objective.ElecBalanceService.calculate_balance_per_sector")
+    def test_add_elec_sector_objectives_returns_unchanged_when_no_elec_balance(self, mock_balance):
+        mock_balance.return_value = {}
+        objective_per_sector = [
+            {
+                "code": "ESSENCE",
+                "available_balance": 1_000,
+                "pending_teneur": 100,
+                "declared_teneur": 200,
+            }
+        ]
+
+        result = ObjectiveService.add_elec_teneur_to_objectives_per_sector(objective_per_sector, Mock(), 1, "2025-01-01")
+
+        self.assertEqual(result, objective_per_sector)
+
+
+class ObjectiveServiceBuildObjectivesResultTest(TestCase):
+    """Unit tests for ObjectiveService.build_objectives_result() method."""
+
+    @patch.object(ObjectiveService, "calculate_energy_basis")
+    @patch.object(ObjectiveService, "get_balances_for_objectives_calculation")
+    @patch.object(ObjectiveService, "calculate_objectives_and_penalties")
+    @patch.object(ObjectiveService, "get_elec_category")
+    @patch.object(ObjectiveService, "add_elec_teneur_to_objectives_per_sector")
+    @patch.object(ObjectiveService, "calculate_global_objective")
+    def test_build_objectives_result_uses_biofuel_only_sectors_for_global_objective(
+        self,
+        mock_global_objective,
+        mock_add_elec_to_sectors,
+        mock_get_elec_category,
+        mock_calculate_objectives,
+        mock_get_balances,
+        mock_energy_basis,
+    ):
+        mock_energy_basis.return_value = 10_000_000
+        mock_get_balances.return_value = ({}, {})
+
+        objective_per_category = []
+        objective_per_sector = [
+            {
+                "code": "ESSENCE",
+                "available_balance": 1_000,
+                "pending_teneur": 100,
+                "declared_teneur": 50,
+            }
+        ]
+        mock_calculate_objectives.side_effect = [objective_per_category, objective_per_sector]
+
+        elec_category = {
+            "available_balance": 300,
+            "pending_teneur": 40,
+            "declared_teneur": 20,
+        }
+        mock_get_elec_category.return_value = elec_category
+
+        def merge_elec_sector_values(sectors, *_args):
+            merged_sectors = [sector.copy() for sector in sectors]
+            merged_sectors[0]["available_balance"] += elec_category["available_balance"]
+            merged_sectors[0]["pending_teneur"] += elec_category["pending_teneur"]
+            merged_sectors[0]["declared_teneur"] += elec_category["declared_teneur"]
+            return merged_sectors
+
+        mock_add_elec_to_sectors.side_effect = merge_elec_sector_values
+        mock_global_objective.return_value = {"available_balance": 123, "unit": "tCO2"}
+
+        result = ObjectiveService.build_objectives_result(
+            Mock(),
+            Mock(),
+            Mock(),
+            Mock(),
+            entity_id=1,
+            date_from=date(2025, 1, 1),
+            year=2025,
+        )
+
+        global_sectors_arg = mock_global_objective.call_args[0][0]
+        self.assertEqual(global_sectors_arg[0]["available_balance"], 1_000)
+        self.assertEqual(global_sectors_arg[0]["pending_teneur"], 100)
+        self.assertEqual(global_sectors_arg[0]["declared_teneur"], 50)
+
+        self.assertEqual(result["sectors"][0]["available_balance"], 1_300)
+        self.assertEqual(result["sectors"][0]["pending_teneur"], 140)
+        self.assertEqual(result["sectors"][0]["declared_teneur"], 70)
 
 
 class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):

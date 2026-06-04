@@ -92,7 +92,7 @@ export const ErrorsDetailsDialog = ({
             icon: "ri-history-line",
           },
           {
-            key: "global_errors",
+            key: "global",
             label: `${t("Global")} (${fileData.errors?.global_errors?.length || 0})`,
             icon: "ri-global-line",
           },

@@ -19,6 +19,14 @@ export async function findBiofuels(query: string) {
   return res.data ?? []
 }
 
+export async function findFossilFuels(query?: string) {
+  const res = await apiFetch.GET("/resources/fossil-fuels", {
+    params: { query: { query } },
+  })
+
+  return res.data ?? []
+}
+
 export async function findCountries(
   query: string,
   options?: { exclude_france?: boolean }

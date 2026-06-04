@@ -1,12 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { ObjectivizedCategoriesProgress } from "./objectivized-categories-progress"
-import { objectivizedCategories } from "../../../__test__/data"
+import { ConstrainedCategoriesProgress } from "./constrained-categories-progress"
+import {
+  cappedCategories,
+  objectivizedCategories,
+} from "../../../__test__/data"
 import { MockAnnualDeclarationTiruertProvider } from "accounting/providers/annual-declaration-tiruert.stories.utils"
 
-const meta: Meta<typeof ObjectivizedCategoriesProgress> = {
+const meta: Meta<typeof ConstrainedCategoriesProgress> = {
   title:
-    "modules/accounting/pages/teneur/components/objectives-content/ObjectivizedCategoriesProgress",
-  component: ObjectivizedCategoriesProgress,
+    "modules/accounting/pages/teneur/components/objectives-content/ConstrainedCategoriesProgress",
+  component: ConstrainedCategoriesProgress,
   decorators: [
     (Story) => (
       <MockAnnualDeclarationTiruertProvider>
@@ -18,10 +21,20 @@ const meta: Meta<typeof ObjectivizedCategoriesProgress> = {
 
 export default meta
 
-type Story = StoryObj<typeof ObjectivizedCategoriesProgress>
+type Story = StoryObj<typeof ConstrainedCategoriesProgress>
 
-export const Default: Story = {
+export const Capped: Story = {
   args: {
+    variant: "capped",
+    categories: cappedCategories,
+    onCategoryClick: () => {},
+    readOnly: false,
+  },
+}
+
+export const Objectivized: Story = {
+  args: {
+    variant: "objectivized",
     categories: objectivizedCategories,
     onCategoryClick: () => {},
     readOnly: false,
@@ -30,7 +43,8 @@ export const Default: Story = {
 
 export const PreviousYearDeclaration: Story = {
   args: {
-    categories: objectivizedCategories,
+    variant: "capped",
+    categories: cappedCategories,
     onCategoryClick: () => {},
     readOnly: false,
   },

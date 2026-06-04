@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models.operation import Operation
 from tiruert.models.operation_detail import OperationDetail
+from tiruert.services import operation_year as operation_year_service
 
 
 class FilterActionMixin:
@@ -29,6 +30,7 @@ class FilterActionMixin:
                     "operation",
                     "period",
                     "durability_period",
+                    "year",
                 ],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
@@ -84,6 +86,7 @@ class FilterActionMixin:
             "type": "_transaction",
             "period": "created_at",
             "durability_period": "durability_period",
+            "year": operation_year_service.DB_FIELD,
         }
 
         column = filters.get(filter)
@@ -102,6 +105,7 @@ class FilterActionMixin:
                     output_field=CharField(),
                 ),
             ),
+            **{operation_year_service.DB_FIELD: operation_year_service.db_annotation()},
         )
 
         values = queryset.values_list(column, flat=True).distinct()

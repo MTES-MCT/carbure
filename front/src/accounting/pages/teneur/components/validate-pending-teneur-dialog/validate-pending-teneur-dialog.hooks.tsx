@@ -3,6 +3,7 @@ import { formatSector } from "accounting/utils/formatters"
 import { Column, Cell } from "common/components/table2"
 import { CONVERSIONS, floorNumber, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
+import { SectorObjective } from "../../types"
 
 const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
   <span>
@@ -23,10 +24,6 @@ const floorValue = (value: number) =>
 export const useBiofuelTeneurColumns = () => {
   const { t } = useTranslation()
   const columns: Column<Balance>[] = [
-    {
-      header: t("Filière"),
-      cell: (item) => <Cell text={formatSector(item.sector)} />,
-    },
     {
       header: t("Biocarburant"),
       cell: (item) => item.biofuel?.code,
@@ -55,6 +52,38 @@ export const useBiofuelTeneurColumns = () => {
     {
       header: <HeaderWithSup>{t("Solde final")}</HeaderWithSup>,
       cell: (item) => <Cell text={formatValue(item.available_balance)} />,
+    },
+  ]
+
+  return columns
+}
+
+export const useBiofuelTeneurSectorColumns = () => {
+  const { t } = useTranslation()
+  const columns: Column<SectorObjective>[] = [
+    {
+      header: t("Filière"),
+      cell: (item) => <Cell text={formatSector(item.code)} />,
+    },
+    {
+      header: <HeaderWithSup>{t("Avancement initial")}</HeaderWithSup>,
+      cell: (item) => (
+        <Cell
+          text={formatNumber(item.teneur_declared, {
+            fractionDigits: 0,
+          })}
+        />
+      ),
+    },
+    {
+      header: <HeaderWithSup>{t("Teneur à valider")}</HeaderWithSup>,
+      cell: (item) => <Cell text={formatNumber(item.pending_teneur)} />,
+    },
+    {
+      header: <HeaderWithSup>{t("Avancement final")}</HeaderWithSup>,
+      cell: (item) => (
+        <Cell text={formatNumber(item.teneur_declared + item.pending_teneur)} />
+      ),
     },
   ]
 

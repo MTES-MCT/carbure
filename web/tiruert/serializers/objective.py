@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
 from core.models import Entity, MatierePremiere
+from tiruert.models.objective import Objective
 from tiruert.models.operation import Operation
 from tiruert.serializers.fields import RoundedFloatField
 
 
 class ObjectiveSerializer(serializers.Serializer):
     target_mj = RoundedFloatField()
-    target_type = serializers.CharField()
+    target_type = serializers.ChoiceField(choices=Objective.TARGET_TYPES, allow_null=True)
     penalty = serializers.IntegerField()
     target_percent = serializers.FloatField()
 

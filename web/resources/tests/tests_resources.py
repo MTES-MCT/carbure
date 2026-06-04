@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
+from tiruert.models import FossilFuel, FossilFuelCategory
 from transactions.models import Depot, ProductionSite, Site
 
 
@@ -100,6 +101,23 @@ class ResourcesTest(TestCase):
         data = response.json()
 
         assert len(data) == 1
+
+    def test_get_fossil_fuels(self):
+        category = FossilFuelCategory.objects.create(name="Essence", pci_litre=32.0)
+        FossilFuel.objects.create(label="Supercarburant SP95", nomenclature="SP95", fuel_category=category)
+        FossilFuel.objects.create(label="Gazole routier", nomenclature="GO", fuel_category=category)
+
+        response = self.client.get(reverse("resources-fossil-fuels"))
+
+        assert response.status_code == 200
+        assert len(response.json()) >= 2
+
+        response = self.client.get(reverse("resources-fossil-fuels") + "?query=sp95")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["nomenclature"] == "SP95"
 
     def test_get_countries(self):
         # create countries

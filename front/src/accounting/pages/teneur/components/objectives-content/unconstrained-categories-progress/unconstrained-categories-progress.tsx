@@ -1,13 +1,12 @@
 import { useTranslation } from "react-i18next"
 import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
-import { RecapData } from "../../recap-data"
 import { UnconstrainedCategoryObjective } from "../../../types"
 import { CardGrid } from "../../card-grid"
-import { ExtendedUnit } from "common/types"
-import { floorNumber, formatUnit } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import { useFormatters } from "accounting/hooks/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { ObjectiveProgressRecap } from "../objective-progress-recap"
 
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
@@ -36,37 +35,13 @@ export const UnconstrainedCategoriesProgress = ({
                 ? undefined
                 : () => onCategoryClick(category)
             }
-            mainValue={floorNumber(
-              category.teneur_declared + category.teneur_declared_month,
-              0
-            )}
+            mainValue={formatNumber(category.progress.total_teneur_declared, {
+              fractionDigits: 0,
+            })}
             mainText={t("GJ")}
           >
             {isDeclarationInCurrentPeriod && (
-              <ul>
-                <li>
-                  <RecapData.TeneurDeclaredMonth
-                    value={formatUnit(
-                      category.teneur_declared_month,
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                  />
-                </li>
-                <li>
-                  <RecapData.QuantityAvailable
-                    value={formatUnit(
-                      category.quantity_available,
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                  />
-                </li>
-              </ul>
+              <ObjectiveProgressRecap objective={category} />
             )}
           </CardProgress>
         ))}

@@ -12,6 +12,9 @@ def perform_bulk_operations_validation(modeladmin, request, queryset):
         Operation.EXPORTATION: Operation.VALIDATED,
         Operation.EXPEDITION: Operation.VALIDATED,
         Operation.CESSION: Operation.ACCEPTED,
+        Operation.MAC_BIO: Operation.VALIDATED,
+        Operation.LIVRAISON_DIRECTE: Operation.VALIDATED,
+        Operation.TRANSFERT: Operation.ACCEPTED,
     }
 
     with transaction.atomic():

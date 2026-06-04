@@ -2,12 +2,12 @@ import { useTranslation } from "react-i18next"
 import { formatSector } from "accounting/utils/formatters"
 import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
-import { RecapData } from "../../recap-data"
 import { SectorObjective } from "../../../types"
 import { CardGrid } from "../../card-grid"
-import { ExtendedUnit } from "common/types"
-import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { formatObjectiveGJ } from "../../../utils/formatters"
+import { ObjectiveProgressRecap } from "../objective-progress-recap"
 
 type SectorProgressProps = {
   sectors?: SectorObjective[]
@@ -24,66 +24,42 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
       description={t("Retrouvez ici votre suivi d'objectif par filière.")}
     >
       <CardGrid>
-        {sectors?.map((sector) => (
-          <CardProgress
-            key={sector.code}
-            title={formatSector(sector.code)}
-            description={t(
-              "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total pour cette catégorie)",
-              {
-                date: selectedYear,
-                objective: formatUnit(sector.target, ExtendedUnit.GJ, {
-                  fractionDigits: 0,
-                }),
-                target_percent: formatNumber(sector.target_percent),
-              }
-            )}
-            mainValue={floorNumber(
-              sector.teneur_declared + sector.teneur_declared_month,
-              0
-            )}
-            mainText={t("GJ")}
-            baseQuantity={floorNumber(sector.teneur_declared, 0)}
-            targetQuantity={floorNumber(sector.target, 0)}
-            declaredQuantity={floorNumber(sector.teneur_declared_month, 0)}
-            badge={
-              <CardProgress.DefaultBadge
-                targetQuantity={sector.target}
-                declaredQuantity={
-                  sector.teneur_declared + sector.teneur_declared_month
+        {sectors?.map((sector) => {
+          const { progress } = sector
+
+          return (
+            <CardProgress
+              key={sector.code}
+              title={formatSector(sector.code)}
+              description={t(
+                "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total pour cette catégorie)",
+                {
+                  date: selectedYear,
+                  objective: formatObjectiveGJ(sector.target),
+                  target_percent: formatNumber(sector.target_percent),
                 }
-              />
-            }
-            penalty={sector.penalty}
-          >
-            {isDeclarationInCurrentPeriod && (
-              <ul>
-                <li>
-                  <RecapData.TeneurDeclaredMonth
-                    value={formatUnit(
-                      sector.teneur_declared_month,
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                  />
-                </li>
-                <li>
-                  <RecapData.QuantityAvailable
-                    value={formatUnit(
-                      sector.quantity_available,
-                      ExtendedUnit.GJ,
-                      {
-                        fractionDigits: 0,
-                      }
-                    )}
-                  />
-                </li>
-              </ul>
-            )}
-          </CardProgress>
-        ))}
+              )}
+              mainValue={formatNumber(progress.total_teneur_declared, {
+                fractionDigits: 0,
+              })}
+              mainText={t("GJ")}
+              baseQuantity={progress.base_quantity}
+              targetQuantity={progress.target_quantity}
+              declaredQuantity={progress.declared_quantity}
+              badge={
+                <CardProgress.DefaultBadge
+                  targetQuantity={progress.target_quantity}
+                  declaredQuantity={progress.total_teneur_declared}
+                />
+              }
+              penalty={sector.penalty}
+            >
+              {isDeclarationInCurrentPeriod && (
+                <ObjectiveProgressRecap objective={sector} />
+              )}
+            </CardProgress>
+          )
+        })}
       </CardGrid>
     </ObjectiveSection>
   )
