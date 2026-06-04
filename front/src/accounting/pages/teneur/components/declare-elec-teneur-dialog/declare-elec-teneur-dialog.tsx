@@ -11,11 +11,11 @@ import {
   ElecCategoryObjective,
   MainObjective,
   SectorObjective,
+  TargetType,
 } from "../../types"
-import { formatNumber, formatUnit } from "common/utils/formatters"
+import { formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import { DeclareTeneurProgressBar } from "../declare-teneur-dialog/declare-teneur-progress-bar"
-import { RecapData } from "../recap-data"
 import { Notice } from "common/components/notice"
 import { ObjectiveSectorPicker } from "../objective-sector-picker"
 import { useMemo } from "react"
@@ -40,17 +40,6 @@ export const DeclareElecTeneurDialog = ({
   const mutation = useElecTeneurDialog({ values: form.value, onClose })
 
   const avoidedEmissions = ((form.value.quantity ?? 0) * 1000 * 183) / 1e6
-
-  let remainingCO2 = 0
-  if (mainObjective) {
-    remainingCO2 = Math.max(
-      0,
-      mainObjective.target -
-        mainObjective.teneur_declared -
-        mainObjective.pending_teneur -
-        avoidedEmissions
-    )
-  }
 
   const sectorObjective = useMemo(() => {
     if (!form.value.objective_sector) return undefined
@@ -126,6 +115,8 @@ export const DeclareElecTeneurDialog = ({
                     target={mainObjective.target}
                     quantity={avoidedEmissions}
                     label={t("Objectif global")}
+                    targetType={TargetType.REACH}
+                    formatRemaining={(v) => formatUnit(v, ExtendedUnit.tCO2ev)}
                   />
                 )}
 
@@ -138,20 +129,10 @@ export const DeclareElecTeneurDialog = ({
                     label={t("Filière {{sector}}", {
                       sector: formatSector(sectorObjective?.code),
                     })}
+                    targetType={TargetType.REACH}
                   />
                 )}
               </Grid>
-
-              {mainObjective && (
-                <RecapData.RemainingQuantityBegoreCO2Objective
-                  value={formatNumber(remainingCO2, {
-                    fractionDigits: 0,
-                    mode: "ceil",
-                  })}
-                  bold
-                  size="md"
-                />
-              )}
             </Box>
           </Form>
         </Main>
