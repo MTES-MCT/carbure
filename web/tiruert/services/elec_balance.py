@@ -31,6 +31,10 @@ class ElecBalanceService:
         sector: str,
         date_from=None,
     ) -> ElecBalance:
+        # available_balance is intentionally the same global electric pool for every sector:
+        # any sector can draw from the whole remaining electric balance.
+        # for that reason, we only filter teneur operations by sector.
+
         pending_operations = operations.filter(status=ElecOperation.PENDING)
 
         credited_operations = operations.filter(
@@ -56,6 +60,10 @@ class ElecBalanceService:
             status=ElecOperation.DECLARED,
             debited_entity_id=entity_id,
         )
+
+        if sector != ElecOperation.SECTOR:
+            pending_teneur = pending_teneur.filter(objective_sector=sector)
+            declared_teneur = declared_teneur.filter(objective_sector=sector)
 
         period_credited_operations = credited_operations
         period_debited_operations = debited_operations
@@ -112,7 +120,7 @@ class ElecBalanceService:
 
         return {
             sector: ElecBalanceService._calculate_balance(
-                operations.filter(objective_sector=sector),
+                operations,
                 entity_id,
                 sector,
                 date_from,

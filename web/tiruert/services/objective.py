@@ -157,8 +157,9 @@ class ObjectiveService:
         return elec_category
 
     @staticmethod
-    def add_elec_teneur_to_objectives_per_sector(objective_per_sector, elec_ops, entity_id, date_from_dt):
+    def add_elec_teneur_to_objectives_per_sector(biofuel_objective_per_sector, elec_ops, entity_id, date_from_dt):
         elec_balance_per_sector = ElecBalanceService.calculate_balance_per_sector(elec_ops, entity_id, date_from_dt)
+        objective_per_sector = [sector.copy() for sector in biofuel_objective_per_sector]
 
         for sector_objective in objective_per_sector:
             sector = sector_objective["code"]
@@ -169,6 +170,7 @@ class ObjectiveService:
 
             sector_objective["pending_teneur"] += elec_balance["pending_teneur"]
             sector_objective["declared_teneur"] += elec_balance["declared_teneur"]
+            sector_objective["available_balance"] += elec_balance["available_balance"]
 
         return objective_per_sector
 
@@ -366,7 +368,7 @@ class ObjectiveService:
         )
 
         # 4. Calculate the objectives per sector (using sector-specific energy_basis)
-        objective_per_sector = ObjectiveService.calculate_objectives_and_penalties(
+        biofuel_objective_per_sector = ObjectiveService.calculate_objectives_and_penalties(
             balance_per_sector,
             objectives,
             Objective.SECTOR,
@@ -378,18 +380,18 @@ class ObjectiveService:
         elec_category = ObjectiveService.get_elec_category(elec_ops, entity_id, date_from_dt)
 
         # 6. Merge elec operations attributed to other sectors
-        objective_per_sector = ObjectiveService.add_elec_teneur_to_objectives_per_sector(
-            objective_per_sector, elec_ops, entity_id, date_from_dt
+        merged_objective_per_sector = ObjectiveService.add_elec_teneur_to_objectives_per_sector(
+            biofuel_objective_per_sector, elec_ops, entity_id, date_from_dt
         )
 
         # 7. Calculate the global objective (aggregated from sectors + elec)
         global_objective = ObjectiveService.calculate_global_objective(
-            objective_per_sector, elec_category, objectives, energy_basis
+            biofuel_objective_per_sector, elec_category, objectives, energy_basis
         )
 
         return {
             "main": global_objective,
-            "sectors": objective_per_sector,
+            "sectors": merged_objective_per_sector,
             "categories": [*objective_per_category, elec_category],
         }
 
