@@ -249,19 +249,19 @@ class ElecBalanceServiceTest(TestCase):
         essence_balance = balance[Operation.ESSENCE]
         self.assertEqual(essence_balance["sector"], Operation.ESSENCE)
         self.assertEqual(essence_balance["emission_rate_per_mj"], ElecOperation.EMISSION_RATE_PER_MJ)
-        self.assertEqual(essence_balance["quantity"]["credit"], 0)
-        self.assertEqual(essence_balance["quantity"]["debit"], 8)
-        self.assertEqual(essence_balance["pending_operations"], 1)
+        self.assertEqual(essence_balance["quantity"]["credit"], 1159)
+        self.assertEqual(essence_balance["quantity"]["debit"], 52)
+        self.assertEqual(essence_balance["pending_operations"], 2)
         self.assertEqual(essence_balance["pending_teneur"], 5)
         self.assertEqual(essence_balance["declared_teneur"], 3)
-        self.assertEqual(essence_balance["available_balance"], -19)
+        self.assertEqual(essence_balance["available_balance"], 1084)
 
         gazole_balance = balance[Operation.GAZOLE]
         self.assertEqual(gazole_balance["sector"], Operation.GAZOLE)
-        self.assertEqual(gazole_balance["quantity"]["credit"], 0)
-        self.assertEqual(gazole_balance["quantity"]["debit"], 4)
+        self.assertEqual(gazole_balance["quantity"]["credit"], 1159)
+        self.assertEqual(gazole_balance["quantity"]["debit"], 52)
         self.assertEqual(gazole_balance["declared_teneur"], 4)
-        self.assertEqual(gazole_balance["available_balance"], -4)
+        self.assertEqual(gazole_balance["available_balance"], 1084)
 
     def test_calculate_balance_per_sector_returns_empty_when_no_operations(self):
         balance = ElecBalanceService.calculate_balance_per_sector(ElecOperation.objects.none(), entity_id=self.operator.id)

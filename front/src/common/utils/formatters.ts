@@ -89,6 +89,7 @@ export function formatUnit(
     [Unit.MJ]: i18next.t("MJ"),
     [ExtendedUnit.GJ]: i18next.t("GJ"),
     [ExtendedUnit.MWh]: i18next.t("MWh"),
+    [ExtendedUnit.tCO2ev]: i18next.t("tCO2 évitées"),
   }
 
   return `${formatNumber(num, options)} ${unitLabel[unit]}`
@@ -101,6 +102,7 @@ export function formatUnitOnly(unit: ExtendedUnitType, count = 2) {
     [Unit.MJ]: i18next.t("MJ"),
     [ExtendedUnit.GJ]: i18next.t("GJ"),
     [ExtendedUnit.MWh]: i18next.t("MWh"),
+    [ExtendedUnit.tCO2ev]: i18next.t("tCO2 évitées"),
   }
 
   return unitLabel[unit]

@@ -26,6 +26,8 @@ interface DeclareTeneurProgressBarProps {
   label?: ReactNode
   targetType?: TargetType
   category?: CategoryEnum
+  description?: ReactNode
+  formatRemaining?: (value: number) => string
 }
 
 export const DeclareTeneurProgressBar = ({
@@ -36,6 +38,7 @@ export const DeclareTeneurProgressBar = ({
   label,
   targetType,
   category,
+  formatRemaining = formatObjectiveGJ,
 }: DeclareTeneurProgressBarProps) => {
   const remainingEnergy = targetType
     ? computeRemainingEnergyWithAdditionalQuantity(
@@ -73,7 +76,7 @@ export const DeclareTeneurProgressBar = ({
       />
       {targetType && remainingEnergy !== null && (
         <RemainingQuantity
-          value={formatObjectiveGJ(remainingEnergy)}
+          value={formatRemaining(remainingEnergy)}
           bold
           size="md"
           category={category}
