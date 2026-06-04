@@ -35,7 +35,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
-    year = serializers.IntegerField(source="declaration_year", read_only=True)
+    year = serializers.SerializerMethodField()
 
     def get_volume_l(self, instance) -> float:
         return instance.volume_l
@@ -49,6 +49,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
     def get_avoided_emissions(self, instance) -> float:
         return instance.avoided_emissions
+
+    def get_year(self, instance) -> int | None:
+        return instance.year
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
