@@ -12,8 +12,7 @@ export const Logout = () => {
   const navigate = useNavigate()
   const hasTriggeredLogout = useRef(false)
 
-  const logoutMutation = useMutation({
-    mutationFn: api.logout,
+  const logoutMutation = useMutation(api.logout, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("Vous êtes déconnecté !"), { variant: "success" })

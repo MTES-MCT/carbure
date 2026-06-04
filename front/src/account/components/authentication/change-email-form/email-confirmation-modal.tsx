@@ -23,14 +23,7 @@ export const EmailConfirmationModal = ({
   const notify = useNotify()
   const [otpCode, setOtpCode] = useState("")
 
-  const confirmEmailMutation = useMutation({
-    mutationFn: ({
-      newEmail,
-      otpCode,
-    }: {
-      newEmail: string
-      otpCode: string
-    }) => api.confirmEmailChange(newEmail, otpCode),
+  const confirmEmailMutation = useMutation(api.confirmEmailChange, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("L'adresse email a été mise à jour avec succès !"), {
@@ -76,7 +69,7 @@ export const EmailConfirmationModal = ({
 
   const handleConfirm = () => {
     if (otpCode.trim()) {
-      confirmEmailMutation.mutate({ newEmail, otpCode: otpCode.trim() })
+      confirmEmailMutation.mutate([newEmail, otpCode.trim()])
     }
   }
 

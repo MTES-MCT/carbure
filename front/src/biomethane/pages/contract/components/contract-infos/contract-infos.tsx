@@ -70,7 +70,7 @@ export const ContractInfos = ({
   const onSubmit = () => {
     const formData = extractValues(value)
     const update = (is_red_ii: boolean) => {
-      updateContract({ ...formData, is_red_ii }).then(() => {
+      updateContract([{ ...formData, is_red_ii }]).then(() => {
         setSectionExpanded(CONTRACT_INFOS_SECTION_ID, false)
       })
     }
@@ -86,7 +86,7 @@ export const ContractInfos = ({
         />
       ))
     } else {
-      updateContract(formData).then(() => {
+      updateContract([formData]).then(() => {
         setSectionExpanded(CONTRACT_INFOS_SECTION_ID, false)
       })
     }

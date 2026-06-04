@@ -20,8 +20,7 @@ const OTP = () => {
 
   const { value, bind } = useForm({ otp: "" as string | undefined })
 
-  const verifyOTP = useMutation({
-    mutationFn: api.verifyOTP,
+  const verifyOTP = useMutation(api.verifyOTP, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("Vous êtes connecté !"), { variant: "success" })
@@ -51,7 +50,7 @@ const OTP = () => {
   const execVerifyOTP = verifyOTP.mutateAsync
   useEffect(() => {
     if (searchParams.has("token")) {
-      execVerifyOTP(searchParams.get("token")!)
+      execVerifyOTP([searchParams.get("token")!])
     }
   }, [searchParams, execVerifyOTP])
 
@@ -66,7 +65,7 @@ const OTP = () => {
       </section>
 
       <section>
-        <Form id="otp" onSubmit={() => verifyOTP.mutate(value.otp!)}>
+        <Form id="otp" onSubmit={() => verifyOTP.mutate([value.otp!])}>
           <TextInput
             autoFocus
             variant="solid"

@@ -47,7 +47,7 @@ export const ContractAidOrganism = ({
   const complementaryAidOrganismOptions = useContractAidOrganismOptions()
 
   const onSubmit = () => {
-    updateContractAidOrganism(extractValues(value))
+    updateContractAidOrganism([extractValues(value)])
   }
 
   return (

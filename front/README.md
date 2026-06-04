@@ -14,7 +14,7 @@
 - `react-router-dom`: navigation client
 - `axios`: communication avec l'api
 - `react-async-hook`: intégration de l'async dans react (legacy, en cours de remplacement)
-- `@tanstack/react-query`: gestion du cache et des requêtes (nouveau standard, voir [common/hooks/README.md](src/common/hooks/README.md))
+- `@tanstack/react-query`: gestion du cache et des requêtes (nouveau standard, voir [docs/react-query.md](docs/react-query.md))
 - `clsx`: outil pour combiner des classes CSS
 - `i18next`: gestion des traductions
 - `date-fns`: gestion des dates
@@ -66,7 +66,7 @@ The project is structured to facilitate modular development, ensuring that each 
 
 ### Data fetching (React Query)
 
-See [common/hooks/README.md](src/common/hooks/README.md) for conventions on queries, mutations, query keys, and migrating from the legacy `async` hooks.
+See [docs/react-query.md](docs/react-query.md) for conventions on queries, mutations, query keys, and migrating from the legacy `async` hooks.
 
 ### Design System
 

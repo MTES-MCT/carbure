@@ -42,8 +42,7 @@ export const AccountAccesRights = () => {
 
   const user = useUser()
 
-  const revokeMyself = useMutation({
-    mutationFn: api.revokeMyself,
+  const revokeMyself = useMutation(api.revokeMyself, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
@@ -126,9 +125,9 @@ export const AccountAccesRights = () => {
                         title={t("Annuler mes accès")}
                         description={t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: right.entity.name })} // prettier-ignore
                         confirm={t("Révoquer")}
-                        onConfirm={async () => {
-                          await revokeMyself.mutateAsync(right.entity.id)
-                        }}
+                        onConfirm={() =>
+                          revokeMyself.mutateAsync([right.entity.id])
+                        }
                         onClose={close}
                         hideCancel
                       />
@@ -179,9 +178,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
   const [entity, setEntity] = useState<EntityPreview | undefined>(undefined)
   const [role, setRole] = useState<UserRole | undefined>(UserRole.ReadOnly)
 
-  const requestAccess = useMutation({
-    mutationFn: ({ entityId, role }: { entityId: number; role: UserRole }) =>
-      api.requestAccess(entityId, role),
+  const requestAccess = useMutation(api.requestAccess, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("La société a été ajoutée !"), { variant: "success" })
@@ -227,7 +224,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
         id="access-right"
         onSubmit={async () => {
           matomo.push(["trackEvent", "account", "add-access-right"])
-          await requestAccess.mutateAsync({ entityId: entity!.id, role: role! })
+          await requestAccess.mutateAsync([entity!.id, role!])
           setEntity(undefined)
         }}
       >

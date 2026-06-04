@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 
 import useEntity from "common/hooks/entity"
-import { Unit, UserRole } from "common/types"
+import { UserRole } from "common/types"
 import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
 import { LoaderOverlay } from "common/components/scaffold"
 import * as api from "../api/company"
@@ -15,34 +15,31 @@ const CompanyOptions = () => {
 
   const canModify = entity.hasRights(UserRole.Admin, UserRole.ReadWrite)
 
-  const toggleMAC = useMutation({
-    mutationFn: (toggle: boolean) => api.toggleMAC(entity.id, toggle),
-    invalidates: [COMMON_QUERY_KEYS.userSettings],
-  })
+  const toggleMAC = useMutation(
+    (toggle: boolean) => api.toggleMAC(entity.id, toggle),
+    { invalidates: [COMMON_QUERY_KEYS.userSettings] }
+  )
 
-  const toggleTrading = useMutation({
-    mutationFn: (toggle: boolean) => api.toggleTrading(entity.id, toggle),
-    invalidates: [COMMON_QUERY_KEYS.userSettings],
-  })
-  const toggleElec = useMutation({
-    mutationFn: (toggle: boolean) => api.toggleElec(entity.id, toggle),
-    invalidates: [COMMON_QUERY_KEYS.userSettings],
-  })
+  const toggleTrading = useMutation(
+    (toggle: boolean) => api.toggleTrading(entity.id, toggle),
+    { invalidates: [COMMON_QUERY_KEYS.userSettings] }
+  )
+  const toggleElec = useMutation(
+    (toggle: boolean) => api.toggleElec(entity.id, toggle),
+    { invalidates: [COMMON_QUERY_KEYS.userSettings] }
+  )
 
-  const toggleStocks = useMutation({
-    mutationFn: (toggle: boolean) => api.toggleStocks(entity.id, toggle),
-    invalidates: [COMMON_QUERY_KEYS.userSettings],
-  })
+  const toggleStocks = useMutation(
+    (toggle: boolean) => api.toggleStocks(entity.id, toggle),
+    { invalidates: [COMMON_QUERY_KEYS.userSettings] }
+  )
 
-  const toggleDirectDeliveries = useMutation({
-    mutationFn: (toggle: boolean) =>
-      api.toggleDirectDeliveries(entity.id, toggle),
-    invalidates: [COMMON_QUERY_KEYS.userSettings],
-  })
+  const toggleDirectDeliveries = useMutation(
+    (toggle: boolean) => api.toggleDirectDeliveries(entity.id, toggle),
+    { invalidates: [COMMON_QUERY_KEYS.userSettings] }
+  )
 
-  const setPreferredUnit = useMutation({
-    mutationFn: ({ entityId, unit }: { entityId: number; unit: Unit }) =>
-      api.setEntityPreferredUnit(entityId, unit),
+  const setPreferredUnit = useMutation(api.setEntityPreferredUnit, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
@@ -74,9 +71,7 @@ const CompanyOptions = () => {
               "Ma société préfère afficher les quantités et les opérations en :"
             )}
             value={entity.preferred_unit}
-            onChange={(unit) =>
-              setPreferredUnit.mutate({ entityId: entity.id, unit: unit! })
-            }
+            onChange={(unit) => setPreferredUnit.mutate([entity.id, unit!])}
             options={[
               {
                 value: "l",
@@ -91,25 +86,25 @@ const CompanyOptions = () => {
             disabled={!canModify}
             label={t("Ma société gère un stock sur CarbuRe")}
             value={entity.has_stocks ?? false}
-            onChange={toggleStocks.mutate}
+            onChange={(value) => toggleStocks.mutate([value])}
           />
           <Checkbox
             disabled={!canModify}
             label={t("Ma société a une activité de négoce")}
             value={entity.has_trading}
-            onChange={toggleTrading.mutate}
+            onChange={(value) => toggleTrading.mutate([value])}
           />
           <Checkbox
             disabled={!canModify}
             label={t("Ma société effectue des mises à consommation (B100 et ED95 uniquement)")} // prettier-ignore
             value={entity.has_mac ?? false}
-            onChange={toggleMAC.mutate}
+            onChange={(value) => toggleMAC.mutate([value])}
           />
           <Checkbox
             disabled={!canModify}
             label={t("Ma société effectue des livraisons directes")}
             value={entity.has_direct_deliveries}
-            onChange={toggleDirectDeliveries.mutate}
+            onChange={(value) => toggleDirectDeliveries.mutate([value])}
           />
         </>
       )}
@@ -119,7 +114,7 @@ const CompanyOptions = () => {
           disabled={!canModify}
           label={t("Ma société accepte des volumes d'electricité")}
           value={entity.has_elec}
-          onChange={toggleElec.mutate}
+          onChange={(value) => toggleElec.mutate([value])}
         />
       )}
 

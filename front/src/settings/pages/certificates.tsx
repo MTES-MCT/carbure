@@ -48,9 +48,7 @@ const Certificates = () => {
     },
   })
 
-  const setDefaultCertificate = useMutation({
-    mutationFn: (cert: string | undefined) =>
-      api.setDefaultCertificate(entity.id, cert!),
+  const setDefaultCertificate = useMutation(api.setDefaultCertificate, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
@@ -80,7 +78,7 @@ const Certificates = () => {
         label={t("Certificat par défaut")}
         placeholder={t("Sélectionner un certificat")}
         value={entity.default_certificate ?? undefined}
-        onChange={setDefaultCertificate.mutate}
+        onChange={(cert) => setDefaultCertificate.mutate([entity.id, cert!])}
         options={validCertificates}
         normalize={normalizeEntityCertificate}
         style={{ flex: 1 }}

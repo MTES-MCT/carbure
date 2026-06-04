@@ -86,8 +86,8 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
     annualDeclarationMissingFieldsData,
   } = useAnnualDeclaration()
 
-  const mutation = useMutation({
-    mutationFn: (data: BiomethaneContractPatchRequest) =>
+  const mutation = useMutation(
+    (data: BiomethaneContractPatchRequest) =>
       saveContract(entity.id, data).then((updatedContract) => {
         // If the pages contract/production/injection have missing fields, we should not reset the annual declaration)
         if (
@@ -105,18 +105,20 @@ export const useMutateContractInfos = (contract?: BiomethaneContract) => {
           ))
         }
       }),
-    invalidates: [
-      "contract-infos",
-      COMMON_QUERY_KEYS.userSettings,
-      annualDeclarationKey,
-    ],
-    onSuccess: () => {
-      notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
-    },
-    onError: (e) => {
-      notifyError(e)
-    },
-  })
+    {
+      invalidates: [
+        "contract-infos",
+        COMMON_QUERY_KEYS.userSettings,
+        annualDeclarationKey,
+      ],
+      onSuccess: () => {
+        notify(t("Le contrat a bien été mis à jour."), { variant: "success" })
+      },
+      onError: (e) => {
+        notifyError(e)
+      },
+    }
+  )
 
   return mutation
 }

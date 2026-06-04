@@ -22,10 +22,9 @@ export const useRegisterCompany = ({ closeDialog }: RegisterCompanyProps) => {
   ) => {
     const payload = toRegisterCompanyPayload(formValue)
     if (!payload) return
-    registerCompanyRequest.mutate(payload)
+    registerCompanyRequest.mutate([payload])
   }
-  const registerCompanyRequest = useMutation({
-    mutationFn: api.registerCompany,
+  const registerCompanyRequest = useMutation(api.registerCompany, {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
     onSuccess: () => {
       notify(t("Votre demande d'inscription a bien été envoyée !"), {

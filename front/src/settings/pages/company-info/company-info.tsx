@@ -37,8 +37,8 @@ const CompanyInfo = ({
     !_readOnly &&
     (!company || loggedEntity.hasRights(UserRole.Admin, UserRole.ReadWrite))
 
-  const updateEntity = useMutation({
-    mutationFn: (payload: { entityId: number; formValue: CompanyFormValue }) =>
+  const updateEntity = useMutation(
+    (payload: { entityId: number; formValue: CompanyFormValue }) =>
       api.updateEntity(
         payload.entityId,
         payload.formValue.activity_description!,
@@ -54,15 +54,15 @@ const CompanyInfo = ({
         payload.formValue.website!,
         payload.formValue.vat_number!
       ),
-    invalidates: [COMMON_QUERY_KEYS.userSettings],
-  })
+    { invalidates: [COMMON_QUERY_KEYS.userSettings] }
+  )
   const companyForm = useCompanyForm(entity)
 
   const canSave = hasChange(entity, companyForm.value)
 
   const onSubmitForm = async (formValue: CompanyFormValue | undefined) => {
     if (formValue && canSave) {
-      await updateEntity.mutateAsync({ entityId: entity.id, formValue })
+      await updateEntity.mutateAsync([{ entityId: entity.id, formValue }])
       setIsEditingCompanyAddress(false)
     }
   }
