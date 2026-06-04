@@ -47,12 +47,11 @@ const OTP = () => {
   })
 
   // if a code is specified in the url, automatically call the api with it
-  const execVerifyOTP = verifyOTP.mutateAsync
   useEffect(() => {
     if (searchParams.has("token")) {
-      execVerifyOTP([searchParams.get("token")!])
+      verifyOTP.execute(searchParams.get("token")!)
     }
-  }, [searchParams, execVerifyOTP])
+  }, [searchParams, verifyOTP])
 
   return (
     <Container>
@@ -65,7 +64,7 @@ const OTP = () => {
       </section>
 
       <section>
-        <Form id="otp" onSubmit={() => verifyOTP.mutate([value.otp!])}>
+        <Form id="otp" onSubmit={() => verifyOTP.execute(value.otp!)}>
           <TextInput
             autoFocus
             variant="solid"
@@ -92,7 +91,7 @@ const OTP = () => {
       <footer>
         <Button
           center
-          loading={verifyOTP.isPending}
+          loading={verifyOTP.loading}
           disabled={!value.otp}
           variant="primary"
           icon={UserCheck}

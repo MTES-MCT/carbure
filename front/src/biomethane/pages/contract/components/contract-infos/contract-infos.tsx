@@ -61,8 +61,7 @@ export const ContractInfos = ({
   const { bind, value } = useFormContext<ContractInfosForm>()
   const tariffReferenceOptions = useTariffReferenceOptions()
   const installationCategoryOptions = useInstallationCategoryOptions()
-  const { mutateAsync: updateContract, isPending: loading } =
-    useMutateContractInfos(contract)
+  const { execute: updateContract, loading } = useMutateContractInfos(contract)
   const { setSectionExpanded, isSectionExpanded } = useSectionsManager()
 
   const isEditing = isSectionExpanded(CONTRACT_INFOS_SECTION_ID)
@@ -70,7 +69,7 @@ export const ContractInfos = ({
   const onSubmit = () => {
     const formData = extractValues(value)
     const update = (is_red_ii: boolean) => {
-      updateContract([{ ...formData, is_red_ii }]).then(() => {
+      updateContract({ ...formData, is_red_ii }).then(() => {
         setSectionExpanded(CONTRACT_INFOS_SECTION_ID, false)
       })
     }
@@ -86,7 +85,7 @@ export const ContractInfos = ({
         />
       ))
     } else {
-      updateContract([formData]).then(() => {
+      updateContract(formData).then(() => {
         setSectionExpanded(CONTRACT_INFOS_SECTION_ID, false)
       })
     }

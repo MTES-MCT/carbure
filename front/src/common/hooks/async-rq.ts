@@ -32,6 +32,23 @@ type ApiFn = (...args: any[]) => any
 type MutationVariables<TFn extends ApiFn> =
   Parameters<TFn> extends [] ? void : Parameters<TFn>
 
+type CarbureMutationResult<TFn extends ApiFn> = Omit<
+  UseMutationResult<Awaited<ReturnType<TFn>>, Error, MutationVariables<TFn>>,
+  "mutate" | "mutateAsync" | "isPending"
+>
+
+export type ApiMutationResult<TFn extends ApiFn> =
+  CarbureMutationResult<TFn> & {
+    execute: (...args: Parameters<TFn>) => Promise<Awaited<ReturnType<TFn>>>
+    loading: boolean
+  }
+
+function argsToVariables<TFn extends ApiFn>(
+  args: Parameters<TFn>
+): MutationVariables<TFn> {
+  return (args.length === 0 ? undefined : args) as MutationVariables<TFn>
+}
+
 function useRunMutation<
   TData = unknown,
   TError = Error,
@@ -70,28 +87,13 @@ function useRunMutation<
 
 /**
  * Same API as legacy `async`: `useMutation(apiFn, options)`.
- * `options` = React Query options + `invalidates`. No need to pass `mutationFn`.
- *
- * Variables for `mutate` / `mutateAsync`: `void` when the API has no args, otherwise
- * the tuple `Parameters<typeof apiFn>`.
+ * `options` = React Query options + `invalidates`. Trigger via `execute(...args)`.
  *
  * @example
- * import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
- * import * as api from "../api"
- *
  * const requestAccess = useMutation(api.requestAccess, {
  *   invalidates: [COMMON_QUERY_KEYS.userSettings],
- *   onSuccess: () => notify(t("OK"), { variant: "success" }),
  * })
- *
- * // Multiple API args → tuple
- * await requestAccess.mutateAsync([entityId, role])
- *
- * // Single API arg → one-element tuple
- * await revokeMyself.mutateAsync([entityId])
- *
- * // No API args
- * logoutMutation.mutate()
+ * await requestAccess.execute(entityId, role)
  */
 export function useMutation<TFn extends ApiFn>(
   fn: TFn,
@@ -99,8 +101,8 @@ export function useMutation<TFn extends ApiFn>(
     UseMutationOptions<Awaited<ReturnType<TFn>>, Error, MutationVariables<TFn>>,
     "mutationFn"
   >
-): UseMutationResult<Awaited<ReturnType<TFn>>, Error, MutationVariables<TFn>> {
-  return useRunMutation({
+): ApiMutationResult<TFn> {
+  const { mutateAsync, isPending, ...mutation } = useRunMutation({
     ...options,
     mutationFn: (variables) => {
       if (variables === undefined) {
@@ -109,6 +111,12 @@ export function useMutation<TFn extends ApiFn>(
       return fn(...(variables as Parameters<TFn>))
     },
   })
+
+  return {
+    ...mutation,
+    loading: isPending,
+    execute: (...args: Parameters<TFn>) => mutateAsync(argsToVariables(args)),
+  }
 }
 
 export {

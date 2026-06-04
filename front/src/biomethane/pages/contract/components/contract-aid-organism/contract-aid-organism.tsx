@@ -41,13 +41,13 @@ export const ContractAidOrganism = ({
   const allowedToEdit = useAllowedToEdit()
 
   const { bind, value } = useFormContext<ContractAidOrganismForm>()
-  const { mutate: updateContractAidOrganism, isPending: loading } =
+  const { execute: updateContractAidOrganism, loading } =
     useMutateContractInfos(contract)
 
   const complementaryAidOrganismOptions = useContractAidOrganismOptions()
 
   const onSubmit = () => {
-    updateContractAidOrganism([extractValues(value)])
+    updateContractAidOrganism(extractValues(value))
   }
 
   return (

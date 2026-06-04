@@ -44,10 +44,10 @@ const CompanyOptions = () => {
   })
 
   const isLoading =
-    toggleMAC.isPending ||
-    toggleStocks.isPending ||
-    toggleDirectDeliveries.isPending ||
-    toggleTrading.isPending
+    toggleMAC.loading ||
+    toggleStocks.loading ||
+    toggleDirectDeliveries.loading ||
+    toggleTrading.loading
 
   return (
     <EditableCard
@@ -71,7 +71,7 @@ const CompanyOptions = () => {
               "Ma société préfère afficher les quantités et les opérations en :"
             )}
             value={entity.preferred_unit}
-            onChange={(unit) => setPreferredUnit.mutate([entity.id, unit!])}
+            onChange={(unit) => setPreferredUnit.execute(entity.id, unit!)}
             options={[
               {
                 value: "l",
@@ -86,25 +86,25 @@ const CompanyOptions = () => {
             disabled={!canModify}
             label={t("Ma société gère un stock sur CarbuRe")}
             value={entity.has_stocks ?? false}
-            onChange={(value) => toggleStocks.mutate([value])}
+            onChange={(value) => toggleStocks.execute(value)}
           />
           <Checkbox
             disabled={!canModify}
             label={t("Ma société a une activité de négoce")}
             value={entity.has_trading}
-            onChange={(value) => toggleTrading.mutate([value])}
+            onChange={(value) => toggleTrading.execute(value)}
           />
           <Checkbox
             disabled={!canModify}
             label={t("Ma société effectue des mises à consommation (B100 et ED95 uniquement)")} // prettier-ignore
             value={entity.has_mac ?? false}
-            onChange={(value) => toggleMAC.mutate([value])}
+            onChange={(value) => toggleMAC.execute(value)}
           />
           <Checkbox
             disabled={!canModify}
             label={t("Ma société effectue des livraisons directes")}
             value={entity.has_direct_deliveries}
-            onChange={(value) => toggleDirectDeliveries.mutate([value])}
+            onChange={(value) => toggleDirectDeliveries.execute(value)}
           />
         </>
       )}
@@ -114,7 +114,7 @@ const CompanyOptions = () => {
           disabled={!canModify}
           label={t("Ma société accepte des volumes d'electricité")}
           value={entity.has_elec}
-          onChange={(value) => toggleElec.mutate([value])}
+          onChange={(value) => toggleElec.execute(value)}
         />
       )}
 

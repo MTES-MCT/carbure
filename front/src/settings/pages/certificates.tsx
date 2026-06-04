@@ -78,7 +78,7 @@ const Certificates = () => {
         label={t("Certificat par défaut")}
         placeholder={t("Sélectionner un certificat")}
         value={entity.default_certificate ?? undefined}
-        onChange={(cert) => setDefaultCertificate.mutate([entity.id, cert!])}
+        onChange={(cert) => setDefaultCertificate.execute(entity.id, cert!)}
         options={validCertificates}
         normalize={normalizeEntityCertificate}
         style={{ flex: 1 }}

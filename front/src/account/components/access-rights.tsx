@@ -46,7 +46,7 @@ export const AccountAccesRights = () => {
     invalidates: [COMMON_QUERY_KEYS.userSettings],
   })
 
-  const loading = user.loading || revokeMyself.isPending
+  const loading = user.loading || revokeMyself.loading
 
   return (
     <EditableCard
@@ -125,9 +125,7 @@ export const AccountAccesRights = () => {
                         title={t("Annuler mes accès")}
                         description={t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: right.entity.name })} // prettier-ignore
                         confirm={t("Révoquer")}
-                        onConfirm={() =>
-                          revokeMyself.mutateAsync([right.entity.id])
-                        }
+                        onConfirm={() => revokeMyself.execute(right.entity.id)}
                         onClose={close}
                         hideCancel
                       />
@@ -207,7 +205,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
       }
       footer={
         <Button
-          loading={requestAccess.isPending}
+          loading={requestAccess.loading}
           iconId="ri-add-line"
           disabled={!entity || !role}
           type="submit"
@@ -224,7 +222,7 @@ export const EntityDialog = ({ onClose }: EntityDialogProps) => {
         id="access-right"
         onSubmit={async () => {
           matomo.push(["trackEvent", "account", "add-access-right"])
-          await requestAccess.mutateAsync([entity!.id, role!])
+          await requestAccess.execute(entity!.id, role!)
           setEntity(undefined)
         }}
       >

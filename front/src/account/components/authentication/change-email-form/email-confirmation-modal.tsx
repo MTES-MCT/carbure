@@ -69,7 +69,7 @@ export const EmailConfirmationModal = ({
 
   const handleConfirm = () => {
     if (otpCode.trim()) {
-      confirmEmailMutation.mutate([newEmail, otpCode.trim()])
+      confirmEmailMutation.execute(newEmail, otpCode.trim())
     }
   }
 
@@ -82,7 +82,7 @@ export const EmailConfirmationModal = ({
       footer={
         <Button
           iconId="ri-check-line"
-          loading={confirmEmailMutation.isPending}
+          loading={confirmEmailMutation.loading}
           disabled={!otpCode.trim()}
           type="submit"
           nativeButtonProps={{

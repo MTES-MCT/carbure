@@ -62,7 +62,7 @@ const CompanyInfo = ({
 
   const onSubmitForm = async (formValue: CompanyFormValue | undefined) => {
     if (formValue && canSave) {
-      await updateEntity.mutateAsync([{ entityId: entity.id, formValue }])
+      await updateEntity.execute({ entityId: entity.id, formValue })
       setIsEditingCompanyAddress(false)
     }
   }
@@ -199,7 +199,7 @@ const CompanyInfo = ({
           )}
         </Form>
 
-        {updateEntity.isPending && <LoaderOverlay />}
+        {updateEntity.loading && <LoaderOverlay />}
       </EditableCard>
       <EditableCard
         title={t("Coordonnées du contact principal")}

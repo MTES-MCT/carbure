@@ -46,9 +46,12 @@ useQuery({
 
 ## Mutations
 
-Comme le legacy `async` : **`useMutation(apiFn, options)`** avec `invalidates` en plus des options React Query. Pas de `mutationFn` à écrire.
+Comme le legacy `async` : **`useMutation(apiFn, options)`** avec `invalidates` en plus des options React Query.
 
-Les variables passées à `mutate` / `mutateAsync` sont le tuple **`Parameters<typeof apiFn>`**.
+- Pas de `mutationFn` dans les composants.
+- Déclenchement via **`execute(...args)`** (équivalent historique de `mutateAsync` côté React Query).
+- État de chargement via **`loading`** (alias de `isPending`).
+- `mutate` / `mutateAsync` ne sont pas exposés sur le retour du hook.
 
 ```typescript
 import { COMMON_QUERY_KEYS, useMutation } from "common/hooks/async-rq"
@@ -59,28 +62,25 @@ const requestAccess = useMutation(api.requestAccess, {
   onSuccess: () => notify(t("Enregistré"), { variant: "success" }),
 })
 
-// Plusieurs args API → tuple
-await requestAccess.mutateAsync([entityId, role])
+await requestAccess.execute(entityId, role)
+if (requestAccess.loading) { /* ... */ }
 
-// Un seul arg API → tuple à un élément
-await revokeMyself.mutateAsync([entityId])
-
-// Aucun arg API → mutate() sans variable
-logoutMutation.mutate()
+// Sans arg API
+logoutMutation.execute()
 
 // Args fixés dans le hook (entity.id, etc.)
 const toggleMAC = useMutation(
   (toggle: boolean) => api.toggleMAC(entity.id, toggle),
   { invalidates: [COMMON_QUERY_KEYS.userSettings] }
 )
-toggleMAC.mutate([true])
+toggleMAC.execute(true)
 ```
 
-| Legacy (`async`) | React Query (`async-rq`) |
-|------------------|--------------------------|
+| Legacy (`async`) | `async-rq` |
+|------------------|------------|
 | `useMutation(apiFn, opts)` | `useMutation(apiFn, opts)` |
-| `execute(...args)` | `mutateAsync([...args])` |
-| `loading` | `isPending` |
+| `execute(...args)` | `execute(...args)` |
+| `loading` | `loading` |
 
 ## Query keys
 

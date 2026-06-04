@@ -27,7 +27,7 @@ export const Logout = () => {
     // Prevent duplicate mutation calls in React StrictMode.
     if (hasTriggeredLogout.current) return
     hasTriggeredLogout.current = true
-    logoutMutation.mutate()
+    logoutMutation.execute()
   }, [logoutMutation])
 
   return <LoaderOverlay />
