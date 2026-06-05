@@ -555,17 +555,16 @@ class ObjectiveServiceCalculateGlobalObjectiveTest(TestCase):
         mock_penalty.return_value = 0
 
         objective_per_sector = [
-            {"available_balance": 100_000, "pending_teneur": 50_000, "declared_teneur": 30_000},
-            {"available_balance": 150_000, "pending_teneur": 60_000, "declared_teneur": 40_000},
+            {"saved_emissions": 10.0, "pending_saved_emissions": 5.0, "declared_saved_emissions": 3.0},
+            {"saved_emissions": 15.0, "pending_saved_emissions": 6.0, "declared_saved_emissions": 4.0},
         ]
         elec_category = {"available_balance": 0, "pending_teneur": 0, "declared_teneur": 0}
 
         result = ObjectiveService.calculate_global_objective(objective_per_sector, elec_category, Mock(), 10_000_000)
 
-        # Verify sectors are summed: 100_000 + 150_000 = 250_000, then GHG converted
-        expected_available = ObjectiveService.apply_ghg_conversion(250_000)
-        expected_pending = ObjectiveService.apply_ghg_conversion(110_000)  # 50_000 + 60_000
-        expected_declared = ObjectiveService.apply_ghg_conversion(70_000)  # 30_000 + 40_000
+        expected_available = 25.0
+        expected_pending = 11.0
+        expected_declared = 7.0
 
         self.assertEqual(result["available_balance"], expected_available)
         self.assertEqual(result["pending_teneur"], expected_pending)
@@ -578,15 +577,47 @@ class ObjectiveServiceCalculateGlobalObjectiveTest(TestCase):
         mock_global.return_value = (0, 0, 0)
         mock_penalty.return_value = 0
 
-        objective_per_sector = [{"available_balance": 1_000_000, "pending_teneur": 500_000, "declared_teneur": 200_000}]
+        objective_per_sector = [
+            {
+                "saved_emissions": 2.0,
+                "pending_saved_emissions": 1.0,
+                "declared_saved_emissions": 0.5,
+            }
+        ]
         elec_category = {"available_balance": 100_000, "pending_teneur": 50_000, "declared_teneur": 20_000}
 
         result = ObjectiveService.calculate_global_objective(objective_per_sector, elec_category, Mock(), 10_000_000)
 
-        # Result should include both biofuel (with GHG conversion) and elec (with elec conversion)
-        biofuel_balance = ObjectiveService.apply_ghg_conversion(1_000_000)
+        # Result should include both biofuel (already in tCO2) and elec (with elec conversion)
+        biofuel_balance = 2.0
         elec_balance = ObjectiveService.apply_elec_ghg_conversion(100_000)
         self.assertEqual(result["available_balance"], biofuel_balance + elec_balance)
+
+    @patch.object(ObjectiveService, "get_global_objective_and_penalty")
+    @patch.object(ObjectiveService, "_calcule_penalty")
+    def test_calculate_global_objective_calls_penalty_with_tco2_values(self, mock_penalty, mock_global):
+        """Test calculate_global_objective calls _calcule_penalty with tCO2=True and aggregated tCO2 teneur."""
+        mock_global.return_value = (1_000_000, 120, 0.12)
+        mock_penalty.return_value = 42
+
+        objective_per_sector = [
+            {"saved_emissions": 8.0, "pending_saved_emissions": 2.0, "declared_saved_emissions": 1.0},
+            {"saved_emissions": 3.0, "pending_saved_emissions": 0.5, "declared_saved_emissions": 0.5},
+        ]
+        elec_category = {"available_balance": 100_000, "pending_teneur": 50_000, "declared_teneur": 10_000}
+
+        ObjectiveService.calculate_global_objective(objective_per_sector, elec_category, Mock(), 10_000_000)
+
+        args = mock_penalty.call_args[0]
+        kwargs = mock_penalty.call_args[1]
+
+        self.assertEqual(args[0], 120)
+        expected_teneur = (2.0 + 0.5) + (1.0 + 0.5)
+        expected_teneur += ObjectiveService.apply_elec_ghg_conversion(50_000)
+        expected_teneur += ObjectiveService.apply_elec_ghg_conversion(10_000)
+        self.assertAlmostEqual(args[1], expected_teneur)
+        self.assertEqual(args[2], ObjectiveService.apply_ghg_conversion(1_000_000))
+        self.assertTrue(kwargs["tCO2"])
 
 
 class ObjectiveServiceGetElecCategoryTest(TestCase):
