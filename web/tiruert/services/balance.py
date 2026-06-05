@@ -81,6 +81,8 @@ class BalanceService:
             "ghg_reduction_min": None,
             "ghg_reduction_max": None,
             "saved_emissions": 0,
+            "pending_saved_emissions": 0,
+            "declared_saved_emissions": 0,
         }
 
         return entry
@@ -101,6 +103,11 @@ class BalanceService:
             # Round to 2 decimals after each operation to prevent float precision errors accumulation
             balance[teneur_key][teneur_type] = round(balance[teneur_key][teneur_type], 2)
 
+            avoided_type = "pending_saved_emissions" if operation.status == Operation.PENDING else "declared_saved_emissions"
+            balance[teneur_key][avoided_type] += BalanceService._calculate_avoided_emissions_tco2(operation, detail)
+            # Round to 2 decimals after each operation to prevent float precision errors accumulation
+            balance[teneur_key][avoided_type] = round(balance[teneur_key][avoided_type], 2)
+
         quantity_type = "credit" if credit_operation else "debit"
         balance[quantity_key]["quantity"][quantity_type] += quantity
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
@@ -111,8 +118,6 @@ class BalanceService:
         """
         Updates the balance entry with the details of the operation
         """
-        from tiruert.services.teneur import TeneurService
-
         volume_sign = 1 if credit_operation else -1
         quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
         balance[key]["available_balance"] += quantity * volume_sign
@@ -121,9 +126,7 @@ class BalanceService:
 
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj  # used when displaying balance by lot
 
-        avoided_emissions = TeneurService.convert_producted_emissions_to_avoided_emissions(
-            detail.volume, operation.biofuel, detail.emission_rate_per_mj
-        )
+        avoided_emissions = BalanceService._calculate_avoided_emissions_tco2(operation, detail)
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["saved_emissions"] = round(balance[key]["saved_emissions"], 2)
@@ -132,6 +135,10 @@ class BalanceService:
     def _calculate_quantity(operation, detail, conversion_factor):
         quantity = detail.volume * conversion_factor * operation.renewable_energy_share
         return quantity
+
+    @staticmethod
+    def _calculate_avoided_emissions_tco2(operation, detail):
+        return detail.avoided_emissions * operation.renewable_energy_share
 
     @staticmethod
     def _update_ghg_min_max(balance, key, detail):
