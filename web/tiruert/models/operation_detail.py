@@ -29,7 +29,11 @@ class OperationDetail(models.Model):
     def avoided_emissions(self):
         from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-        lot_energy = self.lot.biofuel.pci_litre * self.volume  # (MJ) energie du lot utilisée pour la création du lot
+        renewable_energy_share = getattr(self.operation, "renewable_energy_share", 1)
+        lot_energy = (
+            self.lot.biofuel.pci_litre * self.volume * renewable_energy_share
+        )  # (MJ) energie du lot utilisée pour la création du lot
+
         return (
             (GHG_REFERENCE_RED_II - self.emission_rate_per_mj) * lot_energy / 1000000
         )  # (tCO2) émissions évitées pour la création du lot

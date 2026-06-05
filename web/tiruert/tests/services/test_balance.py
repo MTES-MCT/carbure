@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from django.test import TestCase
 
@@ -184,6 +184,23 @@ class BalanceServiceCalculateQuantityTest(TestCase):
         self.assertEqual(result, 200.0)  # 100 * 2.5 * 0.8 = 200
 
 
+class OperationDetailAvoidedEmissionsTest(TestCase):
+    """Unit tests for OperationDetail.avoided_emissions property."""
+
+    def test_avoided_emissions_applies_renewable_share(self):
+        from tiruert.models.operation_detail import OperationDetail
+
+        mock_detail = Mock(spec=OperationDetail)
+        mock_detail.lot.biofuel.pci_litre = 10.0
+        mock_detail.volume = 100.0
+        mock_detail.emission_rate_per_mj = 20.0
+        mock_detail.operation.renewable_energy_share = 0.4
+
+        result = OperationDetail.avoided_emissions.fget(mock_detail)
+
+        self.assertEqual(result, (94 - 20.0) * 10.0 * 100.0 * 0.4 / 1000000)
+
+
 class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
     """Unit tests for BalanceService._update_quantity_and_teneur() method."""
 
@@ -195,8 +212,9 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 20.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 30.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 5.0)
@@ -209,41 +227,64 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 15.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, False, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, False, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 10.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 20.0)
 
     def test_update_quantity_and_teneur_updates_pending_teneur_for_pending_teneur_operation(self):
         """Test _update_quantity_and_teneur updates pending_teneur for PENDING TENEUR operations."""
-        balance = {"key1": {"quantity": {"credit": 0.0, "debit": 0.0}, "pending_teneur": 5.0, "declared_teneur": 0.0}}
+        balance = {
+            "key1": {
+                "quantity": {"credit": 0.0, "debit": 0.0},
+                "pending_teneur": 5.0,
+                "declared_teneur": 0.0,
+                "pending_saved_emissions": 1.0,
+                "declared_saved_emissions": 0.0,
+            }
+        }
         mock_operation = Mock()
         mock_operation.type = Operation.TENEUR
         mock_operation.status = Operation.PENDING
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 10.0
+        mock_detail.avoided_emissions = 2.5
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 15.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 0.0)
+        self.assertEqual(balance["key1"]["pending_saved_emissions"], 3.5)
 
     def test_update_quantity_and_teneur_updates_declared_teneur_for_non_pending_teneur_operation(self):
         """Test _update_quantity_and_teneur updates declared_teneur for DECLARED/VALIDATED TENEUR operations."""
-        balance = {"key1": {"quantity": {"credit": 0.0, "debit": 0.0}, "pending_teneur": 0.0, "declared_teneur": 3.0}}
+        balance = {
+            "key1": {
+                "quantity": {"credit": 0.0, "debit": 0.0},
+                "pending_teneur": 0.0,
+                "declared_teneur": 3.0,
+                "pending_saved_emissions": 0.0,
+                "declared_saved_emissions": 1.5,
+            }
+        }
         mock_operation = Mock()
         mock_operation.type = Operation.TENEUR
         mock_operation.status = Operation.DECLARED
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 7.0
+        mock_detail.avoided_emissions = 1.25
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 0.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 10.0)
+        self.assertEqual(balance["key1"]["declared_saved_emissions"], 2.75)
 
     def test_update_quantity_and_teneur_rounds_to_2_decimals(self):
         """Test _update_quantity_and_teneur rounds results to 2 decimal places."""
@@ -253,8 +294,9 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 0.333
         mock_detail = Mock()
         mock_detail.volume = 10.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 3.33)
 
@@ -262,72 +304,120 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
 class BalanceServiceUpdateAvailableBalanceTest(TestCase):
     """Unit tests for BalanceService._update_available_balance() method."""
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_update_available_balance_adds_volume_for_credit_operation(self, mock_convert):
+    def test_update_available_balance_adds_volume_for_credit_operation(self):
         """Test _update_available_balance adds volume when credit_operation=True."""
-        mock_convert.return_value = 50.0
-        balance = {"key1": {"available_balance": 100.0, "saved_emissions": 0.0, "emission_rate_per_mj": 0}}
+        balance = {
+            "key1": {
+                "available_balance": 100.0,
+                "saved_emissions": 0.0,
+                "emission_rate_per_mj": 0,
+            }
+        }
         mock_operation = Mock()
         mock_operation.biofuel = Mock()
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 20.0
         mock_detail.emission_rate_per_mj = 25.0
+        mock_detail.avoided_emissions = 50.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["available_balance"], 120.0)
         self.assertEqual(balance["key1"]["saved_emissions"], 50.0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_update_available_balance_subtracts_volume_for_debit_operation(self, mock_convert):
+    def test_update_available_balance_subtracts_volume_for_debit_operation(self):
         """Test _update_available_balance subtracts volume when credit_operation=False."""
-        mock_convert.return_value = 30.0
-        balance = {"key1": {"available_balance": 100.0, "saved_emissions": 0.0, "emission_rate_per_mj": 0}}
+        balance = {
+            "key1": {
+                "available_balance": 100.0,
+                "saved_emissions": 0.0,
+                "emission_rate_per_mj": 0,
+            }
+        }
         mock_operation = Mock()
         mock_operation.biofuel = Mock()
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 15.0
         mock_detail.emission_rate_per_mj = 20.0
+        mock_detail.avoided_emissions = 30.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, False, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, False, quantity)
 
         self.assertEqual(balance["key1"]["available_balance"], 85.0)
         self.assertEqual(balance["key1"]["saved_emissions"], -30.0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_update_available_balance_sets_emission_rate(self, mock_convert):
+    def test_update_available_balance_sets_emission_rate(self):
         """Test _update_available_balance sets emission_rate_per_mj from detail."""
-        mock_convert.return_value = 0.0
-        balance = {"key1": {"available_balance": 0.0, "saved_emissions": 0.0, "emission_rate_per_mj": 0}}
+        balance = {
+            "key1": {
+                "available_balance": 0.0,
+                "saved_emissions": 0.0,
+                "emission_rate_per_mj": 0,
+            }
+        }
         mock_operation = Mock()
         mock_operation.biofuel = Mock()
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 10.0
         mock_detail.emission_rate_per_mj = 42.5
+        mock_detail.avoided_emissions = 0.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["emission_rate_per_mj"], 42.5)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_update_available_balance_rounds_to_2_decimals(self, mock_convert):
+    def test_update_available_balance_rounds_to_2_decimals(self):
         """Test _update_available_balance rounds results to 2 decimal places."""
-        mock_convert.return_value = 12.3456
-        balance = {"key1": {"available_balance": 0.0, "saved_emissions": 0.0, "emission_rate_per_mj": 0}}
+        balance = {
+            "key1": {
+                "available_balance": 0.0,
+                "saved_emissions": 0.0,
+                "emission_rate_per_mj": 0,
+            }
+        }
         mock_operation = Mock()
         mock_operation.biofuel = Mock()
         mock_operation.renewable_energy_share = 0.333
         mock_detail = Mock()
         mock_detail.volume = 10.0
         mock_detail.emission_rate_per_mj = 25.0
+        mock_detail.avoided_emissions = 12.3456
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["available_balance"], 3.33)
         self.assertEqual(balance["key1"]["saved_emissions"], 12.35)
+
+    def test_update_available_balance_rounds_saved_emissions_cumulatively(self):
+        """Test _update_available_balance keeps stable cumulative rounding across multiple updates."""
+        balance = {
+            "key1": {
+                "available_balance": 0.0,
+                "saved_emissions": 0.0,
+                "emission_rate_per_mj": 0,
+            }
+        }
+        mock_operation = Mock()
+        mock_operation.biofuel = Mock()
+        mock_operation.renewable_energy_share = 0.333
+        mock_detail = Mock()
+        mock_detail.volume = 10.0
+        mock_detail.emission_rate_per_mj = 25.0
+        mock_detail.avoided_emissions = 0.335
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
+
+        # 0.335 -> 0.34 after first update, then 0.34 + 0.335 -> 0.68
+        self.assertEqual(balance["key1"]["saved_emissions"], 0.68)
 
 
 class BalanceServiceUpdateGhgMinMaxTest(TestCase):
@@ -393,6 +483,7 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
     def setUp(self):
         from core.models import Entity
         from tiruert.factories import OperationDetailFactory, OperationFactory
+        from transactions.factories import CarbureLotFactory
 
         self.entity, _ = Entity.objects.get_or_create(
             name="Test Entity",
@@ -400,19 +491,23 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         )
         self.OperationFactory = OperationFactory
         self.OperationDetailFactory = OperationDetailFactory
+        self.CarbureLotFactory = CarbureLotFactory
 
     def _create_operation_with_details(self, **op_kwargs):
         """Helper to create an operation with details."""
         op = self.OperationFactory(**op_kwargs)
-        self.OperationDetailFactory.create_for_operation(op)
+        lot = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+        self.OperationDetailFactory.create_for_operation(op, lot=lot)
         return op
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_groups_operations_by_sector(self, mock_convert):
+    def test_calculate_balance_groups_operations_by_sector(self):
         """Test calculate_balance correctly groups operations by sector."""
         from core.models import Biocarburant
-
-        mock_convert.return_value = 0.0
 
         # Get biofuels from different sectors
         biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
@@ -458,10 +553,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         self.assertGreater(result[Operation.ESSENCE]["quantity"]["debit"], 0)
         self.assertGreater(result[Operation.GAZOLE]["quantity"]["debit"], 0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_filters_operations_by_status(self, mock_convert):
+    def test_calculate_balance_filters_operations_by_status(self):
         """Test calculate_balance only includes operations with allowed statuses."""
-        mock_convert.return_value = 0.0
 
         # Allowed statuses according to calculate_balance implementation
         allowed_statuses = [
@@ -503,10 +596,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
                                 entry["quantity"]["credit"], 0, f"Status {status_code} should not contribute to credit"
                             )
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_applies_credit_and_debit_logic(self, mock_convert):
+    def test_calculate_balance_applies_credit_and_debit_logic(self):
         """Test calculate_balance correctly applies credit/debit based on entity relationship."""
-        mock_convert.return_value = 0.0
 
         # Credit operation (entity receives)
         op_credit = self._create_operation_with_details(
@@ -534,10 +625,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         )
         self.assertTrue(has_credit_or_debit)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_excludes_pending_credits_from_available_balance(self, mock_convert):
+    def test_calculate_balance_excludes_pending_credits_from_available_balance(self):
         """Test calculate_balance excludes PENDING credit operations from available_balance."""
-        mock_convert.return_value = 0.0
 
         op_pending = self._create_operation_with_details(
             credited_entity=self.entity,
@@ -553,10 +642,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         for entry in result.values():
             self.assertEqual(entry["available_balance"], 0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_applies_ges_filtering(self, mock_convert):
+    def test_calculate_balance_applies_ges_filtering(self):
         """Test calculate_balance filters lots by GHG reduction bounds."""
-        mock_convert.return_value = 0.0
 
         # Operation with high GHG reduction
         op = self._create_operation_with_details(
@@ -585,12 +672,9 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
             self.assertEqual(entry["quantity"]["debit"], 0)
             self.assertEqual(entry["quantity"]["credit"], 0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_respects_date_from_filter(self, mock_convert):
+    def test_calculate_balance_respects_date_from_filter(self):
         """Test calculate_balance filters quantity updates by date_from."""
         from datetime import datetime, timezone
-
-        mock_convert.return_value = 0.0
 
         # Create operation with specific date
         op = self._create_operation_with_details(
@@ -617,10 +701,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         for entry in result.values():
             self.assertEqual(entry["quantity"]["debit"], 0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_groups_by_category(self, mock_convert):
+    def test_calculate_balance_groups_by_category(self):
         """Test calculate_balance groups by customs_category correctly."""
-        mock_convert.return_value = 0.0
 
         op1 = self._create_operation_with_details(
             debited_entity=self.entity,
@@ -639,10 +721,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         for key in result.keys():
             self.assertIsInstance(key, str)  # customs_category is a string
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_updates_teneur_by_status(self, mock_convert):
+    def test_calculate_balance_updates_teneur_by_status(self):
         """Test calculate_balance updates pending_teneur vs declared_teneur based on operation status."""
-        mock_convert.return_value = 0.0
 
         op_pending = self._create_operation_with_details(
             debited_entity=self.entity,
@@ -665,10 +745,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
 
         self.assertTrue(has_pending_teneur or has_declared_teneur)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_calculate_balance_applies_conversion_factor_for_mj(self, mock_convert):
+    def test_calculate_balance_applies_conversion_factor_for_mj(self):
         """Test calculate_balance applies conversion factor when unit is 'mj'."""
-        mock_convert.return_value = 0.0
 
         op = self._create_operation_with_details(
             debited_entity=self.entity,
@@ -706,6 +784,7 @@ class BalanceServiceObjectiveSectorTest(TestCase):
     def setUp(self):
         from core.models import Biocarburant, Entity
         from tiruert.factories import OperationDetailFactory, OperationFactory
+        from transactions.factories import CarbureLotFactory
 
         self.entity, _ = Entity.objects.get_or_create(
             name="BalanceDeclaredSectorEntity",
@@ -713,6 +792,7 @@ class BalanceServiceObjectiveSectorTest(TestCase):
         )
         self.OperationFactory = OperationFactory
         self.OperationDetailFactory = OperationDetailFactory
+        self.CarbureLotFactory = CarbureLotFactory
 
         self.biofuel_diesel = Biocarburant.objects.filter(compatible_diesel=True).first()
         self.biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
@@ -725,13 +805,17 @@ class BalanceServiceObjectiveSectorTest(TestCase):
             biofuel=biofuel,
             objective_sector=objective_sector,
         )
-        self.OperationDetailFactory.create_for_operation(op)
+        lot = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+        self.OperationDetailFactory.create_for_operation(op, lot=lot)
         return op
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_objective_sector_overrides_teneur_key_for_sector_groupby(self, mock_convert):
+    def test_objective_sector_overrides_teneur_key_for_sector_groupby(self):
         """A TENEUR with objective_sector=ESSENCE but biofuel=GAZOLE should count pending_teneur in ESSENCE."""
-        mock_convert.return_value = 0.0
 
         if not self.biofuel_diesel or not self.biofuel_essence:
             self.skipTest("Missing biofuel fixtures for GAZOLE or ESSENCE sectors")
@@ -750,10 +834,8 @@ class BalanceServiceObjectiveSectorTest(TestCase):
         if Operation.GAZOLE in result:
             self.assertEqual(result[Operation.GAZOLE]["pending_teneur"], 0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_available_balance_stays_in_natural_sector(self, mock_convert):
+    def test_available_balance_stays_in_natural_sector(self):
         """available_balance must stay in the natural sector even when objective_sector differs."""
-        mock_convert.return_value = 0.0
 
         if not self.biofuel_diesel:
             self.skipTest("Missing biofuel fixture for GAZOLE sector")
@@ -769,10 +851,8 @@ class BalanceServiceObjectiveSectorTest(TestCase):
         self.assertIn(Operation.GAZOLE, result)
         self.assertLess(result[Operation.GAZOLE]["available_balance"], 0)
 
-    @patch("tiruert.services.teneur.TeneurService.convert_producted_emissions_to_avoided_emissions")
-    def test_no_objective_sector_falls_back_to_biofuel_sector(self, mock_convert):
+    def test_no_objective_sector_falls_back_to_biofuel_sector(self):
         """Without objective_sector, behaviour is identical to before: teneur counted in natural sector."""
-        mock_convert.return_value = 0.0
 
         if not self.biofuel_diesel:
             self.skipTest("Missing biofuel fixture for GAZOLE sector")
