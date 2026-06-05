@@ -184,19 +184,21 @@ class BalanceServiceCalculateQuantityTest(TestCase):
         self.assertEqual(result, 200.0)  # 100 * 2.5 * 0.8 = 200
 
 
-class BalanceServiceCalculateAvoidedEmissionsTest(TestCase):
-    """Unit tests for BalanceService._calculate_avoided_emissions_tco2() method."""
+class OperationDetailAvoidedEmissionsTest(TestCase):
+    """Unit tests for OperationDetail.avoided_emissions property."""
 
-    def test_calculate_avoided_emissions_applies_renewable_share(self):
-        """Test _calculate_avoided_emissions_tco2 applies operation renewable_energy_share to detail avoided emissions."""
-        mock_operation = Mock()
-        mock_operation.renewable_energy_share = 0.4
-        mock_detail = Mock()
-        mock_detail.avoided_emissions = 12.5
+    def test_avoided_emissions_applies_renewable_share(self):
+        from tiruert.models.operation_detail import OperationDetail
 
-        result = BalanceService._calculate_avoided_emissions_tco2(mock_operation, mock_detail)
+        mock_detail = Mock(spec=OperationDetail)
+        mock_detail.lot.biofuel.pci_litre = 10.0
+        mock_detail.volume = 100.0
+        mock_detail.emission_rate_per_mj = 20.0
+        mock_detail.operation.renewable_energy_share = 0.4
 
-        self.assertEqual(result, 5.0)
+        result = OperationDetail.avoided_emissions.fget(mock_detail)
+
+        self.assertEqual(result, (94 - 20.0) * 10.0 * 100.0 * 0.4 / 1000000)
 
 
 class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
@@ -210,8 +212,9 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 20.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 30.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 5.0)
@@ -224,8 +227,9 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 15.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, False, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, False, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 10.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 20.0)
@@ -248,8 +252,9 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 10.0
         mock_detail.avoided_emissions = 2.5
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 15.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 0.0)
@@ -273,8 +278,9 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 7.0
         mock_detail.avoided_emissions = 1.25
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 0.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 10.0)
@@ -288,8 +294,9 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 0.333
         mock_detail = Mock()
         mock_detail.volume = 10.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 3.33)
 
@@ -313,8 +320,9 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail.volume = 20.0
         mock_detail.emission_rate_per_mj = 25.0
         mock_detail.avoided_emissions = 50.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["available_balance"], 120.0)
         self.assertEqual(balance["key1"]["saved_emissions"], 50.0)
@@ -335,8 +343,9 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail.volume = 15.0
         mock_detail.emission_rate_per_mj = 20.0
         mock_detail.avoided_emissions = 30.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, False, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, False, quantity)
 
         self.assertEqual(balance["key1"]["available_balance"], 85.0)
         self.assertEqual(balance["key1"]["saved_emissions"], -30.0)
@@ -357,8 +366,9 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail.volume = 10.0
         mock_detail.emission_rate_per_mj = 42.5
         mock_detail.avoided_emissions = 0.0
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["emission_rate_per_mj"], 42.5)
 
@@ -378,11 +388,12 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail.volume = 10.0
         mock_detail.emission_rate_per_mj = 25.0
         mock_detail.avoided_emissions = 12.3456
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["available_balance"], 3.33)
-        self.assertEqual(balance["key1"]["saved_emissions"], 4.11)
+        self.assertEqual(balance["key1"]["saved_emissions"], 12.35)
 
     def test_update_available_balance_rounds_saved_emissions_cumulatively(self):
         """Test _update_available_balance keeps stable cumulative rounding across multiple updates."""
@@ -399,13 +410,14 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 10.0
         mock_detail.emission_rate_per_mj = 25.0
-        mock_detail.avoided_emissions = 1.0
+        mock_detail.avoided_emissions = 0.335
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, 1.0)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
+        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
-        self.assertEqual(balance["key1"]["saved_emissions"], 0.66)
-        self.assertEqual(balance["key1"]["available_balance"], 6.66)
+        # 0.335 -> 0.34 after first update, then 0.34 + 0.335 -> 0.68
+        self.assertEqual(balance["key1"]["saved_emissions"], 0.68)
 
 
 class BalanceServiceUpdateGhgMinMaxTest(TestCase):
