@@ -6,7 +6,11 @@ from rest_framework.viewsets import GenericViewSet
 
 from biomethane.filters.mixins import EntityProducerFilter
 from biomethane.models import BiomethaneAnnualDeclaration
-from biomethane.permissions import HasDrealRights, get_biomethane_permissions
+from biomethane.permissions import (
+    HasDrealRights,
+    get_biomethane_permissions,
+    is_entity_related_to_biomethane_external_admin,
+)
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import YearsActionMixin
@@ -98,7 +102,11 @@ class BiomethaneAnnualDeclarationViewSet(
                 request.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
                 and BiomethaneAnnualDeclarationService.is_declaration_period_open()
             ):
-                serializer = self.get_serializer(data={"producer": request.entity.id, "year": request.year})
+                producer_id = request.entity.id
+                if "producer_id" in request.query_params and is_entity_related_to_biomethane_external_admin(request.entity):
+                    producer_id = request.query_params["producer_id"]
+
+                serializer = self.get_serializer(data={"producer": producer_id, "year": request.year})
                 serializer.is_valid(raise_exception=True)
                 declaration = serializer.save()
                 status_code = status.HTTP_201_CREATED

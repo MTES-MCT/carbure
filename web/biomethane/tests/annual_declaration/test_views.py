@@ -255,3 +255,36 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["year"], self.current_declaration_year)
+
+    def test_retrieve_creates_declaration_for_dreal_target_producer(self):
+        """Test DREAL retrieve creates the declaration for producer_id target when missing."""
+        department = Department.objects.create(code_dept="31", name="Haute-Garonne")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+
+        dreal = Entity.objects.create(name="Test DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        setup_current_user(self, "dreal2@carbure.local", "DREAL 2", "gogogo", [(dreal, "ADMIN")])
+
+        with (
+            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("core.models.declaration_period.date") as mock_date_model,
+        ):
+            mock_date_service.today.return_value = date(self.current_year, 2, 15)
+            mock_date_model.today.return_value = date(self.current_year, 2, 15)
+
+            params = {"entity_id": dreal.id, "producer_id": self.producer_entity.id}
+            response = self.client.get(self.annual_declaration_url, params)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        declaration = BiomethaneAnnualDeclaration.objects.get(
+            producer=self.producer_entity,
+            year=self.current_declaration_year,
+        )
+        self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
