@@ -69,7 +69,7 @@ class BiomethaneAnnualDeclarationViewSet(
             if request.query_params.get("year") is None
             else request.query_params.get("year")
         )
-        setattr(request, "year", year)
+        setattr(request, "year", int(year))
 
         return request
 
@@ -98,15 +98,13 @@ class BiomethaneAnnualDeclarationViewSet(
             declaration = self.get_object()
             status_code = status.HTTP_200_OK
         except BiomethaneAnnualDeclaration.DoesNotExist:
+            # Only create a delcaration if entity is producer, not DREAL or ADEME
             if (
                 request.year == BiomethaneAnnualDeclarationService.get_current_declaration_year()
                 and BiomethaneAnnualDeclarationService.is_declaration_period_open()
+                and not is_entity_related_to_biomethane_external_admin(request.entity)
             ):
-                producer_id = request.entity.id
-                if "producer_id" in request.query_params and is_entity_related_to_biomethane_external_admin(request.entity):
-                    producer_id = request.query_params["producer_id"]
-
-                serializer = self.get_serializer(data={"producer": producer_id, "year": request.year})
+                serializer = self.get_serializer(data={"producer": request.entity.id, "year": request.year})
                 serializer.is_valid(raise_exception=True)
                 declaration = serializer.save()
                 status_code = status.HTTP_201_CREATED

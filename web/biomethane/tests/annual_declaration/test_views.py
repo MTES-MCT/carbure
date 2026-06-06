@@ -256,8 +256,8 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["year"], self.current_declaration_year)
 
-    def test_retrieve_creates_declaration_for_dreal_target_producer(self):
-        """Test DREAL retrieve creates the declaration for producer_id target when missing."""
+    def test_retrieve_does_not_create_declaration_for_dreal_target_producer(self):
+        """Test DREAL retrieve does not create declaration for producer_id target when missing."""
         department = Department.objects.create(code_dept="31", name="Haute-Garonne")
         BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
 
@@ -281,10 +281,10 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
             params = {"entity_id": dreal.id, "producer_id": self.producer_entity.id}
             response = self.client.get(self.annual_declaration_url, params)
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        declaration = BiomethaneAnnualDeclaration.objects.get(
-            producer=self.producer_entity,
-            year=self.current_declaration_year,
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(
+            BiomethaneAnnualDeclaration.objects.filter(
+                producer=self.producer_entity,
+                year=self.current_declaration_year,
+            ).exists()
         )
-        self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
