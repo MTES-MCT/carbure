@@ -1,11 +1,16 @@
-from datetime import date
-
-from django.db.models import Case, CharField, F, OuterRef, Q, Subquery, Value, When
+from django.db.models import Case, CharField, F, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce
 
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Entity
+
+# First = highest priority in the list (DECLARED uses default=0).
+DECLARATION_STATUS_ORDER = (
+    BiomethaneAnnualDeclaration.NOT_STARTED,
+    BiomethaneAnnualDeclaration.OVERDUE,
+    BiomethaneAnnualDeclaration.IN_PROGRESS,
+)
 
 
 class BiomethaneAdminDashboardService:
@@ -20,19 +25,6 @@ class BiomethaneAdminDashboardService:
             producer=OuterRef("pk"),
             year=year,
         )
-        is_overdue = date.today() > BiomethaneAnnualDeclarationService.OVERDUE_DATE
-
-        status_cases = [
-            When(_declaration_status__isnull=True, then=Value(BiomethaneAnnualDeclaration.NOT_STARTED)),
-        ]
-        if is_overdue:
-            status_cases.append(
-                When(
-                    ~Q(_declaration_status=BiomethaneAnnualDeclaration.DECLARED),
-                    then=Value(BiomethaneAnnualDeclaration.OVERDUE),
-                )
-            )
-
         q = (
             entity.get_allowed_entities()
             .filter(entity_type=Entity.BIOMETHANE_PRODUCER)
@@ -44,11 +36,7 @@ class BiomethaneAdminDashboardService:
                 _declaration_status=Subquery(declaration_subquery.values("status")[:1]),
             )
             .annotate(
-                _computed_status=Case(
-                    *status_cases,
-                    default=F("_declaration_status"),
-                    output_field=CharField(),
-                ),
+                _computed_status=BiomethaneAnnualDeclarationService.get_declaration_status_annotation("_declaration_status"),
                 _department_code=Coalesce(
                     F("biomethane_production_unit__department__code_dept"),
                     F("registered_zipcode"),
@@ -57,18 +45,13 @@ class BiomethaneAdminDashboardService:
             )
             .annotate(
                 _priority=Case(
-                    When(
-                        _computed_status=BiomethaneAnnualDeclaration.NOT_STARTED,
-                        then=Value(3),
-                    ),
-                    When(
-                        _computed_status=BiomethaneAnnualDeclaration.OVERDUE,
-                        then=Value(2),
-                    ),
-                    When(
-                        _computed_status=BiomethaneAnnualDeclaration.IN_PROGRESS,
-                        then=Value(1),
-                    ),
+                    *[
+                        When(
+                            _computed_status=status,
+                            then=Value(len(DECLARATION_STATUS_ORDER) - index),
+                        )
+                        for index, status in enumerate(DECLARATION_STATUS_ORDER)
+                    ],
                     default=Value(0),
                 ),
             )

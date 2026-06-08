@@ -1,5 +1,7 @@
 from datetime import date
 
+from django.db.models import Case, CharField, F, Q, Value, When
+
 from biomethane.models import (
     BiomethaneAnnualDeclaration,
     BiomethaneContract,
@@ -63,6 +65,9 @@ class BiomethaneAnnualDeclarationService:
         current_declaration_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
         limit_declaration = BiomethaneAnnualDeclarationService.OVERDUE_DATE
 
+        if declaration is None:
+            return BiomethaneAnnualDeclaration.NOT_STARTED
+
         if (
             declaration.year < current_declaration_year  # Case of past years
             or limit_declaration < date.today()  # Case of current declaration, after 31st March
@@ -70,6 +75,35 @@ class BiomethaneAnnualDeclarationService:
             return BiomethaneAnnualDeclaration.OVERDUE
 
         return declaration.status
+
+    @staticmethod
+    def get_declaration_status_annotation(status_field: str):
+        """
+        SQL status for QuerySet.annotate().
+
+        Expects the queryset to be filtered on the declaration year (dashboard: current year).
+        """
+        is_overdue_period = date.today() > BiomethaneAnnualDeclarationService.OVERDUE_DATE
+
+        status_cases = [
+            When(
+                **{f"{status_field}__isnull": True},
+                then=Value(BiomethaneAnnualDeclaration.NOT_STARTED),
+            ),
+        ]
+        if is_overdue_period:
+            status_cases.append(
+                When(
+                    ~Q(**{status_field: BiomethaneAnnualDeclaration.DECLARED}),
+                    then=Value(BiomethaneAnnualDeclaration.OVERDUE),
+                )
+            )
+
+        return Case(
+            *status_cases,
+            default=F(status_field),
+            output_field=CharField(),
+        )
 
     @staticmethod
     def get_missing_fields(declaration):

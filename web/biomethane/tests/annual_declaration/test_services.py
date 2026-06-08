@@ -393,6 +393,14 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         self.assertEqual(BiomethaneAnnualDeclaration.objects.filter(producer=self.producer_entity).count(), 0)
 
     @patch("biomethane.services.annual_declaration.date")
+    def test_get_declaration_status_not_started(self, mock_date):
+        """Test get_declaration_status returns NOT_STARTED when declaration is missing."""
+        mock_date.today.return_value = date(2026, 3, 30)
+
+        status = BiomethaneAnnualDeclarationService.get_declaration_status(None)
+        self.assertEqual(status, BiomethaneAnnualDeclaration.NOT_STARTED)
+
+    @patch("biomethane.services.annual_declaration.date")
     def test_get_declaration_status_in_progress_current_year(self, mock_date):
         """Test get_declaration_status returns IN_PROGRESS for current year declaration"""
         mock_date.today.return_value = date(2026, 3, 30)  # Before 1st April
