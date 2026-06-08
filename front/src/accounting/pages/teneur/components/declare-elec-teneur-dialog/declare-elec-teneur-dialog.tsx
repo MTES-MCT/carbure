@@ -77,7 +77,7 @@ export const DeclareElecTeneurDialog = ({
             onSubmit={() => mutation.execute()}
           >
             <Box>
-              <ObjectiveSectorPicker {...form.bind("objective_sector")} />
+              <ObjectiveSectorPicker sectorObjectives={sectorObjectives} />
             </Box>
 
             <Box>
