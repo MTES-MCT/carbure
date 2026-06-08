@@ -81,25 +81,28 @@ class BalanceService:
             "ghg_reduction_min": None,
             "ghg_reduction_max": None,
             "saved_emissions": 0,
+            "pending_saved_emissions": 0,
+            "declared_saved_emissions": 0,
         }
 
         return entry
 
-    def _update_quantity_and_teneur(
-        balance, quantity_key, teneur_key, operation, detail, credit_operation, conversion_factor
-    ):
+    def _update_quantity_and_teneur(balance, quantity_key, teneur_key, operation, detail, credit_operation, quantity):
         """
         Updates the balance entry with the details of the operation.
         - quantity (credit/debit) is always updated under quantity_key (natural sector)
         - pending_teneur/declared_teneur are updated under teneur_key (may differ for objective_sector)
         """
-        quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
-
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
             balance[teneur_key][teneur_type] += quantity
             # Round to 2 decimals after each operation to prevent float precision errors accumulation
             balance[teneur_key][teneur_type] = round(balance[teneur_key][teneur_type], 2)
+
+            avoided_type = "pending_saved_emissions" if operation.status == Operation.PENDING else "declared_saved_emissions"
+            balance[teneur_key][avoided_type] += detail.avoided_emissions
+            # Round to 2 decimals after each operation to prevent float precision errors accumulation
+            balance[teneur_key][avoided_type] = round(balance[teneur_key][avoided_type], 2)
 
         quantity_type = "credit" if credit_operation else "debit"
         balance[quantity_key]["quantity"][quantity_type] += quantity
@@ -107,32 +110,27 @@ class BalanceService:
         balance[quantity_key]["quantity"][quantity_type] = round(balance[quantity_key]["quantity"][quantity_type], 2)
 
     @staticmethod
-    def _update_available_balance(balance, key, operation, detail, credit_operation, conversion_factor):
+    def _update_available_balance(balance, key, operation, detail, credit_operation, quantity):
         """
         Updates the balance entry with the details of the operation
         """
-        from tiruert.services.teneur import TeneurService
-
         volume_sign = 1 if credit_operation else -1
-        quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
         balance[key]["available_balance"] += quantity * volume_sign
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["available_balance"] = round(balance[key]["available_balance"], 2)
 
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj  # used when displaying balance by lot
 
-        avoided_emissions = TeneurService.convert_producted_emissions_to_avoided_emissions(
-            detail.volume, operation.biofuel, detail.emission_rate_per_mj
-        )
+        avoided_emissions = detail.avoided_emissions
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["saved_emissions"] = round(balance[key]["saved_emissions"], 2)
 
     @staticmethod
     def _calculate_quantity(operation, detail, conversion_factor):
-        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
-        return quantity
+        return detail.volume * conversion_factor * operation.renewable_energy_share
 
+    @staticmethod
     @staticmethod
     def _update_ghg_min_max(balance, key, detail):
         """
@@ -239,13 +237,12 @@ class BalanceService:
                         balance[key]["biofuel"] = operation.biofuel
 
                 if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
-                    BalanceService._update_available_balance(
-                        balance, key, operation, detail, credit_operation, conversion_factor
-                    )
+                    quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
+                    BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, quantity)
 
                     if date_from is None or operation.created_at >= date_from:
                         BalanceService._update_quantity_and_teneur(
-                            balance, key, teneur_key, operation, detail, credit_operation, conversion_factor
+                            balance, key, teneur_key, operation, detail, credit_operation, quantity
                         )
 
                 # Update GHG reduction min and max values

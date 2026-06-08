@@ -191,7 +191,8 @@ class ObjectiveService:
 
     @staticmethod
     def apply_ghg_conversion(value):
-        return value * GHG_REFERENCE_RED_II / 1000000  # tCO2
+        # Convert MJ to tCO2 using the GHG reference for RED II
+        return value * GHG_REFERENCE_RED_II / 1_000_000  # tCO2
 
     @staticmethod
     def apply_elec_ghg_conversion(value):
@@ -212,14 +213,9 @@ class ObjectiveService:
         )
 
         # Sum sector values
-        available_balance_sum = sum(sector["available_balance"] for sector in objective_per_sector)
-        pending_teneur_sum = sum(sector["pending_teneur"] for sector in objective_per_sector)
-        declared_teneur_sum = sum(sector["declared_teneur"] for sector in objective_per_sector)
-
-        # Apply GHG conversions for biofuel
-        biofuel_available_balance = ObjectiveService.apply_ghg_conversion(available_balance_sum)
-        biofuel_pending_teneur = ObjectiveService.apply_ghg_conversion(pending_teneur_sum)
-        biofuel_declared_teneur = ObjectiveService.apply_ghg_conversion(declared_teneur_sum)
+        biofuel_pending_teneur = sum(sector["pending_saved_emissions"] for sector in objective_per_sector)
+        biofuel_declared_teneur = sum(sector["declared_saved_emissions"] for sector in objective_per_sector)
+        biofuel_available_balance = sum(sector["saved_emissions"] for sector in objective_per_sector)
 
         # Apply GHG conversions for elec
         elec_available_balance = ObjectiveService.apply_elec_ghg_conversion(elec_category["available_balance"])
