@@ -115,7 +115,7 @@ class DoubleCountApplicationsTest(TestCase):
         assert error_count == 1
         errors = file_data["errors"]
 
-        error = errors["global"][0]
+        error = errors["global_errors"][0]
         assert error["error"] == DoubleCountingError.BAD_WORKSHEET_NAME
 
     def test_sourcing_row(self):
@@ -268,13 +268,13 @@ class DoubleCountApplicationsTest(TestCase):
         assert error_count == 1
         errors = file_data["errors"]
 
-        error1 = errors["global"][0]
+        error1 = errors["global_errors"][0]
         assert error1["error"] == DoubleCountingError.PRODUCTION_MISMATCH_SOURCING
         assert error1["meta"]["feedstock"] == "HUILE_ALIMENTAIRE_USAGEE"
         assert error1["meta"]["production"] == 20500
         assert error1["meta"]["sourcing"] == 13410
 
-        # error2 = errors["global"][1]
+        # error2 = errors["global_errors"][1]
         # self.assertEqual(error2["error"], DoubleCountingError.POME_GT_2000)
         # self.assertEqual(error2["meta"]["requested_production"], 8200)
 
@@ -287,7 +287,7 @@ class DoubleCountApplicationsTest(TestCase):
         assert error_count == 1
         errors = file_data["errors"]
 
-        error1 = errors["global"][0]
+        error1 = errors["global_errors"][0]
         assert error1["error"] == DoubleCountingError.UNKNOWN_YEAR
 
     def test_invalid_year_and_missing_data(self):

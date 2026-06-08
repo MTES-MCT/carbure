@@ -62,6 +62,7 @@ dc_feedstock_to_carbure_feedstock = {
     "alcool résiduel de synthèse pharmaceutique": "ALCOOL_DE_SYNTHESE_PHARMACEUTIQUE",
     "résidus de transestérification d'huiles": "RESIDUS_DE_TRANSESTERIFICATION_D_HUILES",
     "huiles acides neutralisées ayant une haute teneur en soufre": "HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE",  # noqa: E501
+    "huiles acides ayant une haute teneur en soufre": "HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE",  # noqa: E501
     "graisses brunes": "GRAISSES_BRUNES",
     "graisses d'insectes": "GRAISSES_D_INSECTES",
     "levures usagées": "LEVURES_USAGEES",
@@ -71,6 +72,8 @@ dc_feedstock_to_carbure_feedstock = {
     "rafles de fruits vides": "RAFLES_DE_FRUITS_VIDES",
     "sucres déchets contenant de l'amidon": "SUCRES_DECHETS_CONTENANT_DE_L_AMIDON",
     "fraction lourde issue de la fabrication de farine": "FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE",
+    "déchets industriels autres": "DECHETS_INDUSTRIELS",
+    "déchets alimentaires": "DECHETS_ALIMENTAIRES",
 }
 
 
