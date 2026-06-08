@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useBind } from "common/components/form2"
-import { ElecTeneurForm } from "../declare-elec-teneur-dialog/declare-elec-teneur-dialog.types"
 import { SectorObjective } from "../../types"
 import { formatSector } from "accounting/utils/formatters"
 
@@ -13,7 +12,7 @@ export const ObjectiveSectorPicker = ({
   sectorObjectives,
 }: ObjectiveSectorPickerProps) => {
   const { t } = useTranslation()
-  const bind = useBind<ElecTeneurForm>()
+  const bind = useBind<{ objective_sector: string | undefined }>()
 
   return (
     <Autocomplete
