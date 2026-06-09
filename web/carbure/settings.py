@@ -348,6 +348,7 @@ HUEY = {
     "url": env("REDIS_URL"),
     "immediate": False,
     "consumer": {"workers": 2},
+    "utc": False,
 }
 
 if DEBUG:

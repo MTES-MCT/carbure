@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from django.core.management.base import BaseCommand
+from django.db.models import Count
 
 from tiruert.models import Operation
 from tiruert.models.declaration_period import TiruertDeclarationPeriod
@@ -13,7 +14,7 @@ class Command(BaseCommand):
     This command should be run every day.
 
     Usage:
-        python web/manage.py cancel_teneur_operations
+        python web/manage.py cancel_closed_period_operations
     """
 
     def add_arguments(self, parser):
@@ -24,18 +25,28 @@ class Command(BaseCommand):
         period_closed_yesterday = TiruertDeclarationPeriod.objects.filter(end_date=yesterday).first()
 
         if period_closed_yesterday:
-            pending_teneur_operations = Operation.objects.filter(
-                type=Operation.TENEUR,
-                status=Operation.PENDING,
+            pending_or_draft_operations = Operation.objects.filter(
+                type__in=Operation.API_DELETABLE_TYPES,
+                status__in=[Operation.PENDING, Operation.DRAFT],
                 declaration_year=period_closed_yesterday.year,
             )
-            count = pending_teneur_operations.count()
-            pending_teneur_operations.update(status=Operation.CANCELED)
+
+            operation_counts_by_type = {
+                row["type"]: row["count"]
+                for row in pending_or_draft_operations.values("type").annotate(count=Count("id")).order_by("type")
+            }
+
+            count = sum(operation_counts_by_type.values())
+
+            pending_or_draft_operations.update(status=Operation.CANCELED)
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"{count} teneur operations have been canceled for declaration year {period_closed_yesterday.year}."
+                    f"{count} operations have been canceled for declaration year {period_closed_yesterday.year}."
                 )
             )
+
+            for operation_type, operation_count in operation_counts_by_type.items():
+                self.stdout.write(self.style.SUCCESS(f"- {operation_type}: {operation_count} operation(s) canceled"))
         else:
             self.stdout.write(self.style.SUCCESS("No declaration period closed yesterday. No operations canceled."))

@@ -16,7 +16,7 @@ Business rules enforced:
   * Producer: MAC_BIO ops only, always B100 / CONV.
   * TRANSFERT: producers can transfer to producers or operators.
     Operators can transfer to other operators only (never to a producer).
-  * TENEUR and TRANSFERT only consume volumes the debited entity actually owns
+    * TENEUR, TRANSFERT and EXPORTATION only consume volumes the debited entity actually owns
     (received via INCORPORATION/MAC_BIO or via incoming TRANSFERT).
 """
 
@@ -55,6 +55,7 @@ PRODUCER_BIOFUEL_FEEDSTOCK_PAIRS = [
 
 TENEUR_STATUSES = [Operation.DECLARED, Operation.PENDING]
 TRANSFERT_STATUSES = [Operation.ACCEPTED, Operation.PENDING]
+EXPORTATION_STATUS = Operation.DRAFT
 
 TENEURS_PER_YEAR_PER_ENTITY = 3
 TRANSFERTS_PER_YEAR_PER_PRODUCER = 3
@@ -147,6 +148,11 @@ class Command(BaseCommand):
                     if self._create_teneur(entity, year, inventory):
                         created += 1
                 self.stdout.write(f"  [{entity.entity_type}] {entity.name}: {created} teneurs")
+
+            # 4. One DRAFT exportation per entity and per year.
+            for entity in entities:
+                created = 1 if self._create_exportation(entity, year, inventory) else 0
+                self.stdout.write(f"  [{entity.entity_type}] {entity.name}: {created} exportation DRAFT")
 
         total_ops = Operation.objects.filter(export_recipient=TAG).count()
         self.stdout.write(self.style.SUCCESS(f"Done. {total_ops} operations created."))
@@ -316,6 +322,35 @@ class Command(BaseCommand):
         # Move the transferred volume from debited to credited inventory.
         entry[1] -= volume
         inventory[credited.id].append([lot, volume])
+        return True
+
+    def _create_exportation(self, entity, year, inventory):
+        entry = self._pick_inventory_entry(entity, inventory)
+        if entry is None:
+            return False
+
+        lot, remaining = entry
+        volume = random.randint(VOLUME_MIN, min(VOLUME_MAX, remaining))
+
+        op = Operation.objects.create(
+            type=Operation.EXPORTATION,
+            status=EXPORTATION_STATUS,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            debited_entity=entity,
+            credited_entity=None,
+            renewable_energy_share=1.0,
+            durability_period=None,
+            declaration_year=year,
+            export_recipient=TAG,
+        )
+        OperationDetail.objects.create(
+            operation=op,
+            lot=lot,
+            volume=volume,
+            emission_rate_per_mj=round(random.uniform(5.0, 40.0), 2),
+        )
+        entry[1] -= volume
         return True
 
     def _cleanup(self):
