@@ -3,10 +3,7 @@ import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
 import { RecapData } from "../../recap-data"
-import { floorNumber, formatDate, formatNumber } from "common/utils/formatters"
-import useEntity from "common/hooks/entity"
-import { downloadMacFossilFuel } from "../../../api"
-import { Download } from "common/components/download"
+import { formatDate, formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type OverallProgressProps = {
@@ -15,9 +12,6 @@ type OverallProgressProps = {
 
 export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const { t } = useTranslation()
-  const entity = useEntity()
-  const { isAdmin } = entity
-  const isAdminOrExternal = isAdmin || entity.isExternal
   const { selectedYear, isDeclarationInCurrentPeriod } =
     useAnnualDeclarationTiruert()
 
@@ -31,36 +25,14 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
     <ObjectiveSection
       title={t("Avancement global")}
       description={
-        <>
-          {isDeclarationInCurrentPeriod && !isAdminOrExternal && (
-            <>
-              <Trans
-                i18nKey="Ces objectifs sont calculés sur la base de vos <a></a> et d'un PCI théorique."
-                components={{
-                  a: (
-                    <Download
-                      label={t("mises à consommation") + " 2023"}
-                      linkProps={{
-                        href: downloadMacFossilFuel(entity.id),
-                      }}
-                    />
-                  ),
-                }}
-              />
-              <br />
-              <br />
-            </>
-          )}
-
-          <Trans
-            i18nKey="Base calculée : {{energy_basis}} GJ"
-            values={{
-              energy_basis: formatNumber(objective?.energy_basis ?? 0, {
-                fractionDigits: 0,
-              }),
-            }}
-          />
-        </>
+        <Trans
+          i18nKey="Base calculée : {{energy_basis}} GJ"
+          values={{
+            energy_basis: formatNumber(objective?.energy_basis ?? 0, {
+              fractionDigits: 0,
+            }),
+          }}
+        />
       }
     >
       {objective && (
@@ -80,20 +52,20 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             }
           )}
           mainValue={formatNumber(
-            objective.teneur_declared + objective.teneur_declared_month,
+            objective.teneur_declared + objective.pending_teneur,
             {
               fractionDigits: 0,
             }
           )}
           mainText={t("tCO2 évitées")}
-          baseQuantity={floorNumber(objective.teneur_declared, 0)}
-          targetQuantity={floorNumber(objective.target, 0)}
-          declaredQuantity={floorNumber(objective.teneur_declared_month, 0)}
+          baseQuantity={objective.progress.base_quantity}
+          targetQuantity={objective.progress.target_quantity}
+          declaredQuantity={objective.progress.declared_quantity}
           badge={
             <CardProgress.DefaultBadge
               targetQuantity={objective.target}
               declaredQuantity={
-                objective.teneur_declared + objective.teneur_declared_month
+                objective.teneur_declared + objective.pending_teneur
               }
             />
           }
@@ -104,7 +76,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
               <li>
                 <RecapData.TeneurDeclaredMonth
                   value={t("{{value}} tCO2 évitées", {
-                    value: formatNumber(objective.teneur_declared_month, {
+                    value: formatNumber(objective.pending_teneur, {
                       fractionDigits: 0,
                     }),
                   })}

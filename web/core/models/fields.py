@@ -12,6 +12,15 @@ class JSONChoiceField(models.JSONField):
         "invalid_choice": "Valeur(s) invalide(s) : %(values)s",
     }
 
+    def formfield(self, **kwargs):
+        # Field.formfield renders a Select when choices are set; keep the JSON textarea widget.
+        original_choices = self.choices
+        self.choices = None
+        try:
+            return super().formfield(**kwargs)
+        finally:
+            self.choices = original_choices
+
     def validate(self, value, model_instance):
         # Run base JSONField validation without Field's built-in choices check.
         # Field.validate expects scalar values for choices and is not suitable for JSON lists.

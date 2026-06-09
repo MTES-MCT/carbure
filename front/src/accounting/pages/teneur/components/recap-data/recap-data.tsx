@@ -68,6 +68,7 @@ const RemainingQuantityBeforeObjective = ({
   category?: CategoryEnum
 }) => {
   const { t } = useTranslation()
+
   return (
     <Text size={size} fontWeight={bold ? "bold" : "regular"}>
       {category
@@ -83,7 +84,7 @@ const RemainingQuantityBeforeObjective = ({
   )
 }
 
-const RemainingQuantityBegoreCO2Objective = ({
+const RemainingQuantityBeforeCO2Objective = ({
   value,
   bold,
   size = "sm",
@@ -107,5 +108,6 @@ export const RecapData = {
   QuantityAvailable: RecapDataQuantityAvailable,
   RemainingQuantityBeforeLimit: RemainingQuantityBeforeLimit,
   RemainingQuantityBeforeObjective: RemainingQuantityBeforeObjective,
-  RemainingQuantityBegoreCO2Objective: RemainingQuantityBegoreCO2Objective,
+  RemainingQuantityBegoreCO2Objective: RemainingQuantityBeforeCO2Objective,
+  RemainingQuantityBeforeCO2Objective: RemainingQuantityBeforeCO2Objective,
 }

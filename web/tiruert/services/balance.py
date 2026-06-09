@@ -20,11 +20,17 @@ class BalanceService:
     }
 
     @staticmethod
-    def _get_key(operation, group_by, detail=None, depot=None):
+    def _get_key(operation, group_by, detail=None, depot=None, for_teneur=False):
         """
-        Determines the appropriate key based on the grouping type
+        Determines the appropriate key based on the grouping type.
+
+        When for_teneur=True and grouping by sector, a TENEUR operation with a objective_sector
+        returns that sector instead of the biofuel's natural sector, so the teneur volume counts
+        toward the chosen sector objective.
         """
         if group_by == BalanceService.GROUP_BY_SECTOR:
+            if for_teneur and operation.type == Operation.TENEUR and operation.objective_sector:
+                return operation.objective_sector
             return operation.sector
         elif group_by == BalanceService.GROUP_BY_CATEGORY:
             return operation.customs_category
@@ -57,14 +63,14 @@ class BalanceService:
         return BalanceService.UNIT_CONVERSION_RULES.get(unit, (None, 1))
 
     @staticmethod
-    def _init_balance_entry(unit, operation=None, group_by=None):
+    def _init_balance_entry(unit):
         """
         Initializes a balance entry with default values
         """
         entry = {
-            "sector": None if not operation else operation.sector,
-            "customs_category": None if not operation else operation.customs_category,
-            "biofuel": None if not operation else operation.biofuel,
+            "sector": None,
+            "customs_category": None,
+            "biofuel": None,
             "quantity": {"credit": 0, "debit": 0},
             "emission_rate_per_mj": 0,
             "pending_teneur": 0,
@@ -75,54 +81,56 @@ class BalanceService:
             "ghg_reduction_min": None,
             "ghg_reduction_max": None,
             "saved_emissions": 0,
+            "pending_saved_emissions": 0,
+            "declared_saved_emissions": 0,
         }
 
         return entry
 
-    def _update_quantity_and_teneur(balance, key, operation, detail, credit_operation, conversion_factor):
+    def _update_quantity_and_teneur(balance, quantity_key, teneur_key, operation, detail, credit_operation, quantity):
         """
-        Updates the balance entry with the details of the operation
+        Updates the balance entry with the details of the operation.
+        - quantity (credit/debit) is always updated under quantity_key (natural sector)
+        - pending_teneur/declared_teneur are updated under teneur_key (may differ for objective_sector)
         """
-        quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
-
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
-            balance[key][teneur_type] += quantity
+            balance[teneur_key][teneur_type] += quantity
             # Round to 2 decimals after each operation to prevent float precision errors accumulation
-            balance[key][teneur_type] = round(balance[key][teneur_type], 2)
+            balance[teneur_key][teneur_type] = round(balance[teneur_key][teneur_type], 2)
+
+            avoided_type = "pending_saved_emissions" if operation.status == Operation.PENDING else "declared_saved_emissions"
+            balance[teneur_key][avoided_type] += detail.avoided_emissions
+            # Round to 2 decimals after each operation to prevent float precision errors accumulation
+            balance[teneur_key][avoided_type] = round(balance[teneur_key][avoided_type], 2)
 
         quantity_type = "credit" if credit_operation else "debit"
-        balance[key]["quantity"][quantity_type] += quantity
+        balance[quantity_key]["quantity"][quantity_type] += quantity
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
-        balance[key]["quantity"][quantity_type] = round(balance[key]["quantity"][quantity_type], 2)
+        balance[quantity_key]["quantity"][quantity_type] = round(balance[quantity_key]["quantity"][quantity_type], 2)
 
     @staticmethod
-    def _update_available_balance(balance, key, operation, detail, credit_operation, conversion_factor):
+    def _update_available_balance(balance, key, operation, detail, credit_operation, quantity):
         """
         Updates the balance entry with the details of the operation
         """
-        from tiruert.services.teneur import TeneurService
-
         volume_sign = 1 if credit_operation else -1
-        quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
         balance[key]["available_balance"] += quantity * volume_sign
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["available_balance"] = round(balance[key]["available_balance"], 2)
 
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj  # used when displaying balance by lot
 
-        avoided_emissions = TeneurService.convert_producted_emissions_to_avoided_emissions(
-            detail.volume, operation.biofuel, detail.emission_rate_per_mj
-        )
+        avoided_emissions = detail.avoided_emissions
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
         balance[key]["saved_emissions"] = round(balance[key]["saved_emissions"], 2)
 
     @staticmethod
     def _calculate_quantity(operation, detail, conversion_factor):
-        quantity = detail.volume * conversion_factor * operation.renewable_energy_share
-        return quantity
+        return detail.volume * conversion_factor * operation.renewable_energy_share
 
+    @staticmethod
     @staticmethod
     def _update_ghg_min_max(balance, key, detail):
         """
@@ -216,9 +224,12 @@ class BalanceService:
 
             for detail in operation.prefetched_details:
                 key = BalanceService._get_key(operation, group_by, detail, depot)
+                teneur_key = BalanceService._get_key(operation, group_by, detail, depot, for_teneur=True)
 
                 if group_by != BalanceService.GROUP_BY_CATEGORY:
                     balance[key]["sector"] = operation.sector
+                    if teneur_key != key:
+                        balance[teneur_key]["sector"] = operation.objective_sector
 
                 if group_by != BalanceService.GROUP_BY_SECTOR:
                     balance[key]["customs_category"] = operation.customs_category
@@ -226,15 +237,12 @@ class BalanceService:
                         balance[key]["biofuel"] = operation.biofuel
 
                 if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
-                    # Update available balance
-                    BalanceService._update_available_balance(
-                        balance, key, operation, detail, credit_operation, conversion_factor
-                    )
+                    quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
+                    BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, quantity)
 
-                    # Update quantity and teneur only if the operation date is after the date_from
                     if date_from is None or operation.created_at >= date_from:
                         BalanceService._update_quantity_and_teneur(
-                            balance, key, operation, detail, credit_operation, conversion_factor
+                            balance, key, teneur_key, operation, detail, credit_operation, quantity
                         )
 
                 # Update GHG reduction min and max values

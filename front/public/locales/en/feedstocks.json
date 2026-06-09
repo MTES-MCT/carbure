@@ -67,5 +67,6 @@
   "ACIDES_GRAS_DE_NOIX_DE_COCO_DISTILLES": "Distilled coconut fatty acids",
   "RAFLES_DE_FRUITS_VIDES": "Empty fruit bunches",
   "SUCRES_DECHETS_CONTENANT_DE_L_AMIDON": "Waste sugars containing starch",
-  "FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE": "Heavy fraction from flour production"
+  "FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE": "Heavy fraction from flour production",
+  "DECHETS_ALIMENTAIRES": "Food waste"
 }

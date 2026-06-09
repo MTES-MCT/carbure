@@ -14,9 +14,11 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import CharField, ListField
 
+from core.filters import AllAnnotatedValuesMultipleFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
 from .custom_filters import CustomOrderingFilter
 from tiruert.models.operation import Operation
+from tiruert.services import operation_year as operation_year_service
 
 
 class BaseFilter(FilterSet):
@@ -120,7 +122,10 @@ class BaseFilter(FilterSet):
 
 
 class OperationFilter(BaseFilter):
-    # date_from = DateFilter(field_name="created_at", lookup_expr="gte")
+    year = AllAnnotatedValuesMultipleFilter(
+        field_name=operation_year_service.DB_FIELD,
+        annotation=operation_year_service.db_annotation(),
+    )
     pass
 
 

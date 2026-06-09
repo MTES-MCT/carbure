@@ -90,7 +90,7 @@ class BaseExpirationTestCase(TestCase):
 
 
 # Fixed date: the command checks date.today() - 1 day == period.end_date
-FIXED_TODAY = date(2025, 4, 1)
+FIXED_TODAY = date(2026, 4, 1)
 
 
 class SetOperationsExpiredIntegrationTest(BaseExpirationTestCase):
@@ -102,13 +102,19 @@ class SetOperationsExpiredIntegrationTest(BaseExpirationTestCase):
         # Declaration period: year=2025, end_date = FIXED_TODAY - 1 day
         self.period = TiruertDeclarationPeriod.objects.create(
             year=2025,
-            start_date=date(2025, 1, 1),
-            end_date=date(2025, 3, 31),
+            start_date=date(2025, 4, 1),
+            end_date=date(2026, 3, 31),
         )
 
-    def _call_command(self):
+    def _call_command(self, current_declaration_year=2026):
         """Call the management command with a frozen date and return stdout output."""
-        with patch("tiruert.management.commands.set_operations_expired.date") as mock_date:
+        with (
+            patch("tiruert.management.commands.set_operations_expired.date") as mock_date,
+            patch(
+                "tiruert.management.commands.set_operations_expired.DeclarationPeriodService.get_current_declaration_year",
+                return_value=current_declaration_year,
+            ),
+        ):
             mock_date.today.return_value = FIXED_TODAY
             out = StringIO()
             call_command("set_operations_expired", stdout=out)
@@ -128,6 +134,15 @@ class SetOperationsExpiredIntegrationTest(BaseExpirationTestCase):
         output = self._call_command()
 
         self.assertIn("No active confirmed operations found", output)
+        self.assertFalse(Operation.objects.filter(type=Operation.EXPIRATION).exists())
+
+    def test_no_current_declaration_period(self):
+        """When no current declaration period exists, no operations should be updated."""
+        self._create_incorporation(volume=1000.0)
+
+        output = self._call_command(current_declaration_year=None)
+
+        self.assertIn("No current declaration period", output)
         self.assertFalse(Operation.objects.filter(type=Operation.EXPIRATION).exists())
 
     def test_creates_expiration_for_fully_unused_incorporation(self):

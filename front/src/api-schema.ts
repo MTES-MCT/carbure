@@ -2250,6 +2250,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/fossil-fuels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["resources_fossil_fuels_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/resources/production-sites": {
         parameters: {
             query?: never;
@@ -2726,6 +2742,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/mac-fossil-fuel/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["tiruert_mac_fossil_fuel_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/mac-fossil-fuel/export/": {
         parameters: {
             query?: never;
@@ -2735,6 +2767,22 @@ export interface paths {
         };
         get: operations["tiruert_mac_fossil_fuel_export_retrieve"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tiruert/mac-fossil-fuel/replace/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["tiruert_mac_fossil_fuel_replace_update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4794,6 +4842,7 @@ export interface components {
             debited_entity?: number | null;
             /** Format: double */
             quantity?: number;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
         };
         ElecOperationList: {
             readonly id: number;
@@ -5284,6 +5333,11 @@ export interface components {
          * @enum {string}
          */
         FileTypeEnum: FileTypeEnum;
+        FossilFuel: {
+            readonly id: number;
+            label: string;
+            nomenclature: string;
+        };
         GenericCertificate: {
             certificate_id: string;
             certificate_type: components["schemas"]["CertificateTypeEnum"];
@@ -5367,6 +5421,26 @@ export interface components {
          * @enum {string}
          */
         MPCategoriesEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category;
+        MacFossilFuel: {
+            readonly id: number;
+            fuel: string;
+            operator: string;
+            /** Format: double */
+            volume?: number;
+            period: number;
+            year: number;
+            depot: string | null;
+            /** Format: date */
+            start_date: string;
+            /** Format: date */
+            end_date: string;
+        };
+        MacFossilFuelInputRequest: {
+            fuel: string;
+            month: number;
+            /** Format: double */
+            volume: number;
+        };
         MainObjective: {
             /** Format: double */
             available_balance: number;
@@ -5442,7 +5516,7 @@ export interface components {
         Objective: {
             /** Format: double */
             target_mj: number;
-            target_type: string;
+            target_type: components["schemas"]["TargetTypeEnum"] | null;
             penalty: number;
             /** Format: double */
             target_percent: number;
@@ -5491,6 +5565,7 @@ export interface components {
             readonly type: string;
             status?: components["schemas"]["OperationStatusEnum"];
             readonly sector: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
             readonly biofuel: string;
             /** Format: double */
@@ -5518,6 +5593,7 @@ export interface components {
             readonly avoided_emissions: number;
             readonly unit: string;
             details?: components["schemas"]["OperationDetail"][];
+            readonly year: number | null;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -5548,6 +5624,7 @@ export interface components {
             to_depot?: number | null;
             export_country?: string | null;
             export_recipient?: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLot"][];
             status?: components["schemas"]["OperationStatusEnum"];
         };
@@ -5561,6 +5638,7 @@ export interface components {
             to_depot?: number | null;
             export_country?: string | null;
             export_recipient?: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
         };
@@ -5569,6 +5647,7 @@ export interface components {
             readonly type: string;
             status?: components["schemas"]["OperationStatusEnum"];
             readonly sector: string;
+            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
             readonly biofuel: string;
             /** Format: double */
@@ -5590,6 +5669,7 @@ export interface components {
             details?: components["schemas"]["OperationDetail"][];
             /** Format: double */
             readonly avoided_emissions: number;
+            readonly year: number | null;
         };
         OperationLot: {
             id: number;
@@ -5822,6 +5902,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["EntityProductionSite"][];
+        };
+        PaginatedMacFossilFuelList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["MacFossilFuel"][];
         };
         PaginatedOperationListList: {
             /** @example 123 */
@@ -6423,6 +6518,12 @@ export interface components {
         StatsResponse: {
             metabase_iframe_url: string;
         };
+        /**
+         * @description * `REACH` - Objectif à atteindre
+         *     * `CAP` - Plafond à ne pas dépasser
+         * @enum {string}
+         */
+        TargetTypeEnum: TargetTypeEnum;
         /**
          * @description * `2011` - 2011
          *     * `2020` - 2020
@@ -11615,6 +11716,28 @@ export interface operations {
             };
         };
     };
+    resources_fossil_fuels_list: {
+        parameters: {
+            query?: {
+                /** @description Search within the fields `label` and `nomenclature` */
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FossilFuel"][];
+                };
+            };
+        };
+    };
     resources_production_sites_list: {
         parameters: {
             query?: {
@@ -12949,11 +13072,43 @@ export interface operations {
             };
         };
     };
+    tiruert_mac_fossil_fuel_list: {
+        parameters: {
+            query: {
+                entity_id: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMacFossilFuelList"];
+                };
+            };
+        };
+    };
     tiruert_mac_fossil_fuel_export_retrieve: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description Filter RFCs by year */
+                year: number;
             };
             header?: never;
             path?: never;
@@ -12967,6 +13122,44 @@ export interface operations {
                 };
                 content: {
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    tiruert_mac_fossil_fuel_replace_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                /** @description MAC year. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MacFossilFuelInputRequest"][];
+                "application/x-www-form-urlencoded": components["schemas"]["MacFossilFuelInputRequest"][];
+                "multipart/form-data": components["schemas"]["MacFossilFuelInputRequest"][];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMacFossilFuelList"];
                 };
             };
         };
@@ -13097,6 +13290,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: string[];
             };
             header?: never;
             path?: never;
@@ -13577,6 +13771,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: string[];
             };
             header?: never;
             path?: never;
@@ -13716,6 +13911,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: string[];
             };
             header?: never;
             path?: never;
@@ -14331,7 +14527,8 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     period = "period",
     sector = "sector",
     status = "status",
-    type = "type"
+    type = "type",
+    year = "year"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",
@@ -14592,6 +14789,10 @@ export enum SpreadingManagementMethodsEnum {
     SPREADING_VIA_PROVIDER = "SPREADING_VIA_PROVIDER",
     TRANSFER = "TRANSFER",
     SALE = "SALE"
+}
+export enum TargetTypeEnum {
+    REACH = "REACH",
+    CAP = "CAP"
 }
 export enum TrackedAmendmentTypesEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",

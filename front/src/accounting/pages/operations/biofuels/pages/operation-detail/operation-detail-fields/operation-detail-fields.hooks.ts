@@ -40,7 +40,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
           value: formatQuantityDisplay(operation, formatUnit, true),
         },
       {
-        label: t("Tonnes CO2 eq evitées"),
+        label: t("Tonnes CO2 eq évitées"),
         value: formatNumber(
           formatValue(operation, operation.avoided_emissions),
           {
@@ -60,8 +60,22 @@ export const useOperationDetailFields = (operation?: Operation) => {
         },
       ...exportationOrExpeditionFields,
       typeof operation.durability_period === "string" && {
-        label: t("Déclaration de durabilité"),
-        value: formatPeriod(operation.durability_period),
+        label:
+          operation.type === OperationType.EXPIRATION
+            ? t("Année de durabilité des volumes expirés")
+            : t("Déclaration de durabilité"),
+        value:
+          operation.type === OperationType.EXPIRATION
+            ? operation.durability_period
+            : formatPeriod(operation.durability_period),
+      },
+      typeof operation.year === "number" && {
+        label: t("Année"),
+        value: operation.year,
+      },
+      operation.type === OperationType.TENEUR && {
+        label: t("Objectif de filière IRICC"),
+        value: formatSector(operation.objective_sector ?? operation.sector),
       },
     ])
 

@@ -1,114 +1,12 @@
 import { getBalances } from "accounting/api/biofuels/balances"
 import { getElecBalances } from "accounting/api/elec/balances"
+import { PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by } from "api-schema"
 import { CategoryEnum } from "common/types"
-import {
-  CategoryObjective,
-  Objectives,
-  UnconstrainedCategoryObjective,
-} from "./types"
+import { Objectives } from "./types"
 import { api, getDownloadUrl } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"
-import { CONVERSIONS } from "common/utils/formatters"
 import { OperationUnit } from "accounting/types"
-
-function parseObjectivesResponse(objectives?: apiTypes["ObjectiveOutput"]) {
-  const baseObjective = {
-    global: {
-      target: objectives?.main.target ?? 0,
-      teneur_declared: objectives?.main.declared_teneur ?? 0,
-      teneur_declared_month: objectives?.main.pending_teneur ?? 0,
-      quantity_available: objectives?.main.available_balance ?? 0,
-      target_percent: objectives?.main.target_percent
-        ? objectives?.main.target_percent * 100
-        : 0,
-      penalty: objectives?.main.penalty ?? 0,
-      energy_basis: CONVERSIONS.energy.MJ_TO_GJ(
-        objectives?.main.energy_basis ?? 0
-      ),
-    },
-    sectors:
-      objectives?.sectors.map((sector: apiTypes["ObjectiveSector"]) => ({
-        code: sector.code,
-        target: CONVERSIONS.energy.MJ_TO_GJ(sector.objective.target_mj),
-        teneur_declared: CONVERSIONS.energy.MJ_TO_GJ(sector.declared_teneur),
-        teneur_declared_month: CONVERSIONS.energy.MJ_TO_GJ(
-          sector.pending_teneur
-        ),
-        quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
-          sector.available_balance
-        ),
-        target_percent: sector.objective.target_percent * 100,
-        penalty: sector.objective.penalty ?? 0,
-      })) ?? [],
-  }
-
-  const defaultCategories: {
-    objectivized_categories: CategoryObjective[]
-    capped_categories: CategoryObjective[]
-    unconstrained_categories: UnconstrainedCategoryObjective[]
-  } = {
-    objectivized_categories: [],
-    capped_categories: [],
-    unconstrained_categories: [],
-  }
-
-  const categories =
-    objectives?.categories.reduce(
-      (
-        objCategories: typeof defaultCategories,
-        category: apiTypes["ObjectiveCategory"]
-      ) => {
-        if (
-          category.objective.target_mj &&
-          category.objective.target_mj === 0
-        ) {
-          return objCategories
-        }
-
-        const cat = {
-          code: category.code,
-          target: category.objective.target_mj
-            ? CONVERSIONS.energy.MJ_TO_GJ(category.objective.target_mj)
-            : 0,
-          teneur_declared: CONVERSIONS.energy.MJ_TO_GJ(
-            category.declared_teneur
-          ),
-          teneur_declared_month: CONVERSIONS.energy.MJ_TO_GJ(
-            category.pending_teneur
-          ),
-          quantity_available: CONVERSIONS.energy.MJ_TO_GJ(
-            category.available_balance
-          ),
-          target_percent: category.objective.target_percent * 100,
-          penalty: category.objective.penalty ?? 0,
-        }
-        if (!category.objective.target_mj) {
-          objCategories.unconstrained_categories.push({
-            ...cat,
-            target: null,
-            target_percent: null,
-          })
-        } else {
-          const categoryMapping = {
-            REACH: "objectivized_categories",
-            CAP: "capped_categories",
-          }
-          const categoryType = categoryMapping[
-            category.objective.target_type as keyof typeof categoryMapping
-          ] as "capped_categories" | "objectivized_categories"
-
-          objCategories[categoryType].push(cat)
-        }
-        return objCategories
-      },
-      defaultCategories
-    ) ?? defaultCategories
-
-  return {
-    ...baseObjective,
-    ...categories,
-  }
-}
+import { parseObjectivesResponse } from "./utils/parse-objectives-response"
 
 export const getObjectives = async (
   entity_id: number,
@@ -148,7 +46,15 @@ export const getBalancesCategory = async (
 export const getBiofuelBalance = async (entity_id: number) => {
   return getBalances<apiTypes["Balance"]>({
     entity_id,
-    unit: OperationUnit.gj,
+    unit: OperationUnit.MJ,
+  })
+}
+
+export const getBiofuelBalancePerSector = async (entity_id: number) => {
+  return getBalances<apiTypes["BalanceBySector"]>({
+    entity_id,
+    unit: OperationUnit.MJ,
+    group_by: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by.sector,
   })
 }
 
@@ -175,5 +81,54 @@ export const validateTeneurElec = async (entity_id: number) => {
   })
 }
 
-export const downloadMacFossilFuel = (entity_id: number) =>
-  getDownloadUrl("/tiruert/mac-fossil-fuel/export/", { entity_id })
+export const downloadMacFossilFuel = (entity_id: number, year: number) =>
+  getDownloadUrl("/tiruert/mac-fossil-fuel/export/", { entity_id, year })
+
+export type MacFossilFuel = {
+  fuel: string
+  volume: number
+  year: number
+  month: number
+}
+
+export const getMacFossilFuels = async (
+  entity_id: number,
+  year: number
+): Promise<MacFossilFuel[]> => {
+  return api
+    .GET("/tiruert/mac-fossil-fuel/", {
+      params: {
+        query: {
+          entity_id: `${entity_id}`,
+          year,
+          page_size: 1000,
+        },
+      },
+    })
+    .then(
+      (res) =>
+        res.data?.results.map((mac) => ({
+          fuel: mac.fuel,
+          volume: mac.volume ?? 0,
+          year: mac.year,
+          month: mac.period % 100,
+        })) ?? []
+    )
+}
+
+export const replaceMacFossilFuels = async (
+  entity_id: number,
+  year: number,
+  macs: apiTypes["MacFossilFuelInputRequest"][]
+) => {
+  return api.PUT("/tiruert/mac-fossil-fuel/replace/", {
+    params: {
+      query: {
+        entity_id,
+        year,
+      },
+    },
+    body: macs,
+    bodySerializer: JSON.stringify,
+  })
+}

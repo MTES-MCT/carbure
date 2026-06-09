@@ -5,12 +5,13 @@ import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { formatNumber, formatUnit } from "common/utils/formatters"
+import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
 import {
+  BiofuelUnconstrainedCategoryObjective,
   CategoryObjective,
   MainObjective,
-  UnconstrainedCategoryObjective,
+  TargetType,
 } from "../../types"
 import { useMemo } from "react"
 import { computeObjectiveEnergy } from "../../utils/formatters"
@@ -79,7 +80,7 @@ export const useRemainingCO2Objective = (
       0,
       mainObjective.target -
         mainObjective.teneur_declared -
-        mainObjective.teneur_declared_month -
+        mainObjective.pending_teneur -
         avoidedEmissions
     )
     return formatNumber(remainingCO2, {
@@ -89,22 +90,24 @@ export const useRemainingCO2Objective = (
   }, [mainObjective, values.avoided_emissions])
 }
 
-// Compute the remaining energy before the limit or the objective after the quantity has been declared
-export const useRemainingEnergyBeforeLimitOrObjective = (
-  objective: CategoryObjective | UnconstrainedCategoryObjective,
+export const useCalculateQuantityMax = (
+  objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective,
   values: DeclareTeneurDialogForm
 ) => {
+  const availableBalance = values.balance?.available_balance
+
   return useMemo(() => {
-    // Add quantity declared only if the "declare quantity" button has been clicked
-    const quantity = values.quantity ?? 0
+    if (availableBalance === undefined) {
+      return 0
+    }
 
-    const remainingEnergy = Math.max(
-      0,
-      objective.target ? computeObjectiveEnergy(objective) - quantity : 0
-    )
+    // if the objective is a cap or there is no target, the maximum quantity is the available balance
+    if (!objective.target || objective.target_type === TargetType.REACH) {
+      return floorNumber(availableBalance, 0)
+    }
 
-    return formatUnit(remainingEnergy, ExtendedUnit.GJ, {
-      fractionDigits: 0,
-    })
-  }, [values.quantity, objective])
+    const remainingObjectiveEnergy = computeObjectiveEnergy(objective)
+
+    return floorNumber(Math.min(availableBalance, remainingObjectiveEnergy), 0)
+  }, [objective, availableBalance])
 }

@@ -1,5 +1,6 @@
 from datetime import date
 from io import BytesIO
+from unittest.mock import patch
 
 import openpyxl
 from django.test import TestCase
@@ -7,8 +8,8 @@ from django.test import TestCase
 from core.models import Entity, UserRights
 from core.tests_utils import PermissionTestMixin, setup_current_user
 from tiruert.models import FossilFuel, FossilFuelCategory, MacFossilFuel
-from tiruert.permissions import HasTiruertRightsObjectives
-from tiruert.views import MacFossilFuelExportViewSet
+from tiruert.permissions import HasTiruertRightsObjectives, HasTiruertWriteRights
+from tiruert.views import MacFossilFuelViewSet
 
 
 class MacFossilFuelExportEndpointSecurityTest(TestCase):
@@ -32,7 +33,7 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         )
 
         category = FossilFuelCategory.objects.create(name="Essence", pci_litre=32.0)
-        fuel = FossilFuel.objects.create(
+        self.fuel = FossilFuel.objects.create(
             label="SP95",
             nomenclature="SP95",
             fuel_category=category,
@@ -41,7 +42,7 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         )
 
         MacFossilFuel.objects.create(
-            fuel=fuel,
+            fuel=self.fuel,
             operator=self.allowed_entity,
             volume=100.0,
             period=1,
@@ -50,7 +51,7 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
             end_date=date(2023, 1, 31),
         )
         MacFossilFuel.objects.create(
-            fuel=fuel,
+            fuel=self.fuel,
             operator=self.other_entity,
             volume=200.0,
             period=1,
@@ -80,6 +81,16 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_authenticated_user_can_export_own_entity_macs(self):
+        MacFossilFuel.objects.create(
+            fuel=self.fuel,
+            operator=self.allowed_entity,
+            volume=50.0,
+            period=2,
+            year=2023,
+            start_date=date(2023, 2, 1),
+            end_date=date(2023, 2, 28),
+        )
+
         response = self.client.get(self.url, {"entity_id": self.allowed_entity.id, "year": 2023})
 
         self.assertEqual(response.status_code, 200)
@@ -91,19 +102,82 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
         workbook = openpyxl.load_workbook(BytesIO(response.content))
         sheet = workbook.active
 
-        # Header + 1 ligne de MAC pour l'entité autorisée
+        # Header + 1 ligne de MAC agrégée pour l'entité autorisée
         self.assertEqual(sheet.max_row, 2)
         self.assertEqual(sheet.cell(row=2, column=2).value, self.allowed_entity.name)
+        self.assertEqual(sheet.cell(row=2, column=4).value, 150.0)
+        self.assertEqual(sheet.cell(row=2, column=5).value, 2023)
+
+    def test_authenticated_user_can_list_own_entity_macs(self):
+        response = self.client.get("/api/tiruert/mac-fossil-fuel/", {"entity_id": self.allowed_entity.id, "year": 2023})
+
+        self.assertEqual(response.status_code, 200)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["operator"], self.allowed_entity.name)
+        self.assertEqual(results[0]["volume"], 100.0)
+
+    @patch("tiruert.views.mac_fossil_fuel.mixins.replace.DeclarationPeriodService.get_current_declaration_year")
+    def test_authenticated_user_can_replace_own_entity_macs(self, get_current_declaration_year):
+        get_current_declaration_year.return_value = 2023
+
+        response = self.client.put(
+            "/api/tiruert/mac-fossil-fuel/replace/",
+            data=[
+                {"fuel": "SP95", "month": 1, "volume": 300.0},
+                {"fuel": "SP95", "month": 2, "volume": 400.0},
+            ],
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.allowed_entity.id}&year=2023",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MacFossilFuel.objects.filter(operator=self.allowed_entity, year=2023).count(), 2)
+        self.assertTrue(MacFossilFuel.objects.filter(operator=self.other_entity, year=2023, volume=200.0).exists())
+        self.assertEqual(
+            list(
+                MacFossilFuel.objects.filter(operator=self.allowed_entity, year=2023)
+                .order_by("period")
+                .values_list("period", "volume")
+            ),
+            [(202301, 300.0), (202302, 400.0)],
+        )
+
+    @patch("tiruert.views.mac_fossil_fuel.mixins.replace.DeclarationPeriodService.get_current_declaration_year")
+    def test_authenticated_user_cannot_replace_macs_for_years_before_current_declaration_year(
+        self, get_current_declaration_year
+    ):
+        get_current_declaration_year.return_value = 2024
+
+        response = self.client.put(
+            "/api/tiruert/mac-fossil-fuel/replace/",
+            data=[
+                {"fuel": "SP95", "month": 1, "volume": 300.0},
+            ],
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.allowed_entity.id}&year=2023",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json(),
+            {"year": "MACs can only be modified for the currently active declaration year onward"},
+        )
+        self.assertTrue(MacFossilFuel.objects.filter(operator=self.allowed_entity, year=2023, volume=100.0).exists())
 
 
 class MacFossilFuelExportViewSetPermissionsTest(TestCase, PermissionTestMixin):
     def test_mac_fossil_fuel_export_uses_objectives_permission(self):
         self.assertViewPermissions(
-            MacFossilFuelExportViewSet,
+            MacFossilFuelViewSet,
             [
                 (
-                    ["export_macfossilfuel_to_excel"],
+                    ["export_macfossilfuel_to_excel", "list"],
                     [HasTiruertRightsObjectives()],
+                ),
+                (
+                    ["replace"],
+                    [HasTiruertWriteRights()],
                 ),
             ],
         )

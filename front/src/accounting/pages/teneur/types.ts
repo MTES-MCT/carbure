@@ -1,16 +1,32 @@
 import { ElecOperationSector, OperationSector } from "accounting/types"
 import { CategoryEnum } from "common/types"
+import { apiTypes } from "common/services/api-fetch.types"
+
+export { TargetTypeEnum as TargetType } from "api-schema"
+
+export type FossilFuel = apiTypes["FossilFuel"]
+
+export interface ObjectiveProgress {
+  total_teneur_declared: number
+  base_quantity: number
+  target_quantity: number
+  declared_quantity: number
+  remaining_energy: number
+  is_objective_met: boolean
+}
 
 export interface BaseObjective {
   target: number
   teneur_declared: number // GJ
   quantity_available: number // GJ
-  teneur_declared_month: number // GJ
+  pending_teneur: number // GJ
   target_percent: number
   penalty: number // euro cents
+  progress: ObjectiveProgress
 }
 export interface CategoryObjective extends BaseObjective {
   code: CategoryEnum
+  target_type: apiTypes["Objective"]["target_type"]
 }
 
 export interface SectorObjective extends BaseObjective {
@@ -48,9 +64,4 @@ export interface Objectives {
   capped_categories: CategoryObjective[]
   objectivized_categories: CategoryObjective[]
   unconstrained_categories: UnconstrainedCategoryObjective[]
-}
-
-export enum TargetType {
-  REACH = "REACH",
-  CAP = "CAP",
 }

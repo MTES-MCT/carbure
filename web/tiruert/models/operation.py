@@ -22,6 +22,9 @@ class OperationManager(models.Manager):
                 "created_at",
                 "renewable_energy_share",
                 "export_recipient",
+                "objective_sector",
+                "durability_period",
+                "declaration_year",
                 # Relations nécessaires
                 "biofuel_id",
                 "credited_entity_id",
@@ -144,6 +147,9 @@ class Operation(models.Model):
     renewable_energy_share = models.FloatField(default=1)
     durability_period = models.CharField(max_length=6, blank=True, null=True)
 
+    # Allows overriding the sector objective, when the declared sector differs from the natural sector of the biofuel
+    objective_sector = models.CharField(max_length=20, choices=SECTOR_CODE_CHOICES, null=True, blank=True)
+
     objects = OperationManager()
 
     @property
@@ -169,6 +175,16 @@ class Operation(models.Model):
     @property
     def avoided_emissions(self):
         return round(sum(detail.avoided_emissions for detail in self.details.all()), 2)  # in tCO2
+
+    @property
+    def year(self) -> int | None:
+        from tiruert.services import operation_year
+
+        return operation_year.resolve(
+            self.type,
+            self.durability_period,
+            self.declaration_year,
+        )
 
     class Meta:
         db_table = "tiruert_operations"

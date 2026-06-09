@@ -229,6 +229,37 @@ class OperationInputSerializerCreateTest(TestCase):
         result = serializer.validate_type(Operation.API_CREATABLE_TYPES[0])
         self.assertEqual(result, Operation.API_CREATABLE_TYPES[0])
 
+    def test_objective_sector_invalid_on_non_teneur(self):
+        """objective_sector must be rejected when type is not TENEUR."""
+        serializer = OperationInputSerializer()
+        data = {
+            "type": Operation.TRANSFERT,
+            "objective_sector": Operation.ESSENCE,
+            "customs_category": "CONV",
+            "biofuel": 1,
+            "debited_entity": 1,
+            "lots": [],
+        }
+        with self.assertRaises(Exception):
+            serializer.validate(data)
+
+    def test_objective_sector_accepted_on_teneur(self):
+        """objective_sector must be accepted when type is TENEUR."""
+        serializer = OperationInputSerializer()
+        data = {
+            "type": Operation.TENEUR,
+            "objective_sector": Operation.ESSENCE,
+        }
+        result = serializer.validate(data)
+        self.assertEqual(result["objective_sector"], Operation.ESSENCE)
+
+    def test_objective_sector_optional_on_teneur(self):
+        """objective_sector can be absent or None on a TENEUR operation."""
+        serializer = OperationInputSerializer()
+        data = {"type": Operation.TENEUR}
+        result = serializer.validate(data)
+        self.assertEqual(result, data)
+
 
 class OperationUpdateSerializerTest(TestCase):
     """Tests for OperationUpdateSerializer field restrictions."""

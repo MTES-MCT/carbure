@@ -61,6 +61,7 @@ class ElecOperationInputSerializer(serializers.ModelSerializer):
             "credited_entity",
             "debited_entity",
             "quantity",
+            "objective_sector",
         ]
 
     def create(self, validated_data):

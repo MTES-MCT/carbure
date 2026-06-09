@@ -34,7 +34,7 @@ class ObjectiveSerializerTest(TestCase):
         """Test ObjectiveSerializer rounds float values when serializing."""
         instance = {
             "target_mj": 1000000.12345,
-            "target_type": "MIN",
+            "target_type": "REACH",
             "penalty": 50,
             "target_percent": 0.15,
         }
@@ -43,7 +43,7 @@ class ObjectiveSerializerTest(TestCase):
         data = serializer.data
 
         self.assertIn("target_mj", data)
-        self.assertEqual(data["target_type"], "MIN")
+        self.assertEqual(data["target_type"], "REACH")
 
     def test_missing_required_fields_are_invalid(self):
         """Test ObjectiveSerializer requires all fields."""
@@ -77,7 +77,7 @@ class ObjectiveSectorSerializerTest(TestCase):
             "unit": "mj",
             "objective": {
                 "target_mj": 8000.0,
-                "target_type": "MIN",
+                "target_type": "REACH",
                 "penalty": 50,
                 "target_percent": 0.08,
             },
@@ -98,7 +98,7 @@ class ObjectiveSectorSerializerTest(TestCase):
             "unit": "mj",
             "objective": {
                 "target_mj": 8000.0,
-                "target_type": "MIN",
+                "target_type": "REACH",
                 "penalty": 50,
                 "target_percent": 0.08,
             },
@@ -119,7 +119,7 @@ class ObjectiveSectorSerializerTest(TestCase):
             "unit": "mj",
             "objective": {
                 "target_mj": 8000.0,
-                "target_type": "MIN",
+                "target_type": "REACH",
                 "penalty": 50,
                 "target_percent": 0.08,
             },
@@ -142,7 +142,7 @@ class ObjectiveSectorSerializerTest(TestCase):
             "unit": "mj",
             "objective": {
                 "target_mj": 8000.0,
-                "target_type": "MIN",
+                "target_type": "REACH",
                 "penalty": 50,
                 "target_percent": 0.08,
             },
@@ -311,7 +311,7 @@ class ObjectiveOutputSerializerTest(TestCase):
                     "unit": "mj",
                     "objective": {
                         "target_mj": 100000.0,
-                        "target_type": "MIN",
+                        "target_type": "REACH",
                         "penalty": 50,
                         "target_percent": 0.1,
                     },
@@ -386,7 +386,7 @@ class ObjectiveOutputSerializerTest(TestCase):
                     "unit": "mj",
                     "objective": {
                         "target_mj": 100000.0,
-                        "target_type": "MIN",
+                        "target_type": "REACH",
                         "penalty": 50,
                         "target_percent": 0.1,
                     },
@@ -399,7 +399,7 @@ class ObjectiveOutputSerializerTest(TestCase):
                     "unit": "mj",
                     "objective": {
                         "target_mj": 80000.0,
-                        "target_type": "MIN",
+                        "target_type": "REACH",
                         "penalty": 50,
                         "target_percent": 0.08,
                     },
@@ -427,7 +427,7 @@ class ObjectiveOutputSerializerTest(TestCase):
                     "unit": "mj",
                     "objective": {
                         "target_mj": 60000.0,
-                        "target_type": "MIN",
+                        "target_type": "REACH",
                         "penalty": 75,
                         "target_percent": 0.035,
                     },

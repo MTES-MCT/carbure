@@ -1,5 +1,7 @@
 from django.db import models
 
+from tiruert.models.operation import Operation
+
 
 class ElecOperationManager(models.Manager):
     def get_queryset(self):
@@ -14,6 +16,7 @@ class ElecOperationManager(models.Manager):
                 "status",
                 "created_at",
                 "quantity",
+                "objective_sector",
                 # Relations nécessaires
                 "credited_entity_id",
                 "debited_entity_id",
@@ -61,6 +64,8 @@ class ElecOperation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     quantity = models.FloatField(default=0)  # unit = MJ
+
+    objective_sector = models.CharField(max_length=20, choices=Operation.SECTOR_CODE_CHOICES, null=True, blank=True)
 
     @property
     def avoided_emissions(self):

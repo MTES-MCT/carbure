@@ -35,6 +35,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
+    year = serializers.SerializerMethodField()
 
     def get_volume_l(self, instance) -> float:
         return instance.volume_l
@@ -48,6 +49,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
     def get_avoided_emissions(self, instance) -> float:
         return instance.avoided_emissions
+
+    def get_year(self, instance) -> int | None:
+        return instance.year
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -64,6 +68,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "type",
             "status",
             "sector",
+            "objective_sector",
             "customs_category",
             "biofuel",
             "renewable_energy_share",
@@ -79,6 +84,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "unit",
             "details",
             "avoided_emissions",
+            "year",
         ]
 
 
@@ -90,6 +96,7 @@ class OperationSerializer(BaseOperationSerializer):
             "type",
             "status",
             "sector",
+            "objective_sector",
             "customs_category",
             "biofuel",
             "renewable_energy_share",
@@ -109,6 +116,7 @@ class OperationSerializer(BaseOperationSerializer):
             "avoided_emissions",
             "unit",
             "details",
+            "year",
         ]
 
     quantity_mj = serializers.SerializerMethodField()
@@ -136,6 +144,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "to_depot",
             "export_country",
             "export_recipient",
+            "objective_sector",
             "lots",
             "status",
         ]
@@ -154,6 +163,13 @@ class OperationInputSerializer(serializers.ModelSerializer):
         if value not in Operation.API_CREATABLE_TYPES:
             raise serializers.ValidationError("error : OPERATION_TYPE_NOT_AUTHORIZED")
         return value
+
+    def validate(self, data):
+        if data.get("objective_sector") and data.get("type") != Operation.TENEUR:
+            raise serializers.ValidationError(
+                {"declared_sector": "objective_sector ne peut être défini que pour les opérations de type TENEUR"}
+            )
+        return data
 
     def create(self, validated_data):
         with transaction.atomic():
