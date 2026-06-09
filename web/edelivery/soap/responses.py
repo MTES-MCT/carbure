@@ -6,6 +6,7 @@ from edelivery.ebms.request_responses.base_request_response import BaseRequestRe
 
 class BaseEdeliveryResponse:
     NAMESPACES = {
+        "header": "http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/",
         "soap": "http://www.w3.org/2003/05/soap-envelope",
         "ws": "http://eu.domibus.wsplugin/",
     }
@@ -64,6 +65,13 @@ class RetrieveMessageResponse(BaseEdeliveryResponse):
     def attachment_value(self):
         value_element = self.find_element("soap:Body/ws:retrieveMessageResponse/payload/value")
         return value_element.text
+
+    def conversation_id(self):
+        conversation_id_element_path = (
+            "soap:Header/header:Messaging/header:UserMessage/header:CollaborationInfo/header:ConversationId"
+        )
+        conversation_id_element = self.find_element(conversation_id_element_path)
+        return conversation_id_element.text
 
 
 class SubmitMessageResponse(BaseEdeliveryResponse):

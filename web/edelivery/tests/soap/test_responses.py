@@ -52,11 +52,19 @@ class ListPendingMessagesResponseTest(TestCase):
 
 class RetrieveMessageResponseTest(TestCase):
     @staticmethod
-    def response_payload(attachment_value=""):
+    def response_payload(conversation_id="", attachment_value=""):
         return f"""\
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
   <soap:Header>
-    <!-- … -->
+    <header:Messaging xmlns:header="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/">
+      <header:UserMessage>
+        <header:CollaborationInfo>
+          <header:ConversationId>{conversation_id}</header:ConversationId>
+          <!-- … -->
+        </header:CollaborationInfo>
+        <!-- … -->
+      </header:UserMessage>
+    </header:Messaging>
   </soap:Header>
   <soap:Body>
     <ns4:retrieveMessageResponse xmlns:ns4="http://eu.domibus.wsplugin/">
@@ -69,6 +77,7 @@ class RetrieveMessageResponseTest(TestCase):
 
     def setUp(self):
         self.patched_unzip = patch("edelivery.soap.responses.unzip_base64_encoded_stream").start()
+        self.patched_unzip.return_value = "<defaultResponse />"
 
     def tearDown(self):
         patch.stopall()
@@ -79,10 +88,14 @@ class RetrieveMessageResponseTest(TestCase):
         self.assertIsInstance(response.request_response, BaseRequestResponse)
         self.assertEqual("<response/>", response.request_response.payload)
 
+    def test_knows_its_conversation_id(self):
+        response = RetrieveMessageResponse(self.response_payload(conversation_id="12345"))
+        self.assertEqual("12345", response.conversation_id())
+
     def test_extracts_zipped_response(self):
         self.patched_unzip.return_value = "<response/>"
 
-        response = RetrieveMessageResponse(self.response_payload("Base64EncodedZippedArchive"))
+        response = RetrieveMessageResponse(self.response_payload(attachment_value="Base64EncodedZippedArchive"))
         self.patched_unzip.assert_called_with("Base64EncodedZippedArchive")
         self.assertEqual("<response/>", response.contents)
 
