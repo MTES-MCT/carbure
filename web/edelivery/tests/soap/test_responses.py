@@ -1,7 +1,6 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.ebms.request_responses.base_request_response import BaseRequestResponse
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
 
@@ -82,12 +81,6 @@ class RetrieveMessageResponseTest(TestCase):
     def tearDown(self):
         patch.stopall()
 
-    def test_initializes_request_response(self):
-        self.patched_unzip.return_value = "<response/>"
-        response = RetrieveMessageResponse(self.response_payload())
-        self.assertIsInstance(response.request_response, BaseRequestResponse)
-        self.assertEqual("<response/>", response.request_response.payload)
-
     def test_knows_its_conversation_id(self):
         response = RetrieveMessageResponse(self.response_payload(conversation_id="12345"))
         self.assertEqual("12345", response.conversation_id())
@@ -97,13 +90,11 @@ class RetrieveMessageResponseTest(TestCase):
 
         response = RetrieveMessageResponse(self.response_payload(attachment_value="Base64EncodedZippedArchive"))
         self.patched_unzip.assert_called_with("Base64EncodedZippedArchive")
-        self.assertEqual("<response/>", response.contents)
+        self.assertEqual("<response/>", response.request_response_payload)
 
     def test_does_not_extract_response_if_error_response(self):
         payload = response_error_payload("WS_PLUGIN:1234", "Some error message")
         response = RetrieveMessageResponse(payload)
-        self.assertIsNone(response.contents)
-        self.assertIsNone(response.request_response)
         self.assertIsNone(response.request_response_payload)
 
 
