@@ -8,21 +8,20 @@ from edelivery.soap.requester import Requester
 
 
 class MockResponse:
-    def __init__(self, response_id, post_retrieval_action_result_value):
-        self.response_id = response_id
+    def __init__(self, post_retrieval_action_result_value):
         self.post_retrieval_action_result_value = post_retrieval_action_result_value
-
-    def request_id(self):
-        return self.response_id
 
     def post_retrieval_action_result(self):
         return self.post_retrieval_action_result_value
 
 
+MATCHING_ID = "111"
+
+
 @patch.dict("os.environ", {"UDB_ACCESS_POINT_ID": "UDB"})
 class RequesterTest(TestCase):
     @staticmethod
-    def message_received(conversation_id="111", payload="<defaultResponse/>"):
+    def message_received(conversation_id=MATCHING_ID, payload="<defaultResponse/>"):
         return json.dumps({"conversation_id": conversation_id, "payload": payload})
 
     def setUp(self):
@@ -32,10 +31,10 @@ class RequesterTest(TestCase):
         self.patched_PubSubAdapter.return_value.next_message.return_value = self.message_received()
 
         self.patched_new_uuid = patch("edelivery.ebms.requests.base_request.new_uuid").start()
-        self.patched_new_uuid.return_value = "111"
+        self.patched_new_uuid.return_value = MATCHING_ID
 
         self.patched_ResponseFactory = patch("edelivery.soap.requester.ResponseFactory").start()
-        self.patched_ResponseFactory.return_value.response.return_value = MockResponse("111", "Some result")
+        self.patched_ResponseFactory.return_value.response.return_value = MockResponse("Some result")
 
     def tearDown(self):
         patch.stopall()
@@ -80,7 +79,7 @@ class RequesterTest(TestCase):
         self.patched_ResponseFactory.assert_called_with(BaseRequestResponse, "<response/>")
 
     def test_returns_result_of_action_triggered_upon_receiving_response_from_udb(self):
-        self.patched_ResponseFactory.return_value.response.return_value = MockResponse("111", "Some result")
+        self.patched_ResponseFactory.return_value.response.return_value = MockResponse("Some result")
 
         request = BaseRequest("<request/>")
         requester = Requester(request)
@@ -95,7 +94,7 @@ class RequesterTest(TestCase):
         self.assertRaises(TimeoutError, requester.do_request)
 
     def test_retries_few_times_before_throwing_timeout_error(self):
-        self.patched_ResponseFactory.return_value.response.return_value = MockResponse("111", "Some result")
+        self.patched_ResponseFactory.return_value.response.return_value = MockResponse("Some result")
         self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, self.message_received()]
 
         request = BaseRequest("<request/>")
