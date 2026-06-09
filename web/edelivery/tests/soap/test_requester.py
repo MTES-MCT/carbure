@@ -24,7 +24,7 @@ class RequesterTest(TestCase):
         patch("edelivery.soap.requester.sleep").start()
         self.patched_PubSubAdapter = patch("edelivery.soap.requester.PubSubAdapter").start()
         self.patched_SubmitMessage = patch("edelivery.soap.requester.SubmitMessage").start()
-        self.patched_PubSubAdapter.return_value.next_message.return_value = "<response/>"
+        self.patched_PubSubAdapter.return_value.next_message.return_value = '{"payload": "<defaultResponse />"}'
 
         self.patched_new_uuid = patch("edelivery.ebms.requests.base_request.new_uuid").start()
         self.patched_new_uuid.return_value = "111"
@@ -52,7 +52,7 @@ class RequesterTest(TestCase):
 
         def log_next_message_call():
             commands_called.append("fetch message")
-            return "<response/>"
+            return '{"payload": "<response/>"}'
 
         self.patched_PubSubAdapter.return_value.next_message = log_next_message_call
         self.patched_PubSubAdapter.return_value.unsubscribe = lambda: commands_called.append("unsubscribe")
@@ -65,7 +65,7 @@ class RequesterTest(TestCase):
         self.assertEqual(["fetch message", "unsubscribe"], commands_called)
 
     def test_instantiates_response_object_with_proper_class_and__received_message(self):
-        self.patched_PubSubAdapter.return_value.next_message.return_value = "<response/>"
+        self.patched_PubSubAdapter.return_value.next_message.return_value = '{"payload": "<response/>"}'
 
         request = BaseRequest("<request/>")
         requester = Requester(request)
@@ -91,7 +91,7 @@ class RequesterTest(TestCase):
 
     def test_retries_few_times_before_throwing_timeout_error(self):
         self.patched_ResponseFactory.return_value.response.return_value = MockResponse("111", "Some result")
-        self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, "<response/>"]
+        self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, '{"payload": "<response/>"}']
 
         request = BaseRequest("<request/>")
         requester = Requester(request)

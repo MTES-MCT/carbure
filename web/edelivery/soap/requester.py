@@ -1,3 +1,4 @@
+import json
 from os import environ
 from time import sleep
 
@@ -21,7 +22,9 @@ class Requester:
                 tried += 1
                 message = self.pub_sub_adapter.next_message()
                 if message is not None:
-                    factory = ResponseFactory(self.request.response_class, message)
+                    message_as_json = json.loads(message)
+                    payload = message_as_json["payload"]
+                    factory = ResponseFactory(self.request.response_class, payload)
                     candidate = factory.response()
                     if candidate.request_id() == self.request.id:
                         return candidate

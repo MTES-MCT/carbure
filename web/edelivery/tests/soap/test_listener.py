@@ -10,7 +10,10 @@ class ListenerTest(TestCase):
         self.patched_ListPendingMessages = patch("edelivery.soap.listener.ListPendingMessages").start()
         self.patched_PubSubAdapter = patch("edelivery.soap.listener.PubSubAdapter").start()
         self.patched_PubSubAdapter.return_value.next_message.return_value = None
-        self.patched_RetrieveMessage = patch("edelivery.soap.listener.RetrieveMessage").start()
+        self.patched_RetrieveMessage = patch(
+            "edelivery.soap.listener.RetrieveMessage",
+            **{"return_value.perform.return_value.request_response_payload": ""},
+        ).start()
         self.patched_sleep = patch("edelivery.soap.listener.sleep").start()
         self.patched_log_exception = patch("edelivery.soap.listener.log_exception").start()
 
@@ -50,7 +53,7 @@ class ListenerTest(TestCase):
         publish.assert_not_called()
 
         listener.poll_once()
-        publish.assert_called_with("<response/>")
+        publish.assert_called_with('{"payload": "<response/>"}')
 
     def test_starts_when_asked_and_polls_eDelivery_layer_every_second(self):
         commands_called = []

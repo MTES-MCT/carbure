@@ -1,3 +1,4 @@
+import json
 from os import environ
 from time import sleep
 
@@ -33,7 +34,8 @@ class Listener:
         if list.pending_message_present():
             id = list.next_pending_message_id()
             payload = RetrieveMessage(id).perform().request_response_payload
-            self.pub_sub_adapter.publish(payload)
+            message = json.dumps({"payload": payload})
+            self.pub_sub_adapter.publish(message)
 
     def start(self):
         self.started = True
