@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -20,11 +21,15 @@ class MockResponse:
 
 @patch.dict("os.environ", {"UDB_ACCESS_POINT_ID": "UDB"})
 class RequesterTest(TestCase):
+    @staticmethod
+    def message_received(conversation_id="111", payload="<defaultResponse/>"):
+        return json.dumps({"conversation_id": conversation_id, "payload": payload})
+
     def setUp(self):
         patch("edelivery.soap.requester.sleep").start()
         self.patched_PubSubAdapter = patch("edelivery.soap.requester.PubSubAdapter").start()
         self.patched_SubmitMessage = patch("edelivery.soap.requester.SubmitMessage").start()
-        self.patched_PubSubAdapter.return_value.next_message.return_value = '{"payload": "<defaultResponse />"}'
+        self.patched_PubSubAdapter.return_value.next_message.return_value = self.message_received()
 
         self.patched_new_uuid = patch("edelivery.ebms.requests.base_request.new_uuid").start()
         self.patched_new_uuid.return_value = "111"
@@ -52,7 +57,7 @@ class RequesterTest(TestCase):
 
         def log_next_message_call():
             commands_called.append("fetch message")
-            return '{"payload": "<response/>"}'
+            return self.message_received()
 
         self.patched_PubSubAdapter.return_value.next_message = log_next_message_call
         self.patched_PubSubAdapter.return_value.unsubscribe = lambda: commands_called.append("unsubscribe")
@@ -65,7 +70,7 @@ class RequesterTest(TestCase):
         self.assertEqual(["fetch message", "unsubscribe"], commands_called)
 
     def test_instantiates_response_object_with_proper_class_and__received_message(self):
-        self.patched_PubSubAdapter.return_value.next_message.return_value = '{"payload": "<response/>"}'
+        self.patched_PubSubAdapter.return_value.next_message.return_value = self.message_received(payload="<response/>")
 
         request = BaseRequest("<request/>")
         requester = Requester(request)
@@ -91,7 +96,7 @@ class RequesterTest(TestCase):
 
     def test_retries_few_times_before_throwing_timeout_error(self):
         self.patched_ResponseFactory.return_value.response.return_value = MockResponse("111", "Some result")
-        self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, '{"payload": "<response/>"}']
+        self.patched_PubSubAdapter.return_value.next_message.side_effect = [None, self.message_received()]
 
         request = BaseRequest("<request/>")
         requester = Requester(request)
@@ -99,8 +104,10 @@ class RequesterTest(TestCase):
         self.assertEqual("Some result", result)
 
     @patch("edelivery.ebms.requests.base_request.new_uuid")
-    def test_checks_whether_request_ids_correspond(self, patched_new_uuid):
-        self.patched_ResponseFactory.return_value.response.return_value = MockResponse("different_request_id", "Some result")
+    def test_checks_whether_conversation_ids_correspond(self, patched_new_uuid):
+        self.patched_PubSubAdapter.return_value.next_message.return_value = self.message_received(
+            conversation_id="different_id",
+        )
         request = BaseRequest("<request/>")
         requester = Requester(request, delay_between_retries=0.001, timeout=0.002)
 

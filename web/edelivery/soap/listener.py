@@ -33,8 +33,10 @@ class Listener:
         list = ListPendingMessages().perform()
         if list.pending_message_present():
             id = list.next_pending_message_id()
-            payload = RetrieveMessage(id).perform().request_response_payload
-            message = json.dumps({"payload": payload})
+            response = RetrieveMessage(id).perform()
+            conversation_id = response.conversation_id()
+            payload = response.request_response_payload
+            message = json.dumps({"conversation_id": conversation_id, "payload": payload})
             self.pub_sub_adapter.publish(message)
 
     def start(self):
