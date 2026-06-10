@@ -506,9 +506,13 @@ paths:
               enum:
                 - DECLARED
                 - IN_PROGRESS
+                - NOT_STARTED
+                - OVERDUE
           description: |-
             * `IN_PROGRESS` - IN_PROGRESS
             * `DECLARED` - DECLARED
+            * `OVERDUE` - OVERDUE
+            * `NOT_STARTED` - NOT_STARTED
           explode: true
           style: form
         - in: query
@@ -594,9 +598,13 @@ paths:
               enum:
                 - DECLARED
                 - IN_PROGRESS
+                - NOT_STARTED
+                - OVERDUE
           description: |-
             * `IN_PROGRESS` - IN_PROGRESS
             * `DECLARED` - DECLARED
+            * `OVERDUE` - OVERDUE
+            * `NOT_STARTED` - NOT_STARTED
           explode: true
           style: form
         - in: query
@@ -2084,6 +2092,28 @@ paths:
           explode: true
           style: form
         - in: query
+          name: tariff_reference
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              title: Référence de l'arrêté tarifaire
+              enum:
+                - ""
+                - "2011"
+                - "2020"
+                - "2021"
+                - "2023"
+                - null
+          description: |-
+            * `2011` - 2011
+            * `2020` - 2020
+            * `2021` - 2021
+            * `2023` - 2023
+          explode: true
+          style: form
+        - in: query
           name: year
           schema:
             type: integer
@@ -2432,6 +2462,7 @@ paths:
               - feedstock
               - producer_name
               - source
+              - tariff_reference
           description: Filter string to apply
           required: true
         - name: ordering
@@ -2477,6 +2508,28 @@ paths:
           explode: true
           style: form
         - in: query
+          name: tariff_reference
+          schema:
+            type: array
+            items:
+              type: string
+              nullable: true
+              title: Référence de l'arrêté tarifaire
+              enum:
+                - ""
+                - "2011"
+                - "2020"
+                - "2021"
+                - "2023"
+                - null
+          description: |-
+            * `2011` - 2011
+            * `2020` - 2020
+            * `2021` - 2021
+            * `2023` - 2023
+          explode: true
+          style: form
+        - in: query
           name: year
           schema:
             type: integer
@@ -2502,6 +2555,7 @@ paths:
                     - feedstock
                     - producer_name
                     - source
+                    - tariff_reference
                   summary: Example of filters response.
           description: ""
   /api/biomethane/supply-plan/download-template/:
@@ -12534,20 +12588,21 @@ components:
         biométhane (DREAL).
       properties:
         status:
-          $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
-        id:
-          type: integer
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
           readOnly: true
         producer:
-          $ref: "#/components/schemas/EntityPreview"
-        effective_date:
-          type: string
-          format: date
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
-          nullable: true
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
+          readOnly: true
+          nullable: true
+        effective_date:
+          type: string
+          format: date
           readOnly: true
           nullable: true
         department:
@@ -12556,13 +12611,12 @@ components:
           nullable: true
         year:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
       required:
         - department
         - effective_date
-        - id
         - producer
+        - status
         - tariff_reference
         - year
     BiomethaneAnnualDeclaration:
@@ -12646,11 +12700,13 @@ components:
         - IN_PROGRESS
         - DECLARED
         - OVERDUE
+        - NOT_STARTED
       type: string
       description: |-
         * `IN_PROGRESS` - IN_PROGRESS
         * `DECLARED` - DECLARED
         * `OVERDUE` - OVERDUE
+        * `NOT_STARTED` - NOT_STARTED
     BiomethaneContract:
       type: object
       properties:

@@ -3364,13 +3364,13 @@ export interface components {
         };
         /** @description Serializer pour la liste admin des déclarations annuelles biométhane (DREAL). */
         BiomethaneAdminAnnualDeclaration: {
-            status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
-            producer: components["schemas"]["EntityPreview"];
+            readonly status: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
+            readonly producer: components["schemas"]["EntityPreview"];
+            readonly tariff_reference: components["schemas"]["TariffReferenceEnum"] | null;
             /** Format: date */
             readonly effective_date: string | null;
-            readonly tariff_reference: components["schemas"]["TariffReferenceEnum"] | null;
             readonly department: string | null;
-            year: number;
+            readonly year: number;
         };
         BiomethaneAnnualDeclaration: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -3407,7 +3407,7 @@ export interface components {
          *     * `NOT_STARTED` - NOT_STARTED
          * @enum {string}
          */
-        BiomethaneAnnualDeclarationStatusEnum: BiomethaneAnnualDeclarationStatusEnum;
+        BiomethaneAnnualDeclarationStatusEnum: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus;
         BiomethaneContract: {
             readonly id: number;
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
@@ -7161,6 +7161,8 @@ export interface operations {
                 /**
                  * @description * `IN_PROGRESS` - IN_PROGRESS
                  *     * `DECLARED` - DECLARED
+                 *     * `OVERDUE` - OVERDUE
+                 *     * `NOT_STARTED` - NOT_STARTED
                  */
                 status?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus[];
                 /**
@@ -7202,6 +7204,8 @@ export interface operations {
                 /**
                  * @description * `IN_PROGRESS` - IN_PROGRESS
                  *     * `DECLARED` - DECLARED
+                 *     * `OVERDUE` - OVERDUE
+                 *     * `NOT_STARTED` - NOT_STARTED
                  */
                 status?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus[];
                 /**
@@ -8264,6 +8268,13 @@ export interface operations {
                  *     * `EXTERNAL` - Externe
                  */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /**
+                 * @description * `2011` - 2011
+                 *     * `2020` - 2020
+                 *     * `2021` - 2021
+                 *     * `2023` - 2023
+                 */
+                tariff_reference?: ("" | "2011" | "2020" | "2021" | "2023" | null)[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -8481,6 +8492,13 @@ export interface operations {
                  *     * `EXTERNAL` - Externe
                  */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /**
+                 * @description * `2011` - 2011
+                 *     * `2020` - 2020
+                 *     * `2021` - 2021
+                 *     * `2023` - 2023
+                 */
+                tariff_reference?: ("" | "2011" | "2020" | "2021" | "2023" | null)[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -14282,7 +14300,8 @@ export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
     department = "department",
     feedstock = "feedstock",
     producer_name = "producer_name",
-    source = "source"
+    source = "source",
+    tariff_reference = "tariff_reference"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
@@ -14655,12 +14674,6 @@ export enum AmendmentObjectEnum {
     PRODUCER_BUYER_INFO_CHANGE = "PRODUCER_BUYER_INFO_CHANGE",
     ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE = "ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE",
     OTHER = "OTHER"
-}
-export enum BiomethaneAnnualDeclarationStatusEnum {
-    IN_PROGRESS = "IN_PROGRESS",
-    DECLARED = "DECLARED",
-    OVERDUE = "OVERDUE",
-    NOT_STARTED = "NOT_STARTED"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",
