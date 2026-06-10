@@ -15,7 +15,15 @@ class CertificatePermissionTest(TestCase, PermissionTestMixin):
                     ["list", "retrieve"],
                     [
                         (
-                            UserRightsFactory(entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR])
+                            UserRightsFactory(
+                                entity_type=[
+                                    Entity.PRODUCER,
+                                    Entity.TRADER,
+                                    Entity.OPERATOR,
+                                    Entity.POWER_OR_HEAT_PRODUCER,
+                                    Entity.BIOMETHANE_PRODUCER,
+                                ]
+                            )
                             | AdminRightsFactory(
                                 allow_external=[ExternalAdminRights.DOUBLE_COUNTING, ExternalAdminRights.TRANSFERRED_ELEC]
                             )
@@ -26,7 +34,13 @@ class CertificatePermissionTest(TestCase, PermissionTestMixin):
                     ["add", "delete", "set_default", "update_certificate"],
                     [
                         HasUserRights(
-                            entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR],
+                            entity_type=[
+                                Entity.PRODUCER,
+                                Entity.TRADER,
+                                Entity.OPERATOR,
+                                Entity.POWER_OR_HEAT_PRODUCER,
+                                Entity.BIOMETHANE_PRODUCER,
+                            ],
                             role=[UserRights.RW, UserRights.ADMIN],
                         )
                     ],
@@ -35,7 +49,7 @@ class CertificatePermissionTest(TestCase, PermissionTestMixin):
                     ["check_entity", "reject_entity"],
                     [
                         HasAdminRights(
-                            allow_external=[ExternalAdminRights.DOUBLE_COUNTING],
+                            allow_external=[ExternalAdminRights.TRANSFERRED_ELEC, ExternalAdminRights.DOUBLE_COUNTING],
                             allow_role=[UserRights.RW, UserRights.ADMIN],
                         )
                     ],
