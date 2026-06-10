@@ -88,6 +88,12 @@ class Entity(models.Model):
     vat_number = models.CharField(max_length=32, blank=True, default="")
     accise_number = models.CharField(max_length=32, blank=True, default="")
 
+    @staticmethod
+    def from_national_trade_register(ntr):
+        registration_id = ntr.registration_id
+        country_code = ntr.country_code
+        return Entity.objects.filter(registered_country__code_pays=country_code, registration_id=registration_id).last()
+
     def __str__(self):
         return self.name
 
