@@ -4222,6 +4222,43 @@ paths:
                 status: success
                 errors: []
           description: Success message
+  /api/elec/provision-certificates-qualicharge/bulk-transfer/:
+    post:
+      operationId: bulk_transfer_provision_certificates_qualicharge
+      description: Transfer non-double-validated volumes to another CPO (target must
+        have parent_entity = current entity)
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - elec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkTransferQualichargeRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BulkTransferQualichargeRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BulkTransferQualichargeRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                status: success
+                transferred_count: 0
+          description: Success message with count of transferred certificates
   /api/elec/provision-certificates-qualicharge/bulk-update/:
     post:
       operationId: bulk_update_provision_certificates_qualicharge
@@ -4408,6 +4445,124 @@ paths:
                     - AMENAGEUR 4
                     - AMENAGEUR 5
                   summary: Example of filters response.
+          description: ""
+  /api/elec/provision-certificates-qualicharge/transfer-targets/:
+    get:
+      operationId: transfer_targets_provision_certificates_qualicharge
+      description: List CPOs authorized to receive volume transfers (those with
+        parent_entity = current entity)
+      parameters:
+        - in: query
+          name: cpo
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: date_from
+          schema:
+            type: array
+            items:
+              type: string
+              format: date
+          explode: true
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: group_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - operating_unit
+          description: "* `operating_unit` - operating_unit"
+          explode: true
+          style: form
+        - in: query
+          name: not_validated
+          schema:
+            type: boolean
+        - in: query
+          name: operating_unit
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: station_id
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: validated_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - BOTH
+                - CPO
+                - DGEC
+                - NO_ONE
+          description: |-
+            * `NO_ONE` - NO_ONE
+            * `DGEC` - DGEC
+            * `CPO` - CPO
+            * `BOTH` - BOTH
+          explode: true
+          style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - elec
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEntityPreviewList"
           description: ""
   /api/elec/provision-certificates/{id}/:
     get:
@@ -13976,6 +14131,19 @@ components:
           format: binary
       required:
         - file
+    BulkTransferQualichargeRequest:
+      type: object
+      properties:
+        operating_unit:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        target_cpo_id:
+          type: integer
+      required:
+        - operating_unit
+        - target_cpo_id
     CarbureLotPublic:
       type: object
       properties:
@@ -18019,6 +18187,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityPreview"
+        total_quantity:
+          type: number
+        total_quantity_renewable:
+          type: number
     PaginatedEntityProductionSiteList:
       type: object
       required:

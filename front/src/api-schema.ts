@@ -1272,6 +1272,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/elec/provision-certificates-qualicharge/bulk-transfer/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Transfer non-double-validated volumes to another CPO (target must have parent_entity = current entity) */
+        post: operations["bulk_transfer_provision_certificates_qualicharge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/elec/provision-certificates-qualicharge/bulk-update/": {
         parameters: {
             query?: never;
@@ -1314,6 +1331,23 @@ export interface paths {
         };
         /** @description Retrieve content of a specific filter */
         get: operations["filter_provision_certificates_qualicharge"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/elec/provision-certificates-qualicharge/transfer-targets/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List CPOs authorized to receive volume transfers (those with parent_entity = current entity) */
+        get: operations["transfer_targets_provision_certificates_qualicharge"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4172,6 +4206,10 @@ export interface components {
             /** Format: binary */
             file: File;
         };
+        BulkTransferQualichargeRequest: {
+            operating_unit: string[];
+            target_cpo_id: number;
+        };
         CarbureLotPublic: {
             readonly id: number;
             year: number;
@@ -5887,6 +5925,8 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["EntityPreview"][];
+            total_quantity?: number;
+            total_quantity_renewable?: number;
         };
         PaginatedEntityProductionSiteList: {
             /** @example 123 */
@@ -9532,6 +9572,35 @@ export interface operations {
             };
         };
     };
+    bulk_transfer_provision_certificates_qualicharge: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkTransferQualichargeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BulkTransferQualichargeRequest"];
+                "multipart/form-data": components["schemas"]["BulkTransferQualichargeRequest"];
+            };
+        };
+        responses: {
+            /** @description Success message with count of transferred certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     bulk_update_provision_certificates_qualicharge: {
         parameters: {
             query: {
@@ -9622,6 +9691,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    transfer_targets_provision_certificates_qualicharge: {
+        parameters: {
+            query: {
+                cpo?: string[];
+                date_from?: string[];
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
+                not_validated?: boolean;
+                operating_unit?: string[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                station_id?: string[];
+                /**
+                 * @description * `NO_ONE` - NO_ONE
+                 *     * `DGEC` - DGEC
+                 *     * `CPO` - CPO
+                 *     * `BOTH` - BOTH
+                 */
+                validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[];
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedEntityPreviewList"];
                 };
             };
         };
