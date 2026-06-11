@@ -1,5 +1,6 @@
 from django.db import models
 
+from biomethane.models.managers.biomethane_annual_declaration import AnnotatedBiomethaneAnnualDeclarationManager
 from core.models import Entity
 
 
@@ -26,6 +27,9 @@ class BiomethaneAnnualDeclaration(models.Model):
 
     # Indique si la déclaration est modifiable ou non
     is_open = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    annotated_objects = AnnotatedBiomethaneAnnualDeclarationManager()
 
     class Meta:
         db_table = "biomethane_annual_declaration"

@@ -51,7 +51,7 @@ class BiomethaneAnnualDeclarationViewSet(
     CreateModelMixin,
     GenericViewSet,
 ):
-    queryset = BiomethaneAnnualDeclaration.objects.all()
+    queryset = BiomethaneAnnualDeclaration.annotated_objects.all()
     serializer_class = BiomethaneAnnualDeclarationSerializer
     filterset_class = EntityProducerFilter
     pagination_class = None
@@ -75,9 +75,9 @@ class BiomethaneAnnualDeclarationViewSet(
 
     def get_queryset(self):
         if self.action == "get_years":
-            return super().get_queryset()
+            return BiomethaneAnnualDeclaration.objects.all()
 
-        return self.queryset.filter(year=self.request.year)
+        return BiomethaneAnnualDeclaration.annotated_objects.filter(year=self.request.year)
 
     @extend_schema(
         responses={
@@ -106,7 +106,8 @@ class BiomethaneAnnualDeclarationViewSet(
             ):
                 serializer = self.get_serializer(data={"producer": request.entity.id, "year": request.year})
                 serializer.is_valid(raise_exception=True)
-                declaration = serializer.save()
+                saved = serializer.save()
+                declaration = self.get_queryset().get(pk=saved.pk)
                 status_code = status.HTTP_201_CREATED
             else:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -128,7 +129,7 @@ class BiomethaneAnnualDeclarationViewSet(
                 context={"is_dreal": is_dreal},
             )
             serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
+            declaration = self.get_queryset().get(pk=serializer.save().pk)
+            return Response(self.get_serializer(declaration).data)
         except BiomethaneAnnualDeclaration.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

@@ -9,7 +9,6 @@ from rest_framework import status
 from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
 from biomethane.models.biomethane_declaration_period import BiomethaneDeclarationPeriod
-from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Department, Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
 from entity.models import EntityScope
@@ -31,8 +30,8 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
             [(self.producer_entity, "RW")],
         )
 
-        self.current_declaration_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
-        self.current_year = date.today().year
+        self.current_declaration_year = 2025
+        self.current_year = 2026
         self.annual_declaration_url = reverse("biomethane-annual-declaration")
         self.base_params = {"entity_id": self.producer_entity.id}
 

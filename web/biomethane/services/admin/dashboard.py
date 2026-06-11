@@ -35,10 +35,15 @@ class BiomethaneAdminDashboardService:
             .annotate(
                 _declaration_status=Subquery(declaration_subquery.values("status")[:1]),
                 _declaration_year=Subquery(declaration_subquery.values("year")[:1]),
-                year=Coalesce(F("_declaration_year"), Value(year)),
             )
             .annotate(
-                _computed_status=BiomethaneAnnualDeclarationService.get_declaration_status_annotation("_declaration_status"),
+                year=Coalesce(F("_declaration_year"), Value(year)),
+                _computed_status=BiomethaneAnnualDeclarationService.get_declaration_status_annotation(
+                    "_declaration_status",
+                    year_field="year",
+                ),
+            )
+            .annotate(
                 _department_code=Coalesce(
                     F("biomethane_production_unit__department__code_dept"),
                     F("registered_zipcode"),

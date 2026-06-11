@@ -209,6 +209,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
 
         response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         self.assertEqual(
             [(result["producer"]["name"], result["status"]) for result in response.json()["results"]],
             expected_before_overdue,
