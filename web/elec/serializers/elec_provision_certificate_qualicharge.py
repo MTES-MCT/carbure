@@ -81,6 +81,28 @@ class ProvisionCertificateUpdateBulkSerializer(serializers.Serializer):
         return value
 
 
+class BulkTransferQualichargeSerializer(serializers.Serializer):
+    operating_unit = serializers.ListField(child=serializers.CharField(), required=True)
+    target_cpo_id = serializers.IntegerField(required=True)
+
+    def validate(self, validated_data):
+        current_entity = self.context.get("request").entity
+        target_cpo_id = validated_data["target_cpo_id"]
+
+        try:
+            target_cpo = Entity.objects.get(id=target_cpo_id, entity_type=Entity.CPO)
+        except Entity.DoesNotExist:
+            raise serializers.ValidationError({"target_cpo_id": "Target CPO not found"})
+
+        if target_cpo.parent_entity_id != current_entity.id:
+            raise serializers.ValidationError(
+                {"target_cpo_id": "This CPO is not authorized to receive transfers from your entity"}
+            )
+
+        validated_data["target_cpo"] = target_cpo
+        return validated_data
+
+
 class TransferCertificateSerializer(serializers.Serializer):
     certificate_id = serializers.IntegerField(required=True)
     target_entity_id = serializers.IntegerField(required=True)
