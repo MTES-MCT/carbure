@@ -21,6 +21,11 @@ export const ConstrainedCategoriesProgress = ({
 }: ConstrainedCategoriesProgressProps) => {
   const { t } = useTranslation()
   const isCapped = variant === "capped"
+  const hasCategories = (categories?.length ?? 0) > 0
+
+  if (isCapped && !hasCategories) {
+    return null
+  }
 
   return (
     <ObjectiveSection
