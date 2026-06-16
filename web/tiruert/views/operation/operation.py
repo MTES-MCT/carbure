@@ -54,7 +54,7 @@ class OperationPagination(MetadataPageNumberPagination):
     ]
 )
 class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
-    queryset = Operation.objects.all()
+    queryset = Operation.objects.all().order_by("pk")
     serializer_class = OperationListSerializer
     filterset_class = OperationFilter
     http_method_names = ["get", "post", "patch", "delete"]
