@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 from django.test import TestCase
 
+from tiruert.models import Objective
 from tiruert.models.elec_operation import ElecOperation
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
@@ -767,6 +768,61 @@ class ObjectiveServiceBuildObjectivesResultTest(TestCase):
         self.assertEqual(result["sectors"][0]["available_balance"], 1_300)
         self.assertEqual(result["sectors"][0]["pending_teneur"], 140)
         self.assertEqual(result["sectors"][0]["declared_teneur"], 70)
+
+
+class ObjectiveServiceCalculateObjectivesAndPenaltiesTest(TestCase):
+    """Unit tests for ObjectiveService.calculate_objectives_and_penalties() method."""
+
+    def test_skips_capped_category_objective_when_no_operations_for_category(self):
+        balance = {}
+
+        objective = Mock(
+            customs_category="CONV",
+            target_type=Objective.CAP,
+            target=0.1,
+            penalty=100,
+        )
+        objectives = Mock()
+        objectives.exists.return_value = True
+        objectives.__iter__ = Mock(return_value=iter([objective]))
+
+        objective_queryset = Mock()
+        objective_queryset.filter.return_value = objectives
+
+        result = ObjectiveService.calculate_objectives_and_penalties(
+            balance,
+            objective_queryset,
+            Objective.BIOFUEL_CATEGORY,
+            energy_basis=1_000_000,
+        )
+
+        self.assertEqual(result, [])
+
+    def test_keeps_reach_category_objective_when_no_operations_for_category(self):
+        balance = {}
+
+        objective = Mock(
+            customs_category="CONV",
+            target_type=Objective.REACH,
+            target=0.1,
+            penalty=100,
+        )
+        objectives = Mock()
+        objectives.exists.return_value = True
+        objectives.__iter__ = Mock(return_value=iter([objective]))
+
+        objective_queryset = Mock()
+        objective_queryset.filter.return_value = objectives
+
+        result = ObjectiveService.calculate_objectives_and_penalties(
+            balance,
+            objective_queryset,
+            Objective.BIOFUEL_CATEGORY,
+            energy_basis=1_000_000,
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["code"], "CONV")
 
 
 class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
