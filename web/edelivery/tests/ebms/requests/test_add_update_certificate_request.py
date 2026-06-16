@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
 from edelivery.ebms.requests.add_update_certificate_request import AddUpdateCertificateRequest
@@ -15,7 +16,7 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
     def setUp(self):
         super().setUp()
         self.entity = MagicMock(**{"ntr_id.return_value": ""})
-        self.certificate = MagicMock(certificate_id="", status="EXPIRED")
+        self.certificate = MagicMock(certificate_id="", valid_from=datetime(2026, 1, 31), status="EXPIRED")
         self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
 
         module_to_patch = "edelivery.ebms.requests.add_update_certificate_request"
@@ -55,3 +56,10 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
         validity_status_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/VALIDITY_STATUS")
         self.assertEqual("UDB_STATUS", validity_status_element.text)
+
+    def test_injects_issue_date(self):
+        self.certificate.valid_from = datetime(2026, 6, 15, tzinfo=timezone.utc)
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+
+        issue_date_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/DATE_OF_ISSUE")
+        self.assertEqual("2026-06-15+00:00", issue_date_element.text)
