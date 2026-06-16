@@ -88,6 +88,16 @@ class ObjectiveService:
             else:
                 continue
 
+            has_operations_for_key = key in balance
+
+            # For capped objectives per category, only return categories with operations.
+            if (
+                objective_type == Objective.BIOFUEL_CATEGORY
+                and objective.target_type == Objective.CAP
+                and not has_operations_for_key
+            ):
+                continue
+
             if key not in balance:
                 # No operations for this objective key: initialize an empty balance entry
                 balance[key] = {
