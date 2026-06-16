@@ -16,7 +16,12 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
     def setUp(self):
         super().setUp()
         self.entity = MagicMock(**{"ntr_id.return_value": ""})
-        self.certificate = MagicMock(certificate_id="", valid_from=datetime(2026, 1, 31), status="EXPIRED")
+        self.certificate = MagicMock(
+            certificate_id="",
+            certificate_type="SYSTEME_NATIONAL",
+            status="EXPIRED",
+            valid_from=datetime(2026, 1, 31),
+        )
         self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
 
         module_to_patch = "edelivery.ebms.requests.add_update_certificate_request"
@@ -63,3 +68,13 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
         issue_date_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/DATE_OF_ISSUE")
         self.assertEqual("2026-06-15+00:00", issue_date_element.text)
+
+    def test_sets_place_of_issue_to_France(self):
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        issue_location_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/PLACE_OF_ISSUE")
+        self.assertEqual("France", issue_location_element.text)
+
+    def test_raises_an_error_if_certificate_not_national_scheme(self):
+        self.certificate.certificate_type = "ISCC"
+        with self.assertRaises(NotImplementedError):
+            AddUpdateCertificateRequest(self.entity_certificate)
