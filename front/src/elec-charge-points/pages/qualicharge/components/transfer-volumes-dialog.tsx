@@ -6,11 +6,7 @@ import { useState } from "react"
 import { EntityPreview } from "common/types"
 import useEntity from "common/hooks/entity"
 import { useMutation, useQuery } from "common/hooks/async"
-import {
-  bulkTransferQualichargeVolumes,
-  getQualichargeFilters,
-  getTransferTargets,
-} from "../api"
+import { bulkTransferQualichargeVolumes, getQualichargeFilters } from "../api"
 import { QualichargeFilter, QualichargeQuery } from "../types"
 import { useNotify } from "common/components/notifications"
 import { Text } from "common/components/text"
@@ -18,11 +14,13 @@ import { Text } from "common/components/text"
 export type TransferVolumesDialogProps = {
   onClose: () => void
   query: QualichargeQuery
+  transferTargets: EntityPreview[]
 }
 
 export const TransferVolumesDialog = ({
   onClose,
   query,
+  transferTargets,
 }: TransferVolumesDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -34,11 +32,6 @@ export const TransferVolumesDialog = ({
   const [selectedCpo, setSelectedCpo] = useState<EntityPreview | undefined>(
     undefined
   )
-
-  const { result: transferTargets } = useQuery(getTransferTargets, {
-    key: "transfer-targets",
-    params: [entity.id],
-  })
 
   const { result: operatingUnits, loading: loadingOperatingUnits } = useQuery(
     getQualichargeFilters,
