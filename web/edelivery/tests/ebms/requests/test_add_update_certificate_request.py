@@ -53,16 +53,6 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         certificate_number_tag = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CERTIFICATE_NUMBER")
         self.assertEqual("SN_UN_2026_0123", certificate_number_tag.text)
 
-    def test_injects_converted_status(self):
-        self.certificate.status = "VALID"
-        self.patched_to_udb.return_value = "UDB_STATUS"
-
-        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
-        self.patched_to_udb.assert_called_with("VALID")
-
-        validity_status_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/VALIDITY_STATUS")
-        self.assertEqual("UDB_STATUS", validity_status_element.text)
-
     def test_injects_issue_date(self):
         self.certificate.valid_from = datetime(2026, 6, 15, tzinfo=timezone.utc)
 
@@ -93,3 +83,13 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
         validity_end_date_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CERT_DATE_TO")
         self.assertEqual("2026-06-17+00:00", validity_end_date_element.text)
+
+    def test_injects_converted_status(self):
+        self.certificate.status = "VALID"
+        self.patched_to_udb.return_value = "UDB_STATUS"
+
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        self.patched_to_udb.assert_called_with("VALID")
+
+        validity_status_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/VALIDITY_STATUS")
+        self.assertEqual("UDB_STATUS", validity_status_element.text)
