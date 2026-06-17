@@ -9,6 +9,7 @@ from rest_framework import serializers
 from core.excel_importer import ExcelImporter, ExcelValidationError
 from core.models import CarbureLot, Entity
 from tiruert.models import Operation
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation import OperationService
 
 
@@ -23,7 +24,6 @@ class OperationGroup:
     customs_category: str
     biofuel_id: int
     biofuel_code: str
-    renewable_energy_share: float
     credited_entity: Entity
     debited_entity: Entity
     row_numbers: list[int]
@@ -86,7 +86,6 @@ class OperationExcelImportService:
                     customs_category=customs_category,
                     biofuel_id=biofuel_id,
                     biofuel_code=first_lot.biofuel.code,
-                    renewable_energy_share=first_lot.biofuel.renewable_energy_share,
                     credited_entity=first_row["credited_entity"],
                     debited_entity=debited_entity,
                     row_numbers=row_numbers,
@@ -145,6 +144,7 @@ class OperationExcelImportService:
     @staticmethod
     def _create_operations(groups: list[OperationGroup]) -> list[Operation]:
         created_operations = []
+        year = DeclarationPeriodService.get_declaration_year()
 
         with transaction.atomic():
             for group in groups:
@@ -155,7 +155,8 @@ class OperationExcelImportService:
                     "biofuel_id": group.biofuel_id,
                     "credited_entity": group.credited_entity,
                     "debited_entity": group.debited_entity,
-                    "renewable_energy_share": group.renewable_energy_share,
+                    "renewable_energy_share": 1,
+                    "declaration_year": year,
                 }
 
                 lots = CarbureLot.objects.filter(id__in=group.lot_volumes.keys()).values("id", "ghg_total")
