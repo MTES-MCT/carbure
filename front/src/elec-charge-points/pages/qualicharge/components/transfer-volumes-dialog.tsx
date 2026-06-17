@@ -1,7 +1,7 @@
 import { Dialog } from "common/components/dialog2"
 import { useTranslation } from "react-i18next"
 import { Button } from "common/components/button2"
-import { Select } from "common/components/selects2"
+import { Select, MultiSelect } from "common/components/selects2"
 import { useState } from "react"
 import { EntityPreview } from "common/types"
 import useEntity from "common/hooks/entity"
@@ -14,7 +14,6 @@ import {
 import { QualichargeFilter, QualichargeQuery } from "../types"
 import { useNotify } from "common/components/notifications"
 import { Text } from "common/components/text"
-import { MultiSelect } from "common/components/selects2/multiselect"
 
 export type TransferVolumesDialogProps = {
   onClose: () => void

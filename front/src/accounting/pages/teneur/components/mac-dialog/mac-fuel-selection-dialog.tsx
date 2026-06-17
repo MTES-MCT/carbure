@@ -3,7 +3,7 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { MultiSelect } from "common/components/selects2/multiselect"
+import { MultiSelect } from "common/components/selects2"
 import { Notice } from "common/components/notice"
 import { FossilFuel } from "../../types"
 

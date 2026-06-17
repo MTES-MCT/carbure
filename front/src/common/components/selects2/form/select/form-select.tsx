@@ -10,7 +10,7 @@ import {
 import { defaultNormalizer, Normalizer } from "common/utils/normalize"
 import cl from "clsx"
 import { useRef, useState } from "react"
-import styles from "./select-dsfr.module.css"
+import styles from "./form-select.module.css"
 
 const defaultGetValue = <T, V = T>(value: V) => {
   if (typeof value === "string") return value
@@ -24,7 +24,7 @@ const defaultGetValue = <T, V = T>(value: V) => {
 }
 
 // The state prop has different values than the InputProps.state, so we need to pick it from the InputProps and map it to the SelectProps.state
-export type SelectDsfrProps<T, V = T> = Omit<
+export type FormSelectProps<T, V = T> = Omit<
   SelectProps<SelectProps.Option[]>,
   "options" | "state"
 > &
@@ -38,7 +38,7 @@ export type SelectDsfrProps<T, V = T> = Omit<
     name?: string
   } & Pick<InputProps, "state">
 
-export const SelectDsfr = <T, V = T>({
+export const FormSelect = <T, V = T>({
   value,
   getValue = defaultGetValue,
   options,
@@ -51,7 +51,7 @@ export const SelectDsfr = <T, V = T>({
   className,
   name,
   ...props
-}: SelectDsfrProps<T, V>) => {
+}: FormSelectProps<T, V>) => {
   const normalizedOptions = options?.map((option) => {
     const normalized = normalize(option)
     return {
@@ -101,7 +101,7 @@ export const SelectDsfr = <T, V = T>({
           />
         }
         state={state === "success" ? "valid" : state}
-        className={cl(className, styles["select-dsfr"])}
+        className={cl(className, styles["form-select"])}
       />
 
       <Dropdown

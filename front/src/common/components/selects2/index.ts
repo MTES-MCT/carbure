@@ -1,6 +1,4 @@
-export {
-  Select as ButtonSelect,
-  type SelectProps as ButtonSelectProps,
-} from "./select"
-export { SelectDsfr, type SelectDsfrProps } from "./select-dsfr"
-export { Select, type SelectProps } from "./select-entry"
+export { Select, type SelectProps } from "./select/select"
+export { FilterSelect, type FilterSelectProps } from "./filter/select"
+export { FormSelect, type FormSelectProps } from "./form/select"
+export { MultiSelect, type MultiSelectProps } from "./filter/multiselect"

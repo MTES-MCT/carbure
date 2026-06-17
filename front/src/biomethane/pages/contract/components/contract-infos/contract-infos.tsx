@@ -1,5 +1,5 @@
 import { NumberInput, RadioGroup } from "common/components/inputs2"
-import { SelectDsfr } from "common/components/selects2"
+import { Select } from "common/components/selects2"
 import { useTranslation } from "react-i18next"
 import {
   useMutateContractInfos,
@@ -119,7 +119,8 @@ export const ContractInfos = ({
           </Notice>
         )}
         <Grid cols={2} gap="lg">
-          <SelectDsfr
+          <Select
+            variant="form"
             label={tBiomethaneInput("contract.tariff_reference")}
             options={tariffReferenceOptions}
             required
@@ -138,7 +139,8 @@ export const ContractInfos = ({
             readOnly={!isEditing}
           />
         </Grid>
-        <SelectDsfr
+        <Select
+          variant="form"
           label={tBiomethaneInput("contract.installation_category")}
           options={installationCategoryOptions}
           required
