@@ -25,6 +25,7 @@ class AddUpdateCertificateRequest(BaseRequest):
       <CERT_DATE_FROM>{to_date_isoformat(certificate.valid_from)}</CERT_DATE_FROM>
       <CERT_DATE_TO>{to_date_isoformat(certificate.valid_until)}</CERT_DATE_TO>
       <VALIDITY_STATUS>{validity_status}</VALIDITY_STATUS>
+      <GROUP_CERTIFICATION>NO</GROUP_CERTIFICATION>
     </EO_CERTIFICATE>
   </EO_CERTIFICATE_HEADER>
 </udb:AddUpdateCertificateRequest>"""

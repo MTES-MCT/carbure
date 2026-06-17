@@ -93,3 +93,8 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
         validity_status_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/VALIDITY_STATUS")
         self.assertEqual("UDB_STATUS", validity_status_element.text)
+
+    def test_sets_group_certification_to_no(self):
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        group_certification_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/GROUP_CERTIFICATION")
+        self.assertEqual("NO", group_certification_element.text)
