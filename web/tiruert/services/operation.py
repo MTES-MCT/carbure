@@ -158,6 +158,41 @@ class OperationService:
             validated_data["status"] = Operation.PENDING
 
     @staticmethod
+    def create_operation_with_details(operation_data, details_data):
+        """
+        Create one operation and its related details.
+        """
+        operation = Operation.objects.create(**operation_data)
+
+        OperationDetail.objects.bulk_create(
+            [
+                OperationDetail(
+                    operation=operation,
+                    lot_id=detail["lot_id"],
+                    volume=detail["volume"],
+                    emission_rate_per_mj=detail["emission_rate_per_mj"],
+                )
+                for detail in details_data
+            ]
+        )
+
+        return operation
+
+    @staticmethod
+    def build_details_data(lot_volumes, emissions_by_lot):
+        """
+        Build OperationDetail payloads from lot volumes and emission rates.
+        """
+        return [
+            {
+                "lot_id": lot_id,
+                "volume": round(volume, 2),
+                "emission_rate_per_mj": emissions_by_lot.get(lot_id, 0),
+            }
+            for lot_id, volume in lot_volumes.items()
+        ]
+
+    @staticmethod
     @transaction.atomic
     def create_operations_from_lots(lots):
         """
@@ -193,32 +228,24 @@ class OperationService:
             if not credited_entity:
                 continue  # skip if no credited entity (should not happen for valid lots)
 
-            operation = Operation.objects.create(
-                type=matching_types[key[0]],
-                status=Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
-                customs_category=key[1],
-                biofuel=lots[0].biofuel,
-                credited_entity=credited_entity,
-                debited_entity=None,
-                from_depot=None,
-                to_depot=lots[0].carbure_delivery_site,
-                renewable_energy_share=lots[0].biofuel.renewable_energy_share,
-                durability_period=lots[0].period,
-            )
+            operation_data = {
+                "type": matching_types[key[0]],
+                "status": Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
+                "customs_category": key[1],
+                "biofuel": lots[0].biofuel,
+                "credited_entity": credited_entity,
+                "debited_entity": None,
+                "from_depot": None,
+                "to_depot": lots[0].carbure_delivery_site,
+                "renewable_energy_share": lots[0].biofuel.renewable_energy_share,
+                "durability_period": lots[0].period,
+            }
 
-            lots_bulk = []
+            lot_volumes = {lot.id: lot.volume for lot in lots}
+            emissions_by_lot = {lot.id: lot.ghg_total for lot in lots}
+            details_data = OperationService.build_details_data(lot_volumes, emissions_by_lot)
 
-            for lot in lots:
-                lots_bulk.append(
-                    {
-                        "operation": operation,
-                        "lot": lot,
-                        "volume": truncate(lot.volume),  # litres
-                        "emission_rate_per_mj": lot.ghg_total,  # gCO2/MJ (input algo d'optimisation)
-                    }
-                )
-
-            OperationDetail.objects.bulk_create([OperationDetail(**data) for data in lots_bulk])
+            OperationService.create_operation_with_details(operation_data, details_data)
 
     @staticmethod
     def filter_valid_lots(lots):

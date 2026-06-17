@@ -182,24 +182,10 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             OperationService.define_operation_status(validated_data)
 
-            # Create the operation
-            operation = Operation.objects.create(**validated_data)
+            lot_volumes = {lot["id"]: lot["volume"] for lot in selected_lots}
+            detail_operations_data = OperationService.build_details_data(lot_volumes, emissions_by_lot)
 
-            # Create the details using server-side emission rates
-            detail_operations_data = []
-            for lot in selected_lots:
-                detail_operations_data.append(
-                    {
-                        "operation": operation,
-                        "lot_id": lot["id"],
-                        "volume": truncate(lot["volume"]),
-                        "emission_rate_per_mj": emissions_by_lot[lot["id"]],
-                    }
-                )
-
-            OperationDetail.objects.bulk_create(
-                [OperationDetail(**data) for data in detail_operations_data],
-            )
+            operation = OperationService.create_operation_with_details(validated_data, detail_operations_data)
 
             return operation
 
