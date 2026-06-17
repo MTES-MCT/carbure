@@ -6,7 +6,7 @@ from .filter import FilterActionMixin
 from .operation_detail_excel_export import OperationDetailExcelExportActionMixin
 from .reject import RejectActionMixin
 from .simulate import SimulateActionMixin
-
+from .excel_import import ExcelImportActionMixin
 
 class ActionMixin(
     AcceptActionMixin,
@@ -17,5 +17,6 @@ class ActionMixin(
     CorrectActionMixin,
     ExcelExportActionMixin,
     OperationDetailExcelExportActionMixin,
+    ExcelImportActionMixin,
 ):
     pass

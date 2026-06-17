@@ -83,6 +83,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "partial_update",
             "destroy",
             "export_operations_to_excel",
+            "import_operations_from_excel",
             "declare_teneur",
         ]:
             return [HasTiruertWriteRights()]

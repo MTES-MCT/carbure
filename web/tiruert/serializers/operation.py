@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from core.models import Pays
 from core.serializers import CountrySerializer
-from core.utils import truncate
+from core.utils import check_file_size_and_extension
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.balance import BalanceBiofuelSerializer
 from tiruert.serializers.fields import RoundedFloatField
@@ -123,6 +123,14 @@ class OperationSerializer(BaseOperationSerializer):
 class OperationLotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     volume = serializers.FloatField()
+
+
+class OperationExcelImportRequestSerializer(serializers.Serializer):
+    file = serializers.FileField()
+    mode = serializers.ChoiceField(choices=["validate", "create"], default="validate")
+
+    def validate_file(self, value):
+        return check_file_size_and_extension(value, max_size_mb=10, extensions=[".xlsx", ".xls"])
 
 
 class OperationInputSerializer(serializers.ModelSerializer):
