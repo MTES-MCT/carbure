@@ -1,1 +1,1 @@
-export { SelectDsfr } from "./select-dsfr"
+export { SelectDsfr, type SelectDsfrProps } from "./select-dsfr"

@@ -1,5 +1,7 @@
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext"
 import { InputProps } from "@codegouvfr/react-dsfr/Input"
+import { Dropdown } from "common/components/dropdown2"
+import { List } from "common/components/list2"
 import {
   Label,
   LabelProps,
@@ -7,6 +9,7 @@ import {
 } from "common/components/inputs2/base-input"
 import { defaultNormalizer, Normalizer } from "common/utils/normalize"
 import cl from "clsx"
+import { useRef, useState } from "react"
 import styles from "./select-dsfr.module.css"
 
 const defaultGetValue = <T, V = T>(value: V) => {
@@ -62,6 +65,9 @@ export const SelectDsfr = <T, V = T>({
     ? normalizedOptions.find((option) => option.value === getValue?.(value))
     : undefined
 
+  const selectRef = useRef<HTMLSelectElement>(null)
+  const [open, setOpen] = useState(false)
+
   if (props.readOnly) {
     return (
       <ReadOnlyValue
@@ -75,25 +81,46 @@ export const SelectDsfr = <T, V = T>({
   }
 
   return (
-    <Select
-      {...props}
-      nativeSelectProps={{
-        value: selectedOption?.value,
-        onChange: onChange ? (e) => onChange(e.target.value as V) : undefined,
-        required: props.required,
-        name,
-      }}
-      options={normalizedOptions}
-      label={
-        <Label
-          hasTooltip={hasTooltip}
-          required={props.required}
-          title={title}
-          label={label}
+    <>
+      <Select
+        {...props}
+        nativeSelectProps={{
+          ref: selectRef,
+          value: selectedOption?.value,
+          required: props.required,
+          name,
+          onMouseDown: (e) => e.preventDefault(),
+        }}
+        options={normalizedOptions}
+        label={
+          <Label
+            hasTooltip={hasTooltip}
+            required={props.required}
+            title={title}
+            label={label}
+          />
+        }
+        state={state === "success" ? "valid" : state}
+        className={cl(className, styles["select-dsfr"])}
+      />
+
+      <Dropdown
+        open={open && options.length > 0}
+        triggerRef={selectRef}
+        onToggle={setOpen}
+      >
+        <List
+          controlRef={selectRef}
+          items={options}
+          selectedValue={value}
+          normalize={normalize}
+          onFocus={onChange}
+          onSelectValue={(selected) => {
+            onChange?.(selected)
+            setOpen(false)
+          }}
         />
-      }
-      state={state === "success" ? "valid" : state}
-      className={cl(className, styles["select-dsfr"])}
-    />
+      </Dropdown>
+    </>
   )
 }
