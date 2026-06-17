@@ -83,6 +83,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "partial_update",
             "destroy",
             "export_operations_to_excel",
+            "download_import_template",
             "import_operations_from_excel",
             "declare_teneur",
         ]:

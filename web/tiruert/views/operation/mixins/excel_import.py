@@ -1,13 +1,31 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from core.excel import ExcelResponse
 from tiruert.serializers.operation import OperationExcelImportRequestSerializer
 from tiruert.services.operation_excel_import import OperationExcelImportService
+from tiruert.services.operation_excel_template import create_operation_import_template
 
 
 class ExcelImportActionMixin:
+    @extend_schema(
+        operation_id="download_operations_import_template",
+        description="Download the TIRUERT operation import template",
+        responses={
+            200: OpenApiResponse(
+                response=OpenApiTypes.BINARY,
+                description="Fichier Excel généré",
+            )
+        },
+    )
+    @action(detail=False, methods=["get"], url_path="import/template")
+    def download_import_template(self, request, *args, **kwargs):
+        file = create_operation_import_template()
+        return ExcelResponse(file)
+
     @extend_schema(
         operation_id="import_operations_from_excel",
         description="Validate or create TIRUERT operations from an Excel file",
