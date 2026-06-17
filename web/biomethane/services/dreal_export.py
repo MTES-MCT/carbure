@@ -4,8 +4,10 @@ from datetime import datetime
 from io import BufferedReader
 
 import xlsxwriter
+from django.core.exceptions import ObjectDoesNotExist
 
 from biomethane.models import (
+    BiomethaneAnnualDeclaration,
     BiomethaneContract,
     BiomethaneDigestate,
     BiomethaneEnergy,
@@ -19,6 +21,14 @@ from biomethane.services.declaration_export import (
     _get_display_value,
     _verbose_name,
 )
+
+
+def _safe_related(obj, attr):
+    """Return a reverse one-to-one related object, or None when it does not exist."""
+    try:
+        return getattr(obj, attr)
+    except ObjectDoesNotExist:
+        return None
 
 
 def _build_column_defs():
@@ -45,8 +55,12 @@ def _build_column_defs():
     return cols
 
 
-def generate_dreal_export(production_units, year: int) -> BufferedReader:
-    """Generate a simple Excel file with one declaration per row for DREAL."""
+def generate_dreal_export(producer_ids, year: int) -> BufferedReader:
+    """Generate a flat Excel file (one row per producer) of validated declarations for DREAL.
+
+    Only producers within `producer_ids` that have a validated (DECLARED) declaration for `year`
+    are exported.
+    """
     filename = f"biomethane_dreal_export_{year}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
     file_path = os.path.join(tempfile.gettempdir(), filename)
 
@@ -60,27 +74,42 @@ def generate_dreal_export(production_units, year: int) -> BufferedReader:
     for col_idx, (label, _section, _field) in enumerate(col_defs):
         sheet.write(0, col_idx, label, header_format)
 
-    # Preload related data to avoid N+1 queries
-    production_units = list(production_units.select_related("producer", "department"))
-    producer_ids = [pu.producer_id for pu in production_units]
+    # Anchor on validated declarations and join year-independent one-to-one relations in a single query
+    declarations = list(
+        BiomethaneAnnualDeclaration.objects.filter(
+            producer_id__in=producer_ids,
+            year=year,
+            status=BiomethaneAnnualDeclaration.DECLARED,
+        )
+        .select_related(
+            "producer",
+            "producer__biomethane_contract",
+            "producer__biomethane_production_unit__department",
+            "producer__biomethane_injection_site",
+        )
+        .order_by("producer__name")
+    )
+    exported_producer_ids = [decl.producer_id for decl in declarations]
 
-    contracts = {c.producer_id: c for c in BiomethaneContract.objects.filter(producer_id__in=producer_ids)}
-    injection_sites = {i.producer_id: i for i in BiomethaneInjectionSite.objects.filter(producer_id__in=producer_ids)}
-    digestates = {d.producer_id: d for d in BiomethaneDigestate.objects.filter(producer_id__in=producer_ids, year=year)}
-    energies = {e.producer_id: e for e in BiomethaneEnergy.objects.filter(producer_id__in=producer_ids, year=year)}
+    # Year-scoped relations cannot be select_related, preload them to avoid N+1 queries
+    digestates = {
+        d.producer_id: d for d in BiomethaneDigestate.objects.filter(producer_id__in=exported_producer_ids, year=year)
+    }
+    energies = {e.producer_id: e for e in BiomethaneEnergy.objects.filter(producer_id__in=exported_producer_ids, year=year)}
 
-    for row_idx, pu in enumerate(production_units, start=1):
-        pid = pu.producer_id
+    for row_idx, declaration in enumerate(declarations, start=1):
+        producer = declaration.producer
+        pid = producer.id
         row_objects = {
-            "contract": contracts.get(pid),
-            "production_unit": pu,
-            "injection_site": injection_sites.get(pid),
+            "contract": _safe_related(producer, "biomethane_contract"),
+            "production_unit": _safe_related(producer, "biomethane_production_unit"),
+            "injection_site": _safe_related(producer, "biomethane_injection_site"),
             "digestate": digestates.get(pid),
             "energy": energies.get(pid),
         }
         for col_idx, (_label, section, field_name) in enumerate(col_defs):
             if section == "producer":
-                sheet.write(row_idx, col_idx, pu.producer.name if pu.producer else "")
+                sheet.write(row_idx, col_idx, producer.name)
             else:
                 obj = row_objects.get(section)
                 if obj is None or field_name is None:

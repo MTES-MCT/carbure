@@ -4,8 +4,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, OpenApiType
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from biomethane.models import BiomethaneProductionUnit
-from biomethane.permissions import HasDrealRights
+from biomethane.permissions import CanAccessAdminModule
 from biomethane.services.dreal_export import generate_dreal_export
 from core.excel import ExcelResponse
 
@@ -23,18 +22,17 @@ from core.excel import ExcelResponse
     },
 )
 @api_view(["GET"])
-@permission_classes([HasDrealRights])
+@permission_classes([CanAccessAdminModule])
 def export_dreal_annual_declaration(request):
-    """Export all biomethane declarations for a given year as a flat Excel file, filtered by DREAL department access."""
+    """Export validated biomethane declarations for a year as a flat Excel file, scoped by DREAL department access."""
     year = request.query_params.get("year")
     if not year:
         return Response({"error": "year parameter is required"}, status=400)
 
     entity = request.entity
-    accessible_dept_codes = entity.get_accessible_departments().values_list("code_dept", flat=True)
-    production_units = BiomethaneProductionUnit.objects.filter(department__code_dept__in=accessible_dept_codes)
-
-    excel_file = generate_dreal_export(production_units, int(year))
+    # Only export producers the requesting entity is allowed to access (DREAL/ADEME department scope)
+    producer_ids = entity.get_allowed_entities().values_list("id", flat=True)
+    excel_file = generate_dreal_export(producer_ids, int(year))
     try:
         return ExcelResponse(excel_file)
     finally:

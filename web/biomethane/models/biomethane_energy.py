@@ -115,19 +115,33 @@ class BiomethaneEnergy(models.Model):
     ## Efficacité énergétique
 
     # Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
-    purified_biogas_quantity_nm3 = models.FloatField(null=True, blank=True)
+    purified_biogas_quantity_nm3 = models.FloatField(
+        null=True, blank=True, verbose_name="Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)"
+    )
 
     # Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
-    purification_electric_consumption_kwe = models.FloatField(null=True, blank=True)
+    purification_electric_consumption_kwe = models.FloatField(
+        null=True,
+        blank=True,
+        verbose_name="Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)",
+    )
 
     # Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants,
     # le chauffage du digesteur et l'épuration du biogaz  (Nm3)
-    self_consumed_biogas_nm3 = models.FloatField(null=True, blank=True)
+    self_consumed_biogas_nm3 = models.FloatField(
+        null=True,
+        blank=True,
+        verbose_name="Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)",  # noqa: E501
+    )
 
     # Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh)
     # ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants,
     # le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
-    self_consumed_biogas_or_biomethane_kwh = models.FloatField(null=True, blank=True)
+    self_consumed_biogas_or_biomethane_kwh = models.FloatField(
+        null=True,
+        blank=True,
+        verbose_name="Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire",  # noqa: E501
+    )
 
     # Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
     total_unit_electric_consumption_kwe = models.FloatField(

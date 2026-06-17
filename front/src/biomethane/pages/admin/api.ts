@@ -1,4 +1,4 @@
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import {
   BiomethaneAdminAnnualDeclarationFilters,
   BiomethaneAdminDashboardQuery,
@@ -60,3 +60,12 @@ export const getBiomethaneAdminDashboardFilters = (
       },
     })
     .then((res) => res.data ?? [])
+
+export const downloadBiomethaneAdminAnnualDeclaration = (
+  entity_id: number,
+  year: number
+) =>
+  download("/biomethane/dreal-export/", {
+    entity_id,
+    year,
+  })
