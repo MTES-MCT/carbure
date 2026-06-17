@@ -4,22 +4,29 @@ import { useNavigate } from "react-router-dom"
 import Form, { useForm } from "common/components/form"
 import { Mail, Lock, Return, UserAdd, User } from "common/components/icons"
 import { TextInput } from "common/components/input"
-import { Container, Switcher } from "./login"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
+import { Container } from "auth/layouts/container"
+import { Title } from "common/components/title"
 
+type RegisterForm = {
+  email?: string
+  name?: string
+  password?: string
+  repeatPassword?: string
+}
 export const Register = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
 
-  const { value, bind } = useForm({
-    email: "" as string | undefined,
-    name: "" as string | undefined,
-    password: "" as string | undefined,
-    repeatPassword: "" as string | undefined,
+  const { value, bind } = useForm<RegisterForm>({
+    email: "",
+    name: "",
+    password: "",
+    repeatPassword: "",
   })
 
   const register = useMutation(api.register, {
@@ -37,10 +44,12 @@ export const Register = () => {
 
   return (
     <Container>
-      <section>
+      {/* <section>
         <Switcher />
-      </section>
-
+      </section> */}
+      <Title is="h1" as="h3" style={{ textAlign: "center" }}>
+        {t("Inscription")}
+      </Title>
       <section>
         <Form
           id="register"
