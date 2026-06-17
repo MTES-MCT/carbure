@@ -11,11 +11,13 @@ from core.models import CarbureLot, Entity
 from tiruert.models import Operation
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation import OperationService
+from tiruert.services.operation_excel_template import get_tiruert_operator_queryset
 
 
 class OperationExcelImportErrors:
     INVALID_OPERATION_TYPE = "INVALID_OPERATION_TYPE"
     INVALID_VOLUME = "INVALID_VOLUME"
+    MISSING_CREDITED_ENTITY = "MISSING_CREDITED_ENTITY"
 
 
 @dataclass
@@ -24,7 +26,7 @@ class OperationGroup:
     customs_category: str
     biofuel_id: int
     biofuel_code: str
-    credited_entity: Entity
+    credited_entity: Entity | None
     debited_entity: Entity
     row_numbers: list[int]
     lot_volumes: dict[int, float]
@@ -36,7 +38,9 @@ class OperationExcelRowSerializer(serializers.Serializer):
     )
     volume = serializers.FloatField()
     operation_type = serializers.CharField()
-    credited_entity = serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all())
+    credited_entity = serializers.PrimaryKeyRelatedField(
+        queryset=get_tiruert_operator_queryset(), required=False, allow_null=True
+    )
 
     def validate_volume(self, value):
         if value <= 0:
@@ -48,6 +52,11 @@ class OperationExcelRowSerializer(serializers.Serializer):
         if normalized not in [Operation.TRANSFERT, Operation.TENEUR]:
             raise serializers.ValidationError(OperationExcelImportErrors.INVALID_OPERATION_TYPE)
         return normalized
+
+    def validate(self, attrs):
+        if attrs.get("operation_type") == Operation.TRANSFERT and not attrs.get("credited_entity"):
+            raise serializers.ValidationError({"credited_entity": [OperationExcelImportErrors.MISSING_CREDITED_ENTITY]})
+        return attrs
 
 
 class OperationExcelImportService:
@@ -63,7 +72,7 @@ class OperationExcelImportService:
                 row["operation_type"],
                 lot.feedstock.category,
                 lot.biofuel_id,
-                credited_entity.id,
+                credited_entity.id if credited_entity else None,
             )
             grouped[key].append({"row_number": row_number, **row})
 
@@ -135,7 +144,9 @@ class OperationExcelImportService:
             "customs_category": group.customs_category,
             "biofuel": group.biofuel_code,
             "debited_entity": {"id": group.debited_entity.id, "name": group.debited_entity.name},
-            "credited_entity": {"id": group.credited_entity.id, "name": group.credited_entity.name},
+            "credited_entity": (
+                {"id": group.credited_entity.id, "name": group.credited_entity.name} if group.credited_entity else None
+            ),
             "lot_count": len(group.lot_volumes),
             "total_volume": round(sum(group.lot_volumes.values()), 4),
             "rows": group.row_numbers,
@@ -174,6 +185,8 @@ class OperationExcelImportService:
         config = {"header_row": 1}
 
         data = ExcelImporter.parse(file, **config)
+        for row in data:
+            row.pop("credited_entity_name", None)
 
         row_serializer = OperationExcelRowSerializer(data=data, many=True)
         ExcelImporter.validate_retrieved_data(row_serializer, config, len(data))
@@ -197,7 +210,7 @@ class OperationExcelImportService:
                     group.operation_type,
                     group.customs_category,
                     group.biofuel_id,
-                    group.credited_entity.id,
+                    group.credited_entity.id if group.credited_entity else None,
                 )
                 result.append(OperationExcelImportService._serialize_group(group, operation_by_key.get(key)))
 
