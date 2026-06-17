@@ -21,6 +21,7 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
             certificate_type="SYSTEME_NATIONAL",
             status="EXPIRED",
             valid_from=datetime(2026, 1, 31),
+            valid_until=datetime(2027, 2, 17),
         )
         self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
 
@@ -64,8 +65,8 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
     def test_injects_issue_date(self):
         self.certificate.valid_from = datetime(2026, 6, 15, tzinfo=timezone.utc)
-        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
 
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
         issue_date_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/DATE_OF_ISSUE")
         self.assertEqual("2026-06-15+00:00", issue_date_element.text)
 
@@ -78,3 +79,17 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.certificate.certificate_type = "ISCC"
         with self.assertRaises(NotImplementedError):
             AddUpdateCertificateRequest(self.entity_certificate)
+
+    def test_sets_validity_start_date(self):
+        self.certificate.valid_from = datetime(2026, 6, 15, tzinfo=timezone.utc)
+
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        validity_start_date_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CERT_DATE_FROM")
+        self.assertEqual("2026-06-15+00:00", validity_start_date_element.text)
+
+    def test_sets_validity_end_date(self):
+        self.certificate.valid_until = datetime(2026, 6, 17, tzinfo=timezone.utc)
+
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        validity_end_date_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CERT_DATE_TO")
+        self.assertEqual("2026-06-17+00:00", validity_end_date_element.text)

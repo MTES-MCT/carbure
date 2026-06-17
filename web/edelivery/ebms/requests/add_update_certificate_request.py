@@ -23,6 +23,8 @@ class AddUpdateCertificateRequest(BaseRequest):
       <VALIDITY_STATUS>{validity_status}</VALIDITY_STATUS>
       <DATE_OF_ISSUE>{to_date_isoformat(certificate.valid_from)}</DATE_OF_ISSUE>
       <PLACE_OF_ISSUE>France</PLACE_OF_ISSUE>
+      <CERT_DATE_FROM>{to_date_isoformat(certificate.valid_from)}</CERT_DATE_FROM>
+      <CERT_DATE_TO>{to_date_isoformat(certificate.valid_until)}</CERT_DATE_TO>
     </EO_CERTIFICATE>
   </EO_CERTIFICATE_HEADER>
 </udb:AddUpdateCertificateRequest>"""
