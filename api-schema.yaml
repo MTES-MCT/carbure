@@ -1909,6 +1909,13 @@ paths:
           description: Authorised entity ID.
           required: true
         - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
           name: year
           schema:
             type: integer
@@ -11927,6 +11934,85 @@ paths:
                     - TERF SAF
                   summary: Example of filters response.
           description: ""
+  /api/tiruert/operations/import/:
+    post:
+      operationId: import_operations_from_excel
+      description: Validate or create TIRUERT operations from an Excel file
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - gj
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationExcelImportRequestRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/OperationExcelImportRequestRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/OperationExcelImportRequestRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationList"
+          description: ""
+  /api/tiruert/operations/import/template/:
+    get:
+      operationId: download_operations_import_template
+      description: Download the TIRUERT operation import template
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: unit
+          schema:
+            type: string
+            enum:
+              - MJ
+              - gj
+              - kg
+              - l
+          description: Specify the volume unit.
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Fichier Excel généré
   /api/tiruert/operations/simulate/:
     post:
       operationId: simulate
@@ -17384,6 +17470,14 @@ components:
         * `CONTINUOUS_INFINITELY_MIXED` - Continu (infiniment mélangé)
         * `PLUG_FLOW_SEMI_CONTINUOUS` - En piston (semi-continu)
         * `BATCH_SILOS` - En silos (batch)
+    ModeEnum:
+      enum:
+        - validate
+        - create
+      type: string
+      description: |-
+        * `validate` - validate
+        * `create` - create
     MonthlyReportDataRequest:
       type: object
       properties:
@@ -17665,6 +17759,18 @@ components:
       required:
         - id
         - name
+    OperationExcelImportRequestRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+        mode:
+          allOf:
+            - $ref: "#/components/schemas/ModeEnum"
+          default: validate
+      required:
+        - file
     OperationInput:
       type: object
       properties:

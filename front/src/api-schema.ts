@@ -3048,6 +3048,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/operations/import/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Validate or create TIRUERT operations from an Excel file */
+        post: operations["import_operations_from_excel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tiruert/operations/import/template/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Download the TIRUERT operation import template */
+        get: operations["download_operations_import_template"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/simulate/": {
         parameters: {
             query?: never;
@@ -5506,6 +5540,12 @@ export interface components {
          * @enum {string}
          */
         MethanizationProcessEnum: MethanizationProcessEnum;
+        /**
+         * @description * `validate` - validate
+         *     * `create` - create
+         * @enum {string}
+         */
+        ModeEnum: ModeEnum;
         MonthlyReportDataRequest: {
             month: number;
             /** Format: double */
@@ -5624,6 +5664,12 @@ export interface components {
         OperationEntity: {
             id: number;
             name: string;
+        };
+        OperationExcelImportRequestRequest: {
+            /** Format: binary */
+            file: File;
+            /** @default validate */
+            mode: components["schemas"]["ModeEnum"];
         };
         OperationInput: {
             type: components["schemas"]["OperationTypeEnum"];
@@ -14116,6 +14162,61 @@ export interface operations {
             };
         };
     };
+    import_operations_from_excel: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Specify the volume unit. */
+                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperationExcelImportRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["OperationExcelImportRequestRequest"];
+                "multipart/form-data": components["schemas"]["OperationExcelImportRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationList"];
+                };
+            };
+        };
+    };
+    download_operations_import_template: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Specify the volume unit. */
+                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fichier Excel généré */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": File;
+                };
+            };
+        };
+    };
     simulate: {
         parameters: {
             query: {
@@ -14909,6 +15010,10 @@ export enum MethanizationProcessEnum {
     CONTINUOUS_INFINITELY_MIXED = "CONTINUOUS_INFINITELY_MIXED",
     PLUG_FLOW_SEMI_CONTINUOUS = "PLUG_FLOW_SEMI_CONTINUOUS",
     BATCH_SILOS = "BATCH_SILOS"
+}
+export enum ModeEnum {
+    validate = "validate",
+    create = "create"
 }
 export enum NetworkTypeEnum {
     TRANSPORT = "TRANSPORT",
