@@ -1,27 +1,29 @@
 import { useTranslation } from "react-i18next"
-import { ImportErrorResponse } from "./supply-excel-import-dialog"
 import { Notice } from "common/components/notice"
 import { Text } from "common/components/text"
 
+export interface ValidationError {
+  row: number
+  errors: Record<string, string[]>
+}
+
+export interface ImportErrorResponse {
+  validation_errors: ValidationError[]
+  total_errors: number
+  total_rows_processed: number
+}
+
+interface ExcelImportErrorsProps {
+  importErrors: ImportErrorResponse
+  fieldLabels?: Record<string, string>
+}
+
 export const ExcelImportErrors = ({
   importErrors,
-}: {
-  importErrors: ImportErrorResponse
-}) => {
+  fieldLabels = {},
+}: ExcelImportErrorsProps) => {
   const { t } = useTranslation()
-  const fieldLabels = {
-    feedstock: t("Intrant"),
-    material_unit: t("Unité matière"),
-    dry_matter_ratio_percent: t("Ratio de matière sèche"),
-    type_cive: t("Type de CIVE"),
-    culture_details: t("Précisez la culture"),
-    collection_type: t("Type de collecte"),
-    volume: t("Volume"),
-    average_weighted_distance_km: t("Distance moyenne pondérée"),
-    maximum_distance_km: t("Distance maximale"),
-    origin_country: t("Pays d'origine"),
-    origin_department: t("Département d'origine"),
-  }
+
   return (
     <Notice variant="alert">
       <div>
@@ -41,9 +43,7 @@ export const ExcelImportErrors = ({
                   ([field, messages]) => (
                     <li key={field}>
                       {t("Champ {{field}} :", {
-                        field:
-                          fieldLabels[field as keyof typeof fieldLabels] ??
-                          field,
+                        field: fieldLabels[field] ?? field,
                       })}
                       <ul>
                         {messages.map((message, msgIndex) => (
