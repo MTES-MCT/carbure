@@ -32,6 +32,14 @@ def _get_sector(biofuel) -> str:
     return ""
 
 
+def default_status(operation_type: str) -> str:
+    default_status = {
+        Operation.TENEUR: Operation.PENDING,
+        Operation.TRANSFERT: Operation.DRAFT,
+    }
+    return default_status.get(operation_type, Operation.DRAFT)
+
+
 @dataclass
 class OperationGroup:
     operation_type: str
@@ -155,7 +163,7 @@ class OperationExcelImportService:
     def _serialize_group(group: OperationGroup, operation: Operation | None = None) -> dict:
         return {
             "operation_id": operation.id if operation else None,
-            "status": operation.status if operation else Operation.DRAFT,
+            "status": operation.status if operation else default_status(group.operation_type),
             "type": group.operation_type,
             "sector": group.sector,
             "customs_category": group.customs_category,
@@ -177,7 +185,7 @@ class OperationExcelImportService:
             for group in groups:
                 operation_data = {
                     "type": group.operation_type,
-                    "status": Operation.DRAFT,
+                    "status": default_status(group.operation_type),
                     "customs_category": group.customs_category,
                     "biofuel_id": group.biofuel_id,
                     "credited_entity": group.credited_entity,
