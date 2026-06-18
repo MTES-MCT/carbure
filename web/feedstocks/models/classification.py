@@ -1,10 +1,10 @@
 from django.db import models
 
-from feedstocks.classification_computed_attributes import (
-    INTERMEDIATE,
-    PRIMARY,
-    get_crop_type,
-)
+PRIMARY = "PRIMARY"
+INTERMEDIATE = "INTERMEDIATE"
+CROP_TYPES_CHOICES = [(PRIMARY, PRIMARY), (INTERMEDIATE, INTERMEDIATE)]
+CATEGORY_PRIMARY_CROPS = "Biomasse agricole - Cultures pour alimentaiton humaine ou animale (principales)"
+CATEGORY_INTERMEDIATE_CROPS = "Biomasse agricole - Cultures intermédiaires"
 
 
 class Classification(models.Model):
@@ -14,15 +14,11 @@ class Classification(models.Model):
 
     @property
     def crop_type(self) -> str | None:
-        return get_crop_type(self)
-
-    @property
-    def is_primary_crop(self) -> bool:
-        return self.crop_type == PRIMARY
-
-    @property
-    def is_intermediate_crop(self) -> bool:
-        return self.crop_type == INTERMEDIATE
+        if self.category == CATEGORY_PRIMARY_CROPS:
+            return PRIMARY
+        elif self.category == CATEGORY_INTERMEDIATE_CROPS:
+            return INTERMEDIATE
+        return None
 
     def __str__(self):
         return f"{self.group} / {self.category} / {self.subcategory}"

@@ -8,10 +8,10 @@ Denominator: total declared tMB (same basis as tariff coefficient proportions).
 from django.db.models import Case, F, FloatField, Sum, Value, When
 
 from biomethane.services.supply_plan.tariff_coefficient import (
-    _pct,
+    _percentage,
     _wet_matter_tonnage_expression,
 )
-from feedstocks.classification_computed_attributes import CATEGORY_PRIMARY_CROPS
+from feedstocks.models.classification import CATEGORY_PRIMARY_CROPS
 
 
 def compute_primary_crop_proportion(queryset) -> float:
@@ -39,4 +39,4 @@ def compute_primary_crop_proportion(queryset) -> float:
     if not total:
         return 0.0
 
-    return _pct(rows["primary"] or 0.0, total)
+    return _percentage(rows["primary"] or 0.0, total)

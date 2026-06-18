@@ -6,8 +6,8 @@ from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, Biome
 from biomethane.models import BiomethaneSupplyInput
 from biomethane.services.supply_plan.primary_crop_proportion import compute_primary_crop_proportion
 from core.models import MatierePremiere
-from feedstocks.classification_computed_attributes import CATEGORY_PRIMARY_CROPS
 from feedstocks.models import Classification
+from feedstocks.models.classification import CATEGORY_PRIMARY_CROPS
 
 
 class PrimaryCropProportionTests(TestCase):

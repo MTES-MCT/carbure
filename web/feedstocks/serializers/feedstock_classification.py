@@ -4,8 +4,7 @@ from rest_framework.fields import ChoiceField
 
 from core.models import MatierePremiere
 from core.serializers import FeedStockSerializer
-from feedstocks.classification_computed_attributes import CROP_TYPES_CHOICES, get_crop_type
-from feedstocks.models.classification import Classification
+from feedstocks.models.classification import CROP_TYPES_CHOICES, Classification
 
 
 class ClassificationSerializer(serializers.ModelSerializer):
@@ -17,7 +16,7 @@ class ClassificationSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(ChoiceField(choices=CROP_TYPES_CHOICES, allow_null=True))
     def get_crop_type(self, obj):
-        return get_crop_type(obj)
+        return obj.crop_type
 
 
 class FeedStockClassificationSerializer(serializers.ModelSerializer):
