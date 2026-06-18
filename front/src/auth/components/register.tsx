@@ -8,6 +8,10 @@ import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { Container, Content, FooterAuth } from "auth/layouts/container"
 import { Title } from "common/components/title"
+import {
+  PasswordInput,
+  usePasswordValidation,
+} from "auth/components/password-input"
 
 export const Register = () => {
   const { t } = useTranslation()
@@ -15,7 +19,7 @@ export const Register = () => {
   const notifyError = useNotifyError()
   const navigate = useNavigate()
 
-  const { value, bind } = useForm({
+  const { value, bind, setField } = useForm({
     email: "" as string | undefined,
     name: "" as string | undefined,
     password: "" as string | undefined,
@@ -33,7 +37,10 @@ export const Register = () => {
     },
   })
 
-  const isPassOk = value.password === value.repeatPassword
+  const { messages, confirmationMessages, isValid } = usePasswordValidation(
+    value.password,
+    value.repeatPassword
+  )
 
   return (
     <Container>
@@ -67,18 +74,22 @@ export const Register = () => {
             {...bind("name")}
             required
           />
-          <TextInput
-            type="password"
+          <PasswordInput
             label={t("Mot de passe")}
-            {...bind("password")}
+            value={value.password}
+            onChange={(v) => setField("password", v)}
+            messages={messages}
+            autoComplete="new-password"
             required
           />
-          <TextInput
-            type="password"
+          <PasswordInput
             label={t("Répéter le mot de passe")}
-            {...bind("repeatPassword")}
+            value={value.repeatPassword}
+            onChange={(v) => setField("repeatPassword", v)}
+            messages={confirmationMessages}
+            messagesHint=""
+            autoComplete="new-password"
             required
-            stateRelatedMessage={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
           />
         </Form>
 
@@ -95,13 +106,7 @@ export const Register = () => {
           </Button>
           <Button
             loading={register.loading}
-            disabled={
-              !isPassOk ||
-              !value.email ||
-              !value.name ||
-              !value.password ||
-              !value.repeatPassword
-            }
+            disabled={!isValid || !value.email || !value.name}
             type="submit"
             nativeButtonProps={{ form: "register" }}
           >
