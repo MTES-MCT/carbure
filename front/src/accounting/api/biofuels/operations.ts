@@ -3,6 +3,7 @@ import { OperationsFilter, OperationsQuery, OperationOrder } from "../../types"
 import { api, download } from "common/services/api-fetch"
 import { download as downloadFile } from "common/services/api"
 import { formatOperation } from "accounting/utils/formatters"
+import { ModeEnum } from "api-schema"
 
 export const getOperationsFilters = (
   filter: string,
@@ -221,5 +222,23 @@ export function downloadOperationDetails(
   return downloadFile(`/tiruert/operations/${operation_id}/export/`, {
     entity_id,
     selected_entity_id,
+  })
+}
+
+export const importOperationsFromExcel = async (
+  entityId: number,
+  file: File,
+  mode: ModeEnum
+) => {
+  return api.POST(`/tiruert/operations/import/`, {
+    params: {
+      query: {
+        entity_id: entityId,
+      },
+    },
+    body: {
+      file,
+      mode: mode,
+    },
   })
 }

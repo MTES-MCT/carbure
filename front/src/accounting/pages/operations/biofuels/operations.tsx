@@ -24,11 +24,16 @@ import { ExportButton } from "common/components/export"
 import { Notice } from "common/components/notice"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { Button } from "common/components/button2"
+import { useLocation, useNavigate } from "react-router-dom"
+import { OperationsExcelImportDialog } from "../operations-excel-import-dialog"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   const { selectedEntityId } = useSelectedEntity()
+  const navigate = useNavigate()
+  const location = useLocation()
   const filterLabels = {
     [OperationsFilter.years]: t("Année"),
     [OperationsFilter.status]: t("Statut"),
@@ -46,7 +51,7 @@ const OperationsBiofuels = () => {
     useQueryBuilder<OperationsQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(api.getOperations, {
-    key: `operations-${selectedEntityId}`,
+    key: `operations`,
     params: [query, selectedEntityId],
   })
 
@@ -65,6 +70,16 @@ const OperationsBiofuels = () => {
     <>
       <ActionBar>
         <ExportButton query={query} download={api.downloadOperations} />
+        <Button
+          onClick={() => {
+            navigate({ search: location.search, hash: "#import" })
+          }}
+          iconId="ri-upload-line"
+          asideX
+          priority="secondary"
+        >
+          {t("Importer des opérations")}
+        </Button>
       </ActionBar>
 
       <FilterMultiSelect2
@@ -119,6 +134,16 @@ const OperationsBiofuels = () => {
       )}
 
       <HashRoute path="operation/:id" element={<OperationDetail />} />
+      <HashRoute
+        path="/import"
+        element={
+          <OperationsExcelImportDialog
+            onClose={() => {
+              navigate({ search: location.search, hash: "#" })
+            }}
+          />
+        }
+      />
     </>
   )
 }
