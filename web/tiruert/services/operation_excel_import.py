@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.excel_importer import ExcelImporter, ExcelValidationError
@@ -56,18 +57,20 @@ class OperationExcelRowSerializer(serializers.Serializer):
 
     def validate_volume(self, value):
         if value <= 0:
-            raise serializers.ValidationError(OperationExcelImportErrors.INVALID_VOLUME)
+            raise serializers.ValidationError(_("La valeur du volume doit être supérieure à zéro."))
         return value
 
     def validate_operation_type(self, value):
         normalized = str(value or "").strip().upper()
         if normalized not in [Operation.TRANSFERT, Operation.TENEUR]:
-            raise serializers.ValidationError(OperationExcelImportErrors.INVALID_OPERATION_TYPE)
+            raise serializers.ValidationError(_("Le type d'opération doit être 'TRANSFERT' ou 'TENEUR'."))
         return normalized
 
     def validate(self, attrs):
         if attrs.get("operation_type") == Operation.TRANSFERT and not attrs.get("credited_entity"):
-            raise serializers.ValidationError({"credited_entity": [OperationExcelImportErrors.MISSING_CREDITED_ENTITY]})
+            raise serializers.ValidationError(
+                {"credited_entity": _("Destinataire requis pour les opérations de type TRANSFERT.")}
+            )
         return attrs
 
 
@@ -143,7 +146,7 @@ class OperationExcelImportService:
                 OperationService.check_volumes(selected_lots, data, "l")
             except serializers.ValidationError as exc:
                 for row_number in group.row_numbers:
-                    errors.append({"row": row_number, "errors": {"volume": [str(exc.detail)]}})
+                    errors.append({"row": row_number, "errors": exc.detail})
 
         if errors:
             raise ExcelValidationError(errors, total_rows)

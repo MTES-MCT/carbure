@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.models import CarbureLot, MatierePremiere
@@ -76,7 +77,7 @@ class OperationService:
         """
         Check if the selected lots exist and have enough volume to perform the operation
         """
-        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data)
+        np_volumes, __, np_lot_ids, __, __ = TeneurService.prepare_data(data)
 
         # Normalize available and requested volumes to business precision.
         available_volumes = {int(lot_id): truncate(volume) for lot_id, volume in zip(np_lot_ids, np_volumes)}
@@ -86,10 +87,18 @@ class OperationService:
             volume = truncate(lot["volume"])
 
             if lot_id not in available_volumes:
-                raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
+                raise serializers.ValidationError({"lot_id": [_(f"{lot_id}: Cet id de lot n'existe pas")]})
 
             if available_volumes[lot_id] < volume:
-                raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
+                raise serializers.ValidationError(
+                    {
+                        "lot_id": [
+                            _(
+                                f"{lot_id}: Volume insuffisant pour le lot sélectionné. Volume disponible: {available_volumes[lot_id]}"  # noqa: E501
+                            )
+                        ]
+                    }
+                )
 
     @staticmethod
     def check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year):
