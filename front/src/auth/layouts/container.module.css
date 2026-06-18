@@ -39,8 +39,17 @@
   gap: var(--spacing-2w);
 }
 
-.content {
+.footer-auth--aside-x {
+  justify-content: flex-end;
+}
+
+.content,
+.section {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-5w);
+}
+
+.section {
+  gap: var(--spacing-2w);
 }

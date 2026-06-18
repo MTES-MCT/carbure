@@ -6,12 +6,14 @@ import { TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
-import { Container, Content, FooterAuth } from "auth/layouts/container"
+import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
 import { Title } from "common/components/title"
 import {
   PasswordInput,
   usePasswordValidation,
 } from "auth/components/password-input"
+import { Text } from "common/components/text"
+import Alert from "@codegouvfr/react-dsfr/Alert"
 
 export const Register = () => {
   const { t } = useTranslation()
@@ -120,23 +122,25 @@ export const RegisterPending = () => {
 
   return (
     <Container>
-      <section>
-        <p>
-          {t(
-            "Votre demande d'inscription a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra d'activer votre compte afin de pouvoir vous connecter."
-          )}
-        </p>
-      </section>
+      <Content>
+        <Section>
+          <Alert
+            severity="success"
+            description={t("Le compte a bien été créé !")}
+            small
+            closable
+          />
+          <Text>
+            {t(
+              "Votre demande d'inscription a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra d'activer votre compte afin de pouvoir vous connecter."
+            )}
+          </Text>
+        </Section>
 
-      <footer>
-        <Button
-          priority="secondary"
-          iconId="ri-arrow-left-line"
-          linkProps={{ to: "/" }}
-        >
+        <Button priority="secondary" linkProps={{ to: "/" }} asideX>
           {t("Retour")}
         </Button>
-      </footer>
+      </Content>
     </Container>
   )
 }
