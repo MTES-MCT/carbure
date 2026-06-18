@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from core.excel_importer import ExcelImporter, ExcelValidationError
 from core.models import CarbureLot, Entity
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation import OperationService
@@ -20,12 +21,23 @@ class OperationExcelImportErrors:
     MISSING_CREDITED_ENTITY = "MISSING_CREDITED_ENTITY"
 
 
+def _get_sector(biofuel) -> str:
+    if biofuel.compatible_essence:
+        return Operation.ESSENCE
+    elif biofuel.compatible_diesel:
+        return Operation.GAZOLE
+    elif biofuel.code in SAF_BIOFUEL_TYPES:
+        return Operation.CARBUREACTEUR
+    return ""
+
+
 @dataclass
 class OperationGroup:
     operation_type: str
     customs_category: str
     biofuel_id: int
     biofuel_code: str
+    sector: str
     credited_entity: Entity | None
     debited_entity: Entity
     row_numbers: list[int]
@@ -95,6 +107,7 @@ class OperationExcelImportService:
                     customs_category=customs_category,
                     biofuel_id=biofuel_id,
                     biofuel_code=first_lot.biofuel.code,
+                    sector=_get_sector(first_lot.biofuel),
                     credited_entity=first_row["credited_entity"],
                     debited_entity=debited_entity,
                     row_numbers=row_numbers,
@@ -141,6 +154,7 @@ class OperationExcelImportService:
             "operation_id": operation.id if operation else None,
             "status": operation.status if operation else Operation.DRAFT,
             "type": group.operation_type,
+            "sector": group.sector,
             "customs_category": group.customs_category,
             "biofuel": group.biofuel_code,
             "debited_entity": {"id": group.debited_entity.id, "name": group.debited_entity.name},
@@ -155,8 +169,7 @@ class OperationExcelImportService:
     @staticmethod
     def _create_operations(groups: list[OperationGroup]) -> list[Operation]:
         created_operations = []
-        year = DeclarationPeriodService.get_declaration_year()
-
+        year = DeclarationPeriodService.get_current_declaration_year()
         with transaction.atomic():
             for group in groups:
                 operation_data = {
