@@ -1,13 +1,13 @@
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import Form, { useForm } from "common/components/form"
-import { Mail, Lock, Return, UserAdd, User } from "common/components/icons"
-import { TextInput } from "common/components/input"
-import { Container, Switcher } from "./login"
+import { Form, useForm } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
+import { Container, Content, FooterAuth } from "auth/layouts/container"
+import { Title } from "common/components/title"
 
 export const Register = () => {
   const { t } = useTranslation()
@@ -37,13 +37,14 @@ export const Register = () => {
 
   return (
     <Container>
-      <section>
-        <Switcher />
-      </section>
+      <Title is="h1" as="h3" style={{ textAlign: "center" }}>
+        {t("Inscription")}
+      </Title>
 
-      <section>
+      <Content>
         <Form
           id="register"
+          gap="sm"
           onSubmit={() =>
             register.execute(
               value.email!,
@@ -55,77 +56,65 @@ export const Register = () => {
         >
           <TextInput
             autoFocus
-            variant="solid"
-            icon={Mail}
             type="email"
             label={t("Adresse email")}
             {...bind("email")}
             required
           />
           <TextInput
-            variant="solid"
             placeholder="Jean-François CHAMPOLLION"
-            icon={User}
             label={t("Nom")}
             {...bind("name")}
             required
           />
           <TextInput
-            variant="solid"
-            icon={Lock}
             type="password"
             label={t("Mot de passe")}
             {...bind("password")}
             required
           />
           <TextInput
-            variant="solid"
-            icon={Lock}
             type="password"
             label={t("Répéter le mot de passe")}
             {...bind("repeatPassword")}
             required
-            error={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
-          />
-          <Button
-            variant="link"
-            label={t("Je n'ai pas reçu le lien d'activation")}
-            to="../activate-request"
+            stateRelatedMessage={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
           />
         </Form>
-      </section>
 
-      <footer>
         <Button
+          customPriority="link"
+          linkProps={{ to: "../activate-request" }}
           center
-          loading={register.loading}
-          disabled={
-            !isPassOk ||
-            !value.email ||
-            !value.name ||
-            !value.password ||
-            !value.repeatPassword
-          }
-          variant="primary"
-          icon={UserAdd}
-          submit="register"
-          label={t("Créer un nouveau compte")}
-        />
-        <Button
-          center
-          variant="secondary"
-          icon={Return}
-          label={t("Annuler")}
-          action={() => navigate("/")}
-        />
-      </footer>
+        >
+          {t("Je n'ai pas reçu le lien d'activation")}
+        </Button>
+        <FooterAuth>
+          <Button priority="secondary" linkProps={{ to: "/" }}>
+            {t("Annuler")}
+          </Button>
+          <Button
+            loading={register.loading}
+            disabled={
+              !isPassOk ||
+              !value.email ||
+              !value.name ||
+              !value.password ||
+              !value.repeatPassword
+            }
+            type="submit"
+            nativeButtonProps={{ form: "register" }}
+          >
+            {t("Créer un nouveau compte")}
+          </Button>
+        </FooterAuth>
+      </Content>
     </Container>
   )
 }
 
 export const RegisterPending = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   return (
     <Container>
@@ -139,12 +128,12 @@ export const RegisterPending = () => {
 
       <footer>
         <Button
-          center
-          variant="secondary"
-          icon={Return}
-          label={t("Retour")}
-          action={() => navigate("/")}
-        />
+          priority="secondary"
+          iconId="ri-arrow-left-line"
+          linkProps={{ to: "/" }}
+        >
+          {t("Retour")}
+        </Button>
       </footer>
     </Container>
   )
