@@ -62,7 +62,7 @@ export const usePasswordValidation = (
   const confirmationMessages: PasswordMessage[] = hasConfirmation
     ? [
         {
-          message: t("Les deux mots de passe sont identiques"),
+          message: t("Les deux mots de passe doivent être identiques"),
           severity: getSeverity(confirmationValue, isMatching),
         },
       ]

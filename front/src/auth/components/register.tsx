@@ -37,10 +37,21 @@ export const Register = () => {
     },
   })
 
-  const { messages, confirmationMessages, isValid } = usePasswordValidation(
+  const { isValid } = usePasswordValidation(
     value.password,
     value.repeatPassword
   )
+
+  const handleRegister = () => {
+    if (!isValid) return
+
+    register.execute(
+      value.email!,
+      value.name!,
+      value.password!,
+      value.repeatPassword!
+    )
+  }
 
   return (
     <Container>
@@ -49,18 +60,7 @@ export const Register = () => {
       </Title>
 
       <Content>
-        <Form
-          id="register"
-          gap="sm"
-          onSubmit={() =>
-            register.execute(
-              value.email!,
-              value.name!,
-              value.password!,
-              value.repeatPassword!
-            )
-          }
-        >
+        <Form id="register" gap="sm" onSubmit={handleRegister}>
           <TextInput
             autoFocus
             type="email"
@@ -78,7 +78,6 @@ export const Register = () => {
             label={t("Mot de passe")}
             value={value.password}
             onChange={(v) => setField("password", v)}
-            messages={messages}
             autoComplete="new-password"
             required
           />
@@ -86,8 +85,7 @@ export const Register = () => {
             label={t("Répéter le mot de passe")}
             value={value.repeatPassword}
             onChange={(v) => setField("repeatPassword", v)}
-            messages={confirmationMessages}
-            messagesHint=""
+            confirm={value.password}
             autoComplete="new-password"
             required
           />
@@ -106,7 +104,6 @@ export const Register = () => {
           </Button>
           <Button
             loading={register.loading}
-            disabled={!isValid || !value.email || !value.name}
             type="submit"
             nativeButtonProps={{ form: "register" }}
           >
