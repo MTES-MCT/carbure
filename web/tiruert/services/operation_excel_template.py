@@ -31,7 +31,7 @@ ENTITIES_SHEET_NAME = "Entités"
 HEADER_ROW = 0
 KEY_ROW = 1
 FIRST_DATA_ROW = 2
-LAST_DATA_ROW = 100001
+LAST_DATA_ROW = 10001
 
 
 def _excel_column_letter(col_index: int) -> str:
