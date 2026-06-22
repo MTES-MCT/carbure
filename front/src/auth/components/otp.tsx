@@ -10,6 +10,7 @@ import * as api from "../api"
 import { useEffect } from "react"
 import { HttpError } from "common/services/api-fetch"
 import { Text } from "common/components/text"
+import { ROUTE_URLS } from "common/utils/routes"
 
 const OTP = () => {
   const { t } = useTranslation()
@@ -24,7 +25,7 @@ const OTP = () => {
 
     onSuccess: () => {
       notify(t("Vous êtes connecté !"), { variant: "success" })
-      navigate("/")
+      navigate(ROUTE_URLS.HOME)
     },
 
     onError: (error) => {
@@ -90,7 +91,10 @@ const OTP = () => {
         </Section>
 
         <FooterAuth>
-          <Button onClick={() => navigate("/")} priority="secondary">
+          <Button
+            onClick={() => navigate(ROUTE_URLS.HOME)}
+            priority="secondary"
+          >
             {t("Annuler")}
           </Button>
           <Button

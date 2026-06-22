@@ -26,7 +26,7 @@ const Login = () => {
     onSuccess: () => {
       notify(t("Un code vient de vous être envoyé"), { variant: "success" })
       api.requestOTP()
-      navigate("../otp")
+      navigate(ROUTE_URLS.AUTH.OTP)
     },
     onError: (error) => {
       let errorMessage = t("La connexion a échoué")
@@ -82,7 +82,7 @@ const Login = () => {
         <Section gap="lg">
           <Button
             customPriority="link"
-            linkProps={{ to: "../activate-request" }}
+            linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}
             center
           >
             {t("Je n'ai pas reçu le lien d'activation")}
@@ -97,7 +97,7 @@ const Login = () => {
         </Section>
 
         <FooterAuth>
-          <Button priority="secondary" linkProps={{ to: "/" }}>
+          <Button priority="secondary" linkProps={{ to: ROUTE_URLS.HOME }}>
             {t("Annuler")}
           </Button>
           <Button

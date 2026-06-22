@@ -198,9 +198,13 @@ export const ROUTE_URLS = {
   },
   AUTH: {
     LOGIN: "/auth/login",
+    OTP: "/auth/otp",
     REGISTER: "/auth/register",
+    REGISTER_PENDING: "/auth/register-pending",
     LOGOUT: "/auth/logout",
     RESET_PASSWORD_REQUEST: "/auth/reset-password-request",
+    RESET_PASSWORD_PENDING: "/auth/reset-password-pending",
+    RESET_PASSWORD: "/auth/reset-password",
     ACTIVATE_REQUEST: "/auth/activate-request",
   },
   STATISTICS: (entity_id: number) => urlWithOrgId(entity_id, "/stats"),

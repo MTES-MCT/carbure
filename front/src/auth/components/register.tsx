@@ -33,7 +33,7 @@ export const Register = () => {
   const register = useMutation(api.register, {
     onSuccess: () => {
       notify(t("Le compte a bien été créé !"), { variant: "success" })
-      navigate("../register-pending")
+      navigate(ROUTE_URLS.AUTH.REGISTER_PENDING)
     },
 
     onError: (error) => {
@@ -103,7 +103,7 @@ export const Register = () => {
           {t("Je n'ai pas reçu le lien d'activation")}
         </Button>
         <FooterAuth>
-          <Button priority="secondary" linkProps={{ to: "/" }}>
+          <Button priority="secondary" linkProps={{ to: ROUTE_URLS.HOME }}>
             {t("Annuler")}
           </Button>
           <Button
@@ -152,7 +152,7 @@ export const RegisterPending = () => {
           </Text>
         </Section>
 
-        <Button priority="secondary" linkProps={{ to: "/" }} asideX>
+        <Button priority="secondary" linkProps={{ to: ROUTE_URLS.HOME }} asideX>
           {t("Retour")}
         </Button>
       </Content>

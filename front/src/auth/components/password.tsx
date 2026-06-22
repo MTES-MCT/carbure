@@ -12,6 +12,7 @@ import { TextInput } from "common/components/inputs2"
 import { PasswordInput, usePasswordValidation } from "./password-input"
 import { Text } from "common/components/text"
 import Alert from "@codegouvfr/react-dsfr/Alert"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const ResetPasswordRequest = () => {
   const { t } = useTranslation()
@@ -25,7 +26,7 @@ export const ResetPasswordRequest = () => {
       notify(t("La demande de changement de mot de passe a été envoyée !"), {
         variant: "success",
       })
-      navigate("../reset-password-pending")
+      navigate(ROUTE_URLS.AUTH.RESET_PASSWORD_PENDING)
     },
 
     onError: () => {
@@ -56,7 +57,10 @@ export const ResetPasswordRequest = () => {
           </Form>
         </Section>
         <FooterAuth asideX>
-          <Button onClick={() => navigate("../login")} priority="secondary">
+          <Button
+            onClick={() => navigate(ROUTE_URLS.AUTH.LOGIN)}
+            priority="secondary"
+          >
             {t("Annuler")}
           </Button>
           <Button
@@ -97,7 +101,10 @@ export const ResetPasswordPending = () => {
         </Section>
 
         <FooterAuth asideX>
-          <Button priority="secondary" onClick={() => navigate("/")}>
+          <Button
+            priority="secondary"
+            onClick={() => navigate(ROUTE_URLS.HOME)}
+          >
             {t("Retour")}
           </Button>
         </FooterAuth>
@@ -122,7 +129,7 @@ export const ResetPassword = () => {
   const resetPassword = useMutation(api.resetPassword, {
     onSuccess: () => {
       notify(t("Le mot de passe a bien été changé !"), { variant: "success" })
-      navigate("../login")
+      navigate(ROUTE_URLS.AUTH.LOGIN)
     },
 
     onError: (error) => {
@@ -172,7 +179,10 @@ export const ResetPassword = () => {
           </Form>
         </Section>
         <FooterAuth>
-          <Button onClick={() => navigate("/")} priority="secondary">
+          <Button
+            onClick={() => navigate(ROUTE_URLS.HOME)}
+            priority="secondary"
+          >
             {t("Annuler")}
           </Button>
           <Button

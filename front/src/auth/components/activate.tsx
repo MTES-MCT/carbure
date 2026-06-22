@@ -17,7 +17,7 @@ import { Form, useForm } from "common/components/form2"
 import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
 import Alert from "@codegouvfr/react-dsfr/Alert"
 import { Text } from "common/components/text"
-import { addQueryParams } from "common/utils/routes"
+import { addQueryParams, ROUTE_URLS } from "common/utils/routes"
 
 export const Activate = () => {
   const { t } = useTranslation()
@@ -81,7 +81,7 @@ export const Activate = () => {
             <Button
               linkProps={{
                 to: addQueryParams(
-                  "../reset-password",
+                  ROUTE_URLS.AUTH.RESET_PASSWORD,
                   Object.fromEntries(userInvitedSearchParams.entries())
                 ),
               }}
@@ -90,12 +90,12 @@ export const Activate = () => {
             </Button>
           )}
           {isSuccess && !isUserInvited && (
-            <Button onClick={() => navigate("../login")}>
+            <Button onClick={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
               {t("Se connecter")}
             </Button>
           )}
           {isError && !isUserInvited && (
-            <Button onClick={() => navigate("../register")}>
+            <Button onClick={() => navigate(ROUTE_URLS.AUTH.REGISTER)}>
               {t("Réessayer de s'inscrire")}
             </Button>
           )}
@@ -120,7 +120,7 @@ export const ActivateRequest = () => {
         ),
         { variant: "success" }
       )
-      navigate("../register-pending")
+      navigate(ROUTE_URLS.AUTH.REGISTER_PENDING)
     },
 
     onError: () => {
@@ -150,7 +150,10 @@ export const ActivateRequest = () => {
           </Form>
         </Section>
         <FooterAuth asideX>
-          <Button onClick={() => navigate("../register")} priority="secondary">
+          <Button
+            onClick={() => navigate(ROUTE_URLS.AUTH.REGISTER)}
+            priority="secondary"
+          >
             {t("Annuler")}
           </Button>
           <Button
@@ -175,7 +178,7 @@ export function useToken() {
 
   useEffect(() => {
     if (uidb64 === undefined || token === undefined) {
-      navigate("/")
+      navigate(ROUTE_URLS.HOME)
     }
   }, [uidb64, token, navigate])
 

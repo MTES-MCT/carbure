@@ -5,6 +5,7 @@ import { invalidate } from "common/hooks/invalidate"
 import * as api from "../api"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const Logout = () => {
   const { t } = useTranslation()
@@ -18,7 +19,7 @@ export const Logout = () => {
     onSuccess: () => {
       invalidate("user-settings")
       notify(t("Vous êtes déconnecté !"), { variant: "success" })
-      navigate("/")
+      navigate(ROUTE_URLS.HOME)
     },
     onError: () => {
       notify(t("La déconnexion a échoué !"), { variant: "danger" })
