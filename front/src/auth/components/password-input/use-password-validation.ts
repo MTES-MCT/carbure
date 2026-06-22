@@ -42,10 +42,6 @@ export const usePasswordValidation = (
       label: t("12 caractères minimum"),
       test: (v) => v.length >= MIN_LENGTH,
     },
-    {
-      label: t("Au moins une lettre"),
-      test: (v) => /\p{L}/u.test(v),
-    },
   ]
 
   const messages: PasswordMessage[] = rules.map((rule) => ({

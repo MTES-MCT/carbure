@@ -14,6 +14,8 @@ import {
 } from "auth/components/password-input"
 import { Text } from "common/components/text"
 import Alert from "@codegouvfr/react-dsfr/Alert"
+import { Divider } from "common/components/divider"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const Register = () => {
   const { t } = useTranslation()
@@ -95,7 +97,7 @@ export const Register = () => {
 
         <Button
           customPriority="link"
-          linkProps={{ to: "../activate-request" }}
+          linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}
           center
         >
           {t("Je n'ai pas reçu le lien d'activation")}
@@ -112,6 +114,19 @@ export const Register = () => {
             {t("Créer un nouveau compte")}
           </Button>
         </FooterAuth>
+        <Divider />
+        <Section>
+          <Title is="h4" as="h5" style={{ textAlign: "center" }}>
+            {t("Vous avez déjà un compte ?")}
+          </Title>
+          <Button
+            priority="secondary"
+            linkProps={{ to: ROUTE_URLS.AUTH.LOGIN }}
+            center
+          >
+            {t("Se connecter")}
+          </Button>
+        </Section>
       </Content>
     </Container>
   )

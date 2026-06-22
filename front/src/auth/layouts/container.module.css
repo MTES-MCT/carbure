@@ -50,6 +50,10 @@
   gap: var(--spacing-5w);
 }
 
-.section {
+.section--gap-md {
   gap: var(--spacing-2w);
+}
+
+.section--gap-lg {
+  gap: var(--spacing-3w);
 }

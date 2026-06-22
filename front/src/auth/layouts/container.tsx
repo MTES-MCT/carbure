@@ -45,6 +45,16 @@ export const Content = ({ children }: { children: React.ReactNode }) => {
 }
 
 // Separate elements with a small gap between them
-export const Section = ({ children }: { children: React.ReactNode }) => {
-  return <section className={css.section}>{children}</section>
+export const Section = ({
+  children,
+  gap = "md",
+}: {
+  children: React.ReactNode
+  gap?: "md" | "lg"
+}) => {
+  return (
+    <section className={cl(css.section, gap && css[`section--gap-${gap}`])}>
+      {children}
+    </section>
+  )
 }

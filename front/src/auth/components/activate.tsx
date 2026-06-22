@@ -17,6 +17,7 @@ import { Form, useForm } from "common/components/form2"
 import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
 import Alert from "@codegouvfr/react-dsfr/Alert"
 import { Text } from "common/components/text"
+import { addQueryParams } from "common/utils/routes"
 
 export const Activate = () => {
   const { t } = useTranslation()
@@ -79,8 +80,10 @@ export const Activate = () => {
           {isUserInvited && (
             <Button
               linkProps={{
-                to: "../reset-password",
-                state: { search: userInvitedSearchParams.toString() },
+                to: addQueryParams(
+                  "../reset-password",
+                  Object.fromEntries(userInvitedSearchParams.entries())
+                ),
               }}
             >
               {t("Définir mon mot de passe")}

@@ -1,30 +1,27 @@
-import React from "react"
-import cl from "clsx"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import Button from "common/components/button"
-import Form, { useForm } from "common/components/form"
-import { Mail, Lock, UserCheck, Return } from "common/components/icons"
-import { TextInput } from "common/components/input"
-import { useMatch } from "react-router-dom"
-import { Link } from "react-router-dom"
-import { Overlay, Panel } from "common/components/scaffold"
-import marianne from "common/assets/images/Marianne.svg"
-import css from "./auth.module.css"
+import { Button } from "common/components/button2"
+import { Form, useForm } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
+import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
+import { Title } from "common/components/title"
+import { PasswordInput } from "auth/components/password-input"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { ROUTE_URLS } from "common/utils/routes"
+import { Divider } from "common/components/divider"
 
 const Login = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
 
-  const { value, bind } = useForm({
+  const { value, bind, setField } = useForm({
     username: "" as string | undefined,
     password: "" as string | undefined,
   })
+
   const login = useMutation(api.login, {
     onSuccess: () => {
       notify(t("Un code vient de vous être envoyé"), { variant: "success" })
@@ -44,102 +41,89 @@ const Login = () => {
       notify(errorMessage, { variant: "danger" })
     },
   })
+
   return (
     <Container>
-      <section>
-        <Switcher />
-      </section>
+      <Title is="h1" as="h3" style={{ textAlign: "center" }}>
+        {t("Connexion")}
+      </Title>
 
-      <section>
+      <Content>
         <Form
           id="login"
+          gap="sm"
           onSubmit={() => login.execute(value.username!, value.password!)}
         >
           <TextInput
             autoFocus
-            variant="solid"
-            icon={Mail}
             type="email"
             label={t("Adresse email")}
             {...bind("username")}
+            required
           />
-          <TextInput
-            variant="solid"
-            icon={Lock}
-            type="password"
-            label={t("Mot de passe")}
-            {...bind("password")}
-          />
-          <Button
-            variant="link"
-            label={t("J'ai oublié mon mot de passe")}
-            to={ROUTE_URLS.AUTH.RESET_PASSWORD_REQUEST}
-          />
-          <Button
-            variant="link"
-            label={t("Cliquez ici pour activer votre compte.")}
-            to={ROUTE_URLS.AUTH.ACTIVATE_REQUEST}
-          />
+          <div>
+            <PasswordInput
+              label={t("Mot de passe")}
+              value={value.password}
+              onChange={(v) => setField("password", v)}
+              messages={[]}
+              autoComplete="current-password"
+              required
+            />
+            <Button
+              customPriority="link"
+              linkProps={{ to: ROUTE_URLS.AUTH.RESET_PASSWORD_REQUEST }}
+              center
+            >
+              {t("Mot de passe oublié ?")}
+            </Button>
+          </div>
         </Form>
-      </section>
+        <Section gap="lg">
+          <Button
+            customPriority="link"
+            linkProps={{ to: "../activate-request" }}
+            center
+          >
+            {t("Je n'ai pas reçu le lien d'activation")}
+          </Button>
+          <Button
+            customPriority="link"
+            linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}
+            center
+          >
+            {t("Cliquez ici pour activer votre compte.")}
+          </Button>
+        </Section>
 
-      <footer>
-        <Button
-          center
-          loading={login.loading}
-          disabled={!value.username || !value.password}
-          variant="primary"
-          icon={UserCheck}
-          submit="login"
-          label={t("Se connecter au compte")}
-        />
-        <Button
-          center
-          variant="secondary"
-          icon={Return}
-          label={t("Annuler")}
-          action={() => navigate("/")}
-        />
-      </footer>
+        <FooterAuth>
+          <Button priority="secondary" linkProps={{ to: "/" }}>
+            {t("Annuler")}
+          </Button>
+          <Button
+            loading={login.loading}
+            type="submit"
+            nativeButtonProps={{ form: "login" }}
+          >
+            {t("Se connecter")}
+          </Button>
+        </FooterAuth>
+        <Divider />
+        <Section>
+          <Title is="h4" as="h5" style={{ textAlign: "center" }}>
+            {t("Vous n'avez pas de compte ?")}
+          </Title>
+          <Button
+            priority="secondary"
+            linkProps={{ to: ROUTE_URLS.AUTH.REGISTER }}
+            center
+          >
+            {t("S'inscrire")}
+          </Button>
+        </Section>
+      </Content>
     </Container>
   )
 }
-
-export const Container = ({ children }: { children: React.ReactNode }) => (
-  <Overlay className={css.auth}>
-    <Panel className={css.panel}>
-      <header>
-        <Logo />
-      </header>
-      {children}
-    </Panel>
-  </Overlay>
-)
-
-export const Switcher = () => {
-  const { t } = useTranslation()
-  const match = useMatch("auth/:focus")
-  const isLogin = match?.params.focus === "login"
-  const isRegister = match?.params.focus === "register"
-  return (
-    <div className={css.switcher}>
-      <Link to="../login" className={cl(isLogin && css.active)}>
-        {"→ "}
-        {t("Connexion")}
-      </Link>
-      <Link to="../register" className={cl(isRegister && css.active)}>
-        {"→ "}
-        {t("Inscription")}
-      </Link>
-    </div>
-  )
-}
-
-export const Logo = () => (
-  <Link to="/" className={css.logo}>
-    <img src={marianne} alt="marianne logo" />
-    <h1>CarbuRe</h1>
-  </Link>
-)
 
 export default Login

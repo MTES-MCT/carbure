@@ -197,6 +197,8 @@ export const ROUTE_URLS = {
     FOREIGN_COMPANY_REGISTRATION: "/account/companies/registration/foreign",
   },
   AUTH: {
+    LOGIN: "/auth/login",
+    REGISTER: "/auth/register",
     LOGOUT: "/auth/logout",
     RESET_PASSWORD_REQUEST: "/auth/reset-password-request",
     ACTIVATE_REQUEST: "/auth/activate-request",
