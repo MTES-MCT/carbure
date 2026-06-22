@@ -1,66 +1,150 @@
+import { Button } from "common/components/button2"
+import { Collapse } from "common/components/collapse2"
+import { Row } from "common/components/scaffold"
 import { Text } from "common/components/text"
-import { Fragment } from "react"
 import { useTranslation } from "react-i18next"
+import { Action } from "../types"
 import { ActionNode } from "../utils"
 import css from "./action-tree.module.css"
-import { Collapse } from "common/components/collapse2"
 
 const INDENT_REM = 1.5
 
-const ActionTreeNodeLabel = ({
+const ActionLine = ({
   node,
   path,
-  depth,
+  depth = 0,
+  onEdit,
+  onDelete,
 }: {
   node: ActionNode
   path: string
-  depth: number
+  depth?: number
+  onEdit?: (action: Action) => void
+  onDelete?: (action: Action) => void
 }) => {
+  const { t } = useTranslation()
+
   return (
     <div
       className={css.line}
       style={{ paddingLeft: `${depth * INDENT_REM}rem` }}
     >
+      <Text>#{node.id}</Text>
       <Text className={css.label}>{`action ${path}`}</Text>
       <Text>{node.type}</Text>
       <Text>{node.quantity}</Text>
-      <Text className={css.muted}>({node.available} dispo)</Text>
       <Text>{node.status ?? "—"}</Text>
       <Text className={css.muted}>{node.owner_name}</Text>
+      {(onEdit || onDelete) && (
+        <Row gap="sm" className={css.actions}>
+          {onEdit && (
+            <Button
+              priority="tertiary no outline"
+              iconId="ri-pencil-line"
+              title={t("Modifier")}
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit(node)
+              }}
+            />
+          )}
+          {onDelete && (
+            <Button
+              priority="tertiary no outline"
+              iconId="ri-delete-bin-line"
+              title={t("Supprimer")}
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(node)
+              }}
+            />
+          )}
+        </Row>
+      )}
     </div>
   )
 }
-const ActionTreeNode = ({
+
+const ActionTreeBranch = ({
   node,
   path,
   depth,
+  onEdit,
+  onDelete,
 }: {
   node: ActionNode
   path: string
   depth: number
-}) => {
-  return (
-    <Collapse
-      label={<ActionTreeNodeLabel node={node} path={path} depth={depth} />}
-    >
-      {node.children.map((child, index) => (
-        <ActionTreeNode
-          key={child.id}
-          node={child}
-          path={`${path}.${index + 1}`}
-          depth={depth + 1}
-        />
-      ))}
-    </Collapse>
-  )
-}
+  onEdit?: (action: Action) => void
+  onDelete?: (action: Action) => void
+}) => (
+  <>
+    <ActionLine
+      node={node}
+      path={path}
+      depth={depth}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    />
+    {node.children.map((child, index) => (
+      <ActionTreeBranch
+        key={child.id}
+        node={child}
+        path={`${path}.${index + 1}`}
+        depth={depth + 1}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    ))}
+  </>
+)
+
+const ActionTreeRoot = ({
+  node,
+  path,
+  onEdit,
+  onDelete,
+}: {
+  node: ActionNode
+  path: string
+  onEdit?: (action: Action) => void
+  onDelete?: (action: Action) => void
+}) => (
+  <Collapse
+    className={css.rootCollapse}
+    label={
+      <ActionLine node={node} path={path} onEdit={onEdit} onDelete={onDelete} />
+    }
+  >
+    {node.children.length > 0 && (
+      <div className={css.subtree}>
+        {node.children.map((child, index) => (
+          <ActionTreeBranch
+            key={child.id}
+            node={child}
+            path={`${path}.${index + 1}`}
+            depth={1}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
+      </div>
+    )}
+  </Collapse>
+)
 
 export const ActionTree = ({
   roots,
   loading,
+  onEdit,
+  onDelete,
 }: {
   roots: ActionNode[]
   loading?: boolean
+  onEdit?: (action: Action) => void
+  onDelete?: (action: Action) => void
 }) => {
   const { t } = useTranslation()
 
@@ -83,25 +167,13 @@ export const ActionTree = ({
   return (
     <div className={css.tree}>
       {roots.map((root, index) => (
-        <Collapse
-          label={
-            <ActionTreeNodeLabel
-              node={root}
-              path={String(index + 1)}
-              depth={0}
-            />
-          }
+        <ActionTreeRoot
           key={root.id}
-        >
-          {root.children.map((child, index) => (
-            <ActionTreeNode
-              key={child.id}
-              node={child}
-              path={`${String(index + 1)}.${index + 1}`}
-              depth={1}
-            />
-          ))}
-        </Collapse>
+          node={root}
+          path={String(index + 1)}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   )

@@ -1,16 +1,20 @@
 .tree {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-s);
   padding: var(--spacing-sm) 0;
 }
 
 .line {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: var(--spacing-m);
   line-height: 1.5;
+}
+
+.actions {
+  margin-left: auto;
 }
 
 .label {
@@ -19,6 +23,17 @@
 
 .muted {
   color: var(--text-secondary);
+}
+
+.rootCollapse :global(.fr-collapse) {
+  margin: 0;
+}
+
+.subtree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
 }
 
 .empty {

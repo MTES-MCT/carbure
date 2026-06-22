@@ -1,28 +1,9 @@
 import { api } from "common/services/api-fetch"
 import { ActionCreateRequest } from "./types"
 
-export const getActions = async (entity_id: number) =>
-  api
-    .GET("/stock-poc/actions/", { params: { query: { entity_id } } })
-    .then((res) => res.data ?? [])
-
 export const getActionTree = async (entity_id: number) =>
   api
     .GET("/stock-poc/actions/tree/", { params: { query: { entity_id } } })
-    .then((res) => res.data ?? [])
-
-export const getAvailableConsumption = async (entity_id: number) =>
-  api
-    .GET("/stock-poc/actions/available-consumption/", {
-      params: { query: { entity_id } },
-    })
-    .then((res) => res.data ?? [])
-
-export const getAvailableCertificates = async (entity_id: number) =>
-  api
-    .GET("/stock-poc/actions/available-certificates/", {
-      params: { query: { entity_id } },
-    })
     .then((res) => res.data ?? [])
 
 export const createAction = async (

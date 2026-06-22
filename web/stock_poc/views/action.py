@@ -69,20 +69,6 @@ class ActionViewSet(ModelViewSet):
         queryset = with_available(Action.objects.all()).select_related("owner")
         return Response(ActionSerializer(queryset, many=True).data)
 
-    @extend_schema(responses=ActionSerializer(many=True))
-    @action(detail=False, methods=["get"], url_path="available-consumption")
-    def available_consumption(self, request):
-        """Actions the entity can still consume (physical stock)."""
-        queryset = available_for_consumption(request.entity).select_related("owner")
-        return Response(ActionSerializer(queryset, many=True).data)
-
-    @extend_schema(responses=ActionSerializer(many=True))
-    @action(detail=False, methods=["get"], url_path="available-certificates")
-    def available_certificates(self, request):
-        """Actions the entity can still transfer as certificates (accounting stock)."""
-        queryset = available_for_certificates(request.entity).select_related("owner")
-        return Response(ActionSerializer(queryset, many=True).data)
-
     @extend_schema(
         request=None,
         responses={200: {"type": "object", "properties": {"deleted": {"type": "integer"}}}},
