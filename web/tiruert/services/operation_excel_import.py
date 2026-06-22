@@ -11,6 +11,7 @@ from core.excel_importer import ExcelImporter, ExcelValidationError
 from core.models import CarbureLot, Entity
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation
+from tiruert.serializers.operation import OperationImportResponseSerializer
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation import OperationService
 from tiruert.services.operation_excel_template import get_tiruert_operator_queryset
@@ -160,7 +161,7 @@ class OperationExcelImportService:
             raise ExcelValidationError(errors, total_rows)
 
     @staticmethod
-    def _serialize_group(group: OperationGroup, operation: Operation | None = None) -> dict:
+    def _group_to_dict(group: OperationGroup, operation: Operation | None = None) -> dict:
         return {
             "operation_id": operation.id if operation else None,
             "status": operation.status if operation else default_status(group.operation_type),
@@ -228,7 +229,7 @@ class OperationExcelImportService:
                 (op.type, op.customs_category, op.biofuel_id, op.credited_entity_id): op for op in operations
             }
 
-            result = []
+            groups_data = []
             for group in groups:
                 key = (
                     group.operation_type,
@@ -236,11 +237,9 @@ class OperationExcelImportService:
                     group.biofuel_id,
                     group.credited_entity.id if group.credited_entity else None,
                 )
-                result.append(OperationExcelImportService._serialize_group(group, operation_by_key.get(key)))
+                groups_data.append(OperationExcelImportService._group_to_dict(group, operation_by_key.get(key)))
 
-            return {"mode": mode, "operations": result}
+            return OperationImportResponseSerializer({"mode": mode, "operations": groups_data}).data
 
-        return {
-            "mode": mode,
-            "operations": [OperationExcelImportService._serialize_group(group) for group in groups],
-        }
+        groups_data = [OperationExcelImportService._group_to_dict(group) for group in groups]
+        return OperationImportResponseSerializer({"mode": mode, "operations": groups_data}).data

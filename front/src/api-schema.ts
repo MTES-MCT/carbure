@@ -5671,6 +5671,24 @@ export interface components {
             /** @default validate */
             mode: components["schemas"]["ModeEnum"];
         };
+        OperationImportGroup: {
+            operation_id: number | null;
+            status: string;
+            type: string;
+            sector: string;
+            customs_category: string;
+            biofuel: string;
+            debited_entity: components["schemas"]["OperationEntity"];
+            credited_entity: components["schemas"]["OperationEntity"] | null;
+            lot_count: number;
+            /** Format: double */
+            total_volume: number;
+            rows: number[];
+        };
+        OperationImportResponse: {
+            mode: components["schemas"]["ModeEnum"];
+            operations: components["schemas"]["OperationImportGroup"][];
+        };
         OperationInput: {
             type: components["schemas"]["OperationTypeEnum"];
             customs_category: components["schemas"]["MPCategoriesEnum"];
@@ -14042,7 +14060,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationList"];
+                    "application/json": components["schemas"]["OperationImportResponse"];
                 };
             };
         };

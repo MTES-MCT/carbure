@@ -133,6 +133,25 @@ class OperationExcelImportRequestSerializer(serializers.Serializer):
         return check_file_size_and_extension(value, max_size_mb=10, extensions=[".xlsx", ".xls"])
 
 
+class OperationImportGroupSerializer(serializers.Serializer):
+    operation_id = serializers.IntegerField(allow_null=True)
+    status = serializers.CharField()
+    type = serializers.CharField()
+    sector = serializers.CharField()
+    customs_category = serializers.CharField()
+    biofuel = serializers.CharField()
+    debited_entity = OperationEntitySerializer()
+    credited_entity = OperationEntitySerializer(allow_null=True)
+    lot_count = serializers.IntegerField()
+    total_volume = serializers.FloatField()
+    rows = serializers.ListField(child=serializers.IntegerField())
+
+
+class OperationImportResponseSerializer(serializers.Serializer):
+    mode = serializers.ChoiceField(choices=["validate", "create"])
+    operations = OperationImportGroupSerializer(many=True)
+
+
 class OperationInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation

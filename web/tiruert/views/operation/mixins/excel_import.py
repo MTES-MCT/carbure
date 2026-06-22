@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from core.excel import ExcelResponse
-from tiruert.serializers.operation import OperationExcelImportRequestSerializer
+from tiruert.serializers.operation import OperationExcelImportRequestSerializer, OperationImportResponseSerializer
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation_excel_import import OperationExcelImportService
 from tiruert.services.operation_excel_template import create_operation_import_template
@@ -31,6 +31,7 @@ class ExcelImportActionMixin:
         operation_id="import_operations_from_excel",
         description="Validate or create TIRUERT operations from an Excel file",
         request=OperationExcelImportRequestSerializer,
+        responses=OperationImportResponseSerializer,
     )
     @action(detail=False, methods=["post"], url_path="import")
     def import_operations_from_excel(self, request, *args, **kwargs):

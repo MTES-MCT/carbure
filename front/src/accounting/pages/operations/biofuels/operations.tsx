@@ -26,7 +26,7 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { Button } from "common/components/button2"
 import { useLocation, useNavigate } from "react-router-dom"
-import { OperationsExcelImportDialog } from "../operations-excel-import-dialog"
+import { OperationsExcelImportDialog } from "./pages/operations-excel-import-dialog"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
