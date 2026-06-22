@@ -2620,6 +2620,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stock-poc/actions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["stock_poc_actions_list"];
+        put?: never;
+        post: operations["stock_poc_actions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stock-poc/actions/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["stock_poc_actions_retrieve"];
+        put?: never;
+        post?: never;
+        delete: operations["stock_poc_actions_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["stock_poc_actions_partial_update"];
+        trace?: never;
+    };
+    "/api/stock-poc/actions/available-certificates/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Actions the entity can still transfer as certificates (accounting stock). */
+        get: operations["stock_poc_actions_available_certificates_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stock-poc/actions/available-consumption/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Actions the entity can still consume (physical stock). */
+        get: operations["stock_poc_actions_available_consumption_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stock-poc/actions/reset/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Delete all POC actions (global reset for testing). */
+        post: operations["stock_poc_actions_reset_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stock-poc/actions/tree/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Flat list of the entity actions; the tree is rebuilt on the frontend. */
+        get: operations["stock_poc_actions_tree_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/declaration-period/": {
         parameters: {
             query?: never;
@@ -3210,6 +3310,58 @@ export interface components {
     schemas: {
         AcceptRequest: {
             ets_status: components["schemas"]["EtsStatusEnum"];
+        };
+        Action: {
+            readonly id: number;
+            /** Type d'action */
+            type: components["schemas"]["StockPocActionTypeEnum"];
+            /** Statut */
+            status?: components["schemas"]["StockPocActionStatusEnum"] | null;
+            /**
+             * Quantité
+             * Format: decimal
+             */
+            quantity: string;
+            /** Format: decimal */
+            readonly available: string;
+            /** Entité propriétaire */
+            owner: number;
+            readonly owner_name: string;
+            /** Action parente */
+            parent?: number | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        ActionCreate: {
+            readonly id: number;
+            /** Type d'action */
+            type: components["schemas"]["StockPocActionTypeEnum"];
+            /** Statut */
+            status?: components["schemas"]["StockPocActionStatusEnum"] | null;
+            /**
+             * Quantité
+             * Format: decimal
+             */
+            quantity: string;
+            /** Action parente */
+            parent?: number | null;
+            /** Entité propriétaire */
+            owner?: number;
+        };
+        ActionCreateRequest: {
+            /** Type d'action */
+            type: components["schemas"]["StockPocActionTypeEnum"];
+            /** Statut */
+            status?: components["schemas"]["StockPocActionStatusEnum"] | null;
+            /**
+             * Quantité
+             * Format: decimal
+             */
+            quantity: string;
+            /** Action parente */
+            parent?: number | null;
+            /** Entité propriétaire */
+            owner?: number;
         };
         ActivateAccountRequest: {
             uidb64: string;
@@ -4099,7 +4251,7 @@ export interface components {
             /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /**
-             * Ratio de matière sèche - tMS/tMS (%)
+             * Ratio de matière sèche (tMS/tMB)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;
@@ -4166,7 +4318,7 @@ export interface components {
             producer: components["schemas"]["EntityPreview"];
             readonly year: number;
             readonly origin_country: string;
-            readonly feedstock: string;
+            readonly feedstock: components["schemas"]["BiomethaneSupplyInputExportFeedstock"];
             readonly source: string;
             readonly material_unit: string;
             readonly type_cive: string;
@@ -4174,7 +4326,7 @@ export interface components {
             /** Précisez la culture */
             culture_details?: string | null;
             /**
-             * Ratio de matière sèche - tMS/tMS (%)
+             * Ratio de matière sèche (tMS/tMB)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;
@@ -4195,6 +4347,10 @@ export interface components {
              * Format: double
              */
             maximum_distance_km?: number | null;
+        };
+        BiomethaneSupplyInputExportFeedstock: {
+            name: string;
+            classification: components["schemas"]["Classification"] | null;
         };
         /**
          * @description * `INTERNAL` - Interne
@@ -6006,6 +6162,21 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
+        PatchedActionCreateRequest: {
+            /** Type d'action */
+            type?: components["schemas"]["StockPocActionTypeEnum"];
+            /** Statut */
+            status?: components["schemas"]["StockPocActionStatusEnum"] | null;
+            /**
+             * Quantité
+             * Format: decimal
+             */
+            quantity?: string;
+            /** Action parente */
+            parent?: number | null;
+            /** Entité propriétaire */
+            owner?: number;
+        };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             producer?: number;
@@ -6558,6 +6729,22 @@ export interface components {
         StatsResponse: {
             metabase_iframe_url: string;
         };
+        /**
+         * @description * `ACCEPTED` - ACCEPTED
+         *     * `REFUSED` - REFUSED
+         *     * `PENDING` - PENDING
+         * @enum {string}
+         */
+        StockPocActionStatusEnum: PathsApiStockPocActionsGetParametersQueryStatus;
+        /**
+         * @description * `CREATION_H2` - CREATION_H2
+         *     * `TRANSFERT` - TRANSFERT
+         *     * `CONSOMMATION` - CONSOMMATION
+         *     * `PERTE` - PERTE
+         *     * `VALORISATION` - VALORISATION
+         * @enum {string}
+         */
+        StockPocActionTypeEnum: PathsApiStockPocActionsGetParametersQueryType;
         /**
          * @description * `REACH` - Objectif à atteindre
          *     * `CAP` - Plafond à ne pas dépasser
@@ -12729,6 +12916,298 @@ export interface operations {
             };
         };
     };
+    stock_poc_actions_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ACCEPTED` - ACCEPTED
+                 *     * `REFUSED` - REFUSED
+                 *     * `PENDING` - PENDING
+                 */
+                status?: PathsApiStockPocActionsGetParametersQueryStatus;
+                /**
+                 * @description * `CREATION_H2` - CREATION_H2
+                 *     * `TRANSFERT` - TRANSFERT
+                 *     * `CONSOMMATION` - CONSOMMATION
+                 *     * `PERTE` - PERTE
+                 *     * `VALORISATION` - VALORISATION
+                 */
+                type?: PathsApiStockPocActionsGetParametersQueryType;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"][];
+                };
+            };
+        };
+    };
+    stock_poc_actions_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionCreateRequest"];
+                "multipart/form-data": components["schemas"]["ActionCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionCreate"];
+                };
+            };
+        };
+    };
+    stock_poc_actions_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action (stock POC). */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"];
+                };
+            };
+        };
+    };
+    stock_poc_actions_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action (stock POC). */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    stock_poc_actions_partial_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action (stock POC). */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedActionCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedActionCreateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedActionCreateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionCreate"];
+                };
+            };
+        };
+    };
+    stock_poc_actions_available_certificates_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ACCEPTED` - ACCEPTED
+                 *     * `REFUSED` - REFUSED
+                 *     * `PENDING` - PENDING
+                 */
+                status?: PathsApiStockPocActionsGetParametersQueryStatus;
+                /**
+                 * @description * `CREATION_H2` - CREATION_H2
+                 *     * `TRANSFERT` - TRANSFERT
+                 *     * `CONSOMMATION` - CONSOMMATION
+                 *     * `PERTE` - PERTE
+                 *     * `VALORISATION` - VALORISATION
+                 */
+                type?: PathsApiStockPocActionsGetParametersQueryType;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"][];
+                };
+            };
+        };
+    };
+    stock_poc_actions_available_consumption_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ACCEPTED` - ACCEPTED
+                 *     * `REFUSED` - REFUSED
+                 *     * `PENDING` - PENDING
+                 */
+                status?: PathsApiStockPocActionsGetParametersQueryStatus;
+                /**
+                 * @description * `CREATION_H2` - CREATION_H2
+                 *     * `TRANSFERT` - TRANSFERT
+                 *     * `CONSOMMATION` - CONSOMMATION
+                 *     * `PERTE` - PERTE
+                 *     * `VALORISATION` - VALORISATION
+                 */
+                type?: PathsApiStockPocActionsGetParametersQueryType;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"][];
+                };
+            };
+        };
+    };
+    stock_poc_actions_reset_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deleted?: number;
+                    };
+                };
+            };
+        };
+    };
+    stock_poc_actions_tree_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ACCEPTED` - ACCEPTED
+                 *     * `REFUSED` - REFUSED
+                 *     * `PENDING` - PENDING
+                 */
+                status?: PathsApiStockPocActionsGetParametersQueryStatus;
+                /**
+                 * @description * `CREATION_H2` - CREATION_H2
+                 *     * `TRANSFERT` - TRANSFERT
+                 *     * `CONSOMMATION` - CONSOMMATION
+                 *     * `PERTE` - PERTE
+                 *     * `VALORISATION` - VALORISATION
+                 */
+                type?: PathsApiStockPocActionsGetParametersQueryType;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"][];
+                };
+            };
+        };
+    };
     tiruert_declaration_period_retrieve: {
         parameters: {
             query: {
@@ -14508,6 +14987,18 @@ export enum PathsApiSafTicketsFiltersGetParametersQueryFilter {
     status = "status",
     supplier = "supplier",
     year = "year"
+}
+export enum PathsApiStockPocActionsGetParametersQueryStatus {
+    ACCEPTED = "ACCEPTED",
+    PENDING = "PENDING",
+    REFUSED = "REFUSED"
+}
+export enum PathsApiStockPocActionsGetParametersQueryType {
+    CONSOMMATION = "CONSOMMATION",
+    CREATION_H2 = "CREATION_H2",
+    PERTE = "PERTE",
+    TRANSFERT = "TRANSFERT",
+    VALORISATION = "VALORISATION"
 }
 export enum PathsApiTiruertElecOperationsGetParametersQueryOperation {
     ACQUISITION_FROM_CPO = "ACQUISITION_FROM_CPO",

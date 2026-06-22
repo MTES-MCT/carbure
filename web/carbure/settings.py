@@ -128,6 +128,7 @@ INSTALLED_APPS = [
     "edelivery",
     "anonymization",
     "feedstocks",
+    "stock_poc",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
@@ -450,6 +451,8 @@ SPECTACULAR_SETTINGS = {
         "BiomethaneAnnualDeclarationStatusEnum": "biomethane.models.BiomethaneAnnualDeclaration.DECLARATION_STATUS_CHOICES",
         "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
         "ElecQualichargeStatusEnum": "elec.models.ElecProvisionCertificateQualicharge.VALIDATION_CHOICES",
+        "StockPocActionTypeEnum": "stock_poc.models.Action.TYPES",
+        "StockPocActionStatusEnum": "stock_poc.models.Action.STATUSES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,

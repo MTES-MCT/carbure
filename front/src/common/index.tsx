@@ -39,6 +39,7 @@ const PublicStats = lazy(() => import("carbure/components/public-stats"))
 const ElecAudit = lazy(() => import("elec-auditor"))
 const ContactPage = lazy(() => import("contact"))
 const ElecCertificates = lazy(() => import("elec/pages/certificates"))
+const StockPoc = lazy(() => import("stock-poc"))
 
 const Carbure = () => {
   useCacheBuster()
@@ -155,6 +156,7 @@ const Org = () => {
     <Routes>
       <Route path="settings/*" element={<Settings />} />
       <Route path="registry" element={<Registry />} />
+      <Route path="stock-poc/*" element={<StockPoc />} />
 
       {(isIndustry || isPowerOrHeatProducer) && (
         <>

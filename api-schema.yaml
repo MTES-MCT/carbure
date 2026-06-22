@@ -9227,6 +9227,425 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/stock-poc/actions/:
+    get:
+      operationId: stock_poc_actions_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            nullable: true
+            title: Statut
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REFUSED
+          description: |-
+            * `ACCEPTED` - ACCEPTED
+            * `REFUSED` - REFUSED
+            * `PENDING` - PENDING
+        - in: query
+          name: type
+          schema:
+            type: string
+            title: Type d'action
+            enum:
+              - CONSOMMATION
+              - CREATION_H2
+              - PERTE
+              - TRANSFERT
+              - VALORISATION
+          description: |-
+            * `CREATION_H2` - CREATION_H2
+            * `TRANSFERT` - TRANSFERT
+            * `CONSOMMATION` - CONSOMMATION
+            * `PERTE` - PERTE
+            * `VALORISATION` - VALORISATION
+      tags:
+        - stock-poc
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Action"
+          description: ""
+    post:
+      operationId: stock_poc_actions_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - stock-poc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionCreate"
+          description: ""
+  /api/stock-poc/actions/{id}/:
+    get:
+      operationId: stock_poc_actions_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action (stock POC).
+          required: true
+      tags:
+        - stock-poc
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Action"
+          description: ""
+    patch:
+      operationId: stock_poc_actions_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action (stock POC).
+          required: true
+      tags:
+        - stock-poc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedActionCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedActionCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedActionCreateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionCreate"
+          description: ""
+    delete:
+      operationId: stock_poc_actions_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action (stock POC).
+          required: true
+      tags:
+        - stock-poc
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/stock-poc/actions/available-certificates/:
+    get:
+      operationId: stock_poc_actions_available_certificates_list
+      description: Actions the entity can still transfer as certificates (accounting stock).
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            nullable: true
+            title: Statut
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REFUSED
+          description: |-
+            * `ACCEPTED` - ACCEPTED
+            * `REFUSED` - REFUSED
+            * `PENDING` - PENDING
+        - in: query
+          name: type
+          schema:
+            type: string
+            title: Type d'action
+            enum:
+              - CONSOMMATION
+              - CREATION_H2
+              - PERTE
+              - TRANSFERT
+              - VALORISATION
+          description: |-
+            * `CREATION_H2` - CREATION_H2
+            * `TRANSFERT` - TRANSFERT
+            * `CONSOMMATION` - CONSOMMATION
+            * `PERTE` - PERTE
+            * `VALORISATION` - VALORISATION
+      tags:
+        - stock-poc
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Action"
+          description: ""
+  /api/stock-poc/actions/available-consumption/:
+    get:
+      operationId: stock_poc_actions_available_consumption_list
+      description: Actions the entity can still consume (physical stock).
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            nullable: true
+            title: Statut
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REFUSED
+          description: |-
+            * `ACCEPTED` - ACCEPTED
+            * `REFUSED` - REFUSED
+            * `PENDING` - PENDING
+        - in: query
+          name: type
+          schema:
+            type: string
+            title: Type d'action
+            enum:
+              - CONSOMMATION
+              - CREATION_H2
+              - PERTE
+              - TRANSFERT
+              - VALORISATION
+          description: |-
+            * `CREATION_H2` - CREATION_H2
+            * `TRANSFERT` - TRANSFERT
+            * `CONSOMMATION` - CONSOMMATION
+            * `PERTE` - PERTE
+            * `VALORISATION` - VALORISATION
+      tags:
+        - stock-poc
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Action"
+          description: ""
+  /api/stock-poc/actions/reset/:
+    post:
+      operationId: stock_poc_actions_reset_create
+      description: Delete all POC actions (global reset for testing).
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - stock-poc
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: integer
+          description: ""
+  /api/stock-poc/actions/tree/:
+    get:
+      operationId: stock_poc_actions_tree_list
+      description: Flat list of the entity actions; the tree is rebuilt on the frontend.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            nullable: true
+            title: Statut
+            enum:
+              - ACCEPTED
+              - PENDING
+              - REFUSED
+          description: |-
+            * `ACCEPTED` - ACCEPTED
+            * `REFUSED` - REFUSED
+            * `PENDING` - PENDING
+        - in: query
+          name: type
+          schema:
+            type: string
+            title: Type d'action
+            enum:
+              - CONSOMMATION
+              - CREATION_H2
+              - PERTE
+              - TRANSFERT
+              - VALORISATION
+          description: |-
+            * `CREATION_H2` - CREATION_H2
+            * `TRANSFERT` - TRANSFERT
+            * `CONSOMMATION` - CONSOMMATION
+            * `PERTE` - PERTE
+            * `VALORISATION` - VALORISATION
+      tags:
+        - stock-poc
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Action"
+          description: ""
   /api/tiruert/declaration-period/:
     get:
       operationId: tiruert_declaration_period_retrieve
@@ -12149,6 +12568,111 @@ components:
           $ref: "#/components/schemas/EtsStatusEnum"
       required:
         - ets_status
+    Action:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionTypeEnum"
+          title: Type d'action
+        status:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionStatusEnum"
+          nullable: true
+          title: Statut
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Quantité
+        available:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        owner:
+          type: integer
+          title: Entité propriétaire
+        owner_name:
+          type: string
+          readOnly: true
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - available
+        - created_at
+        - id
+        - owner
+        - owner_name
+        - quantity
+        - type
+    ActionCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionTypeEnum"
+          title: Type d'action
+        status:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionStatusEnum"
+          nullable: true
+          title: Statut
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Quantité
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        owner:
+          type: integer
+          title: Entité propriétaire
+      required:
+        - id
+        - quantity
+        - type
+    ActionCreateRequest:
+      type: object
+      properties:
+        type:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionTypeEnum"
+          title: Type d'action
+        status:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionStatusEnum"
+          nullable: true
+          title: Statut
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Quantité
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        owner:
+          type: integer
+          title: Entité propriétaire
+      required:
+        - quantity
+        - type
     ActivateAccountRequest:
       type: object
       properties:
@@ -13911,7 +14435,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche - tMS/tMS (%)
+          title: Ratio de matière sèche (tMS/tMB)
         volume:
           type: number
           format: double
@@ -14062,7 +14586,8 @@ components:
           type: string
           readOnly: true
         feedstock:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputExportFeedstock"
           readOnly: true
         source:
           type: string
@@ -14085,7 +14610,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche - tMS/tMS (%)
+          title: Ratio de matière sèche (tMS/tMB)
         volume:
           type: number
           format: double
@@ -14115,6 +14640,19 @@ components:
         - source
         - type_cive
         - year
+    BiomethaneSupplyInputExportFeedstock:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 256
+        classification:
+          allOf:
+            - $ref: "#/components/schemas/Classification"
+          nullable: true
+      required:
+        - classification
+        - name
     BiomethaneSupplyInputSourceEnum:
       enum:
         - INTERNAL
@@ -18312,6 +18850,30 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedActionCreateRequest:
+      type: object
+      properties:
+        type:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionTypeEnum"
+          title: Type d'action
+        status:
+          allOf:
+            - $ref: "#/components/schemas/StockPocActionStatusEnum"
+          nullable: true
+          title: Statut
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          title: Quantité
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        owner:
+          type: integer
+          title: Entité propriétaire
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
@@ -19727,6 +20289,30 @@ components:
           type: string
       required:
         - metabase_iframe_url
+    StockPocActionStatusEnum:
+      enum:
+        - ACCEPTED
+        - REFUSED
+        - PENDING
+      type: string
+      description: |-
+        * `ACCEPTED` - ACCEPTED
+        * `REFUSED` - REFUSED
+        * `PENDING` - PENDING
+    StockPocActionTypeEnum:
+      enum:
+        - CREATION_H2
+        - TRANSFERT
+        - CONSOMMATION
+        - PERTE
+        - VALORISATION
+      type: string
+      description: |-
+        * `CREATION_H2` - CREATION_H2
+        * `TRANSFERT` - TRANSFERT
+        * `CONSOMMATION` - CONSOMMATION
+        * `PERTE` - PERTE
+        * `VALORISATION` - VALORISATION
     TargetTypeEnum:
       enum:
         - REACH

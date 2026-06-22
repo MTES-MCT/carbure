@@ -50,6 +50,8 @@ export const ROUTE_URLS = {
     }
   },
 
+  STOCK_POC: (entity_id: number) => urlWithOrgId(entity_id, "/stock-poc"),
+
   BIOFUELS: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, `/transactions/${year}`)
 

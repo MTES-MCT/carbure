@@ -16,5 +16,6 @@ urlpatterns = [
     path("tiruert/", include("tiruert.urls")),
     path("biomethane/", include("biomethane.urls")),
     path("feedstocks/", include("feedstocks.urls")),
+    path("stock-poc/", include("stock_poc.urls")),
     path("nav-stats", get_nav_stats, name="carbure-nav-stats"),
 ]

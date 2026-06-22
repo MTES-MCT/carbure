@@ -1,0 +1,26 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) 0;
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-m);
+  line-height: 1.5;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--text-secondary);
+}
+
+.empty {
+  color: var(--text-secondary);
+}

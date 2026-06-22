@@ -10,6 +10,7 @@ import { getNavStats } from "./api"
 import { useEffect } from "react"
 import { useAccounting } from "./hooks/useAccounting"
 import { useBiomethane } from "./hooks/useBiomethane"
+import { useStockPoc } from "./hooks/useStockPoc"
 
 export const usePrivateSidebar = () => {
   const entity = useEntity()
@@ -27,6 +28,7 @@ export const usePrivateSidebar = () => {
   const doubleCount = useDoubleCount(result?.data)
   const accounting = useAccounting()
   const biomethane = useBiomethane()
+  const stockPoc = useStockPoc()
 
   useEffect(() => {
     if (entity.id !== -1) {
@@ -43,6 +45,7 @@ export const usePrivateSidebar = () => {
     ...chargePoints,
     saf,
     accounting,
+    stockPoc,
   ]
     .filter(
       (category) =>
