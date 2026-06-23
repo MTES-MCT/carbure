@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
+from types import SimpleNamespace
 
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
@@ -135,6 +136,7 @@ class OperationExcelImportService:
         lot_biofuels = {
             lot.id: lot.biofuel for lot in CarbureLot.objects.filter(id__in=first_lot_ids).select_related("biofuel")
         }
+        declaration_year = DeclarationPeriodService.get_current_declaration_year()
 
         errors = []
         for group in groups:
@@ -150,9 +152,17 @@ class OperationExcelImportService:
                 "customs_category": group.customs_category,
                 "type": group.operation_type,
             }
+            request = SimpleNamespace(entity=group.debited_entity, GET={})
 
             try:
-                OperationService.check_volumes(selected_lots, data, "l")
+                OperationService.perform_checks_before_create(
+                    request=request,
+                    entity_id=group.debited_entity.id,
+                    selected_lots=selected_lots,
+                    data=data,
+                    unit="l",
+                    declaration_year=declaration_year,
+                )
             except serializers.ValidationError as exc:
                 for row_number in group.row_numbers:
                     errors.append({"row": row_number, "errors": exc.detail})
