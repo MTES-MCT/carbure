@@ -392,11 +392,8 @@ class OperationServiceCheckVolumesTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_volumes(selected_lots, data)
 
-        self.assertIn("lot_id: 999", context.exception.detail)
-        self.assertIn(
-            OperationServiceErrors.LOT_NOT_FOUND,
-            str(context.exception.detail["lot_id: 999"]),
-        )
+        self.assertIn("lot_id", context.exception.detail.keys())
+        self.assertIn("999: Cet id de lot n'existe pas", str(context.exception.detail.values()))
 
     @patch("tiruert.services.operation.TeneurService.prepare_data")
     def test_check_volumes_raises_error_when_insufficient_volume(self, mock_prepare_data):
@@ -417,29 +414,33 @@ class OperationServiceCheckVolumesTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_volumes(selected_lots, data)
 
-        self.assertIn("lot_id: 1", context.exception.detail)
-        self.assertIn(
-            OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME,
-            str(context.exception.detail["lot_id: 1"]),
-        )
+        self.assertIn("lot_id", context.exception.detail.keys())
+        self.assertIn("1: Volume insuffisant pour le lot sélectionné", str(context.exception.detail.values()))
 
     @patch("tiruert.services.operation.TeneurService.prepare_data")
-    def test_check_volumes_accepts_tiny_float_overflow_with_tolerance(self, mock_prepare_data):
-        """Should accept tiny float overflow caused by precision artifacts."""
+    def test_check_volumes_raises_error_when_duplicate_lot_total_exceeds_available(self, mock_prepare_data):
+        """Should raise ValidationError when duplicate lot lines exceed available volume once aggregated."""
         mock_prepare_data.return_value = (
-            [1000.0],
+            [1000.0],  # np_volumes (available)
             None,
-            [1],
+            [1],  # np_lot_ids
             None,
             None,
         )
 
         selected_lots = [
-            {"id": 1, "volume": 1000.0000005},
+            {"id": 1, "volume": 700},
+            {"id": 1, "volume": 400},  # Total requested = 1100 > 1000 available
         ]
 
         data = {"biofuel": Mock()}
-        OperationService.check_volumes(selected_lots, data)
+        unit = "l"
+
+        with self.assertRaises(ValidationError) as context:
+            OperationService.check_volumes(selected_lots, data, unit)
+
+        self.assertIn("lot_id", context.exception.detail.keys())
+        self.assertIn("1: Volume insuffisant pour le lot sélectionné", str(context.exception.detail.values()))
 
 
 class OperationServiceCheckObjectivesComplianceTest(TestCase):
