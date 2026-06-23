@@ -9,8 +9,6 @@ from stock_poc.models import Action
 from stock_poc.permissions import HasStockPocRights
 from stock_poc.serializers import ActionCreateSerializer, ActionSerializer
 from stock_poc.services.balance import (
-    available_for_certificates,
-    available_for_consumption,
     with_available,
 )
 

@@ -9,14 +9,19 @@ from stock_poc.services.balance import (
 )
 
 
-def available_for_consumption(entity: Entity) -> QuerySet:
-    """Actions the entity can still consume (physical stock)."""
-    return with_available().filter(type=Action.CONSOMMATION, owner=entity).select_related("owner", "parent")
+def in_physical_stock_actions(entity: Entity) -> QuerySet:
+    """All actions with available balance."""
+    return (
+        with_available()
+        .filter(type=Action.CREATION_H2, owner=entity)
+        .filter(available__gt=0)
+        .select_related("owner", "parent")
+    )
 
 
 def available_for_certificates(entity: Entity) -> QuerySet:
-    """Accounting stock the entity can still transfer as certificates."""
-    return with_available().filter(type=Action.VALORISATION, owner=entity).select_related("owner", "parent")
+    """Validated consumptions that act as transferable certificates."""
+    return with_available().filter(type=Action.CONSOMMATION, status=Action.ACCEPTED, owner=entity).filter(available__gt=0)
 
 
 def owned_actions(entity: Entity) -> QuerySet:
@@ -52,19 +57,23 @@ class Scenario:
 
 SCENARIOS: dict[str, Scenario] = {
     "consumption": Scenario(
-        help="Stock de l'entité marqués comme consommés",
-        query=available_for_consumption,
+        help="Stock physique consommable (CREATION_H2 avec solde > 0)",
+        query=in_physical_stock_actions,
     ),
     "certificates": Scenario(
-        help="Stocks qui sont devenus des certificats",
+        help="Certificats (CONSOMMATION ACCEPTED avec solde > 0)",
         query=available_for_certificates,
     ),
+    "owned": Scenario(
+        help="Toutes les actions dont l'entité est propriétaire",
+        query=owned_actions,
+    ),
     "sent": Scenario(
-        help="Stocks de l'entité envoyés",
+        help="Transferts émis (TRANSFERT dont le parent appartient à l'entité)",
         query=sent_transfers,
     ),
     "received": Scenario(
-        help="Stocks reçus",
+        help="Transferts reçus (TRANSFERT dont l'entité est propriétaire)",
         query=received_transfers,
     ),
     "all": Scenario(

@@ -30,7 +30,7 @@ class ActionSerializer(serializers.ModelSerializer):
         annotated = getattr(obj, "available", None)
         if annotated is not None:
             return annotated
-        children = obj.children.filter(status__in=[Action.ACCEPTED, Action.PENDING])
+        children = obj.children.exclude(status=Action.REFUSED)
         used = sum((child.quantity for child in children), Decimal("0"))
         return obj.quantity - used
 
