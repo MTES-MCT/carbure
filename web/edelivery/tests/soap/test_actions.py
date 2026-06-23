@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from edelivery.ebms.requests import BaseRequest
+from edelivery.ebms.requests.base_request import BaseRequest
 from edelivery.soap.actions import EdeliveryError, ListPendingMessages, RetrieveMessage, SubmitMessage
 from edelivery.soap.responses import ListPendingMessagesResponse, RetrieveMessageResponse, SubmitMessageResponse
 
@@ -76,7 +76,7 @@ class SubmitMessageTest(TestCase):
         patched_new_uuid.return_value = "12345678-1234-1234-1234-1234567890ab"
         patched_timestamp.return_value = "2025-07-15T13:00:00+00:00"
 
-        request = MagicMock(**{"zipped_encoded.return_value": "abcdef"})
+        request = MagicMock(**{"zipped_encoded.return_value": "abcdef", "conversation_id": "12345"})
         action = SubmitMessage("responder_id", request)
 
         expected_payload = """\
@@ -102,6 +102,7 @@ class SubmitMessageTest(TestCase):
         <eb:CollaborationInfo>
           <eb:Service>https://union-database.ec.europa.eu/e-delivery/services/send</eb:Service>
           <eb:Action>https://union-database.ec.europa.eu/e-delivery/actions/sendRequest</eb:Action>
+          <eb:ConversationId>12345</eb:ConversationId>
         </eb:CollaborationInfo>
         <eb:MessageProperties>
           <eb:Property name="originalSender">CarbuRe_NTR</eb:Property>

@@ -8,6 +8,7 @@ import {
 } from "./types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { download } from "common/services/api"
+import { EntityPreview } from "common/types"
 
 const getQuery = (query: QualichargeQuery) => {
   const query2 =
@@ -147,4 +148,30 @@ export function exportQualichargeCertificates(query: QualichargeQuery) {
     "/elec/provision-certificates-qualicharge/export/",
     getQuery(query)
   )
+}
+
+export function getTransferTargets(entity_id: number) {
+  return api
+    .GET("/elec/provision-certificates-qualicharge/transfer-targets/", {
+      params: {
+        query: { entity_id },
+      },
+    })
+    .then((res) => res.data as unknown as EntityPreview[])
+}
+
+export function bulkTransferQualichargeVolumes(
+  entity_id: number,
+  target_cpo_id: number,
+  operating_unit: string[]
+) {
+  return api.POST("/elec/provision-certificates-qualicharge/bulk-transfer/", {
+    params: {
+      query: { entity_id },
+    },
+    body: {
+      target_cpo_id,
+      operating_unit,
+    } as never,
+  })
 }

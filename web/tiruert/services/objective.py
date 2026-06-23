@@ -88,6 +88,16 @@ class ObjectiveService:
             else:
                 continue
 
+            has_operations_for_key = key in balance
+
+            # For capped objectives per category, only return categories with operations.
+            if (
+                objective_type == Objective.BIOFUEL_CATEGORY
+                and objective.target_type == Objective.CAP
+                and not has_operations_for_key
+            ):
+                continue
+
             if key not in balance:
                 # No operations for this objective key: initialize an empty balance entry
                 balance[key] = {
@@ -213,9 +223,9 @@ class ObjectiveService:
         )
 
         # Sum sector values
-        biofuel_pending_teneur = sum(sector["pending_saved_emissions"] for sector in objective_per_sector)
-        biofuel_declared_teneur = sum(sector["declared_saved_emissions"] for sector in objective_per_sector)
-        biofuel_available_balance = sum(sector["saved_emissions"] for sector in objective_per_sector)
+        biofuel_pending_teneur = sum(sector.get("pending_saved_emissions", 0) for sector in objective_per_sector)
+        biofuel_declared_teneur = sum(sector.get("declared_saved_emissions", 0) for sector in objective_per_sector)
+        biofuel_available_balance = sum(sector.get("saved_emissions", 0) for sector in objective_per_sector)
 
         # Apply GHG conversions for elec
         elec_available_balance = ObjectiveService.apply_elec_ghg_conversion(elec_category["available_balance"])

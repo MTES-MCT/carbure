@@ -92,6 +92,7 @@ class SubmitMessage(AbstractSoapAction):
         <eb:CollaborationInfo>
           <eb:Service>https://union-database.ec.europa.eu/e-delivery/services/send</eb:Service>
           <eb:Action>https://union-database.ec.europa.eu/e-delivery/actions/sendRequest</eb:Action>
+          <eb:ConversationId>{self.message.conversation_id}</eb:ConversationId>
         </eb:CollaborationInfo>
         <eb:MessageProperties>
           <eb:Property name="originalSender">{self.original_sender}</eb:Property>

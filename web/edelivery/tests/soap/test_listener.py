@@ -11,6 +11,12 @@ class ListenerTest(TestCase):
         self.patched_PubSubAdapter = patch("edelivery.soap.listener.PubSubAdapter").start()
         self.patched_PubSubAdapter.return_value.next_message.return_value = None
         self.patched_RetrieveMessage = patch("edelivery.soap.listener.RetrieveMessage").start()
+        self.patched_RetrieveMessage.return_value.perform.return_value = Mock(
+            **{
+                "conversation_id.return_value": "",
+                "request_response_payload": "",
+            }
+        )
         self.patched_sleep = patch("edelivery.soap.listener.sleep").start()
         self.patched_log_exception = patch("edelivery.soap.listener.log_exception").start()
 
@@ -40,8 +46,9 @@ class ListenerTest(TestCase):
         self.patched_RetrieveMessage.assert_called_with("123")
         retrieve_perform.assert_called()
 
-    def test_publishes_retrieved_message_on_message_queue(self):
+    def test_publishes_conversation_id_and_retrieved_message_on_message_queue(self):
         perform = self.patched_RetrieveMessage.return_value.perform
+        perform.return_value.conversation_id.return_value = "12345"
         perform.return_value.request_response_payload = "<response/>"
 
         publish = self.patched_PubSubAdapter.return_value.publish
@@ -50,7 +57,7 @@ class ListenerTest(TestCase):
         publish.assert_not_called()
 
         listener.poll_once()
-        publish.assert_called_with("<response/>")
+        publish.assert_called_with('{"conversation_id": "12345", "payload": "<response/>"}')
 
     def test_starts_when_asked_and_polls_eDelivery_layer_every_second(self):
         commands_called = []

@@ -31,6 +31,7 @@ import useEntity from "common/hooks/entity"
 import { ExternalAdminPages } from "common/types"
 import { Button } from "common/components/button2"
 import { ValidateAllDataDialog } from "./components/validate-all-data-dialog"
+import { TransferVolumesDialog } from "./components/transfer-volumes-dialog"
 import { ExportButton } from "common/components/export"
 
 export const Qualicharge = () => {
@@ -98,6 +99,10 @@ export const Qualicharge = () => {
 
   const openValidateAllDataModal = () => {
     portal((close) => <ValidateAllDataDialog onClose={close} query={query} />)
+  }
+
+  const openTransferVolumesModal = () => {
+    portal((close) => <TransferVolumesDialog onClose={close} query={query} />)
   }
 
   usePrivateNavigation(t("Données Qualicharge"))
@@ -186,6 +191,15 @@ export const Qualicharge = () => {
                       >
                         {t("Valider toutes les données")}
                       </Button>
+                      {entity.isCPO && (
+                        <Button
+                          priority="secondary"
+                          iconId="ri-send-plane-line"
+                          onClick={openTransferVolumesModal}
+                        >
+                          {t("Transférer des volumes")}
+                        </Button>
+                      )}
                       <ActionBar.Grow />
                       <ExportButton
                         query={query}

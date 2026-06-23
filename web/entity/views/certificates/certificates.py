@@ -5,9 +5,14 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
 
 from certificates.models import ProductionSiteCertificate
-from core.models import Entity, EntityCertificate, ExternalAdminRights, UserRights
-from core.permissions import AdminRightsFactory, HasAdminRights, HasUserRights, UserRightsFactory
+from core.models import Entity, EntityCertificate
 from core.serializers import EntityCertificateSerializer
+from entity.permissions import (
+    HasCertificateAdminRights,
+    HasCertificateAdminWriteRights,
+    HasCertificateRights,
+    HasCertificateWriteRights,
+)
 
 from .mixins import ActionMixin
 
@@ -16,30 +21,17 @@ class EntityCertificateViewSet(ListModelMixin, RetrieveModelMixin, viewsets.Gene
     serializer_class = EntityCertificateSerializer
     pagination_class = None
 
-    permission_classes = [
-        UserRightsFactory(entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR])
-        | AdminRightsFactory(allow_external=[ExternalAdminRights.DOUBLE_COUNTING, ExternalAdminRights.TRANSFERRED_ELEC])
-    ]
+    permission_classes = [HasCertificateRights | HasCertificateAdminRights]
 
     def get_queryset(self):
         return EntityCertificate.objects.order_by("-added_dt", "checked_by_admin").select_related("entity", "certificate")
 
     def get_permissions(self):
         if self.action in ["add", "delete", "update_certificate", "set_default"]:
-            return [
-                HasUserRights(
-                    entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR],
-                    role=[UserRights.RW, UserRights.ADMIN],
-                ),
-            ]
+            return [HasCertificateWriteRights()]
 
         if self.action in ["check_entity", "reject_entity"]:
-            return [
-                HasAdminRights(
-                    allow_external=[ExternalAdminRights.DOUBLE_COUNTING],
-                    allow_role=[UserRights.RW, UserRights.ADMIN],
-                )
-            ]
+            return [HasCertificateAdminWriteRights()]
 
         return super().get_permissions()
 

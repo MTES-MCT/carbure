@@ -8,10 +8,9 @@ from edelivery.tests.ebms.fixtures.transaction_xml_data import transaction_xml_d
 
 class TransactionTest(TestCase):
     def setUp(self):
-        self.patched_from_national_trade_register = patch(
-            "edelivery.ebms.transaction.from_national_trade_register",
-        ).start()
-        self.patched_from_national_trade_register.return_value = 99999
+        patched_Entity = patch("edelivery.ebms.transaction.Entity").start()
+        self.patched_from_national_trade_register = patched_Entity.from_national_trade_register
+        self.patched_from_national_trade_register.return_value.id = 99999
 
     def tearDown(self):
         patch.stopall()
@@ -40,28 +39,34 @@ class TransactionTest(TestCase):
         lot_attributes = transaction.to_lot_attributes()
         self.assertEqual(date(2025, 12, 22), lot_attributes["delivery_date"])
 
-    def test_knows_its_supplier(self):
-        self.patched_from_national_trade_register.return_value = 12345
+    @patch("edelivery.ebms.transaction.NationalTradeRegister.from_id")
+    def test_knows_its_supplier(self, patched_from_id):
+        self.patched_from_national_trade_register.return_value.id = 12345
 
         xml_data = transaction_xml_data(supplier_id="FR_SIREN_CD123456789")
         transaction = Transaction.from_xml(xml_data)
         self.assertEqual("FR_SIREN_CD123456789", transaction.supplier_id())
         self.patched_from_national_trade_register.assert_not_called()
+        patched_from_id.assert_not_called()
 
         lot_attributes = transaction.to_lot_attributes()
-        self.patched_from_national_trade_register.assert_any_call("FR_SIREN_CD123456789")
+        patched_from_id.assert_any_call("FR_SIREN_CD123456789")
+        self.patched_from_national_trade_register.assert_called()
         self.assertEqual(12345, lot_attributes["carbure_supplier_id"])
 
-    def test_knows_its_client(self):
-        self.patched_from_national_trade_register.return_value = 12345
+    @patch("edelivery.ebms.transaction.NationalTradeRegister.from_id")
+    def test_knows_its_client(self, patched_from_id):
+        self.patched_from_national_trade_register.return_value.id = 12345
 
         xml_data = transaction_xml_data(client_id="FR_SIREN_CD123123123")
         transaction = Transaction.from_xml(xml_data)
         self.assertEqual("FR_SIREN_CD123123123", transaction.client_id())
         self.patched_from_national_trade_register.assert_not_called()
+        patched_from_id.assert_not_called()
 
         lot_attributes = transaction.to_lot_attributes()
-        self.patched_from_national_trade_register.assert_any_call("FR_SIREN_CD123123123")
+        patched_from_id.assert_any_call("FR_SIREN_CD123123123")
+        self.patched_from_national_trade_register.assert_called()
         self.assertEqual(12345, lot_attributes["carbure_client_id"])
 
     def test_translates_its_status(self):

@@ -13,6 +13,9 @@ class BiomethaneSupplyInputFilter(FilterSet):
     department = AllValuesMultipleFilter(field_name="origin_department", lookup_expr="exact", required=False)
     # Filter used for admin supply inputs page
     producer_name = AllValuesMultipleFilter(field_name="supply_plan__producer__name", lookup_expr="exact", required=False)
+    tariff_reference = AllValuesMultipleFilter(
+        field_name="supply_plan__producer__biomethane_contract__tariff_reference", lookup_expr="exact", required=False
+    )
 
     def filter_by_entity(self, queryset, name, value):
         """

@@ -202,7 +202,16 @@ export const BiomethaneAdminRoutes = () => {
           path="declarations/:selectedEntityId"
           element={<Navigate replace to={`${currentYear}`} />}
         />
-        <Route path="dashboard" element={<BiomethaneAdminDashboardPage />} />
+        <Route
+          path="dashboard/:year"
+          element={<BiomethaneAdminDashboardPage />}
+        />
+        <Route
+          path="dashboard"
+          element={
+            <Navigate replace to={`${lastAnnualDeclarationYearAdmin}`} />
+          }
+        />
 
         {adminPermissions.canAccessSupplyPlan && (
           <>
