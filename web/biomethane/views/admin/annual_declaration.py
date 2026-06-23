@@ -19,13 +19,6 @@ from core.models import Entity
             description="Authorised entity ID.",
             required=True,
         ),
-        OpenApiParameter(
-            name="year",
-            type=int,
-            location=OpenApiParameter.QUERY,
-            description="Year of the annual declaration",
-            required=False,
-        ),
     ]
 )
 class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, FiltersActionFactory()):

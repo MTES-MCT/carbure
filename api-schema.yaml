@@ -538,8 +538,8 @@ paths:
         - in: query
           name: year
           schema:
-            type: integer
-          description: Year of the annual declaration
+            type: number
+          required: true
       tags:
         - biomethane
       security:
@@ -635,8 +635,8 @@ paths:
         - in: query
           name: year
           schema:
-            type: integer
-          description: Year of the annual declaration
+            type: number
+          required: true
       tags:
         - biomethane
       security:

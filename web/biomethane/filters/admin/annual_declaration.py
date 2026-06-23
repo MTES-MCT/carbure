@@ -1,4 +1,4 @@
-from django_filters import AllValuesMultipleFilter, FilterSet, MultipleChoiceFilter
+from django_filters import AllValuesMultipleFilter, FilterSet, MultipleChoiceFilter, NumberFilter
 
 from biomethane.models.biomethane_annual_declaration import BiomethaneAnnualDeclaration
 from biomethane.models.biomethane_contract import BiomethaneContract
@@ -16,6 +16,10 @@ class BiomethaneAdminAnnualDeclarationFilter(FilterSet):
         field_name="_computed_status",
         choices=BiomethaneAnnualDeclaration.ADMIN_DASHBOARD_STATUS_CHOICES,
     )
+    year = NumberFilter(method="ignore_year", required=True)
+
+    def ignore_year(self, queryset, name, value):
+        return queryset
 
     class Meta:
         model = Entity
