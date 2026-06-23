@@ -1,53 +1,70 @@
 import { importOperationsFromExcel } from "accounting/api/biofuels/operations"
-import { OperationImportResponse } from "accounting/types"
+import { OperationExcelImportRequest } from "accounting/types"
 import { useMutation } from "common/hooks/async"
 import { ImportErrorResponse } from "common/molecules/excel-import-errors"
 import { ModeEnum } from "api-schema"
+import { useForm } from "common/components/form2"
+import useEntity from "common/hooks/entity"
+import { useState } from "react"
+import { useNotify, useNotifyError } from "common/components/notifications"
+import { useTranslation } from "react-i18next"
 
 type UseOperationsExcelImportDialogParams = {
-  entityId: number
-  mode: ModeEnum
-  onValidationSuccess: (result: OperationImportResponse | null) => void
-  onCreateSuccess: () => void
-  onValidationError: (error: ImportErrorResponse) => void
-  onUnknownError: () => void
+  onClose: () => void
 }
 
 export const useOperationsExcelImportDialog = ({
-  entityId,
-  mode,
-  onValidationSuccess,
-  onCreateSuccess,
-  onValidationError,
-  onUnknownError,
+  onClose,
 }: UseOperationsExcelImportDialogParams) => {
-  const { execute, loading } = useMutation(
+  const entity = useEntity()
+  const [importErrors, setImportErrors] = useState<ImportErrorResponse | null>(
+    null
+  )
+  const notify = useNotify()
+  const { t } = useTranslation()
+  const notifyError = useNotifyError()
+
+  const entityId = entity.id
+
+  const form = useForm<Partial<OperationExcelImportRequest>>({
+    file: undefined,
+    mode: ModeEnum.validate,
+  })
+
+  const { execute, loading, result } = useMutation(
     (file: File, importMode: ModeEnum) =>
       importOperationsFromExcel(entityId, file, importMode),
     {
       invalidates: ["operations"],
-      onSuccess: (res) => {
-        if (mode === ModeEnum.validate) {
-          const result =
-            (res?.data as OperationImportResponse | undefined) ?? null
-          onValidationSuccess(result)
+      onSuccess: () => {
+        if (form.value.mode === ModeEnum.validate) {
+          form.setField("mode", ModeEnum.create)
           return
         }
-
-        onCreateSuccess()
+        notify(t("Les opérations ont été créées avec succès."), {
+          variant: "success",
+        })
+        onClose()
       },
       onError: (error) => {
         try {
           const errorData = JSON.parse(error.message)
           if (errorData.validation_errors) {
-            onValidationError(errorData as ImportErrorResponse)
+            setImportErrors(errorData as ImportErrorResponse)
+            form.setField("mode", ModeEnum.validate)
             return
           }
         } catch {
           // Not JSON, fall through
         }
 
-        onUnknownError()
+        notifyError(
+          new Error(
+            t(
+              "Erreur lors de l'import du fichier. Veuillez vérifier le format et réessayer."
+            )
+          )
+        )
       },
     }
   )
@@ -55,5 +72,10 @@ export const useOperationsExcelImportDialog = ({
   return {
     executeImport: execute,
     loading,
+    form,
+    operations: result?.data?.operations,
+    importErrors,
+    setImportErrors,
+    isValidated: form.value.mode === ModeEnum.create,
   }
 }

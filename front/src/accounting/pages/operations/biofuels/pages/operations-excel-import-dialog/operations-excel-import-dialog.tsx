@@ -1,23 +1,14 @@
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"
 import { Trans, useTranslation } from "react-i18next"
-import { Form, useForm } from "common/components/form"
+import { Form } from "common/components/form"
 import { FileInput } from "common/components/inputs2"
-import { useNotify, useNotifyError } from "common/components/notifications"
-import { useState } from "react"
 import { Notice } from "common/components/notice"
 import { Box } from "common/components/scaffold"
-import {
-  ExcelImportErrors,
-  ImportErrorResponse,
-} from "common/molecules/excel-import-errors"
+import { ExcelImportErrors } from "common/molecules/excel-import-errors"
 import { Text } from "common/components/text"
 import useEntity from "common/hooks/entity"
 import { ModeEnum } from "api-schema"
-import {
-  OperationExcelImportRequest,
-  OperationImportResponse,
-} from "accounting/types"
 import { useOperationsExcelImportDialog } from "./operations-excel-import-dialog.hooks"
 
 export const OperationsExcelImportDialog = ({
@@ -27,14 +18,6 @@ export const OperationsExcelImportDialog = ({
 }) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const notify = useNotify()
-  const notifyError = useNotifyError()
-  const [importErrors, setImportErrors] = useState<ImportErrorResponse | null>(
-    null
-  )
-  const [validationResult, setValidationResult] =
-    useState<OperationImportResponse | null>(null)
-  const [validated, setValidated] = useState(false)
 
   const fieldLabels = {
     lot_id: t("N° de lot"),
@@ -43,60 +26,29 @@ export const OperationsExcelImportDialog = ({
     credited_entity: t("Entité créditée"),
   }
 
-  const { value, bind } = useForm<OperationExcelImportRequest>({
-    file: undefined,
-    mode: ModeEnum.validate,
+  const {
+    executeImport,
+    loading,
+    form,
+    operations,
+    importErrors,
+    setImportErrors,
+    isValidated,
+  } = useOperationsExcelImportDialog({
+    onClose,
   })
-
+  const { value } = form
   const mode = value.mode
 
-  const { executeImport, loading } = useOperationsExcelImportDialog({
-    entityId: entity.id || 0,
-    mode,
-    onValidationSuccess: (result) => {
-      setValidationResult(result)
-      setValidated(true)
-      bind("mode").onChange(ModeEnum.create)
-    },
-    onCreateSuccess: () => {
-      notify(t("Les opérations ont été créées avec succès."), {
-        variant: "success",
-      })
-      onClose()
-    },
-    onValidationError: (errorData) => {
-      setImportErrors(errorData)
-      setValidated(false)
-      bind("mode").onChange(ModeEnum.validate)
-      setValidationResult(null)
-    },
-    onUnknownError: () => {
-      notifyError(
-        new Error(
-          t(
-            "Erreur lors de l'import du fichier. Veuillez vérifier le format et réessayer."
-          )
-        )
-      )
-    },
-  })
-
   const handleSubmit = () => {
-    if (!value.file) {
-      notifyError(new Error(t("Veuillez sélectionner un fichier")))
-      return
-    }
-
     setImportErrors(null)
-    executeImport(value.file, mode)
+    executeImport(value.file!, mode!)
   }
 
   const handleFileChange = (file: File | undefined) => {
-    bind("file").onChange(file)
-    setValidated(false)
-    bind("mode").onChange(ModeEnum.validate)
+    form.setField("file", file)
+    form.setField("mode", ModeEnum.validate)
     setImportErrors(null)
-    setValidationResult(null)
   }
 
   const templatePath = `/api/tiruert/operations/import/template/?entity_id=${entity.id}`
@@ -114,11 +66,9 @@ export const OperationsExcelImportDialog = ({
           nativeButtonProps={{ form: "operations-import-form" }}
           loading={loading}
           disabled={!value.file}
-          priority={validated ? "primary" : "secondary"}
+          priority={isValidated ? "primary" : "secondary"}
         >
-          {mode === ModeEnum.validate
-            ? t("Valider le fichier")
-            : t("Créer les opérations")}
+          {!isValidated ? t("Valider le fichier") : t("Créer les opérations")}
         </Button>
       }
       onClose={onClose}
@@ -160,6 +110,7 @@ export const OperationsExcelImportDialog = ({
             onChange={handleFileChange}
             state="info"
             stateRelatedMessage={t("Format accepté: .xlsx")}
+            required
           />
 
           {importErrors && importErrors.validation_errors.length > 0 && (
@@ -169,20 +120,20 @@ export const OperationsExcelImportDialog = ({
             />
           )}
 
-          {validationResult && (
+          {operations && (
             <Notice
               variant="info"
               title={t(
                 "Vous êtes sur le point de créer {{count}} opération(s) :",
                 {
-                  count: validationResult.operations.length,
+                  count: operations.length,
                 }
               )}
             >
               <div>
                 <strong></strong>
                 <ul>
-                  {validationResult.operations.map((op, idx) => (
+                  {operations.map((op, idx) => (
                     <li key={idx}>
                       {[
                         op.type,
