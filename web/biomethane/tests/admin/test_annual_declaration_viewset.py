@@ -152,7 +152,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             self.assertEqual(result["year"], self.current_year)
 
     def test_list_filters_by_current_year(self):
-        """list returns only declarations for the current declaration year."""
+        """list without year param defaults to the current declaration year."""
 
         setup_current_user(
             self,
@@ -164,7 +164,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_03,
             year=self.current_year - 1,
-            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+            status=BiomethaneAnnualDeclaration.DECLARED,
         )
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_03,
@@ -179,6 +179,65 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         results = data["results"]
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["year"], self.current_year)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
+
+    def test_list_with_year_param_returns_declaration_for_requested_year(self):
+        """list with year param returns status and year for the requested declaration year."""
+        setup_current_user(
+            self,
+            "dreal-other@example.com",
+            "DREAL with dept 03",
+            "User",
+            [(self.dreal_other, "ADMIN")],
+        )
+        previous_year = self.current_year - 1
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_03,
+            year=previous_year,
+            status=BiomethaneAnnualDeclaration.DECLARED,
+        )
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_03,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        response = self.client.get(
+            self.admin_declarations_url,
+            {"entity_id": self.dreal_other.id, "year": previous_year},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["year"], previous_year)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.DECLARED)
+
+    def test_list_with_year_param_returns_not_started_when_no_declaration(self):
+        """list with year param returns NOT_STARTED when no declaration exists for that year."""
+        setup_current_user(
+            self,
+            "dreal-other@example.com",
+            "DREAL with dept 03",
+            "User",
+            [(self.dreal_other, "ADMIN")],
+        )
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_03,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        response = self.client.get(
+            self.admin_declarations_url,
+            {"entity_id": self.dreal_other.id, "year": self.current_year - 1},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["year"], self.current_year - 1)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.NOT_STARTED)
 
     def test_list_is_ordered_by_priority_and_producer_name(self):
         """list returns producers ordered by status priority, then by producer name."""

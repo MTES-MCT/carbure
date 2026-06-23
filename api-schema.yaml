@@ -535,6 +535,11 @@ paths:
             * `2023` - 2023
           explode: true
           style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:
@@ -627,6 +632,11 @@ paths:
             * `2023` - 2023
           explode: true
           style: form
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the annual declaration
       tags:
         - biomethane
       security:

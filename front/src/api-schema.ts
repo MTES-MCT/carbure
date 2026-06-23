@@ -7172,6 +7172,8 @@ export interface operations {
                  *     * `2023` - 2023
                  */
                 tariff_reference?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference[];
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -7215,6 +7217,8 @@ export interface operations {
                  *     * `2023` - 2023
                  */
                 tariff_reference?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference[];
+                /** @description Year of the annual declaration */
+                year?: number;
             };
             header?: never;
             path?: never;

@@ -15,12 +15,12 @@ DECLARATION_STATUS_ORDER = (
 
 class BiomethaneAdminDashboardService:
     @staticmethod
-    def get_dashboard_queryset(entity):
+    def get_dashboard_queryset(entity: Entity, year: int | None = None):
         """
         Returns biomethane producers visible to the admin entity, including those
         without an annual declaration for the current year (NOT_STARTED status).
         """
-        year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        year = year or BiomethaneAnnualDeclarationService.get_current_declaration_year()
         declaration_subquery = BiomethaneAnnualDeclaration.objects.filter(
             producer=OuterRef("pk"),
             year=year,

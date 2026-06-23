@@ -19,6 +19,13 @@ from core.models import Entity
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Year of the annual declaration",
+            required=False,
+        ),
     ]
 )
 class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, FiltersActionFactory()):
@@ -30,4 +37,8 @@ class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, Fi
     serializer_class = BiomethaneAdminAnnualDeclarationSerializer
 
     def get_queryset(self):
-        return BiomethaneAdminDashboardService.get_dashboard_queryset(self.request.entity)
+        year = self.request.query_params.get("year")
+        return BiomethaneAdminDashboardService.get_dashboard_queryset(
+            self.request.entity,
+            int(year) if year is not None else None,
+        )
