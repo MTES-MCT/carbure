@@ -18,6 +18,9 @@ export const AllStatuses: Story = {
       />
       <AnnualDeclarationStatusBadge status={AnnualDeclarationStatus.DECLARED} />
       <AnnualDeclarationStatusBadge status={AnnualDeclarationStatus.OVERDUE} />
+      <AnnualDeclarationStatusBadge
+        status={AnnualDeclarationStatus.NOT_STARTED}
+      />
     </div>
   ),
 }

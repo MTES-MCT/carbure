@@ -26,7 +26,7 @@ class ValidateActionMixin:
             declaration = self.filter_queryset(self.get_queryset()).get()
 
             if BiomethaneAnnualDeclarationService.is_declaration_complete(declaration) and declaration.is_open:
-                current_status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+                current_status = declaration.computed_status
                 if current_status == BiomethaneAnnualDeclaration.OVERDUE:
                     declaration.is_open = False
 

@@ -1,6 +1,7 @@
 from datetime import date
 from unittest.mock import MagicMock, patch
 
+from django.db.models import CharField, IntegerField, Value
 from django.test import TestCase
 
 from biomethane.factories import BiomethaneDigestateFactory, BiomethaneProductionUnitFactory
@@ -24,6 +25,13 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
         self.current_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
+
+    def _get_computed_status(self, declaration):
+        return (
+            BiomethaneAnnualDeclaration.annotated_objects.filter(pk=declaration.pk)
+            .values_list("computed_status", flat=True)
+            .get()
+        )
 
     @patch("biomethane.services.annual_declaration.date")
     def test_get_declaration_period(self, mock_date):
@@ -392,10 +400,28 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         # Verify no declaration was created
         self.assertEqual(BiomethaneAnnualDeclaration.objects.filter(producer=self.producer_entity).count(), 0)
 
+    def test_get_declaration_status_not_started(self):
+        """Test annotation returns NOT_STARTED when status field is null."""
+        status = (
+            Entity.objects.filter(pk=self.producer_entity.pk)
+            .annotate(
+                _declaration_status=Value(None, output_field=CharField()),
+                year=Value(2025, output_field=IntegerField()),
+            )
+            .annotate(
+                computed_status=BiomethaneAnnualDeclarationService.get_declaration_status_annotation(
+                    "_declaration_status", "year"
+                ),
+            )
+            .values_list("computed_status", flat=True)
+            .get()
+        )
+        self.assertEqual(status, BiomethaneAnnualDeclaration.NOT_STARTED)
+
     @patch("biomethane.services.annual_declaration.date")
-    def test_get_declaration_status_in_progress_current_year(self, mock_date):
-        """Test get_declaration_status returns IN_PROGRESS for current year declaration"""
-        mock_date.today.return_value = date(2026, 3, 30)  # Before 1st April
+    def test_get_declaration_status_in_progress_before_deadline(self, mock_date):
+        """Test get_declaration_status returns IN_PROGRESS before 31st March of the declaration year"""
+        mock_date.today.return_value = date(2025, 3, 30)
 
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -403,13 +429,13 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        status = self._get_computed_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.IN_PROGRESS)
 
     @patch("biomethane.services.annual_declaration.date")
-    def test_get_declaration_status_overdue_current_year_after_31st_march(self, mock_date):
-        """Test get_declaration_status returns OVERDUE for current year declaration after 31st March"""
-        mock_date.today.return_value = date(2026, 4, 1)  # After 31st March
+    def test_get_declaration_status_overdue_after_declaration_year_march_31(self, mock_date):
+        """Test get_declaration_status returns OVERDUE after 31st March of the declaration year"""
+        mock_date.today.return_value = date(2026, 4, 1)
 
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
@@ -417,7 +443,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        status = self._get_computed_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.OVERDUE)
 
     @patch("biomethane.services.annual_declaration.date")
@@ -431,26 +457,24 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             status=BiomethaneAnnualDeclaration.DECLARED,
         )
 
-        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        status = self._get_computed_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.DECLARED)
 
     @patch("biomethane.services.annual_declaration.date")
     def test_get_declaration_status_overdue_previous_year(self, mock_date):
-        """Test get_declaration_status returns OVERDUE for old year IN_PROGRESS declaration even before 1st April"""
-        # Current date in April 2026, so current declaration year is 2025 (year - 1)
-        mock_date.today.return_value = date(2026, 3, 31)  # Before 1st April
+        """Test get_declaration_status returns OVERDUE for old year IN_PROGRESS declaration"""
+        mock_date.today.return_value = date(2026, 2, 1)
 
-        # Declaration for 2024 (< 2025) still IN_PROGRESS should be OVERDUE
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=2024,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        status = BiomethaneAnnualDeclarationService.get_declaration_status(declaration)
+        status = self._get_computed_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.OVERDUE)
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_get_declarations_for_entity_filters_for_ademe(self, _):
         ademe = Entity.objects.create(name="ADEME", entity_type=Entity.EXTERNAL_ADMIN)
         ExternalAdminRights.objects.create(entity=ademe, right=ExternalAdminRights.ADEME)

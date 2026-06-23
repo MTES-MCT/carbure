@@ -4,11 +4,11 @@ import { useRoutes } from "common/hooks/routes"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { useNavigate } from "react-router-dom"
 import { BiomethaneProducer } from "../../types"
-import { useAnnualDeclarationYearsAdmin } from "../../hooks/use-annual-declaration-years-admin"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { ToggleDeclarationButton } from "./toggle-declaration-button"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
+import { SelectYearsAdmin } from "../../components/select-years-admin"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -43,7 +43,10 @@ export const DeclarationDetailHeader = ({
         }}
       />
 
-      <SelectYears key={selectedEntityId} />
+      <SelectYearsAdmin
+        key={selectedEntityId}
+        urlRoot={`biomethane/admin/declarations/${selectedEntityId}`}
+      />
 
       {/* Only display the open badge if the declaration exists */}
       {annualDeclaration?.status && (
@@ -51,17 +54,5 @@ export const DeclarationDetailHeader = ({
       )}
       {canEditDeclaration && <ToggleDeclarationButton />}
     </Row>
-  )
-}
-
-// Use a separate component to set a key to the select to force a re-render when the selected entity changes
-const SelectYears = () => {
-  const years = useAnnualDeclarationYearsAdmin()
-  return (
-    <Select
-      options={years.options}
-      value={years.selected}
-      onChange={years.setYear}
-    />
   )
 }

@@ -91,7 +91,7 @@ class EntityTest(TestCase):
 
         self.assertEqual(result, [dreal_a, dreal_b])
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_get_allowed_entities_for_ademe_filters_to_ademe_eligible_producers(self, _):
         ademe = create_entity_with_department(self.dept_02, external_admin_right=ExternalAdminRights.ADEME)
         producer_with_ademe_contract = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER, name="Producer ADEME")

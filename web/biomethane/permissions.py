@@ -1,4 +1,4 @@
-from biomethane.services.ademe import AdemeService
+from biomethane.services.admin.ademe import AdemeService
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import AdminRightsFactory, HasAdminRights, UserRightsFactory
 

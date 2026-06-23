@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.models import BiomethaneContract
-from biomethane.services.ademe import AdemeService
+from biomethane.services.admin.ademe import AdemeService
 from core.models import Entity
 
 
@@ -16,7 +16,7 @@ class AdemeServiceTests(TestCase):
             entity_type=Entity.BIOMETHANE_PRODUCER,
         )
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_get_ademe_contract_filter_builds_expected_filter(self, _):
         contract_filter = AdemeService.get_ademe_contract_filter("producer__biomethane_contract__")
 
@@ -46,7 +46,7 @@ class AdemeServiceTests(TestCase):
 
         self.assertIsNone(result)
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_is_allowed_to_access_object_true_when_ademe_and_effective_year_is_in_scope(self, _):
         contract = BiomethaneContractFactory.create(
             producer=self.producer,
@@ -59,7 +59,7 @@ class AdemeServiceTests(TestCase):
 
         self.assertTrue(result)
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_is_allowed_to_access_object_false_when_contract_without_ademe_aid(self, _):
         contract = BiomethaneContractFactory.create(
             producer=self.producer,
@@ -80,7 +80,7 @@ class AdemeServiceTests(TestCase):
 
         self.assertFalse(result)
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_is_allowed_to_access_object_false_when_effective_year_is_not_in_scope(self, _):
         contract = BiomethaneContractFactory.create(
             producer=self.producer,
