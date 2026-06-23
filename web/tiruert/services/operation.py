@@ -18,9 +18,6 @@ from tiruert.services.teneur import TeneurService
 
 
 class OperationServiceErrors:
-    INSUFFICIENT_INPUT_VOLUME = "INSUFFICIENT_INPUT_VOLUME"
-    LOT_NOT_FOUND = "LOT_NOT_FOUND"
-    LOT_EMISSION_RATE_NOT_FOUND = "LOT_EMISSION_RATE_NOT_FOUND"
     TARGET_EXCEEDED = "TARGET_EXCEEDED"
     ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
 
@@ -82,10 +79,12 @@ class OperationService:
         # Normalize available and requested volumes to business precision.
         available_volumes = {int(lot_id): truncate(volume) for lot_id, volume in zip(np_lot_ids, np_volumes)}
 
+        # Aggregate requested volumes per lot to correctly handle duplicate lot ids.
+        requested_volumes = defaultdict(float)
         for lot in selected_lots:
-            lot_id = lot["id"]
-            volume = truncate(lot["volume"])
+            requested_volumes[lot["id"]] += truncate(lot["volume"])
 
+        for lot_id, volume in requested_volumes.items():
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({"lot_id": [_(f"{lot_id}: Cet id de lot n'existe pas")]})
 
@@ -192,13 +191,18 @@ class OperationService:
         """
         Build OperationDetail payloads from lot volumes and emission rates.
         """
+        if hasattr(lot_volumes, "items"):
+            lot_volume_items = lot_volumes.items()
+        else:
+            lot_volume_items = ((lot["id"], lot["volume"]) for lot in lot_volumes)
+
         return [
             {
                 "lot_id": lot_id,
                 "volume": round(volume, 2),
                 "emission_rate_per_mj": emissions_by_lot.get(lot_id, 0),
             }
-            for lot_id, volume in lot_volumes.items()
+            for lot_id, volume in lot_volume_items
         ]
 
     @staticmethod

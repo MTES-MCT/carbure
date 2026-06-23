@@ -209,8 +209,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             OperationService.define_operation_status(validated_data)
 
-            lot_volumes = {lot["id"]: lot["volume"] for lot in selected_lots}
-            detail_operations_data = OperationService.build_details_data(lot_volumes, emissions_by_lot)
+            detail_operations_data = OperationService.build_details_data(selected_lots, emissions_by_lot)
 
             operation = OperationService.create_operation_with_details(validated_data, detail_operations_data)
 
