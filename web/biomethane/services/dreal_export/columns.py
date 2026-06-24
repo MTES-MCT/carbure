@@ -25,7 +25,7 @@ SECTION_COLORS = {
     "injection_site": "#E8FCE8",
     "digestate": "#FCE8F0",
     "energy": "#F0E8FC",
-    "supply_plan": "#F0E8FC",
+    "supply_plan": "#E8FCF0",
 }
 
 
@@ -66,6 +66,25 @@ def _model_columns(model_class, section: str, attr: str, extra_fields=()) -> lis
     return columns
 
 
+def _energy_columns() -> list[ColumnDef]:
+    columns = _model_columns(BiomethaneEnergy, "energy", "energy")
+    columns.extend(
+        [
+            ColumnDef(
+                "Quantité de biométhane injecté (Nm3/an)",
+                "energy",
+                lambda ctx: ctx.energy_metrics.injected_biomethane_nm3_per_year if ctx.energy_metrics else None,
+            ),
+            ColumnDef(
+                "Nombre d'heures de fonctionnement (h)",
+                "energy",
+                lambda ctx: ctx.energy_metrics.operating_hours if ctx.energy_metrics else None,
+            ),
+        ]
+    )
+    return columns
+
+
 def build_column_defs() -> list[ColumnDef]:
     """Return ordered column definitions for the DREAL flat export."""
     return [
@@ -74,7 +93,7 @@ def build_column_defs() -> list[ColumnDef]:
         *_model_columns(BiomethaneContract, "contract", "contract"),
         *_model_columns(BiomethaneInjectionSite, "injection_site", "injection_site"),
         *_model_columns(BiomethaneDigestate, "digestate", "digestate"),
-        *_model_columns(BiomethaneEnergy, "energy", "energy"),
+        *_energy_columns(),
         ColumnDef(
             "Tonnage total brut d'intrants (tMB)",
             "supply_plan",

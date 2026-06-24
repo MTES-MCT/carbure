@@ -12,7 +12,7 @@ from biomethane.models import (
 )
 from core.models import Entity
 
-from .metrics import SupplyPlanMetrics, preload_supply_plan_metrics
+from .metrics import EnergyMetrics, SupplyPlanMetrics, preload_energy_metrics, preload_supply_plan_metrics
 
 
 def _safe_related(obj, attr):
@@ -34,6 +34,7 @@ class ExportRowContext:
     digestate: BiomethaneDigestate | None
     energy: BiomethaneEnergy | None
     supply_metrics: SupplyPlanMetrics | None
+    energy_metrics: EnergyMetrics | None
 
 
 @dataclass
@@ -44,6 +45,7 @@ class ExportContext:
     digestates: dict[int, BiomethaneDigestate]
     energies: dict[int, BiomethaneEnergy]
     supply_metrics_by_producer: dict[int, SupplyPlanMetrics]
+    energy_metrics_by_producer: dict[int, EnergyMetrics]
 
     def row_context(self, declaration: BiomethaneAnnualDeclaration) -> ExportRowContext:
         producer = declaration.producer
@@ -56,7 +58,17 @@ class ExportContext:
             digestate=self.digestates.get(producer_id),
             energy=self.energies.get(producer_id),
             supply_metrics=self.supply_metrics_by_producer.get(producer_id),
+            energy_metrics=self.energy_metrics_by_producer.get(producer_id),
         )
+
+
+def _contracts_by_producer(declarations: list[BiomethaneAnnualDeclaration]) -> dict[int, BiomethaneContract | None]:
+    contracts: dict[int, BiomethaneContract | None] = {}
+    for declaration in declarations:
+        producer_id = declaration.producer_id
+        if producer_id not in contracts:
+            contracts[producer_id] = _safe_related(declaration.producer, "biomethane_contract")
+    return contracts
 
 
 def load_export_context(producer_ids, year: int) -> ExportContext:
@@ -91,4 +103,5 @@ def load_export_context(producer_ids, year: int) -> ExportContext:
         digestates=digestates,
         energies=energies,
         supply_metrics_by_producer=preload_supply_plan_metrics(exported_producer_ids, year),
+        energy_metrics_by_producer=preload_energy_metrics(energies, _contracts_by_producer(declarations)),
     )
