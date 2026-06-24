@@ -80,4 +80,14 @@ def build_column_defs() -> list[ColumnDef]:
             "supply_plan",
             lambda ctx: ctx.supply_metrics.total_gross_volume_tmb if ctx.supply_metrics else None,
         ),
+        ColumnDef(
+            "Part cultures principales (%)",
+            "supply_plan",
+            lambda ctx: ctx.supply_metrics.primary_crop_percentage if ctx.supply_metrics else None,
+        ),
+        ColumnDef(
+            "Part cultures intermédiaires (%)",
+            "supply_plan",
+            lambda ctx: ctx.supply_metrics.intermediate_crop_percentage if ctx.supply_metrics else None,
+        ),
     ]
