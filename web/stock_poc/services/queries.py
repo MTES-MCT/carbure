@@ -55,30 +55,50 @@ class Scenario:
         self.requires_entity = requires_entity
 
 
+QUERY_ORDER = ["consumption", "certificates", "sent", "received"]
+
+
 SCENARIOS: dict[str, Scenario] = {
     "consumption": Scenario(
-        help="Stock physique consommable (CREATION_H2 avec solde > 0)",
+        help="En stock",
         query=in_physical_stock_actions,
     ),
     "certificates": Scenario(
-        help="Certificats (CONSOMMATION ACCEPTED avec solde > 0)",
+        help="Certificats disponibles",
         query=available_for_certificates,
     ),
-    "owned": Scenario(
-        help="Toutes les actions dont l'entité est propriétaire",
-        query=owned_actions,
-    ),
     "sent": Scenario(
-        help="Transferts émis (TRANSFERT dont le parent appartient à l'entité)",
+        help="Certificats envoyés",
         query=sent_transfers,
     ),
     "received": Scenario(
-        help="Transferts reçus (TRANSFERT dont l'entité est propriétaire)",
+        help="Certificats reçus (actuellement tous les transferts, pas de diff entre physique et comptable)",
         query=received_transfers,
     ),
-    "all": Scenario(
-        help="Toutes les actions du POC (sans filtre entité)",
-        query=all_actions,
-        requires_entity=False,
-    ),
 }
+
+
+def run_scenarios(*, entity: Entity | None = None) -> list[dict]:
+    """Run all registered query scenarios (shared by CLI and API)."""
+    results = []
+    for name in QUERY_ORDER:
+        scenario = SCENARIOS[name]
+        if scenario.requires_entity:
+            if entity is None:
+                raise ValueError(f"Scenario '{name}' requires an entity.")
+            queryset = scenario.query(entity)
+            entity_id = entity.pk
+        else:
+            queryset = scenario.query()
+            entity_id = None
+
+        results.append(
+            {
+                "name": name,
+                "help": scenario.help,
+                "requires_entity": scenario.requires_entity,
+                "entity_id": entity_id,
+                "results": queryset,
+            }
+        )
+    return results

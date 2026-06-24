@@ -4,6 +4,8 @@ Filière : **H2**
 Entités : **A** (déclarant), **B**, **C**  
 Seed POC : `scenario_1` (état **final** après tout le parcours)
 
+Documentation complémentaire : [README](../README.md)
+
 ---
 
 ## Récit utilisateur
@@ -19,6 +21,8 @@ Seed POC : `scenario_1` (état **final** après tout le parcours)
 7. A envoie **150 kg** du certificat B à **C** (en attente d'acceptation).
 8. **B accepte** le transfert de 100 kg.
 9. **C refuse** le transfert de 150 kg → les 150 kg redeviennent disponibles sur le certificat B chez A.
+
+> Le seed `scenario_1` charge directement l'**état final** (étape 9). Les étapes intermédiaires se rejouent manuellement via l'UI POC ou seront modélisées plus tard.
 
 ---
 

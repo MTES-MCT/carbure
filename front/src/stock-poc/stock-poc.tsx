@@ -10,6 +10,7 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { deleteAction, getActionTree, resetAllActions } from "./api"
 import { ActionTree } from "./components/action-tree"
+import { QueryScenarios } from "./components/query-scenarios"
 import {
   CreateActionDialog,
   INVALIDATES,
@@ -141,6 +142,8 @@ export const StockPoc = () => {
             onDelete={handleDelete}
           />
         </Box>
+
+        <QueryScenarios actions={actionList} />
       </Content>
     </Main>
   )

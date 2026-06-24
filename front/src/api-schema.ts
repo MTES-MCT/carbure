@@ -2652,32 +2652,15 @@ export interface paths {
         patch: operations["stock_poc_actions_partial_update"];
         trace?: never;
     };
-    "/api/stock-poc/actions/available-certificates/": {
+    "/api/stock-poc/actions/queries/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Actions the entity can still transfer as certificates (accounting stock). */
-        get: operations["stock_poc_actions_available_certificates_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/stock-poc/actions/available-consumption/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Actions the entity can still consume (physical stock). */
-        get: operations["stock_poc_actions_available_consumption_list"];
+        /** @description Run all query scenarios from services/queries.py. */
+        get: operations["stock_poc_actions_queries_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2710,7 +2693,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Flat list of the entity actions; the tree is rebuilt on the frontend. */
+        /** @description Flat list of all POC actions; the global tree is rebuilt on the frontend. */
         get: operations["stock_poc_actions_tree_list"];
         put?: never;
         post?: never;
@@ -6322,6 +6305,17 @@ export interface components {
          * @enum {integer}
          */
         QuarterEnum: PathsApiElecProvisionCertificatesGetParametersQueryQuarter;
+        QueryScenario: {
+            name: string;
+            help: string;
+            requires_entity: boolean;
+            entity_id: number | null;
+            results: components["schemas"]["Action"][];
+        };
+        QueryScenariosResponse: {
+            query_entity_id: number | null;
+            scenarios: components["schemas"]["QueryScenario"][];
+        };
         RegistrationCountry: {
             name: string;
             name_en: string;
@@ -13064,29 +13058,13 @@ export interface operations {
             };
         };
     };
-    stock_poc_actions_available_certificates_list: {
+    stock_poc_actions_queries_retrieve: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description A search term. */
-                search?: string;
-                /**
-                 * @description * `ACCEPTED` - ACCEPTED
-                 *     * `REFUSED` - REFUSED
-                 *     * `PENDING` - PENDING
-                 */
-                status?: PathsApiStockPocActionsGetParametersQueryStatus;
-                /**
-                 * @description * `CREATION_H2` - CREATION_H2
-                 *     * `TRANSFERT` - TRANSFERT
-                 *     * `CONSOMMATION` - CONSOMMATION
-                 *     * `PERTE` - PERTE
-                 *     * `VALORISATION` - VALORISATION
-                 */
-                type?: PathsApiStockPocActionsGetParametersQueryType;
+                /** @description Entity used for entity-scoped query scenarios. Defaults to entity_id when omitted. */
+                query_entity_id?: number;
             };
             header?: never;
             path?: never;
@@ -13099,47 +13077,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Action"][];
-                };
-            };
-        };
-    };
-    stock_poc_actions_available_consumption_list: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description A search term. */
-                search?: string;
-                /**
-                 * @description * `ACCEPTED` - ACCEPTED
-                 *     * `REFUSED` - REFUSED
-                 *     * `PENDING` - PENDING
-                 */
-                status?: PathsApiStockPocActionsGetParametersQueryStatus;
-                /**
-                 * @description * `CREATION_H2` - CREATION_H2
-                 *     * `TRANSFERT` - TRANSFERT
-                 *     * `CONSOMMATION` - CONSOMMATION
-                 *     * `PERTE` - PERTE
-                 *     * `VALORISATION` - VALORISATION
-                 */
-                type?: PathsApiStockPocActionsGetParametersQueryType;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Action"][];
+                    "application/json": components["schemas"]["QueryScenariosResponse"];
                 };
             };
         };

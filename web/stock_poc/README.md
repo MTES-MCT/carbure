@@ -104,12 +104,14 @@ uv run python web/manage.py query_stock_poc
 
 Sans argument, exécute tous les scénarios de requête pour les entités POC.
 
+L’interface web affiche les mêmes scénarios (section « Requêtes métier »), avec un sélecteur d’entité (`query_entity_id`).
+
 ```bash
 uv run python web/manage.py query_stock_poc --list
 uv run python web/manage.py query_stock_poc --scenario certificates --entity-id <id>
 ```
 
-Comparer le résultat au **tableau attendu** dans la fiche scénario.
+Ajouter une entrée dans `services/queries.py` → visible en CLI et en UI automatiquement.
 
 Requêtes disponibles : `consumption`, `certificates`, `owned`, `sent`, `received`, `all`.
 

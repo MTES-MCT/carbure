@@ -7,7 +7,7 @@ import { createAction } from "../api"
 import { Action } from "../types"
 import { ActionForm, ActionFormValue } from "./action-form"
 
-export const INVALIDATES = ["stock-poc-tree"]
+export const INVALIDATES = ["stock-poc-tree", "stock-poc-queries"]
 
 export function toActionRequestBody(value: ActionFormValue) {
   return {

@@ -6,6 +6,23 @@ export const getActionTree = async (entity_id: number) =>
     .GET("/stock-poc/actions/tree/", { params: { query: { entity_id } } })
     .then((res) => res.data ?? [])
 
+export const getQueryScenarios = async (
+  entity_id: number,
+  query_entity_id?: number
+) =>
+  api
+    .GET("/stock-poc/actions/queries/", {
+      params: {
+        query: {
+          entity_id,
+          ...(query_entity_id !== undefined && query_entity_id !== entity_id
+            ? { query_entity_id }
+            : {}),
+        },
+      },
+    })
+    .then((res) => res.data)
+
 export const createAction = async (
   entity_id: number,
   body: ActionCreateRequest

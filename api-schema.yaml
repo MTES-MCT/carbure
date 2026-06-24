@@ -9416,10 +9416,10 @@ paths:
       responses:
         "204":
           description: No response body
-  /api/stock-poc/actions/available-certificates/:
+  /api/stock-poc/actions/queries/:
     get:
-      operationId: stock_poc_actions_available_certificates_list
-      description: Actions the entity can still transfer as certificates (accounting stock).
+      operationId: stock_poc_actions_queries_retrieve
+      description: Run all query scenarios from services/queries.py.
       parameters:
         - in: query
           name: entity_id
@@ -9427,49 +9427,12 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
         - in: query
-          name: status
+          name: query_entity_id
           schema:
-            type: string
-            nullable: true
-            title: Statut
-            enum:
-              - ACCEPTED
-              - PENDING
-              - REFUSED
-          description: |-
-            * `ACCEPTED` - ACCEPTED
-            * `REFUSED` - REFUSED
-            * `PENDING` - PENDING
-        - in: query
-          name: type
-          schema:
-            type: string
-            title: Type d'action
-            enum:
-              - CONSOMMATION
-              - CREATION_H2
-              - PERTE
-              - TRANSFERT
-              - VALORISATION
-          description: |-
-            * `CREATION_H2` - CREATION_H2
-            * `TRANSFERT` - TRANSFERT
-            * `CONSOMMATION` - CONSOMMATION
-            * `PERTE` - PERTE
-            * `VALORISATION` - VALORISATION
+            type: integer
+          description: Entity used for entity-scoped query scenarios. Defaults to
+            entity_id when omitted.
       tags:
         - stock-poc
       security:
@@ -9480,77 +9443,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Action"
-          description: ""
-  /api/stock-poc/actions/available-consumption/:
-    get:
-      operationId: stock_poc_actions_available_consumption_list
-      description: Actions the entity can still consume (physical stock).
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-        - in: query
-          name: status
-          schema:
-            type: string
-            nullable: true
-            title: Statut
-            enum:
-              - ACCEPTED
-              - PENDING
-              - REFUSED
-          description: |-
-            * `ACCEPTED` - ACCEPTED
-            * `REFUSED` - REFUSED
-            * `PENDING` - PENDING
-        - in: query
-          name: type
-          schema:
-            type: string
-            title: Type d'action
-            enum:
-              - CONSOMMATION
-              - CREATION_H2
-              - PERTE
-              - TRANSFERT
-              - VALORISATION
-          description: |-
-            * `CREATION_H2` - CREATION_H2
-            * `TRANSFERT` - TRANSFERT
-            * `CONSOMMATION` - CONSOMMATION
-            * `PERTE` - PERTE
-            * `VALORISATION` - VALORISATION
-      tags:
-        - stock-poc
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Action"
+                $ref: "#/components/schemas/QueryScenariosResponse"
           description: ""
   /api/stock-poc/actions/reset/:
     post:
@@ -9581,7 +9474,7 @@ paths:
   /api/stock-poc/actions/tree/:
     get:
       operationId: stock_poc_actions_tree_list
-      description: Flat list of the entity actions; the tree is rebuilt on the frontend.
+      description: Flat list of all POC actions; the global tree is rebuilt on the frontend.
       parameters:
         - in: query
           name: entity_id
@@ -19219,6 +19112,41 @@ components:
         * `2` - T2
         * `3` - T3
         * `4` - T4
+    QueryScenario:
+      type: object
+      properties:
+        name:
+          type: string
+        help:
+          type: string
+        requires_entity:
+          type: boolean
+        entity_id:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Action"
+      required:
+        - entity_id
+        - help
+        - name
+        - requires_entity
+        - results
+    QueryScenariosResponse:
+      type: object
+      properties:
+        query_entity_id:
+          type: integer
+          nullable: true
+        scenarios:
+          type: array
+          items:
+            $ref: "#/components/schemas/QueryScenario"
+      required:
+        - query_entity_id
+        - scenarios
     RegistrationCountry:
       type: object
       properties:
