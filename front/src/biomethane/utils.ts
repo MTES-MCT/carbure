@@ -50,6 +50,7 @@ export const getDeclarationStatusLabel = (status: AnnualDeclarationStatus) => {
     [AnnualDeclarationStatus.IN_PROGRESS]: i18next.t("Déclaration en cours"),
     [AnnualDeclarationStatus.DECLARED]: i18next.t("Déclaration transmise"),
     [AnnualDeclarationStatus.OVERDUE]: i18next.t("Déclaration en retard"),
+    [AnnualDeclarationStatus.NOT_STARTED]: i18next.t("Non commencé"),
   }
   return labelMapping[status]
 }

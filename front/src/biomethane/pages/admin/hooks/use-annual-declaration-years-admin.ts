@@ -1,5 +1,4 @@
 import useYears from "common/hooks/years-2"
-import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 const getAnnualDeclarationYearsAdmin = () => {
   const currentYear = new Date().getFullYear()
@@ -19,11 +18,9 @@ export const lastAnnualDeclarationYearAdmin =
 /**
  * Get years from 2025 (the first year of the biomethane module), to N-1 (the current year - 1)
  */
-export const useAnnualDeclarationYearsAdmin = () => {
-  const { selectedEntityId } = useSelectedEntity()
-
-  return useYears(
-    `biomethane/admin/declarations/${selectedEntityId}`,
+export const useAnnualDeclarationYearsAdmin = (urlRoot: string) =>
+  useYears(
+    urlRoot,
     () => {
       return Promise.resolve({
         data: annualDeclarationYearsAdmin,
@@ -32,4 +29,3 @@ export const useAnnualDeclarationYearsAdmin = () => {
     },
     { readOnly: false, withCurrentYearIfEmpty: false }
   )
-}

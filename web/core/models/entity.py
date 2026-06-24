@@ -225,7 +225,7 @@ class Entity(models.Model):
             # that have received ADEME complementary aid.
             # If the entity also has DREAL rights, keep the broader DREAL scope.
             if has_ademe_right and not has_dreal_right:
-                from biomethane.services.ademe import AdemeService
+                from biomethane.services.admin.ademe import AdemeService
 
                 condition &= AdemeService.get_ademe_contract_filter(
                     contract_prefix="biomethane_contract__",

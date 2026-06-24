@@ -17,7 +17,7 @@ class BiomethaneAnnualDeclarationStatusSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["status"] = BiomethaneAnnualDeclarationService.get_declaration_status(instance)
+        representation["status"] = instance.computed_status
         return representation
 
 
