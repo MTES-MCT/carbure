@@ -43,7 +43,9 @@ class ExcelExportActionMixin:
                     "columns": dreal_columns
                     + [
                         {"label": "Provenance", "value": "source"},
-                        {"label": "Intrant", "value": "feedstock"},
+                        {"label": "Intrant", "value": "feedstock.name"},
+                        {"label": "Catégorie", "value": "feedstock.classification.category"},
+                        {"label": "Sous-catégorie", "value": "feedstock.classification.subcategory"},
                         {"label": "Unité", "value": "material_unit"},
                         {"label": "Ratio de matière sèche (%)", "value": "dry_matter_ratio_percent"},
                         {"label": "Volume (t)", "value": "volume"},

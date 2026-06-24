@@ -1,5 +1,6 @@
 from django.db import models
 
+from biomethane.models.managers.biomethane_annual_declaration import AnnotatedBiomethaneAnnualDeclarationManager
 from core.models import Entity
 
 
@@ -7,8 +8,15 @@ class BiomethaneAnnualDeclaration(models.Model):
     IN_PROGRESS = "IN_PROGRESS"
     DECLARED = "DECLARED"
     OVERDUE = "OVERDUE"  # Virtual status
+    NOT_STARTED = "NOT_STARTED"  # Virtual status (no declaration row yet)
     DECLARATION_STATUS = [(IN_PROGRESS, IN_PROGRESS), (DECLARED, DECLARED)]
-    DECLARATION_STATUS_CHOICES = [(IN_PROGRESS, IN_PROGRESS), (DECLARED, DECLARED), (OVERDUE, OVERDUE)]
+    DECLARATION_STATUS_CHOICES = [
+        (IN_PROGRESS, IN_PROGRESS),
+        (DECLARED, DECLARED),
+        (OVERDUE, OVERDUE),
+        (NOT_STARTED, NOT_STARTED),
+    ]
+    ADMIN_DASHBOARD_STATUS_CHOICES = DECLARATION_STATUS_CHOICES
     # Propriétaire de la déclaration annuelle
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="biomethane_declarations")
 
@@ -19,6 +27,9 @@ class BiomethaneAnnualDeclaration(models.Model):
 
     # Indique si la déclaration est modifiable ou non
     is_open = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    annotated_objects = AnnotatedBiomethaneAnnualDeclarationManager()
 
     class Meta:
         db_table = "biomethane_annual_declaration"

@@ -282,3 +282,41 @@ class BiomethaneSupplyInputExportSerializerTests(TestCase):
         self.assertEqual(data["type_cive"], "")
         self.assertEqual(data["collection_type"], "")
         self.assertEqual(data["source"], "")
+
+    def test_export_serializer_outputs_feedstock_classification(self):
+        """Feedstock must include classification category and subcategory for Excel export."""
+        classification = Classification.objects.create(
+            group="Biomasse",
+            category="Biomasse agricole - Cultures intermédiaires",
+            subcategory="CIVE",
+        )
+        feedstock = MatierePremiere.objects.create(
+            name="Seigle - CIVE",
+            name_en="Rye - CIVE",
+            code="SEIGLE_CIVE",
+            is_methanogenic=True,
+            classification=classification,
+        )
+        supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=feedstock,
+        )
+        data = BiomethaneSupplyInputExportSerializer(supply_input).data
+
+        self.assertEqual(data["feedstock"]["name"], "Seigle - CIVE")
+        self.assertEqual(
+            data["feedstock"]["classification"]["category"],
+            "Biomasse agricole - Cultures intermédiaires",
+        )
+        self.assertEqual(data["feedstock"]["classification"]["subcategory"], "CIVE")
+
+    def test_export_serializer_outputs_null_feedstock_classification(self):
+        """Feedstock without classification must serialize classification as null."""
+        supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock,
+        )
+        data = BiomethaneSupplyInputExportSerializer(supply_input).data
+
+        self.assertEqual(data["feedstock"]["name"], "Maïs")
+        self.assertIsNone(data["feedstock"]["classification"])

@@ -8,6 +8,7 @@ from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
 from core.models import Department, Entity, ExternalAdminRights
+from edelivery.ebms.ntr import NationalTradeRegister
 from entity.factories.entity import EntityFactory
 from entity.models import EntityScope
 
@@ -48,6 +49,21 @@ class EntityTest(TestCase):
         patched_filter.assert_called_with(entity=entity, role=self.patched_UserRights.ADMIN, user__is_active=True)
         patched_values_list.assert_called_with("user__email", flat=True)
 
+    @patch("core.models.entity.Entity.objects.filter")
+    def test_fetches_entity_from_ntr_id(self, patched_filter):
+        entity = Entity(id=12345)
+        patched_last = patched_filter.return_value.last
+        patched_last.return_value = entity
+
+        patched_filter.assert_not_called()
+        patched_last.assert_not_called()
+
+        ntr = NationalTradeRegister.from_id("FR_SIREN_CD123456789")
+        result = Entity.from_national_trade_register(ntr)
+        patched_filter.assert_called_with(registered_country__code_pays="FR", registration_id="123456789")
+        patched_last.assert_called()
+        self.assertEqual(12345, result.id)
+
     def test_get_managing_external_admins_returns_none_when_no_production_unit(self):
         """Sans unité de production, on ne récupère aucun admin."""
         producer_no_unit = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER)
@@ -75,7 +91,7 @@ class EntityTest(TestCase):
 
         self.assertEqual(result, [dreal_a, dreal_b])
 
-    @patch("biomethane.services.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
+    @patch("biomethane.services.admin.ademe.AdemeService.get_ademe_min_effective_year", return_value=2021)
     def test_get_allowed_entities_for_ademe_filters_to_ademe_eligible_producers(self, _):
         ademe = create_entity_with_department(self.dept_02, external_admin_right=ExternalAdminRights.ADEME)
         producer_with_ademe_contract = EntityFactory.create(entity_type=Entity.BIOMETHANE_PRODUCER, name="Producer ADEME")

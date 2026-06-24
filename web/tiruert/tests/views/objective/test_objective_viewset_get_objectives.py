@@ -41,10 +41,11 @@ class ObjectiveViewSetAdminAggregatedTest(TestCase):
 
     def test_returns_503_when_cache_miss(self):
         """Admin without selected_entity_id gets 503 when no aggregated data is cached."""
-        response = self.client.get(
-            OBJECTIVES_URL,
-            {"entity_id": self.admin_entity.id, "year": 2025},
-        )
+        with self.assertLogs("django.request", level="ERROR"):
+            response = self.client.get(
+                OBJECTIVES_URL,
+                {"entity_id": self.admin_entity.id, "year": 2025},
+            )
 
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
 
@@ -65,10 +66,11 @@ class ObjectiveViewSetAdminAggregatedTest(TestCase):
         cache.set("tiruert:aggregated_objectives:2024", VALID_CACHED_OBJECTIVES)
 
         # Year 2025 has no cache → 503
-        response_2025 = self.client.get(
-            OBJECTIVES_URL,
-            {"entity_id": self.admin_entity.id, "year": 2025},
-        )
+        with self.assertLogs("django.request", level="ERROR"):
+            response_2025 = self.client.get(
+                OBJECTIVES_URL,
+                {"entity_id": self.admin_entity.id, "year": 2025},
+            )
         self.assertEqual(response_2025.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
 
         # Year 2024 is cached → 200

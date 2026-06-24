@@ -1,7 +1,8 @@
 from datetime import datetime
 
+from core.models.entity import Entity
 from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter
-from edelivery.ebms.ntr import from_national_trade_register
+from edelivery.ebms.ntr import NationalTradeRegister
 from edelivery.ebms.udb_element import UDBElement
 
 
@@ -51,12 +52,17 @@ class Transaction(UDBElement):
         return self.xml_root_element.find("./SELLER_ECONOMIC_OPERATOR_NUMBER").text
 
     def to_lot_attributes(self):
+        def entity_id(ntr_id):
+            ntr = NationalTradeRegister.from_id(ntr_id)
+            entity = Entity.from_national_trade_register(ntr)
+            return entity.id
+
         biofuel_code = MaterialConverter().from_udb_biofuel_code(self.biofuel_code())
-        client_id = from_national_trade_register(self.client_id())
+        client_id = entity_id(self.client_id())
         feedstock_code = MaterialConverter().from_udb_feedstock_code(self.feedstock_code())
         lot_status = self.carbure_status()
         quantity_data = QuantityConverter().from_udb(self.unit(), self.quantity())
-        supplier_id = from_national_trade_register(self.supplier_id())
+        supplier_id = entity_id(self.supplier_id())
 
         attributes = {
             "biofuel_code": biofuel_code,

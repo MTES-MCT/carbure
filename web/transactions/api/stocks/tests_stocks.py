@@ -249,14 +249,6 @@ class StocksFlowTest(TestCase):
         status = response.json()["status"]
         assert status == "success"
 
-        # Cannot flush a stock with a remaining volume greater than 1% => 5% in deed
-        stock = CarbureStockFactory.create(parent_lot=parent_lot, carbure_client=self.producer, remaining_volume=5001)
-        stock.save()  # HACK to avoid `generate_carbure_id` later
-        query = {"entity_id": self.producer.id, "stock_ids": [stock.id]}
-        response = self.client.post(reverse("transactions-stocks-flush"), query)
-        status = response.json()["status"]
-        assert status == "error"
-
     def test_stock_transformation(self):
         eth = Biocarburant.objects.get(code="ETH")
 

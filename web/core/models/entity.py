@@ -88,6 +88,12 @@ class Entity(models.Model):
     vat_number = models.CharField(max_length=32, blank=True, default="")
     accise_number = models.CharField(max_length=32, blank=True, default="")
 
+    @staticmethod
+    def from_national_trade_register(ntr):
+        registration_id = ntr.registration_id
+        country_code = ntr.country_code
+        return Entity.objects.filter(registered_country__code_pays=country_code, registration_id=registration_id).last()
+
     def __str__(self):
         return self.name
 
@@ -219,7 +225,7 @@ class Entity(models.Model):
             # that have received ADEME complementary aid.
             # If the entity also has DREAL rights, keep the broader DREAL scope.
             if has_ademe_right and not has_dreal_right:
-                from biomethane.services.ademe import AdemeService
+                from biomethane.services.admin.ademe import AdemeService
 
                 condition &= AdemeService.get_ademe_contract_filter(
                     contract_prefix="biomethane_contract__",

@@ -1272,6 +1272,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/elec/provision-certificates-qualicharge/bulk-transfer/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Transfer non-double-validated volumes to another CPO (target must have parent_entity = current entity) */
+        post: operations["bulk_transfer_provision_certificates_qualicharge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/elec/provision-certificates-qualicharge/bulk-update/": {
         parameters: {
             query?: never;
@@ -1314,6 +1331,23 @@ export interface paths {
         };
         /** @description Retrieve content of a specific filter */
         get: operations["filter_provision_certificates_qualicharge"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/elec/provision-certificates-qualicharge/transfer-targets/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List CPOs authorized to receive volume transfers (those with parent_entity = current entity) */
+        get: operations["transfer_targets_provision_certificates_qualicharge"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3330,14 +3364,13 @@ export interface components {
         };
         /** @description Serializer pour la liste admin des déclarations annuelles biométhane (DREAL). */
         BiomethaneAdminAnnualDeclaration: {
-            status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
-            readonly id: number;
-            producer: components["schemas"]["EntityPreview"];
+            readonly status: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
+            readonly producer: components["schemas"]["EntityPreview"];
+            readonly tariff_reference: components["schemas"]["TariffReferenceEnum"] | null;
             /** Format: date */
             readonly effective_date: string | null;
-            readonly tariff_reference: components["schemas"]["TariffReferenceEnum"] | null;
             readonly department: string | null;
-            year: number;
+            readonly year: number;
         };
         BiomethaneAnnualDeclaration: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -3371,9 +3404,10 @@ export interface components {
          * @description * `IN_PROGRESS` - IN_PROGRESS
          *     * `DECLARED` - DECLARED
          *     * `OVERDUE` - OVERDUE
+         *     * `NOT_STARTED` - NOT_STARTED
          * @enum {string}
          */
-        BiomethaneAnnualDeclarationStatusEnum: BiomethaneAnnualDeclarationStatusEnum;
+        BiomethaneAnnualDeclarationStatusEnum: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus;
         BiomethaneContract: {
             readonly id: number;
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
@@ -4171,6 +4205,10 @@ export interface components {
         BiomethaneUploadExcelRequest: {
             /** Format: binary */
             file: File;
+        };
+        BulkTransferQualichargeRequest: {
+            operating_unit: string[];
+            target_cpo_id: number;
         };
         CarbureLotPublic: {
             readonly id: number;
@@ -5887,6 +5925,8 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["EntityPreview"][];
+            total_quantity?: number;
+            total_quantity_renewable?: number;
         };
         PaginatedEntityProductionSiteList: {
             /** @example 123 */
@@ -7121,6 +7161,8 @@ export interface operations {
                 /**
                  * @description * `IN_PROGRESS` - IN_PROGRESS
                  *     * `DECLARED` - DECLARED
+                 *     * `OVERDUE` - OVERDUE
+                 *     * `NOT_STARTED` - NOT_STARTED
                  */
                 status?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus[];
                 /**
@@ -7130,6 +7172,7 @@ export interface operations {
                  *     * `2023` - 2023
                  */
                 tariff_reference?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference[];
+                year: number;
             };
             header?: never;
             path?: never;
@@ -7162,6 +7205,8 @@ export interface operations {
                 /**
                  * @description * `IN_PROGRESS` - IN_PROGRESS
                  *     * `DECLARED` - DECLARED
+                 *     * `OVERDUE` - OVERDUE
+                 *     * `NOT_STARTED` - NOT_STARTED
                  */
                 status?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus[];
                 /**
@@ -7171,6 +7216,7 @@ export interface operations {
                  *     * `2023` - 2023
                  */
                 tariff_reference?: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference[];
+                year: number;
             };
             header?: never;
             path?: never;
@@ -8224,6 +8270,13 @@ export interface operations {
                  *     * `EXTERNAL` - Externe
                  */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /**
+                 * @description * `2011` - 2011
+                 *     * `2020` - 2020
+                 *     * `2021` - 2021
+                 *     * `2023` - 2023
+                 */
+                tariff_reference?: ("" | "2011" | "2020" | "2021" | "2023" | null)[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -8441,6 +8494,13 @@ export interface operations {
                  *     * `EXTERNAL` - Externe
                  */
                 source?: PathsApiBiomethaneSupplyInputGetParametersQuerySource[];
+                /**
+                 * @description * `2011` - 2011
+                 *     * `2020` - 2020
+                 *     * `2021` - 2021
+                 *     * `2023` - 2023
+                 */
+                tariff_reference?: ("" | "2011" | "2020" | "2021" | "2023" | null)[];
                 /** @description Year of the supply plan. */
                 year: number;
             };
@@ -9532,6 +9592,35 @@ export interface operations {
             };
         };
     };
+    bulk_transfer_provision_certificates_qualicharge: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkTransferQualichargeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BulkTransferQualichargeRequest"];
+                "multipart/form-data": components["schemas"]["BulkTransferQualichargeRequest"];
+            };
+        };
+        responses: {
+            /** @description Success message with count of transferred certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     bulk_update_provision_certificates_qualicharge: {
         parameters: {
             query: {
@@ -9622,6 +9711,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    transfer_targets_provision_certificates_qualicharge: {
+        parameters: {
+            query: {
+                cpo?: string[];
+                date_from?: string[];
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `operating_unit` - operating_unit */
+                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
+                not_validated?: boolean;
+                operating_unit?: string[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                station_id?: string[];
+                /**
+                 * @description * `NO_ONE` - NO_ONE
+                 *     * `DGEC` - DGEC
+                 *     * `CPO` - CPO
+                 *     * `BOTH` - BOTH
+                 */
+                validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[];
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedEntityPreviewList"];
                 };
             };
         };
@@ -14145,7 +14279,9 @@ export interface operations {
 }
 export enum PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus {
     DECLARED = "DECLARED",
-    IN_PROGRESS = "IN_PROGRESS"
+    IN_PROGRESS = "IN_PROGRESS",
+    NOT_STARTED = "NOT_STARTED",
+    OVERDUE = "OVERDUE"
 }
 export enum PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference {
     Value2011 = "2011",
@@ -14166,7 +14302,8 @@ export enum PathsApiBiomethaneSupplyInputFiltersGetParametersQueryFilter {
     department = "department",
     feedstock = "feedstock",
     producer_name = "producer_name",
-    source = "source"
+    source = "source",
+    tariff_reference = "tariff_reference"
 }
 export enum PathsApiDoubleCountingAgreementsGetParametersQueryOrder_by {
     ValueMinuscertificate_id = "-certificate_id",
@@ -14539,11 +14676,6 @@ export enum AmendmentObjectEnum {
     PRODUCER_BUYER_INFO_CHANGE = "PRODUCER_BUYER_INFO_CHANGE",
     ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE = "ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE",
     OTHER = "OTHER"
-}
-export enum BiomethaneAnnualDeclarationStatusEnum {
-    IN_PROGRESS = "IN_PROGRESS",
-    DECLARED = "DECLARED",
-    OVERDUE = "OVERDUE"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

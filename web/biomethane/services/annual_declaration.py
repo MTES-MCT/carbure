@@ -1,5 +1,9 @@
 from datetime import date
 
+from django.db.models import BooleanField, Case, CharField, DateField, ExpressionWrapper, F, Q, Value, When
+from django.db.models.expressions import CombinedExpression
+from django.db.models.functions import Cast, Concat
+
 from biomethane.models import (
     BiomethaneAnnualDeclaration,
     BiomethaneContract,
@@ -10,13 +14,16 @@ from biomethane.models import (
     BiomethaneSupplyPlan,
 )
 from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
-from biomethane.services.ademe import AdemeService
+from biomethane.services.admin.ademe import AdemeService
 from biomethane.services.digestate import BiomethaneDigestateService
 from core.models.entity import ExternalAdminRights
 
 
 class BiomethaneAnnualDeclarationService:
-    OVERDUE_DATE = date(date.today().year, 3, 31)  # 31st March of the current year
+    @staticmethod
+    def get_overdue_date(declaration_year: int) -> date:
+        """31st March of the year following the declaration year (end of the declaration period)."""
+        return date(declaration_year + 1, 3, 31)
 
     @staticmethod
     def get_current_declaration_year():
@@ -47,29 +54,36 @@ class BiomethaneAnnualDeclarationService:
             return False
 
     @staticmethod
-    def get_declaration_status(declaration):
+    def get_declaration_status_annotation(status_field: str, year_field: str):
         """
-        Returns the status of a biomethane annual declaration.
+        SQL status for QuerySet.annotate().
 
-        If the declaration is for a past year or if the current date is past the overdue date (31st March)
-        and the declaration is not marked as DECLARED, the status is set to OVERDUE.
-
-        Args:
-            declaration: An object representing the biomethane annual declaration.
-
-        Returns:
-            str: The status of the declaration, either 'OVERDUE' or its current status.
+        Overdue when today is past 31st March of the year following the declaration year
+        and status is not DECLARED. Null status (no declaration row) maps to NOT_STARTED.
         """
-        current_declaration_year = BiomethaneAnnualDeclarationService.get_current_declaration_year()
-        limit_declaration = BiomethaneAnnualDeclarationService.OVERDUE_DATE
+        today = Value(date.today(), output_field=DateField())
+        deadline = Cast(
+            Concat(F(year_field) + Value(1), Value("-03-31")),
+            output_field=DateField(),
+        )
+        is_past_deadline = ExpressionWrapper(
+            CombinedExpression(today, ">", deadline, output_field=BooleanField()),
+            output_field=BooleanField(),
+        )
+        not_declared = ~Q(**{status_field: BiomethaneAnnualDeclaration.DECLARED})
 
-        if (
-            declaration.year < current_declaration_year  # Case of past years
-            or limit_declaration < date.today()  # Case of current declaration, after 31st March
-        ) and declaration.status != BiomethaneAnnualDeclaration.DECLARED:
-            return BiomethaneAnnualDeclaration.OVERDUE
-
-        return declaration.status
+        return Case(
+            When(
+                **{f"{status_field}__isnull": True},
+                then=Value(BiomethaneAnnualDeclaration.NOT_STARTED),
+            ),
+            When(
+                is_past_deadline & not_declared,
+                then=Value(BiomethaneAnnualDeclaration.OVERDUE),
+            ),
+            default=F(status_field),
+            output_field=CharField(),
+        )
 
     @staticmethod
     def get_missing_fields(declaration):

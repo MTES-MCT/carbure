@@ -3,11 +3,12 @@ Tests for BiomethaneAdminAnnualDeclarationViewSet.
 
 Covers filtering of annual declarations by department (DREAL):
 - by production unit (biomethane_production_unit__department) only
-- ordering by priority (IN_PROGRESS first) then by producer name
+- ordering by status priority (NOT_STARTED, OVERDUE, IN_PROGRESS, DECLARED) then by producer name
 - filters endpoint (department, status, tariff_reference)
 """
 
 from datetime import date
+from unittest.mock import patch
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
@@ -26,6 +27,8 @@ from entity.models import EntityScope
 
 class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMixin):
     """Tests for BiomethaneAdminAnnualDeclarationViewSet (DREAL list of annual declarations)."""
+
+    dashboard_date_target = "biomethane.services.annual_declaration.date"
 
     @classmethod
     def setUpTestData(cls):
@@ -100,6 +103,8 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         )
 
         cls.admin_declarations_url = reverse("biomethane-admin-annual-declarations-list")
+        cls.dashboard_date_before_overdue = date(cls.current_year + 1, 2, 15)
+        cls.dashboard_date_after_overdue = date(cls.current_year + 1, 4, 15)
 
     def setUp(self):
         self.user = setup_current_user(
@@ -109,15 +114,24 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             "User",
             [(self.dreal, "ADMIN")],
         )
+        self.dashboard_date_patcher = patch(self.dashboard_date_target)
+        self.mock_dashboard_date = self.dashboard_date_patcher.start()
+        self.mock_dashboard_date.today.return_value = self.dashboard_date_before_overdue
+
+    def tearDown(self):
+        self.dashboard_date_patcher.stop()
+
+    def _list_params(self, entity_id, **extra):
+        return {"entity_id": entity_id, "year": self.current_year, **extra}
 
     def test_list_returns_only_declarations_from_accessible_departments(self):
-        """list returns only declarations for producers whose unit is in an accessible department."""
-        declaration_dept_01 = BiomethaneAnnualDeclaration.objects.create(
+        """list returns only producers whose unit is in an accessible department."""
+        BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_01,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
-        declaration_dept_02 = BiomethaneAnnualDeclaration.objects.create(
+        BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_02,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
@@ -128,80 +142,110 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
+        response = self.client.get(self.admin_declarations_url, self._list_params(self.dreal.id))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        results = data["results"]
-        declaration_ids = [d["id"] for d in results]
-        expected_declaration_ids = [declaration_dept_01.id, declaration_dept_02.id]
+        results = response.json()["results"]
+        producer_ids = [d["producer"]["id"] for d in results]
 
-        self.assertEqual(declaration_ids, expected_declaration_ids)
+        self.assertEqual(set(producer_ids), {self.producer_dept_01.id, self.producer_dept_02.id})
+        self.assertNotIn(self.producer_no_unit_zipcode_01.id, producer_ids)
+        self.assertNotIn(self.producer_no_unit_zipcode_03.id, producer_ids)
+        for result in results:
+            self.assertEqual(result["year"], self.current_year)
 
-    def test_list_includes_producers_without_unit_when_registered_zipcode_in_accessible_dept(self):
-        """list includes producers without unit whose registered_zipcode is in the accessible departments list."""
-        BiomethaneAnnualDeclaration.objects.create(
-            producer=self.producer_no_unit_zipcode_01,
-            year=self.current_year,
-            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+    def test_list_filters_by_year(self):
+        """list with year param returns declarations for the requested year only."""
+
+        setup_current_user(
+            self,
+            "dreal-other@example.com",
+            "DREAL with dept 03",
+            "User",
+            [(self.dreal_other, "ADMIN")],
         )
-
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        results = data["results"]
-        self.assertEqual(len(results), 1)
-        self.assertEqual(
-            BiomethaneAnnualDeclaration.objects.get(pk=results[0]["id"]).producer_id,
-            self.producer_no_unit_zipcode_01.id,
-        )
-
-    def test_list_excludes_producers_without_unit_when_registered_zipcode_not_in_accessible_dept(self):
-        """list excludes producers without unit whose registered_zipcode is not in the accessible departments."""
         BiomethaneAnnualDeclaration.objects.create(
-            producer=self.producer_no_unit_zipcode_03,
-            year=self.current_year,
-            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
-        )
-
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        results = data["results"]
-        self.assertEqual(len(results), 0)
-
-    def test_list_filters_by_current_year(self):
-        """list returns only declarations for the current declaration year."""
-        BiomethaneAnnualDeclaration.objects.create(
-            producer=self.producer_dept_01,
+            producer=self.producer_dept_03,
             year=self.current_year - 1,
-            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+            status=BiomethaneAnnualDeclaration.DECLARED,
         )
         BiomethaneAnnualDeclaration.objects.create(
-            producer=self.producer_dept_01,
+            producer=self.producer_dept_03,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
+        response = self.client.get(self.admin_declarations_url, self._list_params(self.dreal_other.id))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
         results = data["results"]
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["year"], self.current_year)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.IN_PROGRESS)
 
-    def test_list_is_ordered_by_priority_and_producer_name(self):
-        """list returns declarations ordered by priority (IN_PROGRESS first) then by producer name."""
-        EntityScope.objects.create(
-            entity=self.dreal, content_type=ContentType.objects.get_for_model(Department), object_id=self.dept_03.id
+    def test_list_with_year_param_returns_declaration_for_requested_year(self):
+        """list with year param returns status and year for the requested declaration year."""
+        setup_current_user(
+            self,
+            "dreal-other@example.com",
+            "DREAL with dept 03",
+            "User",
+            [(self.dreal_other, "ADMIN")],
+        )
+        previous_year = self.current_year - 1
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_03,
+            year=previous_year,
+            status=BiomethaneAnnualDeclaration.DECLARED,
         )
         BiomethaneAnnualDeclaration.objects.create(
-            producer=self.producer_dept_02,
+            producer=self.producer_dept_03,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        response = self.client.get(
+            self.admin_declarations_url,
+            self._list_params(self.dreal_other.id, year=previous_year),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["year"], previous_year)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.DECLARED)
+
+    def test_list_with_year_param_returns_not_started_when_no_declaration(self):
+        """list with year param returns NOT_STARTED when no declaration exists for that year."""
+        setup_current_user(
+            self,
+            "dreal-other@example.com",
+            "DREAL with dept 03",
+            "User",
+            [(self.dreal_other, "ADMIN")],
+        )
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_03,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+        )
+
+        response = self.client.get(
+            self.admin_declarations_url,
+            self._list_params(self.dreal_other.id, year=self.current_year - 1),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["year"], self.current_year - 1)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.NOT_STARTED)
+
+    def test_list_is_ordered_by_priority_and_producer_name(self):
+        """list returns producers ordered by status priority, then by producer name."""
+        EntityScope.objects.create(
+            entity=self.dreal, content_type=ContentType.objects.get_for_model(Department), object_id=self.dept_03.id
         )
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_03,
@@ -214,16 +258,36 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             status=BiomethaneAnnualDeclaration.DECLARED,
         )
 
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
+        expected_before_overdue = [
+            ("Producteur Dépt 02", BiomethaneAnnualDeclaration.NOT_STARTED),
+            ("Producteur Dépt 03", BiomethaneAnnualDeclaration.IN_PROGRESS),
+            ("Producteur Dépt 01", BiomethaneAnnualDeclaration.DECLARED),
+        ]
+        expected_after_overdue = [
+            ("Producteur Dépt 02", BiomethaneAnnualDeclaration.NOT_STARTED),
+            ("Producteur Dépt 03", BiomethaneAnnualDeclaration.OVERDUE),
+            ("Producteur Dépt 01", BiomethaneAnnualDeclaration.DECLARED),
+        ]
 
+        response = self.client.get(self.admin_declarations_url, self._list_params(self.dreal.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        results = data["results"]
-        names = [d["producer"]["name"] for d in results]
-        self.assertEqual(names, ["Producteur Dépt 02", "Producteur Dépt 03", "Producteur Dépt 01"])
+
+        self.assertEqual(
+            [(result["producer"]["name"], result["status"]) for result in response.json()["results"]],
+            expected_before_overdue,
+        )
+
+        with patch(self.dashboard_date_target) as mock_date:
+            mock_date.today.return_value = self.dashboard_date_after_overdue
+            response = self.client.get(self.admin_declarations_url, self._list_params(self.dreal.id))
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(
+                [(result["producer"]["name"], result["status"]) for result in response.json()["results"]],
+                expected_after_overdue,
+            )
 
     def test_list_different_dreal_sees_different_declarations(self):
-        """A different DREAL only sees declarations for producers in its accessible departments."""
+        """A different DREAL only sees producers in its accessible departments."""
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_01,
             year=self.current_year,
@@ -243,29 +307,53 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             [(self.dreal_other, "ADMIN")],
         )
 
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal_other.id})
+        response = self.client.get(self.admin_declarations_url, self._list_params(self.dreal_other.id))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
-        results = data["results"]
-        self.assertEqual(len(results), 1)
+        results = response.json()["results"]
+        producer_ids = [result["producer"]["id"] for result in results]
+
+        self.assertEqual(producer_ids, [self.producer_dept_03.id])
+
+    def test_list_returns_not_started_when_no_declarations(self):
+        """list returns accessible producers with NOT_STARTED when no declaration exists."""
+        response = self.client.get(self.admin_declarations_url, self._list_params(self.dreal.id))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+
+        self.assertEqual(len(results), 2)
         self.assertEqual(
-            BiomethaneAnnualDeclaration.objects.get(pk=results[0]["id"]).producer_id,
-            self.producer_dept_03.id,
+            {result["producer"]["id"] for result in results},
+            {self.producer_dept_01.id, self.producer_dept_02.id},
+        )
+        self.assertTrue(all(result["status"] == BiomethaneAnnualDeclaration.NOT_STARTED for result in results))
+
+    def test_list_filters_by_not_started_status(self):
+        """list can be filtered by the virtual NOT_STARTED status."""
+        BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_dept_01,
+            year=self.current_year,
+            status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
 
-    def test_list_returns_empty_list_when_no_declarations(self):
-        """list returns an empty list when no declarations match."""
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.dreal.id})
+        response = self.client.get(
+            self.admin_declarations_url,
+            self._list_params(
+                self.dreal.id,
+                status=BiomethaneAnnualDeclaration.NOT_STARTED,
+            ),
+        )
 
-        data = response.json()
-        results = data["results"]
-
-        self.assertEqual(len(results), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["producer"]["id"], self.producer_dept_02.id)
+        self.assertEqual(results[0]["status"], BiomethaneAnnualDeclaration.NOT_STARTED)
 
     def test_list_applies_five_year_contract_filter_only_for_ademe(self):
-        """ADEME only sees declarations where effective_date year is >= current year - 4."""
+        """ADEME only sees producers with contractswhere effective_date year is >= current year - 4."""
         ineligible_effective_date = date(self.current_year - 5, 1, 1)
         eligible_effective_date = date(self.current_year - 4, 1, 1)
 
@@ -287,7 +375,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
         )
-        declaration_eligible = BiomethaneAnnualDeclaration.objects.create(
+        BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_02,
             year=self.current_year,
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
@@ -301,15 +389,16 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             [(self.ademe, "ADMIN")],
         )
 
-        response = self.client.get(self.admin_declarations_url, {"entity_id": self.ademe.id})
+        response = self.client.get(self.admin_declarations_url, self._list_params(self.ademe.id))
 
-        declaration_ids = [d["id"] for d in response.json()["results"]]
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+        producer_ids = [result["producer"]["id"] for result in results]
 
-        self.assertEqual(declaration_ids, [declaration_eligible.id])
+        self.assertEqual(producer_ids, [self.producer_dept_02.id])
 
     def test_filters_return_expected_values_for_accessible_declarations(self):
-        """filters endpoint returns only department, status and tariff_reference values from current year declarations in
-        accessible departments."""
+        """filters endpoint returns department, status and tariff_reference values from accessible producers."""
         BiomethaneContractFactory.create(
             producer=self.producer_dept_01,
             tariff_reference="2011",
@@ -329,12 +418,16 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
             status=BiomethaneAnnualDeclaration.DECLARED,
         )
 
-        self.assertFilters(
-            BiomethaneAdminAnnualDeclarationViewSet,
-            {
-                "department": ["01", "02"],
-                "status": ["DECLARED", "IN_PROGRESS"],
-                "tariff_reference": ["2011", "2023"],
-            },
-            entity=self.dreal,
-        )
+        filter_params = {"year": self.current_year}
+        for filter_name, expected_values in {
+            "department": ["01", "02"],
+            "status": ["DECLARED", "IN_PROGRESS"],
+            "tariff_reference": ["2011", "2023"],
+        }.items():
+            self.assertFilterOptions(
+                BiomethaneAdminAnnualDeclarationViewSet,
+                filter_name,
+                expected_values,
+                params=filter_params,
+                entity=self.dreal,
+            )

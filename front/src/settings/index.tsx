@@ -33,11 +33,16 @@ const Settings = () => {
     hasAdminRight,
   } = entity
 
-  const hasCertificates = isIndustry
+  const hasCertificates =
+    isIndustry ||
+    isPowerOrHeatProducer ||
+    (isBiomethaneProducer && entity.is_red_ii)
+
   const hasDepot =
     isIndustry ||
     isPowerOrHeatProducer ||
     hasAdminRight(ExternalAdminPages.DGDDI)
+
   const hasOptions = isIndustry || isBiomethaneProducer
   const defaultTab = hasOptions ? "options" : "info"
   return (
