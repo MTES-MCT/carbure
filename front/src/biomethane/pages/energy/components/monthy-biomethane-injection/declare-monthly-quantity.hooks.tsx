@@ -63,6 +63,7 @@ export const useDeclareMonthlyQuantityColumns = ({
             readOnly={isReadOnly}
             required
             state={isError ? "error" : "default"}
+            step={0.01}
           />
         )
       },
@@ -91,6 +92,7 @@ export const useDeclareMonthlyQuantityColumns = ({
             readOnly={isReadOnly}
             required
             state={isError ? "error" : "default"}
+            step={0.01}
           />
         )
       },
