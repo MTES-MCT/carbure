@@ -6,7 +6,8 @@ from django.utils.text import slugify
 from rest_framework.decorators import action
 
 from biomethane.permissions import HasDrealRights
-from core.excel import ExcelResponse, export_to_excel
+from biomethane.services.supply_input_export import generate_supply_input_export
+from core.excel import ExcelResponse
 
 
 class ExcelExportActionMixin:
@@ -16,52 +17,22 @@ class ExcelExportActionMixin:
         url_path="export",
     )
     def export_supply_plan_to_excel(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset().select_related(
+            "supply_plan__producer__biomethane_production_unit__department",
+            "feedstock__classification",
+            "origin_country",
+        )
+        queryset = self.filter_queryset(queryset)
 
         year = request.query_params.get("year")
         name = "biomethane_plan_approvisionnement"
         filename = f"{name}_{year}_{slugify(request.entity.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         file_path = os.path.join(tempfile.gettempdir(), filename)
 
-        permission = HasDrealRights()
-        is_dreal = permission.has_permission(request, self)
+        is_dreal = HasDrealRights().has_permission(request, self)
+        rows = self.get_serializer(queryset, many=True).data
+        excel_file = generate_supply_input_export(file_path, rows, dreal=is_dreal)
 
-        dreal_columns = (
-            [
-                {"label": "Producteur", "value": "producer.name"},
-            ]
-            if is_dreal
-            else []
-        )
-
-        excel_file = export_to_excel(
-            file_path,
-            [
-                {
-                    "label": "Plan d'approvisionnement",
-                    "rows": self.get_serializer(queryset, many=True).data,
-                    "columns": dreal_columns
-                    + [
-                        {"label": "Provenance", "value": "source"},
-                        {"label": "Intrant", "value": "feedstock.name"},
-                        {"label": "Catégorie", "value": "feedstock.classification.category"},
-                        {"label": "Sous-catégorie", "value": "feedstock.classification.subcategory"},
-                        {"label": "Unité", "value": "material_unit"},
-                        {"label": "Ratio de matière sèche (%)", "value": "dry_matter_ratio_percent"},
-                        {"label": "Volume (t)", "value": "volume"},
-                        {"label": "Département d'origine", "value": "origin_department"},
-                        {"label": "Distance moyenne pondérée (km)", "value": "average_weighted_distance_km"},
-                        {"label": "Distance maximale (km)", "value": "maximum_distance_km"},
-                        {"label": "Pays d'origine", "value": "origin_country"},
-                        {"label": "Type de CIVE", "value": "type_cive"},
-                        {"label": "Précisez la culture", "value": "culture_details"},
-                        {"label": "Type de collecte", "value": "collection_type"},
-                        {"label": "Année", "value": "year"},
-                    ],
-                }
-            ],
-            column_width=15,
-        )
         try:
             return ExcelResponse(excel_file)
         finally:

@@ -1,13 +1,9 @@
 import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
-import {
-  downloadAnnualDeclaration,
-  downloadDrealAnnualDeclaration,
-} from "biomethane/api"
+import { downloadAnnualDeclaration } from "biomethane/api"
 import useEntity from "common/hooks/entity"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { AnnualDeclarationStatus } from "biomethane/types"
-import { ExternalAdminPages } from "common/types"
 
 interface DownloadDeclarationButtonProps {
   year: number
@@ -24,10 +20,7 @@ export const DownloadDeclarationButton = ({
     return null
   }
 
-  const isDreal = entity.hasAnyAdminRight([ExternalAdminPages.DREAL])
-  const handleDownload = isDreal
-    ? () => downloadDrealAnnualDeclaration(entity.id, year)
-    : () => downloadAnnualDeclaration(entity.id, year)
+  const handleDownload = () => downloadAnnualDeclaration(entity.id, year)
 
   return (
     <Button
