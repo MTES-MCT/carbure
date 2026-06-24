@@ -12,6 +12,8 @@ from biomethane.models import (
 )
 from core.models import Entity
 
+from .metrics import SupplyPlanMetrics, preload_supply_plan_metrics
+
 
 def _safe_related(obj, attr):
     """Return a reverse one-to-one related object, or None when it does not exist."""
@@ -31,6 +33,7 @@ class ExportRowContext:
     injection_site: BiomethaneInjectionSite | None
     digestate: BiomethaneDigestate | None
     energy: BiomethaneEnergy | None
+    supply_metrics: SupplyPlanMetrics | None
 
 
 @dataclass
@@ -40,6 +43,7 @@ class ExportContext:
     declarations: list[BiomethaneAnnualDeclaration]
     digestates: dict[int, BiomethaneDigestate]
     energies: dict[int, BiomethaneEnergy]
+    supply_metrics_by_producer: dict[int, SupplyPlanMetrics]
 
     def row_context(self, declaration: BiomethaneAnnualDeclaration) -> ExportRowContext:
         producer = declaration.producer
@@ -51,6 +55,7 @@ class ExportContext:
             injection_site=_safe_related(producer, "biomethane_injection_site"),
             digestate=self.digestates.get(producer_id),
             energy=self.energies.get(producer_id),
+            supply_metrics=self.supply_metrics_by_producer.get(producer_id),
         )
 
 
@@ -85,4 +90,5 @@ def load_export_context(producer_ids, year: int) -> ExportContext:
         declarations=declarations,
         digestates=digestates,
         energies=energies,
+        supply_metrics_by_producer=preload_supply_plan_metrics(exported_producer_ids, year),
     )

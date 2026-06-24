@@ -25,6 +25,7 @@ SECTION_COLORS = {
     "injection_site": "#E8FCE8",
     "digestate": "#FCE8F0",
     "energy": "#F0E8FC",
+    "supply_plan": "#F0E8FC",
 }
 
 
@@ -74,4 +75,9 @@ def build_column_defs() -> list[ColumnDef]:
         *_model_columns(BiomethaneInjectionSite, "injection_site", "injection_site"),
         *_model_columns(BiomethaneDigestate, "digestate", "digestate"),
         *_model_columns(BiomethaneEnergy, "energy", "energy"),
+        ColumnDef(
+            "Tonnage total brut d'intrants (tMB)",
+            "supply_plan",
+            lambda ctx: ctx.supply_metrics.total_gross_volume_tmb if ctx.supply_metrics else None,
+        ),
     ]
