@@ -10556,11 +10556,7 @@ paths:
         - in: query
           name: year
           schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
+            type: number
       tags:
         - tiruert
       security:
@@ -11258,6 +11254,10 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
+        - in: query
+          name: year
+          schema:
+            type: number
       tags:
         - tiruert
       security:
@@ -11550,11 +11550,7 @@ paths:
         - in: query
           name: year
           schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
+            type: number
       tags:
         - tiruert
       security:
@@ -11912,11 +11908,7 @@ paths:
         - in: query
           name: year
           schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
+            type: number
       tags:
         - tiruert
       security:
@@ -17657,7 +17649,6 @@ components:
             $ref: "#/components/schemas/OperationDetail"
         year:
           type: integer
-          nullable: true
           readOnly: true
       required:
         - _depot
@@ -17874,7 +17865,6 @@ components:
           readOnly: true
         year:
           type: integer
-          nullable: true
           readOnly: true
       required:
         - _depot

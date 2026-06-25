@@ -2,7 +2,8 @@ from datetime import datetime  # noqa: I001
 from zoneinfo import ZoneInfo
 
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import IntegerField, Q
+from django.db.models.functions import Cast, Coalesce, Substr
 from django_filters import (
     CharFilter,
     FilterSet,
@@ -18,7 +19,6 @@ from core.filters import AllAnnotatedValuesMultipleFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
 from .custom_filters import CustomOrderingFilter
 from tiruert.models.operation import Operation
-from tiruert.services import operation_year as operation_year_service
 
 
 class BaseFilter(FilterSet):
@@ -123,8 +123,14 @@ class BaseFilter(FilterSet):
 
 class OperationFilter(BaseFilter):
     year = AllAnnotatedValuesMultipleFilter(
-        field_name=operation_year_service.DB_FIELD,
-        annotation=operation_year_service.db_annotation(),
+        field_name="year",
+        annotation=Coalesce(
+            "declaration_year",
+            Cast(
+                Substr("durability_period", 1, 4),
+                output_field=IntegerField(),
+            ),
+        ),
     )
     pass
 
