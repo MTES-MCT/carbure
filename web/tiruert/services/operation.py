@@ -3,6 +3,7 @@ from copy import copy
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import Q
 from rest_framework import serializers
 
 from core.models import CarbureLot, MatierePremiere
@@ -123,6 +124,7 @@ class OperationService:
         then creates one operation per group with associated details.
         """
         valid_lots = OperationService.filter_valid_lots(lots)
+        valid_lots = OperationService.filter_fr_delivery_site(valid_lots)
         valid_lots = OperationService.remove_existing_lots(valid_lots)
 
         if not valid_lots:
@@ -190,6 +192,13 @@ class OperationService:
         """
         DELIVERY_TYPES_ACCEPTED = [CarbureLot.RFC, CarbureLot.BLENDING, CarbureLot.DIRECT]
         return lots.filter(lot_status__in=["ACCEPTED", "FROZEN"], delivery_type__in=DELIVERY_TYPES_ACCEPTED)
+
+    @staticmethod
+    def filter_fr_delivery_site(lots):
+        """
+        Keep only lots with a delivery site in France, or with no delivery site.
+        """
+        return lots.filter(Q(carbure_delivery_site__country__code_pays="FR") | Q(carbure_delivery_site__isnull=True))
 
     @staticmethod
     def remove_existing_lots(lots):
