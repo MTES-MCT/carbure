@@ -5631,7 +5631,7 @@ export interface components {
             readonly avoided_emissions: number;
             readonly unit: string;
             details?: components["schemas"]["OperationDetail"][];
-            readonly year: number | null;
+            readonly year: number;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -5707,7 +5707,7 @@ export interface components {
             details?: components["schemas"]["OperationDetail"][];
             /** Format: double */
             readonly avoided_emissions: number;
-            readonly year: number | null;
+            readonly year: number;
         };
         OperationLot: {
             id: number;
@@ -13424,7 +13424,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                year?: string[];
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13790,6 +13790,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -13905,7 +13906,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                year?: string[];
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -14045,7 +14046,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                year?: string[];
+                year?: number;
             };
             header?: never;
             path?: never;
