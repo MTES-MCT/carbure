@@ -491,6 +491,14 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+        - in: query
+          name: producer
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -578,6 +586,7 @@ paths:
             type: string
             enum:
               - department
+              - producer
               - status
               - tariff_reference
           description: Filter string to apply
@@ -588,6 +597,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: producer
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -654,6 +671,7 @@ paths:
                 ExampleOfFiltersResponse.:
                   value:
                     - department
+                    - producer
                     - status
                     - tariff_reference
                   summary: Example of filters response.
@@ -1607,8 +1625,8 @@ paths:
   /api/biomethane/dreal-export/:
     get:
       operationId: biomethane_dreal_export_retrieve
-      description: Export all biomethane declarations for a given year as a flat Excel
-        file, filtered by DREAL department access.
+      description: Export validated biomethane declarations for a year as a flat Excel
+        file, scoped by DREAL department access.
       parameters:
         - in: query
           name: entity_id
@@ -13371,18 +13389,29 @@ components:
           type: number
           format: double
           nullable: true
+          title: Quantité totale de biogaz traitée par le système d'épuration sur l’année
+            (Nm3)
         purification_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
+          title: Consommation électrique du système d'épuration et le cas échéant du
+            traitement des évents (kWe)
         self_consumed_biogas_nm3:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation
+            ou le traitement des intrants, le chauffage du digesteur et
+            l'épuration du biogaz (Nm3)
         self_consumed_biogas_or_biomethane_kwh:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz/biométhane autoconsommée pour le chauffage du
+            digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le
+            prétraitement des intrants, le chauffage du digesteur et l'épuration
+            (kWh) selon la référence tarifaire
         total_unit_electric_consumption_kwe:
           type: number
           format: double
@@ -13490,18 +13519,29 @@ components:
           type: number
           format: double
           nullable: true
+          title: Quantité totale de biogaz traitée par le système d'épuration sur l’année
+            (Nm3)
         purification_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
+          title: Consommation électrique du système d'épuration et le cas échéant du
+            traitement des évents (kWe)
         self_consumed_biogas_nm3:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation
+            ou le traitement des intrants, le chauffage du digesteur et
+            l'épuration du biogaz (Nm3)
         self_consumed_biogas_or_biomethane_kwh:
           type: number
           format: double
           nullable: true
+          title: Quantité de biogaz/biométhane autoconsommée pour le chauffage du
+            digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le
+            prétraitement des intrants, le chauffage du digesteur et l'épuration
+            (kWh) selon la référence tarifaire
         total_unit_electric_consumption_kwe:
           type: number
           format: double
@@ -14002,7 +14042,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche - tMS/tMS (%)
+          title: Ratio de matière sèche (tMS/tMB)
         volume:
           type: number
           format: double
@@ -14146,6 +14186,8 @@ components:
       properties:
         producer:
           $ref: "#/components/schemas/EntityPreview"
+        production_unit:
+          $ref: "#/components/schemas/BiomethaneProductionUnit"
         year:
           type: integer
           readOnly: true
@@ -14153,7 +14195,8 @@ components:
           type: string
           readOnly: true
         feedstock:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputExportFeedstock"
           readOnly: true
         source:
           type: string
@@ -14176,7 +14219,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche - tMS/tMS (%)
+          title: Ratio de matière sèche (tMS/tMB)
         volume:
           type: number
           format: double
@@ -14203,9 +14246,23 @@ components:
         - material_unit
         - origin_country
         - producer
+        - production_unit
         - source
         - type_cive
         - year
+    BiomethaneSupplyInputExportFeedstock:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 256
+        classification:
+          allOf:
+            - $ref: "#/components/schemas/Classification"
+          nullable: true
+      required:
+        - classification
+        - name
     BiomethaneSupplyInputSourceEnum:
       enum:
         - INTERNAL

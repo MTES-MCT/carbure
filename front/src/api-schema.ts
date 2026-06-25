@@ -536,7 +536,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Export all biomethane declarations for a given year as a flat Excel file, filtered by DREAL department access. */
+        /** @description Export validated biomethane declarations for a year as a flat Excel file, scoped by DREAL department access. */
         get: operations["biomethane_dreal_export_retrieve"];
         put?: never;
         post?: never;
@@ -3807,13 +3807,25 @@ export interface components {
             attest_no_fossil_for_energy?: boolean;
             /** Précisions */
             energy_details?: string | null;
-            /** Format: double */
+            /**
+             * Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
+             * Format: double
+             */
             purified_biogas_quantity_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
+             * Format: double
+             */
             purification_electric_consumption_kwe?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)
+             * Format: double
+             */
             self_consumed_biogas_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+             * Format: double
+             */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
             /**
              * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
@@ -3880,13 +3892,25 @@ export interface components {
             attest_no_fossil_for_energy?: boolean;
             /** Précisions */
             energy_details?: string | null;
-            /** Format: double */
+            /**
+             * Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
+             * Format: double
+             */
             purified_biogas_quantity_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
+             * Format: double
+             */
             purification_electric_consumption_kwe?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)
+             * Format: double
+             */
             self_consumed_biogas_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+             * Format: double
+             */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
             /**
              * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
@@ -4116,7 +4140,7 @@ export interface components {
             /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /**
-             * Ratio de matière sèche - tMS/tMS (%)
+             * Ratio de matière sèche (tMS/tMB)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;
@@ -4181,9 +4205,10 @@ export interface components {
         /** @description Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche). */
         BiomethaneSupplyInputExport: {
             producer: components["schemas"]["EntityPreview"];
+            production_unit: components["schemas"]["BiomethaneProductionUnit"];
             readonly year: number;
             readonly origin_country: string;
-            readonly feedstock: string;
+            readonly feedstock: components["schemas"]["BiomethaneSupplyInputExportFeedstock"];
             readonly source: string;
             readonly material_unit: string;
             readonly type_cive: string;
@@ -4191,7 +4216,7 @@ export interface components {
             /** Précisez la culture */
             culture_details?: string | null;
             /**
-             * Ratio de matière sèche - tMS/tMS (%)
+             * Ratio de matière sèche (tMS/tMB)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;
@@ -4212,6 +4237,10 @@ export interface components {
              * Format: double
              */
             maximum_distance_km?: number | null;
+        };
+        BiomethaneSupplyInputExportFeedstock: {
+            name: string;
+            classification: components["schemas"]["Classification"] | null;
         };
         /**
          * @description * `INTERNAL` - Interne
@@ -7173,6 +7202,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
+                producer?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -7217,6 +7247,7 @@ export interface operations {
                 filter: PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                producer?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -14331,6 +14362,7 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_re
 }
 export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter {
     department = "department",
+    producer = "producer",
     status = "status",
     tariff_reference = "tariff_reference"
 }
