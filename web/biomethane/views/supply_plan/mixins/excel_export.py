@@ -30,8 +30,7 @@ class ExcelExportActionMixin:
         file_path = os.path.join(tempfile.gettempdir(), filename)
 
         is_dreal = HasDrealRights().has_permission(request, self)
-        rows = self.get_serializer(queryset, many=True).data
-        excel_file = generate_supply_input_export(file_path, rows, dreal=is_dreal)
+        excel_file = generate_supply_input_export(file_path, queryset, dreal=is_dreal)
 
         try:
             return ExcelResponse(excel_file)
