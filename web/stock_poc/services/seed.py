@@ -8,6 +8,7 @@ from stock_poc.fixtures.scenarios import (
     entity_name_for_key,
 )
 from stock_poc.models import Action
+from stock_poc.models.action_status import ActionStatus
 
 
 def ensure_entities() -> dict[str, Entity]:
@@ -34,8 +35,10 @@ def _create_action_tree(
         quantity=fixture["quantity"],
         owner=entities[owner_key],
         parent=parent,
-        status=fixture.get("status"),
     )
+    status = fixture.get("status")
+    if status is not None:
+        ActionStatus.objects.create(action=action, status=status)
     for child_fixture in fixture.get("children", []):
         _create_action_tree(
             child_fixture,

@@ -13,9 +13,6 @@ from stock_poc.serializers import (
     ActionSerializer,
     QueryScenariosResponseSerializer,
 )
-from stock_poc.services.balance import (
-    with_available,
-)
 from stock_poc.services.queries import run_scenarios
 
 
@@ -51,26 +48,26 @@ class ActionViewSet(ModelViewSet):
         return context
 
     def get_queryset(self):
-        return with_available(Action.objects.filter(owner=self.request.entity)).select_related("owner")
+        return Action.objects.filter(owner=self.request.entity).select_related("owner")
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+        instance = Action.objects.get(pk=serializer.save().pk)
         return Response(ActionSerializer(instance).data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+        instance = Action.objects.get(pk=serializer.save().pk)
         return Response(ActionSerializer(instance).data, status=status.HTTP_200_OK)
 
     @extend_schema(responses=ActionSerializer(many=True))
     @action(detail=False, methods=["get"], url_path="tree")
     def tree(self, request):
         """Flat list of all POC actions; the global tree is rebuilt on the frontend."""
-        queryset = with_available(Action.objects.all()).select_related("owner")
+        queryset = Action.objects.all().select_related("owner")
         return Response(ActionSerializer(queryset, many=True).data)
 
     @extend_schema(

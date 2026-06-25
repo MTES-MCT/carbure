@@ -42,7 +42,7 @@ Une seule table : `stock_poc_action` (`Action`).
 available = quantity − Σ(enfants directs qui réservent)
 ```
 
-Un enfant **réserve** sa quantité **sauf** si `status = REFUSED`.  
+Un enfant **réserve** sa quantité **sauf** si son **dernier statut** est `REFUSED`.  
 Les enfants sans statut (ex. `PERTE`) **réservent** quand même.
 
 ---
@@ -66,9 +66,13 @@ Les données de seed (arbre final) sont dans `fixtures/scenarios.py`.
 web/stock_poc/
   docs/scenarios/           # Fiches métier (collègues)
   fixtures/scenarios.py     # Arbres finaux par scénario
+  models/
+    action.py
+    action_status.py
+  managers/
+    action.py               # Statut courant + solde available
   services/
-    balance.py              # Calcul available
-    queries.py              # Requêtes CLI
+    queries.py              # Requêtes CLI / API
     seed.py
   management/commands/
     seed_stock_poc.py

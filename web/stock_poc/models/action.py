@@ -1,6 +1,7 @@
 from django.db import models
 
 from core.models import Entity
+from stock_poc.managers import ActionManager
 
 
 class Action(models.Model):
@@ -8,7 +9,7 @@ class Action(models.Model):
 
     Each action represents a quantity of matter (physical) or of certificate
     (accounting) that derives from its parent action. The available balance of
-    an action is `quantity - sum(direct children quantities)`.
+    an action is `quantity - sum(direct children whose latest status is not REFUSED)`.
     """
 
     # Action types under test for the POC
@@ -23,16 +24,6 @@ class Action(models.Model):
         (CONSOMMATION, CONSOMMATION),
         (PERTE, PERTE),
         (VALORISATION, VALORISATION),
-    ]
-
-    # Status of an action (can also be null = no workflow status yet)
-    ACCEPTED = "ACCEPTED"
-    REFUSED = "REFUSED"
-    PENDING = "PENDING"
-    STATUSES = [
-        (ACCEPTED, ACCEPTED),
-        (REFUSED, REFUSED),
-        (PENDING, PENDING),
     ]
 
     quantity = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Quantité")
@@ -51,8 +42,9 @@ class Action(models.Model):
         related_name="children",
         verbose_name="Action parente",
     )
-    status = models.CharField(max_length=16, choices=STATUSES, null=True, blank=True, verbose_name="Statut")
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = ActionManager()
 
     class Meta:
         db_table = "stock_poc_action"

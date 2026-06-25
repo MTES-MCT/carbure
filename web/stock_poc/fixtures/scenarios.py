@@ -1,6 +1,7 @@
 from typing import TypedDict
 
 from stock_poc.models import Action
+from stock_poc.models.action_status import ActionStatus
 
 
 class EntityFixture(TypedDict):
@@ -44,26 +45,26 @@ SCENARIO_FIXTURES: dict[str, ScenarioFixture] = {
                     {
                         "type": Action.CONSOMMATION,
                         "quantity": "700",
-                        "status": Action.ACCEPTED,
+                        "status": ActionStatus.ACCEPTED,
                         "children": [
                             {
                                 "type": Action.TRANSFERT,
                                 "quantity": "100",
                                 "owner": "entity_b",
-                                "status": Action.ACCEPTED,
+                                "status": ActionStatus.ACCEPTED,
                             },
                         ],
                     },
                     {
                         "type": Action.CONSOMMATION,
                         "quantity": "150",
-                        "status": Action.ACCEPTED,
+                        "status": ActionStatus.ACCEPTED,
                         "children": [
                             {
                                 "type": Action.TRANSFERT,
                                 "quantity": "150",
                                 "owner": "entity_c",
-                                "status": Action.REFUSED,
+                                "status": ActionStatus.REFUSED,
                             },
                         ],
                     },
@@ -80,7 +81,7 @@ SCENARIO_FIXTURES: dict[str, ScenarioFixture] = {
                 "quantity": "500",
                 "owner": "entity_a",
                 "children": [
-                    {"type": Action.CONSOMMATION, "quantity": "490", "status": Action.ACCEPTED},
+                    {"type": Action.CONSOMMATION, "quantity": "490", "status": ActionStatus.ACCEPTED},
                     {"type": Action.PERTE, "quantity": "10"},
                 ],
             },

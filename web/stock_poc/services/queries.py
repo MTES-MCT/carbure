@@ -4,48 +4,39 @@ from django.db.models import QuerySet
 
 from core.models import Entity
 from stock_poc.models import Action
-from stock_poc.services.balance import (
-    with_available,
-)
+from stock_poc.models.action_status import ActionStatus
 
 
 def in_physical_stock_actions(entity: Entity) -> QuerySet:
     """All actions with available balance."""
-    return (
-        with_available()
-        .filter(type=Action.CREATION_H2, owner=entity)
-        .filter(available__gt=0)
-        .select_related("owner", "parent")
-    )
+    return Action.objects.filter(type=Action.CREATION_H2, owner=entity, available__gt=0).select_related("owner", "parent")
 
 
 def available_for_certificates(entity: Entity) -> QuerySet:
     """Validated consumptions that act as transferable certificates."""
-    return with_available().filter(type=Action.CONSOMMATION, status=Action.ACCEPTED, owner=entity).filter(available__gt=0)
+    return Action.objects.filter(type=Action.VALORISATION, status=ActionStatus.ACCEPTED, owner=entity, available__gt=0)
 
 
 def owned_actions(entity: Entity) -> QuerySet:
     """All actions owned by the entity, with available balance."""
-    return with_available(Action.objects.filter(owner=entity)).select_related("owner", "parent")
+    return Action.objects.filter(owner=entity).select_related("owner", "parent")
 
 
 def sent_transfers(entity: Entity) -> QuerySet:
     """TRANSFERT actions emitted by the entity (parent owned by entity)."""
-    return (
-        with_available()
-        .filter(type=Action.TRANSFERT, parent__owner=entity)
-        .select_related("owner", "parent", "parent__owner")
+    return Action.objects.filter(type=Action.TRANSFERT, parent__owner=entity).select_related(
+        "owner", "parent", "parent__owner"
     )
 
 
 def received_transfers(entity: Entity) -> QuerySet:
     """TRANSFERT actions received by the entity (owner = entity)."""
-    return with_available().filter(type=Action.TRANSFERT, owner=entity).select_related("owner", "parent", "parent__owner")
+    return Action.objects.filter(type=Action.TRANSFERT, owner=entity).select_related("owner", "parent", "parent__owner")
 
 
 def all_actions() -> QuerySet:
     """All POC actions (global debug view)."""
-    return with_available(Action.objects.all()).select_related("owner", "parent")
+    return Action.objects.all().select_related("owner", "parent")
 
 
 class Scenario:
