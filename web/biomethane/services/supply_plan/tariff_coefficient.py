@@ -24,25 +24,26 @@ def compute_tariff_coefficient_proportions(
     """
     Return {"p1": …, "p2": …, "p3": …, "p": …, "pef": …} as % of declared wet matter tonnage (tMB).
 
+    When tariff_reference is omitted, each line uses its producer contract regime.
+    When tariff_reference is provided, that regime applies to every line (override).
+
     Lines without a coefficient still weigh the denominator; they are not assigned to a bucket.
     """
     if not queryset.exists():
         return _zeros()
 
-    # 1. Contract tariff decree → regime (AT_2011 or AT_2020_PLUS).
-    if tariff_reference is None:
-        tariff_reference = queryset.values_list(
-            "supply_plan__producer__biomethane_contract__tariff_reference",
-            flat=True,
-        ).first()
-
-    regime = Coeff.regime_for_tariff_reference(tariff_reference)
-    if not regime:
+    if tariff_reference is not None and not Coeff.regime_for_tariff_reference(tariff_reference):
         return _zeros()
 
-    # 2. Referential lookup: coefficient for each line's feedstock under this regime.
+    # 1. Tariff decree → regime (AT_2011 or AT_2020_PLUS), per line or overridden globally.
+    queryset = _annotate_regime(queryset, tariff_reference)
+
+    # 2. Referential lookup: coefficient for each line's feedstock under its regime.
     referential = Subquery(
-        Coeff.objects.filter(feedstock_id=OuterRef("feedstock_id"), regime=regime).values("coefficient")[:1],
+        Coeff.objects.filter(
+            feedstock_id=OuterRef("feedstock_id"),
+            regime=OuterRef("regime"),
+        ).values("coefficient")[:1],
         output_field=CharField(),
     )
 
@@ -80,6 +81,31 @@ def compute_tariff_coefficient_proportions(
         return _zeros()
 
     return {coeff.lower(): _percentage(rows[coeff.lower()] or 0.0, total) for coeff in COEFFICIENTS}
+
+
+def _annotate_regime(
+    queryset: QuerySet[BiomethaneSupplyInput], tariff_reference: str | None
+) -> QuerySet[BiomethaneSupplyInput]:
+    """
+    Annotate each line with the tariff decree regime used for coefficient lookup.
+
+    When tariff_reference is provided, every line uses that override.
+    Otherwise, regime is derived from each producer's contract.
+    """
+    if tariff_reference is not None:
+        calculated_regime = Coeff.regime_for_tariff_reference(tariff_reference)
+        return queryset.annotate(regime=Value(calculated_regime, output_field=CharField()))
+
+    regime_whens = [
+        When(
+            supply_plan__producer__biomethane_contract__tariff_reference=ref,
+            then=Value(regime),
+        )
+        for ref, regime in Coeff.TARIFF_REFERENCE_TO_REGIME.items()
+    ]
+    return queryset.annotate(
+        regime=Case(*regime_whens, default=Value(None), output_field=CharField()),
+    )
 
 
 def _wet_matter_tonnage_expression():

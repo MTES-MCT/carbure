@@ -100,6 +100,63 @@ class TariffCoefficientProportionsTests(TestCase):
 
         self.assertEqual(compute_tariff_coefficient_proportions(self._inputs())["p1"], 40.0)
 
+    def test_multi_producer_uses_each_contract_regime(self):
+        """Each line uses its producer's contract regime, not an arbitrary first match."""
+        supply_plan_2023 = BiomethaneSupplyPlanFactory.create()
+        BiomethaneContractFactory.create(producer=supply_plan_2023.producer, tariff_reference="2023")
+
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock_p2,
+            volume=50,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=supply_plan_2023,
+            feedstock=self.feedstock_p2,
+            volume=50,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+
+        inputs = BiomethaneSupplyInput.objects.filter(supply_plan__in=[self.supply_plan, supply_plan_2023])
+        result = compute_tariff_coefficient_proportions(inputs)
+
+        self.assertEqual(result["p2"], 50.0)
+        self.assertEqual(result["p"], 50.0)
+
+    def test_producer_without_contract_leaves_tonnage_unclassified(self):
+        supply_plan_no_contract = BiomethaneSupplyPlanFactory.create()
+
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock_p1,
+            volume=100,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=supply_plan_no_contract,
+            feedstock=self.feedstock_p1,
+            volume=100,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+
+        inputs = BiomethaneSupplyInput.objects.filter(supply_plan__in=[self.supply_plan, supply_plan_no_contract])
+        result = compute_tariff_coefficient_proportions(inputs)
+
+        self.assertEqual(result["p1"], 50.0)
+
+    def test_invalid_explicit_tariff_reference_returns_zeros(self):
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock_p1,
+            volume=100,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+
+        result = compute_tariff_coefficient_proportions(self._inputs(), tariff_reference="invalid")
+
+        self.assertEqual(result, {"p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
+
     def test_regime_follows_contract_tariff_reference(self):
         BiomethaneSupplyInputFactory.create(
             supply_plan=self.supply_plan,
