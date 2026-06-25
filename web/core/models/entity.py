@@ -4,6 +4,8 @@ import hashlib
 from django.db import models
 from django.db.models import Q
 
+from transactions.models.site import Site
+
 from .geography import Department, Pays
 from .user import UserRights
 
@@ -190,6 +192,9 @@ class Entity(models.Model):
         entity_ids = EntityScopeDepartment.objects.filter(object_id=department.id).values_list("entity_id", flat=True)
 
         return list(Entity.objects.filter(id__in=entity_ids, entity_type=Entity.EXTERNAL_ADMIN))
+
+    def get_sites(self):
+        return Site.objects.filter(entitysite__entity=self)
 
     def get_users_emails(self, **filters):
         filter_result = UserRights.objects.filter(entity=self, user__is_active=True, **filters)
