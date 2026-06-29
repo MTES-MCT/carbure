@@ -23,7 +23,7 @@ class OperationServiceErrors:
 
 
 class OperationService:
-    FLOAT_COMPARISON_TOLERANCE = 1e-6
+    VOLUME_PRECISION = 2
 
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
@@ -75,12 +75,15 @@ class OperationService:
         """
         np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
 
-        # Round available volumes to 8 decimals to match optimization algorithm precision
-        available_volumes = {int(lot_id): round(float(volume), 8) for lot_id, volume in zip(np_lot_ids, np_volumes)}
+        # Normalize available and requested volumes to business precision.
+        available_volumes = {
+            int(lot_id): round(float(volume), OperationService.VOLUME_PRECISION)
+            for lot_id, volume in zip(np_lot_ids, np_volumes)
+        }
 
         for lot in selected_lots:
             lot_id = lot["id"]
-            volume = lot["volume"]
+            volume = round(float(lot["volume"]), OperationService.VOLUME_PRECISION)
 
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
@@ -201,7 +204,7 @@ class OperationService:
                     {
                         "operation": operation,
                         "lot": lot,
-                        "volume": round(lot.volume, 2),  # litres
+                        "volume": round(lot.volume, OperationService.VOLUME_PRECISION),  # litres
                         "emission_rate_per_mj": lot.ghg_total,  # gCO2/MJ (input algo d'optimisation)
                     }
                 )
@@ -252,12 +255,18 @@ class OperationService:
                 new_lot_conv.feedstock = copy(lot.feedstock)
                 new_lot_conv.feedstock.category = MatierePremiere.CONV
                 volume_decimal = Decimal(str(lot.volume))
-                new_lot_conv.volume = round(float(volume_decimal * Decimal("0.4")), 2)
+                new_lot_conv.volume = round(
+                    float(volume_decimal * Decimal("0.4")),
+                    OperationService.VOLUME_PRECISION,
+                )
 
                 new_lot_ep2 = copy(lot)
                 new_lot_ep2.feedstock = copy(lot.feedstock)
                 new_lot_ep2.feedstock.category = MatierePremiere.EP2AM
-                new_lot_ep2.volume = round(float(volume_decimal * Decimal("0.6")), 2)
+                new_lot_ep2.volume = round(
+                    float(volume_decimal * Decimal("0.6")),
+                    OperationService.VOLUME_PRECISION,
+                )
 
                 result_lots.append(new_lot_conv)
                 result_lots.append(new_lot_ep2)
