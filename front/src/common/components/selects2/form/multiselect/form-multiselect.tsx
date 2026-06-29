@@ -13,6 +13,7 @@ import i18next from "i18next"
 import { useRef, useState } from "react"
 import { FormPickerTrigger } from "../combobox"
 import Tag from "@codegouvfr/react-dsfr/Tag"
+import { useTranslation } from "react-i18next"
 
 export type FormMultiSelectProps<T, V = T> = Omit<
   InputProps,
@@ -47,11 +48,15 @@ export const FormMultiSelect = <T, V = T>({
 }: FormMultiSelectProps<T, V>) => {
   const triggerRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
+  const { t } = useTranslation()
 
   const selectedItems = options.filter((option) =>
     value?.some((selected) => matches(selected, normalize(option).value))
   )
   const displayLabel = labelize(selectedItems, normalize)
+  const placeholderWithOptions = t("{{count}} options sélectionnées", {
+    count: selectedItems.length,
+  })
 
   if (props.readOnly) {
     return (
@@ -66,7 +71,7 @@ export const FormMultiSelect = <T, V = T>({
   }
 
   return (
-    <>
+    <div>
       <FormPickerTrigger
         {...props}
         label={label}
@@ -74,7 +79,7 @@ export const FormMultiSelect = <T, V = T>({
         title={title}
         className={className}
         triggerRef={triggerRef}
-        displayValue={displayLabel}
+        displayValue={selectedItems.length > 0 ? placeholderWithOptions : ""}
         placeholder={placeholder}
       />
 
@@ -101,7 +106,7 @@ export const FormMultiSelect = <T, V = T>({
           key={String(normalize(item).value)}
           dismissible
           small
-          style={{ marginTop: "4px" }}
+          style={{ marginTop: "6px" }}
           nativeButtonProps={{
             onClick: () => {
               const removedItems = value?.filter(
@@ -114,6 +119,6 @@ export const FormMultiSelect = <T, V = T>({
           {normalize(item).label}
         </Tag>
       ))}
-    </>
+    </div>
   )
 }

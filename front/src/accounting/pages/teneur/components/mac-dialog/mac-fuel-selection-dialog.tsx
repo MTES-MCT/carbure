@@ -46,8 +46,6 @@ export const MacFuelSelectionDialog = ({
 
         <MultiSelect<FossilFuel, string>
           search
-          clear
-          full
           placeholder={t("Choisissez des carburants")}
           value={selectedFuels}
           options={fossilFuels}
@@ -56,6 +54,7 @@ export const MacFuelSelectionDialog = ({
             value: fuel.nomenclature,
             label: fuel.label,
           })}
+          variant="form"
         />
       </Dialog>
     </Portal>
