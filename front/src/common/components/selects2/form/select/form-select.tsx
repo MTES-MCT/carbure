@@ -1,72 +1,47 @@
-import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext"
-import { InputProps } from "@codegouvfr/react-dsfr/Input"
 import { Dropdown } from "common/components/dropdown2"
 import { List } from "common/components/list2"
-import {
-  Label,
-  LabelProps,
-  ReadOnlyValue,
-} from "common/components/inputs2/base-input"
-import { defaultNormalizer, Normalizer } from "common/utils/normalize"
-import cl from "clsx"
+import { LabelProps, ReadOnlyValue } from "common/components/inputs2/base-input"
+import { InputProps } from "common/components/inputs2/input"
+import { matches } from "common/utils/collection"
+import { defaultNormalizer, Normalizer, Sorter } from "common/utils/normalize"
+import i18next from "i18next"
 import { useRef, useState } from "react"
-import styles from "./form-select.module.css"
+import { FormPickerTrigger } from "../combobox"
 
-const defaultGetValue = <T, V = T>(value: V) => {
-  if (typeof value === "string") return value
-  if (typeof value === "number") return value.toString()
-  if (typeof value === "boolean") return value.toString()
-
-  console.error(
-    "The value used inside the select is a complex data, define a getValue function to handle it (base html select only support string values)"
-  )
-  return ""
-}
-
-// The state prop has different values than the InputProps.state, so we need to pick it from the InputProps and map it to the SelectProps.state
 export type FormSelectProps<T, V = T> = Omit<
-  SelectProps<SelectProps.Option[]>,
-  "options" | "state"
-> &
-  Omit<LabelProps, "label"> & {
-    value?: V | undefined
-    getValue?: (value: V) => string
-    options: T[]
-    onChange?: (value: V | undefined) => void
-    normalize?: Normalizer<T, V>
-    label?: LabelProps["label"]
-    name?: string
-  } & Pick<InputProps, "state">
+  InputProps,
+  "value" | "onChange" | "nativeInputProps" | "inputRef" | "iconId"
+> & {
+  value?: V | undefined
+  options: T[]
+  onChange?: (value: V | undefined) => void
+  normalize?: Normalizer<T, V>
+  search?: boolean
+  sort?: Sorter<T, V>
+  placeholder?: string
+} & Pick<LabelProps, "hasTooltip" | "title">
 
 export const FormSelect = <T, V = T>({
   value,
-  getValue = defaultGetValue,
   options,
   onChange,
   normalize = defaultNormalizer,
   label,
   hasTooltip,
   title,
-  state,
   className,
-  name,
+  search,
+  sort,
+  placeholder = i18next.t("Sélectionner une option"),
   ...props
 }: FormSelectProps<T, V>) => {
-  const normalizedOptions = options?.map((option) => {
-    const normalized = normalize(option)
-    return {
-      label: normalized.label,
-      value: getValue(normalized.value),
-      name: getValue(normalized.value),
-    }
-  })
-
-  const selectedOption = value
-    ? normalizedOptions.find((option) => option.value === getValue?.(value))
-    : undefined
-
-  const selectRef = useRef<HTMLSelectElement>(null)
+  const triggerRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
+
+  const selectedItem = options.find((option) =>
+    value !== undefined ? matches(value, normalize(option).value) : false
+  )
+  const displayLabel = selectedItem ? normalize(selectedItem).label : undefined
 
   if (props.readOnly) {
     return (
@@ -75,52 +50,45 @@ export const FormSelect = <T, V = T>({
         hasTooltip={hasTooltip}
         title={title}
         readOnly={props.readOnly}
-        value={selectedOption?.label ?? ""}
+        value={displayLabel ?? ""}
       />
     )
   }
 
   return (
     <>
-      <Select
+      <FormPickerTrigger
         {...props}
-        nativeSelectProps={{
-          ref: selectRef,
-          value: selectedOption?.value,
-          required: props.required,
-          name,
-          onMouseDown: (e) => e.preventDefault(),
-        }}
-        options={normalizedOptions}
-        label={
-          <Label
-            hasTooltip={hasTooltip}
-            required={props.required}
-            title={title}
-            label={label}
-          />
-        }
-        state={state === "success" ? "valid" : state}
-        className={cl(className, styles["form-select"])}
+        label={label}
+        hasTooltip={hasTooltip}
+        title={title}
+        className={className}
+        triggerRef={triggerRef}
+        displayValue={displayLabel ?? ""}
+        placeholder={placeholder}
       />
 
-      <Dropdown
-        open={open && options.length > 0}
-        triggerRef={selectRef}
-        onToggle={setOpen}
-      >
-        <List
-          controlRef={selectRef}
-          items={options}
-          selectedValue={value}
-          normalize={normalize}
-          onFocus={onChange}
-          onSelectValue={(selected) => {
-            onChange?.(selected)
-            setOpen(false)
-          }}
-        />
-      </Dropdown>
+      {!props.disabled && (
+        <Dropdown
+          open={open && options.length > 0}
+          triggerRef={triggerRef}
+          onToggle={setOpen}
+        >
+          <List
+            controlRef={triggerRef}
+            search={search}
+            items={options}
+            selectedValue={value}
+            normalize={normalize}
+            sort={sort}
+            onFocus={onChange}
+            onSelectValue={(selected) => {
+              onChange?.(selected)
+              setOpen(false)
+            }}
+          />
+        </Dropdown>
+      )}
     </>
   )
 }
