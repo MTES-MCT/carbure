@@ -7443,11 +7443,6 @@ paths:
       operationId: resources_entities_list
       parameters:
         - in: query
-          name: allowed_tiruert
-          schema:
-            type: boolean
-          description: Only show entities allowed to be tiruert
-        - in: query
           name: entity_type
           schema:
             type: array
@@ -13977,7 +13972,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche - tMS/tMS (%)
+          title: Ratio de matière sèche (tMS/tMB)
         volume:
           type: number
           format: double
@@ -14128,7 +14123,8 @@ components:
           type: string
           readOnly: true
         feedstock:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneSupplyInputExportFeedstock"
           readOnly: true
         source:
           type: string
@@ -14151,7 +14147,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche - tMS/tMS (%)
+          title: Ratio de matière sèche (tMS/tMB)
         volume:
           type: number
           format: double
@@ -14181,6 +14177,19 @@ components:
         - source
         - type_cive
         - year
+    BiomethaneSupplyInputExportFeedstock:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 256
+        classification:
+          allOf:
+            - $ref: "#/components/schemas/Classification"
+          nullable: true
+      required:
+        - classification
+        - name
     BiomethaneSupplyInputSourceEnum:
       enum:
         - INTERNAL
@@ -17480,15 +17489,18 @@ components:
         target_mj:
           type: number
           format: double
+          nullable: true
         target_type:
           allOf:
             - $ref: "#/components/schemas/TargetTypeEnum"
           nullable: true
         penalty:
           type: integer
+          nullable: true
         target_percent:
           type: number
           format: double
+          nullable: true
       required:
         - penalty
         - target_mj

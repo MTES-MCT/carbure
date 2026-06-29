@@ -7,10 +7,10 @@ from tiruert.serializers.fields import RoundedFloatField
 
 
 class ObjectiveSerializer(serializers.Serializer):
-    target_mj = RoundedFloatField()
+    target_mj = RoundedFloatField(allow_null=True)
     target_type = serializers.ChoiceField(choices=Objective.TARGET_TYPES, allow_null=True)
-    penalty = serializers.IntegerField()
-    target_percent = serializers.FloatField()
+    penalty = serializers.IntegerField(allow_null=True)
+    target_percent = serializers.FloatField(allow_null=True)
 
 
 class ObjectiveSectorSerializer(serializers.Serializer):
