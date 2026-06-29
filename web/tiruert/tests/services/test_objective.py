@@ -824,6 +824,65 @@ class ObjectiveServiceCalculateObjectivesAndPenaltiesTest(TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["code"], "CONV")
 
+    def _make_mock_queryset(self, objectives):
+        """Build a mock queryset that iterates over the given objectives."""
+        mock_filtered_qs = Mock()
+        mock_filtered_qs.exists.return_value = bool(objectives)
+        mock_filtered_qs.__iter__ = Mock(return_value=iter(objectives))
+        mock_qs = Mock()
+        mock_qs.filter.return_value = mock_filtered_qs
+        return mock_qs
+
+    def test_category_without_target_type_is_present_with_null_values(self):
+        """Objective with empty target_type is included in results with null target_mj and target_type."""
+        mock_objective = Mock()
+        mock_objective.customs_category = "OTHER"
+        mock_objective.target_type = ""  # blank in DB = unconstrained objective
+        mock_objective.target = None
+        mock_objective.penalty = None
+
+        balance = {
+            "OTHER": {
+                "available_balance": 2_141_281_059.45,
+                "pending_teneur": 0.0,
+                "declared_teneur": 0.0,
+                "unit": "mj",
+            }
+        }
+
+        result = ObjectiveService.calculate_objectives_and_penalties(
+            balance,
+            self._make_mock_queryset([mock_objective]),
+            Objective.BIOFUEL_CATEGORY,
+            energy_basis=10_000_000,
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["code"], "OTHER")
+        self.assertIsNone(result[0]["objective"]["target_mj"])
+        self.assertIsNone(result[0]["objective"]["target_type"])
+        self.assertIsNone(result[0]["objective"]["target_percent"])
+
+    def test_category_without_target_type_and_no_operations_is_still_present(self):
+        """Unconstrained objective with no operations (balance empty) is still included in results."""
+        mock_objective = Mock()
+        mock_objective.customs_category = "OTHER"
+        mock_objective.target_type = ""
+        mock_objective.target = None
+        mock_objective.penalty = None
+
+        result = ObjectiveService.calculate_objectives_and_penalties(
+            {},  # no operations for this category
+            self._make_mock_queryset([mock_objective]),
+            Objective.BIOFUEL_CATEGORY,
+            energy_basis=10_000_000,
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["code"], "OTHER")
+        self.assertIsNone(result[0]["objective"]["target_mj"])
+        self.assertIsNone(result[0]["objective"]["target_type"])
+
 
 class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
     """Unit tests for ObjectiveService.get_balances_for_objectives_calculation() method."""
