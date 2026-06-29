@@ -132,6 +132,10 @@ class ObjectiveService:
 
             keys_with_objective.add(key)
 
+            # No target type means unconstrained objective like "OTHER": keep None values from initialization
+            if not objective.target_type:
+                continue
+
             # Calculate target and penalty using appropriate energy basis
             target = ObjectiveService._calculate_target_for_objective(objective.target, objective_energy_basis)
             penalty_amount = ObjectiveService._calcule_penalty(
