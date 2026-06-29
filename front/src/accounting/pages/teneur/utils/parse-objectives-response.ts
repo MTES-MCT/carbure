@@ -37,11 +37,11 @@ const parseSectorObjective = (
 ): SectorObjective => {
   const objective = {
     code: sector.code,
-    target: toGj(sector.objective.target_mj),
+    target: toGj(sector.objective.target_mj ?? 0),
     teneur_declared: toGj(sector.declared_teneur),
     pending_teneur: toGj(sector.pending_teneur),
     quantity_available: toGj(sector.available_balance),
-    target_percent: sector.objective.target_percent * 100,
+    target_percent: (sector.objective.target_percent ?? 0) * 100,
     penalty: sector.objective.penalty ?? 0,
   }
 
@@ -57,7 +57,7 @@ const parseCategoryBase = (category: apiTypes["ObjectiveCategory"]) => {
     teneur_declared: toGj(category.declared_teneur),
     pending_teneur: toGj(category.pending_teneur),
     quantity_available: toGj(category.available_balance),
-    target_percent: category.objective.target_percent * 100,
+    target_percent: (category.objective.target_percent ?? 0) * 100,
     penalty: category.objective.penalty ?? 0,
     target_type: category.objective.target_type,
   }
