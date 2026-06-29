@@ -218,24 +218,32 @@ class TeneurService:
 
         # Create a dictionary of selected batches with their respective index and volume
         # Round all volumes to 2 decimals to match database precision
+        # Cap the running total so the sum never exceeds the requested target volume:
+        # accumulated rounding can push the total slightly above target, so the last
+        # selected batch is reduced to absorb the difference.
+        target_volume_clean = round(target_volume, 2)
+        allocated_volume = 0.0
         selected_batches_volumes = {}
         for idx in nonzero_indices:
             optimized_volume = result_array[idx]  # Volume suggested by optimization algorithm
             available_volume = batches_volumes[idx]  # Available volume at the beginning of optimization
 
-            # Clean available_volume to 2 decimals (database precision)
+            # Clean available_volume to 2 decimals
             # Any extra decimals are float conversion artifacts
             available_volume_clean = round(available_volume, 2)
+            optimized_volume_clean = round(optimized_volume, 2)
 
-            # Ensure we never exceed available volume, then round to 2 decimals
-            safe_volume = min(optimized_volume, available_volume_clean)
-            selected_volume = round(safe_volume, 2)
+            # Cap optimized volume using values already normalized to business precision,
+            # and by the volume still needed to reach the target.
+            remaining_volume = round(target_volume_clean - allocated_volume, 2)
+            selected_volume = min(optimized_volume_clean, available_volume_clean, remaining_volume)
 
             # Skip negligible volumes that add noise to the response
             if selected_volume <= 0:
                 continue
 
             selected_batches_volumes[idx] = selected_volume
+            allocated_volume = round(allocated_volume + selected_volume, 2)
 
         return selected_batches_volumes, res.fun
 
