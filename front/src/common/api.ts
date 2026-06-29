@@ -50,7 +50,6 @@ export async function findEntities(
     is_enabled?: boolean
     entity_type?: EntityType[]
     is_tiruert_liable?: boolean
-    allowed_tiruert?: boolean
   }
 ) {
   const res = await apiFetch.GET("/resources/entities", {
