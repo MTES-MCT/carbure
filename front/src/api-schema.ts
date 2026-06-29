@@ -4099,7 +4099,7 @@ export interface components {
             /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /**
-             * Ratio de matière sèche - tMS/tMS (%)
+             * Ratio de matière sèche (tMS/tMB)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;
@@ -4166,7 +4166,7 @@ export interface components {
             producer: components["schemas"]["EntityPreview"];
             readonly year: number;
             readonly origin_country: string;
-            readonly feedstock: string;
+            readonly feedstock: components["schemas"]["BiomethaneSupplyInputExportFeedstock"];
             readonly source: string;
             readonly material_unit: string;
             readonly type_cive: string;
@@ -4174,7 +4174,7 @@ export interface components {
             /** Précisez la culture */
             culture_details?: string | null;
             /**
-             * Ratio de matière sèche - tMS/tMS (%)
+             * Ratio de matière sèche (tMS/tMB)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;
@@ -4195,6 +4195,10 @@ export interface components {
              * Format: double
              */
             maximum_distance_km?: number | null;
+        };
+        BiomethaneSupplyInputExportFeedstock: {
+            name: string;
+            classification: components["schemas"]["Classification"] | null;
         };
         /**
          * @description * `INTERNAL` - Interne
@@ -5553,11 +5557,11 @@ export interface components {
         };
         Objective: {
             /** Format: double */
-            target_mj: number;
+            target_mj: number | null;
             target_type: components["schemas"]["TargetTypeEnum"] | null;
-            penalty: number;
+            penalty: number | null;
             /** Format: double */
-            target_percent: number;
+            target_percent: number | null;
         };
         ObjectiveCategory: {
             code: components["schemas"]["MPCategoriesEnum"];
@@ -11799,8 +11803,6 @@ export interface operations {
     resources_entities_list: {
         parameters: {
             query?: {
-                /** @description Only show entities allowed to be tiruert */
-                allowed_tiruert?: boolean;
                 /** @description Only keep specific entity types */
                 entity_type?: string[];
                 /** @description Only show enabled entities */
