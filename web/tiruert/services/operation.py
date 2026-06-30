@@ -150,13 +150,9 @@ class OperationService:
             if not credited_entity:
                 continue  # skip if no credited entity (should not happen for valid lots)
 
-            status = (
-                Operation.VALIDATED if str(lots[0].period)[:4] < "2026" else Operation.PENDING
-            )  # TODO: Remove when real conditions
-
             operation = Operation.objects.create(
                 type=matching_types[key[0]],
-                status=status,  # TODO: Set to PENDING when DGGDI validation will be implemented
+                status=Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
                 customs_category=key[1],
                 biofuel=lots[0].biofuel,
                 credited_entity=credited_entity,
