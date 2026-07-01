@@ -52,13 +52,6 @@ export const ReadOnly: Story = {
   },
 }
 
-export const SuccessState: Story = {
-  args: {
-    state: "success",
-    value: [1, 2],
-  },
-}
-
 export const Search: Story = {
   args: {
     search: true,

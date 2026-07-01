@@ -7,6 +7,7 @@ import { updateContractOk } from "../../tests/api"
 import { okEntitySearch } from "common/__test__/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
 import { ContractInfosForm, TariffReference } from "../../types"
+import { selectOptionByName } from "common/components/selects2/selects2.stories.utils"
 import { userEvent, waitFor, within } from "@storybook/test"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType } from "common/types"
@@ -144,7 +145,6 @@ export const WatchedFieldsChanged: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     const { getByRole, getByLabelText } = canvas
-    const body = within(document.body)
 
     await step("Open the editable card", async () => {
       const editButton = await waitFor(() =>
@@ -161,17 +161,12 @@ export const WatchedFieldsChanged: Story = {
     })
 
     await step("Change installation_category", async () => {
-      const installationCategorySelect = await waitFor(() =>
-        getByLabelText(/^Catégorie d'installation/)
-      )
-      await userEvent.click(installationCategorySelect)
-
-      const option = await waitFor(() =>
-        body.getByText(
-          "Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés"
-        )
-      )
-      await userEvent.click(option)
+      await selectOptionByName({
+        canvasElement,
+        name: "installation_category",
+        option:
+          "Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés",
+      })
     })
 
     await step("Submit the form", async () => {

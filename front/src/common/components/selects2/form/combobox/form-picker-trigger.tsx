@@ -18,6 +18,7 @@ export function FormPickerTrigger({
   required,
   triggerRef,
   displayValue,
+  name,
   placeholder,
   className,
   ...props
@@ -31,6 +32,7 @@ export function FormPickerTrigger({
       label={label}
       nativeInputProps={{
         ref: triggerRef,
+        name,
         value: displayValue,
         readOnly: true,
         placeholder,
