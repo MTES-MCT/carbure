@@ -148,6 +148,7 @@ class ObjectiveService:
                 "target_mj": target,
                 "target_type": objective.target_type,
                 "penalty": penalty_amount,
+                "penalty_rate": objective.penalty,
                 "target_percent": objective.target,
             }
 
@@ -185,6 +186,16 @@ class ObjectiveService:
             sector_objective["pending_teneur"] += elec_balance["pending_teneur"]
             sector_objective["declared_teneur"] += elec_balance["declared_teneur"]
             sector_objective["available_balance"] += elec_balance["available_balance"]
+
+            # Recalculate penalty now that elec teneur has been added
+            obj = sector_objective.get("objective", {})
+            penalty_rate = obj.get("penalty_rate")
+            target_mj = obj.get("target_mj")
+            if penalty_rate and target_mj:
+                total_teneur_sector = sector_objective["pending_teneur"] + sector_objective["declared_teneur"]
+                sector_objective["objective"]["penalty"] = ObjectiveService._calcule_penalty(
+                    penalty_rate, total_teneur_sector, target_mj
+                )
 
         return objective_per_sector
 
