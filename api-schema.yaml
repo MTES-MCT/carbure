@@ -10549,9 +10549,13 @@ paths:
               - l
           description: Specify the volume unit.
         - in: query
-          name: year
+          name: years
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -11249,10 +11253,6 @@ paths:
               - kg
               - l
           description: Specify the volume unit.
-        - in: query
-          name: year
-          schema:
-            type: number
       tags:
         - tiruert
       security:
@@ -11543,9 +11543,13 @@ paths:
               - l
           description: Specify the volume unit.
         - in: query
-          name: year
+          name: years
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -11698,7 +11702,7 @@ paths:
               - sector
               - status
               - type
-              - year
+              - years
           description: Filter string to apply
           required: true
         - in: query
@@ -11901,9 +11905,13 @@ paths:
               - l
           description: Specify the volume unit.
         - in: query
-          name: year
+          name: years
           schema:
-            type: number
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:

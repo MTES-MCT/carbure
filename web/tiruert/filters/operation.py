@@ -122,7 +122,7 @@ class BaseFilter(FilterSet):
 
 
 class OperationFilter(BaseFilter):
-    year = AllAnnotatedValuesMultipleFilter(
+    years = AllAnnotatedValuesMultipleFilter(
         field_name="year",
         annotation=Coalesce(
             "declaration_year",
