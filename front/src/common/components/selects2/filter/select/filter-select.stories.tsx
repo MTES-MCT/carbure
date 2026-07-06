@@ -1,29 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { MultiSelect } from "./multiselect"
+import { FilterSelect } from "./filter-select"
 import { ReactNode, useState } from "react"
 import { userEvent, waitFor, within } from "@storybook/test"
 
 const meta: Meta<
-  typeof MultiSelect<{ label: ReactNode; value: string }, string>
+  typeof FilterSelect<{ label: ReactNode; value: string }, string>
 > = {
-  component: MultiSelect,
-  title: "common/components/MultiSelect",
+  component: FilterSelect,
+  title: "common/components/selects2/FilterSelect",
   args: {
     options: [
       { label: "Item 1", value: "1" },
       { label: "Item 2", value: "2" },
       { label: "Item 3", value: "3" },
-      { label: "Item 4", value: "4" },
-      { label: "Item 5", value: "5" },
-      { label: "Item 6", value: "6" },
     ],
   },
   render: (args) => {
-    const [value, setValue] = useState<string[] | undefined>(args.value)
+    const [value, setValue] = useState<string | undefined>(args.value)
 
     return (
       <div style={{ width: "300px" }}>
-        <MultiSelect
+        <FilterSelect
           {...args}
           value={value}
           onChange={(item) => setValue(item)}
@@ -34,7 +31,7 @@ const meta: Meta<
 }
 
 type Story = StoryObj<
-  typeof MultiSelect<{ label: ReactNode; value: string }, string>
+  typeof FilterSelect<{ label: ReactNode; value: string }, string>
 >
 
 export default meta
@@ -59,21 +56,29 @@ export const Search: Story = {
   },
 }
 
-export const Disabled: Story = {
-  args: {
-    disabled: true,
-  },
-}
-
 export const FullWidth: Story = {
   args: {
     full: true,
   },
 }
 
+export const CustomRenderer: Story = {
+  args: {
+    value: "1",
+    valueRenderer: (item) => <div style={{ color: "red" }}>{item.label}</div>,
+  },
+}
+
 export const OverflowValues: Story = {
   args: {
-    value: ["1", "2", "3", "4", "5", "6"],
+    options: [
+      {
+        label:
+          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
+        value: "10",
+      },
+    ],
+    value: "10",
   },
 }
 

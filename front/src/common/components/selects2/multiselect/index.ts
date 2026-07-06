@@ -1,1 +1,1 @@
-export * from "./multiselect"
+export { MultiSelect, type MultiSelectProps } from "./multiselect"

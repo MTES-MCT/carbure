@@ -1,0 +1,3 @@
+.form-picker-trigger :global(.fr-input) {
+  cursor: pointer;
+}
