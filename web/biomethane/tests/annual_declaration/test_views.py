@@ -287,3 +287,38 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
                 year=self.current_declaration_year,
             ).exists()
         )
+
+    def test_create_declaration_as_dreal(self):
+        """Test DREAL can create a declaration via POST when it does not exist yet."""
+        department = Department.objects.create(code_dept="31", name="Haute-Garonne")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+
+        dreal = Entity.objects.create(name="Test DREAL Create", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+
+        setup_current_user(self, "dreal-create@carbure.local", "DREAL Create", "gogogo", [(dreal, "ADMIN")])
+
+        params = {
+            "entity_id": dreal.id,
+            "producer_id": self.producer_entity.id,
+            "year": self.current_declaration_year,
+        }
+        data = {
+            "producer": self.producer_entity.id,
+            "year": self.current_declaration_year,
+            "is_open": True,
+        }
+
+        response = self.client.post(
+            self.annual_declaration_url,
+            data,
+            content_type="application/json",
+            query_params=params,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
