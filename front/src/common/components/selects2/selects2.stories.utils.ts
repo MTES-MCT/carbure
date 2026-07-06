@@ -2,16 +2,29 @@ import { userEvent, waitFor, within } from "@storybook/test"
 
 type TextMatcher = string | RegExp
 
-async function waitForSelectDropdown(): Promise<HTMLElement> {
-  const dropdown = await waitFor(() => {
-    const element = document.querySelector<HTMLElement>("[data-dropdown]")
-    if (!element) {
-      throw new Error("Select dropdown not found")
-    }
-    return element
-  })
+const SELECT_TIMEOUT = 3000
 
-  return dropdown
+async function waitForSelectDropdown(
+  trigger: HTMLElement
+): Promise<HTMLElement> {
+  return waitFor(
+    async () => {
+      await userEvent.click(trigger)
+
+      const dropdown = document.querySelector<HTMLElement>("[data-dropdown]")
+      if (!dropdown) {
+        throw new Error("retry")
+      }
+
+      return dropdown
+    },
+    {
+      timeout: SELECT_TIMEOUT,
+      onTimeout: () => {
+        return new Error("Select dropdown not found")
+      },
+    }
+  )
 }
 
 /**
@@ -24,10 +37,7 @@ export async function selectOption({
   trigger: HTMLElement
   option: TextMatcher
 }) {
-  trigger.focus()
-  await userEvent.keyboard("{ArrowDown}")
-  const dropdown = await waitForSelectDropdown()
-
+  const dropdown = await waitForSelectDropdown(trigger)
   const optionElement = await waitFor(() => within(dropdown).getByText(option))
   await userEvent.click(optionElement)
 }
