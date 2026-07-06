@@ -700,6 +700,40 @@ class ObjectiveServiceAddElecSectorObjectivesTest(TestCase):
 
         self.assertEqual(result, objective_per_sector)
 
+    @patch("tiruert.services.objective.ElecBalanceService.calculate_balance_per_sector")
+    def test_add_elec_sector_objectives_recalculates_penalty_with_elec_teneur(self, mock_balance):
+        mock_balance.return_value = {
+            "GAZOLE": {
+                "available_balance": 0,
+                "pending_teneur": 100_000,
+                "declared_teneur": 200_000,
+            }
+        }
+        objective_per_sector = [
+            {
+                "code": "GAZOLE",
+                "available_balance": 2_000,
+                "pending_teneur": 300_000,
+                "declared_teneur": 400_000,
+                "objective": {
+                    "target_mj": 1_000_000,
+                    "target_type": Objective.REACH,
+                    "penalty": 30_000,
+                    "penalty_rate": 100,
+                    "target_percent": 0.1,
+                },
+            }
+        ]
+
+        result = ObjectiveService.add_elec_teneur_to_objectives_per_sector(objective_per_sector, Mock(), 1, "2025-01-01")
+
+        # Teneur is increased by elec values
+        self.assertEqual(result[0]["pending_teneur"], 400_000)
+        self.assertEqual(result[0]["declared_teneur"], 600_000)
+
+        # New total teneur matches target => penalty should be recalculated to 0
+        self.assertEqual(result[0]["objective"]["penalty"], 0)
+
 
 class ObjectiveServiceBuildObjectivesResultTest(TestCase):
     """Unit tests for ObjectiveService.build_objectives_result() method."""

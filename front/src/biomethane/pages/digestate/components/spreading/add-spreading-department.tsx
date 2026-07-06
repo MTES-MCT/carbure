@@ -1,7 +1,7 @@
 import { Dialog } from "common/components/dialog2"
 import { Form, useForm } from "common/components/form2"
 import { Box } from "common/components/scaffold"
-import { SelectDsfr } from "common/components/selects2"
+import { Select } from "common/components/selects2"
 import { getDepartmentOptions } from "common/utils/geography"
 import { useTranslation } from "react-i18next"
 import {
@@ -79,7 +79,8 @@ export const AddSpreadingDepartment = ({
     >
       <Box>
         <Form id="add-spreading-department-form" onSubmit={handleSubmit}>
-          <SelectDsfr
+          <Select
+            variant="form"
             options={options}
             label={tBiomethaneInput("digestate_spreading.spreading_department")}
             placeholder={t("Sélectionner un département")}

@@ -1,13 +1,13 @@
-from django.db.models import Case, CharField, Value, When
-from django.db.models.functions import Cast, Coalesce, Concat, ExtractMonth, ExtractYear
+from django.db.models import Case, CharField, IntegerField, Value, When
+from django.db.models.functions import Cast, Coalesce, Concat, ExtractMonth, ExtractYear, Substr
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from saf.models.constants import SAF_BIOFUEL_TYPES
+from tiruert.filters import OperationFilterForBalance
 from tiruert.models.operation import Operation
 from tiruert.models.operation_detail import OperationDetail
-from tiruert.services import operation_year as operation_year_service
 
 
 class FilterActionMixin:
@@ -30,7 +30,7 @@ class FilterActionMixin:
                     "operation",
                     "period",
                     "durability_period",
-                    "year",
+                    "years",
                 ],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
@@ -86,7 +86,7 @@ class FilterActionMixin:
             "type": "_transaction",
             "period": "created_at",
             "durability_period": "durability_period",
-            "year": operation_year_service.DB_FIELD,
+            "years": "year",
         }
 
         column = filters.get(filter)
@@ -105,7 +105,13 @@ class FilterActionMixin:
                     output_field=CharField(),
                 ),
             ),
-            **{operation_year_service.DB_FIELD: operation_year_service.db_annotation()},
+            year=Coalesce(
+                "declaration_year",
+                Cast(
+                    Substr("durability_period", 1, 4),
+                    output_field=IntegerField(),
+                ),
+            ),
         )
 
         values = queryset.values_list(column, flat=True).distinct()
@@ -192,7 +198,7 @@ class FilterActionMixin:
         feedstock_values = query_params.pop("feedstock", [])
         origin_country_values = query_params.pop("origin_country", [])
 
-        filterset = self.filterset_class(query_params, queryset=self.get_queryset(), request=request)
+        filterset = OperationFilterForBalance(query_params, queryset=self.get_queryset(), request=request)
         operation_qs = filterset.qs
 
         details_qs = OperationDetail.objects.filter(operation__in=operation_qs)

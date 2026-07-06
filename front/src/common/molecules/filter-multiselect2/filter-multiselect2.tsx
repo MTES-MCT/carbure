@@ -1,4 +1,4 @@
-import { MultiSelect } from "common/components/selects2/multiselect"
+import { MultiSelect } from "common/components/selects2"
 import styles from "./filter-multiselect2.module.css"
 import { Normalizer } from "common/utils/normalize"
 import { QueryFilters } from "common/hooks/query-builder-2"

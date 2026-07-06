@@ -3,7 +3,7 @@ import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { MultiSelect } from "common/components/selects2/multiselect"
+import { MultiSelect } from "common/components/selects2"
 import { Notice } from "common/components/notice"
 import { FossilFuel } from "../../types"
 
@@ -46,8 +46,6 @@ export const MacFuelSelectionDialog = ({
 
         <MultiSelect<FossilFuel, string>
           search
-          clear
-          full
           placeholder={t("Choisissez des carburants")}
           value={selectedFuels}
           options={fossilFuels}
@@ -56,6 +54,7 @@ export const MacFuelSelectionDialog = ({
             value: fuel.nomenclature,
             label: fuel.label,
           })}
+          variant="form"
         />
       </Dialog>
     </Portal>
