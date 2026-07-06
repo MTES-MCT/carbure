@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
@@ -8,7 +9,7 @@ from rest_framework.test import APIRequestFactory
 from core.models import Biocarburant, DeclarationPeriod, Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 from tiruert.models import Operation, OperationDetail
-from tiruert.views.operation.operation import OperationViewSet
+from tiruert.services.teneur import GHG_REFERENCE_RED_II
 from transactions.factories import CarbureLotFactory
 from transactions.models import Depot
 
@@ -334,6 +335,69 @@ class OperationViewSetIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Operation.objects.filter(id=operation.id).exists())
+
+    @patch("tiruert.serializers.operation.OperationService.perform_checks_before_create")
+    def test_create_teneur_operation_keeps_requested_gj_and_avoided_emissions(self, mock_perform_checks):
+        """Test POST /operations/ creates a TENEUR operation whose persisted values match the expected target."""
+        mock_perform_checks.return_value = None
+
+        target_volume_gj = 550000.0
+        target_avoided_emissions = 47000.0
+        lot_volume_l = target_volume_gj * 1000 / self.biofuel_eth.pci_litre
+        emission_rate_per_mj = GHG_REFERENCE_RED_II - (target_avoided_emissions * 1000000 / (target_volume_gj * 1000))
+
+        lot = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="BLENDING",
+            volume=lot_volume_l,
+            ghg_total=9.9,
+            carbure_delivery_site=self.depot,
+        )
+
+        source_operation = Operation.objects.create(
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            customs_category=MatierePremiere.CONV,
+            biofuel=self.biofuel_eth,
+            credited_entity=self.entity,
+            to_depot=self.depot,
+            renewable_energy_share=1.0,
+        )
+        OperationDetail.objects.create(
+            operation=source_operation,
+            lot=lot,
+            volume=lot_volume_l,
+            emission_rate_per_mj=emission_rate_per_mj,
+        )
+
+        payload = {
+            "type": Operation.TENEUR,
+            "customs_category": MatierePremiere.CONV,
+            "biofuel": self.biofuel_eth.id,
+            "debited_entity": self.entity.id,
+            "lots": [{"id": lot.id, "volume": lot_volume_l}],
+        }
+
+        response = self.client.post(
+            self.url,
+            data=payload,
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.entity.id}",
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        created_operation_id = response.json()["id"]
+        retrieve_url = reverse("operations-detail", kwargs={"pk": created_operation_id})
+        retrieve_response = self.client.get(retrieve_url, QUERY_STRING=f"entity_id={self.entity.id}&unit=gj")
+
+        self.assertEqual(retrieve_response.status_code, 200)
+        data = retrieve_response.json()
+        self.assertEqual(data["quantity"], target_volume_gj)
+        self.assertEqual(data["avoided_emissions"], target_avoided_emissions)
 
 
 class OperationViewSetDGECIntegrationTest(TestCase):

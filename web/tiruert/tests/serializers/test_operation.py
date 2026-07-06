@@ -189,6 +189,7 @@ class OperationInputSerializerCreateTest(TestCase):
 
         mock_service.perform_checks_before_create.return_value = None
         mock_service.define_operation_status.return_value = None
+        mock_service.get_emission_rates_by_lot.return_value = {lot.id: 9.8}
 
         serializer.create(validated_data)
 
@@ -221,6 +222,7 @@ class OperationInputSerializerCreateTest(TestCase):
 
         mock_service.perform_checks_before_create.return_value = None
         mock_service.define_operation_status.return_value = None
+        mock_service.get_emission_rates_by_lot.return_value = {lot.id: 9.8}
 
         serializer.create(validated_data)
 
@@ -255,6 +257,7 @@ class OperationInputSerializerCreateTest(TestCase):
 
         mock_service.perform_checks_before_create.return_value = None
         mock_service.define_operation_status.return_value = None
+        mock_service.get_emission_rates_by_lot.return_value = {lot.id: 9.8}
 
         operation = serializer.create(validated_data)
 
@@ -268,7 +271,7 @@ class OperationInputSerializerCreateTest(TestCase):
         detail1 = operation.details.first()
         self.assertEqual(detail1.lot_id, lot.id)
         self.assertEqual(detail1.volume, 500)
-        # emission_rate_per_mj comes from CarbureLot.ghg_total
+        # emission_rate_per_mj comes from OperationService.get_emission_rates_by_lot
         self.assertEqual(detail1.emission_rate_per_mj, 9.8)
 
     def test_validate_type_accepts_authorized_types(self):
