@@ -42,6 +42,7 @@ export type OperationsQuery = OperationsQueryBuilder["query"] & {
   [OperationsFilter.type]?: OperationDebitOrCredit[]
   [OperationsFilter.operation]?: OperationType[]
   [OperationsFilter.depot]?: string[]
+  [OperationsFilter.years]?: string[]
 }
 
 // Re-exports

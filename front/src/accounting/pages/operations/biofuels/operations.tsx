@@ -26,7 +26,7 @@ const OperationsBiofuels = () => {
   const { formatUnit } = useUnit()
   const { selectedEntityId } = useSelectedEntity()
   const filterLabels = {
-    [OperationsFilter.year]: t("Année"),
+    [OperationsFilter.years]: t("Année"),
     [OperationsFilter.status]: t("Statut"),
     [OperationsFilter.operation]: t("Opération"),
     [OperationsFilter.depot]: t("Dépôts"),

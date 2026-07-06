@@ -1,5 +1,10 @@
 import { getBalanceFilters } from "accounting/api/biofuels/balances"
-import { Balance, BalancesFilter, BalancesQueryBuilder } from "accounting/types"
+import {
+  Balance,
+  BalancesFilter,
+  BalancesQueryBuilder,
+  OperationsStatus,
+} from "accounting/types"
 import { useFormContext } from "common/components/form2"
 import { QueryFilters, useQueryBuilder } from "common/hooks/query-builder-2"
 import { Normalizer } from "common/utils/normalize"
@@ -43,6 +48,7 @@ export const useAdvancedFiltersBalance = (balance: Balance) => {
         sector: [balance.sector],
         customs_category: [balance.customs_category],
         biofuel: [balance.biofuel?.code],
+        status: [OperationsStatus.VALIDATED, OperationsStatus.ACCEPTED],
       },
       filter as BalancesFilter
     )
