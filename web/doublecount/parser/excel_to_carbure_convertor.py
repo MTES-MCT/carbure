@@ -54,7 +54,7 @@ dc_feedstock_to_carbure_feedstock = {
     "alcools mauvais goûts": "MAUVAIS_GOUTS",
     "huiles acides de plumes de volailles": "HUILES_ACIDES_DE_PLUMES_DE_VOLAILLES",
     "huiles acides de pâtes de neutralisation": "PATES_DE_NEUTRALISATION",
-    "huiles de terres de blanchiment usagée": "HUILES_DE_TERRES_DE_BLANCHIMENT_USAGEE",
+    "huiles de terres de blanchiment usagées": "HUILES_DE_TERRES_DE_BLANCHIMENT_USAGEES",
     "résidus de cristallisation d'hydrolysats de dextrose": "RESIDUS_DE_CRISTALLISATION_D_HYDROLYSATS_DE_DEXTROSE",
     "rétentats de microfiltration de solution de glucose": "RETENTATS_DE_MICROFILTRATION_DE_SOLUTION_DE_GLUCOSE",
     "huile de coque de noix de cajou": "HUILE_DE_COQUE_DE_NOIX_DE_CAJOU",
