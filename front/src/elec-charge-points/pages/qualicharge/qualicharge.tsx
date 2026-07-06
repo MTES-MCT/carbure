@@ -18,7 +18,6 @@ import { useNotify } from "common/components/notifications"
 import { Pagination } from "common/components/pagination2"
 import { usePortal } from "common/components/portal"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { EntityPreview } from "common/types"
 import {
   useGetFilterOptions,
   useQualichargeColumns,
@@ -55,13 +54,13 @@ export const Qualicharge = () => {
     key: "qualicharge-data",
     params: [query],
   })
-  const { result: transferTargets, loading: loadingTransferTargets } = useQuery<
-    EntityPreview[],
-    [number]
-  >(getTransferTargets, {
-    key: "transfer-targets",
-    params: [entity.id],
-  })
+  const { result: transferTargets, loading: loadingTransferTargets } = useQuery(
+    getTransferTargets,
+    {
+      key: "transfer-targets",
+      params: [entity.id],
+    }
+  )
   const getFilterOptions = useGetFilterOptions(query)
 
   const validateVolumes = useValidateVolumes({

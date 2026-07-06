@@ -82,16 +82,18 @@ export const TransferVolumesDialog = ({
       </Text>
       <div>
         <MultiSelect
+          label={t("Unités d'exploitation")}
           placeholder={t("Sélectionner une unité d'exploitation")}
           value={selectedOperatingUnit}
           options={operatingUnits ?? []}
           onChange={setSelectedOperatingUnit}
           loading={loadingOperatingUnits}
-          full
+          variant="form"
         />
       </div>
       <div>
         <Select
+          label={t("Destinataire")}
           placeholder={t("Sélectionner un destinataire")}
           value={selectedCpo?.id}
           options={transferTargets ?? []}
@@ -99,7 +101,7 @@ export const TransferVolumesDialog = ({
             setSelectedCpo(transferTargets?.find((c) => c.id === id))
           }
           normalize={(cpo) => ({ value: cpo.id, label: cpo.name })}
-          full
+          variant="form"
         />
       </div>
     </Dialog>

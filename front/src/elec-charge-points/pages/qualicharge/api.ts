@@ -8,7 +8,6 @@ import {
 } from "./types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { download } from "common/services/api"
-import { EntityPreview } from "common/types"
 
 const getQuery = (query: QualichargeQuery) => {
   const query2 =
@@ -157,7 +156,7 @@ export function getTransferTargets(entity_id: number) {
         query: { entity_id },
       },
     })
-    .then((res) => res.data as unknown as EntityPreview[])
+    .then((res) => res.data)
 }
 
 export function bulkTransferQualichargeVolumes(
