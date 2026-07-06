@@ -190,11 +190,7 @@ const Home = () => {
           </div>
         </div>
 
-        <Button
-          icon={ExternalLink}
-          href="/app/stats"
-          className={styles.homeButton}
-        >
+        <Button icon={ExternalLink} href="/stats" className={styles.homeButton}>
           <Trans>Voir les statistiques</Trans>
         </Button>
       </section>
