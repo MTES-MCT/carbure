@@ -149,6 +149,48 @@ class OperationViewSetIntegrationTest(TestCase):
 
         self.assertEqual(queryset._prefetch_related_lookups, ())
 
+    def test_list_queryset_prefetches_details_when_requested(self):
+        """List queryset should prefetch details when the details flag is enabled."""
+        django_request = self.factory.get(self.url, {"entity_id": self.entity.id, "details": 1})
+        django_request.entity = self.entity
+        django_request.unit = "l"
+
+        view = OperationViewSet()
+        view.request = Request(django_request)
+        view.action = "list"
+
+        queryset = view.get_queryset()
+
+        self.assertIn("details", queryset._prefetch_related_lookups)
+
+    def test_correct_queryset_prefetches_details(self):
+        """The correct action should prefetch details for the correction serializer."""
+        django_request = self.factory.get(self.url, {"entity_id": self.entity.id})
+        django_request.entity = self.entity
+        django_request.unit = "l"
+
+        view = OperationViewSet()
+        view.request = Request(django_request)
+        view.action = "correct"
+
+        queryset = view.get_queryset()
+
+        self.assertIn("details", queryset._prefetch_related_lookups)
+
+    def test_export_queryset_prefetches_details(self):
+        """The export action should prefetch details for the Excel export."""
+        django_request = self.factory.get(self.url, {"entity_id": self.entity.id})
+        django_request.entity = self.entity
+        django_request.unit = "l"
+
+        view = OperationViewSet()
+        view.request = Request(django_request)
+        view.action = "export_operations_to_excel"
+
+        queryset = view.get_queryset()
+
+        self.assertIn("details", queryset._prefetch_related_lookups)
+
     def test_list_operations_with_details(self):
         """Test GET /operations/?details=1 includes operation details."""
         query = {"entity_id": self.entity.id, "details": 1}

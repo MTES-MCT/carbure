@@ -118,6 +118,7 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
         multiplicator = multiplicators.get(self.request.unit, None)
         # Permissions to use selected_entity_id here are handled in the filter_entity() method of the OperationFilter
         entity_id = self.request.query_params.get("selected_entity_id") or self.request.entity.id
+        details_requested = self.request.GET.get("details", "0") == "1"
 
         details_queryset = OperationDetail.objects.filter(operation_id=OuterRef("pk"))
         total_volume_subquery = details_queryset.values("operation_id").annotate(total=Sum("volume")).values("total")[:1]
@@ -202,8 +203,10 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
 
         queryset = super().get_queryset().annotate(**annotations)
 
-        if self.action == "list" and self.request.GET.get("details", "0") != "1":
+        if self.action == "list" and not details_requested:
             queryset = queryset.prefetch_related(None)
+        elif self.action in ["retrieve", "correct", "export_operations_to_excel"] or details_requested:
+            queryset = queryset.prefetch_related("details")
 
         # exclude operations that are drafts and credits
         queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
