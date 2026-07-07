@@ -13,6 +13,7 @@ export interface ObjectiveProgress {
   declared_quantity: number
   remaining_energy: number
   is_objective_met: boolean
+  quantity_available: number
 }
 
 export interface BaseObjective {

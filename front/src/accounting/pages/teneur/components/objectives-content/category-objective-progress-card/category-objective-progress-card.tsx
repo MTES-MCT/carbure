@@ -55,7 +55,7 @@ export const CategoryObjectiveProgressCard = ({
         "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
         {
           date: selectedYear,
-          objective: formatObjectiveGJ(category.target),
+          objective: formatObjectiveGJ(progress.target_quantity),
           target_percent: formatNumber(category.target_percent),
         }
       )}

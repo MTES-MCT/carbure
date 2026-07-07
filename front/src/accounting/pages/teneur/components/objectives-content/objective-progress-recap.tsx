@@ -37,7 +37,7 @@ export const ObjectiveProgressRecap = ({
     <ul>
       <li>
         <RecapData.TeneurDeclaredMonth
-          value={formatValue(objective.pending_teneur)}
+          value={formatValue(objective.progress.declared_quantity)}
         />
       </li>
       {remainingType !== undefined && (
@@ -49,7 +49,7 @@ export const ObjectiveProgressRecap = ({
       )}
       <li>
         <RecapData.QuantityAvailable
-          value={formatValue(objective.quantity_available)}
+          value={formatValue(objective.progress.quantity_available)}
         />
       </li>
     </ul>
