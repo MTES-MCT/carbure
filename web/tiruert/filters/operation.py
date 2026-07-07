@@ -8,7 +8,6 @@ from django_filters import (
     CharFilter,
     FilterSet,
     NumberFilter,
-    AllValuesMultipleFilter,
     MultipleChoiceFilter,
 )
 from drf_spectacular.utils import extend_schema_field
@@ -19,7 +18,6 @@ from rest_framework.serializers import (
     ListField,
 )
 
-from core.filters import AllAnnotatedValuesMultipleFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
 from .custom_filters import CustomOrderingFilter
 from tiruert.models.operation import Operation
@@ -31,7 +29,7 @@ class BaseFilter(FilterSet):
     operation = MultipleChoiceFilter(
         choices=Operation.OPERATION_TYPES + (("ACQUISITION", "ACQUISITION"),), field_name="type"
     )
-    biofuel = AllValuesMultipleFilter(field_name="biofuel__code")
+    biofuel = CharFilter(method="filter_biofuel")
     sector = MultipleChoiceFilter(choices=Operation.SECTOR_CODE_CHOICES, field_name="_sector")
     from_to = CharFilter(method="filter_from_to")
     depot = CharFilter(method="filter_depot")
@@ -39,9 +37,9 @@ class BaseFilter(FilterSet):
     period = CharFilter(method="filter_period")
     customs_category = MultipleChoiceFilter(choices=MatierePremiere.MP_CATEGORIES)
     status = MultipleChoiceFilter(choices=Operation.OPERATION_STATUSES)
-    feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code")
-    origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays")
-    durability_period = AllValuesMultipleFilter(field_name="durability_period")
+    feedstock = CharFilter(method="filter_feedstock")
+    origin_country = CharFilter(method="filter_origin_country")
+    durability_period = CharFilter(method="filter_durability_period")
 
     order_by = CustomOrderingFilter(
         fields=(
@@ -86,10 +84,32 @@ class BaseFilter(FilterSet):
         entities = self.request.GET.getlist(name)
         return queryset.filter(Q(credited_entity__name__in=entities) | Q(debited_entity__name__in=entities)).distinct()
 
+    def filter_multiple_values(self, queryset, field_name, param_name):
+        values = self.data.getlist(param_name)
+        if values:
+            return queryset.filter(Q(**{f"{field_name}__in": values}))
+        return queryset
+
+    @extend_schema_field(ListField(child=CharField()))
+    def filter_biofuel(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "biofuel__code", name)
+
+    @extend_schema_field(ListField(child=CharField()))
+    def filter_feedstock(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "details__lot__feedstock__code", name)
+
+    @extend_schema_field(ListField(child=CharField()))
+    def filter_origin_country(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "details__lot__country_of_origin__code_pays", name)
+
     @extend_schema_field(ListField(child=CharField()))
     def filter_depot(self, queryset, name, value):
         depots = self.request.GET.getlist(name)
         return queryset.filter(Q(from_depot__name__in=depots) | Q(to_depot__name__in=depots)).distinct()
+
+    @extend_schema_field(ListField(child=CharField()))
+    def filter_durability_period(self, queryset, name, value):
+        return self.filter_multiple_values(queryset, "durability_period", name)
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_period(self, queryset, name, value):
@@ -128,30 +148,33 @@ class BaseFilter(FilterSet):
 
 
 class OperationFilter(BaseFilter):
-    years = extend_schema_field(SerializerIntegerField())(
-        AllAnnotatedValuesMultipleFilter(
-            field_name="year",
-            annotation=Coalesce(
+    years = CharFilter(method="filter_years")
+
+    @extend_schema_field(ListField(child=CharField()))
+    def filter_years(self, queryset, name, value):
+        years = self.request.GET.getlist(name)
+        if not years:
+            return queryset
+
+        return queryset.annotate(
+            year=Coalesce(
                 "declaration_year",
                 Cast(
                     Substr("durability_period", 1, 4),
                     output_field=IntegerField(),
                 ),
-                output_field=IntegerField(),
-            ),
-        )
-    )
-    pass
+            )
+        ).filter(year__in=years)
 
 
 class OperationFilterForBalance(BaseFilter):
     # Lot-level filters are handled by Prefetch in BalanceService, not at the Operation queryset level
     ges_bound_min = NumberFilter(method="ignore")
     ges_bound_max = NumberFilter(method="ignore")
-    feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code", method="ignore")
-    origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays", method="ignore")
+    feedstock = CharFilter(method="ignore")
+    origin_country = CharFilter(method="ignore")
     # durability_period is resolved to specific lot_ids in the view and passed via detail_filters
-    durability_period = AllValuesMultipleFilter(method="ignore")
+    durability_period = CharFilter(method="ignore")
 
     def ignore(self, queryset, name, value):
         return queryset
