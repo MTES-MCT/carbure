@@ -2,9 +2,10 @@ import { MainObjective } from "../../../types"
 import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
-import { RecapData } from "../../recap-data"
 import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { ObjectiveProgressRecap } from "../objective-progress-recap"
+import { ExtendedUnit } from "common/types"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -66,26 +67,11 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           penalty={objective.penalty}
         >
           {isDeclarationInCurrentPeriod && (
-            <ul>
-              <li>
-                <RecapData.TeneurDeclaredMonth
-                  value={t("{{value}} tCO2 évitées", {
-                    value: formatNumber(objective.pending_teneur, {
-                      fractionDigits: 0,
-                    }),
-                  })}
-                />
-              </li>
-              <li>
-                <RecapData.QuantityAvailable
-                  value={t("{{value}} tCO2 évitées", {
-                    value: formatNumber(objective.quantity_available, {
-                      fractionDigits: 0,
-                    }),
-                  })}
-                />
-              </li>
-            </ul>
+            <ObjectiveProgressRecap
+              objective={objective}
+              remainingType="objective"
+              unit={ExtendedUnit.tCO2ev}
+            />
           )}
         </CardProgress>
       )}
