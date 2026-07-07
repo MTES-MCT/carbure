@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from core.models import Biocarburant, MatierePremiere
 from tiruert.models import Operation
-from tiruert.serializers import OperationSerializer
+from tiruert.serializers import OperationListSerializer, OperationSerializer
 from tiruert.serializers.operation import (
     BaseOperationSerializer,
     OperationInputSerializer,
@@ -54,6 +54,46 @@ class BaseOperationSerializerTest(TestCase):
 
         self.assertEqual(result, "kg")
 
+    def test_get_fields_removes_details_when_not_requested(self):
+        """Should not build the nested details field on list responses by default."""
+        serializer = OperationListSerializer(context={"details": False})
+
+        self.assertNotIn("details", serializer.fields)
+
+    def test_get_fields_keeps_details_when_requested(self):
+        """Should keep nested details field when explicit details mode is enabled."""
+        serializer = OperationListSerializer(context={"details": True})
+
+        self.assertIn("details", serializer.fields)
+
+    def test_operation_list_serializer_uses_annotated_quantity_and_avoided_emissions(self):
+        """List serializer should read pre-annotated numeric fields directly."""
+        operation = Mock(spec=Operation)
+        operation.id = 1
+        operation._type = Operation.CESSION
+        operation.status = Operation.PENDING
+        operation._sector = Operation.ESSENCE
+        operation.objective_sector = None
+        operation.customs_category = MatierePremiere.CONV
+        operation.biofuel = Mock(code="ETH")
+        operation.renewable_energy_share = 1.0
+        operation.credited_entity = Mock(id=1, name="Credited")
+        operation.debited_entity = Mock(id=2, name="Debited")
+        operation._entity = "Credited"
+        operation.from_depot = Mock(id=10, name="From")
+        operation.to_depot = Mock(id=11, name="To")
+        operation._depot = "To"
+        operation.export_country = None
+        operation.created_at = None
+        operation._quantity = 123.456
+        operation._avoided_emissions = 78.901
+        operation.declaration_year = 2024
+
+        serializer = OperationListSerializer(operation, context={"details": False, "unit": "l"})
+
+        self.assertEqual(serializer.data["quantity"], 123.46)
+        self.assertEqual(serializer.data["avoided_emissions"], 78.9)
+
 
 class OperationSerializerTest(TestCase):
     """Tests for OperationSerializer delegation to model methods."""
@@ -73,6 +113,16 @@ class OperationSerializerTest(TestCase):
         result = serializer.get_avoided_emissions(instance)
 
         self.assertEqual(result, 451.50)
+
+    def test_get_avoided_emissions_uses_annotation_when_available(self):
+        """Should prefer annotated avoided emissions on list querysets."""
+        serializer = self._create_serializer()
+        instance = Mock(spec=Operation)
+        instance._avoided_emissions = 451.504
+
+        result = serializer.get_avoided_emissions(instance)
+
+        self.assertEqual(result, 451.5)
 
     def test_get_quantity_mj_always_uses_mj_unit(self):
         """Should always use 'mj' unit regardless of context unit."""

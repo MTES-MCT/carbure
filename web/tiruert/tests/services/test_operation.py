@@ -1,5 +1,6 @@
 from unittest.mock import Mock, patch
 
+from django.http import QueryDict
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
@@ -387,7 +388,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH")}
         selected_lots = []
@@ -405,7 +406,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=21.3)}
         selected_lots = [{"id": 1, "volume": 1000}]
@@ -436,7 +437,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
 
@@ -462,7 +463,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
 

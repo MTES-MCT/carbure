@@ -146,3 +146,14 @@ class OperationPaginationTest(TestCase):
 
         operation.quantity.assert_called_once_with(unit="l")
         self.assertEqual(result["total_quantity"], 0.0)
+
+    def test_get_extra_metadata_uses_queryset_aggregate_when_available(self):
+        """Should delegate total_quantity computation to the ORM queryset when possible."""
+        queryset = Mock()
+        queryset.aggregate.return_value = {"total_quantity": 1234.5}
+        self.pagination.queryset = queryset
+
+        result = self.pagination.get_extra_metadata()
+
+        queryset.aggregate.assert_called_once()
+        self.assertEqual(result, {"total_quantity": 1234.5})

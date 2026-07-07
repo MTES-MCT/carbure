@@ -1,11 +1,12 @@
 from unittest.mock import Mock
 
+from django.db.models import Q
 from django.http import QueryDict
 from django.test import RequestFactory, TestCase
 from rest_framework.exceptions import PermissionDenied
 
 from core.models import Entity
-from tiruert.filters.operation import BaseFilter, OperationFilterForBalance
+from tiruert.filters.operation import BaseFilter, OperationFilter, OperationFilterForBalance
 from tiruert.models.operation import Operation
 
 
@@ -228,20 +229,41 @@ class BaseFilterTest(TestCase):
         queryset.filter.return_value.distinct.assert_called_once()
 
     def test_filter_durability_period_multiple_values(self):
-        """Test durability_period filter generates an OR Q object for multiple periods."""
+        """Test durability_period filter uses an __in lookup for multiple periods."""
         queryset = Mock()
         queryset.filter.return_value = queryset
 
         request = self.factory.get("/test/?durability_period=202401&durability_period=202406")
+        request.GET = QueryDict("durability_period=202401&durability_period=202406")
 
-        filterset = BaseFilter({}, queryset=queryset, request=request)
-        filterset.filters["durability_period"].filter(queryset, ["202401", "202406"])
+        filterset = BaseFilter(request.GET, queryset=queryset, request=request)
+        filterset.filter_durability_period(queryset, "durability_period", None)
 
-        queryset.filter.assert_called_once()
-        q_filter = queryset.filter.call_args[0][0]
-        self.assertEqual(q_filter.connector, "OR")
-        self.assertIn(("durability_period", "202401"), q_filter.children)
-        self.assertIn(("durability_period", "202406"), q_filter.children)
+        queryset.filter.assert_called_once_with(Q(durability_period__in=["202401", "202406"]))
+
+
+class OperationFilterTest(TestCase):
+    """Unit tests for OperationFilter-specific helpers."""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_filter_years_annotates_then_filters(self):
+        """Test years filter uses an annotated year instead of preloading choices."""
+        queryset = Mock()
+        annotated_queryset = Mock()
+        queryset.annotate.return_value = annotated_queryset
+        annotated_queryset.filter.return_value = annotated_queryset
+
+        request = self.factory.get("/test/?years=2024&years=2025")
+        request.GET = QueryDict("years=2024&years=2025")
+
+        filterset = OperationFilter(request.GET, queryset=queryset, request=request)
+        result = filterset.filter_years(queryset, "years", None)
+
+        queryset.annotate.assert_called_once()
+        annotated_queryset.filter.assert_called_once_with(year__in=["2024", "2025"])
+        self.assertEqual(result, annotated_queryset)
 
 
 class OperationFilterForBalanceTest(TestCase):
