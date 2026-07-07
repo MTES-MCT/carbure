@@ -92,15 +92,15 @@ class BaseFilter(FilterSet):
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_biofuel(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "biofuel__code", name)
+        return self.filter_multiple_values(queryset, "biofuel__code", "biofuel")
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_feedstock(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "details__lot__feedstock__code", name)
+        return self.filter_multiple_values(queryset, "details__lot__feedstock__code", "feedstock")
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_origin_country(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "details__lot__country_of_origin__code_pays", name)
+        return self.filter_multiple_values(queryset, "details__lot__country_of_origin__code_pays", "origin_country")
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_depot(self, queryset, name, value):
@@ -109,7 +109,7 @@ class BaseFilter(FilterSet):
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_durability_period(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "durability_period", name)
+        return self.filter_multiple_values(queryset, "durability_period", "durability_period")
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_period(self, queryset, name, value):
