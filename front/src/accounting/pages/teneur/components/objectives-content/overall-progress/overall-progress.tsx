@@ -3,7 +3,7 @@ import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
 import { RecapData } from "../../recap-data"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
 type OverallProgressProps = {
@@ -14,12 +14,6 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const { t } = useTranslation()
   const { selectedYear, isDeclarationInCurrentPeriod } =
     useAnnualDeclarationTiruert()
-
-  // If the declaration is in the current period, the total annual date is the current date
-  // If the declaration is not in the current period, the total annual date is the end of the previous year
-  const totalAnnualDate = isDeclarationInCurrentPeriod
-    ? new Date()
-    : new Date(selectedYear, 2, 31)
 
   return (
     <ObjectiveSection
@@ -37,8 +31,8 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
     >
       {objective && (
         <CardProgress
-          title={t("Total annuel à la date du {{date}}", {
-            date: formatDate(totalAnnualDate, "dd/MM/yyyy"),
+          title={t("Année {{year}}", {
+            year: selectedYear,
           })}
           description={t(
             "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",

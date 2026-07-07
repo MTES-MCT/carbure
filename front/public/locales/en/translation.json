@@ -211,7 +211,7 @@
   "Veuillez choisir dans le menu ci-dessous les carburants que vous souhaitez inclure dans vos déclarations de mises à consommation. Ils s'afficheront ensuite dans le tableau, où vous pourrez en préciser les volumes.": "Please select from the menu below the fuels you wish to include in your declarations of release for consumption. They will then appear in the table, where you can specify their volumes.",
   "Choisissez des carburants": "Pick fuels",
   "Mises à consommation": "Releases for consumption",
-  "Renseigner mes MàC": "Fill in my RfC",
+  "Voir mes MàC": "View my RfC",
   "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique.": "The basis for your targets will be calculated using the fossil fuel quantities you reported as released for consumption, along with a theoretical lower heating value (LHV).",
   "Télécharger mes mises à consommation {{year}}": "Download my releases for consumption of {{year}}",
   "Choisissez une filière afin d'affecter ce certificat de teneur à l'objectif correspondant :": "Select a track to assign this content certificate to the corresponding objective:",
@@ -225,7 +225,7 @@
   "Avancement par catégorie de carburants alternatifs": "Progress by alternative fuel category",
   "Avancement global": "Overall progress",
   "Base calculée : {{energy_basis}} GJ": "Calculated basis: {{energy_basis}} GJ",
-  "Total annuel à la date du {{date}}": "Annual total as of {{date}}",
+  "Année {{year}}": "Year {{year}}",
   "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)": "Target {{date}}: {{objective}} tCO2 avoided ({{target_percent}}% of total)",
   "{{value}} tCO2 évitées": "{{value}} tCO2 avoided",
   "Avancement par filière": "Advancement by sector",
@@ -722,7 +722,6 @@
   "{{count}} par page_other": "{{count}} per page",
   "Sélectionner 1 ou plusieurs options": "Select one or more options",
   "{{count}} options sélectionnées_one": "{{count}} option selected",
-  "{{count}} options sélectionnées_many": "{{count}} options selected",
   "{{count}} options sélectionnées_other": "{{count}} options selected",
   "Sélectionner une option": "Select an option",
   "Revenir à la liste complète": "Back to full list",
@@ -2224,5 +2223,6 @@
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_one": "<b>{{count}} lot</b> present <b>inconsistencies</b>.",
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} lots</b> present <b>inconsistencies</b>.",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lot</b> must be declared by <b>{{date}}</b>.",
-  "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> must be declared by <b>{{date}}</b>."
+  "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> must be declared by <b>{{date}}</b>.",
+  "{{count}} options sélectionnées_many": "{{count}} options selected"
 }
