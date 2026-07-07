@@ -1,4 +1,5 @@
-from django.db.models import Case, CharField, F, FloatField, Q, Sum, Value, When
+from django.db.models import Case, CharField, ExpressionWrapper, F, FloatField, OuterRef, Q, Subquery, Sum, Value, When
+from django.db.models.functions import Coalesce
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,7 +9,7 @@ from core.pagination import MetadataPageNumberPagination
 from entity.permissions import HasDgddiWriteRights
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
-from tiruert.models import Operation
+from tiruert.models import Operation, OperationDetail
 from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights, TiruertAdminRights
 from tiruert.serializers import (
     OperationInputSerializer,
@@ -17,6 +18,7 @@ from tiruert.serializers import (
     OperationUpdateSerializer,
 )
 from tiruert.services.declaration_period import DeclarationPeriodService
+from tiruert.services.teneur import GHG_REFERENCE_RED_II
 from tiruert.views.mixins import UnitMixin
 
 from .mixins import ActionMixin
@@ -26,9 +28,23 @@ class OperationPagination(MetadataPageNumberPagination):
     aggregate_fields = {"total_quantity": 0}
 
     def get_extra_metadata(self):
+        queryset = getattr(self, "queryset", None)
+        if callable(getattr(queryset, "aggregate", None)):
+            return queryset.aggregate(
+                total_quantity=Coalesce(
+                    Sum(
+                        ExpressionWrapper(
+                            F("_quantity") * F("renewable_energy_share"),
+                            output_field=FloatField(),
+                        )
+                    ),
+                    Value(0.0),
+                )
+            )
+
         metadata = {"total_quantity": 0}
 
-        for operation in self.queryset:
+        for operation in queryset or []:
             # _quantity is annotated and signed (positive=credit, negative=debit)
             quantity = operation.quantity(unit=self.request.unit) * operation.renewable_energy_share
             metadata["total_quantity"] += quantity
@@ -103,72 +119,91 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
         # Permissions to use selected_entity_id here are handled in the filter_entity() method of the OperationFilter
         entity_id = self.request.query_params.get("selected_entity_id") or self.request.entity.id
 
-        queryset = (
-            super()
-            .get_queryset()
+        details_queryset = OperationDetail.objects.filter(operation_id=OuterRef("pk"))
+        total_volume_subquery = details_queryset.values("operation_id").annotate(total=Sum("volume")).values("total")[:1]
+        avoided_emissions_subquery = (
+            details_queryset.values("operation_id")
             .annotate(
-                total_volume=Sum("details__volume"),
-                _sector=Case(
-                    When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
-                    When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
-                    When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
-                    default=Value(None),
-                    output_field=CharField(),
-                ),
-                _type=Case(
-                    When(Q(type="CESSION", credited_entity_id=entity_id), then=Value("ACQUISITION")),
-                    default=F("type"),
-                    output_field=CharField(),
-                ),
-                _depot=Case(
-                    When(Q(type="CESSION", credited_entity_id=entity_id), then=F("to_depot__name")),
-                    When(Q(type="CESSION", debited_entity_id=entity_id), then=F("from_depot__name")),
-                    When(Q(type="INCORPORATION") | Q(type="MAC_BIO"), then=F("to_depot__name")),
-                    When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("from_depot__name")),
-                    default=Value(None),
-                    output_field=CharField(),
-                ),
-                _entity=Case(
-                    When(Q(type="CESSION", credited_entity_id=entity_id), then=F("debited_entity__name")),
-                    When(Q(type="CESSION", debited_entity_id=entity_id), then=F("credited_entity__name")),
-                    When(Q(type="TRANSFERT", credited_entity_id=entity_id), then=F("debited_entity__name")),
-                    When(Q(type="TRANSFERT", debited_entity_id=entity_id), then=F("credited_entity__name")),
-                    When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("export_recipient")),
-                    default=Value(None),
-                    output_field=CharField(),
-                ),
-                _quantity=Case(
-                    When(
-                        credited_entity_id=entity_id,
-                        then=F("total_volume") * (F(multiplicator) if multiplicator else 1),
-                    ),
-                    When(
-                        debited_entity_id=entity_id,
-                        then=F("total_volume") * -1 * (F(multiplicator) if multiplicator else 1),
-                    ),
-                    default=Value(None),
-                    output_field=FloatField(),
-                ),
-                _volume=Case(
-                    When(
-                        credited_entity_id=entity_id,
-                        then=F("total_volume"),
-                    ),
-                    When(
-                        debited_entity_id=entity_id,
-                        then=F("total_volume") * -1,
-                    ),
-                    default=Value(None),
-                    output_field=FloatField(),
-                ),
-                _transaction=Case(
-                    When(credited_entity_id=entity_id, then=Value("CREDIT")),
-                    When(debited_entity_id=entity_id, then=Value("DEBIT")),
-                    default=Value(None),
-                    output_field=CharField(),
-                ),
+                total=Sum(
+                    ExpressionWrapper(
+                        (Value(GHG_REFERENCE_RED_II) - F("emission_rate_per_mj"))
+                        * F("lot__biofuel__pci_litre")
+                        * F("volume")
+                        * F("operation__renewable_energy_share")
+                        / Value(1000000.0),
+                        output_field=FloatField(),
+                    )
+                )
             )
+            .values("total")[:1]
         )
+
+        total_volume_expr = Coalesce(
+            Subquery(total_volume_subquery, output_field=FloatField()),
+            Value(0.0),
+        )
+        quantity_factor_expr = F(multiplicator) if multiplicator else Value(1.0)
+        sign_expr = Case(
+            When(credited_entity_id=entity_id, then=Value(1.0)),
+            When(debited_entity_id=entity_id, then=Value(-1.0)),
+            default=Value(None),
+            output_field=FloatField(),
+        )
+
+        annotations = {
+            "_avoided_emissions": Coalesce(
+                Subquery(avoided_emissions_subquery, output_field=FloatField()),
+                Value(0.0),
+            ),
+            "_sector": Case(
+                When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
+                When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
+                When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
+            "_type": Case(
+                When(Q(type="CESSION", credited_entity_id=entity_id), then=Value("ACQUISITION")),
+                default=F("type"),
+                output_field=CharField(),
+            ),
+            "_depot": Case(
+                When(Q(type="CESSION", credited_entity_id=entity_id), then=F("to_depot__name")),
+                When(Q(type="CESSION", debited_entity_id=entity_id), then=F("from_depot__name")),
+                When(Q(type="INCORPORATION") | Q(type="MAC_BIO"), then=F("to_depot__name")),
+                When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("from_depot__name")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
+            "_entity": Case(
+                When(Q(type="CESSION", credited_entity_id=entity_id), then=F("debited_entity__name")),
+                When(Q(type="CESSION", debited_entity_id=entity_id), then=F("credited_entity__name")),
+                When(Q(type="TRANSFERT", credited_entity_id=entity_id), then=F("debited_entity__name")),
+                When(Q(type="TRANSFERT", debited_entity_id=entity_id), then=F("credited_entity__name")),
+                When(Q(type="EXPORTATION") | Q(type="EXPEDITION"), then=F("export_recipient")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
+            "_quantity": ExpressionWrapper(
+                total_volume_expr * quantity_factor_expr * sign_expr,
+                output_field=FloatField(),
+            ),
+            "_transaction": Case(
+                When(credited_entity_id=entity_id, then=Value("CREDIT")),
+                When(debited_entity_id=entity_id, then=Value("DEBIT")),
+                default=Value(None),
+                output_field=CharField(),
+            ),
+        }
+
+        # _volume is only needed by non-list actions (retrieve/export), skip it on list queries.
+        if self.action != "list":
+            annotations["_volume"] = ExpressionWrapper(total_volume_expr * sign_expr, output_field=FloatField())
+
+        queryset = super().get_queryset().annotate(**annotations)
+
+        if self.action == "list" and self.request.GET.get("details", "0") != "1":
+            queryset = queryset.prefetch_related(None)
 
         # exclude operations that are drafts and credits
         queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
