@@ -15,11 +15,11 @@ const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
 // Format all values in the table to GJ
 const formatValue = (value: number) =>
   formatNumber(CONVERSIONS.energy.MJ_TO_GJ(value), {
-    fractionDigits: 0,
+    fractionDigits: 2,
   })
 
 const floorValue = (value: number) =>
-  floorNumber(CONVERSIONS.energy.MJ_TO_GJ(value), 0)
+  floorNumber(CONVERSIONS.energy.MJ_TO_GJ(value), 2)
 
 export const useBiofuelTeneurColumns = () => {
   const { t } = useTranslation()
@@ -39,7 +39,7 @@ export const useBiofuelTeneurColumns = () => {
           text={formatNumber(
             floorValue(item.available_balance + item.pending_teneur),
             {
-              fractionDigits: 0,
+              fractionDigits: 2,
             }
           )}
         />
@@ -70,7 +70,7 @@ export const useBiofuelTeneurSectorColumns = () => {
       cell: (item) => (
         <Cell
           text={formatNumber(item.teneur_declared, {
-            fractionDigits: 0,
+            fractionDigits: 2,
           })}
         />
       ),
@@ -105,7 +105,7 @@ export const useElecTeneurColumns = () => {
             floorValue(item.available_balance) +
               floorValue(item.pending_teneur),
             {
-              fractionDigits: 0,
+              fractionDigits: 2,
             }
           )}
         />

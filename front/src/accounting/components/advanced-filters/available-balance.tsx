@@ -18,12 +18,12 @@ export const AvailableBalance = ({
   const { t } = useTranslation()
   const { formatUnit } = useUnit(unit)
 
-  const availableBalanceFormatted = floorNumber(availableBalance, 0)
+  const availableBalanceFormatted = floorNumber(availableBalance, 2)
 
   return (
     <Notice
       noColor
-      variant={availableBalanceFormatted === 0 ? "warning" : "info"}
+      variant={availableBalanceFormatted <= 1 ? "warning" : "info"}
     >
       <div>
         {t("Solde disponible pour les filtres sélectionnés")}
@@ -33,7 +33,7 @@ export const AvailableBalance = ({
         ) : (
           <b>
             {formatUnit(availableBalance, {
-              fractionDigits: 0,
+              fractionDigits: 2,
               mode: "floor",
             })}
           </b>

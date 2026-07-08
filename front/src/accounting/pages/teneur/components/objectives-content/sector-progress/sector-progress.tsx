@@ -40,7 +40,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 }
               )}
               mainValue={formatNumber(progress.total_teneur_declared, {
-                fractionDigits: 0,
+                fractionDigits: 2,
               })}
               mainText={t("GJ")}
               baseQuantity={progress.base_quantity}

@@ -24,7 +24,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           i18nKey="Base calculée : {{energy_basis}} GJ"
           values={{
             energy_basis: formatNumber(objective?.energy_basis ?? 0, {
-              fractionDigits: 0,
+              fractionDigits: 2,
             }),
           }}
         />

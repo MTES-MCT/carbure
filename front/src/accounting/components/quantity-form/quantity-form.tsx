@@ -93,7 +93,7 @@ const QuantitySection = ({
         "quantity",
         t(
           "La quantité déclarée est supérieure à la quantité maximale autorisée ({{max}}). Merci de modifier la quantité.",
-          { max: formatUnit(quantityMax, { fractionDigits: 0 }) }
+          { max: formatUnit(quantityMax, { fractionDigits: 2 }) }
         )
       )
       return
@@ -148,7 +148,7 @@ const QuantitySection = ({
   })
 
   const quantityMaxLabel = value.availableBalance
-    ? `(${t("solde")}: ${formatUnit(value.availableBalance, { fractionDigits: 0, mode: "floor" })})`
+    ? `(${t("solde")}: ${formatUnit(value.availableBalance, { fractionDigits: 2, mode: "floor" })})`
     : undefined
 
   // When the component is mounted, reset the quantity declared if the quantity is greater than the quantity max
@@ -163,7 +163,7 @@ const QuantitySection = ({
     <>
       <NumberInput
         label={`${getQuantityInputLabel(type)} ${quantityMaxLabel ?? ""}`}
-        step={1}
+        step={0.01}
         max={quantityMax}
         onKeyDown={(e) => {
           if (e.key === "Enter") {

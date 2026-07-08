@@ -36,7 +36,7 @@ export const UnconstrainedCategoriesProgress = ({
                 : () => onCategoryClick(category)
             }
             mainValue={formatNumber(category.progress.total_teneur_declared, {
-              fractionDigits: 0,
+              fractionDigits: 2,
             })}
             mainText={t("GJ")}
           >

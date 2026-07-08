@@ -30,7 +30,7 @@ export const useCreateOperation = ({
   const getSuccessMessage = useCallback(
     (operationType: CreateOperationType, quantity: number) => {
       const quantityFormatted = formatUnit(quantity, {
-        fractionDigits: 0,
+        fractionDigits: 2,
       })
       const messages: Partial<Record<CreateOperationType, string>> = {
         [CreateOperationType.TRANSFERT]: t(

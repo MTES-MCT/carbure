@@ -23,9 +23,9 @@ const debouncedGetBalance = debounce(
       ...mapAdvancedFiltersForPayload(filters),
       unit,
     }).then((res) => {
-      const quantity = floorNumber(res.data.total_quantity ?? 0, 0)
+      const quantity = floorNumber(res.data.total_quantity ?? 0, 2)
 
-      if (quantity === 0) return undefined
+      if (quantity <= 1) return undefined
 
       return res.data.results.length > 0 ? res.data.results[0] : undefined
     }),

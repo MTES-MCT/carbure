@@ -48,7 +48,7 @@ export const CategoryObjectiveProgressCard = ({
     <CardProgress
       title={category.code}
       mainValue={formatNumber(progress.total_teneur_declared, {
-        fractionDigits: 0,
+        fractionDigits: 2,
       })}
       mainText={t("GJ")}
       description={t(
