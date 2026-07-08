@@ -34,7 +34,7 @@ export const MacSection = () => {
           {t("Mises à consommation")}
         </Title>
         <Button asideX priority="secondary" onClick={onAddMac}>
-          {t("Renseigner mes MàC")}
+          {t("Voir mes MàC")}
         </Button>
       </Row>
       <p>
