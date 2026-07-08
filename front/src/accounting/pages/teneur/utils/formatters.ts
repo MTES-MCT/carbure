@@ -1,7 +1,7 @@
 import { FRACTION_DIGITS_OPERATION } from "accounting/config"
 import { BaseObjective, ObjectiveProgress } from "../types"
 import { ExtendedUnit } from "common/types"
-import { ceilNumber, floorNumber } from "common/utils/formatters"
+import { ceilNumber, floorNumber, formatUnit } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 
 type ObjectiveProgressInput = Pick<
@@ -73,9 +73,18 @@ export const computeObjectiveEnergy = (objective: ObjectiveProgressInput) =>
  * @returns The remaining energy
  */
 export const computeRemainingEnergyWithAdditionalQuantity = (
-  objective: ObjectiveProgressInput,
+  objective: {
+    target: number
+    teneur_declared: number
+    pending_teneur: number
+  },
   additionalQuantity: number
-) => Math.max(0, computeObjectiveEnergy(objective) - additionalQuantity)
+) =>
+  Math.max(
+    0,
+    computeObjectiveEnergy({ ...objective, quantity_available: 0 }) -
+      additionalQuantity
+  )
 
 export const withObjectiveProgress = <T extends ObjectiveProgressInput>(
   objective: T

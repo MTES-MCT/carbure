@@ -35,6 +35,7 @@ export const operationCredit: Operation = {
   created_at: "2021-01-01T00:00:00Z",
   quantity_mj: 27000,
   avoided_emissions: 100,
+  year: 2025,
 }
 
 export const operationDebit: Operation = {

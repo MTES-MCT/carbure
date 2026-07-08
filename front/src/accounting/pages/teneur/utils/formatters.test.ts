@@ -9,11 +9,12 @@ describe("computeRemainingEnergyWithAdditionalQuantity", () => {
     target: 300,
     teneur_declared: 20,
     pending_teneur: 10,
+    quantity_available: 0,
   }
 
   it("returns the same value as computeObjectiveEnergy when no quantity is added", () => {
     expect(computeRemainingEnergyWithAdditionalQuantity(objective, 0)).toBe(
-      computeObjectiveEnergy(objective)
+      computeObjectiveEnergy({ ...objective })
     )
   })
 
