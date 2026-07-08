@@ -183,7 +183,7 @@ export const Qualicharge = () => {
                       }
                     )}
                   />
-                  {status === QualichargeTab.PENDING && (
+                  {status === QualichargeTab.PENDING ? (
                     <ActionBar>
                       <Button
                         priority="secondary"
@@ -200,6 +200,14 @@ export const Qualicharge = () => {
                           {t("Transférer des volumes")}
                         </Button>
                       )}
+                      <ActionBar.Grow />
+                      <ExportButton
+                        query={query}
+                        download={exportQualichargeCertificates}
+                      />
+                    </ActionBar>
+                  ) : (
+                    <ActionBar>
                       <ActionBar.Grow />
                       <ExportButton
                         query={query}

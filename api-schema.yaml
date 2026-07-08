@@ -10549,7 +10549,7 @@ paths:
               - l
           description: Specify the volume unit.
         - in: query
-          name: year
+          name: years
           schema:
             type: array
             items:
@@ -11543,7 +11543,7 @@ paths:
               - l
           description: Specify the volume unit.
         - in: query
-          name: year
+          name: years
           schema:
             type: array
             items:
@@ -11702,7 +11702,7 @@ paths:
               - sector
               - status
               - type
-              - year
+              - years
           description: Filter string to apply
           required: true
         - in: query
@@ -11905,7 +11905,7 @@ paths:
               - l
           description: Specify the volume unit.
         - in: query
-          name: year
+          name: years
           schema:
             type: array
             items:
@@ -17669,7 +17669,6 @@ components:
             $ref: "#/components/schemas/OperationDetail"
         year:
           type: integer
-          nullable: true
           readOnly: true
       required:
         - _depot
@@ -17886,7 +17885,6 @@ components:
           readOnly: true
         year:
           type: integer
-          nullable: true
           readOnly: true
       required:
         - _depot

@@ -1,20 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { Select } from "./select"
 import { ReactNode, useState } from "react"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { Select } from "./select"
 
-const meta: Meta<typeof Select<{ label: ReactNode; value: string }, string>> = {
+const meta: Meta<typeof Select<{ label: ReactNode; value: number }, number>> = {
   component: Select,
-  title: "common/components/Select",
+  title: "common/components/selects2/Select",
   args: {
     options: [
-      { label: "Item 1", value: "1" },
-      { label: "Item 2", value: "2" },
-      { label: "Item 3", value: "3" },
+      { label: "Item 1", value: 1 },
+      { label: "Item 2", value: 2 },
+      { label: "Item 3", value: 3 },
     ],
+    label: "Label of the select",
   },
   render: (args) => {
-    const [value, setValue] = useState<string | undefined>(args.value)
+    const [value, setValue] = useState<number | undefined>(args.value)
 
     return (
       <div style={{ width: "300px" }}>
@@ -25,62 +25,31 @@ const meta: Meta<typeof Select<{ label: ReactNode; value: string }, string>> = {
 }
 
 type Story = StoryObj<
-  typeof Select<{ label: ReactNode; value: string }, string>
+  typeof Select<{ label: ReactNode; value: number }, number>
 >
 
 export default meta
 
-export const DefaultList: Story = {
-  play: async ({ canvasElement }) => {
-    const { getByRole } = within(canvasElement)
-    const select = await waitFor(() => getByRole("button"))
+export const Filter: Story = {}
 
-    // For unknown reason, the dropdown does not have the good size
-    // when the story is rendered.
-    await new Promise((resolve) => setTimeout(resolve, 100))
-
-    await userEvent.click(select)
+export const Form: Story = {
+  args: {
+    variant: "form",
   },
 }
 
-export const Search: Story = {
-  ...DefaultList,
+export const FormReadOnly: Story = {
   args: {
-    search: true,
+    variant: "form",
+    readOnly: true,
+    value: 2,
   },
 }
 
-export const FullWidth: Story = {
+export const FormSuccessState: Story = {
   args: {
-    full: true,
-  },
-}
-
-export const CustomRenderer: Story = {
-  args: {
-    value: "1",
-    valueRenderer: (item) => <div style={{ color: "red" }}>{item.label}</div>,
-  },
-}
-
-export const OverflowValues: Story = {
-  args: {
-    options: [
-      {
-        label:
-          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
-        value: "10",
-      },
-    ],
-    value: "10",
-  },
-}
-
-export const LoadingState: Story = {
-  args: {
-    loading: true,
-  },
-  parameters: {
-    chromatic: { disableSnapshot: true },
+    variant: "form",
+    state: "success",
+    value: 2,
   },
 }

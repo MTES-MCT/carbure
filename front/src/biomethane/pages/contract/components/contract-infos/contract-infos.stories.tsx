@@ -6,12 +6,9 @@ import { generateWatchedFieldsProvider } from "biomethane/providers/watched-fiel
 import { updateContractOk } from "../../tests/api"
 import { okEntitySearch } from "common/__test__/api"
 import GLOBAL_MOCKS from "@storybook/mocks"
-import {
-  ContractInfosForm,
-  InstallationCategory,
-  TariffReference,
-} from "../../types"
-import { fireEvent, userEvent, waitFor, within } from "@storybook/test"
+import { ContractInfosForm, TariffReference } from "../../types"
+import { selectOptionByName } from "common/components/selects2/selects2.stories.utils"
+import { userEvent, waitFor, within } from "@storybook/test"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType } from "common/types"
 import { producer } from "common/__test__/data"
@@ -146,7 +143,8 @@ export const WatchedFieldsChanged: Story = {
     ]),
   ],
   play: async ({ canvasElement, step }) => {
-    const { getByRole, getAllByRole } = within(canvasElement)
+    const canvas = within(canvasElement)
+    const { getByRole, getByLabelText } = canvas
 
     await step("Open the editable card", async () => {
       const editButton = await waitFor(() =>
@@ -156,23 +154,18 @@ export const WatchedFieldsChanged: Story = {
     })
 
     await step("Change buyer", async () => {
-      const buyerAutocomplete = await waitFor(() => getByRole("textbox"))
+      const buyerAutocomplete = await waitFor(() => getByLabelText(/^Acheteur/))
       await userEvent.click(buyerAutocomplete)
 
       await userEvent.type(buyerAutocomplete, producer.name)
     })
 
     await step("Change installation_category", async () => {
-      // Couldn't found a better way to select the installation_category select
-      const selectInstallationCategory = await waitFor(
-        () => getAllByRole("combobox")[1]
-      )
-
-      if (!selectInstallationCategory)
-        throw new Error("Select installation_category not found")
-
-      await fireEvent.change(selectInstallationCategory, {
-        target: { value: InstallationCategory.INSTALLATION_CATEGORY_3 },
+      await selectOptionByName({
+        canvasElement,
+        name: "installation_category",
+        option:
+          "Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés",
       })
     })
 

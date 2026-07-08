@@ -3,10 +3,11 @@ from unittest.mock import Mock, patch
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
-from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
+from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from tiruert.models import Operation
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
+from transactions.factories.depot import DepotFactory
 from transactions.models import Depot
 
 
@@ -195,6 +196,45 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
         # Verify all returned lots have valid delivery_type
         for lot in valid_lots:
             self.assertIn(lot.delivery_type, ["RFC", "BLENDING", "DIRECT"])
+
+    def test_filter_fr_delivery_site_keeps_fr_and_no_delivery_site_lots(self):
+        """Should keep lots with a FR delivery site and lots with no delivery site."""
+        non_fr_depot = DepotFactory(country=Pays.objects.get(code_pays="DE"))
+
+        lot_non_fr = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="BLENDING",
+            volume=900,
+            carbure_delivery_site=non_fr_depot,
+        )
+
+        lot_without_delivery_site = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="BLENDING",
+            volume=800,
+            carbure_delivery_site=None,
+        )
+
+        lots = CarbureLot.objects.filter(
+            id__in=[
+                self.lot_blending_accepted.id,
+                lot_non_fr.id,
+                lot_without_delivery_site.id,
+            ]
+        )
+        filtered_lots = OperationService.filter_fr_delivery_site(lots)
+
+        self.assertEqual(filtered_lots.count(), 2)
+        self.assertSetEqual(
+            set(filtered_lots.values_list("id", flat=True)),
+            {self.lot_blending_accepted.id, lot_without_delivery_site.id},
+        )
 
 
 class OperationServiceRemoveExistingLotsTest(OperationServiceTestCase):

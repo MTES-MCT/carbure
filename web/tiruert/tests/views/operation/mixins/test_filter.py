@@ -118,6 +118,11 @@ class FilterBalanceEndpointTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.view = DummyFilterView()
+        # filters_balance instantiates OperationFilterForBalance directly, so patch it here
+        # once for every test in this class instead of the unused self.view.filterset_class.
+        self.mock_filterset_class = self.enterContext(
+            patch("tiruert.views.operation.mixins.filter.OperationFilterForBalance")
+        )
 
     def _make_drf_request(self, path):
         """Create a DRF Request from a Django request."""
@@ -128,11 +133,7 @@ class FilterBalanceEndpointTest(TestCase):
         """Setup mock queryset with given return values."""
         mock_operation_qs = Mock()
         self.view.queryset = mock_operation_qs
-
-        # Setup filterset mock
-        mock_filterset = Mock()
-        mock_filterset.qs = mock_operation_qs
-        self.view.filterset_class.return_value = mock_filterset
+        self.mock_filterset_class.return_value.qs = mock_operation_qs
 
         # Setup OperationDetail mock queryset
         mock_details_qs = Mock()

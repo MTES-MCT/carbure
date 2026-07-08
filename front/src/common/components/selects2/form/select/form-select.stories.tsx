@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { SelectDsfr } from "./select-dsfr"
+import { FormSelect } from "./form-select"
 import { ReactNode, useState } from "react"
 
 const meta: Meta<
-  typeof SelectDsfr<{ label: ReactNode; value: number }, number>
+  typeof FormSelect<{ label: ReactNode; value: number }, number>
 > = {
-  component: SelectDsfr,
-  title: "common/components/SelectDsfr",
+  component: FormSelect,
+  title: "common/components/selects2/FormSelect",
   args: {
     options: [
       { label: "Item 1", value: 1 },
@@ -20,7 +20,7 @@ const meta: Meta<
 
     return (
       <div style={{ width: "300px" }}>
-        <SelectDsfr
+        <FormSelect
           {...args}
           value={value}
           onChange={(item) => setValue(item)}
@@ -31,7 +31,7 @@ const meta: Meta<
 }
 
 type Story = StoryObj<
-  typeof SelectDsfr<{ label: ReactNode; value: number }, number>
+  typeof FormSelect<{ label: ReactNode; value: number }, number>
 >
 
 export default meta
