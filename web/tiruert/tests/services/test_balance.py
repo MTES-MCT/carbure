@@ -102,24 +102,6 @@ class BalanceServiceInitBalanceEntryTest(TestCase):
 class BalanceServiceGetKeyTest(TestCase):
     """Unit tests for BalanceService._get_key() method."""
 
-    def test_get_key_returns_sector_when_group_by_sector(self):
-        """Test _get_key returns operation.sector when grouping by sector."""
-        mock_operation = Mock()
-        mock_operation.sector = "ESSENCE"
-
-        result = BalanceService._get_key(mock_operation, BalanceService.GROUP_BY_SECTOR)
-
-        self.assertEqual(result, "ESSENCE")
-
-    def test_get_key_returns_category_when_group_by_category(self):
-        """Test _get_key returns operation.customs_category when grouping by category."""
-        mock_operation = Mock()
-        mock_operation.customs_category = MatierePremiere.CONV
-
-        result = BalanceService._get_key(mock_operation, BalanceService.GROUP_BY_CATEGORY)
-
-        self.assertEqual(result, MatierePremiere.CONV)
-
     def test_get_key_returns_base_tuple_for_default_grouping(self):
         """Test _get_key returns (sector, category, biofuel_code) for other groupings."""
         mock_operation = Mock()
@@ -214,7 +196,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail.volume = 20.0
         quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
+        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 30.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 5.0)
@@ -229,7 +211,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail.volume = 15.0
         quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, False, quantity)
+        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, False, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 10.0)
         self.assertEqual(balance["key1"]["quantity"]["debit"], 20.0)
@@ -254,7 +236,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail.avoided_emissions = 2.5
         quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
+        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 15.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 0.0)
@@ -280,7 +262,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail.avoided_emissions = 1.25
         quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
+        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["pending_teneur"], 0.0)
         self.assertEqual(balance["key1"]["declared_teneur"], 10.0)
@@ -296,7 +278,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail.volume = 10.0
         quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
 
-        BalanceService._update_quantity_and_teneur(balance, "key1", "key1", mock_operation, mock_detail, True, quantity)
+        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["quantity"]["credit"], 3.33)
 
@@ -418,54 +400,6 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
 
         # 0.335 -> 0.34 after first update, then 0.34 + 0.335 -> 0.68
         self.assertEqual(balance["key1"]["saved_emissions"], 0.68)
-
-
-class BalanceServiceUpdateGhgMinMaxTest(TestCase):
-    """Unit tests for BalanceService._update_ghg_min_max() method."""
-
-    def test_update_ghg_min_max_sets_initial_min_and_max(self):
-        """Test _update_ghg_min_max sets min and max when both are None."""
-        balance = {"key1": {"ghg_reduction_min": None, "ghg_reduction_max": None}}
-        mock_detail = Mock()
-        mock_detail.lot.ghg_reduction_red_ii = 65.5
-
-        BalanceService._update_ghg_min_max(balance, "key1", mock_detail)
-
-        self.assertEqual(balance["key1"]["ghg_reduction_min"], 65.5)
-        self.assertEqual(balance["key1"]["ghg_reduction_max"], 65.5)
-
-    def test_update_ghg_min_max_updates_min_when_new_value_is_lower(self):
-        """Test _update_ghg_min_max updates min when new value is lower than current."""
-        balance = {"key1": {"ghg_reduction_min": 70.0, "ghg_reduction_max": 80.0}}
-        mock_detail = Mock()
-        mock_detail.lot.ghg_reduction_red_ii = 60.0
-
-        BalanceService._update_ghg_min_max(balance, "key1", mock_detail)
-
-        self.assertEqual(balance["key1"]["ghg_reduction_min"], 60.0)
-        self.assertEqual(balance["key1"]["ghg_reduction_max"], 80.0)
-
-    def test_update_ghg_min_max_updates_max_when_new_value_is_higher(self):
-        """Test _update_ghg_min_max updates max when new value is higher than current."""
-        balance = {"key1": {"ghg_reduction_min": 60.0, "ghg_reduction_max": 70.0}}
-        mock_detail = Mock()
-        mock_detail.lot.ghg_reduction_red_ii = 85.0
-
-        BalanceService._update_ghg_min_max(balance, "key1", mock_detail)
-
-        self.assertEqual(balance["key1"]["ghg_reduction_min"], 60.0)
-        self.assertEqual(balance["key1"]["ghg_reduction_max"], 85.0)
-
-    def test_update_ghg_min_max_keeps_existing_when_new_value_is_between(self):
-        """Test _update_ghg_min_max keeps existing min/max when new value is between them."""
-        balance = {"key1": {"ghg_reduction_min": 60.0, "ghg_reduction_max": 80.0}}
-        mock_detail = Mock()
-        mock_detail.lot.ghg_reduction_red_ii = 70.0
-
-        BalanceService._update_ghg_min_max(balance, "key1", mock_detail)
-
-        self.assertEqual(balance["key1"]["ghg_reduction_min"], 60.0)
-        self.assertEqual(balance["key1"]["ghg_reduction_max"], 80.0)
 
 
 class BalanceServiceCalculateBalanceIntegrationTest(TestCase):

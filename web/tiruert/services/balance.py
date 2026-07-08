@@ -5,7 +5,8 @@ from django.db.models import Prefetch
 
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
-from tiruert.services.balance_sql import calculate_balance_with_annotations
+from tiruert.services.balance_annotations import calculate_balance_with_annotations
+from tiruert.services.balance_filters import apply_operation_detail_filters
 
 
 class BalanceService:
@@ -136,27 +137,7 @@ class BalanceService:
         detail_filters keys: ges_bound_min, ges_bound_max, feedstock, origin_country, lot_ids
         """
         details_qs = OperationDetail.objects.select_related("lot")
-
-        if detail_filters:
-            ges_min = detail_filters.get("ges_bound_min")
-            ges_max = detail_filters.get("ges_bound_max")
-            if ges_min is not None and ges_max is not None:
-                details_qs = details_qs.filter(
-                    lot__ghg_reduction_red_ii__gte=float(ges_min),
-                    lot__ghg_reduction_red_ii__lte=float(ges_max),
-                )
-
-            feedstock = detail_filters.get("feedstock")
-            if feedstock:
-                details_qs = details_qs.filter(lot__feedstock__code__in=feedstock)
-
-            origin_country = detail_filters.get("origin_country")
-            if origin_country:
-                details_qs = details_qs.filter(lot__country_of_origin__code_pays__in=origin_country)
-
-            lot_ids = detail_filters.get("lot_ids")
-            if lot_ids is not None:
-                details_qs = details_qs.filter(lot_id__in=lot_ids)
+        details_qs = apply_operation_detail_filters(details_qs, detail_filters)
 
         return operations.prefetch_related(Prefetch("details", queryset=details_qs, to_attr="prefetched_details"))
 

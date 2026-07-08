@@ -19,6 +19,7 @@ from django.db.models import (
 from core.models import Biocarburant
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
+from tiruert.services.balance_filters import apply_operation_detail_filters
 
 
 def _get_sector_expression():
@@ -68,33 +69,6 @@ def _get_avoided_emissions_expression():
         / Value(1000000.0),
         output_field=FloatField(),
     )
-
-
-def _apply_detail_filters(details_qs, detail_filters=None):
-    if not detail_filters:
-        return details_qs
-
-    ges_min = detail_filters.get("ges_bound_min")
-    ges_max = detail_filters.get("ges_bound_max")
-    if ges_min is not None and ges_max is not None:
-        details_qs = details_qs.filter(
-            lot__ghg_reduction_red_ii__gte=float(ges_min),
-            lot__ghg_reduction_red_ii__lte=float(ges_max),
-        )
-
-    feedstock = detail_filters.get("feedstock")
-    if feedstock:
-        details_qs = details_qs.filter(lot__feedstock__code__in=feedstock)
-
-    origin_country = detail_filters.get("origin_country")
-    if origin_country:
-        details_qs = details_qs.filter(lot__country_of_origin__code_pays__in=origin_country)
-
-    lot_ids = detail_filters.get("lot_ids")
-    if lot_ids is not None:
-        details_qs = details_qs.filter(lot_id__in=lot_ids)
-
-    return details_qs
 
 
 def _build_common_context(entity_id, unit, date_from):
@@ -354,7 +328,7 @@ def calculate_balance_with_annotations(operations, entity_id, group_by, unit, da
         operation__in=operations,
         operation__status__in=Operation.ACTIVE_STATUSES,
     )
-    details_qs = _apply_detail_filters(details_qs, detail_filters)
+    details_qs = apply_operation_detail_filters(details_qs, detail_filters)
 
     context = _build_common_context(entity_id, unit, date_from)
 
