@@ -1,13 +1,32 @@
-import { Overlay } from "common/components/scaffold"
 import css from "./container.module.css"
 import { Link } from "react-router-dom"
 import marianne from "common/assets/images/Marianne.svg"
 import { Title } from "common/components/title"
 import cl from "clsx"
+import { Dialog, DialogProps } from "common/components/dialog2"
+
+export const DialogContainerSpacing = () => {
+  return <div style={{ marginBottom: "var(--spacing-8w)" }} />
+}
+export const DialogContainer = (props: DialogProps) => {
+  return (
+    <Dialog {...props} className={css["dialog-container"]}>
+      <header>
+        <Link to="/" className={css.logo}>
+          <img src={marianne} alt="marianne logo" />
+          <Title is="h1" style={{ textAlign: "center" }}>
+            CarbuRe
+          </Title>
+        </Link>
+      </header>
+      {props.children}
+    </Dialog>
+  )
+}
 
 export const Container = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Overlay className={css.container}>
+    <div className={css.container}>
       <div className={css["container-content"]}>
         <header>
           <Link to="/" className={css.logo}>
@@ -19,7 +38,7 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
         </header>
         {children}
       </div>
-    </Overlay>
+    </div>
   )
 }
 

@@ -14,7 +14,13 @@ import { Button } from "common/components/button2"
 import * as api from "../api"
 import { LoaderLine } from "common/components/icon"
 import { Form, useForm } from "common/components/form2"
-import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
+import {
+  Container,
+  Content,
+  DialogContainer,
+  FooterAuth,
+  Section,
+} from "auth/layouts/container"
 import Alert from "@codegouvfr/react-dsfr/Alert"
 import { Text } from "common/components/text"
 import { addQueryParams, ROUTE_URLS } from "common/utils/routes"
@@ -129,7 +135,7 @@ export const ActivateRequest = () => {
   })
 
   return (
-    <Container>
+    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.REGISTER)}>
       <Content>
         <Section>
           {t(
@@ -151,12 +157,6 @@ export const ActivateRequest = () => {
         </Section>
         <FooterAuth asideX>
           <Button
-            onClick={() => navigate(ROUTE_URLS.AUTH.REGISTER)}
-            priority="secondary"
-          >
-            {t("Annuler")}
-          </Button>
-          <Button
             loading={requestActivationLink.loading}
             type="submit"
             nativeButtonProps={{ form: "activate-request" }}
@@ -165,7 +165,7 @@ export const ActivateRequest = () => {
           </Button>
         </FooterAuth>
       </Content>
-    </Container>
+    </DialogContainer>
   )
 }
 

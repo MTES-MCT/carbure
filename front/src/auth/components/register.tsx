@@ -6,16 +6,24 @@ import { TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
-import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
+import {
+  Container,
+  Content,
+  DialogContainer,
+  DialogContainerSpacing,
+  FooterAuth,
+  Section,
+} from "auth/layouts/container"
 import { Title } from "common/components/title"
 import {
   PasswordInput,
   usePasswordValidation,
 } from "auth/components/password-input"
+import { ActivateRequest } from "./activate"
 import { Text } from "common/components/text"
 import Alert from "@codegouvfr/react-dsfr/Alert"
-import { Divider } from "common/components/divider"
 import { ROUTE_URLS } from "common/utils/routes"
+import HashRoute from "common/components/hash-route"
 
 export const Register = () => {
   const { t } = useTranslation()
@@ -102,10 +110,7 @@ export const Register = () => {
         >
           {t("Je n'ai pas reçu le lien d'activation")}
         </Button>
-        <FooterAuth>
-          <Button priority="secondary" linkProps={{ to: ROUTE_URLS.HOME }}>
-            {t("Annuler")}
-          </Button>
+        <FooterAuth asideX>
           <Button
             loading={register.loading}
             type="submit"
@@ -114,29 +119,19 @@ export const Register = () => {
             {t("Créer un nouveau compte")}
           </Button>
         </FooterAuth>
-        <Divider />
-        <Section>
-          <Title is="h4" as="h5" style={{ textAlign: "center" }}>
-            {t("Vous avez déjà un compte ?")}
-          </Title>
-          <Button
-            priority="secondary"
-            linkProps={{ to: ROUTE_URLS.AUTH.LOGIN }}
-            center
-          >
-            {t("Se connecter")}
-          </Button>
-        </Section>
       </Content>
+      <HashRoute path="pending" element={<RegisterPending />} />
+      <HashRoute path="activate-request" element={<ActivateRequest />} />
     </Container>
   )
 }
 
 export const RegisterPending = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   return (
-    <Container>
+    <DialogContainer onClose={() => navigate(-1)}>
       <Content>
         <Section>
           <Alert
@@ -150,12 +145,9 @@ export const RegisterPending = () => {
               "Votre demande d'inscription a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra d'activer votre compte afin de pouvoir vous connecter."
             )}
           </Text>
+          <DialogContainerSpacing />
         </Section>
-
-        <Button priority="secondary" linkProps={{ to: ROUTE_URLS.HOME }} asideX>
-          {t("Retour")}
-        </Button>
       </Content>
-    </Container>
+    </DialogContainer>
   )
 }

@@ -10,8 +10,6 @@ import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { ROUTE_URLS } from "common/utils/routes"
-import { Divider } from "common/components/divider"
-
 const Login = () => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -80,13 +78,13 @@ const Login = () => {
           </div>
         </Form>
         <Section gap="lg">
-          <Button
+          {/* <Button
             customPriority="link"
             linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}
             center
           >
             {t("Je n'ai pas reçu le lien d'activation")}
-          </Button>
+          </Button> */}
           <Button
             customPriority="link"
             linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}
@@ -96,10 +94,7 @@ const Login = () => {
           </Button>
         </Section>
 
-        <FooterAuth>
-          <Button priority="secondary" linkProps={{ to: ROUTE_URLS.HOME }}>
-            {t("Annuler")}
-          </Button>
+        <FooterAuth asideX>
           <Button
             loading={login.loading}
             type="submit"
@@ -108,19 +103,6 @@ const Login = () => {
             {t("Se connecter")}
           </Button>
         </FooterAuth>
-        <Divider />
-        <Section>
-          <Title is="h4" as="h5" style={{ textAlign: "center" }}>
-            {t("Vous n'avez pas de compte ?")}
-          </Title>
-          <Button
-            priority="secondary"
-            linkProps={{ to: ROUTE_URLS.AUTH.REGISTER }}
-            center
-          >
-            {t("S'inscrire")}
-          </Button>
-        </Section>
       </Content>
     </Container>
   )
