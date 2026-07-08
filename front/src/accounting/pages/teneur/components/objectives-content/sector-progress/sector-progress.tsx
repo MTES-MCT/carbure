@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next"
-import { formatSector } from "accounting/utils/formatters"
+import {
+  formatAccountingNumber,
+  formatSector,
+} from "accounting/utils/formatters"
 import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { SectorObjective } from "../../../types"
@@ -39,9 +42,7 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                   target_percent: formatNumber(sector.target_percent),
                 }
               )}
-              mainValue={formatNumber(progress.total_teneur_declared, {
-                fractionDigits: 2,
-              })}
+              mainValue={formatAccountingNumber(progress.total_teneur_declared)}
               mainText={t("GJ")}
               baseQuantity={progress.base_quantity}
               targetQuantity={progress.target_quantity}

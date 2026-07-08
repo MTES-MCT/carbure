@@ -6,6 +6,7 @@ import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 import { ExtendedUnit } from "common/types"
+import { formatAccountingNumber } from "accounting/utils/formatters"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -23,9 +24,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
         <Trans
           i18nKey="Base calculée : {{energy_basis}} GJ"
           values={{
-            energy_basis: formatNumber(objective?.energy_basis ?? 0, {
-              fractionDigits: 2,
-            }),
+            energy_basis: formatAccountingNumber(objective?.energy_basis ?? 0),
           }}
         />
       }

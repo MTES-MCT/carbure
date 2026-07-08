@@ -11,6 +11,10 @@ import { ExtendedUnitType } from "common/types"
 import { useEffect } from "react"
 import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
 import { floorNumber } from "common/utils/formatters"
+import { FRACTION_DIGITS_OPERATION } from "accounting/config"
+
+const floorAvailableQuantity = (quantity?: number) =>
+  floorNumber(quantity ?? 0, FRACTION_DIGITS_OPERATION)
 
 const debouncedGetBalance = debounce(
   (entityId, biofuel, sector, category, filters, unit) =>
@@ -23,7 +27,7 @@ const debouncedGetBalance = debounce(
       ...mapAdvancedFiltersForPayload(filters),
       unit,
     }).then((res) => {
-      const quantity = floorNumber(res.data.total_quantity ?? 0, 2)
+      const quantity = floorAvailableQuantity(res.data.total_quantity)
 
       if (quantity <= 1) return undefined
 
@@ -59,7 +63,7 @@ export const useAvailableBalance = ({
       executeOnMount: false,
       executeOnUpdate: false,
       onSuccess: (data) => {
-        const availableBalance = data?.available_balance ?? 0
+        const availableBalance = floorAvailableQuantity(data?.available_balance)
 
         setField("availableBalance", availableBalance)
         setField("balance", {
@@ -73,7 +77,10 @@ export const useAvailableBalance = ({
   // When the component is mounted, set the available balance in the form only if it is not already set
   useEffect(() => {
     if (!value.availableBalance)
-      setField("availableBalance", balance.available_balance)
+      setField(
+        "availableBalance",
+        floorAvailableQuantity(balance.available_balance)
+      )
   }, [])
 
   return {

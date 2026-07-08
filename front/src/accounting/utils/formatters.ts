@@ -1,3 +1,4 @@
+import { FRACTION_DIGITS_OPERATION } from "accounting/config"
 import {
   ElecOperationSector,
   ElecOperationsStatus,
@@ -8,6 +9,12 @@ import {
   OperationType,
 } from "accounting/types"
 import { apiTypes } from "common/services/api-fetch.types"
+import { ExtendedUnitType } from "common/types"
+import {
+  formatNumber,
+  FormatNumberOptions,
+  formatUnit,
+} from "common/utils/formatters"
 import i18next from "i18next"
 
 /**
@@ -114,3 +121,17 @@ export const formatOperation = (
 ) => ({
   quantity_renewable: operation.quantity * operation.renewable_energy_share,
 })
+
+export const formatAccountingUnit = (value: number, unit: ExtendedUnitType) =>
+  formatUnit(value, unit, {
+    fractionDigits: FRACTION_DIGITS_OPERATION,
+  })
+
+export const formatAccountingNumber = (
+  value: number,
+  options?: FormatNumberOptions
+) =>
+  formatNumber(value, {
+    fractionDigits: FRACTION_DIGITS_OPERATION,
+    ...options,
+  })

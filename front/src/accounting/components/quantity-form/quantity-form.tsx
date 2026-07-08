@@ -15,6 +15,7 @@ import {
 import { ExtendedUnitType } from "common/types"
 import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
 import { formatNumber } from "common/utils/formatters"
+import { formatAccountingUnit } from "accounting/utils/formatters"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -93,7 +94,9 @@ const QuantitySection = ({
         "quantity",
         t(
           "La quantité déclarée est supérieure à la quantité maximale autorisée ({{max}}). Merci de modifier la quantité.",
-          { max: formatUnit(quantityMax, { fractionDigits: 2 }) }
+          {
+            max: formatAccountingUnit(quantityMax, unit),
+          }
         )
       )
       return
@@ -148,7 +151,7 @@ const QuantitySection = ({
   })
 
   const quantityMaxLabel = value.availableBalance
-    ? `(${t("solde")}: ${formatUnit(value.availableBalance, { fractionDigits: 2, mode: "floor" })})`
+    ? `(${t("solde")}: ${formatAccountingUnit(value.availableBalance, unit)})`
     : undefined
 
   // When the component is mounted, reset the quantity declared if the quantity is greater than the quantity max

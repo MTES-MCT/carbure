@@ -3,10 +3,10 @@ import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { UnconstrainedCategoryObjective } from "../../../types"
 import { CardGrid } from "../../card-grid"
-import { formatNumber } from "common/utils/formatters"
 import { useFormatters } from "accounting/hooks/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
+import { formatAccountingNumber } from "accounting/utils/formatters"
 
 type UnconstrainedCategoriesProgressProps = {
   categories?: UnconstrainedCategoryObjective[]
@@ -35,9 +35,9 @@ export const UnconstrainedCategoriesProgress = ({
                 ? undefined
                 : () => onCategoryClick(category)
             }
-            mainValue={formatNumber(category.progress.total_teneur_declared, {
-              fractionDigits: 2,
-            })}
+            mainValue={formatAccountingNumber(
+              category.progress.total_teneur_declared
+            )}
             mainText={t("GJ")}
           >
             {isDeclarationInCurrentPeriod && (

@@ -5,8 +5,7 @@ import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
-import { ExtendedUnit } from "common/types"
+import { floorNumber, formatNumber } from "common/utils/formatters"
 import {
   BiofuelUnconstrainedCategoryObjective,
   CategoryObjective,
@@ -14,7 +13,10 @@ import {
   TargetType,
 } from "../../types"
 import { useMemo } from "react"
-import { computeObjectiveEnergy } from "../../utils/formatters"
+import {
+  computeObjectiveEnergy,
+  formatObjectiveGJ,
+} from "../../utils/formatters"
 
 type DeclareTeneurDialogProps = {
   values: DeclareTeneurDialogForm
@@ -48,9 +50,7 @@ export const useDeclareTeneurDialog = ({
         t(
           "La mise en teneur d'une quantité de {{quantity}} a été réalisée avec succès",
           {
-            quantity: formatUnit(values.quantity!, ExtendedUnit.GJ, {
-              fractionDigits: 2,
-            }),
+            quantity: formatObjectiveGJ(values.quantity!),
           }
         ),
         { variant: "success" }

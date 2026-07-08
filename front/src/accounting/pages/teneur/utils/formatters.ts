@@ -1,6 +1,8 @@
+import { FRACTION_DIGITS_OPERATION } from "accounting/config"
 import { BaseObjective, ObjectiveProgress } from "../types"
 import { ExtendedUnit } from "common/types"
-import { ceilNumber, floorNumber, formatUnit } from "common/utils/formatters"
+import { ceilNumber, floorNumber } from "common/utils/formatters"
+import { formatAccountingUnit } from "accounting/utils/formatters"
 
 type ObjectiveProgressInput = Pick<
   BaseObjective,
@@ -12,18 +14,30 @@ type ObjectiveProgressInput = Pick<
 export const computeObjectiveProgress = (
   objective: ObjectiveProgressInput
 ): ObjectiveProgress => {
-  const base_quantity = ceilNumber(objective.teneur_declared, 2)
-  const declared_quantity = ceilNumber(objective.pending_teneur, 2)
-  const target_quantity = floorNumber(objective.target ?? 0, 2)
+  const base_quantity = ceilNumber(
+    objective.teneur_declared,
+    FRACTION_DIGITS_OPERATION
+  )
+  const declared_quantity = ceilNumber(
+    objective.pending_teneur,
+    FRACTION_DIGITS_OPERATION
+  )
+  const target_quantity = floorNumber(
+    objective.target ?? 0,
+    FRACTION_DIGITS_OPERATION
+  )
   const total_teneur_declared = ceilNumber(
     objective.teneur_declared + objective.pending_teneur,
-    2
+    FRACTION_DIGITS_OPERATION
   )
   const remaining_energy = Math.max(
     0,
     target_quantity - base_quantity - declared_quantity
   )
-  const quantity_available = floorNumber(objective.quantity_available, 2)
+  const quantity_available = floorNumber(
+    objective.quantity_available,
+    FRACTION_DIGITS_OPERATION
+  )
 
   // If the target is not set, the objective is not met
   const is_objective_met =
@@ -44,7 +58,7 @@ export const computeObjectiveProgress = (
 }
 
 export const formatObjectiveGJ = (value: number) =>
-  formatUnit(value, ExtendedUnit.GJ, { fractionDigits: 2 })
+  formatAccountingUnit(value, ExtendedUnit.GJ)
 
 export const formatObjectiveCO2 = (value: number) =>
   formatUnit(value, ExtendedUnit.tCO2ev, { fractionDigits: 0 })

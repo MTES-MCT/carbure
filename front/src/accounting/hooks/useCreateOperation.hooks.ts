@@ -9,6 +9,7 @@ import { useUnit } from "common/hooks/unit"
 import { useMutation } from "common/hooks/async"
 import { useCallback } from "react"
 import { CreateOperationType, OperationsStatus } from "accounting/types"
+import { formatAccountingUnit } from "accounting/utils/formatters"
 
 export type UseCreateOperationProps = {
   onOperationCreated: () => void
@@ -25,13 +26,11 @@ export const useCreateOperation = ({
   const entity = useEntity()
   const notify = useNotify()
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
+  const { unit } = useUnit()
 
   const getSuccessMessage = useCallback(
     (operationType: CreateOperationType, quantity: number) => {
-      const quantityFormatted = formatUnit(quantity, {
-        fractionDigits: 2,
-      })
+      const quantityFormatted = formatAccountingUnit(quantity, unit)
       const messages: Partial<Record<CreateOperationType, string>> = {
         [CreateOperationType.TRANSFERT]: t(
           "Le transfert de droits d'une quantité de {{quantity}} a été réalisé avec succès",
@@ -49,7 +48,7 @@ export const useCreateOperation = ({
 
       return messages[operationType]
     },
-    [formatUnit, t]
+    [t, unit]
   )
   return useMutation(
     ({ draft }: { draft?: boolean } = {}) =>
