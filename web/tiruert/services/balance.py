@@ -5,6 +5,7 @@ from django.db.models import Prefetch
 
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
+from tiruert.services.balance_sql import calculate_balance_with_annotations
 
 
 class BalanceService:
@@ -12,7 +13,6 @@ class BalanceService:
     GROUP_BY_CATEGORY = "customs_category"
     GROUP_BY_LOT = "lot"
     GROUP_BY_DEPOT = "depot"
-    GROUP_BY_ALL = [GROUP_BY_SECTOR, GROUP_BY_CATEGORY, GROUP_BY_LOT, GROUP_BY_DEPOT]
     UNIT_CONVERSION_RULES = {
         "mj": ("pci_litre", 1),
         "gj": ("pci_litre", 0.001),
@@ -20,22 +20,11 @@ class BalanceService:
     }
 
     @staticmethod
-    def _get_key(operation, group_by, detail=None, depot=None, for_teneur=False):
+    def _get_key(operation, group_by, detail=None, depot=None):
         """
-        Determines the appropriate key based on the grouping type.
-
-        When for_teneur=True and grouping by sector, a TENEUR operation with a objective_sector
-        returns that sector instead of the biofuel's natural sector, so the teneur volume counts
-        toward the chosen sector objective.
+        Build grouping key for non-annotated balance paths (lot/depot).
         """
-        if group_by == BalanceService.GROUP_BY_SECTOR:
-            if for_teneur and operation.type == Operation.TENEUR and operation.objective_sector:
-                return operation.objective_sector
-            return operation.sector
-        elif group_by == BalanceService.GROUP_BY_CATEGORY:
-            return operation.customs_category
-
-        # Base key for other types of grouping
+        # Base key for lot/depot grouping
         key = (operation.sector, operation.customs_category, operation.biofuel.code)
 
         # Add additional elements to the key based on the grouping type
@@ -87,27 +76,26 @@ class BalanceService:
 
         return entry
 
-    def _update_quantity_and_teneur(balance, quantity_key, teneur_key, operation, detail, credit_operation, quantity):
+    def _update_quantity_and_teneur(balance, key, operation, detail, credit_operation, quantity):
         """
         Updates the balance entry with the details of the operation.
-        - quantity (credit/debit) is always updated under quantity_key (natural sector)
-        - pending_teneur/declared_teneur are updated under teneur_key (may differ for objective_sector)
+        For lot/depot grouping, quantity and teneur updates are applied on the same key.
         """
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
-            balance[teneur_key][teneur_type] += quantity
+            balance[key][teneur_type] += quantity
             # Round to 2 decimals after each operation to prevent float precision errors accumulation
-            balance[teneur_key][teneur_type] = round(balance[teneur_key][teneur_type], 2)
+            balance[key][teneur_type] = round(balance[key][teneur_type], 2)
 
             avoided_type = "pending_saved_emissions" if operation.status == Operation.PENDING else "declared_saved_emissions"
-            balance[teneur_key][avoided_type] += detail.avoided_emissions
+            balance[key][avoided_type] += detail.avoided_emissions
             # Round to 2 decimals after each operation to prevent float precision errors accumulation
-            balance[teneur_key][avoided_type] = round(balance[teneur_key][avoided_type], 2)
+            balance[key][avoided_type] = round(balance[key][avoided_type], 2)
 
         quantity_type = "credit" if credit_operation else "debit"
-        balance[quantity_key]["quantity"][quantity_type] += quantity
+        balance[key]["quantity"][quantity_type] += quantity
         # Round to 2 decimals after each operation to prevent float precision errors accumulation
-        balance[quantity_key]["quantity"][quantity_type] = round(balance[quantity_key]["quantity"][quantity_type], 2)
+        balance[key]["quantity"][quantity_type] = round(balance[key]["quantity"][quantity_type], 2)
 
     @staticmethod
     def _update_available_balance(balance, key, operation, detail, credit_operation, quantity):
@@ -130,21 +118,6 @@ class BalanceService:
     def _calculate_quantity(operation, detail, conversion_factor):
         return detail.volume * conversion_factor * operation.renewable_energy_share
 
-    @staticmethod
-    @staticmethod
-    def _update_ghg_min_max(balance, key, detail):
-        """
-        Updates the GHG min and max values in the balance entry
-        """
-        balance[key]["ghg_reduction_min"] = min(
-            filter(None, [balance[key].get("ghg_reduction_min"), detail.lot.ghg_reduction_red_ii])
-        )
-
-        balance[key]["ghg_reduction_max"] = max(
-            filter(None, [balance[key].get("ghg_reduction_max"), detail.lot.ghg_reduction_red_ii])
-        )
-
-    @staticmethod
     @staticmethod
     def resolve_lot_ids_for_durability_period(operations, durability_period):
         """
@@ -188,6 +161,52 @@ class BalanceService:
         return operations.prefetch_related(Prefetch("details", queryset=details_qs, to_attr="prefetched_details"))
 
     @staticmethod
+    def _calculate_balance_for_lot_or_depot(operations, entity_id, group_by, unit, date_from=None, detail_filters=None):
+        # Use a defaultdict with a factory function that creates an appropriate balance entry
+        balance = defaultdict(partial(BalanceService._init_balance_entry, unit))
+        is_depot_grouping = group_by == BalanceService.GROUP_BY_DEPOT
+
+        operations = operations.filter(status__in=Operation.ACTIVE_STATUSES)
+
+        operations = BalanceService._prefetch_filtered_details(operations, detail_filters)
+
+        for operation in operations:
+            credit_operation = operation.is_credit(entity_id)
+
+            depot = None
+            if is_depot_grouping:
+                depot = operation.to_depot if credit_operation else operation.from_depot
+                if depot is None:
+                    continue
+
+            conversion_factor = BalanceService._get_conversion_factor(operation, unit)
+            last_key = None
+
+            for detail in operation.prefetched_details:
+                key = BalanceService._get_key(operation, group_by, detail, depot)
+                last_key = key
+                balance[key]["sector"] = operation.sector
+                balance[key]["customs_category"] = operation.customs_category
+                balance[key]["biofuel"] = operation.biofuel
+
+                if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
+                    quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
+                    BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, quantity)
+
+                    if date_from is None or operation.created_at >= date_from:
+                        BalanceService._update_quantity_and_teneur(
+                            balance, key, operation, detail, credit_operation, quantity
+                        )
+
+            if last_key is not None and operation.status in [Operation.PENDING, Operation.DRAFT]:
+                balance[last_key]["pending_operations"] += 1
+
+        if is_depot_grouping:
+            balance = BalanceService._update_depot_debit_with_teneur_and_transfert(entity_id, balance, operations)
+
+        return balance
+
+    @staticmethod
     def calculate_balance(operations, entity_id, group_by, unit, date_from=None, detail_filters=None):
         """
         Calculates balances based on the specified grouping
@@ -204,58 +223,25 @@ class BalanceService:
         Returns:
         - A dictionary containing the calculated balances based on the specified grouping
         """
-        # Use a defaultdict with a factory function that creates an appropriate balance entry
-        balance = defaultdict(partial(BalanceService._init_balance_entry, unit))
+        if group_by in [None, BalanceService.GROUP_BY_SECTOR, BalanceService.GROUP_BY_CATEGORY]:
+            return calculate_balance_with_annotations(
+                operations,
+                entity_id,
+                group_by,
+                unit,
+                date_from,
+                detail_filters,
+                init_entry=BalanceService._init_balance_entry,
+            )
 
-        operations = operations.filter(status__in=Operation.ACTIVE_STATUSES)
-
-        operations = BalanceService._prefetch_filtered_details(operations, detail_filters)
-
-        for operation in operations:
-            credit_operation = operation.is_credit(entity_id)
-
-            depot = None
-            if group_by == BalanceService.GROUP_BY_DEPOT:
-                depot = operation.to_depot if credit_operation else operation.from_depot
-                if depot is None:
-                    continue
-
-            conversion_factor = BalanceService._get_conversion_factor(operation, unit)
-
-            for detail in operation.prefetched_details:
-                key = BalanceService._get_key(operation, group_by, detail, depot)
-                teneur_key = BalanceService._get_key(operation, group_by, detail, depot, for_teneur=True)
-
-                if group_by != BalanceService.GROUP_BY_CATEGORY:
-                    balance[key]["sector"] = operation.sector
-                    if teneur_key != key:
-                        balance[teneur_key]["sector"] = operation.objective_sector
-
-                if group_by != BalanceService.GROUP_BY_SECTOR:
-                    balance[key]["customs_category"] = operation.customs_category
-                    if group_by != BalanceService.GROUP_BY_CATEGORY:
-                        balance[key]["biofuel"] = operation.biofuel
-
-                if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
-                    quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
-                    BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, quantity)
-
-                    if date_from is None or operation.created_at >= date_from:
-                        BalanceService._update_quantity_and_teneur(
-                            balance, key, teneur_key, operation, detail, credit_operation, quantity
-                        )
-
-                # Update GHG reduction min and max values
-                if group_by not in BalanceService.GROUP_BY_ALL:
-                    BalanceService._update_ghg_min_max(balance, key, detail)
-
-            if "key" in locals() is not None and operation.status in [Operation.PENDING, Operation.DRAFT]:
-                balance[key]["pending_operations"] += 1
-
-        if group_by == BalanceService.GROUP_BY_DEPOT:
-            balance = BalanceService._update_depot_debit_with_teneur_and_transfert(entity_id, balance, operations)
-
-        return balance
+        return BalanceService._calculate_balance_for_lot_or_depot(
+            operations,
+            entity_id,
+            group_by,
+            unit,
+            date_from,
+            detail_filters,
+        )
 
     @staticmethod
     def _update_depot_debit_with_teneur_and_transfert(entity_id, balance, operations):
