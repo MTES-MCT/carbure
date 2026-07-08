@@ -3,13 +3,19 @@ import { useNavigate } from "react-router-dom"
 import { Button } from "common/components/button2"
 import { Form, useForm } from "common/components/form2"
 import { TextInput } from "common/components/inputs2"
-import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
+import { Container, Content, Section } from "auth/layouts/container"
 import { Title } from "common/components/title"
 import { PasswordInput } from "auth/components/password-input"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { ROUTE_URLS } from "common/utils/routes"
+import HashRoute from "common/components/hash-route"
+import OtpDialog from "./otp"
+import {
+  ResetPasswordPending,
+  ResetPasswordRequest,
+} from "auth/components/password"
 const Login = () => {
   const { t } = useTranslation()
   const notify = useNotify()
@@ -94,16 +100,24 @@ const Login = () => {
           </Button>
         </Section>
 
-        <FooterAuth asideX>
-          <Button
-            loading={login.loading}
-            type="submit"
-            nativeButtonProps={{ form: "login" }}
-          >
-            {t("Se connecter")}
-          </Button>
-        </FooterAuth>
+        <Button
+          loading={login.loading}
+          type="submit"
+          nativeButtonProps={{ form: "login" }}
+          asideX
+        >
+          {t("Se connecter")}
+        </Button>
       </Content>
+      <HashRoute path="otp" element={<OtpDialog />} />
+      <HashRoute
+        path="reset-password-request"
+        element={<ResetPasswordRequest />}
+      />
+      <HashRoute
+        path="reset-password-pending"
+        element={<ResetPasswordPending />}
+      />
     </Container>
   )
 }

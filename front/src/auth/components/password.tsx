@@ -7,7 +7,13 @@ import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { useToken } from "./activate"
 import { Form, useForm } from "common/components/form2"
-import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
+import {
+  Container,
+  Content,
+  DialogContainer,
+  DialogContainerSpacing,
+  Section,
+} from "auth/layouts/container"
 import { TextInput } from "common/components/inputs2"
 import { PasswordInput, usePasswordValidation } from "./password-input"
 import { Text } from "common/components/text"
@@ -35,7 +41,7 @@ export const ResetPasswordRequest = () => {
   })
 
   return (
-    <Container>
+    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
       <Content>
         <Section>
           <p>
@@ -56,24 +62,17 @@ export const ResetPasswordRequest = () => {
             />
           </Form>
         </Section>
-        <FooterAuth asideX>
-          <Button
-            onClick={() => navigate(ROUTE_URLS.AUTH.LOGIN)}
-            priority="secondary"
-          >
-            {t("Annuler")}
-          </Button>
-          <Button
-            loading={requestPasswordReset.loading}
-            disabled={!value.email}
-            type="submit"
-            nativeButtonProps={{ form: "reset-password-request" }}
-          >
-            {t("Demander une réinitialisation")}
-          </Button>
-        </FooterAuth>
+        <Button
+          loading={requestPasswordReset.loading}
+          disabled={!value.email}
+          type="submit"
+          nativeButtonProps={{ form: "reset-password-request" }}
+          asideX
+        >
+          {t("Demander une réinitialisation")}
+        </Button>
       </Content>
-    </Container>
+    </DialogContainer>
   )
 }
 
@@ -82,7 +81,7 @@ export const ResetPasswordPending = () => {
   const navigate = useNavigate()
 
   return (
-    <Container>
+    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
       <Content>
         <Section>
           <Alert
@@ -98,18 +97,10 @@ export const ResetPasswordPending = () => {
               "Si un compte existe avec cet email, vous recevrez un email sous peu contenant un lien qui vous permettra de modifier votre mot de passe."
             )}
           </Text>
+          <DialogContainerSpacing />
         </Section>
-
-        <FooterAuth asideX>
-          <Button
-            priority="secondary"
-            onClick={() => navigate(ROUTE_URLS.HOME)}
-          >
-            {t("Retour")}
-          </Button>
-        </FooterAuth>
       </Content>
-    </Container>
+    </DialogContainer>
   )
 }
 
@@ -178,21 +169,15 @@ export const ResetPassword = () => {
             />
           </Form>
         </Section>
-        <FooterAuth>
-          <Button
-            onClick={() => navigate(ROUTE_URLS.HOME)}
-            priority="secondary"
-          >
-            {t("Annuler")}
-          </Button>
-          <Button
-            loading={resetPassword.loading}
-            type="submit"
-            nativeButtonProps={{ form: "reset-password" }}
-          >
-            {t("Enregistrer le mot de passe")}
-          </Button>
-        </FooterAuth>
+
+        <Button
+          loading={resetPassword.loading}
+          type="submit"
+          nativeButtonProps={{ form: "reset-password" }}
+          asideX
+        >
+          {t("Enregistrer le mot de passe")}
+        </Button>
       </Content>
     </Container>
   )

@@ -155,15 +155,14 @@ export const ActivateRequest = () => {
             />
           </Form>
         </Section>
-        <FooterAuth asideX>
-          <Button
-            loading={requestActivationLink.loading}
-            type="submit"
-            nativeButtonProps={{ form: "activate-request" }}
-          >
-            {t("Renvoyer le lien d'activation")}
-          </Button>
-        </FooterAuth>
+        <Button
+          loading={requestActivationLink.loading}
+          type="submit"
+          nativeButtonProps={{ form: "activate-request" }}
+          asideX
+        >
+          {t("Renvoyer le lien d'activation")}
+        </Button>
       </Content>
     </DialogContainer>
   )

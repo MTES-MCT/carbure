@@ -42,6 +42,10 @@ export const usePasswordValidation = (
       label: t("12 caractères minimum"),
       test: (v) => v.length >= MIN_LENGTH,
     },
+    {
+      label: t("Le mot de passe ne peut pas être entièrement numérique"),
+      test: (v) => !/^\d+$/.test(v),
+    },
   ]
 
   const messages: PasswordMessage[] = rules.map((rule) => ({

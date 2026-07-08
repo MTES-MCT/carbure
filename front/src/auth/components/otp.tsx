@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { Form, useForm } from "common/components/form2"
 import { TextInput } from "common/components/inputs2"
-import { Container, Content, FooterAuth, Section } from "auth/layouts/container"
+import { Content, DialogContainer, Section } from "auth/layouts/container"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
@@ -56,7 +56,7 @@ const OTP = () => {
   }, [searchParams, execVerifyOTP])
 
   return (
-    <Container>
+    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
       <Content>
         <Section>
           <Text>
@@ -90,23 +90,16 @@ const OTP = () => {
           </Button>
         </Section>
 
-        <FooterAuth>
-          <Button
-            onClick={() => navigate(ROUTE_URLS.HOME)}
-            priority="secondary"
-          >
-            {t("Annuler")}
-          </Button>
-          <Button
-            loading={verifyOTP.loading}
-            type="submit"
-            nativeButtonProps={{ form: "otp" }}
-          >
-            {t("Se connecter au compte")}
-          </Button>
-        </FooterAuth>
+        <Button
+          loading={verifyOTP.loading}
+          type="submit"
+          nativeButtonProps={{ form: "otp" }}
+          asideX
+        >
+          {t("Se connecter au compte")}
+        </Button>
       </Content>
-    </Container>
+    </DialogContainer>
   )
 }
 

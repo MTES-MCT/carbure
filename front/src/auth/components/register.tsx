@@ -11,7 +11,6 @@ import {
   Content,
   DialogContainer,
   DialogContainerSpacing,
-  FooterAuth,
   Section,
 } from "auth/layouts/container"
 import { Title } from "common/components/title"
@@ -110,15 +109,14 @@ export const Register = () => {
         >
           {t("Je n'ai pas reçu le lien d'activation")}
         </Button>
-        <FooterAuth asideX>
-          <Button
-            loading={register.loading}
-            type="submit"
-            nativeButtonProps={{ form: "register" }}
-          >
-            {t("Créer un nouveau compte")}
-          </Button>
-        </FooterAuth>
+        <Button
+          loading={register.loading}
+          type="submit"
+          nativeButtonProps={{ form: "register" }}
+          asideX
+        >
+          {t("Créer un nouveau compte")}
+        </Button>
       </Content>
       <HashRoute path="pending" element={<RegisterPending />} />
       <HashRoute path="activate-request" element={<ActivateRequest />} />

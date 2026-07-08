@@ -6,7 +6,7 @@ import cl from "clsx"
 import { Dialog, DialogProps } from "common/components/dialog2"
 
 export const DialogContainerSpacing = () => {
-  return <div style={{ marginBottom: "var(--spacing-8w)" }} />
+  return <div style={{ marginBottom: "var(--spacing-6w)" }} />
 }
 export const DialogContainer = (props: DialogProps) => {
   return (
