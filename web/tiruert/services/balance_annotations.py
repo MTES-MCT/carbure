@@ -17,6 +17,7 @@ from django.db.models import (
 )
 
 from core.models import Biocarburant
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
 from tiruert.services.balance_filters import apply_operation_detail_filters
@@ -26,7 +27,8 @@ def _get_sector_expression():
     return Case(
         When(operation__biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
         When(operation__biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
-        default=Value(Operation.CARBUREACTEUR),
+        When(operation__biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
+        default=Value(None),
         output_field=CharField(),
     )
 
