@@ -1,6 +1,6 @@
 code,nom,fermentescible,graisse,is_double_compte,makes_huile_vegetale,is_displayed,is_industrial_waste,category
 ALGUES,Algues,1,1,1,0,1,0,ANN-IX-A
-AMIDON_RESIDUEL,Amidon résiduel,1,0,0,0,1,0,OTHER
+AMIDON_RESIDUEL,Amidon résiduel,1,0,0,0,1,0,EP2AM
 BAGASSE,Bagasse,1,0,1,0,1,0,ANN-IX-A
 BALLES,Balles (enveloppes),1,0,1,0,0,0,ANN-IX-A
 BETTERAVE,Betterave,1,0,0,0,1,0,CONV
