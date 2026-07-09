@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.db.models import IntegerField
+from django.db.models.functions import Cast, Coalesce, Substr
 
 from tiruert.models import (
     FossilFuel,
@@ -57,6 +59,41 @@ class ObjectiveAdmin(admin.ModelAdmin):
             return f"{obj.penalty / 100} €"
 
 
+class OperationYearFilter(admin.SimpleListFilter):
+    """
+    A computed filter to list operations by year in django admin
+    """
+
+    title = "Année"
+    parameter_name = "year"
+
+    def annotate_year(self, queryset):
+        return queryset.annotate(
+            year=Coalesce(
+                "declaration_year",
+                Cast(
+                    Substr("durability_period", 1, 4),
+                    output_field=IntegerField(),
+                ),
+            )
+        )
+
+    def lookups(self, request, model_admin):
+        years = (
+            self.annotate_year(model_admin.get_queryset(request))
+            .exclude(year__isnull=True)
+            .values_list("year", flat=True)
+            .distinct()
+            .order_by("year")
+        )
+        return [(year, year) for year in years]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return self.annotate_year(queryset).filter(year=self.value())
+        return queryset
+
+
 @admin.register(Operation)
 class OperationAdmin(admin.ModelAdmin):
     list_display = [
@@ -70,7 +107,7 @@ class OperationAdmin(admin.ModelAdmin):
         "validation_date",
     ]
     search_fields = ["credited_entity__name", "debited_entity__name", "credited_entity__id", "debited_entity__id"]
-    list_filter = ["type", "status"]
+    list_filter = ["type", "status", OperationYearFilter]
     actions = [perform_bulk_operations_validation]
 
 
