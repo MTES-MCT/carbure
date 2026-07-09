@@ -9488,6 +9488,14 @@ paths:
               description: |-
                 * `CREDIT` - CREDIT
                 * `DEBIT` - DEBIT
+        - in: query
+          name: years
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -9906,6 +9914,7 @@ paths:
               - period
               - status
               - type
+              - years
           description: Filter string to apply
           required: true
         - in: query
@@ -10005,6 +10014,14 @@ paths:
               description: |-
                 * `CREDIT` - CREDIT
                 * `DEBIT` - DEBIT
+        - in: query
+          name: years
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
