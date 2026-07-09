@@ -1,3 +1,4 @@
+from math import floor
 from typing import Optional
 
 import numpy as np
@@ -70,6 +71,9 @@ class TeneurService:
         """
 
         # Sanity checks on inputs
+        # Round target volume (L) to 2 decimals, because at the end we return 2 decimals precision
+        target_volume = floor(target_volume * 100) / 100
+
         if batches_volumes.sum() < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
@@ -221,7 +225,6 @@ class TeneurService:
         # Cap the running total so the sum never exceeds the requested target volume:
         # accumulated rounding can push the total slightly above target, so the last
         # selected batch is reduced to absorb the difference.
-        target_volume_clean = round(target_volume, 2)
         allocated_volume = 0.0
         selected_batches_volumes = {}
         for idx in nonzero_indices:
@@ -235,7 +238,7 @@ class TeneurService:
 
             # Cap optimized volume using values already normalized to business precision,
             # and by the volume still needed to reach the target.
-            remaining_volume = round(target_volume_clean - allocated_volume, 2)
+            remaining_volume = round(target_volume - allocated_volume, 2)
             selected_volume = min(optimized_volume_clean, available_volume_clean, remaining_volume)
 
             # Skip negligible volumes that add noise to the response

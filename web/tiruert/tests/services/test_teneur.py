@@ -116,6 +116,21 @@ class TeneurServiceOptimizeBiofuelBlendingTest(SimpleTestCase):
         for volume in selected_batches.values():
             self.assertEqual(volume, round(volume, 2))
 
+    def test_optimize_biofuel_blending_total_selected_volume_never_exceeds_target(self):
+        """Test that selected volumes sum is always lower or equal to target volume precision."""
+        batches_volumes = np.array([200.0, 200.0, 200.0])
+        batches_emissions = np.array([50.0, 60.0, 70.0])
+        target_volume = 450.019
+        target_emission = 60.0
+
+        selected_batches, _ = TeneurService.optimize_biofuel_blending(
+            batches_volumes, batches_emissions, target_volume, target_emission
+        )
+
+        normalized_target_volume = np.floor(target_volume * 100) / 100
+        total_selected_volume = sum(selected_batches.values())
+        self.assertLessEqual(total_selected_volume, normalized_target_volume)
+
 
 class TeneurServiceEmissionBoundsTest(SimpleTestCase):
     """Test TeneurService.emission_bounds() method"""

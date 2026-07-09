@@ -189,6 +189,35 @@ class SimulateActionMixinTest(TestCase):
         self.assertEqual(len(response.data["selected_lots"]), 0)
         self.assertEqual(response.data["fun"], 0.0)
 
+    @patch("tiruert.services.teneur.TeneurService.prepare_data")
+    def test_simulate_mj_target_matches_returned_selected_lots_total_energy(self, mock_prepare_data):
+        """Test that target volume in MJ matches the total returned selected lot energy."""
+        requested_target_liters = 30.0
+        requested_target_mj = requested_target_liters * float(self.biofuel.pci_litre)
+
+        mock_prepare_data.return_value = (
+            np.array([100.0, 100.0]),
+            np.array([50.0, 60.0]),
+            np.array([10, 11]),
+            None,
+            requested_target_liters,
+        )
+
+        data = self._create_valid_data()
+        data["target_volume"] = requested_target_mj
+        data["target_emission"] = 0.0
+
+        request = self._create_request(data, unit="mj")
+        response = self.view.simulate(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        selected_lots = response.data["selected_lots"]
+        total_selected_liters = sum(float(lot["volume"]) for lot in selected_lots)
+        total_selected_energy_mj = total_selected_liters * float(self.biofuel.pci_litre)
+
+        self.assertEqual(total_selected_energy_mj, requested_target_mj)
+
 
 class SimulateMinMaxActionMixinTest(TestCase):
     """Test SimulateActionMixin.simulate_min_max() action"""
