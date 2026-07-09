@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -11,7 +13,12 @@ class ElecOperationViewSetIntegrationTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.entity = Entity.objects.create(name="Elec Operator", entity_type=Entity.OPERATOR, has_elec=True)
+        cls.entity = Entity.objects.create(
+            name="Elec Operator",
+            entity_type=Entity.OPERATOR,
+            has_elec=True,
+            accise_number="FR123456",
+        )
         cls.counterparty = Entity.objects.create(name="Counterparty", entity_type=Entity.OPERATOR, has_elec=True)
         cls.other_entity = Entity.objects.create(name="Other Operator", entity_type=Entity.OPERATOR, has_elec=True)
 
@@ -96,3 +103,30 @@ class ElecOperationViewSetIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertTrue(ElecOperation.objects.filter(id=operation.id).exists())
+
+    def test_list_filters_by_years(self):
+        """GET /elec-operations/ should filter operations by creation year."""
+        old_operation = ElecOperation.objects.create(
+            type=ElecOperation.CESSION,
+            status=ElecOperation.ACCEPTED,
+            quantity=10.0,
+            credited_entity=self.entity,
+            debited_entity=self.counterparty,
+        )
+        recent_operation = ElecOperation.objects.create(
+            type=ElecOperation.CESSION,
+            status=ElecOperation.ACCEPTED,
+            quantity=20.0,
+            credited_entity=self.entity,
+            debited_entity=self.counterparty,
+        )
+        ElecOperation.objects.filter(id=old_operation.id).update(created_at=datetime(2024, 1, 15, tzinfo=timezone.utc))
+        ElecOperation.objects.filter(id=recent_operation.id).update(created_at=datetime(2025, 1, 15, tzinfo=timezone.utc))
+
+        url = reverse("elec-operations-list")
+        response = self.client.get(url, query_params={"entity_id": self.entity.id, "years": 2024})
+
+        self.assertEqual(response.status_code, 200)
+        ids = {operation["id"] for operation in response.data["results"]}
+        self.assertIn(old_operation.id, ids)
+        self.assertNotIn(recent_operation.id, ids)

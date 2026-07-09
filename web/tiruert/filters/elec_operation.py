@@ -1,9 +1,11 @@
-from django.db.models import Q
+from django.db.models import IntegerField, Q
+from django.db.models.functions import ExtractYear
 from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
+from core.filters import AllAnnotatedValuesMultipleFilter
 from core.models import Entity
 from tiruert.filters.custom_filters import CustomOrderingFilter
 from tiruert.models import ElecOperation
@@ -105,6 +107,10 @@ class BaseFilter(FilterSet):
 
 class ElecOperationFilter(BaseFilter):
     date_from = DateFilter(field_name="created_at", lookup_expr="gte")
+    years = AllAnnotatedValuesMultipleFilter(
+        field_name="year",
+        annotation=ExtractYear("created_at", output_field=IntegerField()),
+    )
 
 
 class ElecOperationFilterForBalance(BaseFilter):
