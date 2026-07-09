@@ -132,6 +132,14 @@ class TypedMultipleChoiceFieldWithNullLabel(forms.TypedMultipleChoiceField):
     null_label = None
 
 
+class MultipleChoiceFieldWithNullLabel(forms.MultipleChoiceField):
+    """
+    MultipleChoiceField with null_label for drf-spectacular compatibility.
+    """
+
+    null_label = None
+
+
 class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
     """
     Use this filter for boolean filtering, it will automatically give you True/False checks
@@ -153,15 +161,18 @@ class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
         return val.lower() == "true"
 
 
-class MultiValueInFilter(django_filters.CharFilter):
+class MultiValueInFilter(django_filters.MultipleChoiceFilter):
     """
     Filter using all values provided for a query parameter (QueryDict.getlist)
     and applying an __in lookup on the configured field.
     """
 
+    field_class = MultipleChoiceFieldWithNullLabel
+
     def __init__(self, *args, **kwargs):
         self.query_param = kwargs.pop("query_param", None)
         self.apply_distinct = kwargs.pop("distinct", False)
+        kwargs.setdefault("choices", ())
         super().__init__(*args, **kwargs)
 
     def _get_query_param_name(self):
@@ -177,6 +188,9 @@ class MultiValueInFilter(django_filters.CharFilter):
         return self.field_name
 
     def filter(self, qs, value):
+        if self.method is not None:
+            return super().filter(qs, value)
+
         data = getattr(self.parent, "data", None)
         key = self._get_query_param_name()
 
