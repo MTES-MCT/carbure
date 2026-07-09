@@ -27,8 +27,8 @@ GLYCERINE_BRUTE,Glycérine brute,1,1,1,0,1,0,ANN-IX-A
 GRAISSES_FLOTTATION,Graisses de flottation,0,1,1,0,1,0,ANN-IX-A
 HUILE_ALIMENTAIRE_USAGEE,Huile alimentaire usagée,0,1,1,0,1,0,ANN-IX-B
 HUILE_PALME,Huile de palme,0,1,0,0,1,0,CONV
-HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2,Huiles ou graisses animales  (catégorie I et/ou II ),0,1,1,0,1,0,ANN-IX-B
-HUILES_OU_GRAISSES_ANIMALES_CAT3,Huiles ou graisses animales  (catégorie III),0,1,0,0,1,0,OTHER
+HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2,Huiles ou graisses animales (catégorie I et/ou II),0,1,1,0,1,0,ANN-IX-B
+HUILES_OU_GRAISSES_ANIMALES_CAT3,Huiles ou graisses animales (catégorie III),0,1,0,0,1,0,CAT3
 LIES_DE_VIN,Lies de vin,1,0,1,0,1,0,ANN-IX-A
 MAIS,Maïs,1,0,0,0,1,0,CONV
 MARC_DE_RAISIN,Marc de raisin,1,0,1,0,1,0,ANN-IX-A
