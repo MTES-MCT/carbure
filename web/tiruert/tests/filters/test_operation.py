@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 
-from django.db.models import Q
 from django.http import QueryDict
 from django.test import RequestFactory, TestCase
 from rest_framework.exceptions import PermissionDenied
@@ -237,9 +236,25 @@ class BaseFilterTest(TestCase):
         request.GET = QueryDict("durability_period=202401&durability_period=202406")
 
         filterset = BaseFilter(request.GET, queryset=queryset, request=request)
-        filterset.filter_durability_period(queryset, "durability_period", None)
+        filterset.filters["durability_period"].filter(queryset, None)
 
-        queryset.filter.assert_called_once_with(Q(durability_period__in=["202401", "202406"]))
+        queryset.filter.assert_called_once_with(durability_period__in=["202401", "202406"])
+
+    def test_filter_feedstock_applies_distinct(self):
+        """Test feedstock filter deduplicates operation rows when filtering through details join."""
+        queryset = Mock()
+        filtered_queryset = Mock()
+        queryset.filter.return_value = filtered_queryset
+        filtered_queryset.distinct.return_value = filtered_queryset
+
+        request = self.factory.get("/test/?feedstock=UCO&feedstock=PFO")
+        request.GET = QueryDict("feedstock=UCO&feedstock=PFO")
+
+        filterset = BaseFilter(request.GET, queryset=queryset, request=request)
+        filterset.filters["feedstock"].filter(queryset, None)
+
+        queryset.filter.assert_called_once_with(details__lot__feedstock__code__in=["UCO", "PFO"])
+        filtered_queryset.distinct.assert_called_once()
 
 
 class OperationFilterTest(TestCase):

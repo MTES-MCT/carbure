@@ -153,6 +153,53 @@ class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
         return val.lower() == "true"
 
 
+class MultiValueInFilter(django_filters.CharFilter):
+    """
+    Filter using all values provided for a query parameter (QueryDict.getlist)
+    and applying an __in lookup on the configured field.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.query_param = kwargs.pop("query_param", None)
+        self.apply_distinct = kwargs.pop("distinct", False)
+        super().__init__(*args, **kwargs)
+
+    def _get_query_param_name(self):
+        if self.query_param:
+            return self.query_param
+
+        parent = getattr(self, "parent", None)
+        if parent is not None:
+            for filter_name, filter_obj in parent.filters.items():
+                if filter_obj is self:
+                    return filter_name
+
+        return self.field_name
+
+    def filter(self, qs, value):
+        data = getattr(self.parent, "data", None)
+        key = self._get_query_param_name()
+
+        if hasattr(data, "getlist"):
+            values = [value for value in data.getlist(key) if value not in [None, ""]]
+        elif data and key in data:
+            raw_value = data.get(key)
+            if isinstance(raw_value, (list, tuple, set)):
+                values = [value for value in raw_value if value not in [None, ""]]
+            else:
+                values = [] if raw_value in [None, ""] else [raw_value]
+        else:
+            values = []
+
+        if not values:
+            return qs
+
+        qs = qs.filter(**{f"{self.field_name}__in": values})
+        if self.apply_distinct:
+            qs = qs.distinct()
+        return qs
+
+
 class AllAnnotatedValuesMultipleFilter(django_filters.MultipleChoiceFilter):
     """
     A modified version of AllValuesMultipleFilter that allows adding annotation to the current query

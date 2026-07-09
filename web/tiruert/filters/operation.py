@@ -18,6 +18,7 @@ from rest_framework.serializers import (
     ListField,
 )
 
+from core.filters import MultiValueInFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
 from .custom_filters import CustomOrderingFilter
 from tiruert.models.operation import Operation
@@ -29,7 +30,7 @@ class BaseFilter(FilterSet):
     operation = MultipleChoiceFilter(
         choices=Operation.OPERATION_TYPES + (("ACQUISITION", "ACQUISITION"),), field_name="type"
     )
-    biofuel = CharFilter(method="filter_biofuel")
+    biofuel = MultiValueInFilter(field_name="biofuel__code")
     sector = MultipleChoiceFilter(choices=Operation.SECTOR_CODE_CHOICES, field_name="_sector")
     from_to = CharFilter(method="filter_from_to")
     depot = CharFilter(method="filter_depot")
@@ -37,9 +38,9 @@ class BaseFilter(FilterSet):
     period = CharFilter(method="filter_period")
     customs_category = MultipleChoiceFilter(choices=MatierePremiere.MP_CATEGORIES)
     status = MultipleChoiceFilter(choices=Operation.OPERATION_STATUSES)
-    feedstock = CharFilter(method="filter_feedstock")
-    origin_country = CharFilter(method="filter_origin_country")
-    durability_period = CharFilter(method="filter_durability_period")
+    feedstock = MultiValueInFilter(field_name="details__lot__feedstock__code", distinct=True)
+    origin_country = MultiValueInFilter(field_name="details__lot__country_of_origin__code_pays", distinct=True)
+    durability_period = MultiValueInFilter(field_name="durability_period")
 
     order_by = CustomOrderingFilter(
         fields=(
@@ -84,32 +85,10 @@ class BaseFilter(FilterSet):
         entities = self.request.GET.getlist(name)
         return queryset.filter(Q(credited_entity__name__in=entities) | Q(debited_entity__name__in=entities)).distinct()
 
-    def filter_multiple_values(self, queryset, field_name, param_name):
-        values = self.data.getlist(param_name)
-        if values:
-            return queryset.filter(Q(**{f"{field_name}__in": values}))
-        return queryset
-
-    @extend_schema_field(ListField(child=CharField()))
-    def filter_biofuel(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "biofuel__code", "biofuel")
-
-    @extend_schema_field(ListField(child=CharField()))
-    def filter_feedstock(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "details__lot__feedstock__code", "feedstock")
-
-    @extend_schema_field(ListField(child=CharField()))
-    def filter_origin_country(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "details__lot__country_of_origin__code_pays", "origin_country")
-
     @extend_schema_field(ListField(child=CharField()))
     def filter_depot(self, queryset, name, value):
         depots = self.request.GET.getlist(name)
         return queryset.filter(Q(from_depot__name__in=depots) | Q(to_depot__name__in=depots)).distinct()
-
-    @extend_schema_field(ListField(child=CharField()))
-    def filter_durability_period(self, queryset, name, value):
-        return self.filter_multiple_values(queryset, "durability_period", "durability_period")
 
     @extend_schema_field(ListField(child=CharField()))
     def filter_period(self, queryset, name, value):
