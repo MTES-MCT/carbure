@@ -5460,6 +5460,7 @@ export interface components {
          *     * `TALLOL` - Tallol
          *     * `OTHER` - Autre
          *     * `EP2AM` - EP2AM
+         *     * `CAT3` - Graisses de catégorie 3
          * @enum {string}
          */
         MPCategoriesEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category;
@@ -13337,6 +13338,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
@@ -13697,6 +13699,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 /** @description Date from where to calculate teneur and quantity */
@@ -13820,6 +13823,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
@@ -13960,6 +13964,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
@@ -14575,6 +14580,7 @@ export enum PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter {
 export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
     ANN_IX_A = "ANN-IX-A",
     ANN_IX_B = "ANN-IX-B",
+    CAT3 = "CAT3",
     CONV = "CONV",
     EP2AM = "EP2AM",
     OTHER = "OTHER",
