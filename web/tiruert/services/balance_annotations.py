@@ -242,10 +242,10 @@ def _calculate_default_grouping(balance, details_qs, context):
         entry["sector"] = group["group_sector"]
         entry["customs_category"] = group["group_customs_category"]
         entry["biofuel"] = biofuel
-        entry["quantity"]["credit"] = round(group["quantity_credit"] or 0.0, 2)
-        entry["quantity"]["debit"] = round(group["quantity_debit"] or 0.0, 2)
-        entry["available_balance"] = round(group["available_balance"] or 0.0, 2)
-        entry["saved_emissions"] = round(group["saved_emissions"] or 0.0, 2)
+        entry["quantity"]["credit"] = group["quantity_credit"] or 0.0
+        entry["quantity"]["debit"] = group["quantity_debit"] or 0.0
+        entry["available_balance"] = group["available_balance"] or 0.0
+        entry["saved_emissions"] = group["saved_emissions"] or 0.0
         entry["pending_operations"] = group["pending_operations"] or 0
         entry["ghg_reduction_min"] = group["ghg_reduction_min"]
         entry["ghg_reduction_max"] = group["ghg_reduction_max"]
@@ -259,10 +259,10 @@ def _calculate_default_grouping(balance, details_qs, context):
         entry["sector"] = group["group_sector"]
         entry["customs_category"] = group["group_customs_category"]
         entry["biofuel"] = biofuel
-        entry["pending_teneur"] = round(group["pending_teneur"] or 0.0, 2)
-        entry["declared_teneur"] = round(group["declared_teneur"] or 0.0, 2)
-        entry["pending_saved_emissions"] = round(group["pending_saved_emissions"] or 0.0, 2)
-        entry["declared_saved_emissions"] = round(group["declared_saved_emissions"] or 0.0, 2)
+        entry["pending_teneur"] = group["pending_teneur"] or 0.0
+        entry["declared_teneur"] = group["declared_teneur"] or 0.0
+        entry["pending_saved_emissions"] = group["pending_saved_emissions"] or 0.0
+        entry["declared_saved_emissions"] = group["declared_saved_emissions"] or 0.0
 
 
 def _calculate_category_grouping(balance, details_qs, context):
@@ -279,14 +279,14 @@ def _calculate_category_grouping(balance, details_qs, context):
         key = group["group_key"]
         entry = balance[key]
         entry["customs_category"] = key
-        entry["quantity"]["credit"] = round(group["quantity_credit"] or 0.0, 2)
-        entry["quantity"]["debit"] = round(group["quantity_debit"] or 0.0, 2)
-        entry["available_balance"] = round(group["available_balance"] or 0.0, 2)
-        entry["saved_emissions"] = round(group["saved_emissions"] or 0.0, 2)
-        entry["pending_teneur"] = round(group["pending_teneur"] or 0.0, 2)
-        entry["declared_teneur"] = round(group["declared_teneur"] or 0.0, 2)
-        entry["pending_saved_emissions"] = round(group["pending_saved_emissions"] or 0.0, 2)
-        entry["declared_saved_emissions"] = round(group["declared_saved_emissions"] or 0.0, 2)
+        entry["quantity"]["credit"] = group["quantity_credit"] or 0.0
+        entry["quantity"]["debit"] = group["quantity_debit"] or 0.0
+        entry["available_balance"] = group["available_balance"] or 0.0
+        entry["saved_emissions"] = group["saved_emissions"] or 0.0
+        entry["pending_teneur"] = group["pending_teneur"] or 0.0
+        entry["declared_teneur"] = group["declared_teneur"] or 0.0
+        entry["pending_saved_emissions"] = group["pending_saved_emissions"] or 0.0
+        entry["declared_saved_emissions"] = group["declared_saved_emissions"] or 0.0
         entry["pending_operations"] = group["pending_operations"] or 0
 
 
@@ -302,10 +302,10 @@ def _calculate_sector_grouping(balance, details_qs, context):
         key = group["group_key"]
         entry = balance[key]
         entry["sector"] = key
-        entry["quantity"]["credit"] = round(group["quantity_credit"] or 0.0, 2)
-        entry["quantity"]["debit"] = round(group["quantity_debit"] or 0.0, 2)
-        entry["available_balance"] = round(group["available_balance"] or 0.0, 2)
-        entry["saved_emissions"] = round(group["saved_emissions"] or 0.0, 2)
+        entry["quantity"]["credit"] = group["quantity_credit"] or 0.0
+        entry["quantity"]["debit"] = group["quantity_debit"] or 0.0
+        entry["available_balance"] = group["available_balance"] or 0.0
+        entry["saved_emissions"] = group["saved_emissions"] or 0.0
         entry["pending_operations"] = group["pending_operations"] or 0
 
     teneur_groups = (
@@ -316,10 +316,10 @@ def _calculate_sector_grouping(balance, details_qs, context):
         key = group["group_key"]
         entry = balance[key]
         entry["sector"] = key
-        entry["pending_teneur"] = round(group["pending_teneur"] or 0.0, 2)
-        entry["declared_teneur"] = round(group["declared_teneur"] or 0.0, 2)
-        entry["pending_saved_emissions"] = round(group["pending_saved_emissions"] or 0.0, 2)
-        entry["declared_saved_emissions"] = round(group["declared_saved_emissions"] or 0.0, 2)
+        entry["pending_teneur"] = group["pending_teneur"] or 0.0
+        entry["declared_teneur"] = group["declared_teneur"] or 0.0
+        entry["pending_saved_emissions"] = group["pending_saved_emissions"] or 0.0
+        entry["declared_saved_emissions"] = group["declared_saved_emissions"] or 0.0
 
 
 def calculate_balance_with_annotations(operations, entity_id, group_by, unit, date_from, detail_filters, init_entry):

@@ -85,18 +85,12 @@ class BalanceService:
         if operation.type == Operation.TENEUR:
             teneur_type = "pending_teneur" if operation.status == Operation.PENDING else "declared_teneur"
             balance[key][teneur_type] += quantity
-            # Round to 2 decimals after each operation to prevent float precision errors accumulation
-            balance[key][teneur_type] = round(balance[key][teneur_type], 2)
 
             avoided_type = "pending_saved_emissions" if operation.status == Operation.PENDING else "declared_saved_emissions"
             balance[key][avoided_type] += detail.avoided_emissions
-            # Round to 2 decimals after each operation to prevent float precision errors accumulation
-            balance[key][avoided_type] = round(balance[key][avoided_type], 2)
 
         quantity_type = "credit" if credit_operation else "debit"
         balance[key]["quantity"][quantity_type] += quantity
-        # Round to 2 decimals after each operation to prevent float precision errors accumulation
-        balance[key]["quantity"][quantity_type] = round(balance[key]["quantity"][quantity_type], 2)
 
     @staticmethod
     def _update_available_balance(balance, key, operation, detail, credit_operation, quantity):
@@ -105,15 +99,11 @@ class BalanceService:
         """
         volume_sign = 1 if credit_operation else -1
         balance[key]["available_balance"] += quantity * volume_sign
-        # Round to 2 decimals after each operation to prevent float precision errors accumulation
-        balance[key]["available_balance"] = round(balance[key]["available_balance"], 2)
 
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj  # used when displaying balance by lot
 
         avoided_emissions = detail.avoided_emissions
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
-        # Round to 2 decimals after each operation to prevent float precision errors accumulation
-        balance[key]["saved_emissions"] = round(balance[key]["saved_emissions"], 2)
 
     @staticmethod
     def _calculate_quantity(operation, detail, conversion_factor):

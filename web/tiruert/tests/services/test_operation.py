@@ -377,6 +377,26 @@ class OperationServiceCheckVolumesTest(TestCase):
             str(context.exception.detail["lot_id: 1"]),
         )
 
+    @patch("tiruert.services.operation.TeneurService.prepare_data")
+    def test_check_volumes_accepts_tiny_float_overflow_with_tolerance(self, mock_prepare_data):
+        """Should accept tiny float overflow caused by precision artifacts."""
+        mock_prepare_data.return_value = (
+            [1000.0],
+            None,
+            [1],
+            None,
+            None,
+        )
+
+        selected_lots = [
+            {"id": 1, "volume": 1000.0000005},
+        ]
+
+        data = {"biofuel": Mock()}
+        unit = "l"
+
+        OperationService.check_volumes(selected_lots, data, unit)
+
 
 class OperationServiceCheckObjectivesComplianceTest(TestCase):
     """Test OperationService.check_objectives_compliance() validation with mocks."""
@@ -482,6 +502,27 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
             OperationServiceErrors.TARGET_EXCEEDED,
             str(context.exception.detail[error_key]),
         )
+
+    @patch("tiruert.services.operation.BalanceService.calculate_balance")
+    @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
+    def test_check_objectives_compliance_accepts_tiny_float_overflow_with_tolerance(
+        self, mock_calculate_target, mock_calculate_balance
+    ):
+        """Should accept tiny float overflow on futur_teneur comparison."""
+        mock_calculate_target.return_value = 100000
+        mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 80000, "declared_teneur": 15000}}
+
+        mock_request = Mock()
+        mock_request.entity.id = 1
+        mock_request.GET = QueryDict("")
+
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
+
+        # 80,000 + 15,000 + 500.00000005 * 10 = 100,000.0000005
+        selected_lots = [{"id": 1, "volume": 500.00000005}]
+        entity_id = 1
+
+        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
 
     def test_check_objectives_compliance_skips_for_non_teneur_operations(self):
         """Should skip check for non-TENEUR operation types."""

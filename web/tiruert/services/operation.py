@@ -22,6 +22,8 @@ class OperationServiceErrors:
 
 
 class OperationService:
+    FLOAT_COMPARISON_TOLERANCE = 1e-6
+
     @staticmethod
     def perform_checks_before_create(request, entity_id, selected_lots, data, unit, declaration_year):
         OperationService.check_debited_entity(entity_id, data)
@@ -54,7 +56,7 @@ class OperationService:
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
 
-            if available_volumes[lot_id] < volume:
+            if available_volumes[lot_id] + OperationService.FLOAT_COMPARISON_TOLERANCE < volume:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
 
     @staticmethod
@@ -85,7 +87,7 @@ class OperationService:
             # 4. Check if the futur teneur is below the target
             futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ
 
-            if futur_teneur > target:
+            if futur_teneur - target > OperationService.FLOAT_COMPARISON_TOLERANCE:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )

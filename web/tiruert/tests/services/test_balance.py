@@ -268,20 +268,6 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         self.assertEqual(balance["key1"]["declared_teneur"], 10.0)
         self.assertEqual(balance["key1"]["declared_saved_emissions"], 2.75)
 
-    def test_update_quantity_and_teneur_rounds_to_2_decimals(self):
-        """Test _update_quantity_and_teneur rounds results to 2 decimal places."""
-        balance = {"key1": {"quantity": {"credit": 0.0, "debit": 0.0}, "pending_teneur": 0.0, "declared_teneur": 0.0}}
-        mock_operation = Mock()
-        mock_operation.type = Operation.CESSION
-        mock_operation.renewable_energy_share = 0.333
-        mock_detail = Mock()
-        mock_detail.volume = 10.0
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
-
-        BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
-
-        self.assertEqual(balance["key1"]["quantity"]["credit"], 3.33)
-
 
 class BalanceServiceUpdateAvailableBalanceTest(TestCase):
     """Unit tests for BalanceService._update_available_balance() method."""
@@ -353,53 +339,6 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
         self.assertEqual(balance["key1"]["emission_rate_per_mj"], 42.5)
-
-    def test_update_available_balance_rounds_to_2_decimals(self):
-        """Test _update_available_balance rounds results to 2 decimal places."""
-        balance = {
-            "key1": {
-                "available_balance": 0.0,
-                "saved_emissions": 0.0,
-                "emission_rate_per_mj": 0,
-            }
-        }
-        mock_operation = Mock()
-        mock_operation.biofuel = Mock()
-        mock_operation.renewable_energy_share = 0.333
-        mock_detail = Mock()
-        mock_detail.volume = 10.0
-        mock_detail.emission_rate_per_mj = 25.0
-        mock_detail.avoided_emissions = 12.3456
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
-
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
-
-        self.assertEqual(balance["key1"]["available_balance"], 3.33)
-        self.assertEqual(balance["key1"]["saved_emissions"], 12.35)
-
-    def test_update_available_balance_rounds_saved_emissions_cumulatively(self):
-        """Test _update_available_balance keeps stable cumulative rounding across multiple updates."""
-        balance = {
-            "key1": {
-                "available_balance": 0.0,
-                "saved_emissions": 0.0,
-                "emission_rate_per_mj": 0,
-            }
-        }
-        mock_operation = Mock()
-        mock_operation.biofuel = Mock()
-        mock_operation.renewable_energy_share = 0.333
-        mock_detail = Mock()
-        mock_detail.volume = 10.0
-        mock_detail.emission_rate_per_mj = 25.0
-        mock_detail.avoided_emissions = 0.335
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
-
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
-        BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
-
-        # 0.335 -> 0.34 after first update, then 0.34 + 0.335 -> 0.68
-        self.assertEqual(balance["key1"]["saved_emissions"], 0.68)
 
 
 class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
