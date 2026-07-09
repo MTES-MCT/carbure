@@ -801,3 +801,51 @@ class BalanceServiceObjectiveSectorTest(TestCase):
 
         if Operation.ESSENCE in result:
             self.assertEqual(result[Operation.ESSENCE]["pending_teneur"], 0)
+
+    def test_default_grouping_keeps_teneur_in_natural_sector(self):
+        """Default grouping must keep teneur in the biofuel natural sector even when objective_sector differs."""
+
+        if not self.biofuel_diesel:
+            self.skipTest("Missing biofuel fixture for GAZOLE sector")
+
+        op = self._create_teneur_with_details(self.biofuel_diesel, objective_sector=Operation.ESSENCE)
+
+        operations = Operation.objects.filter(id=op.id)
+        result = BalanceService.calculate_balance(operations, self.entity.id, None, "mj")
+
+        natural_key = (Operation.GAZOLE, op.customs_category, self.biofuel_diesel.code)
+        objective_key = (Operation.ESSENCE, op.customs_category, self.biofuel_diesel.code)
+
+        self.assertIn(natural_key, result)
+        self.assertGreater(result[natural_key]["pending_teneur"], 0)
+
+        if objective_key in result:
+            self.assertEqual(result[objective_key]["pending_teneur"], 0)
+
+    def test_objective_sector_only_applies_to_sector_grouping(self):
+        """objective_sector must affect group_by=sector, but not the default sector/category/biofuel grouping."""
+
+        if not self.biofuel_diesel:
+            self.skipTest("Missing biofuel fixture for GAZOLE sector")
+
+        op = self._create_teneur_with_details(self.biofuel_diesel, objective_sector=Operation.ESSENCE)
+
+        operations = Operation.objects.filter(id=op.id)
+
+        sector_result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "mj")
+        default_result = BalanceService.calculate_balance(operations, self.entity.id, None, "mj")
+
+        default_natural_key = (Operation.GAZOLE, op.customs_category, self.biofuel_diesel.code)
+        default_objective_key = (Operation.ESSENCE, op.customs_category, self.biofuel_diesel.code)
+
+        self.assertIn(Operation.ESSENCE, sector_result)
+        self.assertGreater(sector_result[Operation.ESSENCE]["pending_teneur"], 0)
+
+        if Operation.GAZOLE in sector_result:
+            self.assertEqual(sector_result[Operation.GAZOLE]["pending_teneur"], 0)
+
+        self.assertIn(default_natural_key, default_result)
+        self.assertGreater(default_result[default_natural_key]["pending_teneur"], 0)
+
+        if default_objective_key in default_result:
+            self.assertEqual(default_result[default_objective_key]["pending_teneur"], 0)

@@ -203,7 +203,6 @@ def _build_teneur_aggregations(context):
 
 def _calculate_default_grouping(balance, details_qs, context):
     sector_expr = _get_sector_expression()
-    teneur_sector_expr = _get_teneur_sector_expression(sector_expr)
 
     # Aggregate all non-teneur balance metrics (including GHG min/max) by sector/category/biofuel.
     base_groups = list(
@@ -216,10 +215,10 @@ def _calculate_default_grouping(balance, details_qs, context):
         .annotate(**_build_base_aggregations(context, include_ghg=True))
     )
 
-    # Aggregate teneur-specific metrics separately, using objective sector when provided.
+    # Aggregate teneur-specific metrics separately, but keep the natural sector for default grouping.
     teneur_groups = list(
         details_qs.annotate(
-            group_sector=teneur_sector_expr,
+            group_sector=sector_expr,
             group_customs_category=F("operation__customs_category"),
             group_biofuel_id=F("operation__biofuel_id"),
         )
