@@ -7177,19 +7177,26 @@ paths:
   /api/entities/users/update-right-request/:
     post:
       operationId: entities_users_update_right_request_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
       tags:
         - entities
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EntityUserRequest"
+              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/EntityUserRequest"
+              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/EntityUserRequest"
+              $ref: "#/components/schemas/UpdateRightsRequestsRequest"
         required: true
       security:
         - cookieAuth: []
@@ -7199,8 +7206,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntityUser"
-          description: ""
+                status: success
+              examples:
+                SuccessExample:
+                  value:
+                    status: success
+                  summary: Success example
+          description: Request successful.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: ""
+              examples:
+                BadRequest:
+                  value:
+                    message: ""
+                  summary: Bad request
+          description: Bad request.
   /api/entities/users/update-user-role/:
     post:
       operationId: entities_users_update_user_role_create
@@ -9488,6 +9511,14 @@ paths:
               description: |-
                 * `CREDIT` - CREDIT
                 * `DEBIT` - DEBIT
+        - in: query
+          name: years
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -9906,6 +9937,7 @@ paths:
               - period
               - status
               - type
+              - years
           description: Filter string to apply
           required: true
         - in: query
@@ -10005,6 +10037,14 @@ paths:
               description: |-
                 * `CREDIT` - CREDIT
                 * `DEBIT` - DEBIT
+        - in: query
+          name: years
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
       tags:
         - tiruert
       security:
@@ -10294,6 +10334,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -10305,6 +10346,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -10553,7 +10595,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
           explode: true
           style: form
       tags:
@@ -10975,6 +11017,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -10986,6 +11029,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -11287,6 +11331,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -11298,6 +11343,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -11547,7 +11593,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
           explode: true
           style: form
       tags:
@@ -11644,6 +11690,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -11655,6 +11702,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -11909,7 +11957,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
           explode: true
           style: form
       tags:
@@ -14607,36 +14655,6 @@ components:
         - category
         - group
         - subcategory
-    ClientTypeEnum:
-      enum:
-        - Producteur
-        - Opérateur
-        - Administration
-        - Trader
-        - Auditor
-        - Administration Externe
-        - Charge Point Operator
-        - Compagnie aérienne
-        - Unknown
-        - Power or Heat Producer
-        - SAF Trader
-        - Producteur de biométhane
-        - Fournisseur de biométhane
-      type: string
-      description: |-
-        * `Producteur` - Producteur
-        * `Opérateur` - Opérateur
-        * `Administration` - Administration
-        * `Trader` - Trader
-        * `Auditor` - Auditeur
-        * `Administration Externe` - Administration Externe
-        * `Charge Point Operator` - Charge Point Operator
-        * `Compagnie aérienne` - Compagnie aérienne
-        * `Unknown` - Unknown
-        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-        * `SAF Trader` - Trader de SAF
-        * `Producteur de biométhane` - Producteur de biométhane
-        * `Fournisseur de biométhane` - Fournisseur de biométhane
     CollectionTypeEnum:
       enum:
         - PRIVATE
@@ -15948,6 +15966,7 @@ components:
           nullable: true
         month:
           type: string
+          nullable: true
           readOnly: true
         operating_unit:
           type: string
@@ -16819,35 +16838,9 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
-    EntityUser:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          title: Adresse électronique
-          maxLength: 255
-      required:
-        - email
-        - id
-        - name
-    EntityUserRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          minLength: 1
-          title: Adresse électronique
-          maxLength: 255
-      required:
-        - email
+        - SAF_Trader
+        - Producteur_de_biom_thane
+        - Fournisseur_de_biom_thane
     ErrorResponse:
       type: object
       properties:
@@ -17270,6 +17263,7 @@ components:
         - TALLOL
         - OTHER
         - EP2AM
+        - CAT3
       type: string
       description: |-
         * `CONV` - Conventionnel
@@ -17278,6 +17272,7 @@ components:
         * `TALLOL` - Tallol
         * `OTHER` - Autre
         * `EP2AM` - EP2AM
+        * `CAT3` - Graisses de catégorie 3
     MacFossilFuel:
       type: object
       properties:
@@ -19056,7 +19051,7 @@ components:
           maxLength: 64
         client_type:
           allOf:
-            - $ref: "#/components/schemas/ClientTypeEnum"
+            - $ref: "#/components/schemas/EntityTypeEnum"
           readOnly: true
         carbure_producer:
           allOf:
@@ -20003,6 +19998,16 @@ components:
         website:
           type: string
           format: uri
+    UpdateRightsRequestsRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          $ref: "#/components/schemas/UserRightsRequestsStatusEnum"
+      required:
+        - id
+        - status
     UpdateUserRoleRequest:
       type: object
       properties:
@@ -20312,6 +20317,25 @@ components:
       required:
         - requests
         - rights
+    UserRightsSettings:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/BaseUser"
+        entity:
+          $ref: "#/components/schemas/UserEntity"
+        role:
+          allOf:
+            - $ref: "#/components/schemas/RoleEnum"
+          readOnly: true
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - entity
+        - role
+        - user
     UserSettingsResponse:
       type: object
       properties:
@@ -20323,7 +20347,7 @@ components:
         rights:
           type: array
           items:
-            $ref: "#/components/schemas/UserRights"
+            $ref: "#/components/schemas/UserRightsSettings"
         requests:
           type: array
           items:

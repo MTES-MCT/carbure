@@ -25,10 +25,7 @@ import {
   SafTicketStatus,
   SafTicketSourceDetails,
 } from "saf/types"
-import {
-  SiteTypeEnum,
-  PathsApiSafTicketsGetParametersQueryClient_type as ClientType,
-} from "api-schema"
+import { SiteTypeEnum } from "api-schema"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export const safOperatorSnapshot: SafSnapshot = {
@@ -224,7 +221,7 @@ export const safTicketAssignedDetails: SafTicketDetails = {
   year: 2022,
   assignment_period: 202202,
   client: "Air France",
-  client_type: ClientType.Compagnie_a_rienne,
+  client_type: EntityType.Airline,
   created_at: "2022-01-10",
   supplier: producer.name,
   volume: 2000,

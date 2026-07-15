@@ -260,6 +260,7 @@ class ExternalAdminRights(models.Model):
     DREAL = "DREAL"
     ADEME = "ADEME"
     DGDDI = "DGDDI"
+    DGDDI_NATIONAL = "DGDDI_NATIONAL"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -272,6 +273,7 @@ class ExternalAdminRights(models.Model):
         (DREAL, DREAL),
         (ADEME, ADEME),
         (DGDDI, DGDDI),
+        (DGDDI_NATIONAL, DGDDI_NATIONAL),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)

@@ -1,5 +1,5 @@
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
 
 from core.models import (
@@ -805,6 +805,7 @@ class UserRightsRequestsSerializer(serializers.ModelSerializer):
         read_only_fields = ["role", "status"]
 
 
+@extend_schema_serializer(component_name="UserRightsSettings")
 class UserRightsSerializer(serializers.ModelSerializer):
     entity = UserEntitySerializer()
     user = BaseUserSerializer()

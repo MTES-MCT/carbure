@@ -245,6 +245,10 @@ class UserChangeForm(forms.ModelForm):
             "password": forms.HiddenInput(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["user_permissions"].queryset = self.fields["user_permissions"].queryset.select_related("content_type")
+
     def clean_name(self):
         name = self.cleaned_data.get("name")
         if name:

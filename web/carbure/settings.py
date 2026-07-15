@@ -450,6 +450,7 @@ SPECTACULAR_SETTINGS = {
         "BiomethaneAnnualDeclarationStatusEnum": "biomethane.models.BiomethaneAnnualDeclaration.DECLARATION_STATUS_CHOICES",
         "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
         "ElecQualichargeStatusEnum": "elec.models.ElecProvisionCertificateQualicharge.VALIDATION_CHOICES",
+        "EntityTypeEnum": "core.models.Entity.ENTITY_TYPES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
