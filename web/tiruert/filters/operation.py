@@ -62,9 +62,11 @@ class BaseFilter(FilterSet):
     def filter_entity(self, queryset, name, value):
         entity = getattr(self.request, "entity", None)
 
-        # DGEC case: ignore entity_id for filtering, entity_id is just for permissions
+        # DGEC / DGDDI case: ignore entity_id for filtering, entity_id is just for permissions
         if "selected_entity_id" in self.data:
-            if not entity.entity_type == Entity.ADMIN:
+            if not entity.entity_type == Entity.ADMIN and not entity.has_external_admin_right(
+                ExternalAdminRights.DGDDI_NATIONAL
+            ):
                 raise PermissionDenied()
             value = self.data["selected_entity_id"]
 

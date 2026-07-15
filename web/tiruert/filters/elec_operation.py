@@ -5,6 +5,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import CharField, ChoiceField, ListField
 
 from core.models import Entity
+from core.models.entity import ExternalAdminRights
 from tiruert.filters.custom_filters import CustomOrderingFilter
 from tiruert.models import ElecOperation
 
@@ -45,7 +46,9 @@ class BaseFilter(FilterSet):
 
         # DGEC case: ignore entity_id for filtering, entity_id is just for permissions
         if "selected_entity_id" in self.data:
-            if not entity.entity_type == Entity.ADMIN:
+            if not entity.entity_type == Entity.ADMIN and not entity.has_external_admin_right(
+                ExternalAdminRights.DGDDI_NATIONAL
+            ):
                 raise PermissionDenied()
             value = self.data["selected_entity_id"]
 
