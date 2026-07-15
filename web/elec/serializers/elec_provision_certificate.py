@@ -25,7 +25,7 @@ class ElecProvisionCertificateSerializer(serializers.ModelSerializer):
     cpo = EntityPreviewSerializer(read_only=True)
     month = serializers.SerializerMethodField()
 
-    def get_month(self, obj):
+    def get_month(self, obj) -> str | None:
         if obj.date_from:
             return f"{obj.date_from.strftime('%m/%Y')}"
         return None

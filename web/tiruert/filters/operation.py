@@ -13,7 +13,11 @@ from django_filters import (
 )
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.serializers import CharField, ListField
+from rest_framework.serializers import (
+    CharField,
+    IntegerField as SerializerIntegerField,
+    ListField,
+)
 
 from core.filters import AllAnnotatedValuesMultipleFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
@@ -124,15 +128,18 @@ class BaseFilter(FilterSet):
 
 
 class OperationFilter(BaseFilter):
-    years = AllAnnotatedValuesMultipleFilter(
-        field_name="year",
-        annotation=Coalesce(
-            "declaration_year",
-            Cast(
-                Substr("durability_period", 1, 4),
+    years = extend_schema_field(SerializerIntegerField())(
+        AllAnnotatedValuesMultipleFilter(
+            field_name="year",
+            annotation=Coalesce(
+                "declaration_year",
+                Cast(
+                    Substr("durability_period", 1, 4),
+                    output_field=IntegerField(),
+                ),
                 output_field=IntegerField(),
             ),
-        ),
+        )
     )
     pass
 

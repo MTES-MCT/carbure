@@ -215,14 +215,13 @@ export const biocarburant: Biofuel = {
 export const entityRight: UserRight = {
   entity: producer,
   role: UserRole.Admin,
-  name: "Admin Test",
+  user: { email: "test@test.test", name: "Admin Test" },
   expiration_date: "",
-  email: "test@test.test",
 }
 
 export const entityRequest: UserRightRequest = {
   id: 1,
-  user: { email: "user@company.com" },
+  user: { email: "user@company.com", name: "User Company" },
   entity: producer,
   date_requested: "2020-12-22T16:18:27.233Z",
   status: UserRightStatus.Accepted,

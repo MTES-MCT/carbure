@@ -9,12 +9,15 @@ const ADMIN_TO_ENTITIES: Partial<Record<ExternalAdminPages, EntityType[]>> = {
 const ALL_ENTITIES = Object.values(EntityType)
 
 const getCompanyTypesForAdmin = (entity: EntityManager) => {
-  return Object.entries(ADMIN_TO_ENTITIES).reduce((acc, [admin, entities]) => {
-    if (entity.hasAdminRight(admin as ExternalAdminPages)) {
-      return [...acc, ...entities]
-    }
-    return acc
-  }, [] as EntityType[])
+  return Object.entries(ADMIN_TO_ENTITIES).reduce<EntityType[]>(
+    (acc, [admin, entities]) => {
+      if (entity.hasAdminRight(admin as ExternalAdminPages)) {
+        return [...acc, ...entities]
+      }
+      return acc
+    },
+    []
+  )
 }
 
 export const useCompanyTypesByEntity = () => {

@@ -38,9 +38,7 @@ export const useEntitySummaryFilters = () => {
       if (enumValues.includes(filter as EntitySummaryFilter)) {
         switch (filter) {
           case EntitySummaryFilter.Types:
-            ;(filters[EntitySummaryFilter.Types] as EntityType[]).push(
-              value as EntityType
-            )
+            filters[EntitySummaryFilter.Types].push(value as EntityType)
             break
           case EntitySummaryFilter.Operation:
             filters[EntitySummaryFilter.Operation] = value as Operation

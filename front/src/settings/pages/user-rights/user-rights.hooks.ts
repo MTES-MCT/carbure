@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "common/hooks/async"
 import * as api from "../../api/user-rights"
 import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
-import { EntityTypeEnum } from "api-schema"
+import { EntityType } from "common/types"
 
 export const useGetEntityRights = () => {
   const entity = useEntity()
@@ -17,10 +17,10 @@ export const useGetEntityRights = () => {
 
   // Split requests into auditors and others
   const auditors = allRequests.filter(
-    (request) => request.entity.entity_type === EntityTypeEnum.Auditor
+    (request) => request.entity.entity_type === EntityType.Auditor
   )
   const users = allRequests.filter(
-    (request) => request.entity.entity_type !== EntityTypeEnum.Auditor
+    (request) => request.entity.entity_type !== EntityType.Auditor
   )
 
   return {
