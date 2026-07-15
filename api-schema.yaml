@@ -10317,6 +10317,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -10328,6 +10329,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -10998,6 +11000,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -11009,6 +11012,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -11310,6 +11314,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -11321,6 +11326,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -11667,6 +11673,7 @@ paths:
               enum:
                 - ANN-IX-A
                 - ANN-IX-B
+                - CAT3
                 - CONV
                 - EP2AM
                 - OTHER
@@ -11678,6 +11685,7 @@ paths:
             * `TALLOL` - Tallol
             * `OTHER` - Autre
             * `EP2AM` - EP2AM
+            * `CAT3` - Graisses de catégorie 3
           explode: true
           style: form
         - in: query
@@ -17238,6 +17246,7 @@ components:
         - TALLOL
         - OTHER
         - EP2AM
+        - CAT3
       type: string
       description: |-
         * `CONV` - Conventionnel
@@ -17246,6 +17255,7 @@ components:
         * `TALLOL` - Tallol
         * `OTHER` - Autre
         * `EP2AM` - EP2AM
+        * `CAT3` - Graisses de catégorie 3
     MacFossilFuel:
       type: object
       properties:

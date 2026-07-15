@@ -9,6 +9,8 @@ export const useFormatters = () => {
     switch (category) {
       case CategoryEnum.OTHER:
         return t("Autres biocarburants")
+      case CategoryEnum.CAT3:
+        return t("Graisses de cat. 3")
       case ElecOperationSector.ELEC:
         return t("Électricité")
     }
