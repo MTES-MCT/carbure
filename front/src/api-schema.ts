@@ -12838,6 +12838,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
+                years?: string[];
             };
             header?: never;
             path?: never;
@@ -13151,6 +13152,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
+                years?: string[];
             };
             header?: never;
             path?: never;
@@ -14566,7 +14568,8 @@ export enum PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter {
     operation = "operation",
     period = "period",
     status = "status",
-    type = "type"
+    type = "type",
+    years = "years"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
     ANN_IX_A = "ANN-IX-A",
