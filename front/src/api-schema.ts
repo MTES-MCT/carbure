@@ -5602,7 +5602,6 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly unit: string;
-            details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
         };
         OperationCorrectionRequest: {
@@ -5612,13 +5611,6 @@ export interface components {
         OperationDepot: {
             id: number;
             name: string;
-        };
-        OperationDetail: {
-            lot: number;
-            /** Format: double */
-            volume?: number;
-            /** Format: double */
-            emission_rate_per_mj?: number;
         };
         OperationEntity: {
             id: number;
@@ -5676,7 +5668,6 @@ export interface components {
             /** Format: double */
             readonly quantity: number;
             readonly unit: string;
-            details?: components["schemas"]["OperationDetail"][];
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;

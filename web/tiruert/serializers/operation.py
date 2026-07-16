@@ -6,6 +6,7 @@ from rest_framework import serializers
 from core.models import CarbureLot, Pays
 from core.serializers import CountrySerializer
 from tiruert.models import Operation, OperationDetail
+from tiruert.serializers.fields import RoundedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
 
@@ -48,16 +49,21 @@ class BaseOperationSerializer(serializers.ModelSerializer):
         return self.context.get("unit")
 
     def get_avoided_emissions(self, instance) -> float:
+        if getattr(instance, "_avoided_emissions", None) is not None:
+            return round(instance._avoided_emissions, 2)
         return instance.avoided_emissions
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
+    def get_fields(self):
+        fields = super().get_fields()
         if not self.context.get("details"):
-            representation.pop("details", None)
-        return representation
+            fields.pop("details", None)
+        return fields
 
 
 class OperationListSerializer(BaseOperationSerializer):
+    quantity = RoundedFloatField(source="_quantity", read_only=True)
+    avoided_emissions = RoundedFloatField(source="_avoided_emissions", read_only=True)
+
     class Meta:
         model = Operation
         fields = [
