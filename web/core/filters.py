@@ -135,9 +135,17 @@ class TypedMultipleChoiceFieldWithNullLabel(forms.TypedMultipleChoiceField):
 class MultipleChoiceFieldWithNullLabel(forms.MultipleChoiceField):
     """
     MultipleChoiceField with null_label for drf-spectacular compatibility.
+    It also skips static choices validation for dynamic filters.
     """
 
     null_label = None
+
+    def validate(self, value):
+        # Keep default required/empty checks but skip static choices validation.
+        forms.Field.validate(self, value)
+
+    def valid_value(self, value):
+        return True
 
 
 class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
