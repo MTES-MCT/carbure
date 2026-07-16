@@ -88,7 +88,7 @@ class OperationService:
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
 
-            if available_volumes[lot_id] + OperationService.FLOAT_COMPARISON_TOLERANCE < volume:
+            if available_volumes[lot_id] < volume:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
 
     @staticmethod

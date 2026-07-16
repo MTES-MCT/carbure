@@ -24,6 +24,11 @@ GHG_REFERENCE_RED_II = 94  # gCO2/MJ
 
 class TeneurService:
     @staticmethod
+    def _truncate_2_decimals(value: float) -> float:
+        # Add a tiny epsilon to absorb binary float artifacts like 49.99999999999998.
+        return floor((value + 1e-9) * 100) / 100
+
+    @staticmethod
     def optimize_biofuel_blending(
         batches_volumes: npt.NDArray[np.float64],
         batches_emissions: npt.NDArray[np.float64],
@@ -72,7 +77,7 @@ class TeneurService:
 
         # Sanity checks on inputs
         # Round target volume (L) to 2 decimals, because at the end we return 2 decimals precision
-        target_volume = floor(target_volume * 100) / 100
+        target_volume = TeneurService._truncate_2_decimals(target_volume)
 
         if batches_volumes.sum() < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
@@ -233,12 +238,12 @@ class TeneurService:
 
             # Clean available_volume to 2 decimals
             # Any extra decimals are float conversion artifacts
-            available_volume_clean = round(available_volume, 2)
-            optimized_volume_clean = round(optimized_volume, 2)
+            available_volume_clean = TeneurService._truncate_2_decimals(available_volume)
+            optimized_volume_clean = round(optimized_volume, 2)  # it's ok to round up (capped with available_volume_clean)
 
             # Cap optimized volume using values already normalized to business precision,
             # and by the volume still needed to reach the target.
-            remaining_volume = round(target_volume - allocated_volume, 2)
+            remaining_volume = TeneurService._truncate_2_decimals(target_volume - allocated_volume)
             selected_volume = min(optimized_volume_clean, available_volume_clean, remaining_volume)
 
             # Skip negligible volumes that add noise to the response
@@ -246,7 +251,7 @@ class TeneurService:
                 continue
 
             selected_batches_volumes[idx] = selected_volume
-            allocated_volume = round(allocated_volume + selected_volume, 2)
+            allocated_volume = TeneurService._truncate_2_decimals(allocated_volume + selected_volume)
 
         return selected_batches_volumes, res.fun
 

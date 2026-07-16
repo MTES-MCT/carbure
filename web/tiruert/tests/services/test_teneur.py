@@ -27,6 +27,11 @@ class TeneurServiceOptimizeBiofuelBlendingTest(SimpleTestCase):
         total_volume = sum(selected_batches.values())
         self.assertEqual(total_volume, target_volume)
 
+        selected_indices = np.array(list(selected_batches.keys()), dtype=np.int64)
+        selected_volumes = np.array(list(selected_batches.values()), dtype=np.float64)
+        achieved_emission = float(np.dot(selected_volumes, batches_emissions[selected_indices]) / selected_volumes.sum())
+        self.assertLessEqual(achieved_emission, target_emission + 1e-9)
+
     def test_optimize_biofuel_blending_with_enforced_volumes(self):
         """Test optimization with enforced volumes for specific batches"""
         batches_volumes = np.array([100.0, 150.0, 200.0])
