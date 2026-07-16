@@ -12,11 +12,7 @@ from django_filters import (
 )
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.serializers import (
-    CharField,
-    IntegerField as SerializerIntegerField,
-    ListField,
-)
+from rest_framework.serializers import CharField, ListField
 
 from core.filters import MultiValueInFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
