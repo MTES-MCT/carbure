@@ -44,6 +44,9 @@ export const computeObjectiveProgress = (
 export const formatObjectiveGJ = (value: number) =>
   formatUnit(value, ExtendedUnit.GJ, { fractionDigits: 0 })
 
+export const formatObjectiveCO2 = (value: number) =>
+  formatUnit(value, ExtendedUnit.tCO2ev, { fractionDigits: 0 })
+
 export const computeObjectiveEnergy = (objective: ObjectiveProgressInput) =>
   computeObjectiveProgress(objective).remaining_energy
 

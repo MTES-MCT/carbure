@@ -23,6 +23,7 @@ const OperationsElec = () => {
   const { formatUnit } = useUnit()
   const { selectedEntityId } = useSelectedEntity()
   const filterLabels = {
+    [OperationsFilter.years]: t("Année"),
     [OperationsFilter.status]: t("Statut"),
     [OperationsFilter.period]: t("Date"),
     [OperationsFilter.type]: t("Débit / Crédit"),

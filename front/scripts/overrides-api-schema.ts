@@ -28,6 +28,9 @@ const res = mergeDeepRight(parsed, {
           "Airline",
           "Unknown",
           "PowerOrHeatProducer",
+          "SAF_Trader",
+          "Producteur_de_biom_thane",
+          "Fournisseur_de_biom_thane",
         ],
       },
       UserRightsRequestsStatusEnum: {

@@ -2,9 +2,10 @@ import { MainObjective } from "../../../types"
 import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { Trans, useTranslation } from "react-i18next"
-import { RecapData } from "../../recap-data"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { ObjectiveProgressRecap } from "../objective-progress-recap"
+import { ExtendedUnit } from "common/types"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -14,12 +15,6 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
   const { t } = useTranslation()
   const { selectedYear, isDeclarationInCurrentPeriod } =
     useAnnualDeclarationTiruert()
-
-  // If the declaration is in the current period, the total annual date is the current date
-  // If the declaration is not in the current period, the total annual date is the end of the previous year
-  const totalAnnualDate = isDeclarationInCurrentPeriod
-    ? new Date()
-    : new Date(selectedYear, 2, 31)
 
   return (
     <ObjectiveSection
@@ -37,8 +32,8 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
     >
       {objective && (
         <CardProgress
-          title={t("Total annuel à la date du {{date}}", {
-            date: formatDate(totalAnnualDate, "dd/MM/yyyy"),
+          title={t("Année {{year}}", {
+            year: selectedYear,
           })}
           description={t(
             "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",
@@ -72,26 +67,11 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
           penalty={objective.penalty}
         >
           {isDeclarationInCurrentPeriod && (
-            <ul>
-              <li>
-                <RecapData.TeneurDeclaredMonth
-                  value={t("{{value}} tCO2 évitées", {
-                    value: formatNumber(objective.pending_teneur, {
-                      fractionDigits: 0,
-                    }),
-                  })}
-                />
-              </li>
-              <li>
-                <RecapData.QuantityAvailable
-                  value={t("{{value}} tCO2 évitées", {
-                    value: formatNumber(objective.quantity_available, {
-                      fractionDigits: 0,
-                    }),
-                  })}
-                />
-              </li>
-            </ul>
+            <ObjectiveProgressRecap
+              objective={objective}
+              remainingType="objective"
+              unit={ExtendedUnit.tCO2ev}
+            />
           )}
         </CardProgress>
       )}

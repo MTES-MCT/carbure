@@ -143,7 +143,7 @@ export const CompanyForm = ({
       />
       {companyForm.value?.entity_type &&
         ![EntityType.Airline, EntityType.CPO].includes(
-          companyForm.value?.entity_type
+          companyForm.value.entity_type
         ) && (
           <Autocomplete
             label={t("Certificat (schéma volontaire ou national)")}

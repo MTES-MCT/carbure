@@ -4,6 +4,7 @@ import { CategoryEnum, Unit } from "common/types"
 
 export const operationCredit: Operation = {
   id: 1,
+  year: 2021,
   type: OperationType.TRANSFERT,
   sector: OperationSector.ESSENCE,
   customs_category: CategoryEnum.CONV,

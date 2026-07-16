@@ -23,9 +23,11 @@ import { SupplyInputDialog } from "biomethane/pages/supply-plan/supply-input-dia
 
 export const SupplyInputsAdminPage = () => {
   const { t } = useTranslation()
-  const years = useAnnualDeclarationYearsAdmin()
-  const selectedYear = useAnnualDeclarationYear()
   const routes = useRoutes()
+  const years = useAnnualDeclarationYearsAdmin(
+    routes.BIOMETHANE().ADMIN.SUPPLY_INPUTS
+  )
+  const selectedYear = useAnnualDeclarationYear()
   usePrivateNavigation(t("Plan d'approvisionnement"))
 
   const year = selectedYear ?? declarationInterval.year

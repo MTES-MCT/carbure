@@ -42,7 +42,7 @@ export type OperationsQuery = OperationsQueryBuilder["query"] & {
   [OperationsFilter.type]?: OperationDebitOrCredit[]
   [OperationsFilter.operation]?: OperationType[]
   [OperationsFilter.depot]?: string[]
-  [OperationsFilter.years]?: string[]
+  [OperationsFilter.years]?: number[]
 }
 
 // Re-exports
@@ -96,6 +96,7 @@ export type ElecOperationsQueryBuilder = QueryBuilder<
 export type ElecOperationsQuery = ElecOperationsQueryBuilder["query"] & {
   [OperationsFilter.type]?: OperationDebitOrCredit[]
   [OperationsFilter.operation]?: ElecOperationType[]
+  [OperationsFilter.years]?: string[]
 }
 
 export {

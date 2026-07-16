@@ -132,6 +132,7 @@ class ElecOperationFilterTest(SimpleTestCase):
     def test_filter_entity_with_selected_entity_id_raises_for_non_admin(self):
         """Non-admin entity cannot use selected_entity_id — PermissionDenied is raised."""
         entity = Mock(spec=Entity, id=1, entity_type=Entity.OPERATOR)
+        entity.has_external_admin_right.return_value = False
         request = self.factory.get("/test/?entity_id=1&selected_entity_id=2")
         request.query_params = request.GET
         request.entity = entity

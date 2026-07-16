@@ -3,7 +3,11 @@ import {
   api as apiFetch,
   download as downloadFetch,
 } from "common/services/api-fetch"
-import { AgreementListQuery, ApplicationListQuery } from "./types"
+import {
+  AgreementListQuery,
+  ApplicationListQuery,
+  ApplicationFilter,
+} from "./types"
 import { DoubleCountingStatus } from "api-schema"
 // GLOBAL
 
@@ -31,7 +35,7 @@ export function getApplicationFilters(
     .GET("/double-counting/applications/filters/", {
       params: {
         query: {
-          filter: field,
+          filter: field as ApplicationFilter,
           ...query,
           ...QUERY_RESET,
         },

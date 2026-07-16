@@ -55,7 +55,10 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
               penalty={sector.penalty}
             >
               {isDeclarationInCurrentPeriod && (
-                <ObjectiveProgressRecap objective={sector} />
+                <ObjectiveProgressRecap
+                  objective={sector}
+                  remainingType="objective"
+                />
               )}
             </CardProgress>
           )

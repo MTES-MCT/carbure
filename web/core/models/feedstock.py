@@ -56,6 +56,7 @@ class MatierePremiere(models.Model):
     TALLOL = "TALLOL"  # Tall
     OTHER = "OTHER"
     EP2AM = "EP2AM"  # EP2 résiduel
+    CAT3 = "CAT3"  # Graisses de catégorie 3
 
     MP_CATEGORIES = (
         (CONV, "Conventionnel"),
@@ -64,6 +65,7 @@ class MatierePremiere(models.Model):
         (TALLOL, "Tallol"),
         (OTHER, "Autre"),
         (EP2AM, "EP2AM"),
+        (CAT3, "Graisses de catégorie 3"),
     )
 
     name = models.CharField(max_length=256)
