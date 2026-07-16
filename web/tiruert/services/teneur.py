@@ -445,23 +445,10 @@ class TeneurService:
                 # Fix negative volumes by setting them to 0
                 volumes = np.maximum(volumes, 0)
 
-        # Convert target volume into L
-        target_volume = None
-        if data.get("target_volume", None) is not None:
-            target_volume = TeneurService._convert_in_liters(data["target_volume"], unit, data["biofuel"])
+        # Always received in liters from now
+        target_volume = data.get("target_volume", None) or None
 
         return volumes, emissions, lot_ids, enforced_volumes, target_volume
-
-    @staticmethod
-    def _convert_in_liters(quantity, unit, biofuel):
-        if unit == "mj":
-            return quantity / biofuel.pci_litre
-        if unit == "gj":
-            return quantity / biofuel.pci_litre * 1000
-        elif unit == "kg":
-            return quantity / biofuel.masse_volumique
-        else:
-            return quantity
 
     @staticmethod
     def log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes):

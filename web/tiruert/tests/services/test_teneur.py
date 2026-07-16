@@ -193,39 +193,6 @@ class TeneurServiceEmissionBoundsTest(SimpleTestCase):
         self.assertEqual(str(context.exception), TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
 
-class TeneurServiceConvertInLitersTest(SimpleTestCase):
-    """Test TeneurService._convert_in_liters() method"""
-
-    def test_convert_in_liters_returns_same_for_liter_unit(self):
-        """Test that conversion returns same value for liter unit"""
-        mock_biofuel = Mock()
-        quantity = 100.0
-
-        result = TeneurService._convert_in_liters(quantity, "l", mock_biofuel)
-
-        self.assertEqual(result, 100.0)
-
-    def test_convert_in_liters_converts_from_mj(self):
-        """Test conversion from MJ to liters using pci_litre"""
-        mock_biofuel = Mock()
-        mock_biofuel.pci_litre = 35.5
-        quantity = 355.0  # MJ
-
-        result = TeneurService._convert_in_liters(quantity, "mj", mock_biofuel)
-
-        self.assertEqual(result, 10.0)  # 355 / 35.5 = 10
-
-    def test_convert_in_liters_converts_from_kg(self):
-        """Test conversion from kg to liters using masse_volumique"""
-        mock_biofuel = Mock()
-        mock_biofuel.masse_volumique = 0.85
-        quantity = 85.0  # kg
-
-        result = TeneurService._convert_in_liters(quantity, "kg", mock_biofuel)
-
-        self.assertEqual(result, 100.0)  # 85 / 0.85 = 100
-
-
 class TeneurServiceConvertEmissionsTest(SimpleTestCase):
     """Test TeneurService.convert_producted_emissions_to_avoided_emissions() method"""
 
