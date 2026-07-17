@@ -1,4 +1,3 @@
-from math import floor
 from typing import Optional
 
 import numpy as np
@@ -8,6 +7,7 @@ import scipy.sparse
 from django.db.models import Q
 
 from adapters.logger import log_warning
+from core.utils import truncate
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
@@ -23,11 +23,6 @@ GHG_REFERENCE_RED_II = 94  # gCO2/MJ
 
 
 class TeneurService:
-    @staticmethod
-    def _truncate_2_decimals(value: float) -> float:
-        # Add a tiny epsilon to absorb binary float artifacts like 49.99999999999998.
-        return floor((value + 1e-9) * 100) / 100
-
     @staticmethod
     def optimize_biofuel_blending(
         batches_volumes: npt.NDArray[np.float64],
@@ -74,10 +69,11 @@ class TeneurService:
             computed volumes.
 
         """
+        from tiruert.services.operation import VOLUME_PRECISION
 
         # Sanity checks on inputs
         # Round target volume (L) to 2 decimals, because at the end we return 2 decimals precision
-        target_volume = TeneurService._truncate_2_decimals(target_volume)
+        target_volume = truncate(target_volume)
 
         if batches_volumes.sum() < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
@@ -238,12 +234,14 @@ class TeneurService:
 
             # Clean available_volume to 2 decimals
             # Any extra decimals are float conversion artifacts
-            available_volume_clean = TeneurService._truncate_2_decimals(available_volume)
-            optimized_volume_clean = round(optimized_volume, 2)  # it's ok to round up (capped with available_volume_clean)
+            available_volume_clean = truncate(available_volume)
+            optimized_volume_clean = round(
+                optimized_volume, VOLUME_PRECISION
+            )  # it's ok to round up (capped with available_volume_clean)
 
             # Cap optimized volume using values already normalized to business precision,
             # and by the volume still needed to reach the target.
-            remaining_volume = TeneurService._truncate_2_decimals(target_volume - allocated_volume)
+            remaining_volume = truncate(target_volume - allocated_volume)
             selected_volume = min(optimized_volume_clean, available_volume_clean, remaining_volume)
 
             # Skip negligible volumes that add noise to the response
@@ -251,7 +249,7 @@ class TeneurService:
                 continue
 
             selected_batches_volumes[idx] = selected_volume
-            allocated_volume = TeneurService._truncate_2_decimals(allocated_volume + selected_volume)
+            allocated_volume = truncate(allocated_volume + selected_volume)
 
         return selected_batches_volumes, res.fun
 
