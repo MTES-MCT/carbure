@@ -27,10 +27,32 @@ class BiomethaneEnergySerializer(BaseBiomethaneEnergySerializer):
 
 
 class BiomethaneEnergyInputSerializer(BaseBiomethaneEnergySerializer):
+
+    def validate(self, attrs):
+        att_instance = self.instance.__dict__.copy() if self.instance else {}
+        injected_biomethane_gwh_pcs_per_year = attrs.get("injected_biomethane_gwh_pcs_per_year") if attrs.get("injected_biomethane_gwh_pcs_per_year") is not None else att_instance.get("injected_biomethane_gwh_pcs_per_year")
+        pcs_kwh_per_nm3 = attrs.get("injected_biomethane_pcs_kwh_per_nm3") if attrs.get("injected_biomethane_pcs_kwh_per_nm3") is not None else att_instance.get("injected_biomethane_pcs_kwh_per_nm3")
+        produced_biogas_nm3_per_year = attrs.get("produced_biogas_nm3_per_year") if attrs.get("produced_biogas_nm3_per_year") is not None else att_instance.get("produced_biogas_nm3_per_year")
+
+        if (injected_biomethane_gwh_pcs_per_year is not None and
+            pcs_kwh_per_nm3 is not None and
+            produced_biogas_nm3_per_year is not None):
+
+            injected_biomethane_nm3_per_year = (injected_biomethane_gwh_pcs_per_year * 10**6) / pcs_kwh_per_nm3
+            if (injected_biomethane_nm3_per_year - produced_biogas_nm3_per_year) > 0 :
+                raise serializers.ValidationError("The injected biomethane volume does not match the produced biogas volume.")
+
+        
+
+        return attrs
+
+
     def create(self, validated_data):
         entity = self.context.get("entity")
         year = self.context.get("year")
 
         validated_data["producer"] = entity
         validated_data["year"] = year
+        print("validated_data", validated_data)
         return super().create(validated_data)
+    
