@@ -2,7 +2,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from biomethane.models import BiomethaneProductionUnit, BiomethaneSupplyInput, BiomethaneSupplyPlan
+from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
 from biomethane.serializers.production_unit.production_unit import BiomethaneProductionUnitSerializer
 from biomethane.services.supply_plan import apply_feedstock_field_rules
