@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from core.models import Pays
 from core.serializers import CountrySerializer
+from core.utils import truncate
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.fields import RoundedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
@@ -202,7 +203,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
                     {
                         "operation": operation,
                         "lot_id": lot["id"],
-                        "volume": lot["volume"],
+                        "volume": truncate(lot["volume"]),
                         "emission_rate_per_mj": emissions_by_lot[lot["id"]],
                     }
                 )

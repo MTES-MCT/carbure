@@ -7,6 +7,7 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from core.models import CarbureLot, MatierePremiere
+from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
@@ -22,9 +23,10 @@ class OperationServiceErrors:
     ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
 
 
-class OperationService:
-    VOLUME_PRECISION = 2
+VOLUME_PRECISION = 2
 
+
+class OperationService:
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
         """
@@ -76,14 +78,11 @@ class OperationService:
         np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
 
         # Normalize available and requested volumes to business precision.
-        available_volumes = {
-            int(lot_id): round(float(volume), OperationService.VOLUME_PRECISION)
-            for lot_id, volume in zip(np_lot_ids, np_volumes)
-        }
+        available_volumes = {int(lot_id): truncate(volume) for lot_id, volume in zip(np_lot_ids, np_volumes)}
 
         for lot in selected_lots:
             lot_id = lot["id"]
-            volume = round(float(lot["volume"]), OperationService.VOLUME_PRECISION)
+            volume = truncate(lot["volume"])
 
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
@@ -114,12 +113,12 @@ class OperationService:
 
             # 3. Convert the teneur to add from liters to MJ
             pci = data["biofuel"].pci_litre
-            teneur_to_add = sum(lot["volume"] * pci for lot in selected_lots)
+            teneur_to_add = sum(truncate(lot["volume"]) * pci for lot in selected_lots)
 
             # 4. Check if the futur teneur is below the target
             futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ
 
-            if futur_teneur - target > OperationService.FLOAT_COMPARISON_TOLERANCE:
+            if futur_teneur > target:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )
@@ -204,7 +203,7 @@ class OperationService:
                     {
                         "operation": operation,
                         "lot": lot,
-                        "volume": round(lot.volume, OperationService.VOLUME_PRECISION),  # litres
+                        "volume": truncate(lot.volume),  # litres
                         "emission_rate_per_mj": lot.ghg_total,  # gCO2/MJ (input algo d'optimisation)
                     }
                 )
@@ -255,18 +254,12 @@ class OperationService:
                 new_lot_conv.feedstock = copy(lot.feedstock)
                 new_lot_conv.feedstock.category = MatierePremiere.CONV
                 volume_decimal = Decimal(str(lot.volume))
-                new_lot_conv.volume = round(
-                    float(volume_decimal * Decimal("0.4")),
-                    OperationService.VOLUME_PRECISION,
-                )
+                new_lot_conv.volume = truncate(float(volume_decimal * Decimal("0.4")))
 
                 new_lot_ep2 = copy(lot)
                 new_lot_ep2.feedstock = copy(lot.feedstock)
                 new_lot_ep2.feedstock.category = MatierePremiere.EP2AM
-                new_lot_ep2.volume = round(
-                    float(volume_decimal * Decimal("0.6")),
-                    OperationService.VOLUME_PRECISION,
-                )
+                new_lot_ep2.volume = truncate(float(volume_decimal * Decimal("0.6")))
 
                 result_lots.append(new_lot_conv)
                 result_lots.append(new_lot_ep2)
