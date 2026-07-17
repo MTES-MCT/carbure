@@ -9,6 +9,8 @@ class BalanceBiofuelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     code = serializers.CharField()
     renewable_energy_share = RoundedFloatField()
+    pci_litre = RoundedFloatField()
+    masse_volumique = RoundedFloatField()
 
 
 class BalanceQuantitySerializer(serializers.Serializer):
