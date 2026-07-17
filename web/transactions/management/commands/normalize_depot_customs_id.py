@@ -6,7 +6,7 @@ from django.db import transaction
 
 from core.models import Entity
 from entity.models import EntityScope
-from entity.views.depots.mixins.create import get_gps_coordinates
+from entity.services.geolocation import resolve_gps_coordinates
 from transactions.models.depot import Depot
 from transactions.models.site import Site
 
@@ -207,8 +207,10 @@ class Command(BaseCommand):
         )
 
     def update_gps_coordinates(self, depot):
-        depot.gps_coordinates = get_gps_coordinates(depot)
-        if depot.gps_coordinates:
+        coords = resolve_gps_coordinates(depot)
+        if coords:
+            depot.gps_coordinates = coords
+            depot.save(update_fields=["gps_coordinates"])
             self.stdout.write(self.style.SUCCESS(f" - Updated (gps_coordinates: {depot.gps_coordinates})"))
             return True
         return False

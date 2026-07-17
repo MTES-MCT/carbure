@@ -529,6 +529,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/dreal-export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Export validated biomethane declarations for a year as a flat Excel file, scoped by DREAL department access. */
+        get: operations["biomethane_dreal_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/energy/": {
         parameters: {
             query?: never;
@@ -3790,13 +3807,25 @@ export interface components {
             attest_no_fossil_for_energy?: boolean;
             /** Précisions */
             energy_details?: string | null;
-            /** Format: double */
+            /**
+             * Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
+             * Format: double
+             */
             purified_biogas_quantity_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
+             * Format: double
+             */
             purification_electric_consumption_kwe?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)
+             * Format: double
+             */
             self_consumed_biogas_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+             * Format: double
+             */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
             /**
              * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
@@ -3863,13 +3892,25 @@ export interface components {
             attest_no_fossil_for_energy?: boolean;
             /** Précisions */
             energy_details?: string | null;
-            /** Format: double */
+            /**
+             * Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
+             * Format: double
+             */
             purified_biogas_quantity_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
+             * Format: double
+             */
             purification_electric_consumption_kwe?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)
+             * Format: double
+             */
             self_consumed_biogas_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+             * Format: double
+             */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
             /**
              * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
@@ -4164,6 +4205,7 @@ export interface components {
         /** @description Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche). */
         BiomethaneSupplyInputExport: {
             producer: components["schemas"]["EntityPreview"];
+            production_unit: components["schemas"]["BiomethaneProductionUnit"];
             readonly year: number;
             readonly origin_country: string;
             readonly feedstock: components["schemas"]["BiomethaneSupplyInputExportFeedstock"];
@@ -7130,6 +7172,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
+                producer?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -7174,6 +7217,7 @@ export interface operations {
                 filter: PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                producer?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -7885,6 +7929,31 @@ export interface operations {
             };
         };
     };
+    biomethane_dreal_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised DREAL entity ID. */
+                entity_id: number;
+                /** @description Year of the declarations. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fichier Excel généré */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": File;
+                };
+            };
+        };
+    };
     biomethane_energy_retrieve: {
         parameters: {
             query: {
@@ -8056,8 +8125,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
-                producer_id?: number;
                 /** @description Year of the declaration. */
                 year: number;
             };
@@ -14282,6 +14349,7 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_re
 }
 export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter {
     department = "department",
+    producer = "producer",
     status = "status",
     tariff_reference = "tariff_reference"
 }

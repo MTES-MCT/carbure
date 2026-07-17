@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
 from biomethane.serializers.fields import DepartmentField, EuropeanFloatField, LabelChoiceField
+from biomethane.serializers.production_unit.production_unit import BiomethaneProductionUnitSerializer
 from biomethane.services.supply_plan import apply_feedstock_field_rules
 from core.models import MatierePremiere, Pays
 from core.serializers import CountrySerializer, EntityPreviewSerializer
@@ -117,6 +118,7 @@ class BiomethaneSupplyInputExportSerializer(serializers.ModelSerializer):
     """Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche)."""
 
     producer = EntityPreviewSerializer(source="supply_plan.producer")
+    production_unit = BiomethaneProductionUnitSerializer(source="supply_plan.producer.biomethane_production_unit")
     year = serializers.IntegerField(source="supply_plan.year", read_only=True)
     origin_country = serializers.SlugRelatedField(slug_field="name", read_only=True)
     feedstock = BiomethaneSupplyInputExportFeedstockSerializer(read_only=True)

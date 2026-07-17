@@ -193,4 +193,4 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
     def test_export_annual_declaration_permissions(self):
         """Test export_annual_declaration api_view permission: producer OR DREAL."""
         permissions = [p() for p in export_annual_declaration.cls.permission_classes]
-        self.assertPermissionsEqual(permissions, [(HasBiomethaneProducerRights | HasDrealRights)()])
+        self.assertPermissionsEqual(permissions, [HasBiomethaneProducerRights()])

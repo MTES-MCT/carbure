@@ -17,7 +17,6 @@ from core.carburetypes import CarbureSanityCheckErrors
 from core.helpers import send_mail
 from core.models import CarbureLot, Entity, GenericError
 from entity.serializers.depot import CreateDepotSerializer
-from entity.services.geolocation import get_coordinates
 
 
 class CreateDepotActionMixin:
@@ -65,9 +64,6 @@ class CreateDepotActionMixin:
         serializer.is_valid(raise_exception=True)
         depot = serializer.save()
 
-        depot.gps_coordinates = get_gps_coordinates(depot)
-        depot.save()
-
         send_email_to_user(entity, depot.name, request)
         send_email_to_dgec(entity, depot.name, request)
 
@@ -77,12 +73,6 @@ class CreateDepotActionMixin:
         GenericError.objects.filter(lot__in=lots, error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED).delete()
 
         return Response({"status": "success"})
-
-
-def get_gps_coordinates(depot):
-    address = depot.address + " " + depot.postal_code + " " + depot.city + ", " + depot.country.name
-    xy = get_coordinates(address)
-    return f"{xy[0]},{xy[1]}" if xy else None
 
 
 def send_email_to_user(entity, depot_name, request):

@@ -74,6 +74,7 @@ export const useGetDashboardFilterOptions = (
   const getTariffReferenceLabel = useGetTariffReferenceLabel()
   const filterLabels: Record<BiomethaneAdminAnnualDeclarationFilters, string> =
     {
+      [BiomethaneAdminAnnualDeclarationFilters.producer]: t("Producteur"),
       [BiomethaneAdminAnnualDeclarationFilters.status]: t("Statut"),
       [BiomethaneAdminAnnualDeclarationFilters.tariff_reference]:
         t("Arrêté tarifaire"),
