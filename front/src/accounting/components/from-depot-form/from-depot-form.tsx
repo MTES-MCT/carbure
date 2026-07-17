@@ -3,7 +3,6 @@ import { Autocomplete } from "common/components/autocomplete2"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
 import { OperationText } from "accounting/components/operation-text"
-import { useQuery } from "common/hooks/async"
 import { FromDepotFormProps } from "./from-depot-form.types"
 import { getDeliverySites } from "common/api"
 
@@ -12,16 +11,16 @@ export const FromDepotForm = () => {
   const entity = useEntity()
   const { bind } = useFormContext<FromDepotFormProps>()
 
-  const entityDepots = useQuery(() => getDeliverySites(entity.id), {
-    key: "cession-depots",
-    params: [],
-  })
+  const getEntityDepots = async () => {
+    const response = await getDeliverySites(entity.id)
+    return response.data ?? []
+  }
 
   return (
     <Autocomplete
       label={t("Sélectionnez un dépôt d'expédition")}
       placeholder={t("Rechercher un dépôt")}
-      options={entityDepots.result?.data ?? []}
+      getOptions={getEntityDepots}
       normalize={(entityDepot) => ({
         value: entityDepot.depot!,
         label: entityDepot.depot!.name,
