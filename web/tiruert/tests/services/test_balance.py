@@ -641,6 +641,173 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         # Should have non-zero quantity (conversion applied successfully)
         self.assertGreater(result_mj[sector_key]["quantity"]["debit"], 0)
 
+    def test_calculate_balance_truncates_teneur_after_sum_per_operation(self):
+        """Teneur in MJ must apply int() after summing details per operation, then sum operation totals."""
+        from core.models import Biocarburant
+
+        biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
+
+        if not biofuel_essence:
+            self.skipTest("Missing compatible_essence biofuel in fixtures")
+
+        biofuel_essence.pci_litre = 27
+        biofuel_essence.save()
+
+        lot_1 = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+        lot_2 = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+        lot_3 = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+
+        # Op1: 2 details, each 1 L * 27 * 0.5 = 13.5
+        # int(sum details for op1) = int(27.0) = 27
+        # A wrong per-detail truncation would produce int(13.5) + int(13.5) = 26.
+        op1 = self.OperationFactory(
+            debited_entity=self.entity,
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            biofuel=biofuel_essence,
+            renewable_energy_share=0.5,
+        )
+        self.OperationDetailFactory.create_for_operation(op1, lot=lot_1, volume=1.0)
+        self.OperationDetailFactory.create_for_operation(op1, lot=lot_2, volume=1.0)
+
+        # Op2: 1 detail, 1 L * 27 * 0.5 = 13.5 -> int(13.5) = 13
+        op2 = self.OperationFactory(
+            debited_entity=self.entity,
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            biofuel=biofuel_essence,
+            renewable_energy_share=0.5,
+        )
+        self.OperationDetailFactory.create_for_operation(op2, lot=lot_3, volume=1.0)
+
+        operations = Operation.objects.filter(id__in=[op1.id, op2.id])
+
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "mj")
+
+        self.assertIn(Operation.ESSENCE, result)
+        self.assertEqual(result[Operation.ESSENCE]["pending_teneur"], 40)
+
+    def test_calculate_balance_teneur_differs_from_global_volume_truncation(self):
+        """Current operation-level truncation must differ from old global-volume truncation logic."""
+        from core.models import Biocarburant
+
+        biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
+
+        if not biofuel_essence:
+            self.skipTest("Missing compatible_essence biofuel in fixtures")
+
+        biofuel_essence.pci_litre = 27
+        biofuel_essence.save()
+
+        lot_1 = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+        lot_2 = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+
+        op1 = self.OperationFactory(
+            debited_entity=self.entity,
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            biofuel=biofuel_essence,
+            renewable_energy_share=0.5,
+        )
+        self.OperationDetailFactory.create_for_operation(op1, lot=lot_1, volume=1.0)
+
+        op2 = self.OperationFactory(
+            debited_entity=self.entity,
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            biofuel=biofuel_essence,
+            renewable_energy_share=0.5,
+        )
+        self.OperationDetailFactory.create_for_operation(op2, lot=lot_2, volume=1.0)
+
+        operations = Operation.objects.filter(id__in=[op1.id, op2.id])
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "mj")
+
+        # New rule: sum(int(operation_total)) -> int(13.5) + int(13.5) = 26.
+        self.assertIn(Operation.ESSENCE, result)
+        self.assertEqual(result[Operation.ESSENCE]["pending_teneur"], 26)
+
+        # Old behavior (global): int((sum volumes) * pci * share) -> int(2 * 27 * 0.5) = 27.
+        old_global_pending_teneur = int((1.0 + 1.0) * 27 * 0.5)
+        self.assertEqual(old_global_pending_teneur, 27)
+        self.assertNotEqual(result[Operation.ESSENCE]["pending_teneur"], old_global_pending_teneur)
+
+    def test_calculate_balance_teneur_in_gj_truncates_in_mj_then_returns_gj(self):
+        """For GJ unit, teneur truncation is done on MJ operation total, then converted back to GJ."""
+        from core.models import Biocarburant
+
+        biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
+
+        if not biofuel_essence:
+            self.skipTest("Missing compatible_essence biofuel in fixtures")
+
+        biofuel_essence.pci_litre = 27
+        biofuel_essence.save()
+
+        lot_1 = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+        lot_2 = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+
+        op1 = self.OperationFactory(
+            debited_entity=self.entity,
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            biofuel=biofuel_essence,
+            renewable_energy_share=0.5,
+        )
+        self.OperationDetailFactory.create_for_operation(op1, lot=lot_1, volume=1.0)
+
+        op2 = self.OperationFactory(
+            debited_entity=self.entity,
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            biofuel=biofuel_essence,
+            renewable_energy_share=0.5,
+        )
+        self.OperationDetailFactory.create_for_operation(op2, lot=lot_2, volume=1.0)
+
+        operations = Operation.objects.filter(id__in=[op1.id, op2.id])
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "gj")
+
+        # Each op total in MJ = 13.5 -> int(13.5) = 13, then converted to GJ = 0.013.
+        # Sum over 2 operations -> 0.026 GJ.
+        self.assertIn(Operation.ESSENCE, result)
+        self.assertAlmostEqual(result[Operation.ESSENCE]["pending_teneur"], 0.026, places=6)
+
 
 class BalanceServiceObjectiveSectorTest(TestCase):
     """Tests for objective_sector override in BalanceService.calculate_balance()."""
