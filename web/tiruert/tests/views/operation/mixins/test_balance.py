@@ -82,7 +82,13 @@ class BalanceActionMixinTest(TestCase):
             "key1": {
                 "sector": "ESSENCE",
                 "customs_category": "CONV",
-                "biofuel": {"id": 1, "code": "ETH", "renewable_energy_share": 0.8},
+                "biofuel": {
+                    "id": 1,
+                    "code": "ETH",
+                    "renewable_energy_share": 0.8,
+                    "pci_litre": 21.1,
+                    "masse_volumique": 0.79,
+                },
                 "available_balance": 200.0,
                 "quantity": {"credit": 100.0, "debit": 50.0},
                 "pending_teneur": 0.0,
@@ -96,7 +102,13 @@ class BalanceActionMixinTest(TestCase):
             "key2": {
                 "sector": "GAZOLE",
                 "customs_category": "CONV",
-                "biofuel": {"id": 2, "code": "EMHV", "renewable_energy_share": 0.85},
+                "biofuel": {
+                    "id": 2,
+                    "code": "EMHV",
+                    "renewable_energy_share": 0.85,
+                    "pci_litre": 33.3,
+                    "masse_volumique": 0.88,
+                },
                 "available_balance": 50.0,
                 "quantity": {"credit": 25.0, "debit": 10.0},
                 "pending_operations": 2,
@@ -110,7 +122,13 @@ class BalanceActionMixinTest(TestCase):
             "key3": {
                 "sector": "GPL",
                 "customs_category": "CONV",
-                "biofuel": {"id": 3, "code": "EMAG", "renewable_energy_share": 0.9},
+                "biofuel": {
+                    "id": 3,
+                    "code": "EMAG",
+                    "renewable_energy_share": 0.9,
+                    "pci_litre": 27.5,
+                    "masse_volumique": 0.82,
+                },
                 "available_balance": 150.0,
                 "quantity": {"credit": 75.0, "debit": 30.0},
                 "pending_operations": 3,

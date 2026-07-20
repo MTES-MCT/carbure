@@ -20,7 +20,13 @@ class BalanceSerializersTest(TestCase):
 
     def test_balance_biofuel_serializer(self):
         """Test that BalanceBiofuelSerializer correctly serializes a biofuel object"""
-        data = {"id": 1, "code": "ETH", "renewable_energy_share": 0.8}
+        data = {
+            "id": 1,
+            "code": "ETH",
+            "renewable_energy_share": 0.8,
+            "pci_litre": 21.1,
+            "masse_volumique": 0.79,
+        }
         serializer = BalanceBiofuelSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["code"], "ETH")
@@ -45,7 +51,13 @@ class BalanceSerializersTest(TestCase):
         data = {
             "sector": "ESSENCE",
             "customs_category": "CONV",
-            "biofuel": {"id": 1, "code": "ETH", "renewable_energy_share": 0.8},
+            "biofuel": {
+                "id": 1,
+                "code": "ETH",
+                "renewable_energy_share": 0.8,
+                "pci_litre": 21.1,
+                "masse_volumique": 0.79,
+            },
             "available_balance": 150.0,
             "quantity": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 0.0,
@@ -120,7 +132,13 @@ class BalanceSerializerValidationTest(TestCase):
         data = {
             "sector": "INVALID_SECTOR",
             "customs_category": "CONV",
-            "biofuel": {"id": 1, "code": "ETH", "renewable_energy_share": 0.8},
+            "biofuel": {
+                "id": 1,
+                "code": "ETH",
+                "renewable_energy_share": 0.8,
+                "pci_litre": 21.1,
+                "masse_volumique": 0.79,
+            },
             "available_balance": 150.0,
             "quantity": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 0.0,
@@ -140,7 +158,13 @@ class BalanceSerializerValidationTest(TestCase):
         data = {
             "sector": "ESSENCE",
             "customs_category": "INVALID_CATEGORY",
-            "biofuel": {"id": 1, "code": "ETH", "renewable_energy_share": 0.8},
+            "biofuel": {
+                "id": 1,
+                "code": "ETH",
+                "renewable_energy_share": 0.8,
+                "pci_litre": 21.1,
+                "masse_volumique": 0.79,
+            },
             "available_balance": 150.0,
             "quantity": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 0.0,
@@ -269,7 +293,13 @@ class BalanceSerializationTest(TestCase):
 
     def test_balance_serializer_serializes_instance(self):
         """Test that BalanceSerializer correctly serializes a Python dict instance to JSON"""
-        biofuel_instance = {"id": 1, "code": "ETH", "renewable_energy_share": 0.8}
+        biofuel_instance = {
+            "id": 1,
+            "code": "ETH",
+            "renewable_energy_share": 0.8,
+            "pci_litre": 21.1,
+            "masse_volumique": 0.79,
+        }
         instance = {
             "sector": "ESSENCE",
             "customs_category": "CONV",

@@ -7,6 +7,7 @@ from core.models import Pays
 from core.serializers import CountrySerializer
 from core.utils import truncate
 from tiruert.models import Operation, OperationDetail
+from tiruert.serializers.balance import BalanceBiofuelSerializer
 from tiruert.serializers.fields import RoundedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
@@ -30,10 +31,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.CharField(source="_sector", read_only=True)
     type = serializers.CharField(source="_type", read_only=True)
-    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
+    biofuel = BalanceBiofuelSerializer(read_only=True)
     quantity = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
-    renewable_energy_share = serializers.FloatField()
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()

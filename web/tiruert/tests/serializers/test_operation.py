@@ -75,7 +75,13 @@ class BaseOperationSerializerTest(TestCase):
         operation._sector = Operation.ESSENCE
         operation.objective_sector = None
         operation.customs_category = MatierePremiere.CONV
-        operation.biofuel = Mock(code="ETH")
+        operation.biofuel = Biocarburant(
+            id=1,
+            code="ETH",
+            renewable_energy_share=1.0,
+            pci_litre=21.1,
+            masse_volumique=0.79,
+        )
         operation.renewable_energy_share = 1.0
         operation.credited_entity = Mock(id=1, name="Credited")
         operation.debited_entity = Mock(id=2, name="Debited")
