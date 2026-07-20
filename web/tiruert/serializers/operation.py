@@ -109,7 +109,6 @@ class OperationSerializer(BaseOperationSerializer):
             "quantity",
             "quantity_mj",
             "avoided_emissions",
-            "unit",
             "details",
             "year",
         ]
