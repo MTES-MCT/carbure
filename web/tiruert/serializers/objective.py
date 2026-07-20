@@ -33,14 +33,14 @@ class ObjectiveCategorySerializer(serializers.Serializer):
 
 
 class MainObjectiveSerializer(serializers.Serializer):
-    available_balance = TruncatedFloatField(decimal_places=0)
-    target = serializers.FloatField()
-    pending_teneur = TruncatedFloatField(decimal_places=0)
-    declared_teneur = TruncatedFloatField(decimal_places=0)
-    unit = serializers.CharField()
-    penalty = serializers.IntegerField()
-    target_percent = serializers.FloatField()
-    energy_basis = TruncatedFloatField(decimal_places=0)
+    available_balance = TruncatedFloatField()  # tCO2
+    target = TruncatedFloatField()  # tCO2
+    pending_teneur = TruncatedFloatField()  # tCO2
+    declared_teneur = TruncatedFloatField()  # tCO2
+    unit = serializers.CharField()  # tCO2
+    penalty = serializers.IntegerField()  # centimes euros
+    target_percent = serializers.FloatField()  # tCO2
+    energy_basis = TruncatedFloatField(decimal_places=0)  # MJ
 
 
 class ObjectiveOutputSerializer(serializers.Serializer):
