@@ -138,7 +138,10 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
         self.assertViewPermissions(
             BiomethaneSupplyInputViewSet,
             [
-                (["retrieve", "list", "export_supply_plan_to_excel", "filters"], [ReadAccessBiomethane()]),
+                (
+                    ["retrieve", "list", "export_supply_plan_to_excel", "filters", "tariff_coefficient_proportions"],
+                    [ReadAccessBiomethane()],
+                ),
                 (["create", "destroy", "update"], [HasBiomethaneProducerWriteRights()]),
                 (["partial_update"], [(HasBiomethaneProducerWriteRights | HasDrealRights)()]),
             ],
