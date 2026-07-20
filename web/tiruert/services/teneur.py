@@ -308,8 +308,8 @@ class TeneurService:
         return min_emissions_rate, max_emissions_rate
 
     @staticmethod
-    def prepare_data_and_optimize(data, unit):
-        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(data, unit)
+    def prepare_data_and_optimize(data):
+        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(data)
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
         pci = data["biofuel"].pci_litre
@@ -328,15 +328,12 @@ class TeneurService:
         return selected_lots, lot_ids, fun
 
     @staticmethod
-    def get_min_and_max_emissions(data, unit):
+    def get_min_and_max_emissions(data):
         """
         Compute minimum and maximum feasible mix emissions.
         Return avoided emissions (tCO2)
         """
-        volumes, emissions, _, _, target_volume = TeneurService.prepare_data(
-            data,
-            unit,
-        )  # volumes in L, emissions in gCO2/MJ
+        volumes, emissions, _, _, target_volume = TeneurService.prepare_data(data)  # volumes in L, emissions in gCO2/MJ
 
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
             volumes,
@@ -363,7 +360,7 @@ class TeneurService:
         return (GHG_REFERENCE_RED_II - emissions_rate) * volume_energy / 1000000  # tCO2
 
     @staticmethod
-    def prepare_data(data, unit):
+    def prepare_data(data):
         """
         Prepare data for optimization and operation creation
         """

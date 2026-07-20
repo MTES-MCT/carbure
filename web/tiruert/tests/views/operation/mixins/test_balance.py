@@ -73,7 +73,6 @@ class BalanceActionMixinTest(TestCase):
         django_request = self.factory.get("/api/operations/balance/", query_params or {})
         request = Request(django_request)
         request.entity = self.entity
-        request.unit = query_params.get("unit", "l") if query_params else "l"
         return request
 
     def _create_mock_balance_data(self):
@@ -146,7 +145,7 @@ class BalanceActionMixinTest(TestCase):
         """Test that balance action calls BalanceService.calculate_balance with correct parameters"""
         mock_calculate_balance.return_value = {}
 
-        request = self._create_request({"unit": "l"})
+        request = self._create_request({"unit": "mj"})
 
         self.view.balance(request)
 
@@ -154,7 +153,7 @@ class BalanceActionMixinTest(TestCase):
         call_args = mock_calculate_balance.call_args[0]
         self.assertEqual(call_args[1], self.entity.id)  # entity_id
         self.assertIsNone(call_args[2])  # group_by
-        self.assertEqual(call_args[3], "l")  # unit
+        self.assertEqual(call_args[3], "l")  # unit is forced to liters
 
     def test_balance_action_serializer_selection(self):
         """Test that balance action selects the correct serializer based on group_by parameter"""

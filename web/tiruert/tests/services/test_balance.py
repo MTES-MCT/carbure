@@ -8,77 +8,11 @@ from tiruert.services.balance import BalanceService
 
 
 class BalanceServiceDefineConversionRuleTest(TestCase):
-    """Unit tests for BalanceService._define_conversion_rule() method."""
+    """Unit tests for BalanceService unit conversion rules."""
 
-    def test_define_conversion_rule_returns_pci_litre_with_multiplier_1_for_mj(self):
-        """Test _define_conversion_rule returns ('pci_litre', 1) for 'mj' unit."""
-        result = BalanceService._define_conversion_rule("mj")
-        self.assertEqual(result, ("pci_litre", 1))
-
-    def test_define_conversion_rule_returns_pci_litre_with_multiplier_0001_for_gj(self):
-        """Test _define_conversion_rule returns ('pci_litre', 0.001) for 'gj' unit."""
-        result = BalanceService._define_conversion_rule("gj")
-        self.assertEqual(result, ("pci_litre", 0.001))
-
-    def test_define_conversion_rule_returns_masse_volumique_with_multiplier_1_for_kg(self):
-        """Test _define_conversion_rule returns ('masse_volumique', 1) for 'kg' unit."""
-        result = BalanceService._define_conversion_rule("kg")
-        self.assertEqual(result, ("masse_volumique", 1))
-
-    def test_define_conversion_rule_returns_none_field_for_unknown_unit(self):
-        """Test _define_conversion_rule returns (None, 1) for unknown units."""
-        result = BalanceService._define_conversion_rule("liters")
-        self.assertEqual(result, (None, 1))
-
-    def test_define_conversion_rule_returns_none_field_for_empty_string(self):
-        """Test _define_conversion_rule returns (None, 1) for empty string."""
-        result = BalanceService._define_conversion_rule("")
-        self.assertEqual(result, (None, 1))
-
-
-class BalanceServiceGetConversionFactorTest(TestCase):
-    """Unit tests for BalanceService._get_conversion_factor() method."""
-
-    def test_get_conversion_factor_returns_pci_litre_for_mj_unit(self):
-        """Test _get_conversion_factor returns pci_litre value for 'mj' unit."""
-        mock_biofuel = Mock()
-        mock_biofuel.pci_litre = 35.5
-        mock_operation = Mock()
-        mock_operation.biofuel = mock_biofuel
-
-        result = BalanceService._get_conversion_factor(mock_operation, "mj")
-
-        self.assertEqual(result, 35.5)
-
-    def test_get_conversion_factor_returns_masse_volumique_for_kg_unit(self):
-        """Test _get_conversion_factor returns masse_volumique value for 'kg' unit."""
-        mock_biofuel = Mock()
-        mock_biofuel.masse_volumique = 0.85
-        mock_operation = Mock()
-        mock_operation.biofuel = mock_biofuel
-
-        result = BalanceService._get_conversion_factor(mock_operation, "kg")
-
-        self.assertEqual(result, 0.85)
-
-    def test_get_conversion_factor_returns_1_for_unknown_unit(self):
-        """Test _get_conversion_factor returns 1 for unknown units (no conversion)."""
-        mock_operation = Mock()
-        mock_operation.biofuel = Mock()
-
-        result = BalanceService._get_conversion_factor(mock_operation, "liters")
-
-        self.assertEqual(result, 1)
-
-    def test_get_conversion_factor_returns_1_when_attribute_missing(self):
-        """Test _get_conversion_factor returns 1 when biofuel lacks conversion attribute."""
-        mock_biofuel = Mock(spec=[])  # Mock without pci_litre or masse_volumique
-        mock_operation = Mock()
-        mock_operation.biofuel = mock_biofuel
-
-        result = BalanceService._get_conversion_factor(mock_operation, "mj")
-
-        self.assertEqual(result, 1)
+    def test_unit_conversion_rules_only_supports_mj(self):
+        """Only MJ conversion should remain in unit conversion rules."""
+        self.assertEqual(BalanceService.UNIT_CONVERSION_RULES, {"mj": ("pci_litre", 1)})
 
 
 class BalanceServiceInitBalanceEntryTest(TestCase):
@@ -153,17 +87,16 @@ class BalanceServiceGetKeyTest(TestCase):
 class BalanceServiceCalculateQuantityTest(TestCase):
     """Unit tests for BalanceService.calculate_quantity() method."""
 
-    def test_calculate_quantity_multiplies_all_factors(self):
-        """Test calculate_quantity multiplies volume * conversion_factor * renewable_energy_share."""
+    def test_calculate_quantity_multiplies_volume_by_renewable_share(self):
+        """Test calculate_quantity multiplies volume * renewable_energy_share."""
         mock_operation = Mock()
         mock_operation.renewable_energy_share = 0.8
         mock_detail = Mock()
         mock_detail.volume = 100.0
-        conversion_factor = 2.5
 
-        result = BalanceService._calculate_quantity(mock_operation, mock_detail, conversion_factor)
+        result = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
-        self.assertEqual(result, 200.0)  # 100 * 2.5 * 0.8 = 200
+        self.assertEqual(result, 80.0)  # 100 * 0.8 = 80
 
 
 class OperationDetailAvoidedEmissionsTest(TestCase):
@@ -194,7 +127,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 20.0
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
         BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
 
@@ -209,7 +142,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_operation.renewable_energy_share = 1.0
         mock_detail = Mock()
         mock_detail.volume = 15.0
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
         BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, False, quantity)
 
@@ -234,7 +167,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 10.0
         mock_detail.avoided_emissions = 2.5
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
         BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
 
@@ -260,7 +193,7 @@ class BalanceServiceUpdateQuantityAndTeneurTest(TestCase):
         mock_detail = Mock()
         mock_detail.volume = 7.0
         mock_detail.avoided_emissions = 1.25
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
         BalanceService._update_quantity_and_teneur(balance, "key1", mock_operation, mock_detail, True, quantity)
 
@@ -288,7 +221,7 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail.volume = 20.0
         mock_detail.emission_rate_per_mj = 25.0
         mock_detail.avoided_emissions = 50.0
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
         BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
@@ -311,7 +244,7 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail.volume = 15.0
         mock_detail.emission_rate_per_mj = 20.0
         mock_detail.avoided_emissions = 30.0
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
         BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, False, quantity)
 
@@ -334,7 +267,7 @@ class BalanceServiceUpdateAvailableBalanceTest(TestCase):
         mock_detail.volume = 10.0
         mock_detail.emission_rate_per_mj = 42.5
         mock_detail.avoided_emissions = 0.0
-        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail, 1.0)
+        quantity = BalanceService._calculate_quantity(mock_operation, mock_detail)
 
         BalanceService._update_available_balance(balance, "key1", mock_operation, mock_detail, True, quantity)
 
@@ -756,57 +689,6 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         old_global_pending_teneur = int((1.0 + 1.0) * 27 * 0.5)
         self.assertEqual(old_global_pending_teneur, 27)
         self.assertNotEqual(result[Operation.ESSENCE]["pending_teneur"], old_global_pending_teneur)
-
-    def test_calculate_balance_teneur_in_gj_truncates_in_mj_then_returns_gj(self):
-        """For GJ unit, teneur truncation is done on MJ operation total, then converted back to GJ."""
-        from core.models import Biocarburant
-
-        biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
-
-        if not biofuel_essence:
-            self.skipTest("Missing compatible_essence biofuel in fixtures")
-
-        biofuel_essence.pci_litre = 27
-        biofuel_essence.save()
-
-        lot_1 = self.CarbureLotFactory.create(
-            added_by=self.entity,
-            carbure_supplier=self.entity,
-            carbure_client=self.entity,
-            carbure_producer=self.entity,
-        )
-        lot_2 = self.CarbureLotFactory.create(
-            added_by=self.entity,
-            carbure_supplier=self.entity,
-            carbure_client=self.entity,
-            carbure_producer=self.entity,
-        )
-
-        op1 = self.OperationFactory(
-            debited_entity=self.entity,
-            type=Operation.TENEUR,
-            status=Operation.PENDING,
-            biofuel=biofuel_essence,
-            renewable_energy_share=0.5,
-        )
-        self.OperationDetailFactory.create_for_operation(op1, lot=lot_1, volume=1.0)
-
-        op2 = self.OperationFactory(
-            debited_entity=self.entity,
-            type=Operation.TENEUR,
-            status=Operation.PENDING,
-            biofuel=biofuel_essence,
-            renewable_energy_share=0.5,
-        )
-        self.OperationDetailFactory.create_for_operation(op2, lot=lot_2, volume=1.0)
-
-        operations = Operation.objects.filter(id__in=[op1.id, op2.id])
-        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "gj")
-
-        # Each op total in MJ = 13.5 -> int(13.5) = 13, then converted to GJ = 0.013.
-        # Sum over 2 operations -> 0.026 GJ.
-        self.assertIn(Operation.ESSENCE, result)
-        self.assertAlmostEqual(result[Operation.ESSENCE]["pending_teneur"], 0.026, places=6)
 
 
 class BalanceServiceObjectiveSectorTest(TestCase):

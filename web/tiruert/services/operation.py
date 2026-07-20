@@ -56,9 +56,9 @@ class OperationService:
         return emission_rates_by_lot
 
     @staticmethod
-    def perform_checks_before_create(request, entity_id, selected_lots, data, unit, declaration_year):
+    def perform_checks_before_create(request, entity_id, selected_lots, data, declaration_year):
         OperationService.check_debited_entity(entity_id, data)
-        OperationService.check_volumes(selected_lots, data, unit)
+        OperationService.check_volumes(selected_lots, data)
         OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
         OperationService.check_declaration_year(declaration_year, data)
 
@@ -71,11 +71,11 @@ class OperationService:
             raise serializers.ValidationError({"debited_entity": OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID})
 
     @staticmethod
-    def check_volumes(selected_lots, data, unit):
+    def check_volumes(selected_lots, data):
         """
         Check if the selected lots exist and have enough volume to perform the operation
         """
-        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
+        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data)
 
         # Normalize available and requested volumes to business precision.
         available_volumes = {int(lot_id): truncate(volume) for lot_id, volume in zip(np_lot_ids, np_volumes)}

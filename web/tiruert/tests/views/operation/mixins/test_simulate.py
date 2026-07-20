@@ -69,7 +69,7 @@ class SimulateActionMixinTest(TestCase):
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
     def test_simulate_calls_service_with_correct_parameters(self, mock_service):
-        """Test that simulate calls TeneurService.prepare_data_and_optimize with correct parameters"""
+        """Test that simulate calls TeneurService.prepare_data_and_optimize with validated data only."""
         mock_service.return_value = ({0: 1000.0}, np.array([10]), 0.5)
 
         data = self._create_valid_data()
@@ -81,8 +81,6 @@ class SimulateActionMixinTest(TestCase):
         # First arg is validated_data dict
         self.assertEqual(call_args[0]["target_volume"], 1000.0)
         self.assertEqual(call_args[0]["target_emission"], 1.5)
-        # Second arg is unit
-        self.assertEqual(call_args[1], "mj")
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
     def test_simulate_constructs_detail_operations_data_correctly(self, mock_service):
@@ -272,7 +270,7 @@ class SimulateMinMaxActionMixinTest(TestCase):
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.get_min_and_max_emissions")
     def test_simulate_min_max_calls_service_with_correct_parameters(self, mock_service):
-        """Test that simulate_min_max calls TeneurService.get_min_and_max_emissions with correct parameters"""
+        """Test that simulate_min_max calls TeneurService.get_min_and_max_emissions with validated data only."""
         mock_service.return_value = (1.5, 3.2)
 
         data = self._create_valid_data()
@@ -283,8 +281,6 @@ class SimulateMinMaxActionMixinTest(TestCase):
         call_args = mock_service.call_args[0]
         # First arg is validated_data dict
         self.assertEqual(call_args[0]["target_volume"], 1000.0)
-        # Second arg is unit
-        self.assertEqual(call_args[1], "kg")
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.get_min_and_max_emissions")
     def test_simulate_min_max_returns_min_and_max_emissions(self, mock_service):

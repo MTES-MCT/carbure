@@ -47,10 +47,6 @@ def _get_teneur_sector_expression(sector_expr):
 def _get_quantity_expression(unit):
     if unit == "mj":
         factor_expr = F("operation__biofuel__pci_litre")
-    elif unit == "gj":
-        factor_expr = ExpressionWrapper(F("operation__biofuel__pci_litre") * Value(0.001), output_field=FloatField())
-    elif unit == "kg":
-        factor_expr = F("operation__biofuel__masse_volumique")
     else:
         factor_expr = Value(1.0)
 
@@ -74,8 +70,8 @@ def _get_avoided_emissions_expression():
 
 
 def _build_common_context(entity_id, unit, date_from):
-    quantity_expr = _get_quantity_expression(unit)
-    teneur_quantity_expr = _get_quantity_expression("mj") if unit == "gj" else quantity_expr
+    quantity_expr = _get_quantity_expression("l")
+    teneur_quantity_expr = _get_quantity_expression("mj")
     avoided_emissions_expr = _get_avoided_emissions_expression()
 
     credit_cond = Q(operation__credited_entity_id=entity_id)
@@ -167,8 +163,8 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
 
     grouped_contributions = defaultdict(
         lambda: {
-            "pending_teneur": 0.0,
-            "declared_teneur": 0.0,
+            "pending_teneur": 0,
+            "declared_teneur": 0,
             "pending_saved_emissions": 0.0,
             "declared_saved_emissions": 0.0,
         }
@@ -177,9 +173,7 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
     for group in operation_groups:
         key = tuple(group[field] for field in group_fields)
         entry = grouped_contributions[key]
-        operation_quantity = int(group["operation_quantity"] or 0.0)
-        if context["unit"] == "gj":
-            operation_quantity = operation_quantity / 1000.0
+        operation_quantity = int(group["operation_quantity"] or 0)
         operation_saved_emissions = group["operation_saved_emissions"] or 0.0
 
         if group["operation__status"] == Operation.PENDING:

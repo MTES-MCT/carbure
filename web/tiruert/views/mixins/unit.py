@@ -7,23 +7,18 @@ class UnitMixin:
 
     The unit is determined in the following order:
     1. 'unit' parameter from the request (POST or GET)
-    2. Entity's preferred unit (entity.preferred_unit)
-    3. Default value: 'l' (liters)
+    2. Default value: 'l' (liters)
     """
 
     def initialize_request(self, request, *args, **kwargs):
         """
         Initializes the request by adding the 'unit' attribute.
 
-        The unit is retrieved from request parameters,
-        the entity, or defaults to 'l'.
+        The unit is retrieved from request parameters or defaults to 'l'.
         """
         request = super().initialize_request(request, *args, **kwargs)
         # Get unit from request params or entity preference or default to liters
-        entity = getattr(request, "entity", None)
-        unit = (
-            request.POST.get("unit", request.GET.get("unit")) or (entity.preferred_unit.lower() if entity else None) or "l"
-        )
+        unit = request.POST.get("unit", request.GET.get("unit")) or "l"
         setattr(request, "unit", unit.lower())
         return request
 

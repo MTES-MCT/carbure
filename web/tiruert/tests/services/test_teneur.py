@@ -236,8 +236,6 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
             "target_volume": 1000.0,
             "target_emission": 1.5,
         }
-        unit = "l"
-
         volumes = np.array([100.0, 200.0])
         emissions = np.array([50.0, 60.0])
         lot_ids = np.array([1, 2])
@@ -247,9 +245,9 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         mock_prepare.return_value = (volumes, emissions, lot_ids, enforced_volumes, target_volume)
         mock_optimize.return_value = ({0: 100.0, 1: 900.0}, 0.5)
 
-        selected_lots, returned_lot_ids, fun = TeneurService.prepare_data_and_optimize(data, unit)
+        selected_lots, returned_lot_ids, fun = TeneurService.prepare_data_and_optimize(data)
 
-        mock_prepare.assert_called_once_with(data, unit)
+        mock_prepare.assert_called_once_with(data)
         self.assertIsNotNone(selected_lots)
 
     @patch("tiruert.services.teneur.TeneurService.prepare_data")
@@ -263,8 +261,6 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
             "target_volume": 1000.0,
             "target_emission": 1.5,
         }
-        unit = "l"
-
         volumes = np.array([100.0, 200.0])
         emissions = np.array([50.0, 60.0])
         lot_ids = np.array([1, 2])
@@ -274,7 +270,7 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         mock_prepare.return_value = (volumes, emissions, lot_ids, enforced_volumes, target_volume)
         mock_optimize.return_value = ({0: 100.0, 1: 900.0}, 0.5)
 
-        TeneurService.prepare_data_and_optimize(data, unit)
+        TeneurService.prepare_data_and_optimize(data)
 
         # Verify optimize was called with correct arguments
         mock_optimize.assert_called_once()
@@ -337,7 +333,7 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
 
         data = self._make_data(feedstock=["COLZA", "TOURNESOL"])
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         _, call_kwargs = mock_balance.call_args
         self.assertEqual(call_kwargs["detail_filters"]["feedstock"], ["COLZA", "TOURNESOL"])
@@ -352,7 +348,7 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
 
         data = self._make_data(origin_country=["FR", "DE"])
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         _, call_kwargs = mock_balance.call_args
         self.assertEqual(call_kwargs["detail_filters"]["origin_country"], ["FR", "DE"])
@@ -367,7 +363,7 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
 
         data = self._make_data()
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         _, call_kwargs = mock_balance.call_args
         self.assertIsNone(call_kwargs["detail_filters"]["feedstock"])
@@ -382,7 +378,7 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
 
         data = self._make_data()
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         _, call_kwargs = mock_balance.call_args
         self.assertIsNone(call_kwargs["detail_filters"]["origin_country"])
@@ -400,7 +396,7 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
 
         data = self._make_data(durability_period=["2024", "2025"])
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         mock_resolve.assert_called_once()
         _, call_kwargs = mock_balance.call_args
@@ -416,7 +412,7 @@ class TeneurServicePrepareDataTest(SimpleTestCase):
 
         data = self._make_data()
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         _, call_kwargs = mock_balance.call_args
         self.assertIsNone(call_kwargs["detail_filters"]["lot_ids"])
@@ -477,7 +473,7 @@ class TeneurServicePrepareDataDurabilityFilterTest(TestCase):
             "durability_period": ["2024"],
         }
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         _, call_kwargs = mock_balance.call_args
         lot_ids = call_kwargs["detail_filters"]["lot_ids"]
@@ -496,7 +492,7 @@ class TeneurServicePrepareDataDurabilityFilterTest(TestCase):
             "debited_entity": self.entity,
         }
 
-        TeneurService.prepare_data(data, "l")
+        TeneurService.prepare_data(data)
 
         _, call_kwargs = mock_balance.call_args
         self.assertIsNone(call_kwargs["detail_filters"]["lot_ids"])
@@ -513,8 +509,6 @@ class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):
         mock_biofuel = Mock()
         mock_biofuel.pci_litre = 35.5
         data = {"biofuel": mock_biofuel, "target_volume": 1000.0}
-        unit = "l"
-
         volumes = np.array([100.0, 200.0])
         emissions = np.array([50.0, 60.0])
         lot_ids = np.array([1, 2])
@@ -525,9 +519,9 @@ class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):
         mock_bounds.return_value = (50.0, 60.0)
         mock_convert.side_effect = [2.0, 1.5]  # max_avoided, min_avoided
 
-        min_avoided, max_avoided = TeneurService.get_min_and_max_emissions(data, unit)
+        min_avoided, max_avoided = TeneurService.get_min_and_max_emissions(data)
 
-        mock_prepare.assert_called_once_with(data, unit)
+        mock_prepare.assert_called_once_with(data)
         self.assertEqual(min_avoided, 1.5)
         self.assertEqual(max_avoided, 2.0)
 
@@ -538,13 +532,11 @@ class TeneurServiceGetMinAndMaxEmissionsTest(SimpleTestCase):
         """Test that get_min_and_max_emissions returns (min_avoided, max_avoided) in correct order"""
         mock_biofuel = Mock()
         data = {"biofuel": mock_biofuel, "target_volume": 1000.0}
-        unit = "l"
-
         mock_prepare.return_value = (np.array([100.0]), np.array([50.0]), np.array([1]), None, 1000.0)
         mock_bounds.return_value = (40.0, 70.0)  # min_rate, max_rate
         mock_convert.side_effect = [3.0, 1.0]  # Conversions for min_rate (→max_avoided), max_rate (→min_avoided)
 
-        min_avoided, max_avoided = TeneurService.get_min_and_max_emissions(data, unit)
+        min_avoided, max_avoided = TeneurService.get_min_and_max_emissions(data)
 
         # min_avoided should correspond to max emission rate
         # max_avoided should correspond to min emission rate

@@ -368,11 +368,9 @@ class OperationServiceCheckVolumesTest(TestCase):
         ]
 
         data = {"biofuel": Mock()}
-        unit = "l"
-
         # Should not raise exception
-        OperationService.check_volumes(selected_lots, data, unit)
-        mock_prepare_data.assert_called_once_with(data, unit)
+        OperationService.check_volumes(selected_lots, data)
+        mock_prepare_data.assert_called_once_with(data)
 
     @patch("tiruert.services.operation.TeneurService.prepare_data")
     def test_check_volumes_raises_error_when_lot_not_found(self, mock_prepare_data):
@@ -390,10 +388,8 @@ class OperationServiceCheckVolumesTest(TestCase):
         ]
 
         data = {"biofuel": Mock()}
-        unit = "l"
-
         with self.assertRaises(ValidationError) as context:
-            OperationService.check_volumes(selected_lots, data, unit)
+            OperationService.check_volumes(selected_lots, data)
 
         self.assertIn("lot_id: 999", context.exception.detail)
         self.assertIn(
@@ -417,10 +413,8 @@ class OperationServiceCheckVolumesTest(TestCase):
         ]
 
         data = {"biofuel": Mock()}
-        unit = "l"
-
         with self.assertRaises(ValidationError) as context:
-            OperationService.check_volumes(selected_lots, data, unit)
+            OperationService.check_volumes(selected_lots, data)
 
         self.assertIn("lot_id: 1", context.exception.detail)
         self.assertIn(
@@ -444,9 +438,7 @@ class OperationServiceCheckVolumesTest(TestCase):
         ]
 
         data = {"biofuel": Mock()}
-        unit = "l"
-
-        OperationService.check_volumes(selected_lots, data, unit)
+        OperationService.check_volumes(selected_lots, data)
 
 
 class OperationServiceCheckObjectivesComplianceTest(TestCase):

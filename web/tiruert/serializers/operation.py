@@ -33,21 +33,13 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source="_type", read_only=True)
     biofuel = BalanceBiofuelSerializer(read_only=True)
     quantity = serializers.SerializerMethodField()
-    unit = serializers.SerializerMethodField()
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
     year = serializers.IntegerField(source="declaration_year", read_only=True)
 
-    def get_volume_l(self, instance) -> float:
-        return instance.volume_l
-
     def get_quantity(self, instance) -> float:
-        unit = self.context.get("unit")
-        return instance.quantity(unit=unit)
-
-    def get_unit(self, instance) -> str:
-        return self.context.get("unit")
+        return instance.quantity()
 
     def get_avoided_emissions(self, instance) -> float:
         if getattr(instance, "_avoided_emissions", None) is not None:
@@ -85,7 +77,6 @@ class OperationListSerializer(BaseOperationSerializer):
             "export_country",
             "created_at",
             "quantity",
-            "unit",
             "details",
             "avoided_emissions",
             "year",
@@ -127,7 +118,7 @@ class OperationSerializer(BaseOperationSerializer):
     export_country = CountrySerializer(read_only=True)
 
     def get_quantity_mj(self, instance) -> float:
-        return instance.quantity(unit="mj", force=True)
+        return int(instance.quantity(unit="mj", force=True))
 
 
 class OperationLotSerializer(serializers.Serializer):
@@ -179,12 +170,11 @@ class OperationInputSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             request = self.context.get("request")
             entity_id = request.entity.id
-            unit = request.unit
             selected_lots = validated_data.pop("lots")
             declaration_year = self.context.get("declaration_year")
 
             OperationService.perform_checks_before_create(
-                request, entity_id, selected_lots, validated_data, unit, declaration_year
+                request, entity_id, selected_lots, validated_data, declaration_year
             )
 
             # Fetch emission rates from the oldest OperationDetail for each lot
