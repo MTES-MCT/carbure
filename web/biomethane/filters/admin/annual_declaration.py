@@ -18,6 +18,8 @@ class BiomethaneAdminAnnualDeclarationFilter(FilterSet):
     )
     year = NumberFilter(method="ignore_year", required=True)
 
+    producer = AllValuesMultipleFilter(field_name="name", lookup_expr="exact", required=False)
+
     def ignore_year(self, queryset, name, value):
         return queryset
 

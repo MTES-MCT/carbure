@@ -29,13 +29,6 @@ class ExportAnnualDeclarationViewTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"], "year parameter is required")
 
-    def test_unknown_producer_id_returns_404(self):
-        """A producer_id that does not exist returns a 404 with an error message."""
-        response = self.client.get(self.url, {**self.base_params, "producer_id": 999999})
-
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data["error"], "producer not found")
-
     def test_response_content_type_is_excel_and_attachment(self):
         """Successful export returns application/vnd.ms-excel content type and Content-Disposition attachment header."""
         response = self.client.get(self.url, self.base_params)

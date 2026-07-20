@@ -1,10 +1,10 @@
 from django.test import TestCase
 
-from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
+from biomethane.factories import BiomethaneProductionUnitFactory, BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateSerializer
 from biomethane.serializers.supply_plan.supply_input import BiomethaneSupplyInputExportSerializer
-from core.models import Entity, MatierePremiere
+from core.models import Department, Entity, MatierePremiere
 from feedstocks.models import Classification
 
 
@@ -320,3 +320,30 @@ class BiomethaneSupplyInputExportSerializerTests(TestCase):
 
         self.assertEqual(data["feedstock"]["name"], "Maïs")
         self.assertIsNone(data["feedstock"]["classification"])
+
+    def test_export_serializer_outputs_production_unit(self):
+        """Production unit must be serialized as a nested object for DREAL Excel export."""
+        department = Department.objects.create(code_dept="34", name="Hérault")
+        production_unit = BiomethaneProductionUnitFactory.create(
+            producer=self.producer,
+            name="Méthaniseur du Languedoc",
+            department=department,
+        )
+        supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock,
+        )
+        data = BiomethaneSupplyInputExportSerializer(supply_input).data
+
+        self.assertEqual(data["production_unit"]["name"], production_unit.name)
+        self.assertEqual(data["production_unit"]["department"], "34")
+
+    def test_export_serializer_outputs_null_production_unit_when_missing(self):
+        """Missing production unit must serialize as null."""
+        supply_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock,
+        )
+        data = BiomethaneSupplyInputExportSerializer(supply_input).data
+
+        self.assertIsNone(data["production_unit"])

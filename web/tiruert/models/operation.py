@@ -11,7 +11,6 @@ class OperationManager(models.Manager):
             super()
             .get_queryset()
             .select_related("biofuel", "credited_entity", "debited_entity", "from_depot", "to_depot")
-            .prefetch_related("details")
             .only(
                 # Champs de l'opération
                 "id",

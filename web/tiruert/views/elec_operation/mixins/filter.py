@@ -1,3 +1,5 @@
+from django.db.models import IntegerField
+from django.db.models.functions import ExtractYear
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,7 +14,7 @@ class FilterActionMixin:
             OpenApiParameter(
                 name="filter",
                 type=str,
-                enum=["status", "type", "from_to", "operation", "period"],
+                enum=["status", "type", "from_to", "operation", "period", "years"],
                 location=OpenApiParameter.QUERY,
                 description="Filter string to apply",
                 required=True,
@@ -62,11 +64,14 @@ class FilterActionMixin:
             "type": "_type",
             "period": "_period",
             "created_at": "created_at",
+            "years": "year",
         }
 
         column = filters.get(filter)
         if not column:
             raise Exception(f"Filter '{filter}' does not exist for operations")
+
+        queryset = queryset.annotate(year=ExtractYear("created_at", output_field=IntegerField()))
 
         values = queryset.values_list(column, flat=True).distinct()
         results = []

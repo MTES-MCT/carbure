@@ -16,11 +16,13 @@ export const MacSection = () => {
   const { selectedYear, currentDeclarationYear = 0 } =
     useAnnualDeclarationTiruert()
 
+  const readOnly = selectedYear < currentDeclarationYear
+
   const onAddMac = () => {
     portal((close) => (
       <MacDialog
         onClose={close}
-        readOnly={selectedYear < currentDeclarationYear}
+        readOnly={readOnly}
         entityId={entity.id}
         year={selectedYear}
       />
@@ -34,7 +36,7 @@ export const MacSection = () => {
           {t("Mises à consommation")}
         </Title>
         <Button asideX priority="secondary" onClick={onAddMac}>
-          {t("Renseigner mes MàC")}
+          {readOnly ? t("Voir mes MàC") : t("Renseigner mes MàC")}
         </Button>
       </Row>
       <p>

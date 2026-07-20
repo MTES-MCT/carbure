@@ -529,6 +529,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/dreal-export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Export validated biomethane declarations for a year as a flat Excel file, scoped by DREAL department access. */
+        get: operations["biomethane_dreal_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/energy/": {
         parameters: {
             query?: never;
@@ -3790,13 +3807,25 @@ export interface components {
             attest_no_fossil_for_energy?: boolean;
             /** Précisions */
             energy_details?: string | null;
-            /** Format: double */
+            /**
+             * Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
+             * Format: double
+             */
             purified_biogas_quantity_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
+             * Format: double
+             */
             purification_electric_consumption_kwe?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)
+             * Format: double
+             */
             self_consumed_biogas_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+             * Format: double
+             */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
             /**
              * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
@@ -3863,13 +3892,25 @@ export interface components {
             attest_no_fossil_for_energy?: boolean;
             /** Précisions */
             energy_details?: string | null;
-            /** Format: double */
+            /**
+             * Quantité totale de biogaz traitée par le système d'épuration sur l’année (Nm3)
+             * Format: double
+             */
             purified_biogas_quantity_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Consommation électrique du système d'épuration et le cas échéant du traitement des évents (kWe)
+             * Format: double
+             */
             purification_electric_consumption_kwe?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation ou le traitement des intrants, le chauffage du digesteur et l'épuration du biogaz (Nm3)
+             * Format: double
+             */
             self_consumed_biogas_nm3?: number | null;
-            /** Format: double */
+            /**
+             * Quantité de biogaz/biométhane autoconsommée pour le chauffage du digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le prétraitement des intrants, le chauffage du digesteur et l'épuration (kWh) selon la référence tarifaire
+             * Format: double
+             */
             self_consumed_biogas_or_biomethane_kwh?: number | null;
             /**
              * Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
@@ -4164,6 +4205,7 @@ export interface components {
         /** @description Serializer for Excel export: choice fields are serialized as display labels (e.g. DRY → Sèche). */
         BiomethaneSupplyInputExport: {
             producer: components["schemas"]["EntityPreview"];
+            production_unit: components["schemas"]["BiomethaneProductionUnit"];
             readonly year: number;
             readonly origin_country: string;
             readonly feedstock: components["schemas"]["BiomethaneSupplyInputExportFeedstock"];
@@ -4370,23 +4412,6 @@ export interface components {
             category: string;
             subcategory: string;
         };
-        /**
-         * @description * `Producteur` - Producteur
-         *     * `Opérateur` - Opérateur
-         *     * `Administration` - Administration
-         *     * `Trader` - Trader
-         *     * `Auditor` - Auditeur
-         *     * `Administration Externe` - Administration Externe
-         *     * `Charge Point Operator` - Charge Point Operator
-         *     * `Compagnie aérienne` - Compagnie aérienne
-         *     * `Unknown` - Unknown
-         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-         *     * `SAF Trader` - Trader de SAF
-         *     * `Producteur de biométhane` - Producteur de biométhane
-         *     * `Fournisseur de biométhane` - Fournisseur de biométhane
-         * @enum {string}
-         */
-        ClientTypeEnum: PathsApiSafTicketsGetParametersQueryClient_type;
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
@@ -4923,7 +4948,7 @@ export interface components {
             date_from?: string | null;
             /** Format: date */
             date_to?: string | null;
-            readonly month: string;
+            readonly month: string | null;
             operating_unit: string;
             /** Format: double */
             energy_amount: number;
@@ -5266,22 +5291,6 @@ export interface components {
          * @enum {string}
          */
         EntityTypeEnum: EntityTypeEnum;
-        EntityUser: {
-            readonly id: number;
-            readonly name: string;
-            /**
-             * Adresse électronique
-             * Format: email
-             */
-            email: string;
-        };
-        EntityUserRequest: {
-            /**
-             * Adresse électronique
-             * Format: email
-             */
-            email: string;
-        };
         ErrorResponse: {
             message: string;
         };
@@ -5460,6 +5469,7 @@ export interface components {
          *     * `TALLOL` - Tallol
          *     * `OTHER` - Autre
          *     * `EP2AM` - EP2AM
+         *     * `CAT3` - Graisses de catégorie 3
          * @enum {string}
          */
         MPCategoriesEnum: PathsApiTiruertOperationsGetParametersQueryCustoms_category;
@@ -5634,7 +5644,6 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly unit: string;
-            details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
         };
         OperationCorrectionRequest: {
@@ -5644,13 +5653,6 @@ export interface components {
         OperationDepot: {
             id: number;
             name: string;
-        };
-        OperationDetail: {
-            lot: number;
-            /** Format: double */
-            volume?: number;
-            /** Format: double */
-            emission_rate_per_mj?: number;
         };
         OperationEntity: {
             id: number;
@@ -5708,7 +5710,6 @@ export interface components {
             /** Format: double */
             readonly quantity: number;
             readonly unit: string;
-            details?: components["schemas"]["OperationDetail"][];
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
@@ -6277,7 +6278,7 @@ export interface components {
             readonly reception_airport: components["schemas"]["Airport"];
             free_field?: string | null;
             agreement_reference?: string | null;
-            readonly client_type: components["schemas"]["ClientTypeEnum"];
+            readonly client_type: components["schemas"]["EntityTypeEnum"];
             readonly carbure_producer: components["schemas"]["EntityPreview"];
             unknown_producer?: string | null;
             readonly carbure_production_site: components["schemas"]["ProductionSite"];
@@ -6665,6 +6666,10 @@ export interface components {
             /** Format: uri */
             website?: string;
         };
+        UpdateRightsRequestsRequest: {
+            id: number;
+            status: components["schemas"]["UserRightsRequestsStatusEnum"];
+        };
         UpdateUserRoleRequest: {
             request_id: number;
             role: string;
@@ -6778,11 +6783,18 @@ export interface components {
             rights: components["schemas"]["UserRights"][];
             requests: components["schemas"]["UserRightsRequests"][];
         };
+        UserRightsSettings: {
+            user: components["schemas"]["BaseUser"];
+            entity: components["schemas"]["UserEntity"];
+            readonly role: components["schemas"]["RoleEnum"];
+            /** Format: date-time */
+            expiration_date?: string | null;
+        };
         UserSettingsResponse: {
             /** Format: email */
             email: string;
             name: string;
-            rights: components["schemas"]["UserRights"][];
+            rights: components["schemas"]["UserRightsSettings"][];
             requests: components["schemas"]["UserRightsRequests"][];
         };
         /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
@@ -7160,6 +7172,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
+                producer?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -7204,6 +7217,7 @@ export interface operations {
                 filter: PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                producer?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -7915,6 +7929,31 @@ export interface operations {
             };
         };
     };
+    biomethane_dreal_export_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised DREAL entity ID. */
+                entity_id: number;
+                /** @description Year of the declarations. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fichier Excel généré */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": File;
+                };
+            };
+        };
+    };
     biomethane_energy_retrieve: {
         parameters: {
             query: {
@@ -8086,8 +8125,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
-                producer_id?: number;
                 /** @description Year of the declaration. */
                 year: number;
             };
@@ -11588,25 +11625,38 @@ export interface operations {
     };
     entities_users_update_right_request_create: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["EntityUserRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["EntityUserRequest"];
-                "multipart/form-data": components["schemas"]["EntityUserRequest"];
+                "application/json": components["schemas"]["UpdateRightsRequestsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UpdateRightsRequestsRequest"];
+                "multipart/form-data": components["schemas"]["UpdateRightsRequestsRequest"];
             };
         };
         responses: {
+            /** @description Request successful. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EntityUser"];
+                    "application/json": unknown;
+                };
+            };
+            /** @description Bad request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };
@@ -12846,6 +12896,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
+                years?: string[];
             };
             header?: never;
             path?: never;
@@ -13159,6 +13210,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
+                years?: string[];
             };
             header?: never;
             path?: never;
@@ -13337,6 +13389,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
@@ -13426,7 +13479,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13697,6 +13750,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 /** @description Date from where to calculate teneur and quantity */
@@ -13820,6 +13874,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
@@ -13907,7 +13962,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13960,6 +14015,7 @@ export interface operations {
                  *     * `TALLOL` - Tallol
                  *     * `OTHER` - Autre
                  *     * `EP2AM` - EP2AM
+                 *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
@@ -14047,7 +14103,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -14293,6 +14349,7 @@ export enum PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_re
 }
 export enum PathsApiBiomethaneAdminAnnualDeclarationsFiltersGetParametersQueryFilter {
     department = "department",
+    producer = "producer",
     status = "status",
     tariff_reference = "tariff_reference"
 }
@@ -14570,11 +14627,13 @@ export enum PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter {
     operation = "operation",
     period = "period",
     status = "status",
-    type = "type"
+    type = "type",
+    years = "years"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
     ANN_IX_A = "ANN-IX-A",
     ANN_IX_B = "ANN-IX-B",
+    CAT3 = "CAT3",
     CONV = "CONV",
     EP2AM = "EP2AM",
     OTHER = "OTHER",

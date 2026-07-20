@@ -74,6 +74,7 @@ class ElecFilterActionMixinTest(TestCase):
             "type": "_type",
             "period": "_period",
             "created_at": "created_at",
+            "years": "year",
         }
 
         for filter_name, expected_column in expected_mappings.items():

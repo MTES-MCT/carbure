@@ -63,14 +63,8 @@ class BiomethaneAnnualDeclarationViewSet(
 
     def initialize_request(self, request, *args, **kwargs):
         request = super().initialize_request(request, *args, **kwargs)
-
-        year = (
-            BiomethaneAnnualDeclarationService.get_current_declaration_year()
-            if request.query_params.get("year") is None
-            else request.query_params.get("year")
-        )
+        year = request.query_params.get("year") or BiomethaneAnnualDeclarationService.get_current_declaration_year()
         setattr(request, "year", int(year))
-
         return request
 
     def get_queryset(self):
@@ -104,7 +98,8 @@ class BiomethaneAnnualDeclarationViewSet(
                 and BiomethaneAnnualDeclarationService.is_declaration_period_open()
                 and not is_entity_related_to_biomethane_external_admin(request.entity)
             ):
-                serializer = self.get_serializer(data={"producer": request.entity.id, "year": request.year})
+                producer_id = request.query_params.get("producer_id") or request.entity.id
+                serializer = self.get_serializer(data={"producer": producer_id, "year": request.year})
                 serializer.is_valid(raise_exception=True)
                 saved = serializer.save()
                 declaration = self.get_queryset().get(pk=saved.pk)

@@ -93,6 +93,7 @@ _SKIP_FIELDS = {
     "is_enabled",
     "created_by",
     "energy",  # owner FK for BiomethaneEnergyMonthlyReport
+    "year",
 }
 
 
@@ -114,7 +115,7 @@ def _auto_fields(model_class, virtual_field=False):
 # BiomethaneProductionUnit inherits from Site via multi-table inheritance.
 # Site fields do not appear in local_fields, so we list them explicitly with labels.
 _PRODUCTION_UNIT_SITE_FIELDS = [
-    ("Nom", "name"),
+    ("Nom du site de production", "name"),
     ("SIRET", "site_siret"),
     ("Adresse", "address"),
     ("Code postal", "postal_code"),

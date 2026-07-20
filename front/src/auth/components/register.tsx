@@ -24,17 +24,23 @@ import Alert from "@codegouvfr/react-dsfr/Alert"
 import { ROUTE_URLS } from "common/utils/routes"
 import HashRoute from "common/components/hash-route"
 
+type RegisterForm = {
+  email?: string
+  name?: string
+  password?: string
+  repeatPassword?: string
+}
 export const Register = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const notifyError = useNotifyError()
   const navigate = useNavigate()
 
-  const { value, bind, setField } = useForm({
-    email: "" as string | undefined,
-    name: "" as string | undefined,
-    password: "" as string | undefined,
-    repeatPassword: "" as string | undefined,
+  const { value, bind } = useForm<RegisterForm>({
+    email: "",
+    name: "",
+    password: "",
+    repeatPassword: "",
   })
 
   const register = useMutation(api.register, {
@@ -87,15 +93,13 @@ export const Register = () => {
           />
           <PasswordInput
             label={t("Mot de passe")}
-            value={value.password}
-            onChange={(v) => setField("password", v)}
+            {...bind("password")}
             autoComplete="new-password"
             required
           />
           <PasswordInput
             label={t("Répéter le mot de passe")}
-            value={value.repeatPassword}
-            onChange={(v) => setField("repeatPassword", v)}
+            {...bind("repeatPassword")}
             confirm={value.password}
             autoComplete="new-password"
             required
