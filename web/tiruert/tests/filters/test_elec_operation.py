@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from unittest.mock import Mock
 
 from django.db.models import Q
@@ -65,7 +66,13 @@ class ElecOperationFilterTest(SimpleTestCase):
 
         filter_set.filter_period(self.queryset, "period", "202401")
 
-        expected = Q(created_at__year="2024", created_at__month="01") | Q(created_at__year="2024", created_at__month="03")
+        expected = Q(
+            created_at__gte=datetime(2023, 12, 31, 23, tzinfo=timezone.utc),
+            created_at__lt=datetime(2024, 1, 31, 23, tzinfo=timezone.utc),
+        ) | Q(
+            created_at__gte=datetime(2024, 2, 29, 23, tzinfo=timezone.utc),
+            created_at__lt=datetime(2024, 3, 31, 22, tzinfo=timezone.utc),
+        )
         self.queryset.filter.assert_called_once()
         called_q = self.queryset.filter.call_args[0][0]
         self.assertEqual(called_q, expected)

@@ -1,14 +1,10 @@
-from datetime import datetime  # noqa: I001
-from zoneinfo import ZoneInfo
-
-from django.conf import settings
 from django.db.models import IntegerField, Q
 from django.db.models.functions import Cast, Coalesce, Substr
 from django_filters import (
     CharFilter,
     FilterSet,
-    NumberFilter,
     MultipleChoiceFilter,
+    NumberFilter,
 )
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
@@ -16,8 +12,10 @@ from rest_framework.serializers import CharField, ListField
 
 from core.filters import MultiValueInFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
-from .custom_filters import CustomOrderingFilter
+from core.utils import get_month_bounds_utc
 from tiruert.models.operation import Operation
+
+from .custom_filters import CustomOrderingFilter
 
 
 class BaseFilter(FilterSet):
@@ -92,29 +90,11 @@ class BaseFilter(FilterSet):
         if not periods:
             return queryset
 
-        # Use the timezone from settings
-        django_timezone = ZoneInfo(settings.TIME_ZONE)
-
         q_objects = Q()
 
         for period in periods:
-            # We have to do all this stuff because scalingo doesn't support mysql timezone
-            year = int(period[:4])
-            month = int(period[4:])
-
-            # Calculate the next month and year
-            if month == 12:
-                next_year = year + 1
-                next_month = 1
-            else:
-                next_year = year
-                next_month = month + 1
-
-            # Dates in UTC
-            start_date = datetime(year, month, 1, 0, 0, 0, tzinfo=django_timezone).astimezone(ZoneInfo("UTC"))
-            end_date = datetime(next_year, next_month, 1, 0, 0, 0, tzinfo=django_timezone).astimezone(ZoneInfo("UTC"))
-
-            q_objects |= Q(created_at__gte=start_date, created_at__lt=end_date)
+            start, end = get_month_bounds_utc(period)
+            q_objects |= Q(created_at__gte=start, created_at__lt=end)
 
         return queryset.filter(q_objects).distinct()
 

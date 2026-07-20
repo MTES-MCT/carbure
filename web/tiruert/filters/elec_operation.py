@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.db.models import IntegerField, Q
 from django.db.models.functions import ExtractYear
 from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter
@@ -8,6 +10,7 @@ from rest_framework.serializers import CharField, ChoiceField, ListField
 from core.filters import AllAnnotatedValuesMultipleFilter
 from core.models import Entity
 from core.models.entity import ExternalAdminRights
+from core.utils import get_month_bounds_utc
 from tiruert.filters.custom_filters import CustomOrderingFilter
 from tiruert.models import ElecOperation
 
@@ -79,7 +82,8 @@ class BaseFilter(FilterSet):
 
         q_objects = Q()
         for period in periods:
-            q_objects |= Q(created_at__year=period[:4], created_at__month=period[4:])
+            start, end = get_month_bounds_utc(period)
+            q_objects |= Q(created_at__gte=start, created_at__lt=end)
         return queryset.filter(q_objects).distinct()
 
     @extend_schema_field(
@@ -112,7 +116,7 @@ class ElecOperationFilter(BaseFilter):
     date_from = DateFilter(field_name="created_at", lookup_expr="gte")
     years = AllAnnotatedValuesMultipleFilter(
         field_name="year",
-        annotation=ExtractYear("created_at", output_field=IntegerField()),
+        annotation=ExtractYear("created_at", tzinfo=timezone.utc, output_field=IntegerField()),
     )
 
 
