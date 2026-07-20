@@ -1,6 +1,7 @@
 import os
 import unicodedata
-from datetime import date
+from datetime import date, datetime, timezone
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import xlsxwriter
@@ -43,6 +44,18 @@ def format_month_label(month_value, locale="fr"):
 
     with override(locale):
         return date_format(date(2000, month_number, 1), "F").capitalize()
+
+
+def get_month_bounds_utc(period: str, timezone_name: str | None = None) -> tuple[datetime, datetime]:
+    """Return the UTC bounds of a YYYYMM calendar month in the requested timezone."""
+    year = int(period[:4])
+    month = int(period[4:])
+    next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
+    local_timezone = ZoneInfo(timezone_name or settings.TIME_ZONE)
+
+    start = datetime(year, month, 1, tzinfo=local_timezone).astimezone(timezone.utc)
+    end = datetime(next_year, next_month, 1, tzinfo=local_timezone).astimezone(timezone.utc)
+    return start, end
 
 
 @transaction.atomic
