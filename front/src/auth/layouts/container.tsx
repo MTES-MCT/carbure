@@ -27,17 +27,7 @@ export const DialogContainer = (props: DialogProps) => {
 export const Container = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className={css.container}>
-      <div className={css["container-content"]}>
-        <header>
-          <Link to="/" className={css.logo}>
-            <img src={marianne} alt="marianne logo" />
-            <Title is="h1" style={{ textAlign: "center" }}>
-              CarbuRe
-            </Title>
-          </Link>
-        </header>
-        {children}
-      </div>
+      <div className={css["container-content"]}>{children}</div>
     </div>
   )
 }
