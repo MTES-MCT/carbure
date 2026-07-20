@@ -4399,6 +4399,7 @@ export interface components {
          *     * `REDCERT` - REDCERT
          *     * `2BS` - 2BS
          *     * `KZR_INIG` - KZR_INIG
+         *     * `CERTIFHY` - CERTIFHY
          * @enum {string}
          */
         CertificateTypeEnum: CertificateTypeEnum;
@@ -14919,7 +14920,8 @@ export enum CertificateTypeEnum {
     ISCC = "ISCC",
     REDCERT = "REDCERT",
     Value2BS = "2BS",
-    KZR_INIG = "KZR_INIG"
+    KZR_INIG = "KZR_INIG",
+    CERTIFHY = "CERTIFHY"
 }
 export enum CollectionTypeEnum {
     PRIVATE = "PRIVATE",
