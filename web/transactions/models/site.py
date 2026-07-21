@@ -119,16 +119,18 @@ class Site(models.Model):
     def _sync_gps_coordinates(self):
         address = build_site_address(self)
 
+        # Set gps coordinates if the site is new
         if self.pk is None:
+            # Set gps coordinates only if the address exists and gps_coordinates is not set
             if not self.gps_coordinates and address:
-                self.gps_coordinates = resolve_gps_coordinates(self)
+                self.gps_coordinates = resolve_gps_coordinates(address)
             return
 
         previous_values = self._get_previous_address_values()
         if not site_address_changed(self, previous_values):
             return
 
-        self.gps_coordinates = resolve_gps_coordinates(self) if address else None
+        self.gps_coordinates = resolve_gps_coordinates(address) if address else None
 
     def save(self, *args, **kwargs):
         self._sync_gps_coordinates()

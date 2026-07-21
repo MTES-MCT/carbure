@@ -359,6 +359,7 @@ if DEBUG:
 
 if env("TEST"):
     HUEY["immediate"] = True  # allow running background tasks immediately so we can have instant results in tests
+    TEST_RUNNER = "carbure.test_runner.CarbureTestRunner"
 
 
 # CSP header configuration

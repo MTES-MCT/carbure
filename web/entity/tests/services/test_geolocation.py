@@ -40,7 +40,8 @@ class GeolocationServiceTests(TestCase):
             city="Paris",
             country=self.france,
         )
-        self.assertEqual(resolve_gps_coordinates(depot), "2.3522,48.8566")
+        address = build_site_address(depot)
+        self.assertEqual(resolve_gps_coordinates(address), "2.3522,48.8566")
 
     def test_site_address_changed_detects_updates(self):
         depot = DepotFactory.build(city="Paris", country=self.france)
