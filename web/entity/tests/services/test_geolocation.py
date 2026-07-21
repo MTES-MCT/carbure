@@ -33,7 +33,7 @@ class GeolocationServiceTests(TestCase):
 
     @patch("entity.services.geolocation.get_coordinates")
     def test_resolve_gps_coordinates(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (2.3522, 48.8566)
+        mock_get_coordinates.return_value = (48.8566, 2.3522)
         depot = DepotFactory.build(
             address="1 rue de Rivoli",
             postal_code="75001",
@@ -41,7 +41,7 @@ class GeolocationServiceTests(TestCase):
             country=self.france,
         )
         address = build_site_address(depot)
-        self.assertEqual(resolve_gps_coordinates(address), "2.3522,48.8566")
+        self.assertEqual(resolve_gps_coordinates(address), "48.8566,2.3522")
 
     def test_site_address_changed_detects_updates(self):
         depot = DepotFactory.build(city="Paris", country=self.france)
@@ -62,7 +62,7 @@ class SiteGeolocationSaveTests(TestCase):
 
     @patch("entity.services.geolocation.get_coordinates")
     def test_site_create_fills_gps_coordinates(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (2.3522, 48.8566)
+        mock_get_coordinates.return_value = (48.8566, 2.3522)
         depot = DepotFactory.create(
             gps_coordinates=None,
             address="1 rue de Rivoli",
@@ -70,7 +70,7 @@ class SiteGeolocationSaveTests(TestCase):
             city="Paris",
             country=self.france,
         )
-        self.assertEqual(depot.gps_coordinates, "2.3522,48.8566")
+        self.assertEqual(depot.gps_coordinates, "48.8566,2.3522")
 
     @patch("entity.services.geolocation.get_coordinates")
     def test_site_create_keeps_provided_gps_coordinates(self, mock_get_coordinates):
@@ -86,7 +86,7 @@ class SiteGeolocationSaveTests(TestCase):
 
     @patch("entity.services.geolocation.get_coordinates")
     def test_site_update_regenerates_gps_when_address_changes(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (2.3522, 48.8566)
+        mock_get_coordinates.return_value = (48.8566, 2.3522)
         depot = DepotFactory.create(
             gps_coordinates="1.0,2.0",
             address="1 rue de Rivoli",
@@ -95,12 +95,12 @@ class SiteGeolocationSaveTests(TestCase):
             country=self.france,
         )
         mock_get_coordinates.reset_mock()
-        mock_get_coordinates.return_value = (4.8357, 45.7640)
+        mock_get_coordinates.return_value = (45.7640, 4.8357)
 
         depot.city = "Lyon"
         depot.save()
 
-        self.assertEqual(depot.gps_coordinates, "4.8357,45.764")
+        self.assertEqual(depot.gps_coordinates, "45.764,4.8357")
         mock_get_coordinates.assert_called_once()
 
     @patch("entity.services.geolocation.get_coordinates")
@@ -122,7 +122,7 @@ class SiteGeolocationSaveTests(TestCase):
 
     @patch("entity.services.geolocation.get_coordinates")
     def test_production_site_create_fills_gps_coordinates(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (2.3522, 48.8566)
+        mock_get_coordinates.return_value = (48.8566, 2.3522)
         production_site = ProductionSiteFactory.create(
             gps_coordinates=None,
             address="10 avenue de France",
@@ -130,4 +130,4 @@ class SiteGeolocationSaveTests(TestCase):
             city="Paris",
             country=self.france,
         )
-        self.assertEqual(production_site.gps_coordinates, "2.3522,48.8566")
+        self.assertEqual(production_site.gps_coordinates, "48.8566,2.3522")

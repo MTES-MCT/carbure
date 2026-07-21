@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 from django.test.runner import DiscoverRunner
 
-DEFAULT_TEST_COORDINATES = (2.3522, 48.8566)
+DEFAULT_TEST_COORDINATES = (48.8566, 2.3522)
 
 
 class CarbureTestRunner(DiscoverRunner):

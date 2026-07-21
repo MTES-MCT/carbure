@@ -25,7 +25,7 @@ export const NumberInput = ({
         hasTooltip={props.hasTooltip}
         title={props.title}
         readOnly={props.readOnly}
-        value={value ? formatNumber(value) : ""}
+        value={value !== undefined && value !== null ? formatNumber(value) : ""}
       />
     )
   }

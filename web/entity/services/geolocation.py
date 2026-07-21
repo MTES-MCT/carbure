@@ -27,7 +27,7 @@ def get_coordinates(address: str) -> tuple[float, float] | None:
         return None
 
     lon, lat = coordinates
-    return lon, lat
+    return lat, lon
 
 
 def build_site_address(site) -> str | None:
@@ -50,8 +50,8 @@ def resolve_gps_coordinates(address: str) -> str | None:
     if not coords:
         return None
 
-    lon, lat = coords
-    return f"{lon},{lat}"
+    lat, lon = coords
+    return f"{lat},{lon}"
 
 
 def site_address_changed(site, previous_values: dict[str, Any] | None) -> bool:
