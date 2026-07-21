@@ -108,7 +108,7 @@ export const FormMultiSelect = <T, V = T>({
             key={String(normalize(item).value)}
             dismissible
             small
-            style={{ marginTop: "6px" }}
+            style={{ marginTop: "8px" }}
             nativeButtonProps={{
               onClick: () => {
                 const removedItems = value?.filter(
