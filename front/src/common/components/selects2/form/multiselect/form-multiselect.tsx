@@ -14,6 +14,7 @@ import { useRef, useState } from "react"
 import { FormPickerTrigger } from "../combobox"
 import Tag from "@codegouvfr/react-dsfr/Tag"
 import { useTranslation } from "react-i18next"
+import { Row } from "common/components/scaffold"
 
 export type FormMultiSelectProps<T, V = T> = Omit<
   InputProps,
@@ -101,24 +102,26 @@ export const FormMultiSelect = <T, V = T>({
           />
         </Dropdown>
       )}
-      {selectedItems.map((item) => (
-        <Tag
-          key={String(normalize(item).value)}
-          dismissible
-          small
-          style={{ marginTop: "6px" }}
-          nativeButtonProps={{
-            onClick: () => {
-              const removedItems = value?.filter(
-                (_value) => _value !== normalize(item).value
-              )
-              onChange?.(removedItems)
-            },
-          }}
-        >
-          {normalize(item).label}
-        </Tag>
-      ))}
+      <Row gap="sm">
+        {selectedItems.map((item) => (
+          <Tag
+            key={String(normalize(item).value)}
+            dismissible
+            small
+            style={{ marginTop: "6px" }}
+            nativeButtonProps={{
+              onClick: () => {
+                const removedItems = value?.filter(
+                  (_value) => _value !== normalize(item).value
+                )
+                onChange?.(removedItems)
+              },
+            }}
+          >
+            {normalize(item).label}
+          </Tag>
+        ))}
+      </Row>
     </div>
   )
 }

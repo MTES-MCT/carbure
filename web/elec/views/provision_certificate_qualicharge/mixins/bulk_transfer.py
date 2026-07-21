@@ -14,13 +14,17 @@ class BulkTransferMixin:
         operation_id="transfer_targets_provision_certificates_qualicharge",
         description="List CPOs authorized to receive volume transfers (those with parent_entity = current entity)",
         responses={
-            status.HTTP_200_OK: EntityPreviewSerializer(many=True),
+            status.HTTP_200_OK: OpenApiResponse(
+                response=EntityPreviewSerializer(many=True),
+                description="List of CPOs authorized to receive volume transfers",
+            ),
         },
     )
     @action(
         detail=False,
         methods=["get"],
         url_path="transfer-targets",
+        pagination_class=None,
     )
     def transfer_targets(self, request, *args, **kwargs):
         target_cpos = Entity.objects.filter(parent_entity=request.entity, entity_type=Entity.CPO)
