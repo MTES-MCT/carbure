@@ -1,5 +1,7 @@
 from django.db import models
 
+from entity.services.geolocation import ADDRESS_FIELDS, site_address_changed
+
 
 class SiteManager(models.Manager):
     def get_queryset(self):
@@ -53,6 +55,7 @@ class Site(models.Model):
         blank=False,
         on_delete=models.SET_NULL,
     )
+    # latitude, longitude
     gps_coordinates = models.CharField(
         verbose_name="Coordonnées GPS",
         max_length=64,
@@ -102,6 +105,22 @@ class Site(models.Model):
             return self.productionsite.dc_reference
         except self.__class__.productionsite.RelatedObjectDoesNotExist:
             return None
+
+    def _get_previous_address_values(self):
+        if self.pk is None:
+            return None
+        return Site.objects.filter(pk=self.pk).values(*ADDRESS_FIELDS).first()
+
+    def _invalidate_gps_coordinates_if_address_changed(self):
+        if self.pk is None:
+            return
+        previous_values = self._get_previous_address_values()
+        if site_address_changed(self, previous_values):
+            self.gps_coordinates = None
+
+    def save(self, *args, **kwargs):
+        self._invalidate_gps_coordinates_if_address_changed()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         creator = self.created_by.name if self.created_by else ""

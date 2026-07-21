@@ -1,10 +1,11 @@
 from unittest.mock import Mock, patch
 
+from django.http import QueryDict
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
-from tiruert.models import Operation
+from tiruert.models import Operation, OperationDetail
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
 from transactions.factories.depot import DepotFactory
@@ -112,6 +113,57 @@ class OperationServiceTestCase(TestCase):
         )
 
         cls.entity_lots = CarbureLot.objects.filter(carbure_client=cls.entity)
+
+
+class OperationServiceEmissionRatesTest(OperationServiceTestCase):
+    def test_get_emission_rates_by_lot_returns_oldest_detail_per_lot(self):
+        lot = self.lot_blending_accepted
+
+        first_operation = Operation.objects.create(
+            type=Operation.CESSION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity,
+            debited_entity=self.entity,
+        )
+        OperationDetail.objects.create(
+            operation=first_operation,
+            lot=lot,
+            volume=100.0,
+            emission_rate_per_mj=1.1,
+        )
+
+        second_operation = Operation.objects.create(
+            type=Operation.CESSION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity,
+            debited_entity=self.entity,
+        )
+        OperationDetail.objects.create(
+            operation=second_operation,
+            lot=lot,
+            volume=100.0,
+            emission_rate_per_mj=2.2,
+        )
+
+        rates_by_lot = OperationService.get_emission_rates_by_lot([lot.id])
+
+        self.assertEqual(rates_by_lot, {lot.id: 1.1})
+
+    def test_get_emission_rates_by_lot_raises_all_missing_lot_ids(self):
+        with self.assertRaises(ValidationError) as context:
+            OperationService.get_emission_rates_by_lot([999001, 999002])
+
+        self.assertEqual(
+            context.exception.detail,
+            {
+                "lot_id: 999001": OperationServiceErrors.LOT_EMISSION_RATE_NOT_FOUND,
+                "lot_id: 999002": OperationServiceErrors.LOT_EMISSION_RATE_NOT_FOUND,
+            },
+        )
 
 
 class OperationServiceCreateOperationsTest(OperationServiceTestCase):
@@ -376,6 +428,26 @@ class OperationServiceCheckVolumesTest(TestCase):
             str(context.exception.detail["lot_id: 1"]),
         )
 
+    @patch("tiruert.services.operation.TeneurService.prepare_data")
+    def test_check_volumes_accepts_tiny_float_overflow_with_tolerance(self, mock_prepare_data):
+        """Should accept tiny float overflow caused by precision artifacts."""
+        mock_prepare_data.return_value = (
+            [1000.0],
+            None,
+            [1],
+            None,
+            None,
+        )
+
+        selected_lots = [
+            {"id": 1, "volume": 1000.0000005},
+        ]
+
+        data = {"biofuel": Mock()}
+        unit = "l"
+
+        OperationService.check_volumes(selected_lots, data, unit)
+
 
 class OperationServiceCheckObjectivesComplianceTest(TestCase):
     """Test OperationService.check_objectives_compliance() validation with mocks."""
@@ -387,7 +459,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH")}
         selected_lots = []
@@ -405,7 +477,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=21.3)}
         selected_lots = [{"id": 1, "volume": 1000}]
@@ -436,7 +508,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
 
@@ -462,7 +534,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
-        mock_request.GET = {}
+        mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
 
@@ -481,6 +553,27 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
             OperationServiceErrors.TARGET_EXCEEDED,
             str(context.exception.detail[error_key]),
         )
+
+    @patch("tiruert.services.operation.BalanceService.calculate_balance")
+    @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
+    def test_check_objectives_compliance_accepts_tiny_float_overflow_with_tolerance(
+        self, mock_calculate_target, mock_calculate_balance
+    ):
+        """Should accept tiny float overflow on futur_teneur comparison."""
+        mock_calculate_target.return_value = 100000
+        mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 80000, "declared_teneur": 15000}}
+
+        mock_request = Mock()
+        mock_request.entity.id = 1
+        mock_request.GET = QueryDict("")
+
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
+
+        # 80,000 + 15,000 + 500.00000005 * 10 = 100,000.0000005
+        selected_lots = [{"id": 1, "volume": 500.00000005}]
+        entity_id = 1
+
+        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
 
     def test_check_objectives_compliance_skips_for_non_teneur_operations(self):
         """Should skip check for non-TENEUR operation types."""

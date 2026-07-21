@@ -17,11 +17,42 @@ from tiruert.services.teneur import TeneurService
 class OperationServiceErrors:
     INSUFFICIENT_INPUT_VOLUME = "INSUFFICIENT_INPUT_VOLUME"
     LOT_NOT_FOUND = "LOT_NOT_FOUND"
+    LOT_EMISSION_RATE_NOT_FOUND = "LOT_EMISSION_RATE_NOT_FOUND"
     TARGET_EXCEEDED = "TARGET_EXCEEDED"
     ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
 
 
 class OperationService:
+    FLOAT_COMPARISON_TOLERANCE = 1e-6
+
+    @staticmethod
+    def get_emission_rates_by_lot(lot_ids):
+        """
+        Return emission rates by lot_id using the oldest OperationDetail found for each lot.
+        """
+        details = (
+            OperationDetail.objects.filter(lot_id__in=lot_ids)
+            .select_related("operation")
+            .order_by("lot_id", "operation__created_at", "id")
+            .values_list("lot_id", "emission_rate_per_mj")
+        )
+
+        emission_rates_by_lot = {}
+        for lot_id, emission_rate in details:
+            if lot_id not in emission_rates_by_lot:
+                emission_rates_by_lot[lot_id] = emission_rate
+
+        missing_lot_ids = set(lot_ids) - set(emission_rates_by_lot)
+        if missing_lot_ids:
+            raise serializers.ValidationError(
+                {
+                    f"lot_id: {lot_id}": OperationServiceErrors.LOT_EMISSION_RATE_NOT_FOUND
+                    for lot_id in sorted(missing_lot_ids)
+                }
+            )
+
+        return emission_rates_by_lot
+
     @staticmethod
     def perform_checks_before_create(request, entity_id, selected_lots, data, unit, declaration_year):
         OperationService.check_debited_entity(entity_id, data)
@@ -54,7 +85,7 @@ class OperationService:
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
 
-            if available_volumes[lot_id] < volume:
+            if available_volumes[lot_id] + OperationService.FLOAT_COMPARISON_TOLERANCE < volume:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
 
     @staticmethod
@@ -85,7 +116,7 @@ class OperationService:
             # 4. Check if the futur teneur is below the target
             futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ
 
-            if futur_teneur > target:
+            if futur_teneur - target > OperationService.FLOAT_COMPARISON_TOLERANCE:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )

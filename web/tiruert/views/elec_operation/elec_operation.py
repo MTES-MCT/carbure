@@ -1,5 +1,7 @@
+from datetime import timezone
+
 from django.db.models import Case, CharField, F, FloatField, Q, Value, When
-from django.db.models.functions import Cast, Concat, ExtractMonth, ExtractYear
+from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
@@ -101,14 +103,11 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
                     output_field=FloatField(),
                 ),
                 _period=Concat(
-                    ExtractYear("created_at", output_field=CharField()),
-                    Case(
-                        When(
-                            created_at__month__lt=10,
-                            then=Concat(Value("0"), Cast("created_at__month", output_field=CharField())),
-                        ),
-                        default=ExtractMonth("created_at", output_field=CharField()),
-                        output_field=CharField(),
+                    ExtractYear("created_at", tzinfo=timezone.utc, output_field=CharField()),
+                    LPad(
+                        ExtractMonth("created_at", tzinfo=timezone.utc, output_field=CharField()),
+                        2,
+                        Value("0"),
                     ),
                 ),
             )

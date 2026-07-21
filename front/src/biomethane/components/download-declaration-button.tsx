@@ -7,12 +7,10 @@ import { AnnualDeclarationStatus } from "biomethane/types"
 
 interface DownloadDeclarationButtonProps {
   year: number
-  producerId?: number
 }
 
 export const DownloadDeclarationButton = ({
   year,
-  producerId,
 }: DownloadDeclarationButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -22,11 +20,13 @@ export const DownloadDeclarationButton = ({
     return null
   }
 
+  const handleDownload = () => downloadAnnualDeclaration(entity.id, year)
+
   return (
     <Button
       iconId="ri-download-line"
       priority="secondary"
-      onClick={() => downloadAnnualDeclaration(entity.id, year, producerId)}
+      onClick={handleDownload}
     >
       {t("Télécharger la déclaration")}
     </Button>

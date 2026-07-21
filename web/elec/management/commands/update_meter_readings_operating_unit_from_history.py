@@ -1,7 +1,10 @@
+from datetime import timezone
+
 import pandas as pd
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db.models import OuterRef, Subquery
+from django.db.models.functions import TruncDate
 
 from elec.models import ElecMeterReading
 
@@ -36,10 +39,14 @@ class Command(BaseCommand):
         apply_updates = options["apply"]
 
         ElecChargePointHistory = apps.get_model("elec", "ElecChargePointHistory")
-        previous_history = ElecChargePointHistory.objects.filter(
-            id=OuterRef("meter__charge_point_id"),
-            history_date__date__lte=OuterRef("reading_date"),
-        ).order_by("-history_date", "-history_id")
+        previous_history = (
+            ElecChargePointHistory.objects.annotate(history_day=TruncDate("history_date", tzinfo=timezone.utc))
+            .filter(
+                id=OuterRef("meter__charge_point_id"),
+                history_day__lte=OuterRef("reading_date"),
+            )
+            .order_by("-history_date", "-history_id")
+        )
 
         readings = (
             ElecMeterReading.objects.select_related("cpo", "application", "meter__charge_point")

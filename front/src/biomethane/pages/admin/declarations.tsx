@@ -1,19 +1,25 @@
-import { Main } from "common/components/scaffold"
+import { Grid, Main } from "common/components/scaffold"
 import { Text } from "common/components/text"
 import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
-import { getBiomethaneProducers } from "./api"
+import {
+  downloadBiomethaneAdminAnnualDeclaration,
+  getBiomethaneProducers,
+} from "./api"
 import useEntity from "common/hooks/entity"
 import { useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Autocomplete } from "common/components/autocomplete2"
+import { useAnnualDeclarationYearsAdmin } from "./hooks/use-annual-declaration-years-admin"
+import { AnnualDeclarationExportCard } from "biomethane/components/annual-declaration-export-card"
 
 const BiomethaneAdminDeclarationsPage = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
   const routes = useRoutes()
+  const years = useAnnualDeclarationYearsAdmin()
   usePrivateNavigation(t("Déclarations par établissement"))
 
   const { result: producers } = useQuery(
@@ -38,6 +44,10 @@ const BiomethaneAdminDeclarationsPage = () => {
     }
   }
 
+  const yearsOptions = years.options
+    ?.map((option) => option.value)
+    .sort((a, b) => b - a)
+
   return (
     <Main>
       <Text>
@@ -52,6 +62,20 @@ const BiomethaneAdminDeclarationsPage = () => {
         placeholder={t("Rechercher un établissement")}
         style={{ maxWidth: "460px" }}
       />
+      <Grid cols={3} gap="lg">
+        {yearsOptions.map((year) => (
+          <AnnualDeclarationExportCard
+            key={year}
+            year={year}
+            fileDescription={t("Liste des déclarations pour l'année {{year}}", {
+              year,
+            })}
+            onDownload={() =>
+              downloadBiomethaneAdminAnnualDeclaration(entity.id, year)
+            }
+          />
+        ))}
+      </Grid>
     </Main>
   )
 }
