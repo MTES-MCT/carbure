@@ -138,6 +138,10 @@ if env.get("IMAGE_TAG") == "prod":
         for year in years:
             ObjectiveSnapshotService.compute_and_cache_aggregated(year)
 
+    @db_periodic_task(crontab(hour=2, minute=0))
+    def periodic_backfill_site_gps_coordinates() -> None:
+        call_command("backfill_site_gps_coordinates", dry_run="false")
+
 
 if env.get("IMAGE_TAG") == "staging":
 
