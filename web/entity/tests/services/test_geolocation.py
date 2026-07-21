@@ -54,17 +54,25 @@ class GeolocationServiceTests(TestCase):
         self.assertTrue(site_address_changed(depot, previous_values))
 
 
-class SiteGeolocationSaveTests(TestCase):
+class SiteGpsInvalidationTests(TestCase):
     fixtures = ["json/countries.json"]
 
     def setUp(self):
         self.france = Pays.objects.get(code_pays="FR")
 
-    @patch("entity.services.geolocation.get_coordinates")
-    def test_site_create_fills_gps_coordinates(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (48.8566, 2.3522)
+    def test_site_create_does_not_set_gps_coordinates(self):
         depot = DepotFactory.create(
             gps_coordinates=None,
+            address="1 rue de Rivoli",
+            postal_code="75001",
+            city="Paris",
+            country=self.france,
+        )
+        self.assertIsNone(depot.gps_coordinates)
+
+    def test_site_create_keeps_provided_gps_coordinates(self):
+        depot = DepotFactory.create(
+            gps_coordinates="48.8566,2.3522",
             address="1 rue de Rivoli",
             postal_code="75001",
             city="Paris",
@@ -72,62 +80,44 @@ class SiteGeolocationSaveTests(TestCase):
         )
         self.assertEqual(depot.gps_coordinates, "48.8566,2.3522")
 
-    @patch("entity.services.geolocation.get_coordinates")
-    def test_site_create_keeps_provided_gps_coordinates(self, mock_get_coordinates):
+    def test_site_update_clears_gps_when_address_changes(self):
         depot = DepotFactory.create(
-            gps_coordinates="1.0,2.0",
+            gps_coordinates="48.8566,2.3522",
             address="1 rue de Rivoli",
             postal_code="75001",
             city="Paris",
             country=self.france,
         )
-        mock_get_coordinates.assert_not_called()
-        self.assertEqual(depot.gps_coordinates, "1.0,2.0")
-
-    @patch("entity.services.geolocation.get_coordinates")
-    def test_site_update_regenerates_gps_when_address_changes(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (48.8566, 2.3522)
-        depot = DepotFactory.create(
-            gps_coordinates="1.0,2.0",
-            address="1 rue de Rivoli",
-            postal_code="75001",
-            city="Paris",
-            country=self.france,
-        )
-        mock_get_coordinates.reset_mock()
-        mock_get_coordinates.return_value = (45.7640, 4.8357)
 
         depot.city = "Lyon"
         depot.save()
 
-        self.assertEqual(depot.gps_coordinates, "45.764,4.8357")
-        mock_get_coordinates.assert_called_once()
+        self.assertIsNone(depot.gps_coordinates)
 
-    @patch("entity.services.geolocation.get_coordinates")
-    def test_site_update_keeps_gps_when_address_unchanged(self, mock_get_coordinates):
+    def test_site_update_keeps_gps_when_address_unchanged(self):
         depot = DepotFactory.create(
-            gps_coordinates="1.0,2.0",
+            gps_coordinates="48.8566,2.3522",
             address="1 rue de Rivoli",
             postal_code="75001",
             city="Paris",
             country=self.france,
         )
-        mock_get_coordinates.reset_mock()
 
         depot.name = "Updated depot name"
         depot.save()
 
-        self.assertEqual(depot.gps_coordinates, "1.0,2.0")
-        mock_get_coordinates.assert_not_called()
+        self.assertEqual(depot.gps_coordinates, "48.8566,2.3522")
 
-    @patch("entity.services.geolocation.get_coordinates")
-    def test_production_site_create_fills_gps_coordinates(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (48.8566, 2.3522)
+    def test_production_site_update_clears_gps_when_address_changes(self):
         production_site = ProductionSiteFactory.create(
-            gps_coordinates=None,
+            gps_coordinates="48.8566,2.3522",
             address="10 avenue de France",
             postal_code="75013",
             city="Paris",
             country=self.france,
         )
-        self.assertEqual(production_site.gps_coordinates, "48.8566,2.3522")
+
+        production_site.city = "Lyon"
+        production_site.save()
+
+        self.assertIsNone(production_site.gps_coordinates)

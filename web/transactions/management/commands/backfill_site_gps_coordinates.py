@@ -10,6 +10,7 @@ CHUNK_SIZE = 1000
 
 
 class Command(BaseCommand):
+    # command : python web/manage.py backfill_site_gps_coordinates --dry-run=true
     help = "Backfill GPS coordinates for sites missing them, with API rate limiting."
 
     def add_arguments(self, parser):
