@@ -1,7 +1,6 @@
 from django.db import models
 
 from core.models import MatierePremiere, Pays
-from saf.models.constants import SAF_BIOFUEL_TYPES
 
 
 class OperationManager(models.Manager):
@@ -150,12 +149,9 @@ class Operation(models.Model):
 
     @property
     def sector(self):
-        if self.biofuel.compatible_essence:
-            return Operation.ESSENCE
-        elif self.biofuel.compatible_diesel:
-            return Operation.GAZOLE
-        elif self.biofuel.code in SAF_BIOFUEL_TYPES:
-            return Operation.CARBUREACTEUR
+        from tiruert.services.operation import OperationService
+
+        return OperationService.define_sector(self.biofuel)
 
     @property
     def volume(self):

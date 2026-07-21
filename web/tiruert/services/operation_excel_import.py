@@ -10,7 +10,6 @@ from rest_framework import serializers
 
 from core.excel_importer import ExcelImporter, ExcelValidationError
 from core.models import CarbureLot, Entity
-from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation
 from tiruert.serializers.operation import OperationImportResponseSerializer
 from tiruert.services.declaration_period import DeclarationPeriodService
@@ -25,13 +24,7 @@ class OperationExcelImportErrors:
 
 
 def _get_sector(biofuel) -> str:
-    if biofuel.compatible_essence:
-        return Operation.ESSENCE
-    elif biofuel.compatible_diesel:
-        return Operation.GAZOLE
-    elif biofuel.code in SAF_BIOFUEL_TYPES:
-        return Operation.CARBUREACTEUR
-    return ""
+    return OperationService.define_sector(biofuel)
 
 
 def default_status(operation_type: str) -> str:

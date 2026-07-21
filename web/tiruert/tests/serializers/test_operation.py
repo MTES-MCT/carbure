@@ -215,9 +215,15 @@ class OperationInputSerializerCreateTest(TestCase):
 
         mock_service.define_operation_status.assert_called_once_with(validated_data)
 
+    @patch("tiruert.serializers.operation.OperationService.get_emission_rates_by_lot")
     @patch("tiruert.serializers.operation.OperationService.define_operation_status")
     @patch("tiruert.serializers.operation.OperationService.perform_checks_before_create")
-    def test_create_creates_operation_and_details(self, _mock_perform_checks, _mock_define_operation_status):
+    def test_create_creates_operation_and_details(
+        self,
+        _mock_perform_checks,
+        _mock_define_operation_status,
+        mock_get_emission_rates_by_lot,
+    ):
         """Should create Operation and OperationDetails from lots."""
         # Create real CarbureLot for ForeignKey constraint
         lot = CarbureLotFactory.create(
@@ -242,6 +248,8 @@ class OperationInputSerializerCreateTest(TestCase):
                 {"id": lot.id, "volume": 300},
             ],
         }
+
+        mock_get_emission_rates_by_lot.return_value = {lot.id: 9.8}
 
         operation = serializer.create(validated_data)
 

@@ -20,6 +20,7 @@ from tiruert.services.teneur import TeneurService
 class OperationServiceErrors:
     TARGET_EXCEEDED = "TARGET_EXCEEDED"
     ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
+    LOT_EMISSION_RATE_NOT_FOUND = "LOT_EMISSION_RATE_NOT_FOUND"
 
 
 VOLUME_PRECISION = 2
@@ -317,3 +318,15 @@ class OperationService:
                 result_lots.append(lot)
 
         return result_lots
+
+    @staticmethod
+    def define_sector(biofuel: str) -> str:
+        from saf.models.constants import SAF_BIOFUEL_TYPES
+
+        if biofuel.compatible_essence:
+            return Operation.ESSENCE
+        elif biofuel.compatible_diesel:
+            return Operation.GAZOLE
+        elif biofuel.code in SAF_BIOFUEL_TYPES:
+            return Operation.CARBUREACTEUR
+        return ""
