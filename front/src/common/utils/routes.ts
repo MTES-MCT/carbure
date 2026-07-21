@@ -39,8 +39,10 @@ export const ROUTE_URLS = {
       },
       ADMIN: {
         OBJECTIVES: `${baseUrl}/admin/objectives`,
-        OBJECTIVES_ENTITY: (entityId: number) =>
-          `${baseUrl}/admin/objectives/${entityId}`,
+        OBJECTIVES_YEAR: (year: number, entityId?: number) =>
+          entityId
+            ? `${baseUrl}/admin/objectives/${year}/entity/${entityId}`
+            : `${baseUrl}/admin/objectives/${year}`,
         OPERATIONS: `${baseUrl}/admin/operations`,
         OPERATIONS_ENTITY: (entityId: number) =>
           `${baseUrl}/admin/operations/${entityId}`,

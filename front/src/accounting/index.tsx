@@ -66,8 +66,9 @@ const MaterialAccounting = () => {
                 </AnnualDeclarationTiruertProvider>
               }
             >
-              <Route index element={<Objectives />} />
-              <Route path=":entityId" element={<Objectives />} />
+              <Route index element={<RedirectToObjectivesYearRoute />} />
+              <Route path=":year" element={<Objectives />} />
+              <Route path=":year/entity/:entityId" element={<Objectives />} />
             </Route>
             <Route path="admin/operations" element={<AdminOperationsLayout />}>
               <Route index element={<AdminOperations />} />
@@ -86,6 +87,14 @@ const MaterialAccounting = () => {
       </Routes>
     </Main>
   )
+}
+
+const RedirectToObjectivesYearRoute = () => {
+  const { currentDeclarationYear } = useAnnualDeclarationTiruert()
+  const routes = useRoutes().ACCOUNTING
+  const year = currentDeclarationYear ?? new Date().getFullYear()
+
+  return <Navigate to={routes.ADMIN.OBJECTIVES_YEAR(year)} replace />
 }
 
 const RedirectToCurrentDeclarationYearRoute = () => {
