@@ -10,6 +10,7 @@ from core.models import Biocarburant, DeclarationPeriod, Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
+from tiruert.views.operation.operation import OperationViewSet
 from transactions.factories import CarbureLotFactory
 from transactions.models import Depot
 
