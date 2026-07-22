@@ -1,8 +1,11 @@
 from io import BufferedReader
 
 import xlsxwriter
+from django.db.models import Q
 
 from core.models import Entity
+from tiruert.models import Operation
+from tiruert.services.balance import BalanceService
 
 
 def get_tiruert_operator_queryset():
@@ -20,7 +23,11 @@ def get_tiruert_operator_queryset():
 
 TABLE_HEADERS = [
     ("Lot id", "lot_id"),
-    ("Volume", "volume"),
+    ("Volume disponible", "available_volume"),
+    ("Volume à prélever", "volume"),
+    ("GHG total", "emission_rate_per_mj"),
+    ("Biocarburant", "biofuel"),
+    ("Categorie", "customs_category"),
     ("Type d'operation", "operation_type"),
     ("Destinataire", "credited_entity_name"),
     ("Destinataire id", "credited_entity"),
@@ -44,23 +51,58 @@ def _excel_column_letter(col_index: int) -> str:
 COLUMN_BY_KEY = {key: _excel_column_letter(i) for i, (_, key) in enumerate(TABLE_HEADERS)}
 
 
-def create_operation_import_template() -> BufferedReader:
+def _get_operator_lots(entity_id: int) -> list[dict]:
+    """Return lots attached to an operator with their available volume and metadata."""
+    operations = Operation.objects.filter(Q(credited_entity_id=entity_id) | Q(debited_entity_id=entity_id))
+    lot_balances = BalanceService.calculate_balance(
+        operations=operations,
+        entity_id=entity_id,
+        group_by=BalanceService.GROUP_BY_LOT,
+        unit="l",
+    )
+
+    lots = []
+    for key, entry in lot_balances.items():
+        # For GROUP_BY_LOT, key is (sector, customs_category, biofuel_code, lot_id)
+        lot_id = key[-1]
+        available_volume = round(float(entry.get("available_balance", 0) or 0), 2)
+        if available_volume <= 0:
+            continue
+
+        lots.append(
+            {
+                "lot_id": lot_id,
+                "available_volume": available_volume,
+                "emission_rate_per_mj": float(entry.get("emission_rate_per_mj", 0) or 0),
+                "biofuel": key[2],
+                "customs_category": key[1],
+            }
+        )
+
+    lots.sort(key=lambda lot: lot["lot_id"])
+    return lots
+
+
+def create_operation_import_template(entity_id: int) -> BufferedReader:
     location = "/tmp/tiruert_operations_import_template.xlsx"
     workbook = xlsxwriter.Workbook(location)
 
     header_format = workbook.add_format({"bold": True, "text_wrap": True, "valign": "vcenter"})
     unlocked_format = workbook.add_format({"locked": False})
+    decimal_format = workbook.add_format({"num_format": "0.00"})
+    unlocked_decimal_format = workbook.add_format({"locked": False, "num_format": "0.00"})
 
     entities = list(get_tiruert_operator_queryset())
+    lots = _get_operator_lots(entity_id)
 
-    _create_main_sheet(workbook, header_format, unlocked_format, entities)
+    _create_main_sheet(workbook, header_format, unlocked_format, unlocked_decimal_format, decimal_format, entities, lots)
     _create_entities_sheet(workbook, entities)
 
     workbook.close()
     return open(location, "rb")
 
 
-def _create_main_sheet(workbook, header_format, unlocked_format, entities):
+def _create_main_sheet(workbook, header_format, unlocked_format, unlocked_decimal_format, decimal_format, entities, lots):
     sheet = workbook.add_worksheet(MAIN_SHEET_NAME)
 
     for col, (label, key) in enumerate(TABLE_HEADERS):
@@ -68,8 +110,22 @@ def _create_main_sheet(workbook, header_format, unlocked_format, entities):
         sheet.write(KEY_ROW, col, key)
 
     sheet.set_row(KEY_ROW, None, None, {"hidden": True})
-    sheet.set_column(0, len(TABLE_HEADERS) - 2, 25, unlocked_format)
+    sheet.set_column(0, 0, 12)
+    sheet.set_column(1, 1, 18, decimal_format)
+    sheet.set_column(2, 2, 18, unlocked_decimal_format)
+    sheet.set_column(3, 5, 16)
+    sheet.set_column(6, 7, 25, unlocked_format)
     sheet.set_column(len(TABLE_HEADERS) - 1, len(TABLE_HEADERS) - 1, None, None, {"hidden": True})
+
+    for index, lot in enumerate(lots):
+        row = FIRST_DATA_ROW + index
+        sheet.write_number(row, 0, lot["lot_id"])
+        sheet.write_number(row, 1, lot["available_volume"], decimal_format)
+        sheet.write_blank(row, 2, None, unlocked_decimal_format)
+        sheet.write_number(row, 3, lot["emission_rate_per_mj"])
+        sheet.write_string(row, 4, lot["biofuel"])
+        sheet.write_string(row, 5, lot["customs_category"])
+
     sheet.protect(
         "",
         {
@@ -100,6 +156,7 @@ def _add_validations(sheet, entities):
             "validate": "integer",
             "criteria": ">=",
             "value": 1,
+            "ignore_blank": True,
             "error_title": "Valeur invalide",
             "error_message": "Lot id doit etre un entier positif.",
         },
@@ -111,6 +168,7 @@ def _add_validations(sheet, entities):
             "validate": "decimal",
             "criteria": ">",
             "value": 0,
+            "ignore_blank": True,
             "error_title": "Valeur invalide",
             "error_message": "Volume doit etre un nombre strictement positif.",
         },

@@ -24,7 +24,7 @@ class ExcelImportActionMixin:
     )
     @action(detail=False, methods=["get"], url_path="import/template")
     def download_import_template(self, request, *args, **kwargs):
-        file = create_operation_import_template()
+        file = create_operation_import_template(request.entity.id)
         return ExcelResponse(file)
 
     @extend_schema(
