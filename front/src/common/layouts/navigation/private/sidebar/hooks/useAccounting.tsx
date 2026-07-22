@@ -3,45 +3,33 @@ import { MenuSection } from "../sidebar.types"
 import { useTranslation } from "react-i18next"
 import { Badge } from "@codegouvfr/react-dsfr/Badge"
 import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
+import { ACCOUNTING_SIDEBAR_NAV } from "accounting/navigation/sidebar-pages"
 
-export const useAccounting = () => {
+const accountingBadge = <Badge severity="info">BETA</Badge>
+
+export const useAccounting = (): MenuSection => {
   const routes = useRoutes()
   const { t } = useTranslation()
   const permissions = useAccountingPermissions()
-  const { adminPermissions } = permissions
 
-  const section: MenuSection = {
+  const profile = permissions.adminPermissions.canAccessAdmin
+    ? "admin"
+    : "redevable"
+
+  const currentProfileNavItems = ACCOUNTING_SIDEBAR_NAV[profile]
+
+  return {
     title: t("Comptabilité"),
-    badge: <Badge severity="info">BETA</Badge>,
+    badge: accountingBadge,
     condition: permissions.canAccessModule,
-    children: [
-      {
-        path: routes.ACCOUNTING.BALANCES.ROOT,
-        title: t("Soldes"),
-        icon: "ri-bank-line",
-        iconActive: "ri-bank-fill",
-        condition: permissions.canAccessBalances,
-      },
-      {
-        path: adminPermissions.canAccessAdmin
-          ? routes.ACCOUNTING.ADMIN.OPERATIONS
-          : routes.ACCOUNTING.OPERATIONS.ROOT,
-        title: t("Opérations"),
-        icon: "ri-bar-chart-2-line",
-        iconActive: "ri-bar-chart-2-fill",
-        condition: permissions.canAccessOperations,
-      },
-      {
-        path: adminPermissions.canAccessAdmin
-          ? routes.ACCOUNTING.ADMIN.OBJECTIVES
-          : routes.ACCOUNTING.TENEUR.ROOT,
-        title: t("Objectifs annuels"),
-        icon: "ri-flashlight-line",
-        iconActive: "ri-flashlight-fill",
-        condition: permissions.canAccessObjectives,
-      },
-    ],
+    children: currentProfileNavItems.map(
+      ({ titleKey, icon, iconActive, path, canAccess }) => ({
+        title: t(titleKey),
+        icon,
+        iconActive,
+        path: path(routes.ACCOUNTING),
+        condition: canAccess(permissions),
+      })
+    ),
   }
-
-  return section
 }

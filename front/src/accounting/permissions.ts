@@ -4,6 +4,8 @@ import { ExternalAdminPages } from "common/types"
 export interface AccountingPermissions {
   canAccessModule: boolean
   canAccessBalances: boolean
+
+  /** Redevable routes operations/* and balances/* — not for admin profiles */
   canAccessOperations: boolean
   canAccessObjectives: boolean
   canAccessTeneur: boolean
@@ -66,7 +68,7 @@ export const getAccountingPermissions = (
   return {
     canAccessModule,
     canAccessBalances: canAccessModule && !admin,
-    canAccessOperations: canAccessModule,
+    canAccessOperations: canAccessModule && !admin,
     canAccessObjectives,
     canAccessTeneur: isLiable(entity) && !admin,
     adminPermissions: {
