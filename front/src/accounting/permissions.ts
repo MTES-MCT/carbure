@@ -24,9 +24,16 @@ export interface AccountingPermissions {
   canUpdateElecOperation: boolean
 }
 
-export const hasAccise = (entity: EntityManager) => entity.accise_number !== ""
-
 export const isLiable = (entity: EntityManager) => entity.is_tiruert_liable
+
+/** Mirrors backend can_access_balance_and_operations (web/tiruert/permissions.py). */
+export const canAccessBalanceAndOperations = (entity: EntityManager) =>
+  entity.isOperator ||
+  ((entity.isTrader || entity.isProducer) && entity.has_mac)
+
+/** Mirrors backend can_access_objectives (web/tiruert/permissions.py). */
+export const canAccessLiableObjectives = (entity: EntityManager) =>
+  canAccessBalanceAndOperations(entity) && isLiable(entity)
 
 export const isDGDDINationalAdmin = (entity: EntityManager) =>
   entity.isExternal && entity.hasAdminRight(ExternalAdminPages.DGDDI_NATIONAL)
@@ -64,15 +71,16 @@ export const getAccountingPermissions = (
   if (!isAuthenticated) return deniedPermissions()
 
   const admin = canAccessAdmin(entity)
-  const canAccessModule = hasAccise(entity) || admin
+  const canAccessBalanceAndOps = canAccessBalanceAndOperations(entity)
+  const canAccessModule = admin || canAccessBalanceAndOps
   const canWrite = entity.canWrite()
 
   return {
     canAccessModule,
-    canAccessBalances: canAccessModule && !admin,
-    canAccessOperations: canAccessModule && !admin,
+    canAccessBalances: canAccessBalanceAndOps && !admin,
+    canAccessOperations: canAccessBalanceAndOps && !admin,
     liable: {
-      canAccessObjectives: isLiable(entity) && !admin,
+      canAccessObjectives: canAccessLiableObjectives(entity) && !admin,
     },
     adminPermissions: {
       canAccessAdmin: admin,

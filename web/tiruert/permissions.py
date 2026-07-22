@@ -5,13 +5,15 @@ TIRUERT_ENTITIES = [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]
 
 
 def can_access_balance_and_operations(entity):
-    requires_mac = entity.entity_type in [Entity.TRADER, Entity.PRODUCER]
-    return (not requires_mac or entity.has_mac) and entity.accise_number != ""
+    if entity.entity_type == Entity.OPERATOR:
+        return True
+    if entity.entity_type in [Entity.TRADER, Entity.PRODUCER]:
+        return entity.has_mac
+    return False
 
 
 def can_access_objectives(entity):
-    requires_mac = entity.entity_type in [Entity.TRADER, Entity.PRODUCER]
-    return (not requires_mac or entity.has_mac) and entity.accise_number != "" and entity.is_tiruert_liable
+    return can_access_balance_and_operations(entity) and entity.is_tiruert_liable
 
 
 HasTiruertRightsBalanceAndOperations = UserRightsFactory(
