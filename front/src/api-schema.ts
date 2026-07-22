@@ -13456,7 +13456,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13939,7 +13939,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -14080,7 +14080,7 @@ export interface operations {
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
                 /** @description Specify the volume unit. */
                 unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
