@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.models import CarbureLot, MatierePremiere
+from core.models.feedstock import Biocarburant
 from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
@@ -320,7 +321,7 @@ class OperationService:
         return result_lots
 
     @staticmethod
-    def define_sector(biofuel: str) -> str:
+    def define_sector(biofuel: Biocarburant) -> str:
         from saf.models.constants import SAF_BIOFUEL_TYPES
 
         if biofuel.compatible_essence:
