@@ -21,20 +21,21 @@ export const getEnergy = (
     })
     .then((res) => res.data)
 
-export const saveEnergy = (
+export const saveEnergy = async (
   entity_id: number,
   year: number,
-  body: BiomethaneEnergyInputRequest
+  data: BiomethaneEnergyInputRequest
 ) => {
-  return api.PUT("/biomethane/energy/", {
+  const response = await api.PUT("/biomethane/energy/", {
     params: {
       query: {
         entity_id,
         year,
       },
     },
-    body,
+    body: data,
   })
+  return response.data
 }
 
 export const getMonthlyReports = (entity_id: number, year: number) =>

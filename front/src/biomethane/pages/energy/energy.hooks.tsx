@@ -24,9 +24,12 @@ export const useSaveEnergy = () => {
           variant: "success",
         })
       },
-      onError: () => notifyError(),
-    }
-  )
+      onError: (e) => {
+        notifyError(e)
+      },
+    },
+    
+
 
   return saveEnergyMutation
 }
