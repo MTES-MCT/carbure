@@ -15,7 +15,6 @@ import {
   biofuelFiltersFormStep,
   biofuelFiltersFormStepKey,
 } from "./biofuel-filters-form"
-import { ExtendedUnit } from "common/types"
 import { CreateOperationType } from "accounting/types"
 import { RecapData } from "../recap-data"
 import {
@@ -118,7 +117,7 @@ const DeclareTeneurDialogContent = ({
               <RecapOperationGrid>
                 <RecapOperation balance={form.value.balance!} />
                 {currentStepIndex > 2 && (
-                  <QuantitySummary values={form.value} unit={ExtendedUnit.GJ} />
+                  <QuantitySummary values={form.value} />
                 )}
               </RecapOperationGrid>
             </Box>
@@ -146,7 +145,6 @@ const DeclareTeneurDialogContent = ({
                     balance={form.value.balance!}
                     type={CreateOperationType.TENEUR}
                     quantityMax={depotQuantityMax}
-                    unit={ExtendedUnit.GJ}
                     onQuantityDeclared={handleQuantityDeclared}
                   />
                 </Box>
@@ -189,7 +187,6 @@ export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
 
   const quantityFormStep = useQuantityFormStep({
     balance: form.value.balance,
-    unit: ExtendedUnit.GJ,
     form,
   })
 

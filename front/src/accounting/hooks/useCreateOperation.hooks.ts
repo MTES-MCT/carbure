@@ -6,6 +6,7 @@ import useEntity from "common/hooks/entity"
 import { useNotify } from "common/components/notifications"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 import { useMutation } from "common/hooks/async"
 import { useCallback } from "react"
 import { CreateOperationType, OperationsStatus } from "accounting/types"
@@ -26,7 +27,7 @@ export const useCreateOperation = ({
   const entity = useEntity()
   const notify = useNotify()
   const { t } = useTranslation()
-  const { unit } = useUnit()
+  const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
 
   const getSuccessMessage = useCallback(
     (operationType: CreateOperationType, quantity: number) => {

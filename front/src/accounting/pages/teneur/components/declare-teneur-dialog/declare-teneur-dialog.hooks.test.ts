@@ -100,7 +100,7 @@ describe("useCalculateQuantityMax", () => {
       )
     )
 
-    expect(result.current).toBe(850)
+    expect(result.current).toBe(849)
   })
 
   it("returns 0 when the available balance is 0", () => {

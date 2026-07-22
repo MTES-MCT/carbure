@@ -34,6 +34,6 @@ export const formatValue = (
   if (!operation) return 0
 
   return operation.type === OperationType.INCORPORATION
-    ? value * operation.renewable_energy_share
+    ? value * (operation.renewable_energy_share ?? 0)
     : value
 }

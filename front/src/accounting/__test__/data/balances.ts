@@ -1,10 +1,12 @@
 import { Balance, OperationSector } from "accounting/types"
 import { CategoryEnum } from "common/types"
 
-const balanceBiofuel: Balance["biofuel"] = {
+export const balanceBiofuel: Balance["biofuel"] = {
   id: 33,
   code: "ETH",
   renewable_energy_share: 0,
+  pci_litre: 21.1,
+  masse_volumique: 0.79,
 }
 
 export const balance: Balance = {
@@ -15,7 +17,6 @@ export const balance: Balance = {
   pending_teneur: 0,
   declared_teneur: 0,
   pending_operations: 0,
-  unit: "l",
   customs_category: CategoryEnum.CONV,
   biofuel: balanceBiofuel,
   ghg_reduction_min: 10,

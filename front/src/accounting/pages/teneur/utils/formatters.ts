@@ -30,10 +30,10 @@ export const computeObjectiveProgress = (
     objective.teneur_declared + objective.pending_teneur,
     FRACTION_DIGITS_OPERATION
   )
-  const remaining_energy = Math.max(
-    0,
-    target_quantity - base_quantity - declared_quantity
+  const remaining_energy = floorNumber(
+    Math.max(0, target_quantity - base_quantity - declared_quantity)
   )
+
   const quantity_available = floorNumber(
     objective.quantity_available,
     FRACTION_DIGITS_OPERATION

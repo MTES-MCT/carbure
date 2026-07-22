@@ -24,6 +24,7 @@ import {
 import styles from "../operations.module.css"
 import cl from "clsx"
 import { useUnit } from "common/hooks/unit"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
@@ -66,7 +67,7 @@ export const useOperationsBiofuelsColumns = ({
   onClickSector,
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
-  const { unit } = useUnit()
+  const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
   const columns: Column<OperationList>[] = [
     {
       header: t("Statut"),
@@ -95,7 +96,7 @@ export const useOperationsBiofuelsColumns = ({
     },
     {
       header: t("Biocarburant"),
-      cell: (item) => <Cell text={item.biofuel} />,
+      cell: (item) => <Cell text={item.biofuel?.code} />,
       key: OperationOrder.biofuel,
     },
     {

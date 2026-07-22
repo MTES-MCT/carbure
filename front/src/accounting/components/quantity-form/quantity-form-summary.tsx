@@ -1,19 +1,13 @@
-import { ExtendedUnit } from "common/types"
 import { QuantityFormProps } from "./quantity-form.types"
 import { useTranslation } from "react-i18next"
 import { useUnit } from "common/hooks/unit"
 import { OperationText } from "../operation-text"
 import { formatNumber } from "common/utils/formatters"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 
-export const QuantitySummary = ({
-  values,
-  unit,
-}: {
-  values: QuantityFormProps
-  unit?: ExtendedUnit
-}) => {
+export const QuantitySummary = ({ values }: { values: QuantityFormProps }) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit(unit)
+  const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   if (!values.quantity || !values.avoided_emissions) {
     return null
   }

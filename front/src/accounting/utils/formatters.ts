@@ -119,7 +119,8 @@ export const formatObjectiveCategory = (category: string) => {
 export const formatOperation = (
   operation: apiTypes["OperationList"] | apiTypes["Operation"]
 ) => ({
-  quantity_renewable: operation.quantity * operation.renewable_energy_share,
+  quantity_renewable:
+    operation.quantity * (operation.renewable_energy_share ?? 1),
 })
 
 export const formatAccountingUnit = (value: number, unit: ExtendedUnitType) =>

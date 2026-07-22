@@ -12,11 +12,12 @@ import { NoResult } from "common/components/no-result2"
 import { getBalances } from "accounting/api/biofuels/balances"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const BalancesBiofuels = () => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
+  const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   const columns = useBalancesBiofuelsColumns()
 
   const filterLabels = {

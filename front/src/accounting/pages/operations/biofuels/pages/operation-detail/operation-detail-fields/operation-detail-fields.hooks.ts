@@ -5,12 +5,13 @@ import { useTranslation } from "react-i18next"
 import { formatQuantityDisplay } from "./operation-detail-fields.utils"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { useUnit } from "common/hooks/unit"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 import { compact } from "common/utils/collection"
 import { formatValue } from "../../../operations.utils"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
+  const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   const exportationOrExpeditionFields =
     useExportationOrExpeditionFields(operation)
 
@@ -29,7 +30,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
         value: formatDate(operation?.created_at),
       },
       { label: t("Catégorie"), value: operation.customs_category },
-      { label: t("Biocarburant"), value: operation.biofuel },
+      { label: t("Biocarburant"), value: operation.biofuel?.code },
       {
         label: t("Quantité"),
         value: formatQuantityDisplay(operation, formatUnit, false),

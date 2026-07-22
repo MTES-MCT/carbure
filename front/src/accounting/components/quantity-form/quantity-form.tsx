@@ -12,10 +12,10 @@ import {
   useFocusOnAvoidedEmissions,
   useQuantityForm,
 } from "./quantity-form.hooks"
-import { ExtendedUnitType } from "common/types"
 import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
 import { formatNumber } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -24,9 +24,6 @@ export type QuantityFormComponentProps = {
   quantityMax: number
 
   type: CreateOperationType
-
-  // Unit of the quantity displayed to the user (default is the entity preferred unit)
-  unit?: ExtendedUnitType
 
   // Lot GHG min and max bounds
   gesBoundMin?: number
@@ -67,11 +64,10 @@ const QuantitySection = ({
   balance,
   quantityMax,
   type,
-  unit: overrideUnit,
   onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit, unit } = useUnit(overrideUnit)
+  const { formatUnit, unit } = useUnit(DEFAULT_UNIT_OPERATION)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } = useFormContext<
@@ -79,7 +75,6 @@ const QuantitySection = ({
   >()
   const mutation = useQuantityForm({
     balance,
-    unit,
   })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&

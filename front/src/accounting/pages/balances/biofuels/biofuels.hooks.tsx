@@ -20,6 +20,7 @@ import { useAccountingPermissions } from "accounting/hooks/use-accounting-permis
 import { compact } from "common/utils/collection"
 import { useUnit } from "common/hooks/unit"
 import { formatNumber } from "common/utils/formatters"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 
 export const useBalancesBiofuelsColumns = () => {
   const { t } = useTranslation()
@@ -27,7 +28,7 @@ export const useBalancesBiofuelsColumns = () => {
   const routes = useRoutes()
   const portal = usePortal()
   const { canTransferBalance } = useAccountingPermissions()
-  const { unit } = useUnit()
+  const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
 
   const columns: Column<apiTypes["Balance"]>[] = compact([
     {

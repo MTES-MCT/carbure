@@ -12,6 +12,7 @@ const emptyProgress = {
   declared_quantity: 0,
   remaining_energy: 0,
   is_objective_met: false,
+  quantity_available: 0,
 }
 
 describe("parseObjectivesResponse", () => {
@@ -52,6 +53,7 @@ describe("parseObjectivesResponse", () => {
         declared_quantity: 5,
         remaining_energy: 85,
         is_objective_met: false,
+        quantity_available: 50,
       },
     })
   })
@@ -75,6 +77,7 @@ describe("parseObjectivesResponse", () => {
           declared_quantity: 2,
           remaining_energy: 2_995,
           is_objective_met: false,
+          quantity_available: 4,
         },
       },
     ])
@@ -94,12 +97,13 @@ describe("parseObjectivesResponse", () => {
         penalty: 0,
         target_type: TargetType.CAP,
         progress: {
-          total_teneur_declared: 54,
-          base_quantity: 4,
-          target_quantity: 4_214,
+          total_teneur_declared: 54.99,
+          base_quantity: 4.99,
+          target_quantity: 4_214.56,
           declared_quantity: 50,
-          remaining_energy: 4_160,
+          remaining_energy: 4_159.57,
           is_objective_met: false,
+          quantity_available: 4_723.8,
         },
       },
       {
@@ -118,6 +122,7 @@ describe("parseObjectivesResponse", () => {
           declared_quantity: 0,
           remaining_energy: 0,
           is_objective_met: false,
+          quantity_available: 357_637.2,
         },
       },
     ])
@@ -135,10 +140,11 @@ describe("parseObjectivesResponse", () => {
         progress: {
           total_teneur_declared: 144,
           base_quantity: 144,
-          target_quantity: 19_667,
+          target_quantity: 19_667.97,
           declared_quantity: 0,
-          remaining_energy: 19_523,
+          remaining_energy: 19_523.97,
           is_objective_met: false,
+          quantity_available: 541_168.9,
         },
       },
     ])
@@ -153,7 +159,10 @@ describe("parseObjectivesResponse", () => {
         quantity_available: 135_531.468,
         penalty: 0,
         target_type: null,
-        progress: emptyProgress,
+        progress: {
+          ...emptyProgress,
+          quantity_available: 135_531.46,
+        },
       },
     ])
   })

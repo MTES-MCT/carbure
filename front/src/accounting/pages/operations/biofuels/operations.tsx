@@ -15,6 +15,7 @@ import { OperationDetail } from "./pages/operation-detail"
 import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
+import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 import { ActionBar } from "common/components/scaffold"
 import { ExportButton } from "common/components/export"
 import { Notice } from "common/components/notice"
@@ -23,7 +24,7 @@ import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
+  const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   const { selectedEntityId } = useSelectedEntity()
   const filterLabels = {
     [OperationsFilter.years]: t("Année"),
