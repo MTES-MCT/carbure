@@ -4,7 +4,6 @@ import Teneur from "./pages/teneur"
 import OperationsBalancesLayout from "./layouts/operations-balances-layout"
 import Operations from "./pages/operations"
 import Balances from "./pages/balances"
-import useEntity from "common/hooks/entity"
 import { TeneurLayout } from "./layouts/teneur-layout"
 import { useLastSectorVisited } from "./hooks/last-sector-visited"
 import { ObjectivesLayout } from "./pages/admin/objectives/objectives-layout"
@@ -17,31 +16,36 @@ import {
 } from "./providers/annual-declaration-tiruert.provider"
 import { useRoutes } from "common/hooks/routes"
 import { SectorTabs } from "./types"
+import { useAccountingPermissions } from "./hooks/use-accounting-permissions"
 
 const MaterialAccounting = () => {
-  const entity = useEntity()
-  const { isAdmin, isExternal } = entity
-  const allowAccounting = isExternal && entity.hasAdminRight("TIRIB")
-
+  const permissions = useAccountingPermissions()
+  const { adminPermissions } = permissions
   const lastSector = useLastSectorVisited()
 
   return (
     <Main>
       <Routes>
-        <Route element={<OperationsBalancesLayout />}>
-          <Route path={`operations/:category`} element={<Operations />} />
-          <Route
-            path="operations"
-            element={<Navigate replace to={lastSector} />}
-          />
+        {permissions.canAccessOperations && (
+          <Route element={<OperationsBalancesLayout />}>
+            <Route path={`operations/:category`} element={<Operations />} />
+            <Route
+              path="operations"
+              element={<Navigate replace to={lastSector} />}
+            />
 
-          <Route path="balances/:category" element={<Balances />} />
-          <Route
-            path="balances"
-            element={<Navigate replace to={lastSector} />}
-          />
-        </Route>
-        {entity.is_tiruert_liable && (
+            {permissions.canAccessBalances && (
+              <>
+                <Route path="balances/:category" element={<Balances />} />
+                <Route
+                  path="balances"
+                  element={<Navigate replace to={lastSector} />}
+                />
+              </>
+            )}
+          </Route>
+        )}
+        {permissions.canAccessTeneur && (
           <Route
             element={
               <AnnualDeclarationTiruertProvider>
@@ -56,31 +60,38 @@ const MaterialAccounting = () => {
             <Route path="teneur/:year" element={<Teneur />} />
           </Route>
         )}
-        {(isAdmin || allowAccounting) && (
+        {adminPermissions.canAccessAdmin && (
           <>
-            <Route
-              path="admin/objectives"
-              element={
-                <AnnualDeclarationTiruertProvider>
-                  <ObjectivesLayout />
-                </AnnualDeclarationTiruertProvider>
-              }
-            >
-              <Route index element={<RedirectToObjectivesYearRoute />} />
-              <Route path=":year" element={<Objectives />} />
-              <Route path=":year/entity/:entityId" element={<Objectives />} />
-            </Route>
-            <Route path="admin/operations" element={<AdminOperationsLayout />}>
-              <Route index element={<AdminOperations />} />
+            {adminPermissions.canAccessObjectives && (
               <Route
-                path=":selectedEntityId/:category"
-                element={<AdminOperations />}
-              />
+                path="admin/objectives"
+                element={
+                  <AnnualDeclarationTiruertProvider>
+                    <ObjectivesLayout />
+                  </AnnualDeclarationTiruertProvider>
+                }
+              >
+                <Route index element={<RedirectToObjectivesYearRoute />} />
+                <Route path=":year" element={<Objectives />} />
+                <Route path=":year/entity/:entityId" element={<Objectives />} />
+              </Route>
+            )}
+            {adminPermissions.canAccessOperations && (
               <Route
-                path=":selectedEntityId"
-                element={<Navigate replace to={SectorTabs.BIOFUELS} />}
-              />
-            </Route>
+                path="admin/operations"
+                element={<AdminOperationsLayout />}
+              >
+                <Route index element={<AdminOperations />} />
+                <Route
+                  path=":selectedEntityId/:category"
+                  element={<AdminOperations />}
+                />
+                <Route
+                  path=":selectedEntityId"
+                  element={<Navigate replace to={SectorTabs.BIOFUELS} />}
+                />
+              </Route>
+            )}
           </>
         )}
         <Route path="*" element={<Navigate replace to="operations" />} />

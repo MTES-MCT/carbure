@@ -1,6 +1,7 @@
 import { Operation, OperationsStatus, OperationType } from "accounting/types"
 
 import useEntity from "common/hooks/entity"
+import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
 import { useTranslation } from "react-i18next"
 import { Button } from "common/components/button2"
 import {
@@ -25,7 +26,7 @@ export const OperationDetailActions = ({
 }) => {
   const entity = useEntity()
   const { t } = useTranslation()
-  const canUpdateOperation = entity.canWrite()
+  const { canUpdateBiofuelOperation } = useAccountingPermissions()
 
   const { execute: deleteOperation, loading: deleteOperationLoading } =
     useDeleteOperation({
@@ -53,7 +54,7 @@ export const OperationDetailActions = ({
     })
 
   const buttonsComponent = useMemo(() => {
-    if (!operation || !canUpdateOperation) return []
+    if (!operation || !canUpdateBiofuelOperation) return []
 
     const buttons: React.ReactNode[] = []
 
@@ -133,10 +134,10 @@ export const OperationDetailActions = ({
     acceptOperation,
     acceptOperationLoading,
     t,
-    canUpdateOperation,
+    canUpdateBiofuelOperation,
   ])
 
-  if (!operation || !canUpdateOperation || entity.isAdmin) return null
+  if (!operation || !canUpdateBiofuelOperation || entity.isAdmin) return null
 
   return buttonsComponent
 }

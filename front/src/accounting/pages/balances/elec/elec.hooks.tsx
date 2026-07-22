@@ -3,9 +3,8 @@ import { usePortal } from "common/components/portal"
 import { Column } from "common/components/table2"
 import { useTranslation } from "react-i18next"
 import { CessionDialog } from "./cession-dialog"
-import useEntity from "common/hooks/entity"
+import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
 import { compact } from "common/utils/collection"
-import { UserRole } from "common/types"
 import { formatNumber } from "common/utils/formatters"
 import { ElecBalance, ElecOperationsStatus } from "accounting/types"
 import { formatSector } from "accounting/utils/formatters"
@@ -16,12 +15,9 @@ import { useNavigate } from "react-router-dom"
 export const useBalancesElecColumns = () => {
   const { t } = useTranslation()
   const portal = usePortal()
-  const entity = useEntity()
+  const { canTransferBalance } = useAccountingPermissions()
   const routes = useRoutes()
   const navigate = useNavigate()
-
-  const canTransfer =
-    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const columns: Column<ElecBalance>[] = compact([
     {
@@ -52,7 +48,7 @@ export const useBalancesElecColumns = () => {
           </Button>
         ),
     },
-    canTransfer && {
+    canTransferBalance && {
       header: t("Céder"),
       cell: (balance) => (
         <Button

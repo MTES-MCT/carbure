@@ -18,7 +18,7 @@ HasTiruertRightsBalanceAndOperations = UserRightsFactory(
     entity_type=TIRUERT_ENTITIES, check=can_access_balance_and_operations
 )
 
-TiruertAdminRights = AdminRightsFactory(allow_external=[ExternalAdminRights.TIRIB_STATS])
+TiruertAdminRights = AdminRightsFactory(allow_external=[ExternalAdminRights.DGDDI_NATIONAL])
 TiruertUserRights = UserRightsFactory(entity_type=TIRUERT_ENTITIES, check=can_access_objectives)
 HasTiruertRightsObjectives = TiruertUserRights | TiruertAdminRights
 
