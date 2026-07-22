@@ -26,9 +26,9 @@ const OBJECTIVE_NAV_ITEM: CommonSidebarEntry = {
   iconActive: "ri-flashlight-fill",
 }
 
-/** annualObjectives → /teneur (redevable) or /admin/objectives (admin). */
+/** Liable and admin both use objectives routes (/objectives vs /admin/objectives). */
 export const ACCOUNTING_SIDEBAR_NAV = {
-  redevable: [
+  liable: [
     {
       titleKey: "Soldes",
       icon: "ri-bank-line",
@@ -43,8 +43,8 @@ export const ACCOUNTING_SIDEBAR_NAV = {
     },
     {
       ...OBJECTIVE_NAV_ITEM,
-      path: (routes) => routes.TENEUR.ROOT,
-      canAccess: (permissions) => permissions.canAccessTeneur,
+      path: (routes) => routes.OBJECTIVES.ROOT,
+      canAccess: (permissions) => permissions.liable.canAccessObjectives,
     },
   ],
   admin: [
@@ -61,4 +61,4 @@ export const ACCOUNTING_SIDEBAR_NAV = {
         permissions.adminPermissions.canAccessObjectives,
     },
   ],
-} satisfies Record<"redevable" | "admin", SidebarEntry[]>
+} satisfies Record<"liable" | "admin", SidebarEntry[]>

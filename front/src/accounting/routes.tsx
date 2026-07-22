@@ -34,10 +34,10 @@ const RedirectToCurrentDeclarationYearRoute = () => {
     console.error("No current declaration year found")
   }
 
-  return <Navigate to={routes.TENEUR.YEAR(year)} />
+  return <Navigate to={routes.OBJECTIVES.YEAR(year)} />
 }
 
-const AccountingRedevableRoutes = () => {
+const AccountingLiableRoutes = () => {
   const permissions = useAccountingPermissions()
   const lastSector = useLastSectorVisited()
 
@@ -61,7 +61,7 @@ const AccountingRedevableRoutes = () => {
         )}
       </Route>
 
-      {permissions.canAccessTeneur && (
+      {permissions.liable.canAccessObjectives && (
         <Route
           element={
             <AnnualDeclarationTiruertProvider>
@@ -70,10 +70,10 @@ const AccountingRedevableRoutes = () => {
           }
         >
           <Route
-            path="teneur"
+            path="objectives"
             element={<RedirectToCurrentDeclarationYearRoute />}
           />
-          <Route path="teneur/:year" element={<Teneur />} />
+          <Route path="objectives/:year" element={<Teneur />} />
         </Route>
       )}
 
@@ -128,5 +128,5 @@ export const AccountingRoutes = () => {
     return <AccountingAdminRoutes />
   }
 
-  return <AccountingRedevableRoutes />
+  return <AccountingLiableRoutes />
 }

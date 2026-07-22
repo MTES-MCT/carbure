@@ -33,9 +33,9 @@ export const ROUTE_URLS = {
         BIOFUELS: `${baseUrl}/balances/biofuels`,
         ELEC: `${baseUrl}/balances/elec`,
       },
-      TENEUR: {
-        ROOT: `${baseUrl}/teneur`,
-        YEAR: (year: number) => `${baseUrl}/teneur/${year}`,
+      OBJECTIVES: {
+        ROOT: `${baseUrl}/objectives`,
+        YEAR: (year: number) => `${baseUrl}/objectives/${year}`,
       },
       ADMIN: {
         OBJECTIVES: `${baseUrl}/admin/objectives`,

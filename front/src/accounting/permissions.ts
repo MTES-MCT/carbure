@@ -5,10 +5,12 @@ export interface AccountingPermissions {
   canAccessModule: boolean
   canAccessBalances: boolean
 
-  /** Redevable routes operations/* and balances/* — not for admin profiles */
+  /** Liable routes operations/* and balances/* — not for admin profiles */
   canAccessOperations: boolean
-  canAccessObjectives: boolean
-  canAccessTeneur: boolean
+
+  liable: {
+    canAccessObjectives: boolean
+  }
 
   adminPermissions: {
     canAccessAdmin: boolean
@@ -41,8 +43,9 @@ const deniedPermissions = (): AccountingPermissions => ({
   canAccessModule: false,
   canAccessBalances: false,
   canAccessOperations: false,
-  canAccessObjectives: false,
-  canAccessTeneur: false,
+  liable: {
+    canAccessObjectives: false,
+  },
   adminPermissions: {
     canAccessAdmin: false,
     canAccessObjectives: false,
@@ -62,15 +65,15 @@ export const getAccountingPermissions = (
 
   const admin = canAccessAdmin(entity)
   const canAccessModule = hasAccise(entity) || admin
-  const canAccessObjectives = isLiable(entity) || admin
   const canWrite = entity.canWrite()
 
   return {
     canAccessModule,
     canAccessBalances: canAccessModule && !admin,
     canAccessOperations: canAccessModule && !admin,
-    canAccessObjectives,
-    canAccessTeneur: isLiable(entity) && !admin,
+    liable: {
+      canAccessObjectives: isLiable(entity) && !admin,
+    },
     adminPermissions: {
       canAccessAdmin: admin,
       canAccessObjectives: admin,

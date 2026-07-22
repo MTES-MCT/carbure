@@ -7,7 +7,7 @@ export const TeneurLayout = () => {
     <>
       <Row style={{ columnGap: "40px", alignItems: "flex-end" }}>
         <div>
-          <ObjectivesYearSelect urlRoot="teneur" />
+          <ObjectivesYearSelect urlRoot="objectives" />
         </div>
       </Row>
       <Content marginTop>

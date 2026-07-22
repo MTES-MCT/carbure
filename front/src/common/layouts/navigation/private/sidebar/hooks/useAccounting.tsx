@@ -14,7 +14,7 @@ export const useAccounting = (): MenuSection => {
 
   const profile = permissions.adminPermissions.canAccessAdmin
     ? "admin"
-    : "redevable"
+    : "liable"
 
   const currentProfileNavItems = ACCOUNTING_SIDEBAR_NAV[profile]
 
