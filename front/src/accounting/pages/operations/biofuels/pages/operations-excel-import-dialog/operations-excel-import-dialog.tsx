@@ -83,7 +83,9 @@ export const OperationsExcelImportDialog = ({
       <Box>
         <p>
           <Trans>
-            Le modèle du fichier attendu est disponible{" "}
+            <Text fontWeight="bold">{t("1ère étape :")}</Text>
+            Vous devez d'abord télécharger le template contenant vos volumes
+            disponibles, en cliquant{" "}
             <Button
               linkProps={{ to: templatePath, target: "_blank" }}
               customPriority="link"
@@ -93,12 +95,14 @@ export const OperationsExcelImportDialog = ({
             .
           </Trans>
         </p>
-        <Text fontWeight="bold">
-          {t(
-            "Pensez à retélécharger le modèle afin d'avoir les dernières modifications du fichier."
-          )}
-        </Text>
 
+        <p>
+          <Trans>
+            <Text fontWeight="bold">{t("2e étape :")}</Text>
+            Une fois le fichier complété, vous pouvez l'uploader ci-dessous pour
+            le valider.
+          </Trans>
+        </p>
         <Form id="operations-import-form" onSubmit={handleSubmit}>
           <FileInput
             loading={loading}
