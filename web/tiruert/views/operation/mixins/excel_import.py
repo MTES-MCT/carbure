@@ -49,10 +49,10 @@ class ExcelImportActionMixin:
 
         file = file_serializer.validated_data["file"]
         mode = file_serializer.validated_data["mode"]
-        entity_id = request.entity.id
+        entity = request.entity
 
         try:
-            result = OperationExcelImportService.execute(file, mode, entity_id)
+            result = OperationExcelImportService.execute(file, mode, entity)
         except ExcelValidationError as e:
             return Response(
                 {
