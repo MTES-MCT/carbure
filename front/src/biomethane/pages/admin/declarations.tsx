@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Autocomplete } from "common/components/autocomplete2"
-import { useAnnualDeclarationYearsAdmin } from "./hooks/use-annual-declaration-years-admin"
+import { getAnnualDeclarationYearsAdmin } from "./hooks/use-annual-declaration-years-admin"
 import { AnnualDeclarationExportCard } from "biomethane/components/annual-declaration-export-card"
 
 const BiomethaneAdminDeclarationsPage = () => {
@@ -19,7 +19,7 @@ const BiomethaneAdminDeclarationsPage = () => {
   const entity = useEntity()
   const navigate = useNavigate()
   const routes = useRoutes()
-  const years = useAnnualDeclarationYearsAdmin()
+  const years = getAnnualDeclarationYearsAdmin()
   usePrivateNavigation(t("Déclarations par établissement"))
 
   const { result: producers } = useQuery(
@@ -44,10 +44,6 @@ const BiomethaneAdminDeclarationsPage = () => {
     }
   }
 
-  const yearsOptions = years.options
-    ?.map((option) => option.value)
-    .sort((a, b) => b - a)
-
   return (
     <Main>
       <Text>
@@ -63,7 +59,7 @@ const BiomethaneAdminDeclarationsPage = () => {
         style={{ maxWidth: "460px" }}
       />
       <Grid cols={3} gap="lg">
-        {yearsOptions.map((year) => (
+        {years.map((year) => (
           <AnnualDeclarationExportCard
             key={year}
             year={year}

@@ -1,6 +1,6 @@
 import useYears from "common/hooks/years-2"
 
-const getAnnualDeclarationYearsAdmin = () => {
+export const getAnnualDeclarationYearsAdmin = () => {
   const currentYear = new Date().getFullYear()
   const startYear = 2025
   const endYear = currentYear > startYear ? currentYear - 1 : startYear
