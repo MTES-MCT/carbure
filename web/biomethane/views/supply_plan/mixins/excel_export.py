@@ -32,11 +32,4 @@ class ExcelExportActionMixin:
         is_dreal = HasDrealRights().has_permission(request, self)
         excel_file = generate_supply_input_export(file_path, queryset, dreal=is_dreal)
 
-        try:
-            return ExcelResponse(excel_file)
-        finally:
-            excel_file.close()
-            try:
-                os.unlink(file_path)
-            except OSError:
-                pass
+        return ExcelResponse(excel_file)

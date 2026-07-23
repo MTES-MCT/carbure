@@ -1,5 +1,3 @@
-import os
-
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -33,11 +31,4 @@ def export_dreal_annual_declaration(request):
     # Only export producers the requesting entity is allowed to access (DREAL/ADEME department scope)
     producer_ids = entity.get_allowed_entities().values_list("id", flat=True)
     excel_file = generate_dreal_export(producer_ids, int(year))
-    try:
-        return ExcelResponse(excel_file)
-    finally:
-        excel_file.close()
-        try:
-            os.unlink(excel_file.name)
-        except OSError:
-            pass
+    return ExcelResponse(excel_file)
