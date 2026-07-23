@@ -54,7 +54,7 @@ class ElecOperationViewSet(ModelViewSet, ActionMixin):
     pagination_class = ElecOperationPagination
 
     def get_permissions(self):
-        if self.action in ["reject", "accept", "create", "destroy"]:
+        if self.action in ["reject", "accept", "create", "destroy", "export_operations_to_excel"]:
             return [HasTiruertWriteRights()]
         else:
             return [(HasTiruertRightsBalanceAndOperations | TiruertAdminRights)()]
