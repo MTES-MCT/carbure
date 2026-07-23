@@ -9857,6 +9857,145 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedElecBalanceList"
           description: ""
+  /api/tiruert/elec-operations/export/:
+    get:
+      operationId: tiruert_elec_operations_export_retrieve
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
+                - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+          explode: false
+          style: form
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: integer
+          description: Entity whose operations are exported when acting as an administrator.
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+        - in: query
+          name: years
+          schema:
+            type: array
+            items:
+              type: number
+          explode: true
+          style: form
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+          description: Excel file download
   /api/tiruert/elec-operations/filters/:
     get:
       operationId: filter_elec_operations
