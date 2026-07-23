@@ -1,15 +1,16 @@
+"""
+Mixin to manage the unit of measurement (L, MJ, KG) in views.
+
+This mixin automatically adds the unit to the request via `initialize_request()`
+and to the serializer context via `get_serializer_context()`.
+
+The unit is determined in the following order:
+1. 'unit' parameter from the request (POST or GET)
+2. Default value: 'l' (liters)
+"""
+
+
 class UnitMixin:
-    """
-    Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-    This mixin automatically adds the unit to the request via `initialize_request()`
-    and to the serializer context via `get_serializer_context()`.
-
-    The unit is determined in the following order:
-    1. 'unit' parameter from the request (POST or GET)
-    2. Default value: 'l' (liters)
-    """
-
     def initialize_request(self, request, *args, **kwargs):
         """
         Initializes the request by adding the 'unit' attribute.
