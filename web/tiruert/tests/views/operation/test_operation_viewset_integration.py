@@ -199,7 +199,7 @@ class OperationViewSetIntegrationTest(TestCase):
         self.lot2.country_of_origin = None
         self.lot2.save(update_fields=["country_of_origin"])
 
-        unrelated_detail = OperationDetail.objects.create(
+        OperationDetail.objects.create(
             operation=self.operation_mac_bio,
             lot=self.lot1,
             volume=250,
@@ -226,37 +226,31 @@ class OperationViewSetIntegrationTest(TestCase):
         self.assertEqual(
             rows[0],
             (
-                "ID détail d'opération",
-                "ID lot",
-                "ID CarbuRe du lot",
+                "ID Carbure",
+                "Volume prélevé (L)",
+                "Taux d'émission (gCO₂/MJ)",
+                "Émissions évitées (tCO₂)",
                 "Biocarburant",
                 "Matière première",
                 "Catégorie",
-                "Pays d'origine",
-                "Période de durabilité",
-                "Volume utilisé (L)",
-                "Taux d'émission (gCO₂/MJ)",
             ),
         )
         self.assertEqual(len(rows), 3)
+        exported_rows = {row[0]: row for row in rows[1:]}
+        detail = self.operation_incorporation.details.get(lot=self.lot1)
         self.assertEqual(
-            rows[1],
+            exported_rows[self.lot1.carbure_id],
             (
-                self.operation_incorporation.details.order_by("id").first().id,
-                self.lot1.id,
                 self.lot1.carbure_id,
-                self.lot1.biofuel.code,
-                self.lot1.feedstock.code,
-                self.lot1.feedstock.category,
-                self.lot1.country_of_origin.code_pays,
-                "202601",
                 500,
                 10.5,
+                detail.avoided_emissions,
+                self.lot1.biofuel.name,
+                self.lot1.feedstock.name,
+                self.lot1.feedstock.category,
             ),
         )
-        self.assertEqual(rows[2][1], self.lot2.id)
-        self.assertIsNone(rows[2][6])
-        self.assertNotIn(unrelated_detail.id, [row[0] for row in rows[1:]])
+        self.assertIn(self.lot2.carbure_id, exported_rows)
 
     def test_list_operations_with_details(self):
         """Test GET /operations/?details=1 includes operation details."""

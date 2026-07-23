@@ -21,27 +21,16 @@ class OperationDetailExcelExportActionMixin:
     )
     def export_operation_details_to_excel(self, request, *args, **kwargs):
         operation = self.get_object()
+
         details = (
-            OperationDetail.objects.filter(operation=operation)
-            .select_related("lot__biofuel", "lot__feedstock", "lot__country_of_origin")
-            .only(
-                "id",
-                "operation_id",
-                "lot_id",
-                "volume",
-                "emission_rate_per_mj",
-                "lot__id",
-                "lot__carbure_id",
-                "lot__biofuel__code",
-                "lot__feedstock__code",
-                "lot__feedstock__category",
-                "lot__country_of_origin__code_pays",
-            )
-            .order_by("id")
+            OperationDetail._base_manager.filter(operation_id=operation.pk)
+            .select_related("operation", "lot", "lot__biofuel", "lot__feedstock", "lot__country_of_origin")
+            .order_by("lot__carbure_id")
         )
 
         filename = f"tiruert_operation_{operation.id}_details_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         file_path = os.path.join(tempfile.gettempdir(), filename)
+
         excel_file = export_to_excel(
             file_path,
             [
@@ -49,20 +38,18 @@ class OperationDetailExcelExportActionMixin:
                     "label": "Détails opération",
                     "rows": details,
                     "columns": [
-                        {"label": "ID détail d'opération", "value": "id"},
-                        {"label": "ID lot", "value": "lot.id"},
-                        {"label": "ID CarbuRe du lot", "value": "lot.carbure_id"},
-                        {"label": "Biocarburant", "value": "lot.biofuel.code"},
-                        {"label": "Matière première", "value": "lot.feedstock.code"},
-                        {"label": "Catégorie", "value": "lot.feedstock.category"},
-                        {"label": "Pays d'origine", "value": "lot.country_of_origin.code_pays"},
-                        {"label": "Période de durabilité", "value": lambda _: operation.durability_period},
-                        {"label": "Volume utilisé (L)", "value": "volume"},
+                        {"label": "ID Carbure", "value": "lot.carbure_id"},
+                        {"label": "Volume prélevé (L)", "value": "volume"},
                         {"label": "Taux d'émission (gCO₂/MJ)", "value": "emission_rate_per_mj"},
+                        {"label": "Émissions évitées (tCO₂)", "value": "avoided_emissions"},
+                        {"label": "Biocarburant", "value": "lot.biofuel.name"},
+                        {"label": "Matière première", "value": "lot.feedstock.name"},
+                        {"label": "Catégorie", "value": "lot.feedstock.category"},
                     ],
                 }
             ],
             column_width=22,
             header_height=30,
         )
+
         return ExcelResponse(excel_file)
