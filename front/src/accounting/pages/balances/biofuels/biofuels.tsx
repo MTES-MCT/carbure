@@ -12,7 +12,10 @@ import { NoResult } from "common/components/no-result2"
 import { getBalances } from "accounting/api/biofuels/balances"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
-import { DEFAULT_UNIT_OPERATION } from "accounting/config"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+} from "accounting/config"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 
 const BalancesBiofuels = () => {
@@ -53,7 +56,7 @@ const BalancesBiofuels = () => {
           <RecapQuantity
             text={t("Le solde affiché représente {{total}}", {
               total: formatUnit(result?.data?.total_quantity ?? 0, {
-                fractionDigits: 0,
+                fractionDigits: FRACTION_DIGITS_LITERS,
               }),
             })}
           />

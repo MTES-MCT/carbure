@@ -69,9 +69,9 @@ describe("useCalculateQuantityMax", () => {
   })
 
   it("returns the floored available balance when the objective target is falsy", () => {
-    expect(renderQuantityMax(createObjective({ target_mj: 0 }), 1_234.56)).toBe(
-      1_234
-    )
+    expect(
+      renderQuantityMax(createObjective({ target_mj: 0 }), 1_234.567)
+    ).toBe(1_234.56)
   })
 
   describe("capped category — remaining MJ converted to L (ceil 2 decimals)", () => {

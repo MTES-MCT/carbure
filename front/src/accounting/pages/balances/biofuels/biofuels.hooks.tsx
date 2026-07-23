@@ -20,7 +20,10 @@ import { useAccountingPermissions } from "accounting/hooks/use-accounting-permis
 import { compact } from "common/utils/collection"
 import { useUnit } from "common/hooks/unit"
 import { formatNumber } from "common/utils/formatters"
-import { DEFAULT_UNIT_OPERATION } from "accounting/config"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+} from "accounting/config"
 
 export const useBalancesBiofuelsColumns = () => {
   const { t } = useTranslation()
@@ -49,7 +52,9 @@ export const useBalancesBiofuelsColumns = () => {
     {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
       cell: (item) =>
-        formatNumber(item.available_balance, { fractionDigits: 0 }),
+        formatNumber(item.available_balance, {
+          fractionDigits: FRACTION_DIGITS_LITERS,
+        }),
       key: OperationOrder.available_balance,
     },
     {

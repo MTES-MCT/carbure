@@ -15,6 +15,7 @@ import {
 import { useMemo } from "react"
 import { maxLitersFromRemainingMj } from "../../utils/liters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
+import { FRACTION_DIGITS_LITERS } from "accounting/config"
 import { Unit } from "common/types"
 
 type DeclareTeneurDialogProps = {
@@ -108,11 +109,11 @@ export const useCalculateQuantityMax = (
 
     // No cap on quantity when there is no target or the category is objectivized (REACH)
     if (!objective.target_mj || objective.target_type === TargetType.REACH) {
-      return floorNumber(availableBalance, 0)
+      return floorNumber(availableBalance, FRACTION_DIGITS_LITERS)
     }
 
     if (!pciLitre) {
-      return floorNumber(availableBalance, 0)
+      return floorNumber(availableBalance, FRACTION_DIGITS_LITERS)
     }
 
     const remainingObjectiveEnergyMj = objective.remaining_energy_mj

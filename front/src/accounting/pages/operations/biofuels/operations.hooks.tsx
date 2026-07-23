@@ -24,7 +24,10 @@ import {
 import styles from "../operations.module.css"
 import cl from "clsx"
 import { useUnit } from "common/hooks/unit"
-import { DEFAULT_UNIT_OPERATION } from "accounting/config"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+} from "accounting/config"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
@@ -137,7 +140,7 @@ export const useOperationsBiofuelsColumns = ({
       cell: (item) => {
         const calculatedQuantity = Math.abs(formatValue(item, item.quantity))
         const formattedQuantity = formatNumber(calculatedQuantity, {
-          fractionDigits: 0,
+          fractionDigits: FRACTION_DIGITS_LITERS,
         })
         return displayValueDebitOrCredit(
           formattedQuantity,

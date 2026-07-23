@@ -15,7 +15,10 @@ import { OperationDetail } from "./pages/operation-detail"
 import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
-import { DEFAULT_UNIT_OPERATION } from "accounting/config"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+} from "accounting/config"
 import { ActionBar } from "common/components/scaffold"
 import { ExportButton } from "common/components/export"
 import { Notice } from "common/components/notice"
@@ -89,7 +92,7 @@ const OperationsBiofuels = () => {
             text={t("{{count}} opérations pour un total de {{total}}", {
               count: result?.data?.count ?? 0,
               total: formatUnit(result?.data?.total_quantity ?? 0, {
-                fractionDigits: 0,
+                fractionDigits: FRACTION_DIGITS_LITERS,
               }),
             })}
           />
