@@ -37,7 +37,14 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                 ),
                 # Read actions require HasTiruertRightsBalanceAndOperations OR HasDgddiWriteRights
                 (
-                    ["list", "retrieve", "balance", "filters", "filters_balance"],
+                    [
+                        "list",
+                        "retrieve",
+                        "balance",
+                        "filters",
+                        "filters_balance",
+                        "export_operation_details_to_excel",
+                    ],
                     [(HasTiruertRightsBalanceAndOperations | HasDgddiWriteRights | TiruertAdminRights)()],
                 ),
             ],

@@ -1,7 +1,9 @@
 from datetime import date
+from io import BytesIO
 
 from django.test import TestCase
 from django.urls import reverse
+from openpyxl import load_workbook
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
@@ -190,6 +192,71 @@ class OperationViewSetIntegrationTest(TestCase):
         queryset = view.get_queryset()
 
         self.assertIn("details", queryset._prefetch_related_lookups)
+
+    def test_export_operation_details_to_excel(self):
+        self.operation_incorporation.durability_period = "202601"
+        self.operation_incorporation.save(update_fields=["durability_period"])
+        self.lot2.country_of_origin = None
+        self.lot2.save(update_fields=["country_of_origin"])
+
+        unrelated_detail = OperationDetail.objects.create(
+            operation=self.operation_mac_bio,
+            lot=self.lot1,
+            volume=250,
+            emission_rate_per_mj=15.0,
+        )
+
+        url = reverse(
+            "operations-export-operation-details-to-excel",
+            kwargs={"pk": self.operation_incorporation.id},
+        )
+        response = self.client.get(url, {"entity_id": self.entity.id})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/vnd.ms-excel")
+        self.assertRegex(
+            response["Content-Disposition"],
+            rf'attachment; filename="tiruert_operation_{self.operation_incorporation.id}_details_\d{{8}}_\d{{6}}.xlsx"',
+        )
+
+        workbook = load_workbook(BytesIO(response.content), read_only=True, data_only=True)
+        sheet = workbook["Détails opération"]
+        rows = list(sheet.iter_rows(values_only=True))
+
+        self.assertEqual(
+            rows[0],
+            (
+                "ID détail d'opération",
+                "ID lot",
+                "ID CarbuRe du lot",
+                "Biocarburant",
+                "Matière première",
+                "Catégorie",
+                "Pays d'origine",
+                "Période de durabilité",
+                "Volume utilisé (L)",
+                "Taux d'émission (gCO₂/MJ)",
+            ),
+        )
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(
+            rows[1],
+            (
+                self.operation_incorporation.details.order_by("id").first().id,
+                self.lot1.id,
+                self.lot1.carbure_id,
+                self.lot1.biofuel.code,
+                self.lot1.feedstock.code,
+                self.lot1.feedstock.category,
+                self.lot1.country_of_origin.code_pays,
+                "202601",
+                500,
+                10.5,
+            ),
+        )
+        self.assertEqual(rows[2][1], self.lot2.id)
+        self.assertIsNone(rows[2][6])
+        self.assertNotIn(unrelated_detail.id, [row[0] for row in rows[1:]])
 
     def test_list_operations_with_details(self):
         """Test GET /operations/?details=1 includes operation details."""
