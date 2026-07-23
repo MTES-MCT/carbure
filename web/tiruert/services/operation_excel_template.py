@@ -23,12 +23,12 @@ def get_tiruert_operator_queryset():
 
 TABLE_HEADERS = [
     ("Lot id", "lot_id"),
-    ("Volume disponible", "available_volume"),
-    ("Volume à prélever", "volume"),
-    ("GHG total", "emission_rate_per_mj"),
+    ("GHG total (gC02/MJ)", "emission_rate_per_mj"),
     ("Biocarburant", "biofuel"),
     ("Categorie", "customs_category"),
-    ("Type d'operation", "operation_type"),
+    ("Volume disponible (L)", "available_volume"),
+    ("Volume à prélever (L)", "volume"),
+    ("Type d'opération", "operation_type"),
     ("Destinataire", "credited_entity_name"),
     ("Destinataire id", "credited_entity"),
 ]
@@ -88,21 +88,37 @@ def create_operation_import_template(entity_id: int) -> BufferedReader:
     workbook = xlsxwriter.Workbook(location)
 
     header_format = workbook.add_format({"bold": True, "text_wrap": True, "valign": "vcenter"})
-    unlocked_format = workbook.add_format({"locked": False})
+    editable_format = workbook.add_format({"locked": False, "bg_color": "#FFF2CC"})
     decimal_format = workbook.add_format({"num_format": "0.00"})
-    unlocked_decimal_format = workbook.add_format({"locked": False, "num_format": "0.00"})
+    editable_decimal_format = workbook.add_format({"locked": False, "num_format": "0.00", "bg_color": "#FFF2CC"})
 
     entities = list(get_tiruert_operator_queryset())
     lots = _get_operator_lots(entity_id)
 
-    _create_main_sheet(workbook, header_format, unlocked_format, unlocked_decimal_format, decimal_format, entities, lots)
+    _create_main_sheet(
+        workbook,
+        header_format,
+        editable_format,
+        editable_decimal_format,
+        decimal_format,
+        entities,
+        lots,
+    )
     _create_entities_sheet(workbook, entities)
 
     workbook.close()
     return open(location, "rb")
 
 
-def _create_main_sheet(workbook, header_format, unlocked_format, unlocked_decimal_format, decimal_format, entities, lots):
+def _create_main_sheet(
+    workbook,
+    header_format,
+    editable_format,
+    editable_decimal_format,
+    decimal_format,
+    entities,
+    lots,
+):
     sheet = workbook.add_worksheet(MAIN_SHEET_NAME)
 
     for col, (label, key) in enumerate(TABLE_HEADERS):
@@ -111,20 +127,22 @@ def _create_main_sheet(workbook, header_format, unlocked_format, unlocked_decima
 
     sheet.set_row(KEY_ROW, None, None, {"hidden": True})
     sheet.set_column(0, 0, 12)
-    sheet.set_column(1, 1, 18, decimal_format)
-    sheet.set_column(2, 2, 18, unlocked_decimal_format)
-    sheet.set_column(3, 5, 16)
-    sheet.set_column(6, 7, 25, unlocked_format)
+    sheet.set_column(1, 1, 16, decimal_format)
+    sheet.set_column(2, 3, 16)
+    sheet.set_column(4, 4, 18, decimal_format)
+    sheet.set_column(5, 5, 18, editable_decimal_format)
+    sheet.set_column(6, 6, 18, editable_format)
+    sheet.set_column(7, 7, 30, editable_format)
     sheet.set_column(len(TABLE_HEADERS) - 1, len(TABLE_HEADERS) - 1, None, None, {"hidden": True})
 
     for index, lot in enumerate(lots):
         row = FIRST_DATA_ROW + index
         sheet.write_number(row, 0, lot["lot_id"])
-        sheet.write_number(row, 1, lot["available_volume"], decimal_format)
-        sheet.write_blank(row, 2, None, unlocked_decimal_format)
-        sheet.write_number(row, 3, lot["emission_rate_per_mj"])
-        sheet.write_string(row, 4, lot["biofuel"])
-        sheet.write_string(row, 5, lot["customs_category"])
+        sheet.write_number(row, 1, lot["emission_rate_per_mj"])
+        sheet.write_string(row, 2, lot["biofuel"])
+        sheet.write_string(row, 3, lot["customs_category"])
+        sheet.write_number(row, 4, lot["available_volume"], decimal_format)
+        sheet.write_blank(row, 5, None, editable_decimal_format)
 
     sheet.protect(
         "",
@@ -220,4 +238,7 @@ def _create_entities_sheet(workbook, entities):
         sheet.write(row, 0, entity.name)
         sheet.write(row, 1, entity.id)
 
+    sheet.set_column(1, 1, None, None, {"hidden": True})
+
     sheet.protect()
+    sheet.hide()
