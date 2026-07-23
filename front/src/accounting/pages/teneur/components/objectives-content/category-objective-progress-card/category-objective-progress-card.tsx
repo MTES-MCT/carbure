@@ -7,7 +7,7 @@ import { CardProgress } from "../../card-progress"
 import { CategoryObjective, TargetType } from "../../../types"
 import { formatObjectiveGJ } from "../../../utils/formatters"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
-import { formatAccountingNumber } from "accounting/utils/formatters"
+import { formatEnergyNumber } from "accounting/utils/formatters"
 
 type CategoryObjectiveProgressCardProps = {
   category: CategoryObjective
@@ -48,7 +48,7 @@ export const CategoryObjectiveProgressCard = ({
   return (
     <CardProgress
       title={category.code}
-      mainValue={formatAccountingNumber(progress.total_teneur_declared)}
+      mainValue={formatEnergyNumber(progress.total_teneur_declared)}
       mainText={t("GJ")}
       description={t(
         "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",

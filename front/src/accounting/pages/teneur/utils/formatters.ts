@@ -1,7 +1,7 @@
-import { FRACTION_DIGITS_OPERATION } from "accounting/config"
+import { FRACTION_DIGITS_GJ, FRACTION_DIGITS_LITERS } from "accounting/config"
 import { BaseObjective, ObjectiveProgress } from "../types"
 import { ExtendedUnit } from "common/types"
-import { ceilNumber, floorNumber, formatUnit } from "common/utils/formatters"
+import { ceilNumber, CONVERSIONS, formatUnit } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 
 type ObjectiveProgressInput = Pick<
@@ -14,30 +14,17 @@ type ObjectiveProgressInput = Pick<
 export const computeObjectiveProgress = (
   objective: ObjectiveProgressInput
 ): ObjectiveProgress => {
-  const base_quantity = ceilNumber(
-    objective.teneur_declared,
-    FRACTION_DIGITS_OPERATION
-  )
-  const declared_quantity = ceilNumber(
-    objective.pending_teneur,
-    FRACTION_DIGITS_OPERATION
-  )
-  const target_quantity = floorNumber(
-    objective.target ?? 0,
-    FRACTION_DIGITS_OPERATION
-  )
-  const total_teneur_declared = ceilNumber(
-    objective.teneur_declared + objective.pending_teneur,
-    FRACTION_DIGITS_OPERATION
-  )
-  const remaining_energy = floorNumber(
-    Math.max(0, target_quantity - base_quantity - declared_quantity)
+  const base_quantity = objective.teneur_declared
+  const declared_quantity = objective.pending_teneur
+  const target_quantity = objective.target ?? 0
+  const total_teneur_declared =
+    objective.teneur_declared + objective.pending_teneur
+  const remaining_energy = Math.max(
+    0,
+    target_quantity - base_quantity - declared_quantity
   )
 
-  const quantity_available = floorNumber(
-    objective.quantity_available,
-    FRACTION_DIGITS_OPERATION
-  )
+  const quantity_available = objective.quantity_available
 
   // If the target is not set, the objective is not met
   const is_objective_met =
@@ -63,6 +50,27 @@ export const formatObjectiveGJ = (value: number) =>
 export const formatObjectiveCO2 = (value: number) =>
   formatUnit(value, ExtendedUnit.tCO2ev, { fractionDigits: 0 })
 
+export const computeEnergyGjFromLiters = (
+  quantityLiters: number,
+  pciLitre: number
+) =>
+  ceilNumber(
+    CONVERSIONS.energy.MJ_TO_GJ(quantityLiters * pciLitre),
+    FRACTION_DIGITS_GJ
+  )
+
+/** Remaining energy (MJ) / PCI → liters, rounded up to 2 decimal places. */
+export const computeRemainingLitersFromMj = (
+  remainingMj: number,
+  pciLitre: number
+) => ceilNumber(remainingMj / pciLitre, FRACTION_DIGITS_LITERS)
+
+/** Remaining cap (GJ) → max liters, rounded up to 2 decimal places. */
+export const computeLitersMaxFromEnergyGj = (
+  energyGj: number,
+  pciLitre: number
+) => computeRemainingLitersFromMj(energyGj * 1000, pciLitre)
+
 export const computeObjectiveEnergy = (objective: ObjectiveProgressInput) =>
   computeObjectiveProgress(objective).remaining_energy
 
@@ -79,12 +87,15 @@ export const computeRemainingEnergyWithAdditionalQuantity = (
     pending_teneur: number
   },
   additionalQuantity: number
-) =>
-  Math.max(
+) => {
+  console.log("objectives", objective)
+
+  return Math.max(
     0,
     computeObjectiveEnergy({ ...objective, quantity_available: 0 }) -
       additionalQuantity
   )
+}
 
 export const withObjectiveProgress = <T extends ObjectiveProgressInput>(
   objective: T

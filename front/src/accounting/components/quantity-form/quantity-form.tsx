@@ -1,21 +1,25 @@
 import { Balance, CreateOperationType } from "accounting/types"
 import { useFormContext } from "common/components/form2"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
-import { Notice } from "common/components/notice"
 import { useEffect, useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
-import { getQuantityInputLabel } from "./quantity-form.utils"
+import {
+  getQuantityInputFeedback,
+  getQuantityInputLabel,
+  showEnergyEquivalent,
+} from "./quantity-form.utils"
 import {
   useFocusOnAvoidedEmissions,
   useQuantityForm,
 } from "./quantity-form.hooks"
 import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
-import { formatNumber } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 import { DEFAULT_UNIT_OPERATION } from "accounting/config"
+import { EnergyEquivalentNotice } from "./quantity-form-energy-equivalent"
+import { AvoidedEmissionsRecapNotice } from "./quantity-form-avoided-emissions-notice"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -67,7 +71,7 @@ const QuantitySection = ({
   onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit, unit } = useUnit(DEFAULT_UNIT_OPERATION)
+  const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } = useFormContext<
@@ -149,6 +153,21 @@ const QuantitySection = ({
     ? `(${t("solde")}: ${formatAccountingUnit(value.availableBalance, unit)})`
     : undefined
 
+  const { state: hintState, stateRelatedMessage: hintMessage } =
+    getQuantityInputFeedback({
+      type,
+      quantityDeclared,
+      t,
+    })
+
+  const isError = quantityBind.state === "error"
+  const state = isError ? "error" : hintState
+  const stateRelatedMessage = isError
+    ? quantityBind.stateRelatedMessage
+    : hintMessage
+
+  const pciLitre = balance.biofuel?.pci_litre
+
   // When the component is mounted, reset the quantity declared if the quantity is greater than the quantity max
   useEffect(() => {
     if (quantityMax && value.quantity && value.quantity > quantityMax) {
@@ -187,66 +206,25 @@ const QuantitySection = ({
             )}
           </>
         }
-        stateRelatedMessage={
-          quantityBind.state === "error"
-            ? quantityBind.stateRelatedMessage
-            : t(
-                "Le nombre de tonnes de CO2 évitées équivalentes sera calculé après validation de la quantité."
-              )
-        }
-        state={
-          quantityBind.state === "error"
-            ? "error"
-            : quantityDeclared
-              ? "default"
-              : "info"
-        }
+        state={state}
+        stateRelatedMessage={stateRelatedMessage}
         disabled={quantityDeclared || mutation.loading}
         required
         inputRef={quantityInputRef}
       />
-      {quantityDeclared &&
-      value.avoided_emissions_min &&
-      value.avoided_emissions_max &&
-      value.avoided_emissions_min > 0 &&
-      value.avoided_emissions_max > 0 ? (
-        <Notice noColor variant="info">
-          <div>
-            {value.avoided_emissions_min === value.avoided_emissions_max ? (
-              <Trans
-                components={{ strong: <strong /> }}
-                t={t}
-                values={{
-                  quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 10,
-                  }),
-                  value: formatNumber(value.avoided_emissions_min, {
-                    fractionDigits: 2,
-                  }),
-                }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
-              />
-            ) : (
-              <Trans
-                components={{ strong: <strong /> }}
-                t={t}
-                values={{
-                  quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 10,
-                  }),
-                  min: formatNumber(value.avoided_emissions_min, {
-                    fractionDigits: 2,
-                  }),
-                  max: formatNumber(value.avoided_emissions_max, {
-                    fractionDigits: 2,
-                  }),
-                }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
-              />
-            )}
-          </div>
-        </Notice>
-      ) : null}
+      {showEnergyEquivalent(type, value.quantity, pciLitre) && (
+        <EnergyEquivalentNotice
+          quantityLiters={value.quantity!}
+          pciLitre={pciLitre!}
+        />
+      )}
+      {quantityDeclared && (
+        <AvoidedEmissionsRecapNotice
+          quantity={value.quantity}
+          avoided_emissions_min={value.avoided_emissions_min}
+          avoided_emissions_max={value.avoided_emissions_max}
+        />
+      )}
     </>
   )
 }

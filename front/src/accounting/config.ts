@@ -1,9 +1,14 @@
 import { Unit } from "common/types"
 
 /**
- * The number of fraction digits to use for operations quantities (teneur, transfert, objectives)
+ * The number of fraction digits to use when number is in GJ
  */
-export const FRACTION_DIGITS_OPERATION = 2
+export const FRACTION_DIGITS_GJ = 3
+
+/**
+ * The number of fraction digits to use when number is in liters
+ */
+export const FRACTION_DIGITS_LITERS = 2
 
 /**
  * The default unit to use for operations quantities (teneur, transfert, objectives)

@@ -1,4 +1,4 @@
-import { FRACTION_DIGITS_OPERATION } from "accounting/config"
+import { FRACTION_DIGITS_GJ, FRACTION_DIGITS_LITERS } from "accounting/config"
 import {
   ElecOperationSector,
   ElecOperationsStatus,
@@ -9,7 +9,7 @@ import {
   OperationType,
 } from "accounting/types"
 import { apiTypes } from "common/services/api-fetch.types"
-import { ExtendedUnitType } from "common/types"
+import { ExtendedUnitType, Unit } from "common/types"
 import {
   formatNumber,
   FormatNumberOptions,
@@ -125,14 +125,15 @@ export const formatOperation = (
 
 export const formatAccountingUnit = (value: number, unit: ExtendedUnitType) =>
   formatUnit(value, unit, {
-    fractionDigits: FRACTION_DIGITS_OPERATION,
+    fractionDigits:
+      unit === Unit.l ? FRACTION_DIGITS_LITERS : FRACTION_DIGITS_GJ,
   })
 
-export const formatAccountingNumber = (
+export const formatEnergyNumber = (
   value: number,
   options?: FormatNumberOptions
 ) =>
   formatNumber(value, {
-    fractionDigits: FRACTION_DIGITS_OPERATION,
+    fractionDigits: FRACTION_DIGITS_GJ,
     ...options,
   })

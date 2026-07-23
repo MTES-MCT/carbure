@@ -1,8 +1,5 @@
 import { Balance, ElecBalance } from "accounting/types"
-import {
-  formatAccountingNumber,
-  formatSector,
-} from "accounting/utils/formatters"
+import { formatEnergyNumber, formatSector } from "accounting/utils/formatters"
 import { Column, Cell } from "common/components/table2"
 import { CONVERSIONS } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
@@ -11,7 +8,7 @@ import { SectorObjective } from "../../types"
 const toGJ = (value: number) => CONVERSIONS.energy.MJ_TO_GJ(value)
 
 // Format all values in the table to GJ
-const formatValue = (value: number) => formatAccountingNumber(toGJ(value))
+const formatValue = (value: number) => formatEnergyNumber(toGJ(value))
 
 export const useBiofuelTeneurColumns = () => {
   const { t } = useTranslation()
@@ -55,23 +52,17 @@ export const useBiofuelTeneurSectorColumns = () => {
     },
     {
       header: `${t("Avancement initial")} (GJ)`,
-      cell: (item) => (
-        <Cell text={formatAccountingNumber(item.teneur_declared)} />
-      ),
+      cell: (item) => <Cell text={formatEnergyNumber(item.teneur_declared)} />,
     },
     {
       header: `${t("Teneur à valider")} (GJ)`,
-      cell: (item) => (
-        <Cell text={formatAccountingNumber(item.pending_teneur)} />
-      ),
+      cell: (item) => <Cell text={formatEnergyNumber(item.pending_teneur)} />,
     },
     {
       header: `${t("Avancement final")} (GJ)`,
       cell: (item) => (
         <Cell
-          text={formatAccountingNumber(
-            item.teneur_declared + item.pending_teneur
-          )}
+          text={formatEnergyNumber(item.teneur_declared + item.pending_teneur)}
         />
       ),
     },

@@ -2,6 +2,7 @@ import { Operation } from "accounting/types"
 import { formatValue, getOperationQuantity } from "../../../operations.utils"
 import { CONVERSIONS } from "common/utils/formatters"
 import { ExtendedUnit } from "common/types"
+import { FRACTION_DIGITS_GJ, FRACTION_DIGITS_LITERS } from "accounting/config"
 
 export const formatQuantityDisplay = (
   operation: Operation,
@@ -17,10 +18,13 @@ export const formatQuantityDisplay = (
     : operation.quantity_mj
 
   return `${getOperationQuantity(
-    formatUnit(quantity)
+    formatUnit(quantity, {
+      fractionDigits: FRACTION_DIGITS_LITERS,
+    })
   )} / ${getOperationQuantity(
     formatUnit(CONVERSIONS.energy.MJ_TO_GJ(quantityMj), {
       unit: ExtendedUnit.GJ,
+      fractionDigits: FRACTION_DIGITS_GJ,
     })
   )}`
 }

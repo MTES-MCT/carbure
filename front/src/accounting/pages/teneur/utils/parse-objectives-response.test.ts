@@ -97,13 +97,13 @@ describe("parseObjectivesResponse", () => {
         penalty: 0,
         target_type: TargetType.CAP,
         progress: {
-          total_teneur_declared: 54.99,
-          base_quantity: 4.99,
-          target_quantity: 4_214.56,
+          total_teneur_declared: 54.988,
+          base_quantity: 4.988,
+          target_quantity: 4_214.566,
           declared_quantity: 50,
-          remaining_energy: 4_159.57,
+          remaining_energy: 4_159.578,
           is_objective_met: false,
-          quantity_available: 4_723.8,
+          quantity_available: 4_723.804,
         },
       },
       {
@@ -122,7 +122,7 @@ describe("parseObjectivesResponse", () => {
           declared_quantity: 0,
           remaining_energy: 0,
           is_objective_met: false,
-          quantity_available: 357_637.2,
+          quantity_available: 357_637.207,
         },
       },
     ])
@@ -140,11 +140,11 @@ describe("parseObjectivesResponse", () => {
         progress: {
           total_teneur_declared: 144,
           base_quantity: 144,
-          target_quantity: 19_667.97,
+          target_quantity: 19_667.973,
           declared_quantity: 0,
-          remaining_energy: 19_523.97,
+          remaining_energy: 19_523.973,
           is_objective_met: false,
-          quantity_available: 541_168.9,
+          quantity_available: 541_168.905,
         },
       },
     ])
@@ -161,7 +161,7 @@ describe("parseObjectivesResponse", () => {
         target_type: null,
         progress: {
           ...emptyProgress,
-          quantity_available: 135_531.46,
+          quantity_available: 135_531.468,
         },
       },
     ])

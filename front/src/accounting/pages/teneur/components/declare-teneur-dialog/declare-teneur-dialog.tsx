@@ -40,6 +40,7 @@ import {
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
 import { useFocusOnAvoidedEmissions } from "accounting/components/quantity-form/quantity-form.hooks"
+import { computeEnergyGjFromLiters } from "../../utils/formatters"
 interface DeclareTeneurDialogProps {
   onClose: () => void
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective
@@ -77,6 +78,16 @@ const DeclareTeneurDialogContent = ({
   )
 
   const depotQuantityMax = useCalculateQuantityMax(objective, form.value)
+  const quantityEnergyGj = useMemo(() => {
+    const quantity = form.value.quantity ?? 0
+    const pciLitre = form.value.balance?.biofuel?.pci_litre
+
+    if (!pciLitre) {
+      return 0
+    }
+
+    return computeEnergyGjFromLiters(quantity, pciLitre)
+  }, [form.value.quantity, form.value.balance?.biofuel?.pci_litre])
   // Get the current sector objective when the biofuel is selected
   const currentSectorObjective = useMemo(() => {
     if (!form.value.balance?.sector) return undefined
@@ -126,7 +137,7 @@ const DeclareTeneurDialogContent = ({
                 <DeclareTeneurProgressBarList
                   sectorObjective={currentSectorObjective}
                   categoryObjective={objective}
-                  quantity={form.value.quantity ?? 0}
+                  quantity={quantityEnergyGj}
                   targetType={targetType}
                 />
               </Box>

@@ -40,6 +40,12 @@ export const DeclareTeneurProgressBar = ({
   category,
   formatRemaining = formatObjectiveGJ,
 }: DeclareTeneurProgressBarProps) => {
+  console.log("calculating remaining energy with additional quantity", {
+    target,
+    teneurDeclared,
+    pendingTeneur,
+    quantity,
+  })
   const remainingEnergy = targetType
     ? computeRemainingEnergyWithAdditionalQuantity(
         {

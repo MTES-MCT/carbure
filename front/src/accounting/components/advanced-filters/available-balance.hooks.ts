@@ -9,10 +9,10 @@ import { AdvancedFiltersFormProps } from "./advanced-filters.types"
 import { useEffect } from "react"
 import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
 import { floorNumber } from "common/utils/formatters"
-import { FRACTION_DIGITS_OPERATION } from "accounting/config"
+import { FRACTION_DIGITS_LITERS } from "accounting/config"
 
 const floorAvailableQuantity = (quantity?: number) =>
-  floorNumber(quantity ?? 0, FRACTION_DIGITS_OPERATION)
+  floorNumber(quantity ?? 0, FRACTION_DIGITS_LITERS)
 
 const debouncedGetBalance = debounce(
   (entityId, biofuel, sector, category, filters) =>

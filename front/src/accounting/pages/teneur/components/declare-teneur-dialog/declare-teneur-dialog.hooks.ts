@@ -14,9 +14,11 @@ import {
 } from "../../types"
 import { useMemo } from "react"
 import {
+  computeLitersMaxFromEnergyGj,
   computeObjectiveEnergy,
-  formatObjectiveGJ,
 } from "../../utils/formatters"
+import { formatAccountingUnit } from "accounting/utils/formatters"
+import { Unit } from "common/types"
 
 type DeclareTeneurDialogProps = {
   values: DeclareTeneurDialogForm
@@ -50,7 +52,7 @@ export const useDeclareTeneurDialog = ({
         t(
           "La mise en teneur d'une quantité de {{quantity}} a été réalisée avec succès",
           {
-            quantity: formatObjectiveGJ(values.quantity!),
+            quantity: formatAccountingUnit(values.quantity!, Unit.l),
           }
         ),
         { variant: "success" }
@@ -90,24 +92,38 @@ export const useRemainingCO2Objective = (
   }, [mainObjective, values.avoided_emissions])
 }
 
+/**
+ * Max declarable quantity for the teneur form, in liters.
+ * Balance is in L; category caps are in GJ — convert remaining cap to liters
+ * (ceil to 2 decimals via pci_litre) before comparing with the available balance.
+ */
 export const useCalculateQuantityMax = (
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective,
   values: DeclareTeneurDialogForm
 ) => {
   const availableBalance = values.balance?.available_balance
+  const pciLitre = values.balance?.biofuel?.pci_litre
 
   return useMemo(() => {
     if (availableBalance === undefined) {
       return 0
     }
 
-    // if the objective is a cap or there is no target, the maximum quantity is the available balance
+    // No cap on quantity when there is no target or the category is objectivized (REACH)
     if (!objective.target || objective.target_type === TargetType.REACH) {
       return floorNumber(availableBalance, 0)
     }
 
-    const remainingObjectiveEnergy = computeObjectiveEnergy(objective)
+    if (!pciLitre) {
+      return floorNumber(availableBalance, 0)
+    }
 
-    return floorNumber(Math.min(availableBalance, remainingObjectiveEnergy), 0)
-  }, [objective, availableBalance])
+    const remainingObjectiveEnergy = computeObjectiveEnergy(objective)
+    const maxLitersFromObjective = computeLitersMaxFromEnergyGj(
+      remainingObjectiveEnergy,
+      pciLitre
+    )
+
+    return Math.min(availableBalance, maxLitersFromObjective)
+  }, [objective, availableBalance, pciLitre])
 }

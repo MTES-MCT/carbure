@@ -1,4 +1,4 @@
-import i18next from "i18next"
+import i18next, { TFunction } from "i18next"
 import { QuantityFormProps } from "./quantity-form.types"
 import { Step } from "common/components/stepper"
 import { CreateOperationType } from "accounting/types"
@@ -46,3 +46,40 @@ export const getQuantityInputLabel = (type: CreateOperationType) => {
       return i18next.t("Type inconnu")
   }
 }
+
+type QuantityInputFeedback = {
+  state: "default" | "info"
+  stateRelatedMessage?: string
+}
+
+export const getQuantityInputFeedback = ({
+  type,
+  quantityDeclared,
+  t,
+}: {
+  type: CreateOperationType
+  quantityDeclared: boolean
+  t: TFunction
+}): QuantityInputFeedback => {
+  if (!quantityDeclared && type === CreateOperationType.TENEUR) {
+    return {
+      state: "info",
+      stateRelatedMessage: t(
+        "L'équivalent en GJ est affiché dès que vous entrez une quantité."
+      ),
+    }
+  }
+
+  return {
+    state: "info",
+    stateRelatedMessage: t(
+      "Le nombre de tonnes de CO2 évitées équivalentes sera calculé après validation de la quantité."
+    ),
+  }
+}
+
+export const showEnergyEquivalent = (
+  type: CreateOperationType,
+  quantity?: number,
+  pciLitre?: number
+) => type === CreateOperationType.TENEUR && Boolean(quantity && pciLitre)
