@@ -25,7 +25,9 @@ export const useBiofuelTeneurColumns = () => {
       header: `${t("Solde initial")} (GJ)`,
       cell: (item) => (
         <Cell
-          text={formatBalanceValue(item.available_balance + item.pending_teneur)}
+          text={formatBalanceValue(
+            item.available_balance + item.pending_teneur
+          )}
         />
       ),
     },
@@ -35,7 +37,9 @@ export const useBiofuelTeneurColumns = () => {
     },
     {
       header: `${t("Solde final")} (GJ)`,
-      cell: (item) => <Cell text={formatBalanceValue(item.available_balance)} />,
+      cell: (item) => (
+        <Cell text={formatBalanceValue(item.available_balance)} />
+      ),
     },
   ]
 
@@ -64,9 +68,7 @@ export const useBiofuelTeneurSectorColumns = () => {
     {
       header: `${t("Avancement final")} (GJ)`,
       cell: (item) => (
-        <Cell
-          text={formatObjectiveGJ(item.progress.total_teneur_declared)}
-        />
+        <Cell text={formatObjectiveGJ(item.progress.total_teneur_declared)} />
       ),
     },
   ]
@@ -85,7 +87,9 @@ export const useElecTeneurColumns = () => {
       header: `${t("Solde initial")} (GJ)`,
       cell: (item) => (
         <Cell
-          text={formatBalanceValue(item.available_balance + item.pending_teneur)}
+          text={formatBalanceValue(
+            item.available_balance + item.pending_teneur
+          )}
         />
       ),
     },
@@ -95,7 +99,9 @@ export const useElecTeneurColumns = () => {
     },
     {
       header: `${t("Solde final")} (GJ)`,
-      cell: (item) => <Cell text={formatBalanceValue(item.available_balance)} />,
+      cell: (item) => (
+        <Cell text={formatBalanceValue(item.available_balance)} />
+      ),
     },
   ]
 

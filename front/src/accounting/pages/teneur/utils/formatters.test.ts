@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   computeRemainingEnergyWithAdditionalQuantityMj,
   remainingEnergyMjFrom,
+  remainingGjAfterAdditionalMj,
 } from "./formatters"
 
 describe("computeRemainingEnergyWithAdditionalQuantityMj", () => {
@@ -27,5 +28,24 @@ describe("computeRemainingEnergyWithAdditionalQuantityMj", () => {
     expect(
       computeRemainingEnergyWithAdditionalQuantityMj(objective, 1_000_000)
     ).toBe(0)
+  })
+})
+
+describe("remainingGjAfterAdditionalMj", () => {
+  const capObjective = {
+    target_mj: 340_000,
+    teneur_declared_mj: 0,
+    pending_teneur_mj: 0,
+  }
+  const pci = 34
+
+  it("ceil-displays remaining GJ when liters are just below the cap max", () => {
+    const additionalMj = 9_999.98 * pci
+
+    expect(remainingGjAfterAdditionalMj(capObjective, additionalMj)).toBe(0.001)
+  })
+
+  it("returns 0 GJ when the cap is exactly reached", () => {
+    expect(remainingGjAfterAdditionalMj(capObjective, 340_000)).toBe(0)
   })
 })

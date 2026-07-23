@@ -13,9 +13,7 @@ import {
   TargetType,
 } from "../../types"
 import { useMemo } from "react"
-import {
-  computeLitersMaxFromEnergyMj,
-} from "../../utils/formatters"
+import { computeLitersMaxFromEnergyMj } from "../../utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 import { Unit } from "common/types"
 

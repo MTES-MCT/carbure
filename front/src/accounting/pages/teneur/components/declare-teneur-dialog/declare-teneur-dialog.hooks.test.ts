@@ -16,14 +16,27 @@ const createObjective = (
   overrides: Partial<CategoryObjective> = {}
 ): CategoryObjective => {
   const {
-    total_teneur_declared_mj: _total,
-    remaining_energy_mj: _remaining,
-    is_objective_met: _isMet,
-    progress: _progress,
-    ...base
+    code,
+    target_mj,
+    teneur_declared_mj,
+    pending_teneur_mj,
+    quantity_available_mj,
+    target_percent,
+    penalty,
+    target_type,
   } = defaultCategoryObjective
 
-  return enrichEnergyObjective({ ...base, ...overrides })
+  return enrichEnergyObjective({
+    code,
+    target_mj,
+    teneur_declared_mj,
+    pending_teneur_mj,
+    quantity_available_mj,
+    target_percent,
+    penalty,
+    target_type,
+    ...overrides,
+  })
 }
 
 const createValues = (

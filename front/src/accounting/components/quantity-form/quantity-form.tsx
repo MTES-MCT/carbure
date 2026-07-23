@@ -190,6 +190,13 @@ const QuantitySection = ({
         {...quantityBind}
         addon={
           <>
+            <Button
+              priority="secondary"
+              onClick={() => quantityBind.onChange(quantityMax)}
+              disabled={quantityDeclared}
+            >
+              {t("Max")}
+            </Button>
             {!quantityDeclared && (
               <Button
                 onClick={declareQuantity}

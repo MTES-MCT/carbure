@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import { ReactNode } from "react"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { formatEnergyNumber } from "accounting/utils/formatters"
 import { formatNumber } from "common/utils/formatters"
 import { CardProgress } from "../../card-progress"
 import { CategoryObjective, TargetType } from "../../../types"
@@ -47,7 +48,7 @@ export const CategoryObjectiveProgressCard = ({
   return (
     <CardProgress
       title={category.code}
-      mainValue={formatObjectiveGJ(progress.total_teneur_declared)}
+      mainValue={formatEnergyNumber(progress.total_teneur_declared)}
       mainText={t("GJ")}
       description={t(
         "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
@@ -57,9 +58,9 @@ export const CategoryObjectiveProgressCard = ({
           target_percent: formatNumber(category.target_percent ?? 0),
         }
       )}
-      baseQuantity={progress.teneur_declared}
-      targetQuantity={progress.target}
-      declaredQuantity={progress.pending_teneur}
+      baseQuantity={category.teneur_declared_mj}
+      targetQuantity={category.target_mj ?? 0}
+      declaredQuantity={category.pending_teneur_mj}
       badge={badge}
       penalty={category.penalty}
       onClick={

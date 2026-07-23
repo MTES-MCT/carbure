@@ -22,7 +22,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
       title={t("Avancement global")}
       description={
         <Trans
-          i18nKey="Base calculée : {{energy_basis}} GJ"
+          i18nKey="Base calculée : {{energy_basis}}"
           values={{
             energy_basis: formatObjectiveGJ(objective?.energy_basis_gj ?? 0),
           }}

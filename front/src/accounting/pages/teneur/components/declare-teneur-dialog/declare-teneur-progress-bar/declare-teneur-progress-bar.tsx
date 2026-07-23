@@ -17,7 +17,7 @@ import {
   formatObjectiveGJ,
   remainingGjAfterAdditionalMj,
 } from "../../../utils/formatters"
-import { mjToDisplayGj, remainingMj } from "../../../utils/energy"
+import { remainingMj } from "../../../utils/energy"
 import { ProgressBar } from "../../progress-bar"
 
 const containerStyle = {
@@ -79,7 +79,7 @@ const TeneurProgressBarSection = ({
 type EnergyTeneurProgressBarProps = {
   objective: Pick<
     EnergyObjective,
-    "target_mj" | "teneur_declared_mj" | "pending_teneur_mj" | "progress"
+    "target_mj" | "teneur_declared_mj" | "pending_teneur_mj"
   >
   additionalMj: number
   label?: ReactNode
@@ -93,26 +93,21 @@ export const EnergyTeneurProgressBar = ({
   label,
   targetType,
   category,
-}: EnergyTeneurProgressBarProps) => {
-  const { progress } = objective
-  const additionalGj = mjToDisplayGj(additionalMj)
-
-  return (
-    <TeneurProgressBarSection
-      label={label}
-      targetType={targetType}
-      category={category}
-      baseQuantity={progress.teneur_declared}
-      targetQuantity={progress.target}
-      declaredQuantity={progress.pending_teneur + additionalGj}
-      remaining={
-        targetType != null
-          ? remainingGjAfterAdditionalMj(objective, additionalMj)
-          : null
-      }
-    />
-  )
-}
+}: EnergyTeneurProgressBarProps) => (
+  <TeneurProgressBarSection
+    label={label}
+    targetType={targetType}
+    category={category}
+    baseQuantity={objective.teneur_declared_mj}
+    targetQuantity={objective.target_mj ?? 0}
+    declaredQuantity={objective.pending_teneur_mj + additionalMj}
+    remaining={
+      targetType != null
+        ? remainingGjAfterAdditionalMj(objective, additionalMj)
+        : null
+    }
+  />
+)
 
 type Co2TeneurProgressBarProps = {
   teneurDeclared: number

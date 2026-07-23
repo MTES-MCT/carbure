@@ -7,7 +7,12 @@ import {
 import { ExtendedUnit } from "common/types"
 import { ceilNumber, formatUnit } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
-import { buildObjectiveProgressGj, mjToDisplayGj, remainingMj } from "./energy"
+import {
+  buildObjectiveProgressGj,
+  mjToDisplayGj,
+  mjToRemainingDisplayGj,
+  remainingMj,
+} from "./energy"
 
 export type EnergyObjectiveInput = Pick<
   EnergyObjectiveFields,
@@ -141,7 +146,7 @@ export const remainingGjAfterAdditionalMj = (
   >,
   additionalMj: number
 ) =>
-  mjToDisplayGj(
+  mjToRemainingDisplayGj(
     computeRemainingEnergyWithAdditionalQuantityMj(
       { ...objective, quantity_available_mj: 0 },
       additionalMj
