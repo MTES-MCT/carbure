@@ -2932,6 +2932,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/operations/{id}/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["export_tiruert_operation_details_excel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/{id}/reject/": {
         parameters: {
             query?: never;
@@ -13594,6 +13610,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    export_tiruert_operation_details_excel: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Specify the volume unit. */
+                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Opération. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.ms-excel": File;
                 };
             };
         };
