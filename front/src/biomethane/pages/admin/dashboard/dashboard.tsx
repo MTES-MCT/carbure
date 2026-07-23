@@ -55,11 +55,18 @@ const Dashboard = () => {
           normalizers={normalizers}
         />
         {!loading && dashboardData && (
-          <RecapQuantity
-            text={t("{{count}} déclarations", {
-              count: dashboardData.count,
-            })}
-          />
+          <>
+            <RecapQuantity
+              text={t("{{count}} déclarations", {
+                count: dashboardData.count,
+              })}
+            />
+            <RecapQuantity
+              text={t("{{total}} Nm³ de biométhane injecté", {
+                total: dashboardData.total_volume_nm3,
+              })}
+            />
+          </>
         )}
         {!loading && (!dashboardData || dashboardData?.count === 0) && (
           <NoResult />

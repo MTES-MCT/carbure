@@ -61,6 +61,14 @@ class BiomethaneAdminDashboardService:
                     default=Value(0),
                 ),
             )
+            .annotate(
+                _volume_nm3=Coalesce(
+                    F("biomethane_energies__injected_biomethane_gwh_pcs_per_year")
+                    * 10**6
+                    / F("biomethane_energies__injected_biomethane_pcs_kwh_per_nm3"),
+                    0.0,
+                )
+            )
             .order_by("-_priority", "name")
         )
         return q

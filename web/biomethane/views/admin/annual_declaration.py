@@ -1,3 +1,5 @@
+from django.db.models import Sum
+from django.db.models.functions import Round
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
@@ -8,6 +10,11 @@ from biomethane.serializers.admin.annual_declaration import BiomethaneAdminAnnua
 from biomethane.services.admin.dashboard import BiomethaneAdminDashboardService
 from core.filters import FiltersActionFactory
 from core.models import Entity
+from core.pagination import MetadataPageNumberPagination
+
+
+class BiomethaneAdminAnnualDeclarationPagination(MetadataPageNumberPagination):
+    aggregate_fields = {"total_volume_nm3": Round(Sum("_volume_nm3"))}
 
 
 @extend_schema(
@@ -28,6 +35,7 @@ class BiomethaneAdminAnnualDeclarationViewSet(GenericViewSet, ListModelMixin, Fi
     filterset_class = BiomethaneAdminAnnualDeclarationFilter
     permission_classes = [CanAccessAdminModule]
     serializer_class = BiomethaneAdminAnnualDeclarationSerializer
+    pagination_class = BiomethaneAdminAnnualDeclarationPagination
 
     def get_queryset(self):
         year = self.request.query_params.get("year")
