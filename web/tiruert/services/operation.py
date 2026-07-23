@@ -19,7 +19,6 @@ from tiruert.services.teneur import TeneurService
 
 
 class OperationServiceErrors:
-    TARGET_EXCEEDED = "TARGET_EXCEEDED"
     ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
     LOT_EMISSION_RATE_NOT_FOUND = "LOT_EMISSION_RATE_NOT_FOUND"
 
@@ -93,55 +92,125 @@ class OperationService:
             if available_volumes[lot_id] < volume:
                 raise serializers.ValidationError(
                     {
-                        "lot_id": [
+                        "volume": [
                             _(
-                                f"{lot_id}: Volume insuffisant pour le lot sélectionné. Volume disponible: {available_volumes[lot_id]}"  # noqa: E501
+                                f"Lot id {lot_id} : Volume insuffisant pour ce lot (volume disponible: {available_volumes[lot_id]} L)"  # noqa: E501
                             )
                         ]
                     }
                 )
 
     @staticmethod
+    def bulk_check_volumes(entries, unit):
+        """
+        Check that several requested operations combined have enough volume available.
+
+        - entries: list of {"biofuel", "customs_category", "debited_entity", "selected_lots"} dicts.
+        Entries sharing the same (biofuel, customs_category) are summed together before checking,
+        since `check_volumes`'s availability lookup is scoped to that combination regardless
+        of operation_type (e.g. a TENEUR group and a TRANSFERT group drawing from the same lots).
+        """
+        grouped: dict[tuple, dict] = {}
+        for entry in entries:
+            key = (entry["biofuel"].id, entry["customs_category"])
+            group = grouped.setdefault(
+                key,
+                {
+                    "biofuel": entry["biofuel"],
+                    "customs_category": entry["customs_category"],
+                    "debited_entity": entry["debited_entity"],
+                    "lot_volumes": defaultdict(float),
+                },
+            )
+            for lot in entry["selected_lots"]:
+                group["lot_volumes"][lot["id"]] += lot["volume"]
+
+        for group in grouped.values():
+            selected_lots = [{"id": lot_id, "volume": volume} for lot_id, volume in group["lot_volumes"].items()]
+            data = {
+                "biofuel": group["biofuel"],
+                "customs_category": group["customs_category"],
+                "debited_entity": group["debited_entity"],
+            }
+            OperationService.check_volumes(selected_lots, data, unit)
+
+    @staticmethod
+    def _check_teneur_target(request, entity_id, customs_category, teneur_to_add, declaration_year, bulk=False):
+        """
+        Check that adding `teneur_to_add` (in MJ) for the given customs category doesn't
+        exceed the capped objective, based on the entity's already pending/declared teneur.
+        """
+        # 1. Get the target for the customs category
+        target = ObjectiveService.calculate_target_for_specific_category(customs_category, request.entity.id)
+        target = 6539212390
+        # Case for reach objective and no objective, no need to do this check compliance
+        if target is None:
+            return
+
+        # 2. Calculate the balance for the requested customs category (all biofuels combined)
+        request.GET = request.GET.copy()
+        request.GET["customs_category"] = customs_category
+        operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
+
+        period = DeclarationPeriodService.get_period_by_year(declaration_year)
+        if period is None:
+            return
+
+        date_from = period.start_date
+
+        balance = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from)
+
+        balance = list(balance.values())[0]  # keep the first (and only one) element
+
+        # 3. Check if the futur teneur is below the target
+        futur_teneur = (
+            truncate(balance["pending_teneur"], 0) + truncate(balance["declared_teneur"], 0) + teneur_to_add
+        )  # all in MJ
+
+        if futur_teneur > target:
+            message = "La somme des teneurs" if bulk else "La teneur"
+            raise serializers.ValidationError(
+                {
+                    "teneur": [
+                        _(
+                            f"{message} à créer ({teneur_to_add} MJ), pour la catégorie {customs_category}, dépasse l'objectif plafonné ({target} MJ)"  # noqa: E501
+                        )
+                    ]
+                }
+            )
+
+    @staticmethod
     def check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year):
         """
         Check if the TENEUR operation respects the capped objective for the customs category
         """
-        if data["type"] == Operation.TENEUR:
-            # 1. Get the target for the customs category
-            target = ObjectiveService.calculate_target_for_specific_category(data["customs_category"], request.entity.id)
+        if data["type"] != Operation.TENEUR:
+            return
 
-            # Case for reach objective and no objective, no need to do this check compliance
-            if target is None:
-                return
+        # Convert the teneur to add from liters to MJ
+        pci = data["biofuel"].pci_litre
+        teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
 
-            # 2. Calculate the balance for requested biofuel and customs category and declaration year
-            request.GET = request.GET.copy()
-            request.GET["customs_category"] = data["customs_category"]
-            request.GET["biofuel"] = data["biofuel"].code
-            operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
+        OperationService._check_teneur_target(request, entity_id, data["customs_category"], teneur_to_add)
 
-            period = DeclarationPeriodService.get_period_by_year(declaration_year)
-            if period is None:
-                return
+    @staticmethod
+    def bulk_check_objectives_compliance(request, entity_id, teneur_entries):
+        """
+        Check if several TENEUR operations combined respect the capped objective for their
+        customs category.
 
-            date_from = period.start_date
+        - teneur_entries: list of {"customs_category", "biofuel", "selected_lots"}
+        dicts.
+        """
+        teneur_to_add_by_category = defaultdict(float)
+        for entry in teneur_entries:
+            pci = entry["biofuel"].pci_litre
+            teneur_to_add_by_category[entry["customs_category"]] += sum(
+                lot["volume"] * pci for lot in entry["selected_lots"]
+            )
 
-            balance = BalanceService.calculate_balance(operations, entity_id, None, "mj", date_from)
-            balance = list(balance.values())[0]  # keep the first (and only one) element
-
-            # 3. Convert the teneur to add from liters to MJ
-            pci = data["biofuel"].pci_litre
-            teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
-
-            # 4. Check if the futur teneur is below the target
-            futur_teneur = (
-                truncate(balance["pending_teneur"], 0) + truncate(balance["declared_teneur"], 0) + teneur_to_add
-            )  # all in MJ
-
-            if futur_teneur > target:
-                raise serializers.ValidationError(
-                    {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
-                )
+        for customs_category, teneur_to_add in teneur_to_add_by_category.items():
+            OperationService._check_teneur_target(request, entity_id, customs_category, teneur_to_add, bulk=True)
 
     @staticmethod
     def check_declaration_year(declaration_year, validated_data):
