@@ -9,6 +9,7 @@ from django_filters import (
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import CharField, ListField
+from rest_framework.serializers import IntegerField as SerializerIntegerField
 
 from core.filters import MultiValueInFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
@@ -105,7 +106,7 @@ class BaseFilter(FilterSet):
 class OperationFilter(BaseFilter):
     years = CharFilter(method="filter_years")
 
-    @extend_schema_field(ListField(child=CharField()))
+    @extend_schema_field(ListField(child=SerializerIntegerField()))
     def filter_years(self, queryset, name, value):
         years = self.request.GET.getlist(name)
         if not years:

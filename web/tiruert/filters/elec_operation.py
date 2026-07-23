@@ -3,6 +3,7 @@ from datetime import timezone
 from django.db.models import IntegerField, Q
 from django.db.models.functions import ExtractYear
 from django_filters import CharFilter, DateFilter, FilterSet, NumberFilter
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import CharField, ChoiceField, ListField
@@ -114,9 +115,11 @@ class BaseFilter(FilterSet):
 
 class ElecOperationFilter(BaseFilter):
     date_from = DateFilter(field_name="created_at", lookup_expr="gte")
-    years = AllAnnotatedValuesMultipleFilter(
-        field_name="year",
-        annotation=ExtractYear("created_at", tzinfo=timezone.utc, output_field=IntegerField()),
+    years = extend_schema_field(OpenApiTypes.NUMBER)(
+        AllAnnotatedValuesMultipleFilter(
+            field_name="year",
+            annotation=ExtractYear("created_at", tzinfo=timezone.utc, output_field=IntegerField()),
+        )
     )
 
 
