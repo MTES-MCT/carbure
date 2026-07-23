@@ -6,7 +6,7 @@ import { SectorObjective } from "../../types"
 import {
   formatObjectiveGJ,
   formatObjectiveGJFromMj,
-} from "../../utils/formatters"
+} from "../../utils/objectives"
 
 const formatBalanceValue = (valueMj: number) => formatObjectiveGJFromMj(valueMj)
 

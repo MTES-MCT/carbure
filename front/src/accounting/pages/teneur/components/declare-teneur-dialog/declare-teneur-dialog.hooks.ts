@@ -13,7 +13,7 @@ import {
   TargetType,
 } from "../../types"
 import { useMemo } from "react"
-import { computeLitersMaxFromEnergyMj } from "../../utils/formatters"
+import { maxLitersFromRemainingMj } from "../../utils/liters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 import { Unit } from "common/types"
 
@@ -116,7 +116,7 @@ export const useCalculateQuantityMax = (
     }
 
     const remainingObjectiveEnergyMj = objective.remaining_energy_mj
-    const maxLitersFromObjective = computeLitersMaxFromEnergyMj(
+    const maxLitersFromObjective = maxLitersFromRemainingMj(
       remainingObjectiveEnergyMj,
       pciLitre
     )

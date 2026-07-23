@@ -6,7 +6,7 @@ import { formatEnergyNumber } from "accounting/utils/formatters"
 import { formatNumber } from "common/utils/formatters"
 import { CardProgress } from "../../card-progress"
 import { CategoryObjective, TargetType } from "../../../types"
-import { formatObjectiveGJ } from "../../../utils/formatters"
+import { formatObjectiveGJ } from "../../../utils/objectives"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 
 type CategoryObjectiveProgressCardProps = {

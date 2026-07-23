@@ -3,10 +3,8 @@ import { describe, expect, it } from "vitest"
 import { balance, balanceBiofuel } from "accounting/__test__/data/balances"
 import { defaultCategoryObjective } from "../../__test__/data"
 import { CategoryObjective } from "../../types"
-import {
-  computeLitersMaxFromEnergyMj,
-  enrichEnergyObjective,
-} from "../../utils/formatters"
+import { enrichEnergyObjective } from "../../utils/objectives"
+import { maxLitersFromRemainingMj } from "../../utils/liters"
 import { useCalculateQuantityMax } from "./declare-teneur-dialog.hooks"
 import { DeclareTeneurDialogForm } from "./declare-teneur-dialog.types"
 
@@ -79,7 +77,7 @@ describe("useCalculateQuantityMax", () => {
   describe("capped category — remaining MJ converted to L (ceil 2 decimals)", () => {
     const objective = createObjective()
     const remainingGj = objective.progress.remaining_energy
-    const maxLitersFromCap = computeLitersMaxFromEnergyMj(
+    const maxLitersFromCap = maxLitersFromRemainingMj(
       objective.remaining_energy_mj,
       PCI
     )
@@ -113,7 +111,7 @@ describe("useCalculateQuantityMax", () => {
       pending_teneur_mj: 25_655,
     })
     const remainingGj = objective.progress.remaining_energy
-    const maxLitersFromCap = computeLitersMaxFromEnergyMj(
+    const maxLitersFromCap = maxLitersFromRemainingMj(
       objective.remaining_energy_mj,
       PCI
     )

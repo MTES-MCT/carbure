@@ -1,5 +1,5 @@
 import { FRACTION_DIGITS_GJ } from "accounting/config"
-import { computeEnergyGjFromLiters } from "accounting/pages/teneur/utils/formatters"
+import { energyFromLiters } from "accounting/pages/teneur/utils/liters"
 import { Notice } from "common/components/notice"
 import { formatNumber } from "common/utils/formatters"
 import { Trans, useTranslation } from "react-i18next"
@@ -14,7 +14,7 @@ export const EnergyEquivalentNotice = ({
   pciLitre,
 }: EnergyEquivalentNoticeProps) => {
   const { t } = useTranslation()
-  const energyGj = computeEnergyGjFromLiters(quantityLiters, pciLitre)
+  const energyGj = energyFromLiters(quantityLiters, pciLitre).gj
 
   return (
     <Notice

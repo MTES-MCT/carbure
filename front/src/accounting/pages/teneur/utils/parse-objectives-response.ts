@@ -1,6 +1,6 @@
 import { apiTypes } from "common/services/api-fetch.types"
 import { MainObjective, Objectives, SectorObjective } from "../types"
-import { enrichEnergyObjective, enrichMainObjective } from "./formatters"
+import { enrichEnergyObjective, enrichMainObjective } from "./objectives"
 
 type ParsedCategories = Pick<
   Objectives,

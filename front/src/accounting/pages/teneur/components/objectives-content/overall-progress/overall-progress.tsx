@@ -6,7 +6,7 @@ import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 import { ExtendedUnit } from "common/types"
-import { formatObjectiveGJ } from "../../../utils/formatters"
+import { formatObjectiveGJ } from "../../../utils/objectives"
 
 type OverallProgressProps = {
   objective?: MainObjective

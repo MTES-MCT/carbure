@@ -15,9 +15,8 @@ import { CategoryEnum } from "common/types"
 import {
   formatObjectiveCO2,
   formatObjectiveGJ,
-  remainingGjAfterAdditionalMj,
-} from "../../../utils/formatters"
-import { remainingMj } from "../../../utils/energy"
+} from "../../../utils/objectives"
+import { remainingGjAfterDeclaration, remainingMj } from "../../../utils/energy"
 import { ProgressBar } from "../../progress-bar"
 
 const containerStyle = {
@@ -103,7 +102,7 @@ export const EnergyTeneurProgressBar = ({
     declaredQuantity={objective.pending_teneur_mj + additionalMj}
     remaining={
       targetType != null
-        ? remainingGjAfterAdditionalMj(objective, additionalMj)
+        ? remainingGjAfterDeclaration(objective, additionalMj)
         : null
     }
   />

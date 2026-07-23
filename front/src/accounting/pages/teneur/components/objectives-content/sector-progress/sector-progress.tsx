@@ -6,7 +6,7 @@ import { SectorObjective } from "../../../types"
 import { CardGrid } from "../../card-grid"
 import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
-import { formatObjectiveGJ } from "../../../utils/formatters"
+import { formatObjectiveGJ } from "../../../utils/objectives"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 
 type SectorProgressProps = {

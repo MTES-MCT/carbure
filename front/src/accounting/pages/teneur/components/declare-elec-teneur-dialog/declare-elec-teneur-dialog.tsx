@@ -23,7 +23,7 @@ import { Notice } from "common/components/notice"
 import { ObjectiveSectorPicker } from "../objective-sector-picker"
 import { useMemo } from "react"
 import { formatSector } from "accounting/utils/formatters"
-import { formatObjectiveGJ } from "../../utils/formatters"
+import { formatObjectiveGJ } from "../../utils/objectives"
 
 interface DeclareElecTeneurDialogProps {
   objective: ElecCategoryObjective

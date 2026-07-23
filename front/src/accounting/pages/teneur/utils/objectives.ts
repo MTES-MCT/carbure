@@ -1,20 +1,18 @@
-import { FRACTION_DIGITS_LITERS } from "accounting/config"
+/**
+ * Objective enrichment and display formatting.
+ * Arithmetic lives in energy.ts (MJ); progress.* fields are GJ for display only.
+ */
 import {
   EnergyObjectiveComputed,
   EnergyObjectiveFields,
   MainObjective,
 } from "../types"
 import { ExtendedUnit } from "common/types"
-import { ceilNumber, formatUnit } from "common/utils/formatters"
+import { formatUnit } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
-import {
-  buildObjectiveProgressGj,
-  mjToDisplayGj,
-  mjToRemainingDisplayGj,
-  remainingMj,
-} from "./energy"
+import { buildObjectiveProgressGj, mjToDisplayGj, remainingMj } from "./energy"
 
-export type EnergyObjectiveInput = Pick<
+type EnergyObjectiveInput = Pick<
   EnergyObjectiveFields,
   "teneur_declared_mj" | "pending_teneur_mj" | "quantity_available_mj"
 > & {
@@ -31,6 +29,8 @@ type MainObjectiveInput = Pick<
   | "target_percent"
   | "penalty"
 >
+
+// ── Enrichment (called when parsing API objectives) ──
 
 export const enrichEnergyObjective = <T extends EnergyObjectiveInput>(
   objective: T
@@ -90,65 +90,15 @@ export const enrichMainObjective = <T extends MainObjectiveInput>(
   }
 }
 
-/** Format a pre-computed GJ value for display. */
+// ── Display (strings with unit — use formatEnergyNumber for number-only) ──
+
+/** Pre-computed GJ value (progress.*) formatted with unit, e.g. "54,988 GJ". */
 export const formatObjectiveGJ = (gj: number) =>
   formatAccountingUnit(gj, ExtendedUnit.GJ)
 
-/** Format a MJ value as GJ (for raw API balances not yet enriched). */
+/** Raw MJ value formatted as GJ with unit (unenriched API balances). */
 export const formatObjectiveGJFromMj = (mj: number) =>
   formatObjectiveGJ(mjToDisplayGj(mj))
 
 export const formatObjectiveCO2 = (value: number) =>
   formatUnit(value, ExtendedUnit.tCO2ev, { fractionDigits: 0 })
-
-export const computeEnergyGjFromLiters = (
-  quantityLiters: number,
-  pciLitre: number
-) => mjToDisplayGj(quantityLiters * pciLitre)
-
-export const computeEnergyMjFromLiters = (
-  quantityLiters: number,
-  pciLitre: number
-) => quantityLiters * pciLitre
-
-export const computeRemainingLitersFromMj = (
-  remainingEnergyMj: number,
-  pciLitre: number
-) => ceilNumber(remainingEnergyMj / pciLitre, FRACTION_DIGITS_LITERS)
-
-export const computeLitersMaxFromEnergyMj = (
-  remainingEnergyMj: number,
-  pciLitre: number
-) => computeRemainingLitersFromMj(remainingEnergyMj, pciLitre)
-
-export const remainingEnergyMjFrom = (objective: EnergyObjectiveInput) =>
-  remainingMj(
-    objective.target_mj ?? 0,
-    objective.teneur_declared_mj,
-    objective.pending_teneur_mj
-  )
-
-export const computeRemainingEnergyWithAdditionalQuantityMj = (
-  objective: Pick<
-    EnergyObjectiveFields,
-    | "target_mj"
-    | "teneur_declared_mj"
-    | "pending_teneur_mj"
-    | "quantity_available_mj"
-  >,
-  additionalMj: number
-) => Math.max(0, remainingEnergyMjFrom(objective) - additionalMj)
-
-export const remainingGjAfterAdditionalMj = (
-  objective: Pick<
-    EnergyObjectiveFields,
-    "target_mj" | "teneur_declared_mj" | "pending_teneur_mj"
-  >,
-  additionalMj: number
-) =>
-  mjToRemainingDisplayGj(
-    computeRemainingEnergyWithAdditionalQuantityMj(
-      { ...objective, quantity_available_mj: 0 },
-      additionalMj
-    )
-  )

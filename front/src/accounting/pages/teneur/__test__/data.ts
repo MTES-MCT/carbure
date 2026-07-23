@@ -7,7 +7,7 @@ import {
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../types"
-import { enrichEnergyObjective, enrichMainObjective } from "../utils/formatters"
+import { enrichEnergyObjective, enrichMainObjective } from "../utils/objectives"
 
 export const cappedCategories: CategoryObjective[] = [
   enrichEnergyObjective({

@@ -1,6 +1,6 @@
 import { RecapData } from "../recap-data"
 import { EnergyObjective, MainObjective } from "../../types"
-import { formatObjectiveCO2, formatObjectiveGJ } from "../../utils/formatters"
+import { formatObjectiveCO2, formatObjectiveGJ } from "../../utils/objectives"
 import { ExtendedUnit } from "common/types"
 
 type EnergyObjectiveProgressRecapProps = {
