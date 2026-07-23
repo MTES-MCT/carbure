@@ -142,7 +142,6 @@ class OperationService:
         """
         # 1. Get the target for the customs category
         target = ObjectiveService.calculate_target_for_specific_category(customs_category, request.entity.id)
-        target = 6539212390
         # Case for reach objective and no objective, no need to do this check compliance
         if target is None:
             return
@@ -399,4 +398,4 @@ class OperationService:
             return Operation.GAZOLE
         elif biofuel.code in SAF_BIOFUEL_TYPES:
             return Operation.CARBUREACTEUR
-        return ""
+        return None

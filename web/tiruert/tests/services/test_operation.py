@@ -414,8 +414,8 @@ class OperationServiceCheckVolumesTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_volumes(selected_lots, data)
 
-        self.assertIn("lot_id", context.exception.detail.keys())
-        self.assertIn("1: Volume insuffisant pour le lot sélectionné", str(context.exception.detail.values()))
+        self.assertIn("volume", context.exception.detail.keys())
+        self.assertIn("1 : Volume insuffisant pour ce lot", str(context.exception.detail.values()))
 
     @patch("tiruert.services.operation.TeneurService.prepare_data")
     def test_check_volumes_raises_error_when_duplicate_lot_total_exceeds_available(self, mock_prepare_data):
@@ -439,8 +439,8 @@ class OperationServiceCheckVolumesTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_volumes(selected_lots, data, unit)
 
-        self.assertIn("lot_id", context.exception.detail.keys())
-        self.assertIn("1: Volume insuffisant pour le lot sélectionné", str(context.exception.detail.values()))
+        self.assertIn("volume", context.exception.detail.keys())
+        self.assertIn("1 : Volume insuffisant pour ce lot", str(context.exception.detail.values()))
 
 
 class OperationServiceCheckObjectivesComplianceTest(TestCase):
@@ -498,7 +498,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         mock_calculate_balance.assert_called_once()
         called_args = mock_calculate_balance.call_args[0]
         self.assertEqual(called_args[1], 1)  # entity_id
-        self.assertEqual(called_args[2], None)  # depot_id
+        self.assertEqual(called_args[2], "customs_category")  # group_by
         self.assertEqual(called_args[3], "mj")  # unit
         self.assertEqual(called_args[4], period_start_date)  # date_from
 
@@ -566,13 +566,10 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
-        error_key = list(context.exception.detail.keys())[0]
-        self.assertIn("futur_teneur", error_key)
-        self.assertIn("target", error_key)
-        self.assertIn(
-            OperationServiceErrors.TARGET_EXCEEDED,
-            str(context.exception.detail[error_key]),
-        )
+        self.assertIn("teneur", context.exception.detail.keys())
+        error_message = str(context.exception.detail["teneur"])
+        self.assertIn("20000", error_message)
+        self.assertIn("100000", error_message)
 
     @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
