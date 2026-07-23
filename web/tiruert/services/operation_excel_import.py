@@ -55,7 +55,6 @@ class OperationGroup:
     credited_entity: Entity | None
     debited_entity: Entity
     row_numbers: list[int]
-    first_row_by_lot: dict[int, int]
     lot_volumes: dict[int, float]
 
 
@@ -126,7 +125,6 @@ class OperationExcelImportService:
         first_lot = first_row["lot_id"]
 
         lot_volumes: dict[int, float] = defaultdict(float)
-        first_row_by_lot: dict[int, int] = {}
         row_numbers = []
 
         # If there are multiple rows for the same lot id, sum their volumes and keep track of row numbers.
@@ -136,7 +134,6 @@ class OperationExcelImportService:
 
             lot_volumes[lot_id] += row["volume"]
             row_numbers.append(row_number)
-            first_row_by_lot.setdefault(lot_id, row_number)
 
         return OperationGroup(
             operation_type=operation_type,
@@ -148,7 +145,6 @@ class OperationExcelImportService:
             credited_entity=first_row["credited_entity"],
             debited_entity=debited_entity,
             row_numbers=row_numbers,
-            first_row_by_lot=first_row_by_lot,
             lot_volumes=dict(lot_volumes),
         )
 
@@ -166,32 +162,18 @@ class OperationExcelImportService:
         ]
 
     @staticmethod
-    def _rows_for_error(group: OperationGroup, exc: serializers.ValidationError) -> list[int]:
-        """Return the row numbers a validation error should be attached to.
-
-        Lot-level errors (formatted as '<lot_id>: ...') are attached only to the first row
-        of the offending lot. Any other error is attached to every row of the group.
-        """
-        lot_errors = exc.detail.get("lot_id") if isinstance(exc.detail, dict) else None
-        if not lot_errors:
-            return group.row_numbers
-
-        if not isinstance(lot_errors, list):
-            lot_errors = [lot_errors]
-
-        targeted_rows = set()
-        for error in lot_errors:
-            prefix = str(error).split(":", 1)[0].strip()
-            if prefix.isdigit():
-                row_number = group.first_row_by_lot.get(int(prefix))
-                if row_number is not None:
-                    targeted_rows.add(row_number)
-
-        return sorted(targeted_rows) if targeted_rows else group.row_numbers
+    def _flatten_error_messages(exc: serializers.ValidationError) -> list[str]:
+        """Extract the raw error message strings from a DRF ValidationError, ignoring field names."""
+        detail = exc.detail
+        if isinstance(detail, dict):
+            return [str(message) for messages in detail.values() for message in messages]
+        if isinstance(detail, list):
+            return [str(message) for message in detail]
+        return [str(detail)]
 
     @staticmethod
-    def _validate_group(group: OperationGroup, biofuel: Biocarburant, declaration_year) -> list[dict]:
-        """Run business checks for a single group. Returns a list of {row, errors} dicts."""
+    def _validate_group(group: OperationGroup, biofuel: Biocarburant, declaration_year) -> list[str]:
+        """Run business checks for a single group. Returns the raw error messages, if any."""
         selected_lots = [{"id": lot_id, "volume": volume} for lot_id, volume in group.lot_volumes.items()]
         data = {
             "debited_entity": group.debited_entity,
@@ -211,22 +193,103 @@ class OperationExcelImportService:
                 declaration_year=declaration_year,
             )
         except serializers.ValidationError as exc:
-            rows = OperationExcelImportService._rows_for_error(group, exc)
-            return [{"row": row_number, "errors": exc.detail} for row_number in rows]
+            return OperationExcelImportService._flatten_error_messages(exc)
 
         return []
 
     @staticmethod
-    def _validate_groups(groups: list[OperationGroup], total_rows: int, declaration_year: int | None) -> None:
-        errors = []
+    def _validate_shared_lot_volumes(groups: list[OperationGroup]) -> list[str]:
+        """
+        Check that the combined volume requested for a lot across groups of different
+        operation_type/credited_entity (e.g. a TENEUR group and a TRANSFERT group both using
+        the same lots) doesn't exceed what's actually available. Each group is otherwise
+        validated in isolation by `_validate_group`, which is unaware of sibling groups of the
+        same import also drawing from the same lots.
+        """
+        combos: dict[tuple[int, str], list[OperationGroup]] = defaultdict(list)
         for group in groups:
             if not group.lot_volumes:
                 continue
 
-            errors.extend(OperationExcelImportService._validate_group(group, group.biofuel, declaration_year))
+            combos[(group.biofuel_id, group.customs_category)].append(group)
 
-        if errors:
-            raise ExcelValidationError(errors, total_rows)
+        messages = []
+        for (_biofuel_id, customs_category), combo_groups in combos.items():
+            # A single group for this combo is already fully covered by `_validate_group`.
+            if len(combo_groups) < 2:
+                continue
+
+            entries = [
+                {
+                    "biofuel": group.biofuel,
+                    "customs_category": customs_category,
+                    "debited_entity": group.debited_entity,
+                    "selected_lots": [{"id": lot_id, "volume": volume} for lot_id, volume in group.lot_volumes.items()],
+                }
+                for group in combo_groups
+            ]
+
+            try:
+                OperationService.bulk_check_volumes(entries, "l")
+            except serializers.ValidationError as exc:
+                messages.extend(OperationExcelImportService._flatten_error_messages(exc))
+
+        return messages
+
+    @staticmethod
+    def _validate_teneur_objectives(groups: list[OperationGroup]) -> list[str]:
+        """
+        Check that the combined TENEUR operations of this import (possibly spanning several
+        biofuels) don't exceed the capped objective for their customs category. Each TENEUR
+        group is otherwise validated in isolation by `_validate_group`, which is unaware of
+        sibling TENEUR groups of the same import contributing to the same customs category.
+        """
+        categories: dict[str, dict] = {}
+        for group in groups:
+            if group.operation_type != Operation.TENEUR or not group.lot_volumes:
+                continue
+
+            entry = categories.setdefault(
+                group.customs_category, {"debited_entity": group.debited_entity, "entries": [], "groups": []}
+            )
+            entry["entries"].append(
+                {
+                    "customs_category": group.customs_category,
+                    "biofuel": group.biofuel,
+                    "selected_lots": [{"id": lot_id, "volume": volume} for lot_id, volume in group.lot_volumes.items()],
+                }
+            )
+            entry["groups"].append(group)
+
+        messages = []
+        for entry in categories.values():
+            # A single TENEUR group for this category is already covered by `_validate_group`.
+            if len(entry["groups"]) < 2:
+                continue
+
+            request = SimpleNamespace(entity=entry["debited_entity"], GET={})
+
+            try:
+                OperationService.bulk_check_objectives_compliance(request, entry["debited_entity"].id, entry["entries"])
+            except serializers.ValidationError as exc:
+                messages.extend(OperationExcelImportService._flatten_error_messages(exc))
+
+        return messages
+
+    @staticmethod
+    def _validate_groups(groups: list[OperationGroup], total_rows: int, declaration_year: int | None) -> None:
+        messages = []
+        for group in groups:
+            if not group.lot_volumes:
+                continue
+
+            messages.extend(OperationExcelImportService._validate_group(group, group.biofuel, declaration_year))
+
+        messages.extend(OperationExcelImportService._validate_shared_lot_volumes(groups))
+        messages.extend(OperationExcelImportService._validate_teneur_objectives(groups))
+
+        if messages:
+            raise ExcelValidationError([{"errors": {"validation": [message]}} for message in messages], total_rows)
 
     @staticmethod
     def _build_operation_data(group: OperationGroup, declaration_year: int) -> dict:

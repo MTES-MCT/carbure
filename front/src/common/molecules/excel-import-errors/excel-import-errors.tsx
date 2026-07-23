@@ -3,7 +3,9 @@ import { Notice } from "common/components/notice"
 import { Text } from "common/components/text"
 
 export interface ValidationError {
-  row: number
+  // Absent for business errors that aren't tied to a specific row
+  // (e.g. cross-row/cross-group checks), which are shown as-is.
+  row?: number
   errors: Record<string, string[]>
 }
 
@@ -35,27 +37,36 @@ export const ExcelImportErrors = ({
         </Text>
 
         <ul>
-          {importErrors.validation_errors.map((validationError, index) => (
-            <li key={index}>
-              {t("Ligne {{line}} :", { line: validationError.row })}
-              <ul>
-                {Object.entries(validationError.errors).map(
-                  ([field, messages]) => (
-                    <li key={field}>
-                      {t("Champ {{field}} :", {
-                        field: fieldLabels[field] ?? field,
-                      })}
-                      <ul>
-                        {messages.map((message, msgIndex) => (
-                          <li key={msgIndex}>{message}</li>
-                        ))}
-                      </ul>
-                    </li>
-                  )
-                )}
-              </ul>
-            </li>
-          ))}
+          {importErrors.validation_errors.flatMap((validationError, index) =>
+            validationError.row !== undefined ? (
+              <li key={index}>
+                {t("Ligne {{line}} :", { line: validationError.row })}
+                <ul>
+                  {Object.entries(validationError.errors).map(
+                    ([field, messages]) => (
+                      <li key={field}>
+                        {t("Champ {{field}} :", {
+                          field: fieldLabels[field] ?? field,
+                        })}
+                        <ul>
+                          {messages.map((message, msgIndex) => (
+                            <li key={msgIndex}>{message}</li>
+                          ))}
+                        </ul>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </li>
+            ) : (
+              Object.entries(validationError.errors).flatMap(
+                ([field, messages]) =>
+                  messages.map((message, msgIndex) => (
+                    <li key={`${index}-${field}-${msgIndex}`}>{message}</li>
+                  ))
+              )
+            )
+          )}
         </ul>
       </div>
     </Notice>
