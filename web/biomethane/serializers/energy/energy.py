@@ -32,16 +32,48 @@ class BiomethaneEnergyInputSerializer(BaseBiomethaneEnergySerializer):
         key_1 = "injected_biomethane_gwh_pcs_per_year"
         key_2 = "injected_biomethane_pcs_kwh_per_nm3"
         key_3 = "produced_biogas_nm3_per_year"
+        key_4 = "injected_biomethane_ch4_rate_percent"
+        key_5 = "flared_biogas_nm3_per_year"
+        key_6 = "self_consumed_biogas_nm3"
 
         injected_biomethane_gwh_pcs_per_year = attrs.get(key_1, att_instance.get(key_1))
         pcs_kwh_per_nm3 = attrs.get(key_2, att_instance.get(key_2))
         produced_biogas_nm3_per_year = attrs.get(key_3, att_instance.get(key_3))
+        injected_biomethane_ch4_rate_percent = attrs.get(key_4, att_instance.get(key_4))
+        flared_biogas_nm3_per_year = attrs.get(key_5, att_instance.get(key_5))
+        self_consumed_biogas_nm3 = attrs.get(key_6, att_instance.get(key_6))
 
-        if None not in (injected_biomethane_gwh_pcs_per_year, pcs_kwh_per_nm3, produced_biogas_nm3_per_year):
-            injected_biomethane_nm3_per_year = (injected_biomethane_gwh_pcs_per_year * 10**6) / pcs_kwh_per_nm3
-            if (injected_biomethane_nm3_per_year - produced_biogas_nm3_per_year) > 0:
+        if None not in (
+            injected_biomethane_gwh_pcs_per_year,
+            pcs_kwh_per_nm3,
+            produced_biogas_nm3_per_year,
+            injected_biomethane_ch4_rate_percent,
+            flared_biogas_nm3_per_year,
+            self_consumed_biogas_nm3,
+        ):
+            biogas_ch4_rate_percent = 55
+            acceptation_threshold = 0.25
+            injected_methane_nm3_per_year = (
+                (injected_biomethane_gwh_pcs_per_year * 10**6)
+                * injected_biomethane_ch4_rate_percent
+                / (pcs_kwh_per_nm3 * 100)
+            )
+            expected_methane_nm3_per_year = (
+                (produced_biogas_nm3_per_year - flared_biogas_nm3_per_year - self_consumed_biogas_nm3)
+                * biogas_ch4_rate_percent
+                / 100
+            )
+
+            if (
+                abs(injected_methane_nm3_per_year - expected_methane_nm3_per_year)
+                > acceptation_threshold * expected_methane_nm3_per_year
+            ):
                 raise serializers.ValidationError(
-                    {"non_field_errors": ["Le volume injecté ne peut pas être supérieur à la production totale de biogaz."]}
+                    {
+                        "biomethane_volume_error": [
+                            "Le volume de méthane injecté ne correspond pas à la part de méthane de la production de biogaz."
+                        ]
+                    }
                 )
 
         return attrs
