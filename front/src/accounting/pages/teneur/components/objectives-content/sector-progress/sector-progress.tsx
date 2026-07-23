@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { formatEnergyNumber, formatSector } from "accounting/utils/formatters"
+import { formatSector } from "accounting/utils/formatters"
 import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { SectorObjective } from "../../../types"
@@ -35,18 +35,18 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total pour cette catégorie)",
                 {
                   date: selectedYear,
-                  objective: formatObjectiveGJ(sector.target),
-                  target_percent: formatNumber(sector.target_percent),
+                  objective: formatObjectiveGJ(progress.target),
+                  target_percent: formatNumber(sector.target_percent ?? 0),
                 }
               )}
-              mainValue={formatEnergyNumber(progress.total_teneur_declared)}
+              mainValue={formatObjectiveGJ(progress.total_teneur_declared)}
               mainText={t("GJ")}
-              baseQuantity={progress.base_quantity}
-              targetQuantity={progress.target_quantity}
-              declaredQuantity={progress.declared_quantity}
+              baseQuantity={progress.teneur_declared}
+              targetQuantity={progress.target}
+              declaredQuantity={progress.pending_teneur}
               badge={
                 <CardProgress.DefaultBadge
-                  targetQuantity={progress.target_quantity}
+                  targetQuantity={progress.target}
                   declaredQuantity={progress.total_teneur_declared}
                 />
               }

@@ -36,11 +36,11 @@ import {
   useRemainingCO2Objective,
 } from "./declare-teneur-dialog.hooks"
 import {
-  DeclareTeneurProgressBar,
+  Co2TeneurProgressBar,
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
 import { useFocusOnAvoidedEmissions } from "accounting/components/quantity-form/quantity-form.hooks"
-import { computeEnergyGjFromLiters } from "../../utils/formatters"
+import { computeEnergyMjFromLiters } from "../../utils/formatters"
 interface DeclareTeneurDialogProps {
   onClose: () => void
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective
@@ -78,7 +78,7 @@ const DeclareTeneurDialogContent = ({
   )
 
   const depotQuantityMax = useCalculateQuantityMax(objective, form.value)
-  const quantityEnergyGj = useMemo(() => {
+  const quantityEnergyMj = useMemo(() => {
     const quantity = form.value.quantity ?? 0
     const pciLitre = form.value.balance?.biofuel?.pci_litre
 
@@ -86,7 +86,7 @@ const DeclareTeneurDialogContent = ({
       return 0
     }
 
-    return computeEnergyGjFromLiters(quantity, pciLitre)
+    return computeEnergyMjFromLiters(quantity, pciLitre)
   }, [form.value.quantity, form.value.balance?.biofuel?.pci_litre])
   // Get the current sector objective when the biofuel is selected
   const currentSectorObjective = useMemo(() => {
@@ -137,7 +137,7 @@ const DeclareTeneurDialogContent = ({
                 <DeclareTeneurProgressBarList
                   sectorObjective={currentSectorObjective}
                   categoryObjective={objective}
-                  quantity={quantityEnergyGj}
+                  quantityMj={quantityEnergyMj}
                   targetType={targetType}
                 />
               </Box>
@@ -165,11 +165,11 @@ const DeclareTeneurDialogContent = ({
                       inputRef={avoidedEmissionsInputRef}
                     />
                     {mainObjective && (
-                      <DeclareTeneurProgressBar
+                      <Co2TeneurProgressBar
                         teneurDeclared={mainObjective.teneur_declared}
                         pendingTeneur={mainObjective.pending_teneur}
                         target={mainObjective.target}
-                        quantity={form.value.avoided_emissions ?? 0}
+                        additionalQuantity={form.value.avoided_emissions ?? 0}
                         label={t("Objectif global")}
                       />
                     )}

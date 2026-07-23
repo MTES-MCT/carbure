@@ -6,52 +6,72 @@ export { TargetTypeEnum as TargetType } from "api-schema"
 
 export type FossilFuel = apiTypes["FossilFuel"]
 
-export interface ObjectiveProgress {
-  total_teneur_declared: number
-  base_quantity: number
-  target_quantity: number
-  declared_quantity: number
-  remaining_energy: number
-  is_objective_met: boolean
+/** GJ values for display only — never use for arithmetic. */
+export interface ObjectiveProgressGj {
+  target: number
+  teneur_declared: number
+  pending_teneur: number
   quantity_available: number
+  total_teneur_declared: number
+  remaining_energy: number
 }
 
-export interface BaseObjective {
-  target: number
-  teneur_declared: number // GJ
-  quantity_available: number // GJ
-  pending_teneur: number // GJ
+export interface EnergyObjectiveFields {
+  target_mj: number | null
+  teneur_declared_mj: number
+  pending_teneur_mj: number
+  quantity_available_mj: number
+  target_percent: number | null
+  penalty: number // euro cents
+}
+
+export interface EnergyObjectiveComputed {
+  total_teneur_declared_mj: number
+  remaining_energy_mj: number
+  is_objective_met: boolean
+  progress: ObjectiveProgressGj
+}
+
+export interface EnergyObjective
+  extends EnergyObjectiveFields, EnergyObjectiveComputed {}
+
+export interface MainObjective {
+  target: number // tCO2
+  teneur_declared: number // tCO2
+  quantity_available: number // tCO2
+  pending_teneur: number // tCO2
   target_percent: number
   penalty: number // euro cents
-  progress: ObjectiveProgress
+  energy_basis_mj: number
+  energy_basis_gj: number
+  total_teneur_declared: number
+  remaining_energy: number
+  is_objective_met: boolean
 }
-export interface CategoryObjective extends BaseObjective {
+
+export interface CategoryObjective extends EnergyObjective {
   code: CategoryEnum
   target_type: apiTypes["Objective"]["target_type"]
 }
 
-export interface SectorObjective extends BaseObjective {
+export interface SectorObjective extends EnergyObjective {
   code: OperationSector
 }
 
-export interface MainObjective extends BaseObjective {
-  energy_basis: number // GJ
-}
-
 export interface ElecCategoryObjective extends Omit<
-  BaseObjective,
-  "target" | "target_percent"
+  EnergyObjective,
+  "target_mj" | "target_percent"
 > {
   code: ElecOperationSector.ELEC
-  target: null
+  target_mj: null
   target_percent: null
 }
 
 export type BiofuelUnconstrainedCategoryObjective = Omit<
   CategoryObjective,
-  "target" | "target_percent"
+  "target_mj" | "target_percent"
 > & {
-  target: null
+  target_mj: null
   target_percent: null
 }
 

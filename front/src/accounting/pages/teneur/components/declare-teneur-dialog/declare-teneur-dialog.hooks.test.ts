@@ -4,9 +4,8 @@ import { balance, balanceBiofuel } from "accounting/__test__/data/balances"
 import { defaultCategoryObjective } from "../../__test__/data"
 import { CategoryObjective } from "../../types"
 import {
-  computeLitersMaxFromEnergyGj,
-  computeObjectiveEnergy,
-  computeObjectiveProgress,
+  computeLitersMaxFromEnergyMj,
+  enrichEnergyObjective,
 } from "../../utils/formatters"
 import { useCalculateQuantityMax } from "./declare-teneur-dialog.hooks"
 import { DeclareTeneurDialogForm } from "./declare-teneur-dialog.types"
@@ -16,12 +15,15 @@ const PCI = balanceBiofuel.pci_litre
 const createObjective = (
   overrides: Partial<CategoryObjective> = {}
 ): CategoryObjective => {
-  const objective = { ...defaultCategoryObjective, ...overrides }
+  const {
+    total_teneur_declared_mj: _total,
+    remaining_energy_mj: _remaining,
+    is_objective_met: _isMet,
+    progress: _progress,
+    ...base
+  } = defaultCategoryObjective
 
-  return {
-    ...objective,
-    progress: computeObjectiveProgress(objective),
-  }
+  return enrichEnergyObjective({ ...base, ...overrides })
 }
 
 const createValues = (
@@ -56,18 +58,22 @@ describe("useCalculateQuantityMax", () => {
   })
 
   it("returns the floored available balance when the objective target is falsy", () => {
-    expect(renderQuantityMax(createObjective({ target: 0 }), 1_234.56)).toBe(
+    expect(renderQuantityMax(createObjective({ target_mj: 0 }), 1_234.56)).toBe(
       1_234
     )
   })
 
-  describe("capped category — remaining GJ converted to L (ceil 2 decimals)", () => {
+  describe("capped category — remaining MJ converted to L (ceil 2 decimals)", () => {
     const objective = createObjective()
-    const remainingGj = computeObjectiveEnergy(objective)
-    const maxLitersFromCap = computeLitersMaxFromEnergyGj(remainingGj, PCI)
+    const remainingGj = objective.progress.remaining_energy
+    const maxLitersFromCap = computeLitersMaxFromEnergyMj(
+      objective.remaining_energy_mj,
+      PCI
+    )
 
     it("converts remaining cap to liters with ceil on 2 decimals", () => {
-      // 300 − 20 − 10 = 270 GJ → ceil(270_000 / 21.1, 2) = 12 796,21 L
+      // 300_000 − 20_000 − 10_000 = 270_000 MJ → 270 GJ
+      // ceil(270_000 / 21.1, 2) = 12 796,21 L
       expect(remainingGj).toBe(270)
       expect(maxLitersFromCap).toBe(12_796.21)
     })
@@ -89,15 +95,18 @@ describe("useCalculateQuantityMax", () => {
 
   describe("capped category with fractional GJ values", () => {
     const objective = createObjective({
-      target: 100.955,
-      teneur_declared: 10.455,
-      pending_teneur: 25.655,
+      target_mj: 100_955,
+      teneur_declared_mj: 10_455,
+      pending_teneur_mj: 25_655,
     })
-    const remainingGj = computeObjectiveEnergy(objective)
-    const maxLitersFromCap = computeLitersMaxFromEnergyGj(remainingGj, PCI)
+    const remainingGj = objective.progress.remaining_energy
+    const maxLitersFromCap = computeLitersMaxFromEnergyMj(
+      objective.remaining_energy_mj,
+      PCI
+    )
 
     it("converts fractional remaining cap to liters with ceil on 2 decimals", () => {
-      // remaining = 100.955 − 10.455 − 25.655 = 64.845 GJ
+      // remaining = 100_955 − 10_455 − 25_655 = 64_845 MJ → 64,845 GJ
       // ceil(64_845 / 21.1, 2) = 3 073,23 L
       expect(remainingGj).toBe(64.845)
       expect(maxLitersFromCap).toBe(3_073.23)

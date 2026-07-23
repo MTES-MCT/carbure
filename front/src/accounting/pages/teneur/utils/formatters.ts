@@ -1,51 +1,97 @@
-import { FRACTION_DIGITS_GJ, FRACTION_DIGITS_LITERS } from "accounting/config"
-import { BaseObjective, ObjectiveProgress } from "../types"
+import { FRACTION_DIGITS_LITERS } from "accounting/config"
+import {
+  EnergyObjectiveComputed,
+  EnergyObjectiveFields,
+  MainObjective,
+} from "../types"
 import { ExtendedUnit } from "common/types"
-import { ceilNumber, CONVERSIONS, formatUnit } from "common/utils/formatters"
+import { ceilNumber, formatUnit } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
+import { buildObjectiveProgressGj, mjToDisplayGj, remainingMj } from "./energy"
 
-type ObjectiveProgressInput = Pick<
-  BaseObjective,
-  "teneur_declared" | "pending_teneur" | "quantity_available"
+export type EnergyObjectiveInput = Pick<
+  EnergyObjectiveFields,
+  "teneur_declared_mj" | "pending_teneur_mj" | "quantity_available_mj"
 > & {
-  target?: number | null
+  target_mj: number | null
 }
 
-export const computeObjectiveProgress = (
-  objective: ObjectiveProgressInput
-): ObjectiveProgress => {
-  const base_quantity = objective.teneur_declared
-  const declared_quantity = objective.pending_teneur
-  const target_quantity = objective.target ?? 0
-  const total_teneur_declared =
-    objective.teneur_declared + objective.pending_teneur
-  const remaining_energy = Math.max(
-    0,
-    target_quantity - base_quantity - declared_quantity
+type MainObjectiveInput = Pick<
+  MainObjective,
+  | "teneur_declared"
+  | "pending_teneur"
+  | "quantity_available"
+  | "target"
+  | "energy_basis_mj"
+  | "target_percent"
+  | "penalty"
+>
+
+export const enrichEnergyObjective = <T extends EnergyObjectiveInput>(
+  objective: T
+): T & EnergyObjectiveComputed => {
+  const total_teneur_declared_mj =
+    objective.teneur_declared_mj + objective.pending_teneur_mj
+  const remaining_energy_mj = remainingMj(
+    objective.target_mj ?? 0,
+    objective.teneur_declared_mj,
+    objective.pending_teneur_mj
+  )
+  const is_objective_met = Boolean(
+    objective.target_mj &&
+    objective.target_mj > 0 &&
+    total_teneur_declared_mj >= objective.target_mj
   )
 
-  const quantity_available = objective.quantity_available
-
-  // If the target is not set, the objective is not met
-  const is_objective_met =
-    objective.target && objective.target > 0
-      ? objective.pending_teneur + objective.teneur_declared >=
-        (objective.target ?? 0)
-      : false
+  const computed = {
+    total_teneur_declared_mj,
+    remaining_energy_mj,
+    is_objective_met,
+  }
 
   return {
-    total_teneur_declared,
-    base_quantity,
-    target_quantity,
-    declared_quantity,
-    remaining_energy,
-    is_objective_met,
-    quantity_available,
+    ...objective,
+    ...computed,
+    progress: buildObjectiveProgressGj({ ...objective, ...computed }),
   }
 }
 
-export const formatObjectiveGJ = (value: number) =>
-  formatAccountingUnit(value, ExtendedUnit.GJ)
+export const enrichMainObjective = <T extends MainObjectiveInput>(
+  objective: T
+): T &
+  Pick<
+    MainObjective,
+    | "total_teneur_declared"
+    | "remaining_energy"
+    | "is_objective_met"
+    | "energy_basis_gj"
+  > => {
+  const total_teneur_declared =
+    objective.teneur_declared + objective.pending_teneur
+  const remaining_energy = remainingMj(
+    objective.target,
+    objective.teneur_declared,
+    objective.pending_teneur
+  )
+  const is_objective_met =
+    objective.target > 0 ? total_teneur_declared >= objective.target : false
+
+  return {
+    ...objective,
+    total_teneur_declared,
+    remaining_energy,
+    is_objective_met,
+    energy_basis_gj: mjToDisplayGj(objective.energy_basis_mj),
+  }
+}
+
+/** Format a pre-computed GJ value for display. */
+export const formatObjectiveGJ = (gj: number) =>
+  formatAccountingUnit(gj, ExtendedUnit.GJ)
+
+/** Format a MJ value as GJ (for raw API balances not yet enriched). */
+export const formatObjectiveGJFromMj = (mj: number) =>
+  formatObjectiveGJ(mjToDisplayGj(mj))
 
 export const formatObjectiveCO2 = (value: number) =>
   formatUnit(value, ExtendedUnit.tCO2ev, { fractionDigits: 0 })
@@ -53,53 +99,51 @@ export const formatObjectiveCO2 = (value: number) =>
 export const computeEnergyGjFromLiters = (
   quantityLiters: number,
   pciLitre: number
-) =>
-  ceilNumber(
-    CONVERSIONS.energy.MJ_TO_GJ(quantityLiters * pciLitre),
-    FRACTION_DIGITS_GJ
-  )
+) => mjToDisplayGj(quantityLiters * pciLitre)
 
-/** Remaining energy (MJ) / PCI → liters, rounded up to 2 decimal places. */
+export const computeEnergyMjFromLiters = (
+  quantityLiters: number,
+  pciLitre: number
+) => quantityLiters * pciLitre
+
 export const computeRemainingLitersFromMj = (
-  remainingMj: number,
+  remainingEnergyMj: number,
   pciLitre: number
-) => ceilNumber(remainingMj / pciLitre, FRACTION_DIGITS_LITERS)
+) => ceilNumber(remainingEnergyMj / pciLitre, FRACTION_DIGITS_LITERS)
 
-/** Remaining cap (GJ) → max liters, rounded up to 2 decimal places. */
-export const computeLitersMaxFromEnergyGj = (
-  energyGj: number,
+export const computeLitersMaxFromEnergyMj = (
+  remainingEnergyMj: number,
   pciLitre: number
-) => computeRemainingLitersFromMj(energyGj * 1000, pciLitre)
+) => computeRemainingLitersFromMj(remainingEnergyMj, pciLitre)
 
-export const computeObjectiveEnergy = (objective: ObjectiveProgressInput) =>
-  computeObjectiveProgress(objective).remaining_energy
-
-/**
- * Compute the remaining energy after the additional quantity is declared
- * @param objective - The objective progress
- * @param additionalQuantity - The additional quantity declared
- * @returns The remaining energy
- */
-export const computeRemainingEnergyWithAdditionalQuantity = (
-  objective: {
-    target: number
-    teneur_declared: number
-    pending_teneur: number
-  },
-  additionalQuantity: number
-) => {
-  console.log("objectives", objective)
-
-  return Math.max(
-    0,
-    computeObjectiveEnergy({ ...objective, quantity_available: 0 }) -
-      additionalQuantity
+export const remainingEnergyMjFrom = (objective: EnergyObjectiveInput) =>
+  remainingMj(
+    objective.target_mj ?? 0,
+    objective.teneur_declared_mj,
+    objective.pending_teneur_mj
   )
-}
 
-export const withObjectiveProgress = <T extends ObjectiveProgressInput>(
-  objective: T
-): T & { progress: ObjectiveProgress } => ({
-  ...objective,
-  progress: computeObjectiveProgress(objective),
-})
+export const computeRemainingEnergyWithAdditionalQuantityMj = (
+  objective: Pick<
+    EnergyObjectiveFields,
+    | "target_mj"
+    | "teneur_declared_mj"
+    | "pending_teneur_mj"
+    | "quantity_available_mj"
+  >,
+  additionalMj: number
+) => Math.max(0, remainingEnergyMjFrom(objective) - additionalMj)
+
+export const remainingGjAfterAdditionalMj = (
+  objective: Pick<
+    EnergyObjectiveFields,
+    "target_mj" | "teneur_declared_mj" | "pending_teneur_mj"
+  >,
+  additionalMj: number
+) =>
+  mjToDisplayGj(
+    computeRemainingEnergyWithAdditionalQuantityMj(
+      { ...objective, quantity_available_mj: 0 },
+      additionalMj
+    )
+  )

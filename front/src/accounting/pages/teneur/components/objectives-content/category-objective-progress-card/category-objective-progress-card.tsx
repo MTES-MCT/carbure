@@ -7,7 +7,6 @@ import { CardProgress } from "../../card-progress"
 import { CategoryObjective, TargetType } from "../../../types"
 import { formatObjectiveGJ } from "../../../utils/formatters"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
-import { formatEnergyNumber } from "accounting/utils/formatters"
 
 type CategoryObjectiveProgressCardProps = {
   category: CategoryObjective
@@ -29,7 +28,7 @@ export const CategoryObjectiveProgressCard = ({
   let badge: ReactNode = null
 
   if (isCapped) {
-    if (progress.is_objective_met) {
+    if (category.is_objective_met) {
       badge = (
         <Badge severity="error" small>
           {t("Plafond atteint")}
@@ -39,7 +38,7 @@ export const CategoryObjectiveProgressCard = ({
   } else {
     badge = (
       <CardProgress.DefaultBadge
-        targetQuantity={progress.target_quantity}
+        targetQuantity={progress.target}
         declaredQuantity={progress.total_teneur_declared}
       />
     )
@@ -48,25 +47,25 @@ export const CategoryObjectiveProgressCard = ({
   return (
     <CardProgress
       title={category.code}
-      mainValue={formatEnergyNumber(progress.total_teneur_declared)}
+      mainValue={formatObjectiveGJ(progress.total_teneur_declared)}
       mainText={t("GJ")}
       description={t(
         "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
         {
           date: selectedYear,
-          objective: formatObjectiveGJ(progress.target_quantity),
-          target_percent: formatNumber(category.target_percent),
+          objective: formatObjectiveGJ(progress.target),
+          target_percent: formatNumber(category.target_percent ?? 0),
         }
       )}
-      baseQuantity={progress.base_quantity}
-      targetQuantity={progress.target_quantity}
-      declaredQuantity={progress.declared_quantity}
+      baseQuantity={progress.teneur_declared}
+      targetQuantity={progress.target}
+      declaredQuantity={progress.pending_teneur}
       badge={badge}
       penalty={category.penalty}
       onClick={
         readOnly ||
         !isDeclarationInCurrentPeriod ||
-        (isCapped && progress.is_objective_met)
+        (isCapped && category.is_objective_met)
           ? undefined
           : () => onCategoryClick(category, category.target_type!)
       }

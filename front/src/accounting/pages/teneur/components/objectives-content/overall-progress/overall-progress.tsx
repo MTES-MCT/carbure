@@ -6,7 +6,7 @@ import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 import { ExtendedUnit } from "common/types"
-import { formatEnergyNumber } from "accounting/utils/formatters"
+import { formatObjectiveGJ } from "../../../utils/formatters"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -24,7 +24,7 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
         <Trans
           i18nKey="Base calculée : {{energy_basis}} GJ"
           values={{
-            energy_basis: formatEnergyNumber(objective?.energy_basis ?? 0),
+            energy_basis: formatObjectiveGJ(objective?.energy_basis_gj ?? 0),
           }}
         />
       }
@@ -45,22 +45,17 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
               target_percent: formatNumber(objective.target_percent),
             }
           )}
-          mainValue={formatNumber(
-            objective.teneur_declared + objective.pending_teneur,
-            {
-              fractionDigits: 0,
-            }
-          )}
+          mainValue={formatNumber(objective.total_teneur_declared, {
+            fractionDigits: 0,
+          })}
           mainText={t("tCO2 évitées")}
-          baseQuantity={objective.progress.base_quantity}
-          targetQuantity={objective.progress.target_quantity}
-          declaredQuantity={objective.progress.declared_quantity}
+          baseQuantity={objective.teneur_declared}
+          targetQuantity={objective.target}
+          declaredQuantity={objective.pending_teneur}
           badge={
             <CardProgress.DefaultBadge
               targetQuantity={objective.target}
-              declaredQuantity={
-                objective.teneur_declared + objective.pending_teneur
-              }
+              declaredQuantity={objective.total_teneur_declared}
             />
           }
           penalty={objective.penalty}

@@ -14,8 +14,7 @@ import {
 } from "../../types"
 import { useMemo } from "react"
 import {
-  computeLitersMaxFromEnergyGj,
-  computeObjectiveEnergy,
+  computeLitersMaxFromEnergyMj,
 } from "../../utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 import { Unit } from "common/types"
@@ -110,7 +109,7 @@ export const useCalculateQuantityMax = (
     }
 
     // No cap on quantity when there is no target or the category is objectivized (REACH)
-    if (!objective.target || objective.target_type === TargetType.REACH) {
+    if (!objective.target_mj || objective.target_type === TargetType.REACH) {
       return floorNumber(availableBalance, 0)
     }
 
@@ -118,9 +117,9 @@ export const useCalculateQuantityMax = (
       return floorNumber(availableBalance, 0)
     }
 
-    const remainingObjectiveEnergy = computeObjectiveEnergy(objective)
-    const maxLitersFromObjective = computeLitersMaxFromEnergyGj(
-      remainingObjectiveEnergy,
+    const remainingObjectiveEnergyMj = objective.remaining_energy_mj
+    const maxLitersFromObjective = computeLitersMaxFromEnergyMj(
+      remainingObjectiveEnergyMj,
       pciLitre
     )
 

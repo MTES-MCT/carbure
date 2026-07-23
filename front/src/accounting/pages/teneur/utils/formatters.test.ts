@@ -1,32 +1,31 @@
 import { describe, expect, it } from "vitest"
 import {
-  computeObjectiveEnergy,
-  computeRemainingEnergyWithAdditionalQuantity,
+  computeRemainingEnergyWithAdditionalQuantityMj,
+  remainingEnergyMjFrom,
 } from "./formatters"
 
-describe("computeRemainingEnergyWithAdditionalQuantity", () => {
+describe("computeRemainingEnergyWithAdditionalQuantityMj", () => {
   const objective = {
-    target: 300,
-    teneur_declared: 20,
-    pending_teneur: 10,
-    quantity_available: 0,
+    target_mj: 300_000,
+    teneur_declared_mj: 20_000,
+    pending_teneur_mj: 10_000,
   }
 
-  it("returns the same value as computeObjectiveEnergy when no quantity is added", () => {
-    expect(computeRemainingEnergyWithAdditionalQuantity(objective, 0)).toBe(
-      computeObjectiveEnergy({ ...objective })
+  it("returns the same value as remainingEnergyMjFrom when no quantity is added", () => {
+    expect(computeRemainingEnergyWithAdditionalQuantityMj(objective, 0)).toBe(
+      remainingEnergyMjFrom(objective)
     )
   })
 
   it("subtracts the additional quantity from the remaining energy", () => {
-    expect(computeRemainingEnergyWithAdditionalQuantity(objective, 50)).toBe(
-      220
-    )
+    expect(
+      computeRemainingEnergyWithAdditionalQuantityMj(objective, 50_000)
+    ).toBe(220_000)
   })
 
   it("never returns a negative value", () => {
-    expect(computeRemainingEnergyWithAdditionalQuantity(objective, 1_000)).toBe(
-      0
-    )
+    expect(
+      computeRemainingEnergyWithAdditionalQuantityMj(objective, 1_000_000)
+    ).toBe(0)
   })
 })
