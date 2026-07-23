@@ -87,7 +87,7 @@ class OperationService:
 
         for lot_id, volume in requested_volumes.items():
             if lot_id not in available_volumes:
-                raise serializers.ValidationError({"lot_id": [_(f"{lot_id}: Cet id de lot n'existe pas")]})
+                raise serializers.ValidationError({"lot_id": [_(f"{lot_id}: Ce lot n'a pas de volume disponible")]})
 
             if available_volumes[lot_id] < volume:
                 raise serializers.ValidationError(
