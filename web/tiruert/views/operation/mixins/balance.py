@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 
 from core.pagination import MetadataPageNumberPagination
+from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.serializers import (
     BalanceByDepotSerializer,
@@ -24,7 +25,7 @@ class BalancePagination(MetadataPageNumberPagination):
 
         for balance in self.queryset:
             metadata["total_quantity"] += balance["available_balance"]
-        metadata["total_quantity"] = round(metadata["total_quantity"], 2)
+        metadata["total_quantity"] = truncate(metadata["total_quantity"], 2)
         return metadata
 
 

@@ -336,7 +336,7 @@ class TeneurService:
         Return avoided emissions (tCO2)
         """
         volumes, emissions, _, _, target_volume = TeneurService.prepare_data(data)  # volumes in L, emissions in gCO2/MJ
-        print(f"volumes = {volumes}, emissions = {emissions}, target_volume = {target_volume}")
+
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
             volumes,
             emissions,
