@@ -13,6 +13,7 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { Autocomplete } from "common/components/autocomplete2"
 import { useAnnualDeclarationYearsAdmin } from "./hooks/use-annual-declaration-years-admin"
 import { AnnualDeclarationExportCard } from "biomethane/components/annual-declaration-export-card"
+import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
 
 const BiomethaneAdminDeclarationsPage = () => {
   const { t } = useTranslation()
@@ -20,6 +21,7 @@ const BiomethaneAdminDeclarationsPage = () => {
   const navigate = useNavigate()
   const routes = useRoutes()
   const years = useAnnualDeclarationYearsAdmin()
+  const { adminPermissions } = useBiomethanePermissions()
   usePrivateNavigation(t("Déclarations par établissement"))
 
   const { result: producers } = useQuery(
@@ -62,20 +64,25 @@ const BiomethaneAdminDeclarationsPage = () => {
         placeholder={t("Rechercher un établissement")}
         style={{ maxWidth: "460px" }}
       />
-      <Grid cols={3} gap="lg">
-        {yearsOptions.map((year) => (
-          <AnnualDeclarationExportCard
-            key={year}
-            year={year}
-            fileDescription={t("Liste des déclarations pour l'année {{year}}", {
-              year,
-            })}
-            onDownload={() =>
-              downloadBiomethaneAdminAnnualDeclaration(entity.id, year)
-            }
-          />
-        ))}
-      </Grid>
+      {adminPermissions.canDownloadDeclaration && (
+        <Grid cols={3} gap="lg">
+          {yearsOptions.map((year) => (
+            <AnnualDeclarationExportCard
+              key={year}
+              year={year}
+              fileDescription={t(
+                "Liste des déclarations pour l'année {{year}}",
+                {
+                  year,
+                }
+              )}
+              onDownload={() =>
+                downloadBiomethaneAdminAnnualDeclaration(entity.id, year)
+              }
+            />
+          ))}
+        </Grid>
+      )}
     </Main>
   )
 }
