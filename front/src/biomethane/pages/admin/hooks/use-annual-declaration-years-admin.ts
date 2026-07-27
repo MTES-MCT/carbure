@@ -12,8 +12,7 @@ const getAnnualDeclarationYearsAdmin = () => {
 }
 
 export const annualDeclarationYearsAdmin = getAnnualDeclarationYearsAdmin()
-export const lastAnnualDeclarationYearAdmin =
-  annualDeclarationYearsAdmin[annualDeclarationYearsAdmin.length - 1]
+export const lastAnnualDeclarationYearAdmin = annualDeclarationYearsAdmin.at(-1)
 
 /**
  * Get years from 2025 (the first year of the biomethane module), to N-1 (the current year - 1)

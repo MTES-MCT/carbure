@@ -420,6 +420,7 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
 
         filter_params = {"year": self.current_year}
         for filter_name, expected_values in {
+            "producer": ["Producteur Dépt 01", "Producteur Dépt 02"],
             "department": ["01", "02"],
             "status": ["DECLARED", "IN_PROGRESS"],
             "tariff_reference": ["2011", "2023"],

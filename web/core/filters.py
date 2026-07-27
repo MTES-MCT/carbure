@@ -132,6 +132,22 @@ class TypedMultipleChoiceFieldWithNullLabel(forms.TypedMultipleChoiceField):
     null_label = None
 
 
+class MultipleChoiceFieldWithNullLabel(forms.MultipleChoiceField):
+    """
+    MultipleChoiceField with null_label for drf-spectacular compatibility.
+    It also skips static choices validation for dynamic filters.
+    """
+
+    null_label = None
+
+    def validate(self, value):
+        # Keep default required/empty checks but skip static choices validation.
+        forms.Field.validate(self, value)
+
+    def valid_value(self, value):
+        return True
+
+
 class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
     """
     Use this filter for boolean filtering, it will automatically give you True/False checks
@@ -151,6 +167,59 @@ class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
     @staticmethod
     def strtobool(val: str) -> bool:
         return val.lower() == "true"
+
+
+class MultiValueInFilter(django_filters.MultipleChoiceFilter):
+    """
+    Filter using all values provided for a query parameter (QueryDict.getlist)
+    and applying an __in lookup on the configured field.
+    """
+
+    field_class = MultipleChoiceFieldWithNullLabel
+
+    def __init__(self, *args, **kwargs):
+        self.query_param = kwargs.pop("query_param", None)
+        self.apply_distinct = kwargs.pop("distinct", False)
+        kwargs.setdefault("choices", ())
+        super().__init__(*args, **kwargs)
+
+    def _get_query_param_name(self):
+        if self.query_param:
+            return self.query_param
+
+        parent = getattr(self, "parent", None)
+        if parent is not None:
+            for filter_name, filter_obj in parent.filters.items():
+                if filter_obj is self:
+                    return filter_name
+
+        return self.field_name
+
+    def filter(self, qs, value):
+        if self.method is not None:
+            return super().filter(qs, value)
+
+        data = getattr(self.parent, "data", None)
+        key = self._get_query_param_name()
+
+        if hasattr(data, "getlist"):
+            values = [value for value in data.getlist(key) if value not in [None, ""]]
+        elif data and key in data:
+            raw_value = data.get(key)
+            if isinstance(raw_value, (list, tuple, set)):
+                values = [value for value in raw_value if value not in [None, ""]]
+            else:
+                values = [] if raw_value in [None, ""] else [raw_value]
+        else:
+            values = []
+
+        if not values:
+            return qs
+
+        qs = qs.filter(**{f"{self.field_name}__in": values})
+        if self.apply_distinct:
+            qs = qs.distinct()
+        return qs
 
 
 class AllAnnotatedValuesMultipleFilter(django_filters.MultipleChoiceFilter):

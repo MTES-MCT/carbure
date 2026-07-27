@@ -54,13 +54,10 @@ export const patchAnnualDeclaration = (
     body: data,
   })
 
-export const downloadAnnualDeclaration = (
+export const downloadAnnualDeclaration = (entity_id: number, year: number) =>
+  download("/biomethane/export/", { entity_id, year })
+
+export const downloadDrealAnnualDeclaration = (
   entity_id: number,
-  year: number,
-  producer_id?: number
-) =>
-  download("/biomethane/export/", {
-    entity_id,
-    year,
-    producer_id,
-  })
+  year: number
+) => download("/biomethane/dreal-export/", { entity_id, year })

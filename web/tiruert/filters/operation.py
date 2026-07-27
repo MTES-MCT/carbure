@@ -1,28 +1,21 @@
-from datetime import datetime  # noqa: I001
-from zoneinfo import ZoneInfo
-
-from django.conf import settings
 from django.db.models import IntegerField, Q
 from django.db.models.functions import Cast, Coalesce, Substr
 from django_filters import (
     CharFilter,
     FilterSet,
-    NumberFilter,
-    AllValuesMultipleFilter,
     MultipleChoiceFilter,
+    NumberFilter,
 )
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.serializers import (
-    CharField,
-    IntegerField as SerializerIntegerField,
-    ListField,
-)
+from rest_framework.serializers import CharField, ListField
 
-from core.filters import AllAnnotatedValuesMultipleFilter
+from core.filters import MultiValueInFilter
 from core.models import Entity, ExternalAdminRights, MatierePremiere
-from .custom_filters import CustomOrderingFilter
+from core.utils import get_month_bounds_utc
 from tiruert.models.operation import Operation
+
+from .custom_filters import CustomOrderingFilter
 
 
 class BaseFilter(FilterSet):
@@ -31,7 +24,7 @@ class BaseFilter(FilterSet):
     operation = MultipleChoiceFilter(
         choices=Operation.OPERATION_TYPES + (("ACQUISITION", "ACQUISITION"),), field_name="type"
     )
-    biofuel = AllValuesMultipleFilter(field_name="biofuel__code")
+    biofuel = MultiValueInFilter(field_name="biofuel__code")
     sector = MultipleChoiceFilter(choices=Operation.SECTOR_CODE_CHOICES, field_name="_sector")
     from_to = CharFilter(method="filter_from_to")
     depot = CharFilter(method="filter_depot")
@@ -39,9 +32,9 @@ class BaseFilter(FilterSet):
     period = CharFilter(method="filter_period")
     customs_category = MultipleChoiceFilter(choices=MatierePremiere.MP_CATEGORIES)
     status = MultipleChoiceFilter(choices=Operation.OPERATION_STATUSES)
-    feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code")
-    origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays")
-    durability_period = AllValuesMultipleFilter(field_name="durability_period")
+    feedstock = MultiValueInFilter(field_name="details__lot__feedstock__code", distinct=True)
+    origin_country = MultiValueInFilter(field_name="details__lot__country_of_origin__code_pays", distinct=True)
+    durability_period = MultiValueInFilter(field_name="durability_period")
 
     order_by = CustomOrderingFilter(
         fields=(
@@ -97,29 +90,11 @@ class BaseFilter(FilterSet):
         if not periods:
             return queryset
 
-        # Use the timezone from settings
-        django_timezone = ZoneInfo(settings.TIME_ZONE)
-
         q_objects = Q()
 
         for period in periods:
-            # We have to do all this stuff because scalingo doesn't support mysql timezone
-            year = int(period[:4])
-            month = int(period[4:])
-
-            # Calculate the next month and year
-            if month == 12:
-                next_year = year + 1
-                next_month = 1
-            else:
-                next_year = year
-                next_month = month + 1
-
-            # Dates in UTC
-            start_date = datetime(year, month, 1, 0, 0, 0, tzinfo=django_timezone).astimezone(ZoneInfo("UTC"))
-            end_date = datetime(next_year, next_month, 1, 0, 0, 0, tzinfo=django_timezone).astimezone(ZoneInfo("UTC"))
-
-            q_objects |= Q(created_at__gte=start_date, created_at__lt=end_date)
+            start, end = get_month_bounds_utc(period)
+            q_objects |= Q(created_at__gte=start, created_at__lt=end)
 
         return queryset.filter(q_objects).distinct()
 
@@ -128,30 +103,33 @@ class BaseFilter(FilterSet):
 
 
 class OperationFilter(BaseFilter):
-    years = extend_schema_field(SerializerIntegerField())(
-        AllAnnotatedValuesMultipleFilter(
-            field_name="year",
-            annotation=Coalesce(
+    years = CharFilter(method="filter_years")
+
+    @extend_schema_field(ListField(child=CharField()))
+    def filter_years(self, queryset, name, value):
+        years = self.request.GET.getlist(name)
+        if not years:
+            return queryset
+
+        return queryset.annotate(
+            year=Coalesce(
                 "declaration_year",
                 Cast(
                     Substr("durability_period", 1, 4),
                     output_field=IntegerField(),
                 ),
-                output_field=IntegerField(),
-            ),
-        )
-    )
-    pass
+            )
+        ).filter(year__in=years)
 
 
 class OperationFilterForBalance(BaseFilter):
     # Lot-level filters are handled by Prefetch in BalanceService, not at the Operation queryset level
     ges_bound_min = NumberFilter(method="ignore")
     ges_bound_max = NumberFilter(method="ignore")
-    feedstock = AllValuesMultipleFilter(field_name="details__lot__feedstock__code", method="ignore")
-    origin_country = AllValuesMultipleFilter(field_name="details__lot__country_of_origin__code_pays", method="ignore")
+    feedstock = MultiValueInFilter(method="ignore")
+    origin_country = MultiValueInFilter(method="ignore")
     # durability_period is resolved to specific lot_ids in the view and passed via detail_filters
-    durability_period = AllValuesMultipleFilter(method="ignore")
+    durability_period = MultiValueInFilter(method="ignore")
 
     def ignore(self, queryset, name, value):
         return queryset

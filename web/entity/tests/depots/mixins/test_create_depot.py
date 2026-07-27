@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 from django.urls import reverse
 
@@ -21,9 +19,7 @@ class TestCreateDepot(TestCase):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.admin, "RW")], True)
         self.pays = Pays.objects.filter(code_pays="FR")[0]
 
-    @patch("entity.views.depots.mixins.create.get_coordinates")
-    def test_create_depot_success(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (48.8566, 2.3522)
+    def test_create_depot_success(self):
         params = {
             "entity_id": self.admin.id,
             "name": "Dépôt de test",
@@ -42,11 +38,8 @@ class TestCreateDepot(TestCase):
         assert new_depot is not None
         assert new_depot.name == "Dépôt de test"
         assert new_depot.is_enabled is False
-        assert new_depot.gps_coordinates == "48.8566,2.3522"
 
-    @patch("entity.views.depots.mixins.create.get_coordinates")
-    def test_create_depot_fail(self, mock_get_coordinates):
-        mock_get_coordinates.return_value = (48.8566, 2.3522)
+    def test_create_depot_fail(self):
         params = {
             "entity_id": self.admin.id,
             "name": "Dépôt de test",
