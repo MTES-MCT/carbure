@@ -16,9 +16,8 @@ import {
 import * as api from "accounting/api/biofuels/balances"
 import { formatSector } from "accounting/utils/formatters"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
-import useEntity from "common/hooks/entity"
+import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
 import { compact } from "common/utils/collection"
-import { UserRole } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { formatNumber } from "common/utils/formatters"
 
@@ -27,11 +26,8 @@ export const useBalancesBiofuelsColumns = () => {
   const navigate = useNavigate()
   const routes = useRoutes()
   const portal = usePortal()
-  const entity = useEntity()
+  const { canTransferBalance } = useAccountingPermissions()
   const { unit } = useUnit()
-
-  const canTransfer =
-    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const columns: Column<apiTypes["Balance"]>[] = compact([
     {
@@ -99,7 +95,7 @@ export const useBalancesBiofuelsColumns = () => {
               <DebitOperationDialog onClose={close} balance={balance} />
             ))
           }
-          disabled={!canTransfer}
+          disabled={!canTransferBalance}
         />
       ),
     },

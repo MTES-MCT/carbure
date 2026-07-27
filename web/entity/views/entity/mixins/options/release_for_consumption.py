@@ -62,6 +62,9 @@ class ToggleRFCActionMixin:
         has_mac = serializer.validated_data.get("has_mac", False)
 
         entity.has_mac = has_mac
+
+        # Give rights to the entity to access the tiruert objectives page
+        entity.is_tiruert_liable = has_mac
         entity.save()
 
         return Response({"status": "success"})
