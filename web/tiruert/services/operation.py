@@ -11,6 +11,7 @@ from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
 
@@ -57,10 +58,10 @@ class OperationService:
 
     @staticmethod
     def perform_checks_before_create(request, entity_id, selected_lots, data, declaration_year):
+        OperationService.check_declaration_year(declaration_year, data)
         OperationService.check_debited_entity(entity_id, data)
         OperationService.check_volumes(selected_lots, data)
-        OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
-        OperationService.check_declaration_year(declaration_year, data)
+        OperationService.check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year)
 
     @staticmethod
     def check_debited_entity(entity_id, data):
@@ -91,7 +92,7 @@ class OperationService:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
 
     @staticmethod
-    def check_objectives_compliance(request, selected_lots, data, entity_id):
+    def check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year):
         """
         Check if the TENEUR operation respects the capped objective for the customs category
         """
@@ -103,12 +104,19 @@ class OperationService:
             if target is None:
                 return
 
-            # 2. Calculate the balance for requested biofuel and customs category
+            # 2. Calculate the balance for requested biofuel and customs category and declaration year
             request.GET = request.GET.copy()
             request.GET["customs_category"] = data["customs_category"]
             request.GET["biofuel"] = data["biofuel"].code
             operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
-            balance = BalanceService.calculate_balance(operations, entity_id, None, "mj")
+
+            period = DeclarationPeriodService.get_period_by_year(declaration_year)
+            if period is None:
+                return
+
+            date_from = period.start_date
+
+            balance = BalanceService.calculate_balance(operations, entity_id, None, "mj", date_from)
             balance = list(balance.values())[0]  # keep the first (and only one) element
 
             # 3. Convert the teneur to add from liters to MJ
