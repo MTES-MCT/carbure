@@ -21,7 +21,7 @@ class BalanceQuantitySerializer(serializers.Serializer):
 class BaseBalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
     initial_balance = serializers.SerializerMethodField()
-    available_balance = RoundedFloatField()
+    available_balance = TruncatedFloatField()
     quantity = BalanceQuantitySerializer()
     pending_teneur = TruncatedFloatField(decimal_places=0)
     declared_teneur = TruncatedFloatField(decimal_places=0)

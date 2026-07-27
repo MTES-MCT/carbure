@@ -75,7 +75,7 @@ class TeneurService:
         # Round target volume (L) to 2 decimals, because at the end we return 2 decimals precision
         target_volume = truncate(target_volume)
 
-        if batches_volumes.sum() < target_volume:
+        if truncate(batches_volumes.sum()) < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
         if enforced_volumes is not None:
@@ -272,7 +272,9 @@ class TeneurService:
         """
 
         # Sanity checks on inputs
-        if batches_volumes.sum() < target_volume:
+        target_volume = truncate(target_volume)
+
+        if truncate(batches_volumes.sum()) < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
         emissions_sorter = np.argsort(batches_emissions)
@@ -334,7 +336,7 @@ class TeneurService:
         Return avoided emissions (tCO2)
         """
         volumes, emissions, _, _, target_volume = TeneurService.prepare_data(data)  # volumes in L, emissions in gCO2/MJ
-
+        print(f"volumes = {volumes}, emissions = {emissions}, target_volume = {target_volume}")
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
             volumes,
             emissions,
