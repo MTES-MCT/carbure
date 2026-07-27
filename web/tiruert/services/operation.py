@@ -121,10 +121,12 @@ class OperationService:
 
             # 3. Convert the teneur to add from liters to MJ
             pci = data["biofuel"].pci_litre
-            teneur_to_add = sum(truncate(lot["volume"]) * pci for lot in selected_lots)
+            teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
 
             # 4. Check if the futur teneur is below the target
-            futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ
+            futur_teneur = (
+                truncate(balance["pending_teneur"], 0) + truncate(balance["declared_teneur"], 0) + teneur_to_add
+            )  # all in MJ
 
             if futur_teneur > target:
                 raise serializers.ValidationError(
