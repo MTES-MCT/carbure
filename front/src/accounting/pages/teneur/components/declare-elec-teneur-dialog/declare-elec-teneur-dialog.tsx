@@ -13,8 +13,7 @@ import {
   SectorObjective,
   TargetType,
 } from "../../types"
-import { formatUnit, CONVERSIONS } from "common/utils/formatters"
-import { ExtendedUnit } from "common/types"
+import { CONVERSIONS } from "common/utils/formatters"
 import {
   Co2TeneurProgressBar,
   EnergyTeneurProgressBar,
@@ -118,7 +117,6 @@ export const DeclareElecTeneurDialog = ({
                     additionalQuantity={avoidedEmissions}
                     label={t("Objectif global")}
                     targetType={TargetType.REACH}
-                    formatRemaining={(v) => formatUnit(v, ExtendedUnit.tCO2ev)}
                   />
                 )}
 

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { floorNumber, formatNumber } from "common/utils/formatters"
+import { floorNumber } from "common/utils/formatters"
 import {
   BiofuelUnconstrainedCategoryObjective,
   CategoryObjective,
@@ -14,7 +14,10 @@ import {
 } from "../../types"
 import { useMemo } from "react"
 import { maxLitersFromRemainingMj } from "../../utils/liters"
-import { formatAccountingUnit } from "accounting/utils/formatters"
+import {
+  formatAccountingUnit,
+  formatTCO2Number,
+} from "accounting/utils/formatters"
 import { FRACTION_DIGITS_LITERS } from "accounting/config"
 import { Unit } from "common/types"
 
@@ -83,10 +86,7 @@ export const useRemainingCO2Objective = (
         mainObjective.pending_teneur -
         avoidedEmissions
     )
-    return formatNumber(remainingCO2, {
-      fractionDigits: 0,
-      mode: "ceil",
-    })
+    return formatTCO2Number(remainingCO2)
   }, [mainObjective, values.avoided_emissions])
 }
 

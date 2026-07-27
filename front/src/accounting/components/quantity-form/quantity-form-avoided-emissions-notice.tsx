@@ -1,9 +1,9 @@
 import { QuantityFormProps } from "./quantity-form.types"
 import { Notice } from "common/components/notice"
 import { useUnit } from "common/hooks/unit"
-import { formatNumber } from "common/utils/formatters"
 import { Trans, useTranslation } from "react-i18next"
 import { DEFAULT_UNIT_OPERATION } from "accounting/config"
+import { formatTCO2Number } from "accounting/utils/formatters"
 
 type AvoidedEmissionsRecapNoticeProps = Pick<
   QuantityFormProps,
@@ -38,7 +38,7 @@ export const AvoidedEmissionsRecapNotice = ({
           t={t}
           values={{
             quantity: formattedQuantity,
-            value: formatNumber(avoided_emissions_min, { fractionDigits: 2 }),
+            value: formatTCO2Number(avoided_emissions_min),
           }}
           defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
         />
@@ -48,8 +48,8 @@ export const AvoidedEmissionsRecapNotice = ({
           t={t}
           values={{
             quantity: formattedQuantity,
-            min: formatNumber(avoided_emissions_min, { fractionDigits: 2 }),
-            max: formatNumber(avoided_emissions_max, { fractionDigits: 2 }),
+            min: formatTCO2Number(avoided_emissions_min),
+            max: formatTCO2Number(avoided_emissions_max),
           }}
           defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
         />

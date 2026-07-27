@@ -7,6 +7,7 @@ import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declara
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 import { ExtendedUnit } from "common/types"
 import { formatObjectiveGJ } from "../../../utils/objectives"
+import { formatTCO2Number } from "accounting/utils/formatters"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -38,16 +39,11 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",
             {
               date: selectedYear,
-              objective: formatNumber(objective.target, {
-                fractionDigits: 0,
-                mode: "ceil",
-              }),
+              objective: formatTCO2Number(objective.target),
               target_percent: formatNumber(objective.target_percent),
             }
           )}
-          mainValue={formatNumber(objective.total_teneur_declared, {
-            fractionDigits: 0,
-          })}
+          mainValue={formatTCO2Number(objective.total_teneur_declared)}
           mainText={t("tCO2 évitées")}
           baseQuantity={objective.teneur_declared}
           targetQuantity={objective.target}

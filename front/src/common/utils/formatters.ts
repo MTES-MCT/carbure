@@ -215,3 +215,6 @@ export const CONVERSIONS = {
     mbToBytes: (value: number) => value * 1000000,
   },
 }
+
+export const getStepFromFractionDigits = (fractionDigits: number) =>
+  Math.pow(10, -fractionDigits)

@@ -7,6 +7,9 @@ import { useEffect, useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
 import {
+  formatAvoidedEmissionsBounds,
+  formatEmissionMax,
+  formatEmissionMin,
   getQuantityInputFeedback,
   getQuantityInputLabel,
   showEnergyEquivalent,
@@ -17,9 +20,14 @@ import {
 } from "./quantity-form.hooks"
 import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
 import { formatAccountingUnit } from "accounting/utils/formatters"
-import { DEFAULT_UNIT_OPERATION } from "accounting/config"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+  FRACTION_DIGITS_TCO2,
+} from "accounting/config"
 import { EnergyEquivalentNotice } from "./quantity-form-energy-equivalent"
 import { AvoidedEmissionsRecapNotice } from "./quantity-form-avoided-emissions-notice"
+import { getStepFromFractionDigits } from "common/utils/formatters"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -36,9 +44,6 @@ export type QuantityFormComponentProps = {
   // Callback function to be called when the quantity is declared
   onQuantityDeclared?: () => void
 }
-
-const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
-export const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 
 const AvoidedEmissionsSection = ({
   inputRef,
@@ -57,6 +62,7 @@ const AvoidedEmissionsSection = ({
       label={t("Saisir un montant en tCO2 évitées")}
       min={formatEmissionMin(value.avoided_emissions_min)}
       max={formatEmissionMax(value.avoided_emissions_max)}
+      step={getStepFromFractionDigits(FRACTION_DIGITS_TCO2)}
       {...bind("avoided_emissions")}
       required
       inputRef={inputRef}
@@ -103,14 +109,25 @@ const QuantitySection = ({
 
     mutation.execute().then((response) => {
       const emissions = response.data
-      const emissionsMin = emissions?.min_avoided_emissions
-        ? Math.trunc(emissions.min_avoided_emissions)
-        : 0
-      const emissionsMax = emissions?.max_avoided_emissions
-        ? Math.trunc(emissions?.max_avoided_emissions)
-        : 0
 
-      if (emissionsMin === 0) {
+      if (
+        !emissions?.min_avoided_emissions ||
+        !emissions?.max_avoided_emissions
+      ) {
+        return
+      }
+
+      const {
+        min: emissionsMin,
+        max: emissionsMax,
+        isInsufficient,
+      } = formatAvoidedEmissionsBounds(
+        emissions.min_avoided_emissions,
+        emissions.max_avoided_emissions
+      )
+
+      // User can only enter avoided emissions if the emission min returned by the API is greater than 1 tCO2
+      if (isInsufficient) {
         quantityInputRef.current?.setCustomValidity(
           t(
             "La quantité entrée n'est pas suffisante pour enregistrer des tCO2 évitées. Merci de modifier la quantité."
@@ -121,8 +138,8 @@ const QuantitySection = ({
         })
         return
       }
-      setQuantityDeclared(true)
 
+      setQuantityDeclared(true)
       setField("avoided_emissions_min", emissionsMin)
       setField("avoided_emissions_max", emissionsMax)
 
@@ -180,7 +197,8 @@ const QuantitySection = ({
     <>
       <NumberInput
         label={`${getQuantityInputLabel(type)} ${quantityMaxLabel ?? ""}`}
-        step={0.01}
+        step={getStepFromFractionDigits(FRACTION_DIGITS_LITERS)}
+        min={0}
         max={quantityMax}
         onKeyDown={(e) => {
           if (e.key === "Enter") {

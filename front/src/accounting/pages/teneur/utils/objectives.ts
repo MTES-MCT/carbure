@@ -12,6 +12,7 @@ import {
 import { ExtendedUnit } from "common/types"
 import { formatUnit } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
+import { FRACTION_DIGITS_TCO2 } from "accounting/config"
 import { mjToDisplayGj, mjToRemainingDisplayGj, remainingMj } from "./energy"
 
 type EnergyObjectiveInput = Pick<
@@ -123,4 +124,6 @@ export const formatObjectiveGJFromMj = (mj: number) =>
   formatObjectiveGJ(mjToDisplayGj(mj))
 
 export const formatObjectiveCO2 = (value: number) =>
-  formatUnit(value, ExtendedUnit.tCO2ev, { fractionDigits: 0 })
+  formatUnit(value, ExtendedUnit.tCO2ev, {
+    fractionDigits: FRACTION_DIGITS_TCO2,
+  })

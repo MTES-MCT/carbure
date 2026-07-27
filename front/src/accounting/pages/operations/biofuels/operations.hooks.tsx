@@ -20,6 +20,7 @@ import {
   formatOperationStatus,
   formatOperationType,
   formatSector,
+  formatTCO2Number,
 } from "accounting/utils/formatters"
 import styles from "../operations.module.css"
 import cl from "clsx"
@@ -155,11 +156,8 @@ export const useOperationsBiofuelsColumns = ({
         const calculatedAvoidedEmissions = Math.abs(
           formatValue(item, item.avoided_emissions)
         )
-        const formattedAvoidedEmissions = formatNumber(
-          calculatedAvoidedEmissions,
-          {
-            fractionDigits: 0,
-          }
+        const formattedAvoidedEmissions = formatTCO2Number(
+          calculatedAvoidedEmissions
         )
         return displayValueDebitOrCredit(
           formattedAvoidedEmissions,

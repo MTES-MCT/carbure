@@ -1,9 +1,9 @@
 import { Operation, OperationType } from "accounting/types"
-import { formatSector } from "accounting/utils/formatters"
+import { formatSector, formatTCO2Number } from "accounting/utils/formatters"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { formatQuantityDisplay } from "./operation-detail-fields.utils"
-import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
+import { formatDate, formatPeriod } from "common/utils/formatters"
 import { useUnit } from "common/hooks/unit"
 import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 import { compact } from "common/utils/collection"
@@ -42,11 +42,8 @@ export const useOperationDetailFields = (operation?: Operation) => {
         },
       {
         label: t("Tonnes CO2 eq évitées"),
-        value: formatNumber(
-          formatValue(operation, operation.avoided_emissions),
-          {
-            fractionDigits: 0,
-          }
+        value: formatTCO2Number(
+          formatValue(operation, operation.avoided_emissions)
         ),
       },
       operation.type === OperationType.TRANSFERT &&

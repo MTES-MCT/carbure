@@ -1,4 +1,8 @@
-import { FRACTION_DIGITS_GJ, FRACTION_DIGITS_LITERS } from "accounting/config"
+import {
+  FRACTION_DIGITS_GJ,
+  FRACTION_DIGITS_LITERS,
+  FRACTION_DIGITS_TCO2,
+} from "accounting/config"
 import {
   ElecOperationSector,
   ElecOperationsStatus,
@@ -135,5 +139,14 @@ export const formatEnergyNumber = (
 ) =>
   formatNumber(value, {
     fractionDigits: FRACTION_DIGITS_GJ,
+    ...options,
+  })
+
+export const formatTCO2Number = (
+  value: number,
+  options?: FormatNumberOptions
+) =>
+  formatNumber(value, {
+    fractionDigits: FRACTION_DIGITS_TCO2,
     ...options,
   })

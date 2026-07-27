@@ -14,7 +14,7 @@ import {
   OperationOrder,
 } from "accounting/types"
 import * as api from "accounting/api/biofuels/balances"
-import { formatSector } from "accounting/utils/formatters"
+import { formatSector, formatTCO2Number } from "accounting/utils/formatters"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
 import { compact } from "common/utils/collection"
@@ -59,7 +59,7 @@ export const useBalancesBiofuelsColumns = () => {
     },
     {
       header: `${t("Solde disponible max. (tCO2)")}`,
-      cell: (item) => formatNumber(item.saved_emissions, { fractionDigits: 0 }),
+      cell: (item) => formatTCO2Number(item.saved_emissions),
       key: OperationOrder.saved_emissions,
     },
     {
