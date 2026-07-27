@@ -39,8 +39,6 @@ class IsVerifiedIntegrationTest(TestCase):
             password=self.password,
         )
 
-        self.protected_url = reverse("test-is-verified")
-
     def login(self):
         credentials = {"username": self.user.email, "password": self.password}
         response = self.client.post(reverse("auth-login"), credentials)
@@ -55,7 +53,7 @@ class IsVerifiedIntegrationTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def assert_verified(self, expected_code):
-        response = self.client.get(self.protected_url)
+        response = self.client.get(reverse("test-is-verified"))
         self.assertEqual(response.status_code, expected_code)
 
     def test_denies_unauthenticated_request(self):
