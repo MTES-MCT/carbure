@@ -7,7 +7,6 @@ from drf_spectacular.utils import (
 )
 from rest_framework import serializers, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import Entity, Pays
@@ -37,8 +36,6 @@ class UpdateEntityInfoSerializer(serializers.Serializer):
 
 
 class UpdateInfoActionMixin:
-    permission_classes = [IsAuthenticated]
-
     @extend_schema(
         parameters=[
             OpenApiParameter(

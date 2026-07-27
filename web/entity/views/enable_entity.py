@@ -5,7 +5,6 @@ from drf_spectacular.utils import (
 )
 from rest_framework import serializers, status
 from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
@@ -37,9 +36,7 @@ class EntityViewSet(ViewSet):
         request=EmptyResponseSerializer,
         responses=EmptyResponseSerializer,
     )
-    @permission_classes(
-        [IsAuthenticated, HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])]
-    )
+    @permission_classes([HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])])
     @action(
         methods=["post"],
         detail=True,
