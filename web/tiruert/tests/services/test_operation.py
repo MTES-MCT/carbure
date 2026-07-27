@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import Mock, patch
 
 from django.http import QueryDict
@@ -456,16 +457,25 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH")}
         selected_lots = []
         entity_id = 1
+        declaration_year = 2025
 
         # Should not raise exception (no target = no check)
-        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
+        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
+    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
-    def test_check_services_method_are_called_with_data(self, mock_calculate_target, mock_calculate_balance):
+    def test_check_services_method_are_called_with_data(
+        self,
+        mock_calculate_target,
+        mock_calculate_balance,
+        mock_get_period_by_year,
+    ):
         """Should call ObjectiveService and BalanceService with correct parameters (MJ unit)."""
         mock_calculate_target.return_value = 100000  # Dummy target
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
+        period_start_date = date(2025, 1, 1)
+        mock_get_period_by_year.return_value = Mock(start_date=period_start_date)
 
         mock_request = Mock()
         mock_request.entity.id = 1
@@ -474,12 +484,14 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=21.3)}
         selected_lots = [{"id": 1, "volume": 1000}]
         entity_id = 1
+        declaration_year = 2025
 
         # Call the method
-        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
+        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
         # Verify ObjectiveService called with correct parameters
         mock_calculate_target.assert_called_once_with("CONV", 1)
+        mock_get_period_by_year.assert_called_once_with(declaration_year)
 
         # Verify BalanceService called with correct parameters
         mock_calculate_balance.assert_called_once()
@@ -487,13 +499,21 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         self.assertEqual(called_args[1], 1)  # entity_id
         self.assertEqual(called_args[2], None)  # depot_id
         self.assertEqual(called_args[3], "mj")  # unit
+        self.assertEqual(called_args[4], period_start_date)  # date_from
 
+    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
-    def test_check_objectives_compliance_passes_when_below_target(self, mock_calculate_target, mock_calculate_balance):
+    def test_check_objectives_compliance_passes_when_below_target(
+        self,
+        mock_calculate_target,
+        mock_calculate_balance,
+        mock_get_period_by_year,
+    ):
         """Should pass when future teneur is below target."""
         # Target = 100,000 MJ
         mock_calculate_target.return_value = 100000
+        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
 
         # Current balance: 50,000 MJ pending + 20,000 MJ declared
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 50000, "declared_teneur": 20000}}
@@ -508,18 +528,24 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Future teneur: 50,000 + 20,000 + 10,000 = 80,000 MJ < 100,000 (OK)
         selected_lots = [{"id": 1, "volume": 1000}]
         entity_id = 1
+        declaration_year = 2025
 
         # Should not raise exception
-        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
+        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
+    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_raises_error_when_exceeds_target(
-        self, mock_calculate_target, mock_calculate_balance
+        self,
+        mock_calculate_target,
+        mock_calculate_balance,
+        mock_get_period_by_year,
     ):
         """Should raise ValidationError when future teneur exceeds target."""
         # Target = 100,000 MJ
         mock_calculate_target.return_value = 100000
+        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
 
         # Current balance: 80,000 MJ pending + 15,000 MJ declared
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 80000, "declared_teneur": 15000}}
@@ -534,9 +560,10 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Future teneur: 80,000 + 15,000 + 20,000 = 115,000 MJ > 100,000 (ERROR)
         selected_lots = [{"id": 1, "volume": 2000}]
         entity_id = 1
+        declaration_year = 2025
 
         with self.assertRaises(ValidationError) as context:
-            OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
+            OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
         error_key = list(context.exception.detail.keys())[0]
         self.assertIn("futur_teneur", error_key)
@@ -546,6 +573,42 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
             str(context.exception.detail[error_key]),
         )
 
+    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
+    @patch("tiruert.services.operation.BalanceService.calculate_balance")
+    @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
+    def test_check_objectives_compliance_truncates_teneur_to_add_after_total_sum(
+        self,
+        mock_calculate_target,
+        mock_calculate_balance,
+        mock_get_period_by_year,
+    ):
+        """Should truncate teneur_to_add at MJ level after summing all lots."""
+        mock_calculate_target.return_value = 117
+        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
+        mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
+
+        mock_request = Mock()
+        mock_request.entity.id = 1
+        mock_request.GET = QueryDict("")
+
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=27)}
+        selected_lots = [
+            {"id": 1, "volume": 2.19},
+            {"id": 2, "volume": 2.19},
+        ]  # results in 2.19*27 + 2.19*27 = 118.26 MJ, which exceeds target of 117 MJ
+
+        with self.assertRaises(ValidationError) as context:
+            OperationService.check_objectives_compliance(
+                mock_request,
+                selected_lots,
+                data,
+                entity_id=1,
+                declaration_year=2025,
+            )
+
+        error_key = list(context.exception.detail.keys())[0]
+        self.assertEqual(error_key, "futur_teneur: 118 - target : 117")
+
     def test_check_objectives_compliance_skips_for_non_teneur_operations(self):
         """Should skip check for non-TENEUR operation types."""
         mock_request = Mock()
@@ -554,7 +617,13 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         entity_id = 1
 
         # Should not raise exception (early return for non-TENEUR)
-        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id)
+        OperationService.check_objectives_compliance(
+            mock_request,
+            selected_lots,
+            data,
+            entity_id,
+            declaration_year=None,
+        )
 
 
 class OperationServiceProcessEP2LotsTest(TestCase):
