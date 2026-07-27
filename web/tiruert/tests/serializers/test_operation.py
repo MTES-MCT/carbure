@@ -1,12 +1,14 @@
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
+from rest_framework import serializers
 
 from core.models import Biocarburant, MatierePremiere
 from tiruert.models import Operation
 from tiruert.serializers import OperationListSerializer, OperationSerializer
 from tiruert.serializers.operation import (
     BaseOperationSerializer,
+    OperationExcelRowSerializer,
     OperationInputSerializer,
     OperationUpdateSerializer,
 )
@@ -274,6 +276,13 @@ class OperationInputSerializerCreateTest(TestCase):
         result = serializer.validate_type(Operation.API_CREATABLE_TYPES[0])
         self.assertEqual(result, Operation.API_CREATABLE_TYPES[0])
 
+    def test_validate_type_rejects_unauthorized_type(self):
+        """Should reject operation types that cannot be created by the API."""
+        serializer = OperationInputSerializer()
+
+        with self.assertRaises(serializers.ValidationError):
+            serializer.validate_type(Operation.CESSION)
+
     def test_objective_sector_invalid_on_non_teneur(self):
         """objective_sector must be rejected when type is not TENEUR."""
         serializer = OperationInputSerializer()
@@ -315,6 +324,91 @@ class OperationUpdateSerializerTest(TestCase):
         allowed_fields = set(serializer.Meta.fields)
 
         self.assertEqual(allowed_fields, {"to_depot", "status"})
+
+
+class OperationExcelRowSerializerTest(TestCase):
+    """Tests for OperationExcelRowSerializer validation rules."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/entities.json",
+        "json/depots.json",
+    ]
+
+    def setUp(self):
+        from core.models import Entity
+
+        self.entity = Entity.objects.create(
+            name="TIRUERT Operator",
+            entity_type=Entity.OPERATOR,
+            is_enabled=True,
+            is_tiruert_liable=True,
+            accise_number="ACC-001",
+        )
+        self.biofuel_eth = Biocarburant.objects.get(code="ETH")
+        self.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
+        self.lot = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            volume=1000,
+        )
+
+    def test_transfert_requires_credited_entity(self):
+        """TRANSFERT rows should require a credited entity."""
+        serializer = OperationExcelRowSerializer()
+
+        with self.assertRaises(serializers.ValidationError) as context:
+            serializer.validate({"operation_type": Operation.TRANSFERT})
+
+        self.assertEqual(
+            context.exception.detail,
+            {
+                "credited_entity": serializers.ErrorDetail(
+                    string="Destinataire requis pour les opérations de type TRANSFERT.",
+                    code="invalid",
+                )
+            },
+        )
+
+    def test_operation_type_is_normalized_and_validated(self):
+        """Operation type should be normalized to uppercase and validated."""
+        serializer = OperationExcelRowSerializer()
+
+        self.assertEqual(serializer.validate_operation_type(" transfert "), Operation.TRANSFERT)
+        with self.assertRaises(serializers.ValidationError):
+            serializer.validate_operation_type("invalid")
+
+    def test_volume_must_be_positive(self):
+        """Volume should be strictly greater than zero."""
+        serializer = OperationExcelRowSerializer()
+
+        with self.assertRaises(serializers.ValidationError) as context:
+            serializer.validate_volume(0)
+
+        self.assertEqual(
+            context.exception.detail,
+            ["La valeur du volume doit être supérieure à zéro."],
+        )
+
+    def test_serializer_validates_transfert_row(self):
+        """A valid TRANSFERT row should resolve related objects correctly."""
+        serializer = OperationExcelRowSerializer(
+            data={
+                "lot_id": self.lot.id,
+                "volume": 125.5,
+                "operation_type": " transfert ",
+                "credited_entity": self.entity.id,
+            }
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["operation_type"], Operation.TRANSFERT)
+        self.assertEqual(serializer.validated_data["credited_entity"], self.entity)
+        self.assertEqual(serializer.validated_data["lot_id"], self.lot)
 
 
 class OperationCorrectionSerializerUpdateTest(TestCase):
