@@ -5312,6 +5312,7 @@ export interface components {
          *     * `DREAL` - DREAL
          *     * `ADEME` - ADEME
          *     * `DGDDI` - DGDDI
+         *     * `DGDDI_NATIONAL` - DGDDI_NATIONAL
          * @enum {string}
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
@@ -12872,7 +12873,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13186,7 +13187,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13369,7 +13370,7 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -13732,7 +13733,7 @@ export interface operations {
                 /** @description Date from where to calculate teneur and quantity */
                 date_from?: string;
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -13854,7 +13855,7 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -13995,7 +13996,7 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -14841,7 +14842,8 @@ export enum ExtAdminPagesEnum {
     BIOFUEL = "BIOFUEL",
     DREAL = "DREAL",
     ADEME = "ADEME",
-    DGDDI = "DGDDI"
+    DGDDI = "DGDDI",
+    DGDDI_NATIONAL = "DGDDI_NATIONAL"
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",

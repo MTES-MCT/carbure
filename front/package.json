@@ -64,7 +64,6 @@
     "storybook": "^8.6.15",
     "storybook-addon-mock-date": "^0.6.0",
     "storybook-addon-remix-react-router": "^3.0.1",
-    "ts-node": "^10.9.2",
     "typescript-plugin-css-modules": "^5.2.0",
     "vitest": "^3.2.4",
     "yaml": "^2.8.0"
@@ -87,7 +86,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --test",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "generate-api": "node --loader ts-node/esm scripts/overrides-api-schema.ts && node --loader ts-node/esm scripts/transform-schema.ts",
+    "generate-api": "node scripts/overrides-api-schema.ts && node scripts/transform-schema.ts",
     "check-diff": "git diff --quiet --exit-code ../api-schema.yaml || (echo 'Attention, le schéma a évolué depuis la dernière génération. Veuillez vérifier les différences et mettre à jour le schéma si nécessaire.')",
     "check-types": "tsc --noEmit",
     "generate-and-check-types": "npm run generate-api && npm run check-diff && npm run check-types"

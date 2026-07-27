@@ -1,6 +1,6 @@
 import django_filters
 from django import forms
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema, extend_schema_field
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -169,6 +169,7 @@ class MultipleBooleanFilter(django_filters.TypedMultipleChoiceFilter):
         return val.lower() == "true"
 
 
+@extend_schema_field(str)
 class MultiValueInFilter(django_filters.MultipleChoiceFilter):
     """
     Filter using all values provided for a query parameter (QueryDict.getlist)
