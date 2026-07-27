@@ -2,12 +2,12 @@ import requests
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 
-from core.decorators import otp_or_403
 from core.models import Entity
+from core.permissions import IsVerified
 from entity.serializers import ResponseDataSerializer, SeachCompanySerializer
 
 FRANCE = {
@@ -36,7 +36,7 @@ class CompanyNotFoundError(APIException):
     responses=ResponseDataSerializer,
 )
 @api_view(["POST"])
-@otp_or_403
+@permission_classes([IsVerified])
 def search_company_view(request):
     serializer = SeachCompanySerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
