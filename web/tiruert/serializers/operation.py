@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db import transaction
 from rest_framework import serializers
 
-from core.models import CarbureLot, Pays
+from core.models import Pays
 from core.serializers import CountrySerializer
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.fields import RoundedFloatField
@@ -186,9 +186,9 @@ class OperationInputSerializer(serializers.ModelSerializer):
                 request, entity_id, selected_lots, validated_data, unit, declaration_year
             )
 
-            # Fetch emission rates from CarbureLot
+            # Fetch emission rates from the oldest OperationDetail for each lot
             lot_ids = [lot["id"] for lot in selected_lots]
-            emissions_by_lot = dict(CarbureLot.objects.filter(id__in=lot_ids).values_list("id", "ghg_total"))
+            emissions_by_lot = OperationService.get_emission_rates_by_lot(lot_ids)
 
             OperationService.define_operation_status(validated_data)
 

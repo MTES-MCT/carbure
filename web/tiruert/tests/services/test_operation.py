@@ -5,7 +5,7 @@ from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
-from tiruert.models import Operation
+from tiruert.models import Operation, OperationDetail
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
 from transactions.factories.depot import DepotFactory
@@ -113,6 +113,57 @@ class OperationServiceTestCase(TestCase):
         )
 
         cls.entity_lots = CarbureLot.objects.filter(carbure_client=cls.entity)
+
+
+class OperationServiceEmissionRatesTest(OperationServiceTestCase):
+    def test_get_emission_rates_by_lot_returns_oldest_detail_per_lot(self):
+        lot = self.lot_blending_accepted
+
+        first_operation = Operation.objects.create(
+            type=Operation.CESSION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity,
+            debited_entity=self.entity,
+        )
+        OperationDetail.objects.create(
+            operation=first_operation,
+            lot=lot,
+            volume=100.0,
+            emission_rate_per_mj=1.1,
+        )
+
+        second_operation = Operation.objects.create(
+            type=Operation.CESSION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity,
+            debited_entity=self.entity,
+        )
+        OperationDetail.objects.create(
+            operation=second_operation,
+            lot=lot,
+            volume=100.0,
+            emission_rate_per_mj=2.2,
+        )
+
+        rates_by_lot = OperationService.get_emission_rates_by_lot([lot.id])
+
+        self.assertEqual(rates_by_lot, {lot.id: 1.1})
+
+    def test_get_emission_rates_by_lot_raises_all_missing_lot_ids(self):
+        with self.assertRaises(ValidationError) as context:
+            OperationService.get_emission_rates_by_lot([999001, 999002])
+
+        self.assertEqual(
+            context.exception.detail,
+            {
+                "lot_id: 999001": OperationServiceErrors.LOT_EMISSION_RATE_NOT_FOUND,
+                "lot_id: 999002": OperationServiceErrors.LOT_EMISSION_RATE_NOT_FOUND,
+            },
+        )
 
 
 class OperationServiceCreateOperationsTest(OperationServiceTestCase):

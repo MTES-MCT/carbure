@@ -4560,105 +4560,11 @@ paths:
         parent_entity = current entity)
       parameters:
         - in: query
-          name: cpo
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
-          name: date_from
-          schema:
-            type: array
-            items:
-              type: string
-              format: date
-          explode: true
-          style: form
-        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: group_by
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - operating_unit
-          description: "* `operating_unit` - operating_unit"
-          explode: true
-          style: form
-        - in: query
-          name: not_validated
-          schema:
-            type: boolean
-        - in: query
-          name: operating_unit
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - name: ordering
-          required: false
-          in: query
-          description: Which field to use when ordering the results.
-          schema:
-            type: string
-        - name: page
-          required: false
-          in: query
-          description: A page number within the paginated result set.
-          schema:
-            type: integer
-        - name: page_size
-          required: false
-          in: query
-          description: Number of results to return per page.
-          schema:
-            type: integer
-        - name: search
-          required: false
-          in: query
-          description: A search term.
-          schema:
-            type: string
-        - in: query
-          name: station_id
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
-          name: validated_by
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - BOTH
-                - CPO
-                - DGEC
-                - NO_ONE
-          description: |-
-            * `NO_ONE` - NO_ONE
-            * `DGEC` - DGEC
-            * `CPO` - CPO
-            * `BOTH` - BOTH
-          explode: true
-          style: form
-        - in: query
-          name: year
-          schema:
-            type: integer
       tags:
         - elec
       security:
@@ -4669,8 +4575,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedEntityPreviewList"
-          description: ""
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntityPreview"
+          description: List of CPOs authorized to receive volume transfers
   /api/elec/provision-certificates/{id}/:
     get:
       operationId: elec_provision_certificates_retrieve
@@ -9559,7 +9467,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: number
           explode: true
           style: form
       tags:
@@ -10085,7 +9993,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: number
           explode: true
           style: form
       tags:
@@ -10405,7 +10313,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -10639,8 +10546,6 @@ paths:
             type: array
             items:
               type: integer
-          explode: true
-          style: form
       tags:
         - tiruert
       security:
@@ -11094,7 +10999,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -11402,7 +11306,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -11637,8 +11540,6 @@ paths:
             type: array
             items:
               type: integer
-          explode: true
-          style: form
       tags:
         - tiruert
       security:
@@ -11761,7 +11662,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -12001,8 +11901,6 @@ paths:
             type: array
             items:
               type: integer
-          explode: true
-          style: form
       tags:
         - tiruert
       security:
@@ -16938,6 +16836,7 @@ components:
         - DREAL
         - ADEME
         - DGDDI
+        - DGDDI_NATIONAL
       type: string
       description: |-
         * `DCA` - DCA
@@ -16950,6 +16849,7 @@ components:
         * `DREAL` - DREAL
         * `ADEME` - ADEME
         * `DGDDI` - DGDDI
+        * `DGDDI_NATIONAL` - DGDDI_NATIONAL
     FeedStock:
       type: object
       properties:
@@ -17726,10 +17626,6 @@ components:
         unit:
           type: string
           readOnly: true
-        details:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationDetail"
         year:
           type: integer
           readOnly: true
@@ -17770,19 +17666,6 @@ components:
       required:
         - id
         - name
-    OperationDetail:
-      type: object
-      properties:
-        lot:
-          type: integer
-        volume:
-          type: number
-          format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
-      required:
-        - lot
     OperationEntity:
       type: object
       properties:
@@ -17938,10 +17821,6 @@ components:
         unit:
           type: string
           readOnly: true
-        details:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationDetail"
         avoided_emissions:
           type: number
           format: double
@@ -18326,10 +18205,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityPreview"
-        total_quantity:
-          type: number
-        total_quantity_renewable:
-          type: number
     PaginatedEntityProductionSiteList:
       type: object
       required:

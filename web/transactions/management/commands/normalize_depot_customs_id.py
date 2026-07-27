@@ -6,7 +6,6 @@ from django.db import transaction
 
 from core.models import Entity
 from entity.models import EntityScope
-from entity.services.geolocation import resolve_gps_coordinates
 from transactions.models.depot import Depot
 from transactions.models.site import Site
 
@@ -143,12 +142,6 @@ class Command(BaseCommand):
                     changed = True
                     self.stdout.write(self.style.SUCCESS(f" - Updated (accise: {accise or 'N/A'})"))
 
-                # Update GPS coordinates if None
-                if not depot.gps_coordinates:
-                    gps_updated = self.update_gps_coordinates(depot)
-                    if gps_updated:
-                        changed = True
-
                 # Search for "bureau de rattachement du dépot"
                 found_office = df_dgddi.loc[
                     df_dgddi["NUMERO DU DEPOT"] == customs_id,
@@ -205,12 +198,3 @@ class Command(BaseCommand):
             content_type=depot_ct,
             object_id=depot.id,
         )
-
-    def update_gps_coordinates(self, depot):
-        coords = resolve_gps_coordinates(depot)
-        if coords:
-            depot.gps_coordinates = coords
-            depot.save(update_fields=["gps_coordinates"])
-            self.stdout.write(self.style.SUCCESS(f" - Updated (gps_coordinates: {depot.gps_coordinates})"))
-            return True
-        return False

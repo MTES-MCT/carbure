@@ -1,6 +1,10 @@
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { exportQualichargeCertificates, getQualichargeData } from "./api"
+import {
+  exportQualichargeCertificates,
+  getQualichargeData,
+  getTransferTargets,
+} from "./api"
 import { ActionBar, Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { useState } from "react"
@@ -50,6 +54,13 @@ export const Qualicharge = () => {
     key: "qualicharge-data",
     params: [query],
   })
+  const { result: transferTargets, loading: loadingTransferTargets } = useQuery(
+    getTransferTargets,
+    {
+      key: "transfer-targets",
+      params: [entity.id],
+    }
+  )
   const getFilterOptions = useGetFilterOptions(query)
 
   const validateVolumes = useValidateVolumes({
@@ -102,7 +113,13 @@ export const Qualicharge = () => {
   }
 
   const openTransferVolumesModal = () => {
-    portal((close) => <TransferVolumesDialog onClose={close} query={query} />)
+    portal((close) => (
+      <TransferVolumesDialog
+        onClose={close}
+        query={query}
+        transferTargets={transferTargets ?? []}
+      />
+    ))
   }
 
   usePrivateNavigation(t("Données Qualicharge"))
@@ -191,15 +208,17 @@ export const Qualicharge = () => {
                       >
                         {t("Valider toutes les données")}
                       </Button>
-                      {entity.isCPO && (
-                        <Button
-                          priority="secondary"
-                          iconId="ri-send-plane-line"
-                          onClick={openTransferVolumesModal}
-                        >
-                          {t("Transférer des volumes")}
-                        </Button>
-                      )}
+                      {entity.isCPO &&
+                        !loadingTransferTargets &&
+                        (transferTargets?.length ?? 0) > 0 && (
+                          <Button
+                            priority="secondary"
+                            iconId="ri-send-plane-line"
+                            onClick={openTransferVolumesModal}
+                          >
+                            {t("Transférer des volumes")}
+                          </Button>
+                        )}
                       <ActionBar.Grow />
                       <ExportButton
                         query={query}

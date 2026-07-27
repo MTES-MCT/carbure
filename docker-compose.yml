@@ -9,6 +9,7 @@ services:
     <<: *common-settings
     environment:
       ENV: ${IMAGE_TAG}
+      MYSQL_INITDB_SKIP_TZINFO: "1"
     volumes:
       - carburedb:/var/lib/mysql
     ports:

@@ -5312,6 +5312,7 @@ export interface components {
          *     * `DREAL` - DREAL
          *     * `ADEME` - ADEME
          *     * `DGDDI` - DGDDI
+         *     * `DGDDI_NATIONAL` - DGDDI_NATIONAL
          * @enum {string}
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
@@ -5930,8 +5931,6 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["EntityPreview"][];
-            total_quantity?: number;
-            total_quantity_renewable?: number;
         };
         PaginatedEntityProductionSiteList: {
             /** @example 123 */
@@ -9759,31 +9758,8 @@ export interface operations {
     transfer_targets_provision_certificates_qualicharge: {
         parameters: {
             query: {
-                cpo?: string[];
-                date_from?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `operating_unit` - operating_unit */
-                group_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryGroup_by[];
-                not_validated?: boolean;
-                operating_unit?: string[];
-                /** @description Which field to use when ordering the results. */
-                ordering?: string;
-                /** @description A page number within the paginated result set. */
-                page?: number;
-                /** @description Number of results to return per page. */
-                page_size?: number;
-                /** @description A search term. */
-                search?: string;
-                station_id?: string[];
-                /**
-                 * @description * `NO_ONE` - NO_ONE
-                 *     * `DGEC` - DGEC
-                 *     * `CPO` - CPO
-                 *     * `BOTH` - BOTH
-                 */
-                validated_by?: PathsApiElecProvisionCertificatesQualichargeGetParametersQueryValidated_by[];
-                year?: number;
             };
             header?: never;
             path?: never;
@@ -9791,12 +9767,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description List of CPOs authorized to receive volume transfers */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedEntityPreviewList"];
+                    "application/json": components["schemas"]["EntityPreview"][];
                 };
             };
         };
@@ -12896,7 +12873,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13210,7 +13187,7 @@ export interface operations {
                 selected_entity_id?: number;
                 status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13393,7 +13370,7 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -13756,7 +13733,7 @@ export interface operations {
                 /** @description Date from where to calculate teneur and quantity */
                 date_from?: string;
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -13878,7 +13855,7 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -14019,7 +13996,7 @@ export interface operations {
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
                 depot?: string[];
-                durability_period?: (string | null)[];
+                durability_period?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 feedstock?: string[];
@@ -14865,7 +14842,8 @@ export enum ExtAdminPagesEnum {
     BIOFUEL = "BIOFUEL",
     DREAL = "DREAL",
     ADEME = "ADEME",
-    DGDDI = "DGDDI"
+    DGDDI = "DGDDI",
+    DGDDI_NATIONAL = "DGDDI_NATIONAL"
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",

@@ -1,6 +1,6 @@
+import { ObjectivesYearSelect } from "accounting/components/objectives-year-select"
 import { Autocomplete } from "common/components/autocomplete2"
 import { Content, Row } from "common/components/scaffold"
-import { Select } from "common/components/selects2"
 import { useQuery } from "common/hooks/async"
 import { useTranslation } from "react-i18next"
 import { Outlet, useNavigate, useParams } from "react-router-dom"
@@ -11,12 +11,16 @@ import { findEligibleTiruertEntities } from "accounting/components/recipient-for
 import { useRoutes } from "common/hooks/routes"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { BetaPage } from "common/molecules/beta-page"
+import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+
+const ADMIN_OBJECTIVES_URL_ROOT = "admin/objectives"
 
 export const ObjectivesLayout = () => {
   const { t } = useTranslation()
   const entity = useEntity()
   const navigate = useNavigate()
   const { entityId } = useParams<{ entityId?: string }>()
+  const { selectedYear } = useAnnualDeclarationTiruert()
   const routes = useRoutes()
 
   usePrivateNavigation(<BetaPage title={t("Objectifs annuels")} />, "teneur")
@@ -31,20 +35,16 @@ export const ObjectivesLayout = () => {
       : undefined
 
   const handleEntityChange = (selectedEntity: EntityPreview | undefined) => {
-    if (selectedEntity?.id) {
-      navigate(routes.ACCOUNTING.ADMIN.OBJECTIVES_ENTITY(selectedEntity.id))
-    }
+    navigate(
+      routes.ACCOUNTING.ADMIN.OBJECTIVES_YEAR(selectedYear, selectedEntity?.id)
+    )
   }
 
   return (
     <>
       <Row style={{ columnGap: "40px", alignItems: "flex-end" }}>
         <div>
-          <Select
-            options={[{ label: `${t("Année")} 2025`, value: 2025 }]}
-            value={2025}
-            disabled
-          />
+          <ObjectivesYearSelect urlRoot={ADMIN_OBJECTIVES_URL_ROOT} />
         </div>
         <div style={{ flex: 0.7 }}>
           <Autocomplete

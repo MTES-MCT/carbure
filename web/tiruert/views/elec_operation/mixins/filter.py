@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.db.models import IntegerField
 from django.db.models.functions import ExtractYear
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
@@ -71,7 +73,7 @@ class FilterActionMixin:
         if not column:
             raise Exception(f"Filter '{filter}' does not exist for operations")
 
-        queryset = queryset.annotate(year=ExtractYear("created_at", output_field=IntegerField()))
+        queryset = queryset.annotate(year=ExtractYear("created_at", tzinfo=timezone.utc, output_field=IntegerField()))
 
         values = queryset.values_list(column, flat=True).distinct()
         results = []

@@ -95,6 +95,30 @@ class EntityProductionSiteTest(TestCase):
         entity = Entity.objects.get(id=self.entity1.id)
         assert entity.has_mac is True
 
+    def test_release_for_consumption_sets_tiruert_liable(self):
+        url = "entity-release-for-consumption"
+        self.entity1.is_tiruert_liable = False
+        self.entity1.has_mac = False
+        self.entity1.save()
+
+        response = self.client.post(
+            reverse(url) + f"?entity_id={self.entity1.id}",
+            {"has_mac": "true"},
+        )
+        assert response.status_code == 200
+        entity = Entity.objects.get(id=self.entity1.id)
+        assert entity.has_mac is True
+        assert entity.is_tiruert_liable is True
+
+        response = self.client.post(
+            reverse(url) + f"?entity_id={self.entity1.id}",
+            {"has_mac": "false"},
+        )
+        assert response.status_code == 200
+        entity = Entity.objects.get(id=self.entity1.id)
+        assert entity.has_mac is False
+        assert entity.is_tiruert_liable is False
+
     def test_trading_option(self):
         url = "entity-trading"
 
