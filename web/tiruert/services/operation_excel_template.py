@@ -3,7 +3,7 @@ from io import BufferedReader
 import xlsxwriter
 from django.db.models import Q
 
-from core.models import Entity
+from core.models import CarbureLot, Entity
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
@@ -22,10 +22,12 @@ def get_tiruert_operator_queryset():
 
 
 TABLE_HEADERS = [
+    ("ID Carbure", "carbure_id"),
     ("Lot id", "lot_id"),
-    ("GHG total (gC02/MJ)", "emission_rate_per_mj"),
+    ("Taux d'émission (gCO₂/MJ)", "emission_rate_per_mj"),
     ("Biocarburant", "biofuel"),
-    ("Categorie", "customs_category"),
+    ("Catégorie", "customs_category"),
+    ("Matière première", "feedstock"),
     ("Volume disponible (L)", "available_volume"),
     ("Volume à prélever (L)", "volume"),
     ("Type d'opération", "operation_type"),
@@ -61,6 +63,14 @@ def _get_operator_lots(entity_id: int) -> list[dict]:
         unit="l",
     )
 
+    lot_ids = [key[-1] for key in lot_balances.keys()]
+    lot_metadata = {
+        lot_id: (carbure_id or "", feedstock or "")
+        for lot_id, carbure_id, feedstock in CarbureLot.objects.filter(id__in=lot_ids).values_list(
+            "id", "carbure_id", "feedstock__name"
+        )
+    }
+
     lots = []
     for key, entry in lot_balances.items():
         # For GROUP_BY_LOT, key is (sector, customs_category, biofuel_code, lot_id)
@@ -69,17 +79,21 @@ def _get_operator_lots(entity_id: int) -> list[dict]:
         if available_volume <= 0:
             continue
 
+        carbure_id, feedstock = lot_metadata.get(lot_id, ("", ""))
+
         lots.append(
             {
                 "lot_id": lot_id,
+                "carbure_id": carbure_id,
                 "available_volume": available_volume,
                 "emission_rate_per_mj": float(entry.get("emission_rate_per_mj", 0) or 0),
                 "biofuel": key[2],
                 "customs_category": key[1],
+                "feedstock": feedstock,
             }
         )
 
-    lots.sort(key=lambda lot: lot["lot_id"])
+    lots.sort(key=lambda lot: lot["carbure_id"] or "")
     return lots
 
 
@@ -126,23 +140,27 @@ def _create_main_sheet(
         sheet.write(KEY_ROW, col, key)
 
     sheet.set_row(KEY_ROW, None, None, {"hidden": True})
-    sheet.set_column(0, 0, 12)
-    sheet.set_column(1, 1, 16, decimal_format)
-    sheet.set_column(2, 3, 16)
-    sheet.set_column(4, 4, 18, decimal_format)
-    sheet.set_column(5, 5, 18, editable_decimal_format)
-    sheet.set_column(6, 6, 18, editable_format)
-    sheet.set_column(7, 7, 30, editable_format)
+    sheet.set_column(0, 0, 25)
+    sheet.set_column(1, 1, None, None, {"hidden": True})
+    sheet.set_column(2, 2, 16, decimal_format)
+    sheet.set_column(3, 4, 16)
+    sheet.set_column(5, 5, 25)
+    sheet.set_column(6, 6, 18, decimal_format)
+    sheet.set_column(7, 7, 18, editable_decimal_format)
+    sheet.set_column(8, 8, 20, editable_format)
+    sheet.set_column(9, 9, 30, editable_format)
     sheet.set_column(len(TABLE_HEADERS) - 1, len(TABLE_HEADERS) - 1, None, None, {"hidden": True})
 
     for index, lot in enumerate(lots):
         row = FIRST_DATA_ROW + index
-        sheet.write_number(row, 0, lot["lot_id"])
-        sheet.write_number(row, 1, lot["emission_rate_per_mj"])
-        sheet.write_string(row, 2, lot["biofuel"])
-        sheet.write_string(row, 3, lot["customs_category"])
-        sheet.write_number(row, 4, lot["available_volume"], decimal_format)
-        sheet.write_blank(row, 5, None, editable_decimal_format)
+        sheet.write_string(row, 0, lot["carbure_id"])
+        sheet.write_number(row, 1, lot["lot_id"])
+        sheet.write_number(row, 2, lot["emission_rate_per_mj"])
+        sheet.write_string(row, 3, lot["biofuel"])
+        sheet.write_string(row, 4, lot["customs_category"])
+        sheet.write_string(row, 5, lot["feedstock"])
+        sheet.write_number(row, 6, lot["available_volume"], decimal_format)
+        sheet.write_blank(row, 7, None, editable_decimal_format)
 
     sheet.protect(
         "",

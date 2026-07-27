@@ -24,7 +24,15 @@ class OperationExcelImportErrors:
 
 
 # Columns added to the export template for display purposes only (not expected by the row serializer).
-DISPLAY_ONLY_COLUMNS = ["credited_entity_name", "available_volume", "emission_rate_per_mj", "biofuel", "customs_category"]
+DISPLAY_ONLY_COLUMNS = [
+    "credited_entity_name",
+    "available_volume",
+    "emission_rate_per_mj",
+    "biofuel",
+    "customs_category",
+    "carbure_id",
+    "feedstock",
+]
 
 EXCEL_IMPORT_CONFIG = {"header_row": 1}
 
