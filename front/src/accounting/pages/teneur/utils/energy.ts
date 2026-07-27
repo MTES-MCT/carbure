@@ -1,5 +1,5 @@
 import { FRACTION_DIGITS_GJ } from "accounting/config"
-import { EnergyObjectiveFields, ObjectiveProgressGj } from "../types"
+import { EnergyObjectiveFields } from "../types"
 import { ceilNumber, truncateNumber } from "common/utils/formatters"
 
 /** MJ → GJ for display only (truncate, never use for arithmetic). */
@@ -51,19 +51,3 @@ export const remainingGjAfterDeclaration = (
   additionalMj: number
 ) =>
   mjToRemainingDisplayGj(remainingMjAfterDeclaration(objective, additionalMj))
-
-export const buildObjectiveProgressGj = (objective: {
-  target_mj: number | null
-  teneur_declared_mj: number
-  pending_teneur_mj: number
-  quantity_available_mj: number
-  total_teneur_declared_mj: number
-  remaining_energy_mj: number
-}): ObjectiveProgressGj => ({
-  target: mjToDisplayGj(objective.target_mj ?? 0),
-  teneur_declared: mjToDisplayGj(objective.teneur_declared_mj),
-  pending_teneur: mjToDisplayGj(objective.pending_teneur_mj),
-  quantity_available: mjToDisplayGj(objective.quantity_available_mj),
-  total_teneur_declared: mjToDisplayGj(objective.total_teneur_declared_mj),
-  remaining_energy: mjToRemainingDisplayGj(objective.remaining_energy_mj),
-})

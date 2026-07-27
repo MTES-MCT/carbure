@@ -3,14 +3,16 @@
  * Arithmetic lives in energy.ts (MJ); progress.* fields are GJ for display only.
  */
 import {
+  EnergyObjective,
   EnergyObjectiveComputed,
   EnergyObjectiveFields,
   MainObjective,
+  ObjectiveProgressGj,
 } from "../types"
 import { ExtendedUnit } from "common/types"
 import { formatUnit } from "common/utils/formatters"
 import { formatAccountingUnit } from "accounting/utils/formatters"
-import { buildObjectiveProgressGj, mjToDisplayGj, remainingMj } from "./energy"
+import { mjToDisplayGj, mjToRemainingDisplayGj, remainingMj } from "./energy"
 
 type EnergyObjectiveInput = Pick<
   EnergyObjectiveFields,
@@ -29,6 +31,26 @@ type MainObjectiveInput = Pick<
   | "target_percent"
   | "penalty"
 >
+
+// ── Progress GJ (used in objective display) ──
+export const buildObjectiveProgressGj = (
+  objective: Pick<
+    EnergyObjective,
+    | "target_mj"
+    | "teneur_declared_mj"
+    | "pending_teneur_mj"
+    | "quantity_available_mj"
+    | "total_teneur_declared_mj"
+    | "remaining_energy_mj"
+  >
+): ObjectiveProgressGj => ({
+  target: mjToDisplayGj(objective.target_mj ?? 0),
+  teneur_declared: mjToDisplayGj(objective.teneur_declared_mj),
+  pending_teneur: mjToDisplayGj(objective.pending_teneur_mj),
+  quantity_available: mjToDisplayGj(objective.quantity_available_mj),
+  total_teneur_declared: mjToDisplayGj(objective.total_teneur_declared_mj),
+  remaining_energy: mjToRemainingDisplayGj(objective.remaining_energy_mj),
+})
 
 // ── Enrichment (called when parsing API objectives) ──
 
