@@ -1,10 +1,10 @@
 from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import MatierePremiere
+from core.permissions import IsVerified
 from feedstocks.serializers.feedstock_classification import FeedStockClassificationSerializer
 
 
@@ -26,7 +26,7 @@ from feedstocks.serializers.feedstock_classification import FeedStockClassificat
     responses=FeedStockClassificationSerializer(many=True),
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsVerified])
 def get_feedstocks(request, *args, **kwargs):
     query = request.query_params.get("query")
     double_count_only = request.query_params.get("double_count_only", False)

@@ -1,24 +1,8 @@
 import inspect
 from functools import wraps
 
-from django.http import JsonResponse
-
 from core.common import ErrorResponse
 from core.models import Entity, ExternalAdminRights, UserRights
-
-
-def otp_or_403(function):
-    @wraps(function)
-    def wrap(request, *args, **kwargs):
-        user = request.user
-        if not user or user.is_anonymous:
-            return JsonResponse({"status": "forbidden", "message": "User not authenticated"}, status=403)
-
-        if not request.user.is_verified():
-            return JsonResponse({"status": "forbidden", "message": "User not verified"}, status=403)
-        return function(request, *args, **kwargs)
-
-    return wrap
 
 
 def call_with_context(view, context, request, args, kwargs):

@@ -6,6 +6,16 @@ from rest_framework.permissions import BasePermission
 from core.common import ErrorResponse
 from core.models import Entity, ExternalAdminRights, UserRights
 
+
+class IsVerified(BasePermission):
+    """
+    Allows access only to authenticated users with verified OTP.
+    """
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_verified())
+
+
 # Admin rights
 
 
