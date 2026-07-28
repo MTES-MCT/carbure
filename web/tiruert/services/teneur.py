@@ -273,19 +273,18 @@ class TeneurService:
 
         # Sanity checks on inputs
         target_volume = truncate(target_volume)
+        total_volume = truncate(batches_volumes.sum())
 
-        if truncate(batches_volumes.sum()) < target_volume:
+        if total_volume < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
         emissions_sorter = np.argsort(batches_emissions)
         emissions_inv_sorter = emissions_sorter[::-1]
-        thresh_min = (target_volume < batches_volumes[emissions_sorter].cumsum()).argmax()
-        thresh_max = (target_volume < batches_volumes[emissions_inv_sorter].cumsum()).argmax()
+        cumulative_min = batches_volumes[emissions_sorter].cumsum()
+        cumulative_max = batches_volumes[emissions_inv_sorter].cumsum()
 
-        # Handle case where the target volume is exactly the sum of the batches volumes
-        if target_volume == batches_volumes.sum():
-            thresh_min = len(batches_volumes) - 1
-            thresh_max = len(batches_volumes) - 1
+        thresh_min = min(np.searchsorted(cumulative_min, target_volume, side="left"), len(batches_volumes) - 1)
+        thresh_max = min(np.searchsorted(cumulative_max, target_volume, side="left"), len(batches_volumes) - 1)
 
         min_emissions_rate = (
             np.dot(

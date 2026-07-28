@@ -181,6 +181,25 @@ class TeneurServiceEmissionBoundsTest(SimpleTestCase):
         self.assertEqual(min_emission, expected_emission)
         self.assertEqual(max_emission, expected_emission)
 
+    def test_emission_bounds_with_target_volume_equals_truncated_sum(self):
+        """Test emission_bounds keeps the last partial batch when the target is truncated."""
+        batches_volumes = np.array([100.129, 150.239, 200.349])
+        batches_emissions = np.array([50.0, 60.0, 70.0])
+        target_volume = batches_volumes.sum()
+
+        min_emission, max_emission = TeneurService.emission_bounds(batches_volumes, batches_emissions, target_volume)
+
+        normalized_target_volume = 450.71
+        expected_min = (
+            100.129 * 50.0 + 150.239 * 60.0 + (normalized_target_volume - (100.129 + 150.239)) * 70.0
+        ) / normalized_target_volume
+        expected_max = (
+            200.349 * 70.0 + 150.239 * 60.0 + (normalized_target_volume - (200.349 + 150.239)) * 50.0
+        ) / normalized_target_volume
+        print(f"Expected min: {expected_min}, Expected max: {expected_max}")
+        self.assertAlmostEqual(min_emission, expected_min)
+        self.assertAlmostEqual(max_emission, expected_max)
+
     def test_emission_bounds_insufficient_volume_raises_error(self):
         """Test that insufficient volume raises ValueError"""
         batches_volumes = np.array([100.0, 50.0])
