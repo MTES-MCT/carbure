@@ -169,6 +169,8 @@ class OperationService:
             truncate(balance["pending_teneur"], 0) + truncate(balance["declared_teneur"], 0) + teneur_to_add
         )  # all in MJ
 
+        target = truncate(target, 0)
+
         if futur_teneur > target:
             message = "La somme des teneurs" if bulk else "La teneur"
             raise serializers.ValidationError(
