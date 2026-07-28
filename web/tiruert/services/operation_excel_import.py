@@ -16,13 +16,6 @@ from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation import OperationService
 from tiruert.services.operation_excel_template import get_tiruert_operator_queryset
 
-
-class OperationExcelImportErrors:
-    INVALID_OPERATION_TYPE = "INVALID_OPERATION_TYPE"
-    INVALID_VOLUME = "INVALID_VOLUME"
-    MISSING_CREDITED_ENTITY = "MISSING_CREDITED_ENTITY"
-
-
 # Columns added to the export template for display purposes only (not expected by the row serializer).
 DISPLAY_ONLY_COLUMNS = [
     "credited_entity_name",
