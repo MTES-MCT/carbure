@@ -5,7 +5,6 @@ import { CategoryEnum } from "common/types"
 import { Objectives } from "./types"
 import { api, getDownloadUrl } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"
-import { OperationUnit } from "accounting/types"
 import { parseObjectivesResponse } from "./utils/parse-objectives-response"
 
 export const getObjectives = async (
@@ -37,7 +36,6 @@ export const getBalancesCategory = async (
     entity_id,
     page: 1,
     customs_category: [category],
-    unit: OperationUnit.gj,
     ges_bound_min: gesBoundMin,
     ges_bound_max: gesBoundMax,
   })
@@ -46,14 +44,12 @@ export const getBalancesCategory = async (
 export const getBiofuelBalance = async (entity_id: number) => {
   return getBalances<apiTypes["Balance"]>({
     entity_id,
-    unit: OperationUnit.MJ,
   })
 }
 
 export const getBiofuelBalancePerSector = async (entity_id: number) => {
   return getBalances<apiTypes["BalanceBySector"]>({
     entity_id,
-    unit: OperationUnit.MJ,
     group_by: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by.sector,
   })
 }

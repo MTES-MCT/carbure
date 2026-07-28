@@ -15,7 +15,6 @@ import {
   biofuelFiltersFormStep,
   biofuelFiltersFormStepKey,
 } from "./biofuel-filters-form"
-import { ExtendedUnit } from "common/types"
 import { CreateOperationType } from "accounting/types"
 import { RecapData } from "../recap-data"
 import {
@@ -37,10 +36,11 @@ import {
   useRemainingCO2Objective,
 } from "./declare-teneur-dialog.hooks"
 import {
-  DeclareTeneurProgressBar,
+  Co2TeneurProgressBar,
   DeclareTeneurProgressBarList,
 } from "./declare-teneur-progress-bar"
 import { useFocusOnAvoidedEmissions } from "accounting/components/quantity-form/quantity-form.hooks"
+import { energyFromLiters } from "../../utils/liters"
 interface DeclareTeneurDialogProps {
   onClose: () => void
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective
@@ -78,6 +78,16 @@ const DeclareTeneurDialogContent = ({
   )
 
   const depotQuantityMax = useCalculateQuantityMax(objective, form.value)
+  const quantityEnergyMj = useMemo(() => {
+    const quantity = form.value.quantity ?? 0
+    const pciLitre = form.value.balance?.biofuel?.pci_litre
+
+    if (!pciLitre) {
+      return 0
+    }
+
+    return energyFromLiters(quantity, pciLitre).mj
+  }, [form.value.quantity, form.value.balance?.biofuel?.pci_litre])
   // Get the current sector objective when the biofuel is selected
   const currentSectorObjective = useMemo(() => {
     if (!form.value.balance?.sector) return undefined
@@ -118,7 +128,7 @@ const DeclareTeneurDialogContent = ({
               <RecapOperationGrid>
                 <RecapOperation balance={form.value.balance!} />
                 {currentStepIndex > 2 && (
-                  <QuantitySummary values={form.value} unit={ExtendedUnit.GJ} />
+                  <QuantitySummary values={form.value} />
                 )}
               </RecapOperationGrid>
             </Box>
@@ -127,7 +137,7 @@ const DeclareTeneurDialogContent = ({
                 <DeclareTeneurProgressBarList
                   sectorObjective={currentSectorObjective}
                   categoryObjective={objective}
-                  quantity={form.value.quantity ?? 0}
+                  quantityMj={quantityEnergyMj}
                   targetType={targetType}
                 />
               </Box>
@@ -146,7 +156,6 @@ const DeclareTeneurDialogContent = ({
                     balance={form.value.balance!}
                     type={CreateOperationType.TENEUR}
                     quantityMax={depotQuantityMax}
-                    unit={ExtendedUnit.GJ}
                     onQuantityDeclared={handleQuantityDeclared}
                   />
                 </Box>
@@ -156,11 +165,11 @@ const DeclareTeneurDialogContent = ({
                       inputRef={avoidedEmissionsInputRef}
                     />
                     {mainObjective && (
-                      <DeclareTeneurProgressBar
+                      <Co2TeneurProgressBar
                         teneurDeclared={mainObjective.teneur_declared}
                         pendingTeneur={mainObjective.pending_teneur}
                         target={mainObjective.target}
-                        quantity={form.value.avoided_emissions ?? 0}
+                        additionalQuantity={form.value.avoided_emissions ?? 0}
                         label={t("Objectif global")}
                       />
                     )}
@@ -189,7 +198,6 @@ export const DeclareTeneurDialog = (props: DeclareTeneurDialogProps) => {
 
   const quantityFormStep = useQuantityFormStep({
     balance: form.value.balance,
-    unit: ExtendedUnit.GJ,
     form,
   })
 

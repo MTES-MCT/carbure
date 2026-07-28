@@ -7,8 +7,9 @@ export const okSimulateMinMax = http.post(
   "/tiruert/operations/simulate/min_max/",
   () => {
     return HttpResponse.json({
-      min_avoided_emissions: 10,
-      max_avoided_emissions: 50,
+      // Decimals exercise ceil(min) / floor(max) formatting to 2 digits
+      min_avoided_emissions: 10.123,
+      max_avoided_emissions: 50.789,
     })
   }
 )
@@ -17,8 +18,9 @@ export const okSimulateMinMaxWithEqualValues = http.post(
   "/tiruert/operations/simulate/min_max/",
   () => {
     return HttpResponse.json({
-      min_avoided_emissions: 10,
-      max_avoided_emissions: 10.65,
+      // Truncate to 2 digits → same value (10), so the input is prefilled
+      min_avoided_emissions: 10.001,
+      max_avoided_emissions: 10.009,
     })
   }
 )
@@ -27,6 +29,7 @@ export const okSimulateMinMaxWithZeroValues = http.post(
   "/tiruert/operations/simulate/min_max/",
   () => {
     return HttpResponse.json({
+      // Truncated min < 1 tCO2 → insufficient quantity error
       min_avoided_emissions: 0.1,
       max_avoided_emissions: 0.2,
     })

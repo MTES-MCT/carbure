@@ -16,7 +16,7 @@ import css from "../../../operations.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
-import { formatDate, formatNumber } from "common/utils/formatters"
+import { formatDate } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import { Button } from "common/components/button2"
 import {
@@ -26,7 +26,10 @@ import {
 } from "./operation-detail.hooks"
 import { Unit } from "common/types"
 import { useUnit } from "common/hooks/unit"
-import { formatOperationType } from "accounting/utils/formatters"
+import {
+  formatOperationType,
+  formatTCO2Number,
+} from "accounting/utils/formatters"
 import { ElecOperationsStatus, ElecOperationType } from "accounting/types"
 
 export const OperationDetail = () => {
@@ -83,9 +86,7 @@ export const OperationDetail = () => {
         },
         {
           label: t("Tonnes CO2 éq evitées"),
-          value: formatNumber(operation.avoided_emissions, {
-            fractionDigits: 0,
-          }),
+          value: formatTCO2Number(operation.avoided_emissions),
         },
         operation.type === ElecOperationType.ACQUISITION && {
           label: t("Expéditeur"),

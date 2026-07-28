@@ -2873,30 +2873,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         get: operations["tiruert_operations_list"];
         put?: never;
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         post: operations["tiruert_operations_create"];
         delete?: never;
         options?: never;
@@ -2911,45 +2889,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         get: operations["tiruert_operations_retrieve"];
         put?: never;
         post?: never;
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         delete: operations["tiruert_operations_destroy"];
         options?: never;
         head?: never;
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         patch: operations["tiruert_operations_partial_update"];
         trace?: never;
     };
@@ -3045,17 +2990,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         get: operations["tiruert_operations_export_retrieve"];
         put?: never;
         post?: never;
@@ -3310,7 +3244,6 @@ export interface components {
             /** Format: double */
             declared_teneur: number;
             pending_operations: number;
-            unit: string;
             customs_category: components["schemas"]["MPCategoriesEnum"];
             biofuel: components["schemas"]["BalanceBiofuel"];
             /** Format: double */
@@ -3325,6 +3258,10 @@ export interface components {
             code: string;
             /** Format: double */
             renewable_energy_share: number;
+            /** Format: double */
+            pci_litre: number;
+            /** Format: double */
+            masse_volumique: number;
         };
         BalanceByDepot: {
             customs_category: string;
@@ -3343,13 +3280,11 @@ export interface components {
             /** Format: double */
             declared_teneur: number;
             pending_operations: number;
-            unit: string;
         };
         BalanceDepot: {
             id: number;
             name: string;
             quantity: components["schemas"]["BalanceQuantity"];
-            unit?: string;
         };
         BalanceQuantity: {
             /**
@@ -5620,9 +5555,9 @@ export interface components {
             readonly sector: string;
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
-            readonly biofuel: string;
+            readonly biofuel: components["schemas"]["BalanceBiofuel"];
             /** Format: double */
-            renewable_energy_share: number;
+            renewable_energy_share?: number;
             credited_entity: components["schemas"]["OperationEntity"];
             debited_entity: components["schemas"]["OperationEntity"];
             /** entity */
@@ -5644,7 +5579,6 @@ export interface components {
             readonly quantity_mj: number;
             /** Format: double */
             readonly avoided_emissions: number;
-            readonly unit: string;
             readonly year: number;
         };
         OperationCorrectionRequest: {
@@ -5694,9 +5628,9 @@ export interface components {
             readonly sector: string;
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
-            readonly biofuel: string;
+            readonly biofuel: components["schemas"]["BalanceBiofuel"];
             /** Format: double */
-            renewable_energy_share: number;
+            renewable_energy_share?: number;
             credited_entity: components["schemas"]["OperationEntity"];
             debited_entity: components["schemas"]["OperationEntity"];
             /** entity */
@@ -5710,7 +5644,6 @@ export interface components {
             readonly created_at: string;
             /** Format: double */
             readonly quantity: number;
-            readonly unit: string;
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
@@ -13454,9 +13387,7 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: number[];
+                years?: string[];
             };
             header?: never;
             path?: never;
@@ -13479,8 +13410,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -13509,8 +13438,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13536,8 +13463,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13562,8 +13487,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13595,8 +13518,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13641,8 +13562,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13684,8 +13603,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13821,8 +13738,6 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -13937,9 +13852,7 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: number[];
+                years?: string[];
             };
             header?: never;
             path?: never;
@@ -13962,8 +13875,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14078,9 +13989,7 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
-                years?: number[];
+                years?: string[];
             };
             header?: never;
             path?: never;
@@ -14103,8 +14012,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14133,8 +14040,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14163,8 +14068,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14672,12 +14575,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     PENDING = "PENDING",
     REJECTED = "REJECTED",
     VALIDATED = "VALIDATED"
-}
-export enum PathsApiTiruertOperationsGetParametersQueryUnit {
-    MJ = "MJ",
-    gj = "gj",
-    kg = "kg",
-    l = "l"
 }
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
     depot = "depot",

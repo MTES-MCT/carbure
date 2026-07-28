@@ -33,10 +33,7 @@ class SimulateActionMixin:
             data = serializer.validated_data
 
             try:
-                selected_lots, lot_ids, fun = TeneurService.prepare_data_and_optimize(
-                    data,
-                    request.unit,
-                )
+                selected_lots, lot_ids, fun = TeneurService.prepare_data_and_optimize(data)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -76,7 +73,7 @@ class SimulateActionMixin:
             data = serializer.validated_data
 
             try:
-                min, max = TeneurService.get_min_and_max_emissions(data, request.unit)
+                min, max = TeneurService.get_min_and_max_emissions(data)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

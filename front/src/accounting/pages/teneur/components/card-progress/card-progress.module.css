@@ -42,3 +42,10 @@
 .card-progress__arrow-right {
   color: var(--background-flat-blue-france);
 }
+
+.card-progress__main-value {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}

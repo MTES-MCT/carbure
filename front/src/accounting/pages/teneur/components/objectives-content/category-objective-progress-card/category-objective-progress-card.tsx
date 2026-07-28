@@ -2,10 +2,11 @@ import { useTranslation } from "react-i18next"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import { ReactNode } from "react"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
+import { formatEnergyNumber } from "accounting/utils/formatters"
 import { formatNumber } from "common/utils/formatters"
 import { CardProgress } from "../../card-progress"
 import { CategoryObjective, TargetType } from "../../../types"
-import { formatObjectiveGJ } from "../../../utils/formatters"
+import { formatObjectiveGJ } from "../../../utils/objectives"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 
 type CategoryObjectiveProgressCardProps = {
@@ -28,7 +29,7 @@ export const CategoryObjectiveProgressCard = ({
   let badge: ReactNode = null
 
   if (isCapped) {
-    if (progress.is_objective_met) {
+    if (category.is_objective_met) {
       badge = (
         <Badge severity="error" small>
           {t("Plafond atteint")}
@@ -38,7 +39,7 @@ export const CategoryObjectiveProgressCard = ({
   } else {
     badge = (
       <CardProgress.DefaultBadge
-        targetQuantity={progress.target_quantity}
+        targetQuantity={progress.target}
         declaredQuantity={progress.total_teneur_declared}
       />
     )
@@ -47,27 +48,25 @@ export const CategoryObjectiveProgressCard = ({
   return (
     <CardProgress
       title={category.code}
-      mainValue={formatNumber(progress.total_teneur_declared, {
-        fractionDigits: 0,
-      })}
+      mainValue={formatEnergyNumber(progress.total_teneur_declared)}
       mainText={t("GJ")}
       description={t(
         "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total)",
         {
           date: selectedYear,
-          objective: formatObjectiveGJ(category.target),
-          target_percent: formatNumber(category.target_percent),
+          objective: formatObjectiveGJ(progress.target),
+          target_percent: formatNumber(category.target_percent ?? 0),
         }
       )}
-      baseQuantity={progress.base_quantity}
-      targetQuantity={progress.target_quantity}
-      declaredQuantity={progress.declared_quantity}
+      baseQuantity={category.teneur_declared_mj}
+      targetQuantity={category.target_mj ?? 0}
+      declaredQuantity={category.pending_teneur_mj}
       badge={badge}
       penalty={category.penalty}
       onClick={
         readOnly ||
         !isDeclarationInCurrentPeriod ||
-        (isCapped && progress.is_objective_met)
+        (isCapped && category.is_objective_met)
           ? undefined
           : () => onCategoryClick(category, category.target_type!)
       }

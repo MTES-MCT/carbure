@@ -6,6 +6,8 @@ import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 import { ExtendedUnit } from "common/types"
+import { formatObjectiveGJ } from "../../../utils/objectives"
+import { formatTCO2Number } from "accounting/utils/formatters"
 
 type OverallProgressProps = {
   objective?: MainObjective
@@ -21,11 +23,9 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
       title={t("Avancement global")}
       description={
         <Trans
-          i18nKey="Base calculée : {{energy_basis}} GJ"
+          i18nKey="Base calculée : {{energy_basis}}"
           values={{
-            energy_basis: formatNumber(objective?.energy_basis ?? 0, {
-              fractionDigits: 0,
-            }),
+            energy_basis: formatObjectiveGJ(objective?.energy_basis_gj ?? 0),
           }}
         />
       }
@@ -39,29 +39,19 @@ export const OverallProgress = ({ objective }: OverallProgressProps) => {
             "Objectif {{date}}: {{objective}} tCO2 évitées ({{target_percent}}% du total)",
             {
               date: selectedYear,
-              objective: formatNumber(objective.target, {
-                fractionDigits: 0,
-                mode: "ceil",
-              }),
+              objective: formatTCO2Number(objective.target),
               target_percent: formatNumber(objective.target_percent),
             }
           )}
-          mainValue={formatNumber(
-            objective.teneur_declared + objective.pending_teneur,
-            {
-              fractionDigits: 0,
-            }
-          )}
+          mainValue={formatTCO2Number(objective.total_teneur_declared)}
           mainText={t("tCO2 évitées")}
-          baseQuantity={objective.progress.base_quantity}
-          targetQuantity={objective.progress.target_quantity}
-          declaredQuantity={objective.progress.declared_quantity}
+          baseQuantity={objective.teneur_declared}
+          targetQuantity={objective.target}
+          declaredQuantity={objective.pending_teneur}
           badge={
             <CardProgress.DefaultBadge
               targetQuantity={objective.target}
-              declaredQuantity={
-                objective.teneur_declared + objective.pending_teneur
-              }
+              declaredQuantity={objective.total_teneur_declared}
             />
           }
           penalty={objective.penalty}

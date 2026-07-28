@@ -16,8 +16,6 @@ class BalanceService:
     GROUP_BY_DEPOT = "depot"
     UNIT_CONVERSION_RULES = {
         "mj": ("pci_litre", 1),
-        "gj": ("pci_litre", 0.001),
-        "kg": ("masse_volumique", 1),
     }
 
     @staticmethod
@@ -37,23 +35,7 @@ class BalanceService:
         return key
 
     @staticmethod
-    def _get_conversion_factor(operation, unit):
-        """
-        Calculates the conversion factor based on the requested unit
-        """
-        conversion_factor_name, multiplier = BalanceService._define_conversion_rule(unit)
-        conversion_factor = getattr(operation.biofuel, conversion_factor_name, 1) if conversion_factor_name else 1
-        return conversion_factor * multiplier
-
-    @staticmethod
-    def _define_conversion_rule(unit):
-        """
-        Determines the conversion field and multiplier based on the unit
-        """
-        return BalanceService.UNIT_CONVERSION_RULES.get(unit, (None, 1))
-
-    @staticmethod
-    def _init_balance_entry(unit):
+    def _init_balance_entry(unit="l"):
         """
         Initializes a balance entry with default values
         """
@@ -106,8 +88,8 @@ class BalanceService:
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
 
     @staticmethod
-    def _calculate_quantity(operation, detail, conversion_factor):
-        return detail.volume * conversion_factor * operation.renewable_energy_share
+    def _calculate_quantity(operation, detail):
+        return detail.volume * operation.renewable_energy_share
 
     @staticmethod
     def resolve_lot_ids_for_durability_period(operations, durability_period):
@@ -132,9 +114,9 @@ class BalanceService:
         return operations.prefetch_related(Prefetch("details", queryset=details_qs, to_attr="prefetched_details"))
 
     @staticmethod
-    def _calculate_balance_for_lot_or_depot(operations, entity_id, group_by, unit, date_from=None, detail_filters=None):
+    def _calculate_balance_for_lot_or_depot(operations, entity_id, group_by, date_from=None, detail_filters=None):
         # Use a defaultdict with a factory function that creates an appropriate balance entry
-        balance = defaultdict(partial(BalanceService._init_balance_entry, unit))
+        balance = defaultdict(partial(BalanceService._init_balance_entry))
         is_depot_grouping = group_by == BalanceService.GROUP_BY_DEPOT
 
         operations = operations.filter(status__in=Operation.ACTIVE_STATUSES)
@@ -150,7 +132,6 @@ class BalanceService:
                 if depot is None:
                     continue
 
-            conversion_factor = BalanceService._get_conversion_factor(operation, unit)
             last_key = None
 
             for detail in operation.prefetched_details:
@@ -161,7 +142,7 @@ class BalanceService:
                 balance[key]["biofuel"] = operation.biofuel
 
                 if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
-                    quantity = BalanceService._calculate_quantity(operation, detail, conversion_factor)
+                    quantity = BalanceService._calculate_quantity(operation, detail)
                     BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, quantity)
 
                     if date_from is None or operation.created_at >= date_from:
@@ -209,7 +190,6 @@ class BalanceService:
             operations,
             entity_id,
             group_by,
-            unit,
             date_from,
             detail_filters,
         )

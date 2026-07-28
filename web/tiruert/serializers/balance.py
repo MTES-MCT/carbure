@@ -2,13 +2,15 @@ from rest_framework import serializers
 
 from core.models import MatierePremiere
 from tiruert.models.operation import Operation
-from tiruert.serializers.fields import RoundedFloatField
+from tiruert.serializers.fields import RoundedFloatField, TruncatedFloatField
 
 
 class BalanceBiofuelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     code = serializers.CharField()
     renewable_energy_share = RoundedFloatField()
+    pci_litre = RoundedFloatField()
+    masse_volumique = RoundedFloatField()
 
 
 class BalanceQuantitySerializer(serializers.Serializer):
@@ -19,12 +21,11 @@ class BalanceQuantitySerializer(serializers.Serializer):
 class BaseBalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
     initial_balance = serializers.SerializerMethodField()
-    available_balance = RoundedFloatField()
+    available_balance = TruncatedFloatField()
     quantity = BalanceQuantitySerializer()
-    pending_teneur = RoundedFloatField()
-    declared_teneur = RoundedFloatField()
+    pending_teneur = TruncatedFloatField(decimal_places=0)
+    declared_teneur = TruncatedFloatField(decimal_places=0)
     pending_operations = serializers.IntegerField()
-    unit = serializers.CharField()
 
     def get_initial_balance(self, instance) -> float:
         result = instance["available_balance"] - instance["quantity"]["credit"] + instance["quantity"]["debit"]
@@ -94,7 +95,6 @@ class BalanceDepotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     quantity = BalanceQuantitySerializer()
-    unit = serializers.CharField(required=False)
 
 
 class BalanceByDepotSerializer(serializers.Serializer):
@@ -127,7 +127,6 @@ class BalanceByDepotSerializer(serializers.Serializer):
                         "credit": value["quantity"]["credit"],
                         "debit": value["quantity"]["debit"],
                     },
-                    "unit": value["unit"],
                 },
             )
 

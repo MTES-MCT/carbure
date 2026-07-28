@@ -1,4 +1,9 @@
 import {
+  FRACTION_DIGITS_GJ,
+  FRACTION_DIGITS_LITERS,
+  FRACTION_DIGITS_TCO2,
+} from "accounting/config"
+import {
   ElecOperationSector,
   ElecOperationsStatus,
   ElecOperationType,
@@ -8,6 +13,12 @@ import {
   OperationType,
 } from "accounting/types"
 import { apiTypes } from "common/services/api-fetch.types"
+import { ExtendedUnitType, Unit } from "common/types"
+import {
+  formatNumber,
+  FormatNumberOptions,
+  formatUnit,
+} from "common/utils/formatters"
 import i18next from "i18next"
 
 /**
@@ -112,5 +123,30 @@ export const formatObjectiveCategory = (category: string) => {
 export const formatOperation = (
   operation: apiTypes["OperationList"] | apiTypes["Operation"]
 ) => ({
-  quantity_renewable: operation.quantity * operation.renewable_energy_share,
+  quantity_renewable:
+    operation.quantity * (operation.renewable_energy_share ?? 1),
 })
+
+export const formatAccountingUnit = (value: number, unit: ExtendedUnitType) =>
+  formatUnit(value, unit, {
+    fractionDigits:
+      unit === Unit.l ? FRACTION_DIGITS_LITERS : FRACTION_DIGITS_GJ,
+  })
+
+export const formatEnergyNumber = (
+  value: number,
+  options?: FormatNumberOptions
+) =>
+  formatNumber(value, {
+    fractionDigits: FRACTION_DIGITS_GJ,
+    ...options,
+  })
+
+export const formatTCO2Number = (
+  value: number,
+  options?: FormatNumberOptions
+) =>
+  formatNumber(value, {
+    fractionDigits: FRACTION_DIGITS_TCO2,
+    ...options,
+  })

@@ -72,7 +72,7 @@ export const FirstStepBalanceZeroDisablesNext: Story = {
     await selectBiofuel(canvasElement)
 
     await waitFor(() => {
-      within(canvasElement).getByText(/0\s+GJ/i)
+      within(canvasElement).getByText(/0\s+litres/i)
     })
 
     const nextStepButton = await waitFor(() =>
@@ -87,7 +87,7 @@ export const SecondStepQuantityMaxCappedByObjective: Story = {
     await fillBiofuelFiltersStep(canvasElement)
     await clickNextStepButton(canvasElement)
 
-    await fillQuantityInput(canvasElement, "271")
+    await fillQuantityInput(canvasElement, "12797")
     const validateButton = await waitFor(() =>
       within(canvasElement).getByRole("button", { name: "Valider la quantité" })
     )

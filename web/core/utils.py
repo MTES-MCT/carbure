@@ -298,3 +298,17 @@ def check_file_size_and_extension(file, max_size_mb: int | None = None, extensio
                 raise ValidationError(f"Ce type de fichier n'est pas supporté. Utilisez un fichier {mime_type}.")
 
     return file
+
+
+def truncate(value: float, decimal_places: int = 2) -> float:
+    # Truncate a float to a given precision without rounding.
+    if value is None:
+        return None
+
+    value = float(value)
+
+    if decimal_places == 0:
+        return int(value)
+
+    factor = 10**decimal_places
+    return int((value + 1e-9) * factor) / factor
