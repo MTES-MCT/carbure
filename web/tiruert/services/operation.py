@@ -207,8 +207,8 @@ class OperationService:
         teneur_to_add_by_category = defaultdict(float)
         for entry in teneur_entries:
             pci = entry["biofuel"].pci_litre
-            teneur_to_add_by_category[entry["customs_category"]] += sum(
-                lot["volume"] * pci for lot in entry["selected_lots"]
+            teneur_to_add_by_category[entry["customs_category"]] += truncate(
+                sum(lot["volume"] * pci for lot in entry["selected_lots"])
             )
 
         for customs_category, teneur_to_add in teneur_to_add_by_category.items():
