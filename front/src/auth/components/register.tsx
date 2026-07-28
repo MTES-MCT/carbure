@@ -20,7 +20,6 @@ import {
 } from "auth/components/password-input"
 import { ActivateRequest } from "./activate"
 import { Text } from "common/components/text"
-import Alert from "@codegouvfr/react-dsfr/Alert"
 import { ROUTE_URLS } from "common/utils/routes"
 import HashRoute from "common/components/hash-route"
 
@@ -133,15 +132,13 @@ export const RegisterPending = () => {
   const navigate = useNavigate()
 
   return (
-    <DialogContainer onClose={() => navigate(-1)}>
+    <DialogContainer
+      onClose={() => navigate(-1)}
+      title={t("Votre compte a bien été créé")}
+      success
+    >
       <Content>
         <Section>
-          <Alert
-            severity="success"
-            description={t("Le compte a bien été créé !")}
-            small
-            closable
-          />
           <Text>
             {t(
               "Votre demande d'inscription a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra d'activer votre compte afin de pouvoir vous connecter."

@@ -17,7 +17,6 @@ import {
 import { TextInput } from "common/components/inputs2"
 import { PasswordInput, usePasswordValidation } from "./password-input"
 import { Text } from "common/components/text"
-import Alert from "@codegouvfr/react-dsfr/Alert"
 import { ROUTE_URLS } from "common/utils/routes"
 
 export const ResetPasswordRequest = () => {
@@ -86,18 +85,13 @@ export const ResetPasswordPending = () => {
   return (
     <DialogContainer
       onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}
-      title={t("Réinitialisation de mot de passe")}
+      title={t(
+        "Votre demande de réinitialisation de mot de passe a bien été envoyée"
+      )}
+      success
     >
       <Content>
         <Section>
-          <Alert
-            severity="success"
-            description={t(
-              "Votre demande de réinitialisation de mot de passe a bien été envoyée !"
-            )}
-            small
-            closable
-          />
           <Text>
             {t(
               "Si un compte existe avec cet email, vous recevrez un email sous peu contenant un lien qui vous permettra de modifier votre mot de passe."

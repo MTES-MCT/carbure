@@ -1,29 +1,59 @@
 import css from "./container.module.css"
 import cl from "clsx"
 import { Dialog, DialogProps } from "common/components/dialog2"
+import { Icon } from "common/components/icon"
 import { Title } from "common/components/title"
 import { ReactNode } from "react"
 
 export const DialogContainerSpacing = () => {
   return <div style={{ marginBottom: "var(--spacing-6w)" }} />
 }
-export const DialogContainer = (props: DialogProps & { title?: ReactNode }) => {
+
+type DialogContainerTitleProps = {
+  title?: ReactNode
+  success?: boolean
+}
+const DialogContainerTitle = ({
+  title,
+  success,
+}: DialogContainerTitleProps) => {
+  return (
+    <Title is="h2" as="h4">
+      {success && (
+        <Icon
+          name="fr-icon-success-fill"
+          className={css["dialog-container-success-icon"]}
+          size="lg"
+        />
+      )}
+      {title}
+    </Title>
+  )
+}
+export const DialogContainer = ({
+  title,
+  success,
+  ...props
+}: DialogProps & DialogContainerTitleProps) => {
   return (
     <Dialog {...props} className={css["dialog-container"]}>
-      {props.title && (
-        <Title is="h2" as="h4">
-          {props.title}
-        </Title>
-      )}
+      {title && <DialogContainerTitle title={title} success={success} />}
       {props.children}
     </Dialog>
   )
 }
 
-export const Container = ({ children }: { children: React.ReactNode }) => {
+export const Container = ({
+  children,
+  title,
+  success,
+}: { children: React.ReactNode } & DialogContainerTitleProps) => {
   return (
     <div className={css.container}>
-      <div className={css["container-content"]}>{children}</div>
+      <div className={css["container-content"]}>
+        {title && <DialogContainerTitle title={title} success={success} />}
+        {children}
+      </div>
     </div>
   )
 }

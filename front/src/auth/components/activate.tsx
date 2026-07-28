@@ -22,7 +22,6 @@ import {
   FooterAuth,
   Section,
 } from "auth/layouts/container"
-import Alert from "@codegouvfr/react-dsfr/Alert"
 import { Text } from "common/components/text"
 import { addQueryParams, ROUTE_URLS } from "common/utils/routes"
 
@@ -46,37 +45,27 @@ export const Activate = () => {
     ? t("Vous pouvez maintenant définir votre mot de passe.")
     : t("Vous pouvez maintenant vous connecter sur CarbuRe.")
 
+  const title = isSuccess
+    ? t("Votre compte a bien été activé")
+    : t("Une erreur s'est produite lors de l'activation de votre compte")
+
   const userInvitedSearchParams = createSearchParams({
     uidb64: uidb64 || "",
     token: activate.result?.data?.token || "",
   })
 
   return (
-    <Container>
+    <Container success={isSuccess} title={title}>
       <Content>
         <Section>
           {activate.loading && <LoaderLine style={{ fontSize: "48px" }} />}
           {isSuccess && (
             <Section>
-              <Alert
-                severity="success"
-                description={t("Votre compte a bien été activé !")}
-                small
-                closable
-              />
               <Text>{activatedMessage}</Text>
             </Section>
           )}
           {isError && (
             <Section>
-              <Alert
-                severity="error"
-                description={t(
-                  "Une erreur s'est produite lors de l'activation de votre compte."
-                )}
-                small
-                closable
-              />
               <Text>
                 {t("Merci de recommencer le processus d'inscription.")}
               </Text>
@@ -146,7 +135,7 @@ export const ActivateRequest = () => {
   return (
     <DialogContainer
       onClose={() => navigate(ROUTE_URLS.AUTH.REGISTER)}
-      title={t("Réactivation de compte")}
+      title={t("Renvoyer le lien d’activation")}
     >
       <Content>
         <Section>

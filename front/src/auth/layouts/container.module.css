@@ -60,3 +60,8 @@
 .section--gap-lg {
   gap: var(--spacing-3w);
 }
+
+.dialog-container-success-icon {
+  margin-right: var(--spacing-1w);
+  color: var(--text-default-success);
+}
