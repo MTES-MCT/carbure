@@ -33,14 +33,16 @@ export const ROUTE_URLS = {
         BIOFUELS: `${baseUrl}/balances/biofuels`,
         ELEC: `${baseUrl}/balances/elec`,
       },
-      TENEUR: {
-        ROOT: `${baseUrl}/teneur`,
-        YEAR: (year: number) => `${baseUrl}/teneur/${year}`,
+      OBJECTIVES: {
+        ROOT: `${baseUrl}/objectives`,
+        YEAR: (year: number) => `${baseUrl}/objectives/${year}`,
       },
       ADMIN: {
         OBJECTIVES: `${baseUrl}/admin/objectives`,
-        OBJECTIVES_ENTITY: (entityId: number) =>
-          `${baseUrl}/admin/objectives/${entityId}`,
+        OBJECTIVES_YEAR: (year: number, entityId?: number) =>
+          entityId
+            ? `${baseUrl}/admin/objectives/${year}/entity/${entityId}`
+            : `${baseUrl}/admin/objectives/${year}`,
         OPERATIONS: `${baseUrl}/admin/operations`,
         OPERATIONS_ENTITY: (entityId: number) =>
           `${baseUrl}/admin/operations/${entityId}`,

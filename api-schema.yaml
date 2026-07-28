@@ -9467,7 +9467,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: number
           explode: true
           style: form
       tags:
@@ -9993,7 +9993,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: number
           explode: true
           style: form
       tags:
@@ -10313,7 +10313,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -10547,8 +10546,6 @@ paths:
             type: array
             items:
               type: integer
-          explode: true
-          style: form
       tags:
         - tiruert
       security:
@@ -11002,7 +10999,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -11310,7 +11306,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -11545,8 +11540,6 @@ paths:
             type: array
             items:
               type: integer
-          explode: true
-          style: form
       tags:
         - tiruert
       security:
@@ -11669,7 +11662,6 @@ paths:
             type: array
             items:
               type: string
-              nullable: true
           explode: true
           style: form
         - in: query
@@ -11909,8 +11901,6 @@ paths:
             type: array
             items:
               type: integer
-          explode: true
-          style: form
       tags:
         - tiruert
       security:
@@ -16846,6 +16836,7 @@ components:
         - DREAL
         - ADEME
         - DGDDI
+        - DGDDI_NATIONAL
       type: string
       description: |-
         * `DCA` - DCA
@@ -16858,6 +16849,7 @@ components:
         * `DREAL` - DREAL
         * `ADEME` - ADEME
         * `DGDDI` - DGDDI
+        * `DGDDI_NATIONAL` - DGDDI_NATIONAL
     FeedStock:
       type: object
       properties:
@@ -17634,10 +17626,6 @@ components:
         unit:
           type: string
           readOnly: true
-        details:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationDetail"
         year:
           type: integer
           readOnly: true
@@ -17678,19 +17666,6 @@ components:
       required:
         - id
         - name
-    OperationDetail:
-      type: object
-      properties:
-        lot:
-          type: integer
-        volume:
-          type: number
-          format: double
-        emission_rate_per_mj:
-          type: number
-          format: double
-      required:
-        - lot
     OperationEntity:
       type: object
       properties:
@@ -17846,10 +17821,6 @@ components:
         unit:
           type: string
           readOnly: true
-        details:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationDetail"
         avoided_emissions:
           type: number
           format: double

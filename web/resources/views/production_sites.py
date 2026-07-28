@@ -1,8 +1,8 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from core.permissions import IsVerified
 from core.serializers import ProductionSiteSerializer
 from transactions.models.production_site import ProductionSite
 
@@ -25,7 +25,7 @@ from transactions.models.production_site import ProductionSite
     responses=ProductionSiteSerializer(many=True),
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsVerified])
 def get_production_sites(request, *args, **kwargs):
     query = request.query_params.get("query")
     producer_id = request.query_params.get("producer_id", False)

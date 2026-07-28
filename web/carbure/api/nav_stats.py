@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import (
@@ -40,7 +39,7 @@ class NavStatsSerializer(serializers.Serializer):
     responses={"200": NavStatsSerializer},
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, HasUserRights])
+@permission_classes([HasUserRights])
 def get_nav_stats(request):
     if not request or not request.user:
         return Response({})

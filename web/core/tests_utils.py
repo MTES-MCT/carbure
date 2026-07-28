@@ -159,7 +159,7 @@ class PermissionTestMixin:
                     ),
                     (
                         ["public_list"],
-                        [IsAuthenticated()]
+                        [IsVerified()]
                     ),
                     (
                         ["admin_stuff"],
