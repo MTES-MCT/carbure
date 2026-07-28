@@ -4,7 +4,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, OpenApiType
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from biomethane.permissions import CanAccessAdminModule
+from biomethane.permissions import CanDownloadDeclaration
 from biomethane.services.dreal_export import generate_dreal_export
 from core.excel import ExcelResponse
 
@@ -22,7 +22,7 @@ from core.excel import ExcelResponse
     },
 )
 @api_view(["GET"])
-@permission_classes([CanAccessAdminModule])
+@permission_classes([CanDownloadDeclaration])
 def export_dreal_annual_declaration(request):
     """Export validated biomethane declarations for a year as a flat Excel file, scoped by DREAL department access."""
     year = request.query_params.get("year")
