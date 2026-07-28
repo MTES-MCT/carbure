@@ -252,7 +252,7 @@ class OperationService:
                 OperationDetail(
                     operation=operation,
                     lot_id=detail["lot_id"],
-                    volume=detail["volume"],
+                    volume=truncate(detail["volume"]),
                     emission_rate_per_mj=detail["emission_rate_per_mj"],
                 )
                 for detail in details_data
