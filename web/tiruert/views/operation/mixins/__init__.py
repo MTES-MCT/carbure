@@ -1,10 +1,12 @@
 from .accept import AcceptActionMixin
-from .reject import RejectActionMixin
 from .balance import BalanceActionMixin
-from .simulate import SimulateActionMixin
-from .filter import FilterActionMixin
 from .correct import CorrectActionMixin
 from .excel_export import ExcelExportActionMixin
+from .filter import FilterActionMixin
+from .operation_detail_excel_export import OperationDetailExcelExportActionMixin
+from .reject import RejectActionMixin
+from .simulate import SimulateActionMixin
+
 
 class ActionMixin(
     AcceptActionMixin,
@@ -14,5 +16,6 @@ class ActionMixin(
     FilterActionMixin,
     CorrectActionMixin,
     ExcelExportActionMixin,
+    OperationDetailExcelExportActionMixin,
 ):
     pass

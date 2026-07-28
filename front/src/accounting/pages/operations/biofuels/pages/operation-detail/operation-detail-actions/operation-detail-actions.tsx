@@ -16,6 +16,8 @@ import {
   isReceivingOperation,
   isSendingOperation,
 } from "../../../operations.utils"
+import * as api from "accounting/api/biofuels/operations"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const OperationDetailActions = ({
   operation,
@@ -27,6 +29,7 @@ export const OperationDetailActions = ({
   const entity = useEntity()
   const { t } = useTranslation()
   const { canUpdateBiofuelOperation } = useAccountingPermissions()
+  const { selectedEntityId } = useSelectedEntity()
 
   const { execute: deleteOperation, loading: deleteOperationLoading } =
     useDeleteOperation({
@@ -54,9 +57,26 @@ export const OperationDetailActions = ({
     })
 
   const buttonsComponent = useMemo(() => {
-    if (!operation || !canUpdateBiofuelOperation) return []
+    if (!operation) return []
 
-    const buttons: React.ReactNode[] = []
+    const buttons: React.ReactNode[] = [
+      <Button
+        key="export"
+        iconId="fr-icon-download-fill"
+        priority="secondary"
+        onClick={() =>
+          api.downloadOperationDetails(
+            entity.id,
+            operation.id,
+            selectedEntityId
+          )
+        }
+      >
+        {t("Exporter")}
+      </Button>,
+    ]
+
+    if (!canUpdateBiofuelOperation || entity.isAdmin) return buttons
 
     if (
       isReceivingOperation(operation.quantity) &&
@@ -135,6 +155,7 @@ export const OperationDetailActions = ({
     acceptOperationLoading,
     t,
     canUpdateBiofuelOperation,
+    selectedEntityId,
   ])
 
   if (!operation || !canUpdateBiofuelOperation || entity.isAdmin) return null
