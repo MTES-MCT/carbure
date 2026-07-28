@@ -1,9 +1,11 @@
 from collections import defaultdict
 from copy import copy
+from datetime import datetime, time
 from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Q
+from django.utils.timezone import make_aware
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -156,8 +158,9 @@ class OperationService:
             return
 
         date_from = period.start_date
+        date_from_dt = make_aware(datetime.combine(date_from, time.min))
 
-        balance = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from)
+        balance = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from_dt)
 
         balance = list(balance.values())[0]  # keep the first (and only one) element
 
@@ -190,10 +193,10 @@ class OperationService:
         pci = data["biofuel"].pci_litre
         teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
 
-        OperationService._check_teneur_target(request, entity_id, data["customs_category"], teneur_to_add)
+        OperationService._check_teneur_target(request, entity_id, data["customs_category"], teneur_to_add, declaration_year)
 
     @staticmethod
-    def bulk_check_objectives_compliance(request, entity_id, teneur_entries):
+    def bulk_check_objectives_compliance(request, entity_id, teneur_entries, declaration_year):
         """
         Check if several TENEUR operations combined respect the capped objective for their
         customs category.
@@ -209,7 +212,9 @@ class OperationService:
             )
 
         for customs_category, teneur_to_add in teneur_to_add_by_category.items():
-            OperationService._check_teneur_target(request, entity_id, customs_category, teneur_to_add, bulk=True)
+            OperationService._check_teneur_target(
+                request, entity_id, customs_category, teneur_to_add, declaration_year, bulk=True
+            )
 
     @staticmethod
     def check_declaration_year(declaration_year, validated_data):

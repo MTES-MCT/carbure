@@ -197,7 +197,6 @@ class OperationExcelImportService:
                 entity_id=group.debited_entity.id,
                 selected_lots=selected_lots,
                 data=data,
-                unit="l",
                 declaration_year=declaration_year,
             )
         except serializers.ValidationError as exc:
@@ -245,7 +244,7 @@ class OperationExcelImportService:
         return messages
 
     @staticmethod
-    def _validate_teneur_objectives(groups: list[OperationGroup]) -> list[str]:
+    def _validate_teneur_objectives(groups: list[OperationGroup], declaration_year: int) -> list[str]:
         """
         Check that the combined TENEUR operations of this import (possibly spanning several
         biofuels) don't exceed the capped objective for their customs category. Each TENEUR
@@ -278,7 +277,9 @@ class OperationExcelImportService:
             request = SimpleNamespace(entity=entry["debited_entity"], GET={})
 
             try:
-                OperationService.bulk_check_objectives_compliance(request, entry["debited_entity"].id, entry["entries"])
+                OperationService.bulk_check_objectives_compliance(
+                    request, entry["debited_entity"].id, entry["entries"], declaration_year
+                )
             except serializers.ValidationError as exc:
                 messages.extend(OperationExcelImportService._flatten_error_messages(exc))
 
@@ -294,7 +295,7 @@ class OperationExcelImportService:
             messages.extend(OperationExcelImportService._validate_group(group, group.biofuel, declaration_year))
 
         messages.extend(OperationExcelImportService._validate_shared_lot_volumes(groups))
-        messages.extend(OperationExcelImportService._validate_teneur_objectives(groups))
+        messages.extend(OperationExcelImportService._validate_teneur_objectives(groups, declaration_year))
 
         if messages:
             raise ExcelValidationError([{"errors": {"validation": [message]}} for message in messages], total_rows)
