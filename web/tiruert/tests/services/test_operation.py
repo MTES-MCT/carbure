@@ -434,10 +434,9 @@ class OperationServiceCheckVolumesTest(TestCase):
         ]
 
         data = {"biofuel": Mock()}
-        unit = "l"
 
         with self.assertRaises(ValidationError) as context:
-            OperationService.check_volumes(selected_lots, data, unit)
+            OperationService.check_volumes(selected_lots, data)
 
         self.assertIn("volume", context.exception.detail.keys())
         self.assertIn("1 : Volume insuffisant pour ce lot", str(context.exception.detail.values()))
@@ -500,7 +499,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         self.assertEqual(called_args[1], 1)  # entity_id
         self.assertEqual(called_args[2], "customs_category")  # group_by
         self.assertEqual(called_args[3], "mj")  # unit
-        self.assertEqual(called_args[4], period_start_date)  # date_from
+        self.assertEqual(called_args[4].date(), period_start_date)  # date_from converted to aware datetime
 
     @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
@@ -604,8 +603,10 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
                 declaration_year=2025,
             )
 
-        error_key = list(context.exception.detail.keys())[0]
-        self.assertEqual(error_key, "futur_teneur: 118 - target : 117")
+        self.assertIn("teneur", context.exception.detail.keys())
+        error_message = str(context.exception.detail["teneur"])
+        self.assertIn("(118 MJ)", error_message)
+        self.assertIn("(117 MJ)", error_message)
 
     def test_check_objectives_compliance_skips_for_non_teneur_operations(self):
         """Should skip check for non-TENEUR operation types."""
@@ -820,9 +821,11 @@ class OperationServiceBulkCheckObjectivesComplianceTest(TestCase):
             },
         ]
 
-        OperationService.bulk_check_objectives_compliance(request, 1, entries)
+        declaration_year = 2025
 
-        mock_check_teneur_target.assert_called_once_with(request, 1, "CONV", 2000, bulk=True)
+        OperationService.bulk_check_objectives_compliance(request, 1, entries, declaration_year)
+
+        mock_check_teneur_target.assert_called_once_with(request, 1, "CONV", 2000, declaration_year, bulk=True)
 
 
 class OperationServiceDefineSectorTest(TestCase):
