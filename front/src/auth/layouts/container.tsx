@@ -1,24 +1,20 @@
 import css from "./container.module.css"
-import { Link } from "react-router-dom"
-import marianne from "common/assets/images/Marianne.svg"
-import { Title } from "common/components/title"
 import cl from "clsx"
 import { Dialog, DialogProps } from "common/components/dialog2"
+import { Title } from "common/components/title"
+import { ReactNode } from "react"
 
 export const DialogContainerSpacing = () => {
   return <div style={{ marginBottom: "var(--spacing-6w)" }} />
 }
-export const DialogContainer = (props: DialogProps) => {
+export const DialogContainer = (props: DialogProps & { title?: ReactNode }) => {
   return (
     <Dialog {...props} className={css["dialog-container"]}>
-      <header>
-        <Link to="/" className={css.logo}>
-          <img src={marianne} alt="marianne logo" />
-          <Title is="h1" style={{ textAlign: "center" }}>
-            CarbuRe
-          </Title>
-        </Link>
-      </header>
+      {props.title && (
+        <Title is="h2" as="h4">
+          {props.title}
+        </Title>
+      )}
       {props.children}
     </Dialog>
   )

@@ -287,7 +287,7 @@
   "Renvoyer le lien d'activation": "Resend activation link",
   "Un code vient de vous être envoyé": "A code has just been sent to you",
   "La connexion a échoué": "Connection failed",
-  "Votre compte n'est pas activé. Merci de cliquer sur le lien de réactivation pour activer votre compte.": "Your account is not activated. Please click on the reactivation link to activate your account.",
+  "Votre compte n'est pas activé. Merci de cliquer sur <Link>le lien de réactivation</Link> pour activer votre compte.": "Your account is not activated. Please click on <Link>the reactivation link</Link> to activate your account.",
   "Connexion": "Connection",
   "Mot de passe oublié ?": "Forgot your password?",
   "Je n'ai pas reçu le lien d'activation": "I have not received the activation link",

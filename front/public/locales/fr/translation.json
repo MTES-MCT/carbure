@@ -288,7 +288,7 @@
   "Renvoyer le lien d'activation": "Renvoyer le lien d'activation",
   "Un code vient de vous être envoyé": "Un code vient de vous être envoyé",
   "La connexion a échoué": "La connexion a échoué",
-  "Votre compte n'est pas activé. Merci de cliquer sur le lien de réactivation pour activer votre compte.": "Votre compte n'est pas activé. Merci de cliquer sur le lien de réactivation pour activer votre compte.",
+  "Votre compte n'est pas activé. Merci de cliquer sur <Link>le lien de réactivation</Link> pour activer votre compte.": "Votre compte n'est pas activé. Merci de cliquer sur <Link>le lien de réactivation</Link> pour activer votre compte.",
   "Connexion": "Connexion",
   "Mot de passe oublié ?": "Mot de passe oublié ?",
   "Je n'ai pas reçu le lien d'activation": "Je n'ai pas reçu le lien d'activation",

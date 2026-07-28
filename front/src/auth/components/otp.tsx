@@ -56,7 +56,10 @@ const OTP = () => {
   }, [searchParams, execVerifyOTP])
 
   return (
-    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
+    <DialogContainer
+      onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}
+      title={t("Code de connexion")}
+    >
       <Content>
         <Section>
           <Text>

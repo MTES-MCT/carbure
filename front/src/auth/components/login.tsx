@@ -1,5 +1,5 @@
-import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { Trans, useTranslation } from "react-i18next"
+import { Link, useNavigate } from "react-router-dom"
 import { Button } from "common/components/button2"
 import { Form, useForm } from "common/components/form2"
 import { TextInput } from "common/components/inputs2"
@@ -33,13 +33,26 @@ const Login = () => {
       navigate(ROUTE_URLS.AUTH.OTP)
     },
     onError: (error) => {
-      let errorMessage = t("La connexion a échoué")
+      let errorMessage: string | React.ReactNode = t("La connexion a échoué")
       if (
         (error as any).data &&
         (error as any).data.message === "Account not activated"
       ) {
-        errorMessage = t(
-          "Votre compte n'est pas activé. Merci de cliquer sur le lien de réactivation pour activer votre compte."
+        errorMessage = (
+          <Trans
+            defaults="Votre compte n'est pas activé. Merci de cliquer sur <Link>le lien de réactivation</Link> pour activer votre compte."
+            components={{
+              Link: (
+                <Link
+                  to={ROUTE_URLS.AUTH.ACTIVATE_REQUEST}
+                  state={{ email: value.username }}
+                  style={{ textDecoration: "underline" }}
+                >
+                  {t("ce formulaire")}
+                </Link>
+              ),
+            }}
+          />
         )
       }
       notify(errorMessage, { variant: "danger" })

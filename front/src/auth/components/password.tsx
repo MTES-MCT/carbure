@@ -41,7 +41,10 @@ export const ResetPasswordRequest = () => {
   })
 
   return (
-    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
+    <DialogContainer
+      onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}
+      title={t("Réinitialisation de mot de passe")}
+    >
       <Content>
         <Section>
           <p>
@@ -81,7 +84,10 @@ export const ResetPasswordPending = () => {
   const navigate = useNavigate()
 
   return (
-    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
+    <DialogContainer
+      onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}
+      title={t("Réinitialisation de mot de passe")}
+    >
       <Content>
         <Section>
           <Alert

@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import {
   createSearchParams,
+  useLocation,
   useNavigate,
   useSearchParams,
 } from "react-router-dom"
@@ -111,12 +112,20 @@ export const Activate = () => {
   )
 }
 
+type ActivateRequestForm = {
+  email?: string
+}
+
 export const ActivateRequest = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
+  const location = useLocation()
+  const email = (location.state as ActivateRequestForm | null)?.email
 
-  const { value, bind } = useForm({ email: "" as string | undefined })
+  const { value, bind } = useForm<ActivateRequestForm>({
+    email: email ?? "",
+  })
 
   const requestActivationLink = useMutation(api.requestActivateAccount, {
     onSuccess: () => {
@@ -135,7 +144,10 @@ export const ActivateRequest = () => {
   })
 
   return (
-    <DialogContainer onClose={() => navigate(ROUTE_URLS.AUTH.REGISTER)}>
+    <DialogContainer
+      onClose={() => navigate(ROUTE_URLS.AUTH.REGISTER)}
+      title={t("Réactivation de compte")}
+    >
       <Content>
         <Section>
           {t(
