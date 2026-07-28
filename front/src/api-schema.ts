@@ -2759,6 +2759,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/elec-operations/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["tiruert_elec_operations_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/elec-operations/filters/": {
         parameters: {
             query?: never;
@@ -13084,6 +13100,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedElecBalanceList"];
+                };
+            };
+        };
+    };
+    tiruert_elec_operations_export_retrieve: {
+        parameters: {
+            query: {
+                date_from?: string;
+                date_to?: string;
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                from_to?: string;
+                operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `created_at` - Created at
+                 *     * `-created_at` - Created at (décroissant)
+                 *     * `operation` - Operation
+                 *     * `-operation` - Operation (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
+                 *     * `period` - Period
+                 *     * `-period` - Period (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `from_to` - From to
+                 *     * `-from_to` - From to (décroissant)
+                 */
+                order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[];
+                period?: string[];
+                /** @description Entity whose operations are exported when acting as an administrator. */
+                selected_entity_id?: number;
+                status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
+                type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
+                years?: number[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Excel file download */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.ms-excel": File;
                 };
             };
         };
