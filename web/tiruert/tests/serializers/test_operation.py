@@ -24,35 +24,16 @@ class BaseOperationSerializerTest(TestCase):
             context = {}
         return BaseOperationSerializer(context=context)
 
-    def test_get_volume_l_delegates_to_model(self):
-        """Should delegate to instance.volume_l property."""
+    def test_get_quantity_delegates_to_model(self):
+        """Should delegate to instance.quantity() with default serializer behavior."""
         serializer = self._create_serializer()
         instance = Mock(spec=Operation)
-        instance.volume_l = 1500.0
-
-        result = serializer.get_volume_l(instance)
-
-        self.assertEqual(result, 1500.0)
-
-    def test_get_quantity_delegates_to_model_with_unit(self):
-        """Should delegate to instance.quantity(unit) with unit from context."""
-        serializer = self._create_serializer(context={"unit": "mj"})
-        instance = Mock(spec=Operation)
-        instance.quantity = Mock(return_value=36000.0)
+        instance.quantity = Mock(return_value=1500.0)
 
         result = serializer.get_quantity(instance)
 
-        instance.quantity.assert_called_once_with(unit="mj")
-        self.assertEqual(result, 36000.0)
-
-    def test_get_unit_returns_unit_from_context(self):
-        """Should return unit from context."""
-        serializer = self._create_serializer(context={"unit": "kg"})
-        instance = Mock(spec=Operation)
-
-        result = serializer.get_unit(instance)
-
-        self.assertEqual(result, "kg")
+        instance.quantity.assert_called_once_with()
+        self.assertEqual(result, 1500.0)
 
     def test_get_fields_removes_details_when_not_requested(self):
         """Should not build the nested details field on list responses by default."""
@@ -75,7 +56,13 @@ class BaseOperationSerializerTest(TestCase):
         operation._sector = Operation.ESSENCE
         operation.objective_sector = None
         operation.customs_category = MatierePremiere.CONV
-        operation.biofuel = Mock(code="ETH")
+        operation.biofuel = Biocarburant(
+            id=1,
+            code="ETH",
+            renewable_energy_share=1.0,
+            pci_litre=21.1,
+            masse_volumique=0.79,
+        )
         operation.renewable_energy_share = 1.0
         operation.credited_entity = Mock(id=1, name="Credited")
         operation.debited_entity = Mock(id=2, name="Debited")
@@ -89,7 +76,7 @@ class BaseOperationSerializerTest(TestCase):
         operation._avoided_emissions = 78.901
         operation.declaration_year = 2024
 
-        serializer = OperationListSerializer(operation, context={"details": False, "unit": "l"})
+        serializer = OperationListSerializer(operation, context={"details": False})
 
         self.assertEqual(serializer.data["quantity"], 123.46)
         self.assertEqual(serializer.data["avoided_emissions"], 78.9)
@@ -129,7 +116,7 @@ class OperationSerializerTest(TestCase):
         # Test with different context units to ensure mj is always used
         for context_unit in ["l", "kg", "mj"]:
             with self.subTest(context_unit=context_unit):
-                serializer = self._create_serializer(context={"unit": context_unit})
+                serializer = self._create_serializer()
                 instance = Mock(spec=Operation)
                 instance.quantity = Mock(return_value=72000.0)
 

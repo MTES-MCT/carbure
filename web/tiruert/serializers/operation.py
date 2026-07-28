@@ -5,7 +5,9 @@ from rest_framework import serializers
 
 from core.models import Pays
 from core.serializers import CountrySerializer
+from core.utils import truncate
 from tiruert.models import Operation, OperationDetail
+from tiruert.serializers.balance import BalanceBiofuelSerializer
 from tiruert.serializers.fields import RoundedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
@@ -29,24 +31,15 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.CharField(source="_sector", read_only=True)
     type = serializers.CharField(source="_type", read_only=True)
-    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
+    biofuel = BalanceBiofuelSerializer(read_only=True)
     quantity = serializers.SerializerMethodField()
-    unit = serializers.SerializerMethodField()
-    renewable_energy_share = serializers.FloatField()
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
     year = serializers.IntegerField(source="declaration_year", read_only=True)
 
-    def get_volume_l(self, instance) -> float:
-        return instance.volume_l
-
     def get_quantity(self, instance) -> float:
-        unit = self.context.get("unit")
-        return instance.quantity(unit=unit)
-
-    def get_unit(self, instance) -> str:
-        return self.context.get("unit")
+        return instance.quantity()
 
     def get_avoided_emissions(self, instance) -> float:
         if getattr(instance, "_avoided_emissions", None) is not None:
@@ -84,7 +77,6 @@ class OperationListSerializer(BaseOperationSerializer):
             "export_country",
             "created_at",
             "quantity",
-            "unit",
             "details",
             "avoided_emissions",
             "year",
@@ -117,7 +109,6 @@ class OperationSerializer(BaseOperationSerializer):
             "quantity",
             "quantity_mj",
             "avoided_emissions",
-            "unit",
             "details",
             "year",
         ]
@@ -126,7 +117,7 @@ class OperationSerializer(BaseOperationSerializer):
     export_country = CountrySerializer(read_only=True)
 
     def get_quantity_mj(self, instance) -> float:
-        return instance.quantity(unit="mj", force=True)
+        return int(instance.quantity(unit="mj", force=True))
 
 
 class OperationLotSerializer(serializers.Serializer):
@@ -178,12 +169,11 @@ class OperationInputSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             request = self.context.get("request")
             entity_id = request.entity.id
-            unit = request.unit
             selected_lots = validated_data.pop("lots")
             declaration_year = self.context.get("declaration_year")
 
             OperationService.perform_checks_before_create(
-                request, entity_id, selected_lots, validated_data, unit, declaration_year
+                request, entity_id, selected_lots, validated_data, declaration_year
             )
 
             # Fetch emission rates from the oldest OperationDetail for each lot
@@ -202,7 +192,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
                     {
                         "operation": operation,
                         "lot_id": lot["id"],
-                        "volume": lot["volume"],
+                        "volume": truncate(lot["volume"]),
                         "emission_rate_per_mj": emissions_by_lot[lot["id"]],
                     }
                 )

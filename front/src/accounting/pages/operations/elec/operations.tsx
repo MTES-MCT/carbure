@@ -17,6 +17,8 @@ import { useUnit } from "common/hooks/unit"
 import { Unit } from "common/types"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { ActionBar } from "common/components/scaffold"
+import { ExportButton } from "common/components/export"
 
 const OperationsElec = () => {
   const { t } = useTranslation()
@@ -45,6 +47,13 @@ const OperationsElec = () => {
 
   return (
     <>
+      <ActionBar>
+        <ExportButton
+          query={query}
+          download={(query) => api.downloadOperations(query, selectedEntityId)}
+        />
+      </ActionBar>
+
       <FilterMultiSelect2
         filterLabels={filterLabels}
         selected={state.filters}

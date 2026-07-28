@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from django.test import SimpleTestCase, override_settings
 
-from core.utils import format_month_label, get_month_bounds_utc
+from core.utils import format_month_label, get_month_bounds_utc, truncate
 
 
 class FormatMonthLabelTests(SimpleTestCase):
@@ -35,3 +35,11 @@ class GetMonthBoundsUtcTests(SimpleTestCase):
                 datetime(2025, 10, 31, 23, tzinfo=timezone.utc),
             ),
         )
+
+
+class TruncateTests(SimpleTestCase):
+    def test_truncate_to_two_decimals_without_rounding(self):
+        self.assertEqual(truncate(12.349, 2), 12.34)
+
+    def test_truncate_with_zero_decimal_places(self):
+        self.assertEqual(truncate(12.99, 0), 12)

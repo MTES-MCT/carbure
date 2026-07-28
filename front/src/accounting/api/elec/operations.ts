@@ -1,5 +1,5 @@
 import { apiTypes } from "common/services/api-fetch.types"
-import { api } from "common/services/api-fetch"
+import { api, download } from "common/services/api-fetch"
 import {
   ElecOperationsFilter,
   ElecOperationsQuery,
@@ -37,6 +37,16 @@ export const getOperations = (
             : [ElecOperationOrder.ValueMinuscreated_at],
       },
     },
+  })
+}
+
+export const downloadOperations = (
+  query: ElecOperationsQuery,
+  selected_entity_id?: number
+) => {
+  return download("/tiruert/elec-operations/export/", {
+    ...query,
+    selected_entity_id,
   })
 }
 

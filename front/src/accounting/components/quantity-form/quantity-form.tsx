@@ -1,20 +1,33 @@
 import { Balance, CreateOperationType } from "accounting/types"
 import { useFormContext } from "common/components/form2"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import { NumberInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
-import { Notice } from "common/components/notice"
 import { useEffect, useRef, useState } from "react"
 import { useUnit } from "common/hooks/unit"
 import { QuantityFormProps } from "./quantity-form.types"
-import { getQuantityInputLabel } from "./quantity-form.utils"
+import {
+  formatAvoidedEmissionsBounds,
+  formatEmissionMax,
+  formatEmissionMin,
+  getQuantityInputFeedback,
+  getQuantityInputLabel,
+  showEnergyEquivalent,
+} from "./quantity-form.utils"
 import {
   useFocusOnAvoidedEmissions,
   useQuantityForm,
 } from "./quantity-form.hooks"
-import { ExtendedUnitType } from "common/types"
 import { AdvancedFiltersFormProps } from "../advanced-filters/advanced-filters.types"
-import { formatNumber } from "common/utils/formatters"
+import { formatAccountingUnit } from "accounting/utils/formatters"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+  FRACTION_DIGITS_TCO2,
+} from "accounting/config"
+import { EnergyEquivalentNotice } from "./quantity-form-energy-equivalent"
+import { AvoidedEmissionsRecapNotice } from "./quantity-form-avoided-emissions-notice"
+import { getStepFromFractionDigits } from "common/utils/formatters"
 
 export type QuantityFormComponentProps = {
   balance: Balance
@@ -24,9 +37,6 @@ export type QuantityFormComponentProps = {
 
   type: CreateOperationType
 
-  // Unit of the quantity displayed to the user (default is the entity preferred unit)
-  unit?: ExtendedUnitType
-
   // Lot GHG min and max bounds
   gesBoundMin?: number
   gesBoundMax?: number
@@ -34,9 +44,6 @@ export type QuantityFormComponentProps = {
   // Callback function to be called when the quantity is declared
   onQuantityDeclared?: () => void
 }
-
-const formatEmissionMin = (value: number) => Math.ceil(value * 10) / 10
-export const formatEmissionMax = (value: number) => Math.floor(value * 10) / 10
 
 const AvoidedEmissionsSection = ({
   inputRef,
@@ -55,6 +62,7 @@ const AvoidedEmissionsSection = ({
       label={t("Saisir un montant en tCO2 évitées")}
       min={formatEmissionMin(value.avoided_emissions_min)}
       max={formatEmissionMax(value.avoided_emissions_max)}
+      step={getStepFromFractionDigits(FRACTION_DIGITS_TCO2)}
       {...bind("avoided_emissions")}
       required
       inputRef={inputRef}
@@ -66,11 +74,10 @@ const QuantitySection = ({
   balance,
   quantityMax,
   type,
-  unit: overrideUnit,
   onQuantityDeclared,
 }: QuantityFormComponentProps) => {
   const { t } = useTranslation()
-  const { formatUnit, unit } = useUnit(overrideUnit)
+  const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
   const quantityInputRef = useRef<HTMLInputElement>(null)
 
   const { value, bind, setField, setFieldError } = useFormContext<
@@ -78,7 +85,6 @@ const QuantitySection = ({
   >()
   const mutation = useQuantityForm({
     balance,
-    unit,
   })
   const [quantityDeclared, setQuantityDeclared] = useState(
     value.avoided_emissions_min !== undefined &&
@@ -93,7 +99,9 @@ const QuantitySection = ({
         "quantity",
         t(
           "La quantité déclarée est supérieure à la quantité maximale autorisée ({{max}}). Merci de modifier la quantité.",
-          { max: formatUnit(quantityMax, { fractionDigits: 0 }) }
+          {
+            max: formatAccountingUnit(quantityMax, unit),
+          }
         )
       )
       return
@@ -101,14 +109,25 @@ const QuantitySection = ({
 
     mutation.execute().then((response) => {
       const emissions = response.data
-      const emissionsMin = emissions?.min_avoided_emissions
-        ? Math.trunc(emissions.min_avoided_emissions)
-        : 0
-      const emissionsMax = emissions?.max_avoided_emissions
-        ? Math.trunc(emissions?.max_avoided_emissions)
-        : 0
 
-      if (emissionsMin === 0) {
+      if (
+        !emissions?.min_avoided_emissions ||
+        !emissions?.max_avoided_emissions
+      ) {
+        return
+      }
+
+      const {
+        min: emissionsMin,
+        max: emissionsMax,
+        isInsufficient,
+      } = formatAvoidedEmissionsBounds(
+        emissions.min_avoided_emissions,
+        emissions.max_avoided_emissions
+      )
+
+      // User can only enter avoided emissions if the emission min returned by the API is greater than 1 tCO2
+      if (isInsufficient) {
         quantityInputRef.current?.setCustomValidity(
           t(
             "La quantité entrée n'est pas suffisante pour enregistrer des tCO2 évitées. Merci de modifier la quantité."
@@ -119,8 +138,8 @@ const QuantitySection = ({
         })
         return
       }
-      setQuantityDeclared(true)
 
+      setQuantityDeclared(true)
       setField("avoided_emissions_min", emissionsMin)
       setField("avoided_emissions_max", emissionsMax)
 
@@ -148,8 +167,22 @@ const QuantitySection = ({
   })
 
   const quantityMaxLabel = value.availableBalance
-    ? `(${t("solde")}: ${formatUnit(value.availableBalance, { fractionDigits: 0, mode: "floor" })})`
+    ? `(${t("solde")}: ${formatAccountingUnit(value.availableBalance, unit)})`
     : undefined
+
+  const { state: hintState, stateRelatedMessage: hintMessage } =
+    getQuantityInputFeedback({
+      quantityDeclared,
+      t,
+    })
+
+  const isError = quantityBind.state === "error"
+  const state = isError ? "error" : hintState
+  const stateRelatedMessage = isError
+    ? quantityBind.stateRelatedMessage
+    : hintMessage
+
+  const pciLitre = balance.biofuel?.pci_litre
 
   // When the component is mounted, reset the quantity declared if the quantity is greater than the quantity max
   useEffect(() => {
@@ -163,7 +196,8 @@ const QuantitySection = ({
     <>
       <NumberInput
         label={`${getQuantityInputLabel(type)} ${quantityMaxLabel ?? ""}`}
-        step={1}
+        step={getStepFromFractionDigits(FRACTION_DIGITS_LITERS)}
+        min={0}
         max={quantityMax}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -173,6 +207,13 @@ const QuantitySection = ({
         {...quantityBind}
         addon={
           <>
+            <Button
+              priority="secondary"
+              onClick={() => quantityBind.onChange(quantityMax)}
+              disabled={quantityDeclared}
+            >
+              {t("Max")}
+            </Button>
             {!quantityDeclared && (
               <Button
                 onClick={declareQuantity}
@@ -189,66 +230,25 @@ const QuantitySection = ({
             )}
           </>
         }
-        stateRelatedMessage={
-          quantityBind.state === "error"
-            ? quantityBind.stateRelatedMessage
-            : t(
-                "Le nombre de tonnes de CO2 évitées équivalentes sera calculé après validation de la quantité."
-              )
-        }
-        state={
-          quantityBind.state === "error"
-            ? "error"
-            : quantityDeclared
-              ? "default"
-              : "info"
-        }
+        state={state}
+        stateRelatedMessage={stateRelatedMessage}
         disabled={quantityDeclared || mutation.loading}
         required
         inputRef={quantityInputRef}
       />
-      {quantityDeclared &&
-      value.avoided_emissions_min &&
-      value.avoided_emissions_max &&
-      value.avoided_emissions_min > 0 &&
-      value.avoided_emissions_max > 0 ? (
-        <Notice noColor variant="info">
-          <div>
-            {value.avoided_emissions_min === value.avoided_emissions_max ? (
-              <Trans
-                components={{ strong: <strong /> }}
-                t={t}
-                values={{
-                  quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 10,
-                  }),
-                  value: formatNumber(value.avoided_emissions_min, {
-                    fractionDigits: 2,
-                  }),
-                }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer <strong>{{value}} tCO2 évitées</strong>."
-              />
-            ) : (
-              <Trans
-                components={{ strong: <strong /> }}
-                t={t}
-                values={{
-                  quantity: formatUnit(value.quantity!, {
-                    fractionDigits: 10,
-                  }),
-                  min: formatNumber(value.avoided_emissions_min, {
-                    fractionDigits: 2,
-                  }),
-                  max: formatNumber(value.avoided_emissions_max, {
-                    fractionDigits: 2,
-                  }),
-                }}
-                defaults="Pour une quantité de <strong>{{quantity}}</strong>, vous pouvez enregistrer entre <strong>{{min}} et {{max}} tCO2 évitées</strong>."
-              />
-            )}
-          </div>
-        </Notice>
-      ) : null}
+      {showEnergyEquivalent(type, value.quantity, pciLitre) && (
+        <EnergyEquivalentNotice
+          quantityLiters={value.quantity!}
+          pciLitre={pciLitre!}
+        />
+      )}
+      {quantityDeclared && (
+        <AvoidedEmissionsRecapNotice
+          quantity={value.quantity}
+          avoided_emissions_min={value.avoided_emissions_min}
+          avoided_emissions_max={value.avoided_emissions_max}
+        />
+      )}
     </>
   )
 }

@@ -7,9 +7,11 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from core.models import CarbureLot, MatierePremiere
+from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
 
@@ -22,9 +24,10 @@ class OperationServiceErrors:
     ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
 
 
-class OperationService:
-    FLOAT_COMPARISON_TOLERANCE = 1e-6
+VOLUME_PRECISION = 2
 
+
+class OperationService:
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
         """
@@ -54,11 +57,11 @@ class OperationService:
         return emission_rates_by_lot
 
     @staticmethod
-    def perform_checks_before_create(request, entity_id, selected_lots, data, unit, declaration_year):
-        OperationService.check_debited_entity(entity_id, data)
-        OperationService.check_volumes(selected_lots, data, unit)
-        OperationService.check_objectives_compliance(request, selected_lots, data, entity_id)
+    def perform_checks_before_create(request, entity_id, selected_lots, data, declaration_year):
         OperationService.check_declaration_year(declaration_year, data)
+        OperationService.check_debited_entity(entity_id, data)
+        OperationService.check_volumes(selected_lots, data)
+        OperationService.check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year)
 
     @staticmethod
     def check_debited_entity(entity_id, data):
@@ -69,27 +72,27 @@ class OperationService:
             raise serializers.ValidationError({"debited_entity": OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID})
 
     @staticmethod
-    def check_volumes(selected_lots, data, unit):
+    def check_volumes(selected_lots, data):
         """
         Check if the selected lots exist and have enough volume to perform the operation
         """
-        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data, unit)
+        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data)
 
-        # Round available volumes to 8 decimals to match optimization algorithm precision
-        available_volumes = {int(lot_id): round(float(volume), 8) for lot_id, volume in zip(np_lot_ids, np_volumes)}
+        # Normalize available and requested volumes to business precision.
+        available_volumes = {int(lot_id): truncate(volume) for lot_id, volume in zip(np_lot_ids, np_volumes)}
 
         for lot in selected_lots:
             lot_id = lot["id"]
-            volume = lot["volume"]
+            volume = truncate(lot["volume"])
 
             if lot_id not in available_volumes:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
 
-            if available_volumes[lot_id] + OperationService.FLOAT_COMPARISON_TOLERANCE < volume:
+            if available_volumes[lot_id] < volume:
                 raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
 
     @staticmethod
-    def check_objectives_compliance(request, selected_lots, data, entity_id):
+    def check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year):
         """
         Check if the TENEUR operation respects the capped objective for the customs category
         """
@@ -101,22 +104,31 @@ class OperationService:
             if target is None:
                 return
 
-            # 2. Calculate the balance for requested biofuel and customs category
+            # 2. Calculate the balance for requested biofuel and customs category and declaration year
             request.GET = request.GET.copy()
             request.GET["customs_category"] = data["customs_category"]
             request.GET["biofuel"] = data["biofuel"].code
             operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
-            balance = BalanceService.calculate_balance(operations, entity_id, None, "mj")
+
+            period = DeclarationPeriodService.get_period_by_year(declaration_year)
+            if period is None:
+                return
+
+            date_from = period.start_date
+
+            balance = BalanceService.calculate_balance(operations, entity_id, None, "mj", date_from)
             balance = list(balance.values())[0]  # keep the first (and only one) element
 
             # 3. Convert the teneur to add from liters to MJ
             pci = data["biofuel"].pci_litre
-            teneur_to_add = sum(lot["volume"] * pci for lot in selected_lots)
+            teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
 
             # 4. Check if the futur teneur is below the target
-            futur_teneur = balance["pending_teneur"] + balance["declared_teneur"] + teneur_to_add  # all in MJ
+            futur_teneur = (
+                truncate(balance["pending_teneur"], 0) + truncate(balance["declared_teneur"], 0) + teneur_to_add
+            )  # all in MJ
 
-            if futur_teneur - target > OperationService.FLOAT_COMPARISON_TOLERANCE:
+            if futur_teneur > target:
                 raise serializers.ValidationError(
                     {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
                 )
@@ -201,7 +213,7 @@ class OperationService:
                     {
                         "operation": operation,
                         "lot": lot,
-                        "volume": round(lot.volume, 2),  # litres
+                        "volume": truncate(lot.volume),  # litres
                         "emission_rate_per_mj": lot.ghg_total,  # gCO2/MJ (input algo d'optimisation)
                     }
                 )
@@ -252,12 +264,12 @@ class OperationService:
                 new_lot_conv.feedstock = copy(lot.feedstock)
                 new_lot_conv.feedstock.category = MatierePremiere.CONV
                 volume_decimal = Decimal(str(lot.volume))
-                new_lot_conv.volume = round(float(volume_decimal * Decimal("0.4")), 2)
+                new_lot_conv.volume = truncate(float(volume_decimal * Decimal("0.4")))
 
                 new_lot_ep2 = copy(lot)
                 new_lot_ep2.feedstock = copy(lot.feedstock)
                 new_lot_ep2.feedstock.category = MatierePremiere.EP2AM
-                new_lot_ep2.volume = round(float(volume_decimal * Decimal("0.6")), 2)
+                new_lot_ep2.volume = truncate(float(volume_decimal * Decimal("0.6")))
 
                 result_lots.append(new_lot_conv)
                 result_lots.append(new_lot_ep2)

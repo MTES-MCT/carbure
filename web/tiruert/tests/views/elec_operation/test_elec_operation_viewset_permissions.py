@@ -14,7 +14,7 @@ class ElecOperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
             ElecOperationViewSet,
             [
                 (
-                    ["reject", "accept", "create", "destroy"],
+                    ["reject", "accept", "create", "destroy", "export_operations_to_excel"],
                     [HasTiruertWriteRights()],
                 ),
                 (

@@ -66,7 +66,7 @@ export const CardProgress = ({
         </div>
         <div>
           {mainValue !== undefined ? (
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div className={css["card-progress__main-value"]}>
               <Title is="p" as="h2">
                 {mainValue}
                 {mainText !== undefined ? (
@@ -80,7 +80,7 @@ export const CardProgress = ({
                 <Text size="sm">
                   Sanction :{" "}
                   {formatNumber(CONVERSIONS.euros.centsToKEuros(penalty), {
-                    fractionDigits: 0,
+                    fractionDigits: 2,
                   })}{" "}
                   k€
                 </Text>

@@ -5,8 +5,7 @@ import { useTranslation } from "react-i18next"
 import { useNotify } from "common/components/notifications"
 import useEntity from "common/hooks/entity"
 import { CreateOperationType } from "accounting/types"
-import { floorNumber, formatNumber, formatUnit } from "common/utils/formatters"
-import { ExtendedUnit } from "common/types"
+import { floorNumber } from "common/utils/formatters"
 import {
   BiofuelUnconstrainedCategoryObjective,
   CategoryObjective,
@@ -14,7 +13,13 @@ import {
   TargetType,
 } from "../../types"
 import { useMemo } from "react"
-import { computeObjectiveEnergy } from "../../utils/formatters"
+import { maxLitersFromRemainingMj } from "../../utils/liters"
+import {
+  formatAccountingUnit,
+  formatTCO2Number,
+} from "accounting/utils/formatters"
+import { FRACTION_DIGITS_LITERS } from "accounting/config"
+import { Unit } from "common/types"
 
 type DeclareTeneurDialogProps = {
   values: DeclareTeneurDialogForm
@@ -48,9 +53,7 @@ export const useDeclareTeneurDialog = ({
         t(
           "La mise en teneur d'une quantité de {{quantity}} a été réalisée avec succès",
           {
-            quantity: formatUnit(values.quantity!, ExtendedUnit.GJ, {
-              fractionDigits: 0,
-            }),
+            quantity: formatAccountingUnit(values.quantity!, Unit.l),
           }
         ),
         { variant: "success" }
@@ -83,31 +86,42 @@ export const useRemainingCO2Objective = (
         mainObjective.pending_teneur -
         avoidedEmissions
     )
-    return formatNumber(remainingCO2, {
-      fractionDigits: 0,
-      mode: "ceil",
-    })
+    return formatTCO2Number(remainingCO2)
   }, [mainObjective, values.avoided_emissions])
 }
 
+/**
+ * Max declarable quantity for the teneur form, in liters.
+ * Balance is in L; category caps are in GJ — convert remaining cap to liters
+ * (ceil to 2 decimals via pci_litre) before comparing with the available balance.
+ */
 export const useCalculateQuantityMax = (
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective,
   values: DeclareTeneurDialogForm
 ) => {
   const availableBalance = values.balance?.available_balance
+  const pciLitre = values.balance?.biofuel?.pci_litre
 
   return useMemo(() => {
     if (availableBalance === undefined) {
       return 0
     }
 
-    // if the objective is a cap or there is no target, the maximum quantity is the available balance
-    if (!objective.target || objective.target_type === TargetType.REACH) {
-      return floorNumber(availableBalance, 0)
+    // No cap on quantity when there is no target or the category is objectivized (REACH)
+    if (!objective.target_mj || objective.target_type === TargetType.REACH) {
+      return floorNumber(availableBalance, FRACTION_DIGITS_LITERS)
     }
 
-    const remainingObjectiveEnergy = computeObjectiveEnergy(objective)
+    if (!pciLitre) {
+      return floorNumber(availableBalance, FRACTION_DIGITS_LITERS)
+    }
 
-    return floorNumber(Math.min(availableBalance, remainingObjectiveEnergy), 0)
-  }, [objective, availableBalance])
+    const remainingObjectiveEnergyMj = objective.remaining_energy_mj
+    const maxLitersFromObjective = maxLitersFromRemainingMj(
+      remainingObjectiveEnergyMj,
+      pciLitre
+    )
+
+    return Math.min(availableBalance, maxLitersFromObjective)
+  }, [objective, availableBalance, pciLitre])
 }

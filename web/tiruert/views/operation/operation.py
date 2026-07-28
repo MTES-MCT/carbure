@@ -1,5 +1,5 @@
 from django.db.models import Case, CharField, ExpressionWrapper, F, FloatField, OuterRef, Q, Subquery, Sum, Value, When
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, Round
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -19,7 +19,6 @@ from tiruert.serializers import (
 )
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
-from tiruert.views.mixins import UnitMixin
 
 from .mixins import ActionMixin
 
@@ -31,14 +30,17 @@ class OperationPagination(MetadataPageNumberPagination):
         queryset = getattr(self, "queryset", None)
         if callable(getattr(queryset, "aggregate", None)):
             return queryset.aggregate(
-                total_quantity=Coalesce(
-                    Sum(
-                        ExpressionWrapper(
-                            F("_quantity") * F("renewable_energy_share"),
-                            output_field=FloatField(),
-                        )
+                total_quantity=Round(
+                    Coalesce(
+                        Sum(
+                            ExpressionWrapper(
+                                F("_quantity") * F("renewable_energy_share"),
+                                output_field=FloatField(),
+                            )
+                        ),
+                        Value(0.0),
                     ),
-                    Value(0.0),
+                    precision=2,
                 )
             )
 
@@ -46,8 +48,9 @@ class OperationPagination(MetadataPageNumberPagination):
 
         for operation in queryset or []:
             # _quantity is annotated and signed (positive=credit, negative=debit)
-            quantity = operation.quantity(unit=self.request.unit) * operation.renewable_energy_share
+            quantity = operation._volume * operation.renewable_energy_share
             metadata["total_quantity"] += quantity
+        metadata["total_quantity"] = round(metadata["total_quantity"], 2)
         return metadata
 
 
@@ -60,16 +63,9 @@ class OperationPagination(MetadataPageNumberPagination):
             description="Authorised entity ID.",
             required=True,
         ),
-        OpenApiParameter(
-            name="unit",
-            type=str,
-            enum=[choice[0] for choice in Operation.OPERATION_UNIT_CHOICE],
-            location=OpenApiParameter.QUERY,
-            description="Specify the volume unit.",
-        ),
     ]
 )
-class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
+class OperationViewSet(ModelViewSet, ActionMixin):
     queryset = Operation.objects.all().order_by("pk")
     serializer_class = OperationListSerializer
     filterset_class = OperationFilter
@@ -111,11 +107,6 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        multiplicators = {
-            "mj": "biofuel__pci_litre",
-            "kg": "biofuel__masse_volumique",
-        }
-        multiplicator = multiplicators.get(self.request.unit, None)
         # Permissions to use selected_entity_id here are handled in the filter_entity() method of the OperationFilter
         entity_id = self.request.query_params.get("selected_entity_id") or self.request.entity.id
         details_requested = self.request.GET.get("details", "0") == "1"
@@ -143,7 +134,6 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
             Subquery(total_volume_subquery, output_field=FloatField()),
             Value(0.0),
         )
-        quantity_factor_expr = F(multiplicator) if multiplicator else Value(1.0)
         sign_expr = Case(
             When(credited_entity_id=entity_id, then=Value(1.0)),
             When(debited_entity_id=entity_id, then=Value(-1.0)),
@@ -185,8 +175,8 @@ class OperationViewSet(UnitMixin, ModelViewSet, ActionMixin):
                 default=Value(None),
                 output_field=CharField(),
             ),
-            "_quantity": ExpressionWrapper(
-                total_volume_expr * quantity_factor_expr * sign_expr,
+            "_quantity": ExpressionWrapper(  # faut il * renewable_energy_share ?
+                total_volume_expr * sign_expr,
                 output_field=FloatField(),
             ),
             "_transaction": Case(

@@ -2,81 +2,70 @@ import { useTranslation } from "react-i18next"
 import { RecapData } from "../../recap-data"
 import {
   CategoryObjective,
+  EnergyObjective,
   SectorObjective,
   TargetType,
   UnconstrainedCategoryObjective,
 } from "../../../types"
-import { floorNumber } from "common/utils/formatters"
 import { formatSector } from "accounting/utils/formatters"
 import { ReactNode } from "react"
 import Badge from "@codegouvfr/react-dsfr/Badge"
 import { Grid } from "common/components/scaffold"
 import { CategoryEnum } from "common/types"
 import {
-  computeRemainingEnergyWithAdditionalQuantity,
+  formatObjectiveCO2,
   formatObjectiveGJ,
-} from "../../../utils/formatters"
+} from "../../../utils/objectives"
+import { remainingGjAfterDeclaration, remainingMj } from "../../../utils/energy"
 import { ProgressBar } from "../../progress-bar"
 
-interface DeclareTeneurProgressBarProps {
-  teneurDeclared: number
-  pendingTeneur: number
-  target: number
-  quantity: number
+const containerStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "var(--spacing-1v)",
+}
+
+type TeneurProgressBarSectionProps = {
   label?: ReactNode
   targetType?: TargetType
   category?: CategoryEnum
-  description?: ReactNode
+  baseQuantity: number
+  targetQuantity: number
+  declaredQuantity: number
+  remaining?: number | null
   formatRemaining?: (value: number) => string
 }
 
-export const DeclareTeneurProgressBar = ({
-  teneurDeclared,
-  pendingTeneur,
-  target,
-  quantity,
+const TeneurProgressBarSection = ({
   label,
   targetType,
   category,
+  baseQuantity,
+  targetQuantity,
+  declaredQuantity,
+  remaining,
   formatRemaining = formatObjectiveGJ,
-}: DeclareTeneurProgressBarProps) => {
-  const remainingEnergy = targetType
-    ? computeRemainingEnergyWithAdditionalQuantity(
-        {
-          target,
-          teneur_declared: teneurDeclared,
-          pending_teneur: pendingTeneur,
-        },
-        quantity ?? 0
-      )
-    : null
-
+}: TeneurProgressBarSectionProps) => {
   const RemainingQuantity =
     targetType === TargetType.CAP
       ? RecapData.RemainingQuantityBeforeLimit
       : RecapData.RemainingQuantityBeforeObjective
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--spacing-1v)",
-      }}
-    >
+    <div style={containerStyle}>
       {label && (
         <Badge severity="info" small noIcon>
           {label}
         </Badge>
       )}
       <ProgressBar
-        baseQuantity={floorNumber(teneurDeclared, 0)}
-        targetQuantity={floorNumber(target, 0)}
-        declaredQuantity={floorNumber(pendingTeneur + (quantity ?? 0), 0)}
+        baseQuantity={baseQuantity}
+        targetQuantity={targetQuantity}
+        declaredQuantity={declaredQuantity}
       />
-      {targetType && remainingEnergy !== null && (
+      {targetType != null && remaining != null && (
         <RemainingQuantity
-          value={formatRemaining(remainingEnergy)}
+          value={formatRemaining(remaining)}
           bold
           size="md"
           category={category}
@@ -86,29 +75,94 @@ export const DeclareTeneurProgressBar = ({
   )
 }
 
+type EnergyTeneurProgressBarProps = {
+  objective: Pick<
+    EnergyObjective,
+    "target_mj" | "teneur_declared_mj" | "pending_teneur_mj"
+  >
+  additionalMj: number
+  label?: ReactNode
+  targetType?: TargetType
+  category?: CategoryEnum
+}
+
+export const EnergyTeneurProgressBar = ({
+  objective,
+  additionalMj,
+  label,
+  targetType,
+  category,
+}: EnergyTeneurProgressBarProps) => (
+  <TeneurProgressBarSection
+    label={label}
+    targetType={targetType}
+    category={category}
+    baseQuantity={objective.teneur_declared_mj}
+    targetQuantity={objective.target_mj ?? 0}
+    declaredQuantity={objective.pending_teneur_mj + additionalMj}
+    remaining={
+      targetType != null
+        ? remainingGjAfterDeclaration(objective, additionalMj)
+        : null
+    }
+  />
+)
+
+type Co2TeneurProgressBarProps = {
+  teneurDeclared: number
+  pendingTeneur: number
+  target: number
+  additionalQuantity: number
+  label?: ReactNode
+  targetType?: TargetType
+  formatRemaining?: (value: number) => string
+}
+
+export const Co2TeneurProgressBar = ({
+  teneurDeclared,
+  pendingTeneur,
+  target,
+  additionalQuantity,
+  label,
+  targetType,
+  formatRemaining = formatObjectiveCO2,
+}: Co2TeneurProgressBarProps) => (
+  <TeneurProgressBarSection
+    label={label}
+    targetType={targetType}
+    baseQuantity={teneurDeclared}
+    targetQuantity={target}
+    declaredQuantity={pendingTeneur + additionalQuantity}
+    remaining={
+      targetType != null
+        ? remainingMj(target, teneurDeclared, pendingTeneur, additionalQuantity)
+        : null
+    }
+    formatRemaining={formatRemaining}
+  />
+)
+
 type DeclareTeneurProgressBarListProps = {
   sectorObjective?: SectorObjective
   categoryObjective?: CategoryObjective | UnconstrainedCategoryObjective
-  quantity: number
+  quantityMj: number
   targetType?: TargetType
 }
 
 export const DeclareTeneurProgressBarList = ({
   sectorObjective,
   categoryObjective,
-  quantity,
+  quantityMj,
   targetType,
 }: DeclareTeneurProgressBarListProps) => {
   const { t } = useTranslation()
 
   return (
     <Grid gap="xl">
-      {categoryObjective?.target && targetType && (
-        <DeclareTeneurProgressBar
-          teneurDeclared={categoryObjective.teneur_declared}
-          pendingTeneur={categoryObjective.pending_teneur}
-          target={categoryObjective.target}
-          quantity={quantity ?? 0}
+      {categoryObjective?.target_mj && targetType && (
+        <EnergyTeneurProgressBar
+          objective={categoryObjective}
+          additionalMj={quantityMj}
           label={t("Catégorie {{category}}", {
             category: categoryObjective.code,
           })}
@@ -117,11 +171,9 @@ export const DeclareTeneurProgressBarList = ({
         />
       )}
       {sectorObjective && (
-        <DeclareTeneurProgressBar
-          teneurDeclared={sectorObjective.teneur_declared}
-          pendingTeneur={sectorObjective.pending_teneur}
-          target={sectorObjective.target}
-          quantity={quantity ?? 0}
+        <EnergyTeneurProgressBar
+          objective={sectorObjective}
+          additionalMj={quantityMj}
           label={t("Filière {{sector}}", {
             sector: formatSector(sectorObjective.code),
           })}

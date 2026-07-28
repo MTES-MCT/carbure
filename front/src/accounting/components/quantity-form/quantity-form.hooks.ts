@@ -3,8 +3,6 @@ import { Balance } from "accounting/types"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { QuantityFormProps } from "./quantity-form.types"
-import { ExtendedUnit, ExtendedUnitType } from "common/types"
-import { useUnit } from "common/hooks/unit"
 import { FormManager, useFormContext } from "common/components/form2"
 import { quantityFormStep } from "./quantity-form.utils"
 import { GHGRangeFormProps } from "../ghg-range-form"
@@ -14,16 +12,10 @@ import { mapAdvancedFiltersForPayload } from "../advanced-filters/advanced-filte
 
 type UseQuantityFormProps = {
   balance: Balance
-  unit?: ExtendedUnitType
   depotId?: number
 }
-export const useQuantityForm = ({
-  balance,
-  unit: overrideUnit,
-  depotId,
-}: UseQuantityFormProps) => {
+export const useQuantityForm = ({ balance, depotId }: UseQuantityFormProps) => {
   const entity = useEntity()
-  const { unit } = useUnit(overrideUnit)
   const { value } = useFormContext<
     QuantityFormProps & AdvancedFiltersFormProps
   >()
@@ -35,7 +27,6 @@ export const useQuantityForm = ({
       debited_entity: entity.id,
       target_volume: value.quantity!,
       target_emission: 0,
-      unit,
       from_depot: depotId,
       ...mapAdvancedFiltersForPayload(value),
     })
@@ -47,20 +38,16 @@ export const useQuantityForm = ({
 
 type UseQuantityFormStepProps = {
   balance?: Balance
-  // Override the unit (default is the entity preferred unit)
-  unit?: ExtendedUnit
   form: FormManager<QuantityFormProps & GHGRangeFormProps>
   overrides?: Parameters<typeof quantityFormStep>[1]
 }
 
 export const useQuantityFormStep = ({
   balance,
-  unit: overrideUnit,
   form,
   overrides,
 }: UseQuantityFormStepProps) => {
   const entity = useEntity()
-  const { unit } = useUnit(overrideUnit)
 
   return quantityFormStep(form.value, {
     ...overrides,
@@ -76,7 +63,6 @@ export const useQuantityFormStep = ({
         debited_entity: entity.id,
         target_volume: form.value.quantity!,
         target_emission: form.value.avoided_emissions ?? 0,
-        unit,
         ...mapAdvancedFiltersForPayload(form.value),
       }).then((response) => {
         form.setField("selected_lots", response.data?.selected_lots)

@@ -1,9 +1,9 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.models import UserRights, UserRightsRequests
+from core.permissions import IsVerified
 from user.serializers import ResponseSuccessSerializer, RevokeAccessSerializer
 
 
@@ -20,7 +20,7 @@ from user.serializers import ResponseSuccessSerializer, RevokeAccessSerializer
     responses={200: ResponseSuccessSerializer},
 )
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsVerified])
 def revoke_myself(request, *args, **kwargs):
     serializer = RevokeAccessSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)

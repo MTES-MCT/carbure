@@ -97,7 +97,8 @@ paths:
                   value:
                     error: NO_CHANGE_REQUEST
                   summary: Aucune demande en cours
-          description: "Erreurs possibles: données invalides, aucune demande en cours,
+          description:
+            "Erreurs possibles: données invalides, aucune demande en cours,
             code expiré, code incorrect"
   /api/auth/login/:
     post:
@@ -274,7 +275,8 @@ paths:
                       password:
                         - Mot de passe incorrect.
                   summary: Erreur de validation
-          description: "Erreurs possibles: données invalides, mot de passe incorrect,
+          description:
+            "Erreurs possibles: données invalides, mot de passe incorrect,
             email déjà utilisé"
   /api/auth/request-otp/:
     get:
@@ -355,7 +357,8 @@ paths:
                       current_password:
                         - PASSWORDS_MATCH
                   summary: Mots de passe identiques
-          description: "Erreurs possibles: données invalides, mot de passe actuel
+          description:
+            "Erreurs possibles: données invalides, mot de passe actuel
             incorrect, nouveau mot de passe invalide"
   /api/auth/request-password-reset/:
     post:
@@ -456,7 +459,8 @@ paths:
   /api/biomethane/admin/annual-declarations/:
     get:
       operationId: biomethane_admin_annual_declarations_list
-      description: Liste des déclarations annuelles des producteurs de biométhane pour
+      description:
+        Liste des déclarations annuelles des producteurs de biométhane pour
         l'année courante (vue DREAL).
       parameters:
         - in: query
@@ -563,7 +567,8 @@ paths:
   /api/biomethane/admin/annual-declarations/filters/:
     get:
       operationId: biomethane_admin_annual_declarations_filters_retrieve
-      description: Liste des déclarations annuelles des producteurs de biométhane pour
+      description:
+        Liste des déclarations annuelles des producteurs de biométhane pour
         l'année courante (vue DREAL).
       parameters:
         - in: query
@@ -732,7 +737,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -780,7 +786,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -825,7 +832,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -879,7 +887,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -913,7 +922,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -958,7 +968,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -986,7 +997,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -1162,7 +1174,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -1193,7 +1206,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -1227,7 +1241,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -1526,7 +1541,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -1565,7 +1581,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -1605,14 +1622,16 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Données d'épandage du
+          description:
+            A unique integer value identifying this Données d'épandage du
             digestat.
           required: true
         - in: query
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -1625,7 +1644,8 @@ paths:
   /api/biomethane/dreal-export/:
     get:
       operationId: biomethane_dreal_export_retrieve
-      description: Export validated biomethane declarations for a year as a flat Excel
+      description:
+        Export validated biomethane declarations for a year as a flat Excel
         file, scoped by DREAL department access.
       parameters:
         - in: query
@@ -1668,7 +1688,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -1690,7 +1711,8 @@ paths:
           description: ""
     put:
       operationId: biomethane_energy_update
-      description: Create or update the energy declaration for the current entity and
+      description:
+        Create or update the energy declaration for the current entity and
         the current year.
       parameters:
         - in: query
@@ -1703,7 +1725,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -1846,7 +1869,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -1874,7 +1898,8 @@ paths:
   /api/biomethane/export/:
     get:
       operationId: biomethane_export_retrieve
-      description: Export all biomethane data for a producer and a given year as an
+      description:
+        Export all biomethane data for a producer and a given year as an
         Excel file.
       parameters:
         - in: query
@@ -1927,7 +1952,8 @@ paths:
           description: ""
     put:
       operationId: biomethane_injection_site_update
-      description: Create or update the injection site for the current entity (upsert
+      description:
+        Create or update the injection site for the current entity (upsert
         operation).
       parameters:
         - in: query
@@ -1991,7 +2017,8 @@ paths:
           description: ""
     put:
       operationId: biomethane_production_unit_update
-      description: Create or update the production unit for the current entity (upsert
+      description:
+        Create or update the production unit for the current entity (upsert
         operation).
       parameters:
         - in: query
@@ -2112,7 +2139,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: producer_name
@@ -2206,7 +2234,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -2267,7 +2296,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -2309,7 +2339,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -2363,7 +2394,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -2416,7 +2448,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
       tags:
         - biomethane
@@ -2449,7 +2482,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -2528,7 +2562,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: producer_name
@@ -2652,7 +2687,8 @@ paths:
           name: producer_id
           schema:
             type: integer
-          description: Producer entity ID (optional, used by DREAL to filter specific
+          description:
+            Producer entity ID (optional, used by DREAL to filter specific
             producer).
         - in: query
           name: year
@@ -4262,7 +4298,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedElecProvisionCertificateQualichargeRespons\
+                $ref:
+                  "#/components/schemas/PaginatedElecProvisionCertificateQualichargeRespons\
                   eList"
           description: ""
   /api/elec/provision-certificates-qualicharge/{id}/:
@@ -4279,7 +4316,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Certificat de Fourniture
+          description:
+            A unique integer value identifying this Certificat de Fourniture
             Qualicharge (elec).
           required: true
       tags:
@@ -4332,7 +4370,8 @@ paths:
   /api/elec/provision-certificates-qualicharge/bulk-transfer/:
     post:
       operationId: bulk_transfer_provision_certificates_qualicharge
-      description: Transfer non-double-validated volumes to another CPO (target must
+      description:
+        Transfer non-double-validated volumes to another CPO (target must
         have parent_entity = current entity)
       parameters:
         - in: query
@@ -4593,7 +4632,8 @@ paths:
           name: id
           schema:
             type: integer
-          description: A unique integer value identifying this Certificat de Fourniture
+          description:
+            A unique integer value identifying this Certificat de Fourniture
             (elec).
           required: true
       tags:
@@ -9263,7 +9303,8 @@ paths:
   /api/tiruert/declaration-period/:
     get:
       operationId: tiruert_declaration_period_retrieve
-      description: Check if there is a current declaration period and return the year
+      description:
+        Check if there is a current declaration period and return the year
         if there is one
       parameters:
         - in: query
@@ -9857,6 +9898,145 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedElecBalanceList"
           description: ""
+  /api/tiruert/elec-operations/export/:
+    get:
+      operationId: tiruert_elec_operations_export_retrieve
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
+                - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+          explode: false
+          style: form
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: integer
+          description: Entity whose operations are exported when acting as an administrator.
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+        - in: query
+          name: years
+          schema:
+            type: array
+            items:
+              type: number
+          explode: true
+          style: form
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+          description: Excel file download
   /api/tiruert/elec-operations/filters/:
     get:
       operationId: filter_elec_operations
@@ -10226,7 +10406,8 @@ paths:
           name: selected_entity_id
           schema:
             type: integer
-          description: Target entity ID (admin only). If provided, returns objectives for
+          description:
+            Target entity ID (admin only). If provided, returns objectives for
             this entity. If omitted for admin, returns aggregated objectives for
             all tiruert-liable entities.
         - in: query
@@ -10250,23 +10431,6 @@ paths:
   /api/tiruert/operations/:
     get:
       operationId: tiruert_operations_list
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: biofuel
@@ -10531,21 +10695,12 @@ paths:
           explode: true
           style: form
         - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
-        - in: query
           name: years
           schema:
             type: array
             items:
-              type: integer
+              type: string
+              minLength: 1
       tags:
         - tiruert
       security:
@@ -10560,23 +10715,6 @@ paths:
           description: ""
     post:
       operationId: tiruert_operations_create
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10584,16 +10722,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -10621,23 +10749,6 @@ paths:
   /api/tiruert/operations/{id}/:
     get:
       operationId: tiruert_operations_retrieve
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10651,16 +10762,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10675,23 +10776,6 @@ paths:
           description: ""
     patch:
       operationId: tiruert_operations_partial_update
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10705,16 +10789,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -10740,23 +10814,6 @@ paths:
           description: ""
     delete:
       operationId: tiruert_operations_destroy
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10770,16 +10827,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10805,16 +10852,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10842,7 +10879,8 @@ paths:
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
+      description:
+        Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
         remove
       parameters:
         - in: query
@@ -10857,16 +10895,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -10914,16 +10942,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10945,7 +10963,8 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
+      description:
+        Retrieve balances grouped by mp category / biofuel or by sector or
         by depot
       parameters:
         - in: query
@@ -11234,16 +11253,6 @@ paths:
             * `DEBIT` - DEBIT
           explode: true
           style: form
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -11525,21 +11534,12 @@ paths:
           explode: true
           style: form
         - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
-        - in: query
           name: years
           schema:
             type: array
             items:
-              type: integer
+              type: string
+              minLength: 1
       tags:
         - tiruert
       security:
@@ -11566,23 +11566,6 @@ paths:
   /api/tiruert/operations/export/:
     get:
       operationId: tiruert_operations_export_retrieve
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -11590,16 +11573,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -11886,21 +11859,12 @@ paths:
           explode: true
           style: form
         - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
-        - in: query
           name: years
           schema:
             type: array
             items:
-              type: integer
+              type: string
+              minLength: 1
       tags:
         - tiruert
       security:
@@ -11935,16 +11899,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -11980,16 +11934,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -12025,16 +11969,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -12406,8 +12340,6 @@ components:
           format: double
         pending_operations:
           type: integer
-        unit:
-          type: string
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
@@ -12434,7 +12366,6 @@ components:
         - quantity
         - saved_emissions
         - sector
-        - unit
     BalanceBiofuel:
       type: object
       properties:
@@ -12445,9 +12376,17 @@ components:
         renewable_energy_share:
           type: number
           format: double
+        pci_litre:
+          type: number
+          format: double
+        masse_volumique:
+          type: number
+          format: double
       required:
         - code
         - id
+        - masse_volumique
+        - pci_litre
         - renewable_energy_share
     BalanceByDepot:
       type: object
@@ -12486,8 +12425,6 @@ components:
           format: double
         pending_operations:
           type: integer
-        unit:
-          type: string
       required:
         - available_balance
         - declared_teneur
@@ -12496,7 +12433,6 @@ components:
         - pending_teneur
         - quantity
         - sector
-        - unit
     BalanceDepot:
       type: object
       properties:
@@ -12506,8 +12442,6 @@ components:
           type: string
         quantity:
           $ref: "#/components/schemas/BalanceQuantity"
-        unit:
-          type: string
       required:
         - id
         - name
@@ -12767,7 +12701,8 @@ components:
         has_complementary_investment_aid:
           type: boolean
           nullable: true
-          title: Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s)
+          title:
+            Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s)
             complémentaire(s) à l'investissement?
         complementary_aid_other_organism_name:
           type: string
@@ -12924,7 +12859,8 @@ components:
         has_complementary_investment_aid:
           type: boolean
           nullable: true
-          title: Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s)
+          title:
+            Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s)
             complémentaire(s) à l'investissement?
         complementary_aid_other_organism_name:
           type: string
@@ -13019,7 +12955,8 @@ components:
           type: number
           format: double
           nullable: true
-          title: Quantité de matières totales traitées par la STEP allant en incinération
+          title:
+            Quantité de matières totales traitées par la STEP allant en incinération
             (t)
         acquiring_companies:
           type: string
@@ -13108,7 +13045,8 @@ components:
           type: number
           format: double
           nullable: true
-          title: Quantité de matières totales traitées par la STEP allant en incinération
+          title:
+            Quantité de matières totales traitées par la STEP allant en incinération
             (t)
         acquiring_companies:
           type: string
@@ -13320,7 +13258,8 @@ components:
           title: Nombre d'heures de fonctionnement de la torchère (h)
         attest_no_fossil_for_energy:
           type: boolean
-          title: J'atteste que les besoins en énergie cités ci-dessus ne sont pas
+          title:
+            J'atteste que les besoins en énergie cités ci-dessus ne sont pas
             satisfaits par une énergie d'origine fossile
         energy_details:
           type: string
@@ -13330,26 +13269,30 @@ components:
           type: number
           format: double
           nullable: true
-          title: Quantité totale de biogaz traitée par le système d'épuration sur l’année
+          title:
+            Quantité totale de biogaz traitée par le système d'épuration sur l’année
             (Nm3)
         purification_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
-          title: Consommation électrique du système d'épuration et le cas échéant du
+          title:
+            Consommation électrique du système d'épuration et le cas échéant du
             traitement des évents (kWe)
         self_consumed_biogas_nm3:
           type: number
           format: double
           nullable: true
-          title: Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation
+          title:
+            Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation
             ou le traitement des intrants, le chauffage du digesteur et
             l'épuration du biogaz (Nm3)
         self_consumed_biogas_or_biomethane_kwh:
           type: number
           format: double
           nullable: true
-          title: Quantité de biogaz/biométhane autoconsommée pour le chauffage du
+          title:
+            Quantité de biogaz/biométhane autoconsommée pour le chauffage du
             digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le
             prétraitement des intrants, le chauffage du digesteur et l'épuration
             (kWh) selon la référence tarifaire
@@ -13360,7 +13303,8 @@ components:
           title: Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
         butane_or_propane_addition:
           type: boolean
-          title: Addition de butane ou propane lors de l'injection du biométhane dans le
+          title:
+            Addition de butane ou propane lors de l'injection du biométhane dans le
             réseau
         fossil_fuel_consumed_kwh:
           type: number
@@ -13369,7 +13313,8 @@ components:
           title: Quantité de combustible fossile consommé (kWh)
         has_opposition_or_complaints_acceptability:
           type: boolean
-          title: L'exploitation de votre unité de méthanisation fait-elle l'objet
+          title:
+            L'exploitation de votre unité de méthanisation fait-elle l'objet
             actuellement d'une opposition ou de plaintes de voisinage ?
         estimated_work_days_acceptability:
           type: integer
@@ -13392,7 +13337,8 @@ components:
           title: Précisions sur les dysfonctionnements
         has_injection_difficulties_due_to_network_saturation:
           type: boolean
-          title: Difficultés pour l'injection dans le réseau de gaz en raison de périodes
+          title:
+            Difficultés pour l'injection dans le réseau de gaz en raison de périodes
             de saturation des réseaux
         injection_impossibility_hours:
           type: integer
@@ -13450,7 +13396,8 @@ components:
           title: Nombre d'heures de fonctionnement de la torchère (h)
         attest_no_fossil_for_energy:
           type: boolean
-          title: J'atteste que les besoins en énergie cités ci-dessus ne sont pas
+          title:
+            J'atteste que les besoins en énergie cités ci-dessus ne sont pas
             satisfaits par une énergie d'origine fossile
         energy_details:
           type: string
@@ -13460,26 +13407,30 @@ components:
           type: number
           format: double
           nullable: true
-          title: Quantité totale de biogaz traitée par le système d'épuration sur l’année
+          title:
+            Quantité totale de biogaz traitée par le système d'épuration sur l’année
             (Nm3)
         purification_electric_consumption_kwe:
           type: number
           format: double
           nullable: true
-          title: Consommation électrique du système d'épuration et le cas échéant du
+          title:
+            Consommation électrique du système d'épuration et le cas échéant du
             traitement des évents (kWe)
         self_consumed_biogas_nm3:
           type: number
           format: double
           nullable: true
-          title: Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation
+          title:
+            Quantité de biogaz autoconsommée pour la pasteurisation, l'hygiénisation
             ou le traitement des intrants, le chauffage du digesteur et
             l'épuration du biogaz (Nm3)
         self_consumed_biogas_or_biomethane_kwh:
           type: number
           format: double
           nullable: true
-          title: Quantité de biogaz/biométhane autoconsommée pour le chauffage du
+          title:
+            Quantité de biogaz/biométhane autoconsommée pour le chauffage du
             digesteur (kWh) ou pour la pasteurisation, l'hygiénisation et le
             prétraitement des intrants, le chauffage du digesteur et l'épuration
             (kWh) selon la référence tarifaire
@@ -13490,7 +13441,8 @@ components:
           title: Consommation électrique soutirée pour l'ensemble de l'unité (kWe)
         butane_or_propane_addition:
           type: boolean
-          title: Addition de butane ou propane lors de l'injection du biométhane dans le
+          title:
+            Addition de butane ou propane lors de l'injection du biométhane dans le
             réseau
         fossil_fuel_consumed_kwh:
           type: number
@@ -13499,7 +13451,8 @@ components:
           title: Quantité de combustible fossile consommé (kWh)
         has_opposition_or_complaints_acceptability:
           type: boolean
-          title: L'exploitation de votre unité de méthanisation fait-elle l'objet
+          title:
+            L'exploitation de votre unité de méthanisation fait-elle l'objet
             actuellement d'une opposition ou de plaintes de voisinage ?
         estimated_work_days_acceptability:
           type: integer
@@ -13522,7 +13475,8 @@ components:
           title: Précisions sur les dysfonctionnements
         has_injection_difficulties_due_to_network_saturation:
           type: boolean
-          title: Difficultés pour l'injection dans le réseau de gaz en raison de périodes
+          title:
+            Difficultés pour l'injection dans le réseau de gaz en raison de périodes
             de saturation des réseaux
         injection_impossibility_hours:
           type: integer
@@ -17571,7 +17525,8 @@ components:
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/BalanceBiofuel"
           readOnly: true
         renewable_energy_share:
           type: number
@@ -17623,9 +17578,6 @@ components:
           type: number
           format: double
           readOnly: true
-        unit:
-          type: string
-          readOnly: true
         year:
           type: integer
           readOnly: true
@@ -17642,11 +17594,9 @@ components:
         - id
         - quantity
         - quantity_mj
-        - renewable_energy_share
         - sector
         - to_depot
         - type
-        - unit
         - year
     OperationCorrectionRequest:
       type: object
@@ -17786,7 +17736,8 @@ components:
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/BalanceBiofuel"
           readOnly: true
         renewable_energy_share:
           type: number
@@ -17818,9 +17769,6 @@ components:
           type: number
           format: double
           readOnly: true
-        unit:
-          type: string
-          readOnly: true
         avoided_emissions:
           type: number
           format: double
@@ -17839,11 +17787,9 @@ components:
         - from_depot
         - id
         - quantity
-        - renewable_energy_share
         - sector
         - to_depot
         - type
-        - unit
         - year
     OperationLot:
       type: object
@@ -20161,7 +20107,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
+      description:
+        A serializer for re-sending the user activation email. Includes
         email field only.
       properties:
         email:

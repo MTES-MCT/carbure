@@ -18,7 +18,6 @@ import {
   PathsApiTiruertElecOperationsGetParametersQueryOrder_by as ElecOperationOrder,
   PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
   ElecOperationTypeEnum as CreateElecOperationType,
-  PathsApiTiruertOperationsGetParametersQueryUnit as OperationUnit,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -57,7 +56,6 @@ export {
   BalancesGroupBy,
   OperationOrder,
   ElecOperationOrder,
-  OperationUnit,
 }
 
 /** BALANCES */

@@ -3,11 +3,11 @@ from rest_framework import serializers
 from core.models import Entity, MatierePremiere
 from tiruert.models.objective import Objective
 from tiruert.models.operation import Operation
-from tiruert.serializers.fields import RoundedFloatField
+from tiruert.serializers.fields import TruncatedFloatField
 
 
 class ObjectiveSerializer(serializers.Serializer):
-    target_mj = RoundedFloatField(allow_null=True)
+    target_mj = TruncatedFloatField(decimal_places=0, allow_null=True)
     target_type = serializers.ChoiceField(choices=Objective.TARGET_TYPES, allow_null=True)
     penalty = serializers.IntegerField(allow_null=True)
     target_percent = serializers.FloatField(allow_null=True)
@@ -15,32 +15,32 @@ class ObjectiveSerializer(serializers.Serializer):
 
 class ObjectiveSectorSerializer(serializers.Serializer):
     code = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
-    pending_teneur = RoundedFloatField()
-    declared_teneur = RoundedFloatField()
-    available_balance = RoundedFloatField()
+    pending_teneur = TruncatedFloatField(decimal_places=0)
+    declared_teneur = TruncatedFloatField(decimal_places=0)
+    available_balance = TruncatedFloatField(decimal_places=0)
     unit = serializers.CharField()
-    energy_basis = serializers.FloatField(default=0)
+    energy_basis = TruncatedFloatField(decimal_places=0, default=0)
     objective = ObjectiveSerializer()
 
 
 class ObjectiveCategorySerializer(serializers.Serializer):
     code = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
-    pending_teneur = RoundedFloatField()
-    declared_teneur = RoundedFloatField()
-    available_balance = RoundedFloatField()
+    pending_teneur = TruncatedFloatField(decimal_places=0)
+    declared_teneur = TruncatedFloatField(decimal_places=0)
+    available_balance = TruncatedFloatField(decimal_places=0)
     unit = serializers.CharField()
     objective = ObjectiveSerializer()
 
 
 class MainObjectiveSerializer(serializers.Serializer):
-    available_balance = RoundedFloatField()
-    target = serializers.FloatField()
-    pending_teneur = RoundedFloatField()
-    declared_teneur = RoundedFloatField()
-    unit = serializers.CharField()
-    penalty = serializers.IntegerField()
-    target_percent = serializers.FloatField()
-    energy_basis = serializers.FloatField()
+    available_balance = TruncatedFloatField()  # tCO2
+    target = TruncatedFloatField()  # tCO2
+    pending_teneur = TruncatedFloatField()  # tCO2
+    declared_teneur = TruncatedFloatField()  # tCO2
+    unit = serializers.CharField()  # tCO2
+    penalty = serializers.IntegerField()  # centimes euros
+    target_percent = serializers.FloatField()  # tCO2
+    energy_basis = TruncatedFloatField(decimal_places=0)  # MJ
 
 
 class ObjectiveOutputSerializer(serializers.Serializer):

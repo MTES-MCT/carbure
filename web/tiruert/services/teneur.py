@@ -7,6 +7,7 @@ import scipy.sparse
 from django.db.models import Q
 
 from adapters.logger import log_warning
+from core.utils import truncate
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
@@ -68,9 +69,13 @@ class TeneurService:
             computed volumes.
 
         """
+        from tiruert.services.operation import VOLUME_PRECISION
 
         # Sanity checks on inputs
-        if batches_volumes.sum() < target_volume:
+        # Round target volume (L) to 2 decimals, because at the end we return 2 decimals precision
+        target_volume = truncate(target_volume)
+
+        if truncate(batches_volumes.sum()) < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
         if enforced_volumes is not None:
@@ -218,24 +223,33 @@ class TeneurService:
 
         # Create a dictionary of selected batches with their respective index and volume
         # Round all volumes to 2 decimals to match database precision
+        # Cap the running total so the sum never exceeds the requested target volume:
+        # accumulated rounding can push the total slightly above target, so the last
+        # selected batch is reduced to absorb the difference.
+        allocated_volume = 0.0
         selected_batches_volumes = {}
         for idx in nonzero_indices:
             optimized_volume = result_array[idx]  # Volume suggested by optimization algorithm
             available_volume = batches_volumes[idx]  # Available volume at the beginning of optimization
 
-            # Clean available_volume to 2 decimals (database precision)
+            # Clean available_volume to 2 decimals
             # Any extra decimals are float conversion artifacts
-            available_volume_clean = round(available_volume, 2)
+            available_volume_clean = truncate(available_volume)
+            optimized_volume_clean = round(
+                optimized_volume, VOLUME_PRECISION
+            )  # it's ok to round up (capped with available_volume_clean)
 
-            # Ensure we never exceed available volume, then round to 2 decimals
-            safe_volume = min(optimized_volume, available_volume_clean)
-            selected_volume = round(safe_volume, 2)
+            # Cap optimized volume using values already normalized to business precision,
+            # and by the volume still needed to reach the target.
+            remaining_volume = truncate(target_volume - allocated_volume)
+            selected_volume = min(optimized_volume_clean, available_volume_clean, remaining_volume)
 
             # Skip negligible volumes that add noise to the response
             if selected_volume <= 0:
                 continue
 
             selected_batches_volumes[idx] = selected_volume
+            allocated_volume = truncate(allocated_volume + selected_volume)
 
         return selected_batches_volumes, res.fun
 
@@ -258,7 +272,9 @@ class TeneurService:
         """
 
         # Sanity checks on inputs
-        if batches_volumes.sum() < target_volume:
+        target_volume = truncate(target_volume)
+
+        if truncate(batches_volumes.sum()) < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
         emissions_sorter = np.argsort(batches_emissions)
@@ -294,8 +310,8 @@ class TeneurService:
         return min_emissions_rate, max_emissions_rate
 
     @staticmethod
-    def prepare_data_and_optimize(data, unit):
-        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(data, unit)
+    def prepare_data_and_optimize(data):
+        volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(data)
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
         pci = data["biofuel"].pci_litre
@@ -314,15 +330,12 @@ class TeneurService:
         return selected_lots, lot_ids, fun
 
     @staticmethod
-    def get_min_and_max_emissions(data, unit):
+    def get_min_and_max_emissions(data):
         """
         Compute minimum and maximum feasible mix emissions.
         Return avoided emissions (tCO2)
         """
-        volumes, emissions, _, _, target_volume = TeneurService.prepare_data(
-            data,
-            unit,
-        )  # volumes in L, emissions in gCO2/MJ
+        volumes, emissions, _, _, target_volume = TeneurService.prepare_data(data)  # volumes in L, emissions in gCO2/MJ
 
         min_emissions_rate, max_emissions_rate = TeneurService.emission_bounds(
             volumes,
@@ -349,7 +362,7 @@ class TeneurService:
         return (GHG_REFERENCE_RED_II - emissions_rate) * volume_energy / 1000000  # tCO2
 
     @staticmethod
-    def prepare_data(data, unit):
+    def prepare_data(data):
         """
         Prepare data for optimization and operation creation
         """
@@ -429,23 +442,10 @@ class TeneurService:
                 # Fix negative volumes by setting them to 0
                 volumes = np.maximum(volumes, 0)
 
-        # Convert target volume into L
-        target_volume = None
-        if data.get("target_volume", None) is not None:
-            target_volume = TeneurService._convert_in_liters(data["target_volume"], unit, data["biofuel"])
+        # Always received in liters from now
+        target_volume = data.get("target_volume", None) or None
 
         return volumes, emissions, lot_ids, enforced_volumes, target_volume
-
-    @staticmethod
-    def _convert_in_liters(quantity, unit, biofuel):
-        if unit == "mj":
-            return quantity / biofuel.pci_litre
-        if unit == "gj":
-            return quantity / biofuel.pci_litre * 1000
-        elif unit == "kg":
-            return quantity / biofuel.masse_volumique
-        else:
-            return quantity
 
     @staticmethod
     def log_negative_volumes(data, debited_entity, volumes, lot_ids, negative_volumes):

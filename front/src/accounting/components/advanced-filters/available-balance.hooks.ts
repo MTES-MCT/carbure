@@ -3,17 +3,19 @@ import { Balance } from "accounting/types"
 import { useFormContext } from "common/components/form2"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { useUnit } from "common/hooks/unit"
 import { debounce } from "common/utils/functions"
 
 import { AdvancedFiltersFormProps } from "./advanced-filters.types"
-import { ExtendedUnitType } from "common/types"
 import { useEffect } from "react"
 import { mapAdvancedFiltersForPayload } from "./advanced-filters.utils"
 import { floorNumber } from "common/utils/formatters"
+import { FRACTION_DIGITS_LITERS } from "accounting/config"
+
+const floorAvailableQuantity = (quantity?: number) =>
+  floorNumber(quantity ?? 0, FRACTION_DIGITS_LITERS)
 
 const debouncedGetBalance = debounce(
-  (entityId, biofuel, sector, category, filters, unit) =>
+  (entityId, biofuel, sector, category, filters) =>
     getBalances({
       page: 1,
       biofuel,
@@ -21,27 +23,19 @@ const debouncedGetBalance = debounce(
       customs_category: category,
       entity_id: entityId,
       ...mapAdvancedFiltersForPayload(filters),
-      unit,
     }).then((res) => {
-      const quantity = floorNumber(res.data.total_quantity ?? 0, 0)
+      const quantity = floorAvailableQuantity(res.data.total_quantity)
 
-      if (quantity === 0) return undefined
+      if (quantity <= 1) return undefined
 
       return res.data.results.length > 0 ? res.data.results[0] : undefined
     }),
   200
 )
 
-export const useAvailableBalance = ({
-  unit: overrideUnit,
-  balance,
-}: {
-  unit?: ExtendedUnitType
-  balance: Balance
-}) => {
+export const useAvailableBalance = ({ balance }: { balance: Balance }) => {
   const entity = useEntity()
   const { value, setField } = useFormContext<AdvancedFiltersFormProps>()
-  const { unit } = useUnit(overrideUnit)
 
   const query = useQuery(
     (filters?: AdvancedFiltersFormProps) =>
@@ -50,8 +44,7 @@ export const useAvailableBalance = ({
         balance.biofuel?.code,
         balance.sector,
         balance.customs_category,
-        filters ?? {},
-        unit
+        filters ?? {}
       ),
     {
       key: "balance-ghg-min-max",
@@ -59,7 +52,7 @@ export const useAvailableBalance = ({
       executeOnMount: false,
       executeOnUpdate: false,
       onSuccess: (data) => {
-        const availableBalance = data?.available_balance ?? 0
+        const availableBalance = floorAvailableQuantity(data?.available_balance)
 
         setField("availableBalance", availableBalance)
         setField("balance", {
@@ -73,7 +66,10 @@ export const useAvailableBalance = ({
   // When the component is mounted, set the available balance in the form only if it is not already set
   useEffect(() => {
     if (!value.availableBalance)
-      setField("availableBalance", balance.available_balance)
+      setField(
+        "availableBalance",
+        floorAvailableQuantity(balance.available_balance)
+      )
   }, [])
 
   return {

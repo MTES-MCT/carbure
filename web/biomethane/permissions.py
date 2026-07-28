@@ -95,6 +95,7 @@ CanAccessInjection = HasBiomethaneProducerRights | HasDrealRights
 
 ## Permission to access admin endpoints
 CanAccessAdminModule = HasDrealRights | HasAdemeRights
+CanDownloadDeclaration = HasDrealRights
 
 
 def get_biomethane_permissions(write_actions, action):
