@@ -1,50 +1,35 @@
 import { useRoutes } from "common/hooks/routes"
 import { MenuSection } from "../sidebar.types"
 import { useTranslation } from "react-i18next"
-import useEntity from "common/hooks/entity"
 import { Badge } from "@codegouvfr/react-dsfr/Badge"
+import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
+import { ACCOUNTING_SIDEBAR_NAV } from "accounting/navigation/sidebar-pages"
 
-export const useAccounting = () => {
+const accountingBadge = <Badge severity="info">BETA</Badge>
+
+export const useAccounting = (): MenuSection => {
   const routes = useRoutes()
   const { t } = useTranslation()
+  const permissions = useAccountingPermissions()
 
-  const { is_tiruert_liable, accise_number, isAdmin, hasAdminRight } =
-    useEntity()
+  const profile = permissions.adminPermissions.canAccessAdmin
+    ? "admin"
+    : "liable"
 
-  const section: MenuSection = {
+  const currentProfileNavItems = ACCOUNTING_SIDEBAR_NAV[profile]
+
+  return {
     title: t("Comptabilité"),
-    badge: <Badge severity="info">BETA</Badge>,
-    condition: accise_number !== "" || isAdmin || hasAdminRight("TIRIB"),
-    children: [
-      {
-        path: routes.ACCOUNTING.BALANCES.ROOT,
-        title: t("Soldes"),
-        icon: "ri-bank-line",
-        iconActive: "ri-bank-fill",
-        condition: !isAdmin && !hasAdminRight("TIRIB"),
-      },
-      {
-        path:
-          isAdmin || hasAdminRight("TIRIB")
-            ? routes.ACCOUNTING.ADMIN.OPERATIONS
-            : routes.ACCOUNTING.OPERATIONS.ROOT,
-        title: t("Opérations"),
-        icon: "ri-bar-chart-2-line",
-        iconActive: "ri-bar-chart-2-fill",
-        condition: true,
-      },
-      {
-        path:
-          isAdmin || hasAdminRight("TIRIB")
-            ? routes.ACCOUNTING.ADMIN.OBJECTIVES
-            : routes.ACCOUNTING.TENEUR.ROOT,
-        title: t("Objectifs annuels"),
-        icon: "ri-flashlight-line",
-        iconActive: "ri-flashlight-fill",
-        condition: is_tiruert_liable || isAdmin || hasAdminRight("TIRIB"),
-      },
-    ],
+    badge: accountingBadge,
+    condition: permissions.canAccessModule,
+    children: currentProfileNavItems.map(
+      ({ titleKey, icon, iconActive, path, canAccess }) => ({
+        title: t(titleKey),
+        icon,
+        iconActive,
+        path: path(routes.ACCOUNTING),
+        condition: canAccess(permissions),
+      })
+    ),
   }
-
-  return section
 }

@@ -3,10 +3,10 @@ from rest_framework.mixins import (
     ListModelMixin,
     RetrieveModelMixin,
 )
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import Entity
+from core.permissions import IsVerified
 from core.serializers import EntityPreviewSerializer
 from saf.filters import ClientFilter
 
@@ -18,7 +18,7 @@ class ClientViewSet(
 ):
     lookup_field = "id"
     queryset = Entity.objects.none()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsVerified]
     serializer_class = EntityPreviewSerializer
     filterset_class = ClientFilter
     search_fields = ["name"]

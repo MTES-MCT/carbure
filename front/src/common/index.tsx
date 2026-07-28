@@ -3,7 +3,7 @@ import { LoaderOverlay } from "common/components/scaffold"
 import useMissingCompanyInfoModal from "companies/hooks/missing-company-info-modal"
 import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity, { EntityContext, useEntityManager } from "common/hooks/entity"
-import useUserManager, { UserContext, useUser } from "common/hooks/user"
+import useUserManager, { UserContext } from "common/hooks/user"
 import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { YearsProvider } from "common/providers/years-provider"
 import { lazy, Suspense } from "react"
@@ -11,6 +11,7 @@ import { BiomethaneRoutes } from "biomethane/routes"
 import { useCacheBuster } from "./hooks/cache-buster"
 import { ExternalAdminPages } from "./types"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
+import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -114,9 +115,10 @@ const currentYear = new Date().getFullYear()
 
 const Org = () => {
   const entity = useEntity()
-  const user = useUser()
   const { canAccessModule: canAccessBiomethaneModule } =
     useBiomethanePermissions()
+  const { canAccessModule: canAccessAccountingModule } =
+    useAccountingPermissions()
   useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO
 
   const {
@@ -131,7 +133,6 @@ const Org = () => {
     isPowerOrHeatProducer,
     isSafTrader,
     has_saf,
-    accise_number,
   } = entity
   const isAdminDC = isExternal && entity.hasAdminRight(ExternalAdminPages.DCA)
   const isSafAdmin =
@@ -139,16 +140,11 @@ const Org = () => {
   const isElecAdmin =
     isExternal && entity.hasAdminRight(ExternalAdminPages.ELEC)
   const isElecOperator = isOperator && entity.has_elec
-  const isTiruertAdmin =
-    isExternal && entity.hasAdminRight(ExternalAdminPages.TIRIB)
   const isTransferElecAdmin =
     isExternal && entity.hasAdminRight(ExternalAdminPages.TRANSFERRED_ELEC)
   const isBiofuelAdmin =
     isExternal && entity.hasAdminRight(ExternalAdminPages.BIOFUEL)
 
-  const userIsMTEDGEC = user?.rights.find(
-    (right) => right.entity.name === "MTE - DGEC"
-  )
   const isSafOperator = isOperator && has_saf
 
   return (
@@ -167,11 +163,7 @@ const Org = () => {
         </>
       )}
 
-      {(userIsMTEDGEC ||
-        isAdmin ||
-        isTiruertAdmin ||
-        isOperator ||
-        accise_number !== "") && (
+      {canAccessAccountingModule && (
         <Route path="accounting/*" element={<MaterialAccounting />} />
       )}
 

@@ -1,9 +1,9 @@
 from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from core.permissions import IsVerified
 from core.serializers import DepotSerializer
 from transactions.models.depot import Depot
 
@@ -26,7 +26,7 @@ from transactions.models.depot import Depot
     responses=DepotSerializer(many=True),
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsVerified])
 def get_depots(request, *args, **kwargs):
     query = request.query_params.get("query")
     public_only = request.query_params.get("public_only", False)

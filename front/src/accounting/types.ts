@@ -96,7 +96,7 @@ export type ElecOperationsQueryBuilder = QueryBuilder<
 export type ElecOperationsQuery = ElecOperationsQueryBuilder["query"] & {
   [OperationsFilter.type]?: OperationDebitOrCredit[]
   [OperationsFilter.operation]?: ElecOperationType[]
-  [OperationsFilter.years]?: string[]
+  [OperationsFilter.years]?: number[]
 }
 
 export {

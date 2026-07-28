@@ -4,6 +4,7 @@ import { useQuery } from "common/hooks/async"
 import { useNavigate } from "react-router-dom"
 import * as api from "accounting/api/elec/operations"
 import useEntity from "common/hooks/entity"
+import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
 import { useHashMatch } from "common/components/hash-route"
 import {
   getOperationEntity,
@@ -23,7 +24,7 @@ import {
   useDeleteOperation,
   useRejectOperation,
 } from "./operation-detail.hooks"
-import { Unit, UserRole } from "common/types"
+import { Unit } from "common/types"
 import { useUnit } from "common/hooks/unit"
 import { formatOperationType } from "accounting/utils/formatters"
 import { ElecOperationsStatus, ElecOperationType } from "accounting/types"
@@ -34,6 +35,7 @@ export const OperationDetail = () => {
   const { t } = useTranslation()
   const { formatUnit } = useUnit()
   const match = useHashMatch("operation/:id")
+  const { canUpdateElecOperation } = useAccountingPermissions()
 
   const { result, loading } = useQuery(api.getOperationDetail, {
     key: "operation-detail",
@@ -41,8 +43,6 @@ export const OperationDetail = () => {
   })
 
   const operation = result?.data
-  const canUpdateOperation =
-    entity.hasRights(UserRole.ReadWrite) || entity.hasRights(UserRole.Admin)
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
@@ -116,7 +116,7 @@ export const OperationDetail = () => {
           <>
             {operation?.type === ElecOperationType.ACQUISITION &&
               operation?.status === ElecOperationsStatus.PENDING &&
-              canUpdateOperation && (
+              canUpdateElecOperation && (
                 <>
                   <Button
                     customPriority="danger"
@@ -143,7 +143,7 @@ export const OperationDetail = () => {
               )}
             {isSendingOperation(operation?.type ?? "") &&
               operation?.status === ElecOperationsStatus.PENDING &&
-              canUpdateOperation && (
+              canUpdateElecOperation && (
                 <Button
                   customPriority="danger"
                   iconId="fr-icon-close-line"
@@ -174,7 +174,7 @@ export const OperationDetail = () => {
               </Grid>
               {operation?.type === ElecOperationType.ACQUISITION &&
                 operation?.status === ElecOperationsStatus.PENDING &&
-                canUpdateOperation && (
+                canUpdateElecOperation && (
                   <>
                     <Text>{t("Voulez-vous accepter ce certificat ?")}</Text>
                     <div>
@@ -189,7 +189,7 @@ export const OperationDetail = () => {
                 )}
               {operation?.type === ElecOperationType.CESSION &&
                 operation?.status === ElecOperationsStatus.PENDING &&
-                canUpdateOperation && (
+                canUpdateElecOperation && (
                   <>
                     <Text>
                       {t("Voulez-vous annuler ce certificat de cession ?")}

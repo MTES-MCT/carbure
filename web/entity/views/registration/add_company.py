@@ -3,10 +3,9 @@ from datetime import datetime
 from django.conf import settings
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import serializers, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from core.decorators import otp_or_403
 from core.helpers import send_mail
 from core.models import (
     Entity,
@@ -17,6 +16,7 @@ from core.models import (
     UserRights,
     UserRightsRequests,
 )
+from core.permissions import IsVerified
 from core.serializers import check_fields_required
 
 
@@ -88,7 +88,7 @@ class ApplyForNewCompanyError:
     ],
 )
 @api_view(["POST"])
-@otp_or_403
+@permission_classes([IsVerified])
 def add_company_view(request):
     serializer = EntityCompanySerializer(data=request.data)
     serializer.is_valid(raise_exception=True)

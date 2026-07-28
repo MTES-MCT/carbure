@@ -1,103 +1,12 @@
-import { Navigate, Route, Routes } from "react-router-dom"
 import { Main } from "common/components/scaffold"
-import Teneur from "./pages/teneur"
-import OperationsBalancesLayout from "./layouts/operations-balances-layout"
-import Operations from "./pages/operations"
-import Balances from "./pages/balances"
-import useEntity from "common/hooks/entity"
-import { TeneurLayout } from "./layouts/teneur-layout"
-import { useLastSectorVisited } from "./hooks/last-sector-visited"
-import { ObjectivesLayout } from "./pages/admin/objectives/objectives-layout"
-import { Objectives } from "./pages/admin/objectives/objectives"
-import { AdminOperationsLayout } from "./pages/admin/operations/admin-operations-layout"
-import { AdminOperations } from "./pages/admin/operations/admin-operations"
-import {
-  AnnualDeclarationTiruertProvider,
-  useAnnualDeclarationTiruert,
-} from "./providers/annual-declaration-tiruert.provider"
-import { useRoutes } from "common/hooks/routes"
-import { SectorTabs } from "./types"
+import { AccountingRoutes } from "./routes"
 
 const MaterialAccounting = () => {
-  const entity = useEntity()
-  const { isAdmin, isExternal } = entity
-  const allowAccounting = isExternal && entity.hasAdminRight("TIRIB")
-
-  const lastSector = useLastSectorVisited()
-
   return (
     <Main>
-      <Routes>
-        <Route element={<OperationsBalancesLayout />}>
-          <Route path={`operations/:category`} element={<Operations />} />
-          <Route
-            path="operations"
-            element={<Navigate replace to={lastSector} />}
-          />
-
-          <Route path="balances/:category" element={<Balances />} />
-          <Route
-            path="balances"
-            element={<Navigate replace to={lastSector} />}
-          />
-        </Route>
-        {entity.is_tiruert_liable && (
-          <Route
-            element={
-              <AnnualDeclarationTiruertProvider>
-                <TeneurLayout />
-              </AnnualDeclarationTiruertProvider>
-            }
-          >
-            <Route
-              path="teneur"
-              element={<RedirectToCurrentDeclarationYearRoute />}
-            />
-            <Route path="teneur/:year" element={<Teneur />} />
-          </Route>
-        )}
-        {(isAdmin || allowAccounting) && (
-          <>
-            <Route
-              path="admin/objectives"
-              element={
-                <AnnualDeclarationTiruertProvider>
-                  <ObjectivesLayout />
-                </AnnualDeclarationTiruertProvider>
-              }
-            >
-              <Route index element={<Objectives />} />
-              <Route path=":entityId" element={<Objectives />} />
-            </Route>
-            <Route path="admin/operations" element={<AdminOperationsLayout />}>
-              <Route index element={<AdminOperations />} />
-              <Route
-                path=":selectedEntityId/:category"
-                element={<AdminOperations />}
-              />
-              <Route
-                path=":selectedEntityId"
-                element={<Navigate replace to={SectorTabs.BIOFUELS} />}
-              />
-            </Route>
-          </>
-        )}
-        <Route path="*" element={<Navigate replace to="operations" />} />
-      </Routes>
+      <AccountingRoutes />
     </Main>
   )
 }
 
-const RedirectToCurrentDeclarationYearRoute = () => {
-  const { currentDeclarationYear } = useAnnualDeclarationTiruert()
-  const routes = useRoutes().ACCOUNTING
-  const year = currentDeclarationYear ?? new Date().getFullYear()
-
-  // This case can't happen, but we log an error to be sure
-  if (!currentDeclarationYear) {
-    console.error("No current declaration year found")
-  }
-
-  return <Navigate to={routes.TENEUR.YEAR(year)} />
-}
 export default MaterialAccounting
