@@ -172,7 +172,6 @@ const QuantitySection = ({
 
   const { state: hintState, stateRelatedMessage: hintMessage } =
     getQuantityInputFeedback({
-      type,
       quantityDeclared,
       t,
     })

@@ -69,6 +69,19 @@ export const ValidateQuantityButtonEnabled: Story = {
   },
 }
 
+export const DisplayEnergyEquivalentForTeneur: Story = {
+  parameters: {
+    docs: {
+      description:
+        "For teneur, show the energy equivalent in GJ as soon as a quantity is entered",
+    },
+  },
+  args: {
+    type: CreateOperationType.TENEUR,
+  },
+  play: ValidateQuantityButtonEnabled.play,
+}
+
 export const ShowErrorWhenQuantityIsGreaterThanQuantityMax: Story = {
   parameters: {
     docs: {
@@ -130,7 +143,7 @@ export const DisplayAvoidedEmissionsWhenQuantityIsDeclaredWithEqualValues: Story
     parameters: {
       docs: {
         description:
-          "Display the avoided emissions component with the range returned by the backend when the quantity is declared with equal values",
+          "When truncated min/max are equal, prefill a single avoided emissions value",
       },
       msw: {
         // Overrides the simulate min max mock api by setting the needed mock as first

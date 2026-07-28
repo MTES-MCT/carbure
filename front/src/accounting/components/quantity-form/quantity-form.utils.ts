@@ -87,28 +87,23 @@ type QuantityInputFeedback = {
 }
 
 export const getQuantityInputFeedback = ({
-  type,
   quantityDeclared,
   t,
 }: {
-  type: CreateOperationType
   quantityDeclared: boolean
   t: TFunction
 }): QuantityInputFeedback => {
-  if (!quantityDeclared && type === CreateOperationType.TENEUR) {
+  if (!quantityDeclared) {
     return {
       state: "info",
       stateRelatedMessage: t(
-        "L'équivalent en GJ est affiché dès que vous entrez une quantité."
+        "Le nombre de tonnes de CO2 évitées équivalentes sera calculé après validation de la quantité."
       ),
     }
   }
 
   return {
-    state: "info",
-    stateRelatedMessage: t(
-      "Le nombre de tonnes de CO2 évitées équivalentes sera calculé après validation de la quantité."
-    ),
+    state: "default",
   }
 }
 

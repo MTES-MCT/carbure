@@ -4,14 +4,11 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { formatQuantityDisplay } from "./operation-detail-fields.utils"
 import { formatDate, formatPeriod } from "common/utils/formatters"
-import { useUnit } from "common/hooks/unit"
-import { DEFAULT_UNIT_OPERATION } from "accounting/config"
 import { compact } from "common/utils/collection"
 import { formatValue } from "../../../operations.utils"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   const exportationOrExpeditionFields =
     useExportationOrExpeditionFields(operation)
 
@@ -33,12 +30,12 @@ export const useOperationDetailFields = (operation?: Operation) => {
       { label: t("Biocarburant"), value: operation.biofuel?.code },
       {
         label: t("Quantité"),
-        value: formatQuantityDisplay(operation, formatUnit, false),
+        value: formatQuantityDisplay(operation, false),
       },
       operation.type === OperationType.INCORPORATION &&
         operation.renewable_energy_share !== 1 && {
           label: t("Quantité renouvelable"),
-          value: formatQuantityDisplay(operation, formatUnit, true),
+          value: formatQuantityDisplay(operation, true),
         },
       {
         label: t("Tonnes CO2 eq évitées"),
@@ -78,7 +75,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
     ])
 
     return fields
-  }, [operation, t, formatUnit, exportationOrExpeditionFields])
+  }, [operation, t, exportationOrExpeditionFields])
 }
 
 const useExportationOrExpeditionFields = (operation?: Operation) => {
