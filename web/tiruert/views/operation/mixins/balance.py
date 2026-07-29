@@ -18,14 +18,14 @@ from tiruert.services.balance import BalanceService
 
 
 class BalancePagination(MetadataPageNumberPagination):
-    aggregate_fields = {"total_quantity": 0.0}
+    aggregate_fields = {"total_volume": 0.0}
 
     def get_extra_metadata(self):
-        metadata = {"total_quantity": 0.0}
+        metadata = {"total_volume": 0.0}
 
         for balance in self.queryset:
-            metadata["total_quantity"] += balance["available_balance"]
-        metadata["total_quantity"] = truncate(metadata["total_quantity"], 2)
+            metadata["total_volume"] += balance["available_balance"]
+        metadata["total_volume"] = truncate(metadata["total_volume"], 2)
         return metadata
 
 

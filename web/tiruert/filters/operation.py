@@ -47,7 +47,7 @@ class BaseFilter(FilterSet):
             ("_type", "type"),
             ("_depot", "depot"),
             ("_entity", "from_to"),
-            ("_quantity", "quantity"),
+            ("_volume", "volume"),
             ("durability_period", "durability_period"),
         ),
         extra_valid_fields=[

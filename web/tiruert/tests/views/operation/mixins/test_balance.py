@@ -17,14 +17,14 @@ class BalancePaginationTest(TestCase):
 
     def test_balance_pagination_aggregate_fields(self):
         """Test that BalancePagination defines aggregate_fields correctly"""
-        self.assertIn("total_quantity", self.paginator.aggregate_fields)
-        self.assertEqual(self.paginator.aggregate_fields["total_quantity"], 0)
+        self.assertIn("total_volume", self.paginator.aggregate_fields)
+        self.assertEqual(self.paginator.aggregate_fields["total_volume"], 0)
 
     def test_get_extra_metadata_with_empty_queryset(self):
-        """Test that get_extra_metadata returns zero total_quantity for empty queryset"""
+        """Test that get_extra_metadata returns zero total_volume for empty queryset"""
         self.paginator.queryset = []
         metadata = self.paginator.get_extra_metadata()
-        self.assertEqual(metadata["total_quantity"], 0)
+        self.assertEqual(metadata["total_volume"], 0)
 
     def test_get_extra_metadata_sums_available_balance(self):
         """Test that get_extra_metadata correctly sums available_balance from queryset"""
@@ -34,7 +34,7 @@ class BalancePaginationTest(TestCase):
             {"available_balance": 75.0, "quantity": {"credit": 40.0, "debit": 15.0}},
         ]
         metadata = self.paginator.get_extra_metadata()
-        self.assertEqual(metadata["total_quantity"], 325.0)  # 100 + 150 + 75
+        self.assertEqual(metadata["total_volume"], 325.0)  # 100 + 150 + 75
 
     def test_get_extra_metadata_handles_negative_values(self):
         """Test that get_extra_metadata correctly handles negative available_balance"""
@@ -43,7 +43,7 @@ class BalancePaginationTest(TestCase):
             {"available_balance": -50.0, "quantity": {"credit": 75.0, "debit": 30.0}},
         ]
         metadata = self.paginator.get_extra_metadata()
-        self.assertEqual(metadata["total_quantity"], 50.0)  # 100 + (-50)
+        self.assertEqual(metadata["total_volume"], 50.0)  # 100 + (-50)
 
 
 class BalanceActionMixinTest(TestCase):
@@ -261,6 +261,6 @@ class BalanceActionMixinTest(TestCase):
         # Verify pagination structure
         self.assertIn("count", response.data)
         self.assertIn("results", response.data)
-        self.assertIn("total_quantity", response.data)
+        self.assertIn("total_volume", response.data)
         self.assertEqual(response.data["count"], 2)
-        self.assertEqual(response.data["total_quantity"], 250.0)  # 200 + 50
+        self.assertEqual(response.data["total_volume"], 250.0)  # 200 + 50

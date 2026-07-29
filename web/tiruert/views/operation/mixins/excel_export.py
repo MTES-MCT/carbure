@@ -31,8 +31,8 @@ class ExcelExportActionMixin:
             "Type Opération",
             "Expéditeur",
             "Destinataire",
-            "Quantité (L)",
-            "Quantité (MJ)",
+            "Volume (L)",
+            "Énergie (MJ)",
             "Tonnes CO2 eq. évitées",
         ]
         for col_num, header in enumerate(headers, 1):
@@ -51,7 +51,7 @@ class ExcelExportActionMixin:
             sheet.cell(row=row_num, column=9, value=operation.debited_entity.name if operation.debited_entity else "")
             sheet.cell(row=row_num, column=10, value=operation.credited_entity.name if operation.credited_entity else "")
             sheet.cell(row=row_num, column=11, value=operation._volume)
-            sheet.cell(row=row_num, column=12, value=operation.volume_to_quantity(operation._volume, "mj"))
+            sheet.cell(row=row_num, column=12, value=operation._energy)
             sheet.cell(row=row_num, column=13, value=sum(detail.avoided_emissions for detail in operation.details.all()))
 
         # Adjust column widths

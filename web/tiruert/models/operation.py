@@ -1,6 +1,7 @@
 from django.db import models
 
 from core.models import MatierePremiere, Pays
+from core.utils import truncate
 
 
 class OperationManager(models.Manager):
@@ -163,6 +164,13 @@ class Operation(models.Model):
             return self._volume
 
         return self.volume
+
+    @property
+    def energy(self):
+        if getattr(self, "_energy", None) is not None:
+            return truncate(self._energy, 0)
+
+        return truncate(self.volume_l * self.renewable_energy_share * self.biofuel.pci_litre, 0)  # in MJ
 
     @property
     def avoided_emissions(self):

@@ -35,14 +35,18 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     sector = serializers.CharField(source="_sector", read_only=True)
     type = serializers.CharField(source="_type", read_only=True)
     biofuel = BalanceBiofuelSerializer(read_only=True)
-    quantity = serializers.SerializerMethodField()
+    volume = serializers.SerializerMethodField()
+    energy = serializers.SerializerMethodField()
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
     year = serializers.IntegerField(source="declaration_year", read_only=True)
 
-    def get_quantity(self, instance) -> float:
-        return instance.quantity()
+    def get_volume(self, instance) -> float:
+        return instance.volume
+
+    def get_energy(self, instance) -> float:
+        return instance.energy
 
     def get_avoided_emissions(self, instance) -> float:
         if getattr(instance, "_avoided_emissions", None) is not None:
@@ -57,7 +61,8 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
 
 class OperationListSerializer(BaseOperationSerializer):
-    quantity = RoundedFloatField(source="_quantity", read_only=True)
+    volume = RoundedFloatField(source="_volume", read_only=True)
+    energy = RoundedFloatField(source="_energy", read_only=True)
     avoided_emissions = RoundedFloatField(source="_avoided_emissions", read_only=True)
 
     class Meta:
@@ -79,7 +84,8 @@ class OperationListSerializer(BaseOperationSerializer):
             "_depot",
             "export_country",
             "created_at",
-            "quantity",
+            "volume",
+            "energy",
             "details",
             "avoided_emissions",
             "year",
@@ -109,18 +115,14 @@ class OperationSerializer(BaseOperationSerializer):
             "created_at",
             "validation_date",
             "durability_period",
-            "quantity",
-            "quantity_mj",
+            "volume",
+            "energy",
             "avoided_emissions",
             "details",
             "year",
         ]
 
-    quantity_mj = serializers.SerializerMethodField()
     export_country = CountrySerializer(read_only=True)
-
-    def get_quantity_mj(self, instance) -> float:
-        return int(instance.quantity(unit="mj", force=True))
 
 
 class OperationLotSerializer(serializers.Serializer):

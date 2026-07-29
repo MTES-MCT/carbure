@@ -26,16 +26,25 @@ class BaseOperationSerializerTest(TestCase):
             context = {}
         return BaseOperationSerializer(context=context)
 
-    def test_get_quantity_delegates_to_model(self):
-        """Should delegate to instance.quantity() with default serializer behavior."""
+    def test_get_volume_delegates_to_model(self):
+        """Should delegate to instance.volume with default serializer behavior."""
         serializer = self._create_serializer()
         instance = Mock(spec=Operation)
-        instance.quantity = Mock(return_value=1500.0)
+        instance.volume = 1500.0
 
-        result = serializer.get_quantity(instance)
+        result = serializer.get_volume(instance)
 
-        instance.quantity.assert_called_once_with()
         self.assertEqual(result, 1500.0)
+
+    def test_get_energy_delegates_to_model(self):
+        """Should delegate to instance.energy with default serializer behavior."""
+        serializer = self._create_serializer()
+        instance = Mock(spec=Operation)
+        instance.energy = 72000.0
+
+        result = serializer.get_energy(instance)
+
+        self.assertEqual(result, 72000.0)
 
     def test_get_fields_removes_details_when_not_requested(self):
         """Should not build the nested details field on list responses by default."""
@@ -49,7 +58,7 @@ class BaseOperationSerializerTest(TestCase):
 
         self.assertIn("details", serializer.fields)
 
-    def test_operation_list_serializer_uses_annotated_quantity_and_avoided_emissions(self):
+    def test_operation_list_serializer_uses_annotated_volume_energy_and_avoided_emissions(self):
         """List serializer should read pre-annotated numeric fields directly."""
         operation = Mock(spec=Operation)
         operation.id = 1
@@ -74,13 +83,15 @@ class BaseOperationSerializerTest(TestCase):
         operation._depot = "To"
         operation.export_country = None
         operation.created_at = None
-        operation._quantity = 123.456
+        operation._volume = 123.456
+        operation._energy = 4567.891
         operation._avoided_emissions = 78.901
         operation.declaration_year = 2024
 
         serializer = OperationListSerializer(operation, context={"details": False})
 
-        self.assertEqual(serializer.data["quantity"], 123.46)
+        self.assertEqual(serializer.data["volume"], 123.46)
+        self.assertEqual(serializer.data["energy"], 4567.89)
         self.assertEqual(serializer.data["avoided_emissions"], 78.9)
 
 
@@ -113,20 +124,15 @@ class OperationSerializerTest(TestCase):
 
         self.assertEqual(result, 451.5)
 
-    def test_get_quantity_mj_always_uses_mj_unit(self):
-        """Should always use 'mj' unit regardless of context unit."""
-        # Test with different context units to ensure mj is always used
-        for context_unit in ["l", "kg", "mj"]:
-            with self.subTest(context_unit=context_unit):
-                serializer = self._create_serializer()
-                instance = Mock(spec=Operation)
-                instance.quantity = Mock(return_value=72000.0)
+    def test_get_energy_delegates_to_model_property(self):
+        """Should use the energy property directly."""
+        serializer = self._create_serializer()
+        instance = Mock(spec=Operation)
+        instance.energy = 72000.0
 
-                result = serializer.get_quantity_mj(instance)
+        result = serializer.get_energy(instance)
 
-                # Should always call with "mj" regardless of context
-                instance.quantity.assert_called_once_with(unit="mj", force=True)
-                self.assertEqual(result, 72000.0)
+        self.assertEqual(result, 72000.0)
 
 
 class OperationInputSerializerCreateTest(TestCase):
