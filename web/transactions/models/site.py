@@ -21,6 +21,7 @@ class Site(models.Model):
     PRODUCTION_BIOGAZ = "PRODUCTION BIOGAZ"
     EFCA = "EFCA"
     AIRPORT = "AIRPORT"
+    H2_REFUELING_STATION = "H2 REFUELING STATION"
 
     SITE_TYPE = (
         (OTHER, "Autre"),
@@ -35,6 +36,7 @@ class Site(models.Model):
         (PRODUCTION_BIOGAZ, "PRODUCTION BIOGAZ"),
         (EFCA, "EFCA"),
         (AIRPORT, "AIRPORT"),
+        (H2_REFUELING_STATION, "H2 REFUELING STATION"),
     )
 
     DEPOT_TYPES = [OTHER, EFS, EFPE, OILDEPOT, BIOFUELDEPOT, HEAT_PLANT, POWER_PLANT, COGENERATION_PLANT, EFCA]
@@ -66,6 +68,7 @@ class Site(models.Model):
     private = models.BooleanField(default=False)
     is_enabled = models.BooleanField(default=True)
     created_by = models.ForeignKey("core.Entity", null=True, blank=True, on_delete=models.SET_NULL)
+    commissioning_date = models.DateField(verbose_name="Date de mise en service", null=True, blank=True)
 
     objects = SiteManager()
 
