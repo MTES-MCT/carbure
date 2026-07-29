@@ -108,11 +108,25 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
 
     def test_list_supply_inputs_success_with_no_supply_plan(self):
         """Test successful retrieval of supply inputs when no existing supply plan"""
+        self.supply_input.volume = 100.0
+        self.supply_input.save(update_fields=["volume"])
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.matiere_mais,
+            material_unit=BiomethaneSupplyInput.DRY,
+            dry_matter_ratio_percent=24.0,
+            volume=200.0,
+        )
 
         response = self.client.get(self.url_base, self.base_params)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(len(response.data["results"]), 2)
+
+        by_unit = {item["material_unit"]: item for item in response.data["results"]}
+        self.assertEqual(by_unit[BiomethaneSupplyInput.WET]["volume_tmb"], 100.0)
+        self.assertEqual(by_unit[BiomethaneSupplyInput.DRY]["volume_tmb"], 833.33)
+        self.assertEqual(response.data["annual_volumes_in_t"], 933.33)
 
     def test_create_supply_input_success(self):
         """Test successful creation of a supply input."""

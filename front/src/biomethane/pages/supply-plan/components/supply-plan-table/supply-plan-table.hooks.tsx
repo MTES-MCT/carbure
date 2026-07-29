@@ -1,14 +1,8 @@
 import { Cell, Column } from "common/components/table2"
 import { useTranslation } from "react-i18next"
-import {
-  BiomethaneSupplyInput,
-  BiomethaneSupplyInputMaterialUnit,
-} from "../../types"
+import { BiomethaneSupplyInput } from "../../types"
 import Tag from "@codegouvfr/react-dsfr/Tag"
-import {
-  convertSupplyPlanInputVolume,
-  getSupplyPlanInputSource,
-} from "../../utils"
+import { getSupplyPlanInputSource } from "../../utils"
 import { getDepartmentName } from "common/utils/geography"
 import { formatNumber } from "common/utils/formatters"
 
@@ -39,16 +33,8 @@ export const useSupplyPlanColumns = () => {
     {
       header: t("Tonnage (tMB)"),
       cell: (input) => {
-        if (!input.volume) return <Cell text={t("N/A")} />
-
-        const volume =
-          input.material_unit === BiomethaneSupplyInputMaterialUnit.DRY
-            ? convertSupplyPlanInputVolume(
-                input.volume,
-                input.dry_matter_ratio_percent ?? 0
-              )
-            : input.volume
-        return <Cell text={`${formatNumber(volume)} tMB`} />
+        if (input.volume_tmb == null) return <Cell text={t("N/A")} />
+        return <Cell text={`${formatNumber(input.volume_tmb)} tMB`} />
       },
     },
   ]

@@ -58,8 +58,8 @@ class BiomethaneSupplyInput(models.Model):
         verbose_name="Unité matière", max_length=5, choices=MATERIAL_UNIT_CHOICES, null=True, blank=True
     )
 
-    # Ratio de matière sèche (%) - Que si matière sèche
-    dry_matter_ratio_percent = models.FloatField(verbose_name="Ratio de matière sèche (tMS/tMB)", null=True, blank=True)
+    # Ratio de matière sèche (%) - Que si matière sèche. tMB = tMS × 100 / ratio.
+    dry_matter_ratio_percent = models.FloatField(verbose_name="Ratio de matière sèche (%)", null=True, blank=True)
 
     # Volume (tMB ou tMS en fonction du choix)
     volume = models.FloatField(verbose_name="Tonnage", null=True, blank=True)

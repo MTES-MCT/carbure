@@ -1,27 +1,14 @@
 from dataclasses import dataclass
 
-from django.db.models import Case, F, FloatField, Q, Sum, Value, When
+from django.db.models import Q, Sum
 from django.db.models.functions import Round
 
 from biomethane.models import BiomethaneSupplyInput
+from biomethane.services.supply_plan.volume import wet_matter_tonnage_expression
 
 # Category labels from feedstocks/fixtures/import-intrants-biomethane.xlsx (typo kept as in source data).
 CATEGORY_PRIMARY_CROPS = "Biomasse agricole - Cultures pour alimentaiton humaine ou animale (principales)"
 CATEGORY_INTERMEDIATE_CROPS = "Biomasse agricole - Cultures intermédiaires"
-
-
-def _gross_volume_tmb_expression():
-    """Convert each supply input volume to gross matter tonnage (tMB)."""
-    return Case(
-        When(material_unit=BiomethaneSupplyInput.WET, then=F("volume")),
-        When(
-            material_unit=BiomethaneSupplyInput.DRY,
-            dry_matter_ratio_percent__gt=0,
-            then=F("volume") * 100.0 / F("dry_matter_ratio_percent"),
-        ),
-        default=Value(None),
-        output_field=FloatField(),
-    )
 
 
 def _compute_percentage(numerator: float | None, denominator: float | None) -> float | None:
@@ -42,7 +29,7 @@ def preload_supply_plan_metrics(producer_ids: list[int], year: int) -> dict[int,
     if not producer_ids:
         return {}
 
-    gross_volume = _gross_volume_tmb_expression()
+    gross_volume = wet_matter_tonnage_expression()
     rows = (
         BiomethaneSupplyInput.objects.filter(
             supply_plan__producer_id__in=producer_ids,
