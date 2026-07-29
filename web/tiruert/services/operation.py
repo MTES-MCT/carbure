@@ -103,7 +103,7 @@ class OperationService:
                 )
 
     @staticmethod
-    def bulk_check_volumes(entries, unit):
+    def bulk_check_volumes(entries):
         """
         Check that several requested operations combined have enough volume available.
 
@@ -134,7 +134,7 @@ class OperationService:
                 "customs_category": group["customs_category"],
                 "debited_entity": group["debited_entity"],
             }
-            OperationService.check_volumes(selected_lots, data, unit)
+            OperationService.check_volumes(selected_lots, data)
 
     @staticmethod
     def _check_teneur_target(request, entity_id, customs_category, teneur_to_add, declaration_year, bulk=False):
