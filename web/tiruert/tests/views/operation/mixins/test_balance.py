@@ -140,6 +140,27 @@ class BalanceActionMixinTest(TestCase):
             },
         }
 
+    def _create_mock_balance_by_lot_data(self):
+        """Helper to create mock balance data for lot grouping"""
+        return {
+            ("ESSENCE", "CONV", "ETH", 42): {
+                "sector": "ESSENCE",
+                "customs_category": "CONV",
+                "biofuel": "ETH",
+                "available_balance": 100.0,
+                "volume": {"credit": 50.0, "debit": 25.0},
+                "emission_rate_per_mj": 25.0,
+            },
+            ("ESSENCE", "CONV", "ETH", 43): {
+                "sector": "ESSENCE",
+                "customs_category": "CONV",
+                "biofuel": "ETH",
+                "available_balance": 50.0,
+                "volume": {"credit": 30.0, "debit": 15.0},
+                "emission_rate_per_mj": 26.0,
+            },
+        }
+
     @patch("tiruert.services.balance.BalanceService.calculate_balance")
     def test_balance_action_calls_calculate_balance_service(self, mock_calculate_balance):
         """Test that balance action calls BalanceService.calculate_balance with correct parameters"""
@@ -261,3 +282,36 @@ class BalanceActionMixinTest(TestCase):
         self.assertIn("total_volume", response.data)
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(response.data["total_volume"], 250.0)  # 200 + 50
+
+    @patch("tiruert.services.balance.BalanceService.calculate_balance")
+    def test_balance_action_with_group_by_lot_returns_volume_not_quantity(self, mock_calculate_balance):
+        """Lot grouping should expose volume in nested lot items, not quantity."""
+        mock_calculate_balance.return_value = self._create_mock_balance_by_lot_data()
+
+        request = self._create_request({"group_by": "lot"})
+
+        response = self.view.balance(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        group = response.data["results"][0]
+        lot = group["lots"][0]
+
+        self.assertIn("volume", lot)
+        self.assertNotIn("quantity", lot)
+        self.assertEqual(lot["volume"], {"credit": 50.0, "debit": 25.0})
+
+    @patch("tiruert.services.balance.BalanceService.calculate_balance")
+    def test_balance_action_default_grouping_returns_quantity_not_volume(self, mock_calculate_balance):
+        """Default grouping should expose quantity, not volume."""
+        mock_calculate_balance.return_value = self._create_mock_balance_data()
+
+        request = self._create_request()
+
+        response = self.view.balance(request)
+
+        self.assertEqual(response.status_code, 200)
+        balance = response.data["results"][0]
+
+        self.assertIn("quantity", balance)
+        self.assertNotIn("volume", balance)
