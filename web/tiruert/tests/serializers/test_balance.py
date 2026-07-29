@@ -223,6 +223,23 @@ class BalancePrepareDataAggregationTest(TestCase):
         self.assertEqual(len(emhv_group["lots"]), 1)
         self.assertEqual(emhv_group["available_balance"], 200.0)
 
+    def test_balance_by_lot_prepare_data_keeps_volume_field(self):
+        """Lot prepare_data should keep volume and never emit quantity in lot items."""
+        balance_dict = {
+            ("ESSENCE", "CONV", "ETH", 42): {
+                "available_balance": 100.0,
+                "volume": {"credit": 50.0, "debit": 25.0},
+                "emission_rate_per_mj": 25.0,
+            }
+        }
+
+        result = BalanceByLotSerializer.prepare_data(balance_dict)
+
+        self.assertEqual(len(result), 1)
+        self.assertIn("lots", result[0])
+        self.assertIn("volume", result[0]["lots"][0])
+        self.assertNotIn("quantity", result[0]["lots"][0])
+
 
 class BalanceSerializationTest(TestCase):
     """Test serialization of Python objects to JSON"""
