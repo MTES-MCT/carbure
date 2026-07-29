@@ -7259,6 +7259,213 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
+  /api/h2/stations/:
+    get:
+      operationId: h2_stations_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - h2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedH2StationList"
+          description: ""
+    post:
+      operationId: h2_stations_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - h2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/H2StationInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/H2StationInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/H2StationInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/H2StationInput"
+          description: ""
+  /api/h2/stations/{id}/:
+    get:
+      operationId: h2_stations_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this h2 station.
+          required: true
+      tags:
+        - h2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/H2Station"
+          description: ""
+    put:
+      operationId: h2_stations_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this h2 station.
+          required: true
+      tags:
+        - h2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/H2StationInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/H2StationInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/H2StationInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/H2StationInput"
+          description: ""
+    patch:
+      operationId: h2_stations_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this h2 station.
+          required: true
+      tags:
+        - h2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedH2StationInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedH2StationInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedH2StationInputRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/H2StationInput"
+          description: ""
+    delete:
+      operationId: h2_stations_destroy
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this h2 station.
+          required: true
+      tags:
+        - h2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
   /api/nav-stats:
     get:
       operationId: nav_stats_retrieve
@@ -12218,6 +12425,14 @@ components:
           $ref: "#/components/schemas/EtsStatusEnum"
       required:
         - ets_status
+    AccessTypeEnum:
+      enum:
+        - PUBLIC
+        - PRIVATE
+      type: string
+      description: |-
+        * `PUBLIC` - Public
+        * `PRIVATE` - Privé
     ActivateAccountRequest:
       type: object
       properties:
@@ -13726,6 +13941,11 @@ components:
           type: boolean
         is_enabled:
           type: boolean
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
         insee_code:
           type: string
           nullable: true
@@ -13867,6 +14087,11 @@ components:
           type: boolean
         is_enabled:
           type: boolean
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
         insee_code:
           type: string
           nullable: true
@@ -14861,6 +15086,11 @@ components:
           type: boolean
         is_enabled:
           type: boolean
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
         customs_id:
           type: string
           maxLength: 32
@@ -15136,6 +15366,14 @@ components:
         has_direct_deliveries:
           type: boolean
           default: false
+    DistributedPressureEnum:
+      enum:
+        - 350
+        - 700
+      type: integer
+      description: |-
+        * `350` - 350 bars
+        * `700` - 700 bars
     DoubleCountingAdminAddRequest:
       type: object
       properties:
@@ -17166,6 +17404,211 @@ components:
           type: integer
       required:
         - assigned_tickets_count
+    H2Station:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        distributed_pressure:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistributedPressureEnum"
+        name:
+          type: string
+          maxLength: 128
+        site_siret:
+          type: string
+          title: SIRET
+          maxLength: 64
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+        address:
+          type: string
+          title: Adresse
+          maxLength: 256
+        postal_code:
+          type: string
+          title: Code postal
+          maxLength: 32
+        city:
+          type: string
+          title: Commune
+          maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          title: Coordonnées GPS
+          maxLength: 64
+        private:
+          type: boolean
+        is_enabled:
+          type: boolean
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        access_type:
+          allOf:
+            - $ref: "#/components/schemas/AccessTypeEnum"
+          title: Nature d'accès au site
+        has_personal_vehicle_connector:
+          type: boolean
+          title: Connecteurs compatibles avec les véhicules particuliers
+        storage_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de stockage sur site
+        distribution_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de distribution
+        country:
+          type: integer
+          nullable: true
+          title: Pays
+        created_by:
+          type: integer
+          nullable: true
+      required:
+        - access_type
+        - distributed_pressure
+        - distribution_capacity
+        - id
+        - name
+        - storage_capacity
+    H2StationInput:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        distributed_pressure:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistributedPressureEnum"
+        name:
+          type: string
+          maxLength: 128
+        site_siret:
+          type: string
+          title: SIRET
+          maxLength: 64
+        address:
+          type: string
+          title: Adresse
+          maxLength: 256
+        postal_code:
+          type: string
+          title: Code postal
+          maxLength: 32
+        city:
+          type: string
+          title: Commune
+          maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          title: Coordonnées GPS
+          maxLength: 64
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        access_type:
+          allOf:
+            - $ref: "#/components/schemas/AccessTypeEnum"
+          title: Nature d'accès au site
+        has_personal_vehicle_connector:
+          type: boolean
+          title: Connecteurs compatibles avec les véhicules particuliers
+        storage_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de stockage sur site
+        distribution_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de distribution
+        country:
+          type: integer
+          nullable: true
+          title: Pays
+      required:
+        - access_type
+        - distribution_capacity
+        - id
+        - name
+        - storage_capacity
+    H2StationInputRequest:
+      type: object
+      properties:
+        distributed_pressure:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistributedPressureEnum"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        site_siret:
+          type: string
+          title: SIRET
+          maxLength: 64
+        address:
+          type: string
+          title: Adresse
+          maxLength: 256
+        postal_code:
+          type: string
+          title: Code postal
+          maxLength: 32
+        city:
+          type: string
+          title: Commune
+          maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          title: Coordonnées GPS
+          maxLength: 64
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        access_type:
+          allOf:
+            - $ref: "#/components/schemas/AccessTypeEnum"
+          title: Nature d'accès au site
+        has_personal_vehicle_connector:
+          type: boolean
+          title: Connecteurs compatibles avec les véhicules particuliers
+        storage_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de stockage sur site
+        distribution_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de distribution
+        country:
+          type: integer
+          nullable: true
+          title: Pays
+      required:
+        - access_type
+        - distribution_capacity
+        - name
+        - storage_capacity
     HygienizationExemptionTypeEnum:
       enum:
         - TOTAL
@@ -18338,6 +18781,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EntityProductionSite"
+    PaginatedH2StationList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/H2Station"
     PaginatedMacFossilFuelList:
       type: object
       required:
@@ -18598,6 +19064,64 @@ components:
           type: string
           title: SIRET
           maxLength: 64
+    PatchedH2StationInputRequest:
+      type: object
+      properties:
+        distributed_pressure:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistributedPressureEnum"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        site_siret:
+          type: string
+          title: SIRET
+          maxLength: 64
+        address:
+          type: string
+          title: Adresse
+          maxLength: 256
+        postal_code:
+          type: string
+          title: Code postal
+          maxLength: 32
+        city:
+          type: string
+          title: Commune
+          maxLength: 128
+        gps_coordinates:
+          type: string
+          nullable: true
+          title: Coordonnées GPS
+          maxLength: 64
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        access_type:
+          allOf:
+            - $ref: "#/components/schemas/AccessTypeEnum"
+          title: Nature d'accès au site
+        has_personal_vehicle_connector:
+          type: boolean
+          title: Connecteurs compatibles avec les véhicules particuliers
+        storage_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de stockage sur site
+        distribution_capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Capacité de distribution
+        country:
+          type: integer
+          nullable: true
+          title: Pays
     PatchedOperationUpdateRequest:
       type: object
       properties:
@@ -19802,6 +20326,7 @@ components:
         - PRODUCTION BIOGAZ
         - EFCA
         - AIRPORT
+        - H2 REFUELING STATION
       type: string
       description: |-
         * `OTHER` - Autre
@@ -19816,6 +20341,7 @@ components:
         * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
+        * `H2 REFUELING STATION` - H2 REFUELING STATION
     SpreadingManagementMethodsEnum:
       enum:
         - DIRECT_SPREADING

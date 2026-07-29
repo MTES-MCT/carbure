@@ -2190,6 +2190,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/h2/stations/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["h2_stations_list"];
+        put?: never;
+        post: operations["h2_stations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/h2/stations/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["h2_stations_retrieve"];
+        put: operations["h2_stations_update"];
+        post?: never;
+        delete: operations["h2_stations_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["h2_stations_partial_update"];
+        trace?: never;
+    };
     "/api/nav-stats": {
         parameters: {
             query?: never;
@@ -3245,6 +3277,12 @@ export interface components {
         AcceptRequest: {
             ets_status: components["schemas"]["EtsStatusEnum"];
         };
+        /**
+         * @description * `PUBLIC` - Public
+         *     * `PRIVATE` - Privé
+         * @enum {string}
+         */
+        AccessTypeEnum: AccessTypeEnum;
         ActivateAccountRequest: {
             uidb64: string;
             token: string;
@@ -4043,6 +4081,11 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
             /** Code INSEE */
             insee_code?: string | null;
             /** Type d'installation */
@@ -4105,6 +4148,11 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
             /** Code INSEE */
             insee_code?: string | null;
             /** Type d'installation */
@@ -4540,6 +4588,11 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
             customs_id?: string;
             accise?: string;
             /**
@@ -4675,6 +4728,12 @@ export interface components {
             /** @default false */
             has_direct_deliveries: boolean;
         };
+        /**
+         * @description * `350` - 350 bars
+         *     * `700` - 700 bars
+         * @enum {integer}
+         */
+        DistributedPressureEnum: DistributedPressureEnum;
         DoubleCountingAdminAddRequest: {
             certificate_id?: string;
             entity_id: number;
@@ -5455,6 +5514,99 @@ export interface components {
         GroupAssignmentResponse: {
             assigned_tickets_count: number;
         };
+        H2Station: {
+            readonly id: number;
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
+            name: string;
+            /** SIRET */
+            site_siret?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity: number;
+            /** Capacité de distribution */
+            distribution_capacity: number;
+            /** Pays */
+            country?: number | null;
+            created_by?: number | null;
+        };
+        H2StationInput: {
+            readonly id: number;
+            distributed_pressure?: components["schemas"]["DistributedPressureEnum"][];
+            name: string;
+            /** SIRET */
+            site_siret?: string;
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity: number;
+            /** Capacité de distribution */
+            distribution_capacity: number;
+            /** Pays */
+            country?: number | null;
+        };
+        H2StationInputRequest: {
+            distributed_pressure?: components["schemas"]["DistributedPressureEnum"][];
+            name: string;
+            /** SIRET */
+            site_siret?: string;
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity: number;
+            /** Capacité de distribution */
+            distribution_capacity: number;
+            /** Pays */
+            country?: number | null;
+        };
         /**
          * @description * `TOTAL` - Totale
          *     * `PARTIAL` - Partielle
@@ -6015,6 +6167,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["EntityProductionSite"][];
         };
+        PaginatedH2StationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["H2Station"][];
+        };
         PaginatedMacFossilFuelList: {
             /** @example 123 */
             count: number;
@@ -6149,6 +6316,35 @@ export interface components {
             postal_code?: string;
             /** SIRET */
             site_siret?: string;
+        };
+        PatchedH2StationInputRequest: {
+            distributed_pressure?: components["schemas"]["DistributedPressureEnum"][];
+            name?: string;
+            /** SIRET */
+            site_siret?: string;
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type?: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity?: number;
+            /** Capacité de distribution */
+            distribution_capacity?: number;
+            /** Pays */
+            country?: number | null;
         };
         PatchedOperationUpdateRequest: {
             to_depot?: number | null;
@@ -6610,6 +6806,7 @@ export interface components {
          *     * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
          *     * `EFCA` - EFCA
          *     * `AIRPORT` - AIRPORT
+         *     * `H2 REFUELING STATION` - H2 REFUELING STATION
          * @enum {string}
          */
         SiteTypeEnum: SiteTypeEnum;
@@ -11788,6 +11985,175 @@ export interface operations {
             };
         };
     };
+    h2_stations_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedH2StationList"];
+                };
+            };
+        };
+    };
+    h2_stations_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["H2StationInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["H2StationInputRequest"];
+                "multipart/form-data": components["schemas"]["H2StationInputRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2StationInput"];
+                };
+            };
+        };
+    };
+    h2_stations_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2Station"];
+                };
+            };
+        };
+    };
+    h2_stations_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["H2StationInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["H2StationInputRequest"];
+                "multipart/form-data": components["schemas"]["H2StationInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2StationInput"];
+                };
+            };
+        };
+    };
+    h2_stations_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    h2_stations_partial_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedH2StationInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedH2StationInputRequest"];
+                "multipart/form-data": components["schemas"]["PatchedH2StationInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2StationInput"];
+                };
+            };
+        };
+    };
     nav_stats_retrieve: {
         parameters: {
             query: {
@@ -14915,6 +15281,10 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     type = "type",
     years = "years"
 }
+export enum AccessTypeEnum {
+    PUBLIC = "PUBLIC",
+    PRIVATE = "PRIVATE"
+}
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",
     EFFECTIVE_DATE = "EFFECTIVE_DATE",
@@ -14999,6 +15369,10 @@ export enum DigestateValorizationMethodsEnum {
     SPREADING = "SPREADING",
     COMPOSTING = "COMPOSTING",
     INCINERATION_LANDFILLING = "INCINERATION_LANDFILLING"
+}
+export enum DistributedPressureEnum {
+    Value350 = 350,
+    Value700 = 700
 }
 export enum DoubleCountingAgreementStatus {
     ACTIVE = "ACTIVE",
@@ -15175,7 +15549,8 @@ export enum SiteTypeEnum {
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
     PRODUCTION_BIOGAZ = "PRODUCTION BIOGAZ",
     EFCA = "EFCA",
-    AIRPORT = "AIRPORT"
+    AIRPORT = "AIRPORT",
+    H2_REFUELING_STATION = "H2 REFUELING STATION"
 }
 export enum SpreadingManagementMethodsEnum {
     DIRECT_SPREADING = "DIRECT_SPREADING",
