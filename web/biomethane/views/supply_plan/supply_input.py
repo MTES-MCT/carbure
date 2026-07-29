@@ -19,7 +19,7 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputExportSerializer,
     BiomethaneSupplyInputSerializer,
 )
-from biomethane.services.supply_plan.volume import wet_matter_tonnage_expression
+from biomethane.services.supply_plan.volume import annotate_volume_tmb, wet_matter_tonnage_expression
 from biomethane.views.mixins import ListWithObjectPermissionsMixin
 from core.filters import FiltersActionFactory
 from core.pagination import MetadataPageNumberPagination
@@ -78,6 +78,9 @@ class BiomethaneSupplyInputViewSet(
     filterset_class = BiomethaneSupplyInputFilter
     search_fields = ["feedstock__name"]
     pagination_class = BiomethaneSupplyInputPagination
+
+    def get_queryset(self):
+        return annotate_volume_tmb(super().get_queryset())
 
     def get_permissions(self):
         return get_biomethane_permissions(["create", "destroy", "update", "partial_update"], self.action)

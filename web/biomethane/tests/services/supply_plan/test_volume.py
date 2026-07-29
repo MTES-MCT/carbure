@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneSupplyInput
-from biomethane.services.supply_plan.volume import wet_matter_tonnage_expression
+from biomethane.services.supply_plan.volume import annotate_volume_tmb, wet_matter_tonnage_expression
 from core.models import Entity
 
 
@@ -38,5 +38,17 @@ class WetMatterTonnageExpressionTests(TestCase):
             .get("total")
         )
 
-        # 100 tMB + 200 × 100 / 24 ≈ 933.33
-        self.assertAlmostEqual(total, round(100.0 + 200.0 * 100.0 / 24.0, 2))
+        # 100 tMB + 200 × 100 / 24 = 933.33
+        self.assertEqual(total, 933.33)
+
+    def test_annotate_volume_tmb(self):
+        dry_input = BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            material_unit=BiomethaneSupplyInput.DRY,
+            dry_matter_ratio_percent=24.0,
+            volume=200.0,
+        )
+
+        annotated = annotate_volume_tmb(BiomethaneSupplyInput.objects.filter(pk=dry_input.pk)).get()
+        # 200 × 100 / 24 = 833.33
+        self.assertEqual(annotated.volume_tmb, 833.33)

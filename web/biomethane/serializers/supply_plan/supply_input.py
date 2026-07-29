@@ -15,6 +15,11 @@ class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
     origin_country = CountrySerializer()
     feedstock = FeedStockClassificationSerializer()
     producer = EntityPreviewSerializer(source="supply_plan.producer")
+    volume_tmb = serializers.FloatField(
+        read_only=True,
+        allow_null=True,
+        help_text="Tonnage en matière brute (tMB), converti depuis tMS si besoin.",
+    )
 
     class Meta:
         model = BiomethaneSupplyInput

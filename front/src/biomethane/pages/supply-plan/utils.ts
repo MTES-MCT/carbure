@@ -58,19 +58,6 @@ export const getSupplyPlanInputCollectionTypeOptions = () => {
   ]
 }
 
-/**
- * Convert dry matter tonnage (tMS) to wet matter (tMB).
- * Mirrors `wet_matter_tonnage_expression` in web/biomethane/services/supply_plan/volume.py:
- *   tMB = tMS × 100 / dryMatterRatioPercent
- */
-export const convertSupplyPlanInputVolume = (
-  volumeTonsMS: number,
-  dryMatterRatioPercent: number
-) => {
-  if (dryMatterRatioPercent <= 0) return undefined
-  return volumeTonsMS / (dryMatterRatioPercent / 100)
-}
-
 export const getSupplyPlanInputSource = (
   source: BiomethaneSupplyInputSource
 ) => {
