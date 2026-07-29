@@ -78,59 +78,14 @@ class BalanceByLotSerializer(serializers.Serializer):
                     "lot": lot_id,
                     "available_balance": value["available_balance"],
                     "volume": {
-                        "credit": value["quantity"]["credit"],
-                        "debit": value["quantity"]["debit"],
+                        "credit": value["volume"]["credit"],
+                        "debit": value["volume"]["debit"],
                     },
                     "emission_rate_per_mj": value["emission_rate_per_mj"],
                 },
             )
 
             # Sum up the available_balance for all lots
-            grouped_balance[group_key]["available_balance"] += value["available_balance"]
-
-        return list(grouped_balance.values())
-
-
-class BalanceDepotSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField()
-    quantity = BalanceQuantitySerializer()
-
-
-class BalanceByDepotSerializer(serializers.Serializer):
-    customs_category = serializers.CharField()
-    biofuel = BalanceBiofuelSerializer()
-    depots = BalanceDepotSerializer(many=True)
-
-    @staticmethod
-    def prepare_data(balance_dict):
-        # Group by customs_category and biofuel, and display balance by depot
-        grouped_balance = {}
-
-        for key, value in balance_dict.items():
-            sector, customs_cat, biofuel, depot = key
-            group_key = (customs_cat, biofuel)
-
-            if group_key not in grouped_balance:
-                grouped_balance[group_key] = {
-                    "customs_category": customs_cat,
-                    "biofuel": value["biofuel"],
-                    "available_balance": 0,
-                    "depots": [],
-                }
-
-            grouped_balance[group_key]["depots"].append(
-                {
-                    "id": depot.id,
-                    "name": depot.name,
-                    "quantity": {
-                        "credit": value["quantity"]["credit"],
-                        "debit": value["quantity"]["debit"],
-                    },
-                },
-            )
-
-            # Sum up the available_balance for all depots
             grouped_balance[group_key]["available_balance"] += value["available_balance"]
 
         return list(grouped_balance.values())

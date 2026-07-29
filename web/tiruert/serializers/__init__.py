@@ -1,4 +1,3 @@
-from .balance import BalanceByDepotSerializer
 from .balance import BalanceByLotSerializer
 from .balance import BalanceBySectorSerializer
 from .balance import BalanceSerializer

@@ -9,7 +9,6 @@ from core.pagination import MetadataPageNumberPagination
 from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.serializers import (
-    BalanceByDepotSerializer,
     BalanceByLotSerializer,
     BalanceBySectorSerializer,
     BalanceSerializer,
@@ -32,15 +31,15 @@ class BalancePagination(MetadataPageNumberPagination):
 class BalanceActionMixin:
     @extend_schema(
         operation_id="list_balances",
-        description="Retrieve balances grouped by mp category / biofuel or by sector or by depot",
+        description="Retrieve balances grouped by mp category / biofuel or by sector",
         filters=True,
         parameters=[
             OpenApiParameter(
                 name="group_by",
                 type=str,
-                enum=["sector", "lot", "depot"],
+                enum=["sector", "lot"],
                 location=OpenApiParameter.QUERY,
-                description="Group by sector, lot or depot.",
+                description="Group by sector, lot.",
                 default="",
             ),
             OpenApiParameter(
@@ -57,7 +56,6 @@ class BalanceActionMixin:
                 component_name="BalanceResponse",
                 serializers=[
                     BalanceSerializer,
-                    BalanceByDepotSerializer,
                     BalanceBySectorSerializer,
                 ],
                 resource_type_field_name=None,
@@ -106,11 +104,10 @@ class BalanceActionMixin:
         # Convert balance to a list of dictionaries for serialization
         serializer_class = {
             "lot": BalanceByLotSerializer,
-            "depot": BalanceByDepotSerializer,
             "sector": BalanceBySectorSerializer,
         }.get(group_by, self.get_serializer_class())
 
-        data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())
+        data = serializer_class.prepare_data(balance) if group_by in ["lot"] else list(balance.values())
 
         # These sortings can't be done in operations filters because they are not in the queryset
         # Theses info are calculated in the balance service

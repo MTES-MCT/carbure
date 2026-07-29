@@ -158,7 +158,6 @@ class BalanceActionMixinTest(TestCase):
     def test_balance_action_serializer_selection(self):
         """Test that balance action selects the correct serializer based on group_by parameter"""
         from tiruert.serializers.balance import (
-            BalanceByDepotSerializer,
             BalanceByLotSerializer,
             BalanceBySectorSerializer,
             BalanceSerializer,
@@ -167,7 +166,6 @@ class BalanceActionMixinTest(TestCase):
         # Test mapping dictionary directly from the balance method logic
         test_cases = [
             ("lot", BalanceByLotSerializer),
-            ("depot", BalanceByDepotSerializer),
             ("sector", BalanceBySectorSerializer),
             (None, BalanceSerializer),  # default when no group_by
         ]
@@ -176,7 +174,6 @@ class BalanceActionMixinTest(TestCase):
             with self.subTest(group_by=group_by):
                 serializer_mapping = {
                     "lot": BalanceByLotSerializer,
-                    "depot": BalanceByDepotSerializer,
                     "sector": BalanceBySectorSerializer,
                 }
                 selected = serializer_mapping.get(group_by, self.view.get_serializer_class())
