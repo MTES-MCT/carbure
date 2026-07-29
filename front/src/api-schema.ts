@@ -4129,6 +4129,11 @@ export interface components {
             origin_country: components["schemas"]["Country"];
             feedstock: components["schemas"]["FeedStockClassification"];
             producer: components["schemas"]["EntityPreview"];
+            /**
+             * Format: double
+             * @description Tonnage en matière brute (tMB), converti depuis tMS si besoin.
+             */
+            readonly volume_tmb: number | null;
             /** Provenance */
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
             /** Type de CIVE */
@@ -4140,7 +4145,7 @@ export interface components {
             /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /**
-             * Ratio de matière sèche (tMS/tMB)
+             * Ratio de matière sèche (%)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;
@@ -4216,7 +4221,7 @@ export interface components {
             /** Précisez la culture */
             culture_details?: string | null;
             /**
-             * Ratio de matière sèche (tMS/tMB)
+             * Ratio de matière sèche (%)
              * Format: double
              */
             dry_matter_ratio_percent?: number | null;

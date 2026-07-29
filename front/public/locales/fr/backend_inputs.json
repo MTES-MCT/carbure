@@ -103,7 +103,7 @@
   "biomethane.supply_input.average_weighted_distance_km": "Distance moyenne pondérée d'approvisionnement (Km)",
   "biomethane.supply_input.collection_type": "Type de collecte",
   "biomethane.supply_input.culture_details": "Précisez la culture",
-  "biomethane.supply_input.dry_matter_ratio_percent": "Ratio de matière sèche (tMS/tMB)",
+  "biomethane.supply_input.dry_matter_ratio_percent": "Ratio de matière sèche (%)",
   "biomethane.supply_input.feedstock": "Intrant",
   "biomethane.supply_input.material_unit": "Unité matière",
   "biomethane.supply_input.maximum_distance_km": "Distance maximale (Km)",

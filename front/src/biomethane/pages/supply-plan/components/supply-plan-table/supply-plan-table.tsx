@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next"
 import { useSupplyPlanColumns } from "./supply-plan-table.hooks"
 import { useLocation } from "react-router-dom"
 import { Pagination } from "common/components/pagination2"
+import { formatNumber } from "common/utils/formatters"
 
 type SupplyPlanTableProps = {
   supplyPlan: {
@@ -41,7 +42,10 @@ export const SupplyPlanTable = ({
     <>
       <RecapQuantity
         text={t("{{total}} tonnes annuelles", {
-          total: supplyPlan.supplyInputs?.annual_volumes_in_t ?? 0,
+          total: formatNumber(
+            supplyPlan.supplyInputs?.annual_volumes_in_t ?? 0,
+            { fractionDigits: 2 }
+          ),
         })}
       />
       <Table
