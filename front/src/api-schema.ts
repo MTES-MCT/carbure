@@ -13533,7 +13533,7 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -13749,8 +13749,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -14025,7 +14023,7 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -14060,7 +14058,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationImportResponse"];
+                    "application/json": components["schemas"]["OperationList"];
                 };
             };
         };
@@ -14162,7 +14160,7 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                years?: string[];
+                years?: number[];
             };
             header?: never;
             path?: never;
@@ -14185,8 +14183,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14205,7 +14201,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationList"];
+                    "application/json": components["schemas"]["OperationImportResponse"];
                 };
             };
         };
@@ -14215,8 +14211,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
