@@ -78,18 +78,28 @@ class BalanceServiceLotVolumeRuleTest(TestCase):
 class OperationDetailAvoidedEmissionsTest(TestCase):
     """Unit tests for OperationDetail.avoided_emissions property."""
 
+    def test_energy_applies_renewable_share(self):
+        from tiruert.models.operation_detail import OperationDetail
+
+        mock_detail = Mock(spec=OperationDetail)
+        mock_detail.volume = 100.0
+        mock_detail.operation.renewable_energy_share = 0.4
+        mock_detail.lot.biofuel.pci_litre = 10.0
+
+        result = OperationDetail.energy.fget(mock_detail)
+
+        self.assertEqual(result, 100.0 * 0.4 * 10.0)
+
     def test_avoided_emissions_applies_renewable_share(self):
         from tiruert.models.operation_detail import OperationDetail
 
         mock_detail = Mock(spec=OperationDetail)
-        mock_detail.lot.biofuel.pci_litre = 10.0
-        mock_detail.volume = 100.0
         mock_detail.emission_rate_per_mj = 20.0
-        mock_detail.operation.renewable_energy_share = 0.4
+        mock_detail.energy = 10.0 * 100.0 * 0.4
 
         result = OperationDetail.avoided_emissions.fget(mock_detail)
 
-        self.assertEqual(result, (94 - 20.0) * 10.0 * 100.0 * 0.4 / 1000000)
+        self.assertEqual(result, (94 - 20.0) * mock_detail.energy / 1000000)
 
 
 class BalanceServiceUpdateAvailableBalanceTest(TestCase):

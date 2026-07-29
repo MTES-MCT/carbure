@@ -27,16 +27,19 @@ class OperationDetail(models.Model):
     emission_rate_per_mj = models.FloatField(default=0.0)  # gC02/MJ réellement utilisés pour la création du lot
 
     @property
+    def energy(self):
+        """Returns the energy used for lot creation in MJ, no rounded."""
+        renewable_energy_share = getattr(self.operation, "renewable_energy_share", 1)
+        return (
+            self.volume * renewable_energy_share * self.lot.biofuel.pci_litre
+        )  # (MJ) énergie réellement utilisée pour la création du lot
+
+    @property
     def avoided_emissions(self):
         from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-        renewable_energy_share = getattr(self.operation, "renewable_energy_share", 1)
-        lot_energy = (
-            self.lot.biofuel.pci_litre * self.volume * renewable_energy_share
-        )  # (MJ) energie du lot utilisée pour la création du lot
-
         return (
-            (GHG_REFERENCE_RED_II - self.emission_rate_per_mj) * lot_energy / 1000000
+            (GHG_REFERENCE_RED_II - self.emission_rate_per_mj) * self.energy / 1000000
         )  # (tCO2) émissions évitées pour la création du lot
 
     class Meta:
