@@ -8342,6 +8342,7 @@ paths:
                 - Charge Point Operator
                 - Compagnie aérienne
                 - Fournisseur de biométhane
+                - HRS
                 - Opérateur
                 - Power or Heat Producer
                 - Producteur
@@ -8363,6 +8364,7 @@ paths:
             * `SAF Trader` - Trader de SAF
             * `Producteur de biométhane` - Producteur de biométhane
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
         - in: query
@@ -8780,6 +8782,7 @@ paths:
                 - Charge Point Operator
                 - Compagnie aérienne
                 - Fournisseur de biométhane
+                - HRS
                 - Opérateur
                 - Power or Heat Producer
                 - Producteur
@@ -8801,6 +8804,7 @@ paths:
             * `SAF Trader` - Trader de SAF
             * `Producteur de biométhane` - Producteur de biométhane
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
         - in: query
@@ -9016,6 +9020,7 @@ paths:
                 - Charge Point Operator
                 - Compagnie aérienne
                 - Fournisseur de biométhane
+                - HRS
                 - Opérateur
                 - Power or Heat Producer
                 - Producteur
@@ -9037,6 +9042,7 @@ paths:
             * `SAF Trader` - Trader de SAF
             * `Producteur de biométhane` - Producteur de biométhane
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
         - in: query
@@ -14634,7 +14640,7 @@ components:
       description: |-
         * `PRIVATE` - Issus de collecteurs privés
         * `LOCAL` - Issus de collectivités locales
-        * `IAA` - Issus d'IAA
+        * `IAA` - Issus de résidus d'IAA
     CommentRequest:
       type: object
       properties:
@@ -16792,6 +16798,7 @@ components:
         - SAF Trader
         - Producteur de biométhane
         - Fournisseur de biométhane
+        - HRS
       type: string
       description: |-
         * `Producteur` - Producteur
@@ -16807,6 +16814,7 @@ components:
         * `SAF Trader` - Trader de SAF
         * `Producteur de biométhane` - Producteur de biométhane
         * `Fournisseur de biométhane` - Fournisseur de biométhane
+        * `HRS` - Distributeur d'hydrogène pour la mobilité
       x-enum-varnames:
         - Producer
         - Operator

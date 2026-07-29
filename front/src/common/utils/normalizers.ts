@@ -263,6 +263,8 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Producteur d'électricité ou de chaleur")
     case EntityType.Producteur_de_biom_thane:
       return i18next.t("Producteur de biométhane")
+    case EntityType.HRS:
+      return i18next.t("Distributeur d'hydrogène pour la mobilité")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")
