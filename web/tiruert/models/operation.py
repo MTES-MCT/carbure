@@ -190,18 +190,3 @@ class Operation(models.Model):
         if self.credited_entity is None:
             return False
         return self.credited_entity.id == int(entity_id) and self.type == Operation.CESSION
-
-    def quantity(self, unit="l", force=False):
-        if getattr(self, "_quantity", None) is not None and not force:
-            return round(self._quantity, 2)
-
-        volume = self.volume_l
-        return round(self.volume_to_quantity(volume, unit), 2)
-
-    def volume_to_quantity(self, volume, unit):
-        if unit == "mj":
-            return volume * self.biofuel.pci_litre
-        elif unit == "kg":
-            return volume * self.biofuel.masse_volumique
-        else:
-            return volume
