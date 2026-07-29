@@ -32,37 +32,67 @@ class OperationConstantsTest(TestCase):
 
 
 class OperationVolumePropertyTest(TestCase):
-    """Tests for Operation.volume_l property."""
+    """Tests for Operation volume properties."""
 
-    def test_volume_l_returns_annotated_volume_when_exists(self):
-        """Should return _volume when it exists (from queryset annotation)."""
+    def test_volume_unsigned_sums_detail_volumes(self):
+        """Should sum raw detail volumes."""
         operation = Operation()
-        operation._volume = 1500.0
+        detail1 = Mock()
+        detail1.volume = 100.2
+        detail2 = Mock()
+        detail2.volume = 50.3
 
-        result = operation.volume_l
-        self.assertEqual(result, 1500.0)
+        details_mock = Mock()
+        details_mock.all = Mock(return_value=[detail1, detail2])
 
-    def test_volume_l_returns_base_volume_when_no_annotation(self):
-        """Should return volume property when _volume doesn't exist."""
+        with patch.object(Operation, "details", PropertyMock(return_value=details_mock)):
+            self.assertEqual(operation.volume_unsigned, 150.5)
+
+    def test_volume_returns_truncated_annotated_volume_when_exists(self):
+        """Should return truncated _volume when it exists (from queryset annotation)."""
+        operation = Operation()
+        operation._volume = 1500.789
+
+        result = operation.volume
+        self.assertEqual(result, 1500.78)
+
+    def test_volume_returns_unsigned_when_no_annotation(self):
+        """Should return truncated unsigned volume when annotation is missing."""
         operation = Operation()
 
-        # Mock the volume property to return a value
-        with patch.object(type(operation), "volume", new_callable=PropertyMock) as mock_volume:
-            mock_volume.return_value = 1000.0
+        with patch.object(type(operation), "volume_unsigned", new_callable=PropertyMock) as mock_volume_unsigned:
+            mock_volume_unsigned.return_value = 321.987
 
-            result = operation.volume_l
-            self.assertEqual(result, 1000.0)
+            result = operation.volume
+            self.assertEqual(result, 321.98)
 
-    def test_volume_l_handles_none_annotation(self):
-        """Should return base volume when _volume is None."""
+
+class OperationEnergyPropertyTest(TestCase):
+    """Tests for Operation.energy property."""
+
+    def test_energy_returns_truncated_annotated_energy_when_exists(self):
+        """Should return truncated _energy when it exists (from queryset annotation)."""
         operation = Operation()
-        operation._volume = None
+        operation._energy = 4567.891
 
-        with patch.object(type(operation), "volume", new_callable=PropertyMock) as mock_volume:
-            mock_volume.return_value = 2000.0
+        result = operation.energy
+        self.assertEqual(result, 4567)
 
-            result = operation.volume_l
-            self.assertEqual(result, 2000.0)
+    def test_energy_returns_unsigned_when_no_annotation(self):
+        """Should compute unsigned energy when annotation is missing."""
+        biofuel = Biocarburant.objects.create(
+            code="TSTEU",
+            name="Test Energy Unsigned",
+            pci_litre=10.0,
+        )
+        operation = Operation(biofuel=biofuel)
+        operation.renewable_energy_share = 0.5
+
+        with patch.object(type(operation), "volume_unsigned", new_callable=PropertyMock) as mock_volume_unsigned:
+            mock_volume_unsigned.return_value = 100.0
+
+            result = operation.energy
+            self.assertEqual(result, 500)
 
 
 class OperationAvoidedEmissionsPropertyTest(TestCase):

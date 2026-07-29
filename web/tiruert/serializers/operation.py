@@ -10,7 +10,7 @@ from core.serializers import CountrySerializer
 from core.utils import check_file_size_and_extension
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.balance import BalanceBiofuelSerializer
-from tiruert.serializers.fields import CachedPrimaryKeyRelatedField, RoundedFloatField
+from tiruert.serializers.fields import CachedPrimaryKeyRelatedField, TruncatedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
 from tiruert.services.operation_excel_template import get_tiruert_operator_queryset
@@ -49,8 +49,6 @@ class BaseOperationSerializer(serializers.ModelSerializer):
         return instance.energy
 
     def get_avoided_emissions(self, instance) -> float:
-        if getattr(instance, "_avoided_emissions", None) is not None:
-            return round(instance._avoided_emissions, 2)
         return instance.avoided_emissions
 
     def get_fields(self):
@@ -61,9 +59,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
 
 class OperationListSerializer(BaseOperationSerializer):
-    volume = RoundedFloatField(source="_volume", read_only=True)
-    energy = RoundedFloatField(source="_energy", read_only=True)
-    avoided_emissions = RoundedFloatField(source="_avoided_emissions", read_only=True)
+    volume = TruncatedFloatField(source="_volume", read_only=True)
+    energy = TruncatedFloatField(source="_energy", read_only=True, decimal_places=0)
+    avoided_emissions = TruncatedFloatField(source="_avoided_emissions", read_only=True)
 
     class Meta:
         model = Operation

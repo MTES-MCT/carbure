@@ -155,36 +155,42 @@ class Operation(models.Model):
         return OperationService.define_sector(self.biofuel)
 
     @property
-    def volume(self):
+    def volume_unsigned(self):
         return sum([detail.volume for detail in self.details.all()])
 
     @property
-    def volume_l(self):
+    def volume(self):
+        """Returns the volume in liters, rounded to 2 decimal places."""
         if getattr(self, "_volume", None) is not None:
-            return self._volume
+            return truncate(self._volume)
 
-        return self.volume
+        return truncate(self.volume_unsigned)  # unsigned
 
     @property
     def energy(self):
+        """Returns the energy in MJ, rounded to 0 decimal places."""
         if getattr(self, "_energy", None) is not None:
             return truncate(self._energy, 0)
 
-        return truncate(self.volume_l * self.renewable_energy_share * self.biofuel.pci_litre, 0)  # in MJ
+        return truncate(self.volume_unsigned * self.renewable_energy_share * self.biofuel.pci_litre, 0)  # unsigned
 
     @property
     def avoided_emissions(self):
-        return round(sum(detail.avoided_emissions for detail in self.details.all()), 2)  # in tCO2
+        """Returns the avoided emissions in tCO2, rounded to 2 decimal places."""
+        if getattr(self, "_avoided_emissions", None) is not None:
+            return truncate(self._avoided_emissions)
+
+        return truncate(sum(detail.avoided_emissions for detail in self.details.all()))  # in tCO2
 
     class Meta:
         db_table = "tiruert_operations"
         verbose_name = "Opération"
         verbose_name_plural = "Opérations"
 
-    def is_credit(self, entity):
+    def is_credit(self, entity_id):
         if self.credited_entity is None:
             return False
-        return self.credited_entity.id == int(entity)
+        return self.credited_entity.id == int(entity_id)
 
     def is_acquisition(self, entity_id):
         if self.credited_entity is None:

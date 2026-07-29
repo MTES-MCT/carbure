@@ -90,8 +90,8 @@ class BaseOperationSerializerTest(TestCase):
 
         serializer = OperationListSerializer(operation, context={"details": False})
 
-        self.assertEqual(serializer.data["volume"], 123.46)
-        self.assertEqual(serializer.data["energy"], 4567.89)
+        self.assertEqual(serializer.data["volume"], 123.45)
+        self.assertEqual(serializer.data["energy"], 4567)
         self.assertEqual(serializer.data["avoided_emissions"], 78.9)
 
 
@@ -114,15 +114,16 @@ class OperationSerializerTest(TestCase):
 
         self.assertEqual(result, 451.50)
 
-    def test_get_avoided_emissions_uses_annotation_when_available(self):
-        """Should prefer annotated avoided emissions on list querysets."""
+    def test_get_avoided_emissions_delegates_to_model_even_if_annotation_exists(self):
+        """Should delegate avoided_emissions to model property."""
         serializer = self._create_serializer()
-        instance = Mock(spec=Operation)
+        instance = Mock()
         instance._avoided_emissions = 451.504
+        instance.avoided_emissions = 0.0
 
         result = serializer.get_avoided_emissions(instance)
 
-        self.assertEqual(result, 451.5)
+        self.assertEqual(result, 0.0)
 
     def test_get_energy_delegates_to_model_property(self):
         """Should use the energy property directly."""
