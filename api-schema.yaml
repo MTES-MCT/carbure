@@ -5563,7 +5563,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -6648,7 +6647,6 @@ paths:
       security:
         - cookieAuth: []
         - basicAuth: []
-        - {}
       responses:
         "200":
           content:
@@ -13947,6 +13945,12 @@ components:
           $ref: "#/components/schemas/FeedStockClassification"
         producer:
           $ref: "#/components/schemas/EntityPreview"
+        volume_tmb:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
+          description: Tonnage en matière brute (tMB), converti depuis tMS si besoin.
         source:
           allOf:
             - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
@@ -13976,7 +13980,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche (tMS/tMB)
+          title: Ratio de matière sèche (%)
         volume:
           type: number
           format: double
@@ -14005,6 +14009,7 @@ components:
         - origin_country
         - producer
         - supply_plan
+        - volume_tmb
     BiomethaneSupplyInputCreate:
       type: object
       properties:
@@ -14153,7 +14158,7 @@ components:
           type: number
           format: double
           nullable: true
-          title: Ratio de matière sèche (tMS/tMB)
+          title: Ratio de matière sèche (%)
         volume:
           type: number
           format: double

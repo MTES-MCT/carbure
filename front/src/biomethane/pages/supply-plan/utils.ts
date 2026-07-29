@@ -58,11 +58,6 @@ export const getSupplyPlanInputCollectionTypeOptions = () => {
   ]
 }
 
-export const convertSupplyPlanInputVolume = (
-  volumeTonsMS: number,
-  ratioTonsMS: number
-) => volumeTonsMS / ratioTonsMS
-
 export const getSupplyPlanInputSource = (
   source: BiomethaneSupplyInputSource
 ) => {
