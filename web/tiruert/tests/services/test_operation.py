@@ -783,15 +783,15 @@ class OperationServiceBulkCheckVolumesTest(TestCase):
             },
         ]
 
-        OperationService.bulk_check_volumes(entries, "l")
+        OperationService.bulk_check_volumes(entries)
 
         self.assertEqual(mock_check_volumes.call_count, 2)
 
         observed = {}
         for call in mock_check_volumes.call_args_list:
-            selected_lots, data, unit = call.args
+            selected_lots, data = call.args
             observed[(data["biofuel"].code, data["customs_category"])] = {lot["id"]: lot["volume"] for lot in selected_lots}
-            self.assertEqual(unit, "l")
+            self.assertEqual(data["debited_entity"], debited_entity)
 
         self.assertEqual(observed[("ETH", "CONV")], {1: 1100, 2: 100})
         self.assertEqual(observed[("EMAG", "ANN-IX-A")], {3: 50})
