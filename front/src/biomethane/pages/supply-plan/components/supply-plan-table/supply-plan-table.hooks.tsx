@@ -48,6 +48,9 @@ export const useSupplyPlanColumns = () => {
                 input.dry_matter_ratio_percent ?? 0
               )
             : input.volume
+
+        if (volume == null) return <Cell text={t("N/A")} />
+
         return <Cell text={`${formatNumber(volume)} tMB`} />
       },
     },

@@ -1,4 +1,5 @@
 from django.db.models import Sum
+from django.db.models.functions import Round
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework.mixins import (
@@ -18,6 +19,7 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputExportSerializer,
     BiomethaneSupplyInputSerializer,
 )
+from biomethane.services.supply_plan.volume import wet_matter_tonnage_expression
 from biomethane.views.mixins import ListWithObjectPermissionsMixin
 from core.filters import FiltersActionFactory
 from core.pagination import MetadataPageNumberPagination
@@ -26,7 +28,8 @@ from .mixins import ExcelExportActionMixin
 
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
-    aggregate_fields = {"annual_volumes_in_t": Sum("volume")}
+    # Total wet matter tonnage (tMB), with DRY lines converted via dry_matter_ratio_percent.
+    aggregate_fields = {"annual_volumes_in_t": Round(Sum(wet_matter_tonnage_expression()), 2)}
 
 
 @extend_schema(
