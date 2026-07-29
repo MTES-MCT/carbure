@@ -33,7 +33,7 @@ BASE_COLUMNS: list[Column] = [
     {"label": "Sous-catégorie", "value": "feedstock.classification.subcategory"},
     {"label": "Unité", "value": _display("material_unit")},
     {"label": "Ratio de matière sèche (%)", "value": "dry_matter_ratio_percent"},
-    {"label": "Volume (t)", "value": "volume"},
+    {"label": "Tonnage brut (tMB)", "value": "volume_tmb"},
     {"label": "Département d'origine", "value": "origin_department"},
     {"label": "Distance moyenne pondérée (km)", "value": "average_weighted_distance_km"},
     {"label": "Distance maximale (km)", "value": "maximum_distance_km"},
