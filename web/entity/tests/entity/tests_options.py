@@ -175,6 +175,9 @@ class EntityProductionSiteTest(TestCase):
     def test_elec_option(self):
         url = "entity-elec"
 
+        self.entity2.is_tiruert_liable = True
+        self.entity2.save()
+
         # wrongly formatted
         response = self.client.post(reverse(url), {"entity_id": "blablabla", "has_elec": "true"})
         assert response.status_code == 403
@@ -205,9 +208,18 @@ class EntityProductionSiteTest(TestCase):
         entity = Entity.objects.get(id=self.entity2.id)
         assert entity.has_elec is False
 
-        # should only work on Operator
+        # should only work on TIRUERT liable entities
         response = self.client.post(
             reverse(url) + f"?entity_id={self.entity1.id}", {"entity_id": self.entity1.id, "has_elec": "true"}
         )
         assert response.status_code == 400
-        assert response.json()["message"] == "NOT_OPERATOR"
+        assert response.json()["message"] == "NOT_TIRUERT_LIABLE"
+
+        self.entity1.is_tiruert_liable = True
+        self.entity1.save()
+        response = self.client.post(
+            reverse(url) + f"?entity_id={self.entity1.id}", {"entity_id": self.entity1.id, "has_elec": "true"}
+        )
+        assert response.status_code == 200
+        entity = Entity.objects.get(id=self.entity1.id)
+        assert entity.has_elec is True
