@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from core.models.entity import Entity
-from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter
+from edelivery.ebms.converters import MaterialConverter, QuantityConverter, TransactionStatusConverter
 from edelivery.ebms.ntr import NationalTradeRegister
 from edelivery.ebms.udb_element import UDBElement
 
@@ -11,7 +11,7 @@ class Transaction(UDBElement):
         return self.xml_root_element.find("./MATERIAL_CODE").text
 
     def carbure_status(self):
-        return StatusConverter().from_udb(self.status())
+        return TransactionStatusConverter().from_udb(self.status())
 
     def client_id(self):
         return self.xml_root_element.find("./BUYER_ECONOMIC_OPERATOR_NUMBER").text

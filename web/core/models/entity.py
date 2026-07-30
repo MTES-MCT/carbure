@@ -4,6 +4,7 @@ import hashlib
 from django.db import models
 from django.db.models import Q
 
+from edelivery.ebms.ntr import NationalTradeRegister
 from transactions.models.site import Site
 
 from .geography import Department, Pays
@@ -132,6 +133,10 @@ class Entity(models.Model):
         if self.entity_type == Entity.EXTERNAL_ADMIN:
             d["ext_admin_pages"] = [e.right for e in self.externaladminrights_set.all()]
         return d
+
+    def ntr_id(self):
+        ntr = NationalTradeRegister(self.registered_country.code_pays, self.registration_id)
+        return ntr.id()
 
     def url_friendly_name(self):
         return self.name.replace(" ", "").upper()
