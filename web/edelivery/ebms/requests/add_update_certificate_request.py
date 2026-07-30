@@ -1,6 +1,6 @@
 from core.models.certificate import GenericCertificate
 from edelivery.adapters.clock import to_date_isoformat
-from edelivery.ebms.converters import CertificateStatusConverter
+from edelivery.ebms.converters import CertificateIssuerConverter, CertificateStatusConverter
 
 from .base_request import BaseRequest
 
@@ -13,6 +13,7 @@ class AddUpdateCertificateRequest(BaseRequest):
             raise NotImplementedError(f"Certificate export to UDB not implemented for certificate type {certificate_type}")
 
         entity = entity_certificate.entity
+        certificate_body_number = CertificateIssuerConverter().to_udb(certificate.certificate_issuer)
         validity_status = CertificateStatusConverter().to_udb(certificate.status)
         payload = f"""\
 <udb:AddUpdateCertificateRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
@@ -20,7 +21,7 @@ class AddUpdateCertificateRequest(BaseRequest):
     <EO_CERTIFICATE>
       <ECONOMIC_OPERATOR_NUMBER>{entity.ntr_id()}</ECONOMIC_OPERATOR_NUMBER>
       <CERTIFICATE_NUMBER>{certificate.certificate_id}</CERTIFICATE_NUMBER>
-      {self.stubbed_certificate_body_fields()}
+      <CERTIFICATE_BODY_NUMBER>{certificate_body_number}</CERTIFICATE_BODY_NUMBER>
       <DATE_OF_ISSUE>{to_date_isoformat(certificate.valid_from)}</DATE_OF_ISSUE>
       <PLACE_OF_ISSUE>France</PLACE_OF_ISSUE>
       <CERT_DATE_FROM>{to_date_isoformat(certificate.valid_from)}</CERT_DATE_FROM>
@@ -33,11 +34,6 @@ class AddUpdateCertificateRequest(BaseRequest):
 </udb:AddUpdateCertificateRequest>"""
 
         super().__init__(payload)
-
-    def stubbed_certificate_body_fields(self):
-        return """\
-<CERTIFICATE_BODY_NUMBER>CU343224531</CERTIFICATE_BODY_NUMBER>
-        """
 
     def stubbed_additional_mandatory_fields(self):
         return """\

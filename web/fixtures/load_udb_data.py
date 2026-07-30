@@ -20,6 +20,7 @@ data = {
             "certificate": {
                 "id": "EU-ISCC-Cert-Test-FR004",
                 "type": GenericCertificate.ISCC,
+                "issuer": "",
                 "valid_from": "2025-08-01",
                 "valid_until": "2026-08-01",
             },
@@ -30,6 +31,7 @@ data = {
             "certificate": {
                 "id": "EU-ISCC-Cert-FR999-00000011",
                 "type": GenericCertificate.ISCC,
+                "issuer": "",
                 "valid_from": "2026-01-08",
                 "valid_until": "2028-01-08",
             },
@@ -40,6 +42,7 @@ data = {
             "certificate": {
                 "id": "SN_UN_2026_0179",
                 "type": GenericCertificate.SYSTEME_NATIONAL,
+                "issuer": "Control Union",
                 "valid_from": "2026-01-08",
                 "valid_until": "2028-01-08",
             },
@@ -70,6 +73,7 @@ if settings.WITH_UDB_ACCEPTANCE_DATA:
             certificate_type=certificate_data["type"],
             defaults={
                 "certificate_holder": producer_data["name"],
+                "certificate_issuer": certificate_data["issuer"],
                 "status": GenericCertificate.VALID,
                 "valid_from": certificate_data["valid_from"],
                 "valid_until": certificate_data["valid_until"],

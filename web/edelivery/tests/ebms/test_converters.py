@@ -1,12 +1,36 @@
+from os import environ
 from unittest import TestCase
+from unittest.mock import patch
 
 from edelivery.ebms.converters import (
+    CertificateIssuerConverter,
     CertificateStatusConverter,
     MaterialConverter,
     QuantityConverter,
     TransactionStatusConverter,
     UDBConversionError,
 )
+
+
+class CertificateIssuerConverterTest(TestCase):
+    def test_converts_carbure_certificate_issuer_to_udb_certificate_body_number(self):
+        conversion_mapping = {"UDB_CERTIFICATE_BODY_NUMBER": "CARBURE_CERTIFICATE_ISSUER"}
+        converter = CertificateIssuerConverter(conversion_mapping)
+        self.assertEqual("UDB_CERTIFICATE_BODY_NUMBER", converter.to_udb("CARBURE_CERTIFICATE_ISSUER"))
+
+    def test_raises_carbure_conversion_error_if_issuer_unknown(self):
+        conversion_mapping = {}
+        converter = CertificateIssuerConverter(conversion_mapping)
+        with self.assertRaises(UDBConversionError) as context:
+            converter.to_udb("UNKNOWN_ISSUER")
+
+        self.assertEqual("Unknown Carbure Certificate Issuer: UNKNOWN_ISSUER", context.exception.message)
+
+    @patch.dict("os.environ", {}, clear=True)
+    def test_plays_nice_when_env_variable_not_present(self):
+        self.assertNotIn("CERTIFICATE_ISSUER_CONVERSION_MAPPING", environ)
+        converter = CertificateIssuerConverter()
+        self.assertEqual(0, len(converter.conversion_mapping))
 
 
 class CertificateStatusConverterTest(TestCase):
