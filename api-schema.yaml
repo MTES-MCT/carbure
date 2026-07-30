@@ -12367,8 +12367,8 @@ components:
         available_balance:
           type: number
           format: double
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
+        volume:
+          $ref: "#/components/schemas/BalanceVolume"
         pending_teneur:
           type: number
           format: double
@@ -12400,9 +12400,9 @@ components:
         - initial_balance
         - pending_operations
         - pending_teneur
-        - quantity
         - saved_emissions
         - sector
+        - volume
     BalanceBiofuel:
       type: object
       properties:
@@ -12437,8 +12437,8 @@ components:
         available_balance:
           type: number
           format: double
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
+        volume:
+          $ref: "#/components/schemas/BalanceVolume"
         pending_teneur:
           type: number
           format: double
@@ -12453,8 +12453,8 @@ components:
         - initial_balance
         - pending_operations
         - pending_teneur
-        - quantity
         - sector
+        - volume
     BalanceQuantity:
       type: object
       properties:
@@ -12470,6 +12470,17 @@ components:
       oneOf:
         - $ref: "#/components/schemas/Balance"
         - $ref: "#/components/schemas/BalanceBySector"
+    BalanceVolume:
+      type: object
+      properties:
+        credit:
+          type: number
+          format: double
+          default: 0
+        debit:
+          type: number
+          format: double
+          default: 0
     BaseUser:
       type: object
       properties:

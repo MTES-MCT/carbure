@@ -5,8 +5,8 @@ from tiruert.serializers.balance import (
     BalanceByLotSerializer,
     BalanceBySectorSerializer,
     BalanceLotSerializer,
-    BalanceQuantitySerializer,
     BalanceSerializer,
+    BalanceVolumeSerializer,
     BaseBalanceSerializer,
 )
 
@@ -30,7 +30,7 @@ class BalanceSerializersTest(TestCase):
     def test_balance_quantity_serializer(self):
         """Test that BalanceQuantitySerializer correctly serializes credit and debit values"""
         quantity = {"credit": 100.0, "debit": 50.0}
-        serializer = BalanceQuantitySerializer(data=quantity)
+        serializer = BalanceVolumeSerializer(data=quantity)
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["credit"], 100.0)
         self.assertEqual(serializer.validated_data["debit"], 50.0)
@@ -104,7 +104,7 @@ class BalanceSerializerValidationTest(TestCase):
 
     def test_balance_quantity_serializer_with_defaults(self):
         """Test that BalanceQuantitySerializer applies default values for missing fields"""
-        serializer = BalanceQuantitySerializer(data={})
+        serializer = BalanceVolumeSerializer(data={})
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["credit"], 0.0)
         self.assertEqual(serializer.validated_data["debit"], 0.0)

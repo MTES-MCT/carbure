@@ -3304,7 +3304,7 @@ export interface components {
             readonly initial_balance: number;
             /** Format: double */
             available_balance: number;
-            quantity: components["schemas"]["BalanceQuantity"];
+            volume: components["schemas"]["BalanceVolume"];
             /** Format: double */
             pending_teneur: number;
             /** Format: double */
@@ -3335,7 +3335,7 @@ export interface components {
             readonly initial_balance: number;
             /** Format: double */
             available_balance: number;
-            quantity: components["schemas"]["BalanceQuantity"];
+            volume: components["schemas"]["BalanceVolume"];
             /** Format: double */
             pending_teneur: number;
             /** Format: double */
@@ -3355,6 +3355,18 @@ export interface components {
             debit: number;
         };
         BalanceResponse: components["schemas"]["Balance"] | components["schemas"]["BalanceBySector"];
+        BalanceVolume: {
+            /**
+             * Format: double
+             * @default 0
+             */
+            credit: number;
+            /**
+             * Format: double
+             * @default 0
+             */
+            debit: number;
+        };
         BaseUser: {
             /** Format: email */
             readonly email: string;

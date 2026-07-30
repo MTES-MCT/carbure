@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.models import MatierePremiere
+from core.utils import truncate
 from tiruert.models.operation import Operation
 from tiruert.serializers.fields import RoundedFloatField, TruncatedFloatField
 
@@ -13,23 +14,23 @@ class BalanceBiofuelSerializer(serializers.Serializer):
     masse_volumique = RoundedFloatField()
 
 
-class BalanceQuantitySerializer(serializers.Serializer):
-    credit = RoundedFloatField(default=0.0)
-    debit = RoundedFloatField(default=0.0)
+class BalanceVolumeSerializer(serializers.Serializer):
+    credit = TruncatedFloatField(default=0.0)
+    debit = TruncatedFloatField(default=0.0)
 
 
 class BaseBalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
     initial_balance = serializers.SerializerMethodField()
     available_balance = TruncatedFloatField()
-    quantity = BalanceQuantitySerializer()
+    volume = BalanceVolumeSerializer(source="quantity")  # can be called "volume" because serializer used only by frontend
     pending_teneur = TruncatedFloatField(decimal_places=0)
     declared_teneur = TruncatedFloatField(decimal_places=0)
     pending_operations = serializers.IntegerField()
 
     def get_initial_balance(self, instance) -> float:
         result = instance["available_balance"] - instance["quantity"]["credit"] + instance["quantity"]["debit"]
-        return round(result, 2)
+        return truncate(result)
 
 
 class BalanceSerializer(BaseBalanceSerializer):
@@ -47,7 +48,7 @@ class BalanceBySectorSerializer(BaseBalanceSerializer):
 class BalanceLotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
     available_balance = RoundedFloatField()
-    volume = BalanceQuantitySerializer()
+    volume = BalanceVolumeSerializer()
     emission_rate_per_mj = RoundedFloatField()
 
 

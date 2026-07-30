@@ -73,20 +73,20 @@ class BalanceService:
 
         return entry
 
-    def _update_volume(balance, key, credit_operation, quantity):
+    def _update_volume(balance, key, credit_operation, volume):
         """
         Updates lot volume credit/debit values.
         """
         volume_type = "credit" if credit_operation else "debit"
-        balance[key]["volume"][volume_type] += quantity
+        balance[key]["volume"][volume_type] += volume
 
     @staticmethod
-    def _update_available_balance(balance, key, operation, detail, credit_operation, quantity):
+    def _update_available_balance(balance, key, operation, detail, credit_operation, volume):
         """
         Updates the balance entry with the details of the operation
         """
         volume_sign = 1 if credit_operation else -1
-        balance[key]["available_balance"] += quantity * volume_sign
+        balance[key]["available_balance"] += volume * volume_sign
 
         balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj  # used when displaying balance by lot
 
@@ -137,11 +137,11 @@ class BalanceService:
                 balance[key]["biofuel"] = operation.biofuel
 
                 if not (credit_operation and operation.status in [Operation.PENDING, Operation.DRAFT]):
-                    quantity = detail.volume
-                    BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, quantity)
+                    volume = detail.volume
+                    BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, volume)
 
                     if date_from is None or operation.created_at >= date_from:
-                        BalanceService._update_volume(balance, key, credit_operation, quantity)
+                        BalanceService._update_volume(balance, key, credit_operation, volume)
 
             if last_key is not None and operation.status in [Operation.PENDING, Operation.DRAFT]:
                 balance[last_key]["pending_operations"] += 1
