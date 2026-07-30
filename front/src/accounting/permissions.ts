@@ -42,7 +42,7 @@ export const canAccessAdmin = (entity: EntityManager) =>
   entity.isAdmin || isDGDDINationalAdmin(entity)
 
 const canAccessElecSector = (entity: EntityManager) =>
-  (entity.isOperator && entity.has_elec) ||
+  (entity.is_tiruert_liable && entity.has_elec) ||
   entity.isAdmin ||
   entity.hasAdminRight(ExternalAdminPages.ELEC)
 
