@@ -11,14 +11,14 @@ export const useElec = (params?: ElecParams) => {
   const routes = useRoutes()
 
   const { isAdmin, isCPO } = entity
-  const isElecOperator = entity.isOperator && entity.has_elec
+  const isElecLiable = entity.is_tiruert_liable && entity.has_elec
   const isElecAdmin = entity.isExternal && entity.hasAdminRight("ELEC")
   const isElecTransferAdmin = entity.isExternal && entity.hasAdminRight("TRANSFERRED_ELEC") // prettier-ignore
 
   const elecCerts: MenuSection = {
     title: t("Certificats d'électricité"),
     condition:
-      isCPO || isElecOperator || isAdmin || isElecAdmin || isElecTransferAdmin,
+      isCPO || isElecLiable || isAdmin || isElecAdmin || isElecTransferAdmin,
     children: [
       {
         path: routes.ELEC_V2().CERTIFICATES.PROVISION,
