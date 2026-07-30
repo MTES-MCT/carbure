@@ -60,7 +60,7 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
         entity = self.request.entity
         if entity.entity_type == Entity.CPO:
             queryset = ElecTransferCertificate.objects.filter(supplier=entity)
-        if entity.entity_type == Entity.OPERATOR:
+        if entity.is_tiruert_liable and entity.has_elec:
             queryset = ElecTransferCertificate.objects.filter(client=entity)
 
         return queryset.select_related("supplier", "client").order_by("id")

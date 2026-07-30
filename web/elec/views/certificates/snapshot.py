@@ -62,7 +62,7 @@ def get_snapshot(request, *args, **kwargs):
     if entity.entity_type == Entity.CPO:
         provision_certificates = provision_certificates.filter(cpo=entity)
         transfer_certificates = transfer_certificates.filter(supplier=entity)
-    elif entity.entity_type == Entity.OPERATOR:
+    elif entity.is_tiruert_liable and entity.has_elec:
         provision_certificates = provision_certificates.none()
         transfer_certificates = transfer_certificates.filter(client=entity)
     elif entity.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
