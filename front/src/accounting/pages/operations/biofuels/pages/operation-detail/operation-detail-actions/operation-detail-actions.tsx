@@ -80,7 +80,7 @@ export const OperationDetailActions = ({
     if (!canUpdateBiofuelOperation || entity.isAdmin) return buttons
 
     if (
-      isReceivingOperation(operation.quantity) &&
+      isReceivingOperation(operation.volume) &&
       operation.type === OperationType.TRANSFERT &&
       operation?.status === OperationsStatus.PENDING
     ) {
@@ -110,7 +110,7 @@ export const OperationDetailActions = ({
     }
 
     if (
-      isSendingOperation(operation.quantity) &&
+      isSendingOperation(operation.volume) &&
       [OperationsStatus.PENDING, OperationsStatus.DRAFT].includes(
         operation.status!
       )

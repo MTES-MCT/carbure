@@ -24,7 +24,7 @@ const debouncedGetBalance = debounce(
       entity_id: entityId,
       ...mapAdvancedFiltersForPayload(filters),
     }).then((res) => {
-      const quantity = floorAvailableQuantity(res.data.total_quantity)
+      const quantity = floorAvailableQuantity(res.data.total_volume)
 
       if (quantity <= 1) return undefined
 

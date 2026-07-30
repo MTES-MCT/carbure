@@ -9,12 +9,12 @@ export const formatQuantityDisplay = (
   applyRenewableShare: boolean = false
 ) => {
   const quantity = applyRenewableShare
-    ? formatValue(operation, operation.quantity)
-    : operation.quantity
+    ? formatValue(operation, operation.volume)
+    : operation.volume
 
   const quantityMj = applyRenewableShare
-    ? formatValue(operation, operation.quantity_mj)
-    : operation.quantity_mj
+    ? formatValue(operation, operation.energy)
+    : operation.energy
 
   return `${getOperationQuantity(
     formatUnit(quantity, Unit.l, {

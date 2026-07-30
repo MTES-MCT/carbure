@@ -14,8 +14,8 @@ describe("formatQuantityDisplay", () => {
 
   it("Should format quantity without applying renewable_energy_share", () => {
     const operation = createOperation({
-      quantity: 1000,
-      quantity_mj: 27000,
+      volume: 1000,
+      energy: 27000,
     })
 
     expect(formatQuantityDisplay(operation, false)).toEqual(
@@ -26,8 +26,8 @@ describe("formatQuantityDisplay", () => {
   it("Should format quantity with renewable_energy_share for incorporation operation", () => {
     const operation = createOperation({
       type: OperationType.INCORPORATION,
-      quantity: 1000,
-      quantity_mj: 27000,
+      volume: 1000,
+      energy: 27000,
       renewable_energy_share: 0.8,
     })
 
@@ -39,8 +39,8 @@ describe("formatQuantityDisplay", () => {
   it("Should not apply renewable_energy_share when applyRenewableShare is false even for incorporation", () => {
     const operation = createOperation({
       type: OperationType.INCORPORATION,
-      quantity: 1000,
-      quantity_mj: 27000,
+      volume: 1000,
+      energy: 27000,
       renewable_energy_share: 0.8,
     })
 
@@ -52,8 +52,8 @@ describe("formatQuantityDisplay", () => {
   it("Should not apply renewable_energy_share for non-incorporation operation even when applyRenewableShare is true", () => {
     const operation = createOperation({
       type: OperationType.TRANSFERT,
-      quantity: 1000,
-      quantity_mj: 27000,
+      volume: 1000,
+      energy: 27000,
       renewable_energy_share: 0.8,
     })
 
@@ -64,8 +64,8 @@ describe("formatQuantityDisplay", () => {
 
   it("Should handle negative quantities correctly", () => {
     const operation = createOperation({
-      quantity: -1000,
-      quantity_mj: -27000,
+      volume: -1000,
+      energy: -27000,
     })
 
     expect(formatQuantityDisplay(operation, false)).toEqual(

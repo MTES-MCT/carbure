@@ -106,7 +106,7 @@ const OperationsBiofuels = () => {
           <RecapQuantity
             text={t("{{count}} opérations pour un total de {{total}}", {
               count: result?.data?.count ?? 0,
-              total: formatUnit(result?.data?.total_quantity ?? 0, {
+              total: formatUnit(result?.data?.total_volume ?? 0, {
                 fractionDigits: FRACTION_DIGITS_LITERS,
               }),
             })}

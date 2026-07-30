@@ -55,7 +55,7 @@ const BalancesBiofuels = () => {
         <>
           <RecapQuantity
             text={t("Le solde affiché représente {{total}}", {
-              total: formatUnit(result?.data?.total_quantity ?? 0, {
+              total: formatUnit(result?.data?.total_volume ?? 0, {
                 fractionDigits: FRACTION_DIGITS_LITERS,
               }),
             })}
