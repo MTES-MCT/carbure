@@ -16,7 +16,7 @@ def get_administrated_entities(admin_entity: Entity):
     # limit entities for Elec stuff
     if admin_entity.has_external_admin_right("ELEC"):
         administrated_entities = administrated_entities.filter(
-            Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True)
+            Q(entity_type=Entity.CPO) | Q(is_tiruert_liable=True, has_elec=True)
         )
 
     return administrated_entities

@@ -216,11 +216,11 @@ class Entity(models.Model):
         if self.has_external_admin_right(ExternalAdminRights.AIRLINE):
             filter_condition |= Q(entity_type=Entity.AIRLINE) | Q(entity_type=Entity.SAF_TRADER)
         if self.has_external_admin_right(ExternalAdminRights.ELEC):
-            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR, has_elec=True)
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(is_tiruert_liable=True, has_elec=True)
         if self.has_external_admin_right(ExternalAdminRights.DOUBLE_COUNTING):
             filter_condition |= Q(entity_type=Entity.PRODUCER)
         if self.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
-            filter_condition |= Q(entity_type=Entity.CPO) | Q(entity_type=Entity.OPERATOR)
+            filter_condition |= Q(entity_type=Entity.CPO) | Q(is_tiruert_liable=True, has_elec=True)
         has_dreal_right = self.has_external_admin_right(ExternalAdminRights.DREAL)
         has_ademe_right = self.has_external_admin_right(ExternalAdminRights.ADEME)
 
