@@ -50,6 +50,7 @@ export function useTabs(snapshot?: ElecCertificateSnapshot): Tab<string>[] {
 export function useFilters() {
   const { t } = useTranslation()
   const entity = useEntity()
+  const isElecLiable = entity.is_tiruert_liable && entity.has_elec
 
   const filters: Record<string, string> = {
     [TransferCertificateFilter.month]: t("Mois"),
@@ -63,7 +64,7 @@ export function useFilters() {
     delete filters[TransferCertificateFilter.used_in_tiruert]
   }
 
-  if (entity.isOperator) {
+  if (isElecLiable) {
     delete filters[TransferCertificateFilter.operator]
   }
 
@@ -73,6 +74,7 @@ export function useFilters() {
 export function useColumns() {
   const { t } = useTranslation()
   const entity = useEntity()
+  const isElecLiable = entity.is_tiruert_liable && entity.has_elec
 
   return compact([
     !entity.isCPO && {
@@ -80,7 +82,7 @@ export function useColumns() {
       header: t("Aménageur"),
       cell: (p) => p.supplier.name,
     },
-    !entity.isOperator && {
+    !isElecLiable && {
       key: "operator",
       header: t("Redevable"),
       cell: (p) => p.client.name,
