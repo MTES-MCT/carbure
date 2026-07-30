@@ -20,7 +20,7 @@ from tiruert.serializers.fields import RoundedFloatField
 class ElecTransferSerializer(serializers.Serializer):
     energy_amount = RoundedFloatField(min_value=0.01, decimal_places=2)
     client = serializers.PrimaryKeyRelatedField(
-        queryset=Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True), required=False
+        queryset=Entity.objects.filter(is_tiruert_liable=True, has_elec=True), required=False
     )
     is_readjustment = serializers.BooleanField(default=False, required=False)
 
