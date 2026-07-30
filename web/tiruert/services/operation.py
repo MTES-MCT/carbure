@@ -1,12 +1,16 @@
 from collections import defaultdict
 from copy import copy
+from datetime import datetime, time
 from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Q
+from django.utils.timezone import make_aware
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.models import CarbureLot, MatierePremiere
+from core.models.feedstock import Biocarburant
 from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
@@ -17,11 +21,8 @@ from tiruert.services.teneur import TeneurService
 
 
 class OperationServiceErrors:
-    INSUFFICIENT_INPUT_VOLUME = "INSUFFICIENT_INPUT_VOLUME"
-    LOT_NOT_FOUND = "LOT_NOT_FOUND"
-    LOT_EMISSION_RATE_NOT_FOUND = "LOT_EMISSION_RATE_NOT_FOUND"
-    TARGET_EXCEEDED = "TARGET_EXCEEDED"
     ENTITY_ID_DO_NOT_MATCH_DEBITED_ID = "ENTITY_ID_DO_NOT_MATCH_DEBITED_ID"
+    LOT_EMISSION_RATE_NOT_FOUND = "LOT_EMISSION_RATE_NOT_FOUND"
 
 
 VOLUME_PRECISION = 2
@@ -76,62 +77,146 @@ class OperationService:
         """
         Check if the selected lots exist and have enough volume to perform the operation
         """
-        np_volumes, _, np_lot_ids, _, _ = TeneurService.prepare_data(data)
+        np_volumes, __, np_lot_ids, __, __ = TeneurService.prepare_data(data)
 
         # Normalize available and requested volumes to business precision.
         available_volumes = {int(lot_id): truncate(volume) for lot_id, volume in zip(np_lot_ids, np_volumes)}
 
+        # Aggregate requested volumes per lot to correctly handle duplicate lot ids.
+        requested_volumes = defaultdict(float)
         for lot in selected_lots:
-            lot_id = lot["id"]
-            volume = truncate(lot["volume"])
+            requested_volumes[lot["id"]] += truncate(lot["volume"])
 
+        for lot_id, volume in requested_volumes.items():
             if lot_id not in available_volumes:
-                raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.LOT_NOT_FOUND})
+                raise serializers.ValidationError({"lot_id": [_(f"{lot_id}: Ce lot n'a pas de volume disponible")]})
 
             if available_volumes[lot_id] < volume:
-                raise serializers.ValidationError({f"lot_id: {lot_id}": OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME})
+                raise serializers.ValidationError(
+                    {
+                        "volume": [
+                            _(
+                                f"Lot id {lot_id} : Volume insuffisant pour ce lot (volume disponible: {available_volumes[lot_id]} L)"  # noqa: E501
+                            )
+                        ]
+                    }
+                )
+
+    @staticmethod
+    def bulk_check_volumes(entries):
+        """
+        Check that several requested operations combined have enough volume available.
+
+        - entries: list of {"biofuel", "customs_category", "debited_entity", "selected_lots"} dicts.
+        Entries sharing the same (biofuel, customs_category) are summed together before checking,
+        since `check_volumes`'s availability lookup is scoped to that combination regardless
+        of operation_type (e.g. a TENEUR group and a TRANSFERT group drawing from the same lots).
+        """
+        grouped: dict[tuple, dict] = {}
+        for entry in entries:
+            key = (entry["biofuel"].id, entry["customs_category"])
+            group = grouped.setdefault(
+                key,
+                {
+                    "biofuel": entry["biofuel"],
+                    "customs_category": entry["customs_category"],
+                    "debited_entity": entry["debited_entity"],
+                    "lot_volumes": defaultdict(float),
+                },
+            )
+            for lot in entry["selected_lots"]:
+                group["lot_volumes"][lot["id"]] += lot["volume"]
+
+        for group in grouped.values():
+            selected_lots = [{"id": lot_id, "volume": volume} for lot_id, volume in group["lot_volumes"].items()]
+            data = {
+                "biofuel": group["biofuel"],
+                "customs_category": group["customs_category"],
+                "debited_entity": group["debited_entity"],
+            }
+            OperationService.check_volumes(selected_lots, data)
+
+    @staticmethod
+    def _check_teneur_target(request, entity_id, customs_category, teneur_to_add, declaration_year, bulk=False):
+        """
+        Check that adding `teneur_to_add` (in MJ) for the given customs category doesn't
+        exceed the capped objective, based on the entity's already pending/declared teneur.
+        """
+        # 1. Get the target for the customs category
+        target = ObjectiveService.calculate_target_for_specific_category(customs_category, request.entity.id)
+        # Case for reach objective and no objective, no need to do this check compliance
+        if target is None:
+            return
+
+        # 2. Calculate the balance for the requested customs category (all biofuels combined)
+        request.GET = request.GET.copy()
+        request.GET["customs_category"] = customs_category
+        operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
+
+        period = DeclarationPeriodService.get_period_by_year(declaration_year)
+        if period is None:
+            return
+
+        date_from = period.start_date
+        date_from_dt = make_aware(datetime.combine(date_from, time.min))
+
+        balance = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from_dt)
+
+        balance = list(balance.values())[0]  # keep the first (and only one) element
+
+        # 3. Check if the futur teneur is below the target
+        futur_teneur = (
+            truncate(balance["pending_teneur"], 0) + truncate(balance["declared_teneur"], 0) + teneur_to_add
+        )  # all in MJ
+
+        target = truncate(target, 0)
+
+        if futur_teneur > target:
+            message = "La somme des teneurs" if bulk else "La teneur"
+            raise serializers.ValidationError(
+                {
+                    "teneur": [
+                        _(
+                            f"{message} à créer ({teneur_to_add} MJ), pour la catégorie {customs_category}, dépasse l'objectif plafonné ({target} MJ)"  # noqa: E501
+                        )
+                    ]
+                }
+            )
 
     @staticmethod
     def check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year):
         """
         Check if the TENEUR operation respects the capped objective for the customs category
         """
-        if data["type"] == Operation.TENEUR:
-            # 1. Get the target for the customs category
-            target = ObjectiveService.calculate_target_for_specific_category(data["customs_category"], request.entity.id)
+        if data["type"] != Operation.TENEUR:
+            return
 
-            # Case for reach objective and no objective, no need to do this check compliance
-            if target is None:
-                return
+        # Convert the teneur to add from liters to MJ
+        pci = data["biofuel"].pci_litre
+        teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
 
-            # 2. Calculate the balance for requested biofuel and customs category and declaration year
-            request.GET = request.GET.copy()
-            request.GET["customs_category"] = data["customs_category"]
-            request.GET["biofuel"] = data["biofuel"].code
-            operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
+        OperationService._check_teneur_target(request, entity_id, data["customs_category"], teneur_to_add, declaration_year)
 
-            period = DeclarationPeriodService.get_period_by_year(declaration_year)
-            if period is None:
-                return
+    @staticmethod
+    def bulk_check_objectives_compliance(request, entity_id, teneur_entries, declaration_year):
+        """
+        Check if several TENEUR operations combined respect the capped objective for their
+        customs category.
 
-            date_from = period.start_date
+        - teneur_entries: list of {"customs_category", "biofuel", "selected_lots"}
+        dicts.
+        """
+        teneur_to_add_by_category = defaultdict(float)
+        for entry in teneur_entries:
+            pci = entry["biofuel"].pci_litre
+            teneur_to_add_by_category[entry["customs_category"]] += truncate(
+                sum(lot["volume"] * pci for lot in entry["selected_lots"])
+            )
 
-            balance = BalanceService.calculate_balance(operations, entity_id, None, "mj", date_from)
-            balance = list(balance.values())[0]  # keep the first (and only one) element
-
-            # 3. Convert the teneur to add from liters to MJ
-            pci = data["biofuel"].pci_litre
-            teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
-
-            # 4. Check if the futur teneur is below the target
-            futur_teneur = (
-                truncate(balance["pending_teneur"], 0) + truncate(balance["declared_teneur"], 0) + teneur_to_add
-            )  # all in MJ
-
-            if futur_teneur > target:
-                raise serializers.ValidationError(
-                    {f"futur_teneur: {futur_teneur} - target : {target}": OperationServiceErrors.TARGET_EXCEEDED}
-                )
+        for customs_category, teneur_to_add in teneur_to_add_by_category.items():
+            OperationService._check_teneur_target(
+                request, entity_id, customs_category, teneur_to_add, declaration_year, bulk=True
+            )
 
     @staticmethod
     def check_declaration_year(declaration_year, validated_data):
@@ -156,6 +241,46 @@ class OperationService:
             validated_data["status"] = Operation.ACCEPTED
         elif validated_data.get("status") != Operation.DRAFT:
             validated_data["status"] = Operation.PENDING
+
+    @staticmethod
+    def create_operation_with_details(operation_data, details_data):
+        """
+        Create one operation and its related details.
+        """
+        operation = Operation.objects.create(**operation_data)
+
+        OperationDetail.objects.bulk_create(
+            [
+                OperationDetail(
+                    operation=operation,
+                    lot_id=detail["lot_id"],
+                    volume=truncate(detail["volume"]),
+                    emission_rate_per_mj=detail["emission_rate_per_mj"],
+                )
+                for detail in details_data
+            ]
+        )
+
+        return operation
+
+    @staticmethod
+    def build_details_data(lot_volumes, emissions_by_lot):
+        """
+        Build OperationDetail payloads from lot volumes and emission rates.
+        """
+        if hasattr(lot_volumes, "items"):
+            lot_volume_items = lot_volumes.items()
+        else:
+            lot_volume_items = ((lot["id"], lot["volume"]) for lot in lot_volumes)
+
+        return [
+            {
+                "lot_id": lot_id,
+                "volume": round(volume, 2),
+                "emission_rate_per_mj": emissions_by_lot.get(lot_id, 0),
+            }
+            for lot_id, volume in lot_volume_items
+        ]
 
     @staticmethod
     @transaction.atomic
@@ -193,32 +318,24 @@ class OperationService:
             if not credited_entity:
                 continue  # skip if no credited entity (should not happen for valid lots)
 
-            operation = Operation.objects.create(
-                type=matching_types[key[0]],
-                status=Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
-                customs_category=key[1],
-                biofuel=lots[0].biofuel,
-                credited_entity=credited_entity,
-                debited_entity=None,
-                from_depot=None,
-                to_depot=lots[0].carbure_delivery_site,
-                renewable_energy_share=lots[0].biofuel.renewable_energy_share,
-                durability_period=lots[0].period,
-            )
+            operation_data = {
+                "type": matching_types[key[0]],
+                "status": Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
+                "customs_category": key[1],
+                "biofuel": lots[0].biofuel,
+                "credited_entity": credited_entity,
+                "debited_entity": None,
+                "from_depot": None,
+                "to_depot": lots[0].carbure_delivery_site,
+                "renewable_energy_share": lots[0].biofuel.renewable_energy_share,
+                "durability_period": lots[0].period,
+            }
 
-            lots_bulk = []
+            lot_volumes = {lot.id: lot.volume for lot in lots}
+            emissions_by_lot = {lot.id: lot.ghg_total for lot in lots}
+            details_data = OperationService.build_details_data(lot_volumes, emissions_by_lot)
 
-            for lot in lots:
-                lots_bulk.append(
-                    {
-                        "operation": operation,
-                        "lot": lot,
-                        "volume": truncate(lot.volume),  # litres
-                        "emission_rate_per_mj": lot.ghg_total,  # gCO2/MJ (input algo d'optimisation)
-                    }
-                )
-
-            OperationDetail.objects.bulk_create([OperationDetail(**data) for data in lots_bulk])
+            OperationService.create_operation_with_details(operation_data, details_data)
 
     @staticmethod
     def filter_valid_lots(lots):
@@ -277,3 +394,15 @@ class OperationService:
                 result_lots.append(lot)
 
         return result_lots
+
+    @staticmethod
+    def define_sector(biofuel: Biocarburant) -> str:
+        from saf.models.constants import SAF_BIOFUEL_TYPES
+
+        if biofuel.compatible_essence:
+            return Operation.ESSENCE
+        elif biofuel.compatible_diesel:
+            return Operation.GAZOLE
+        elif biofuel.code in SAF_BIOFUEL_TYPES:
+            return Operation.CARBUREACTEUR
+        return None

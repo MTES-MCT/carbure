@@ -8,7 +8,7 @@ import {
   useAcceptOperation,
   useDeleteOperation,
   useRejectOperation,
-  useValidateDraftTransfer,
+  useValidateDraftOperation,
 } from "./operation-detail-actions.hooks"
 import { useMemo } from "react"
 import { getOperationValidationButtonText } from "./operation-detail-actions.utils"
@@ -46,7 +46,8 @@ export const OperationDetailActions = ({
   const {
     execute: validateDraftTransfer,
     loading: validateDraftTransferLoading,
-  } = useValidateDraftTransfer({
+  } = useValidateDraftOperation({
+    operation,
     onSuccess: closeDialog,
   })
 

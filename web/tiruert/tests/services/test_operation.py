@@ -392,11 +392,8 @@ class OperationServiceCheckVolumesTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_volumes(selected_lots, data)
 
-        self.assertIn("lot_id: 999", context.exception.detail)
-        self.assertIn(
-            OperationServiceErrors.LOT_NOT_FOUND,
-            str(context.exception.detail["lot_id: 999"]),
-        )
+        self.assertIn("lot_id", context.exception.detail.keys())
+        self.assertIn("999: Ce lot n'a pas de volume disponible", str(context.exception.detail.values()))
 
     @patch("tiruert.services.operation.TeneurService.prepare_data")
     def test_check_volumes_raises_error_when_insufficient_volume(self, mock_prepare_data):
@@ -417,29 +414,32 @@ class OperationServiceCheckVolumesTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_volumes(selected_lots, data)
 
-        self.assertIn("lot_id: 1", context.exception.detail)
-        self.assertIn(
-            OperationServiceErrors.INSUFFICIENT_INPUT_VOLUME,
-            str(context.exception.detail["lot_id: 1"]),
-        )
+        self.assertIn("volume", context.exception.detail.keys())
+        self.assertIn("1 : Volume insuffisant pour ce lot", str(context.exception.detail.values()))
 
     @patch("tiruert.services.operation.TeneurService.prepare_data")
-    def test_check_volumes_accepts_tiny_float_overflow_with_tolerance(self, mock_prepare_data):
-        """Should accept tiny float overflow caused by precision artifacts."""
+    def test_check_volumes_raises_error_when_duplicate_lot_total_exceeds_available(self, mock_prepare_data):
+        """Should raise ValidationError when duplicate lot lines exceed available volume once aggregated."""
         mock_prepare_data.return_value = (
-            [1000.0],
+            [1000.0],  # np_volumes (available)
             None,
-            [1],
+            [1],  # np_lot_ids
             None,
             None,
         )
 
         selected_lots = [
-            {"id": 1, "volume": 1000.0000005},
+            {"id": 1, "volume": 700},
+            {"id": 1, "volume": 400},  # Total requested = 1100 > 1000 available
         ]
 
         data = {"biofuel": Mock()}
-        OperationService.check_volumes(selected_lots, data)
+
+        with self.assertRaises(ValidationError) as context:
+            OperationService.check_volumes(selected_lots, data)
+
+        self.assertIn("volume", context.exception.detail.keys())
+        self.assertIn("1 : Volume insuffisant pour ce lot", str(context.exception.detail.values()))
 
 
 class OperationServiceCheckObjectivesComplianceTest(TestCase):
@@ -497,9 +497,9 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         mock_calculate_balance.assert_called_once()
         called_args = mock_calculate_balance.call_args[0]
         self.assertEqual(called_args[1], 1)  # entity_id
-        self.assertEqual(called_args[2], None)  # depot_id
+        self.assertEqual(called_args[2], "customs_category")  # group_by
         self.assertEqual(called_args[3], "mj")  # unit
-        self.assertEqual(called_args[4], period_start_date)  # date_from
+        self.assertEqual(called_args[4].date(), period_start_date)  # date_from converted to aware datetime
 
     @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
@@ -565,13 +565,10 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
-        error_key = list(context.exception.detail.keys())[0]
-        self.assertIn("futur_teneur", error_key)
-        self.assertIn("target", error_key)
-        self.assertIn(
-            OperationServiceErrors.TARGET_EXCEEDED,
-            str(context.exception.detail[error_key]),
-        )
+        self.assertIn("teneur", context.exception.detail.keys())
+        error_message = str(context.exception.detail["teneur"])
+        self.assertIn("20000", error_message)
+        self.assertIn("100000", error_message)
 
     @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
@@ -606,8 +603,10 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
                 declaration_year=2025,
             )
 
-        error_key = list(context.exception.detail.keys())[0]
-        self.assertEqual(error_key, "futur_teneur: 118 - target : 117")
+        self.assertIn("teneur", context.exception.detail.keys())
+        error_message = str(context.exception.detail["teneur"])
+        self.assertIn("(118 MJ)", error_message)
+        self.assertIn("(117 MJ)", error_message)
 
     def test_check_objectives_compliance_skips_for_non_teneur_operations(self):
         """Should skip check for non-TENEUR operation types."""
@@ -751,3 +750,148 @@ class OperationServiceCreditedEntityFallbackTest(TestCase):
 
         operation = Operation.objects.get(type=Operation.MAC_BIO)
         self.assertEqual(operation.credited_entity, self.operator)
+
+
+class OperationServiceBulkCheckVolumesTest(TestCase):
+    """Tests for OperationService.bulk_check_volumes()."""
+
+    @patch("tiruert.services.operation.OperationService.check_volumes")
+    def test_bulk_check_volumes_groups_and_aggregates_duplicate_lots(self, mock_check_volumes):
+        """Should aggregate volumes by (biofuel, customs_category) before checking."""
+        biofuel_eth = Mock(id=1, code="ETH")
+        biofuel_emag = Mock(id=2, code="EMAG")
+        debited_entity = Mock(id=10)
+
+        entries = [
+            {
+                "biofuel": biofuel_eth,
+                "customs_category": "CONV",
+                "debited_entity": debited_entity,
+                "selected_lots": [{"id": 1, "volume": 700}],
+            },
+            {
+                "biofuel": biofuel_eth,
+                "customs_category": "CONV",
+                "debited_entity": debited_entity,
+                "selected_lots": [{"id": 1, "volume": 400}, {"id": 2, "volume": 100}],
+            },
+            {
+                "biofuel": biofuel_emag,
+                "customs_category": "ANN-IX-A",
+                "debited_entity": debited_entity,
+                "selected_lots": [{"id": 3, "volume": 50}],
+            },
+        ]
+
+        OperationService.bulk_check_volumes(entries)
+
+        self.assertEqual(mock_check_volumes.call_count, 2)
+
+        observed = {}
+        for call in mock_check_volumes.call_args_list:
+            selected_lots, data = call.args
+            observed[(data["biofuel"].code, data["customs_category"])] = {lot["id"]: lot["volume"] for lot in selected_lots}
+            self.assertEqual(data["debited_entity"], debited_entity)
+
+        self.assertEqual(observed[("ETH", "CONV")], {1: 1100, 2: 100})
+        self.assertEqual(observed[("EMAG", "ANN-IX-A")], {3: 50})
+
+
+class OperationServiceBulkCheckObjectivesComplianceTest(TestCase):
+    """Tests for OperationService.bulk_check_objectives_compliance()."""
+
+    @patch("tiruert.services.operation.OperationService._check_teneur_target")
+    def test_bulk_check_objectives_compliance_aggregates_by_customs_category(self, mock_check_teneur_target):
+        """Should sum teneur volumes per customs category before checking objectives."""
+        request = Mock()
+        request.entity.id = 1
+        biofuel_eth = Mock(code="ETH", pci_litre=10)
+        biofuel_emag = Mock(code="EMAG", pci_litre=20)
+
+        entries = [
+            {
+                "customs_category": "CONV",
+                "biofuel": biofuel_eth,
+                "selected_lots": [{"id": 1, "volume": 100}],
+            },
+            {
+                "customs_category": "CONV",
+                "biofuel": biofuel_emag,
+                "selected_lots": [{"id": 2, "volume": 50}],
+            },
+        ]
+
+        declaration_year = 2025
+
+        OperationService.bulk_check_objectives_compliance(request, 1, entries, declaration_year)
+
+        mock_check_teneur_target.assert_called_once_with(request, 1, "CONV", 2000, declaration_year, bulk=True)
+
+
+class OperationServiceDefineSectorTest(TestCase):
+    """Tests for OperationService.define_sector()."""
+
+    def test_define_sector_returns_essence_for_compatible_essence_biofuel(self):
+        """Should return ESSENCE when the biofuel is essence-compatible."""
+        biofuel = Mock(code="ETH", compatible_essence=True, compatible_diesel=False)
+
+        result = OperationService.define_sector(biofuel)
+
+        self.assertEqual(result, Operation.ESSENCE)
+
+    def test_define_sector_returns_gazole_for_compatible_diesel_biofuel(self):
+        """Should return GAZOLE when the biofuel is diesel-compatible."""
+        biofuel = Mock(code="EMHV", compatible_essence=False, compatible_diesel=True)
+
+        result = OperationService.define_sector(biofuel)
+
+        self.assertEqual(result, Operation.GAZOLE)
+
+    def test_define_sector_returns_carbureacteur_for_saf_biofuel(self):
+        """Should return CARBUREACTEUR for SAF biofuel codes."""
+        from saf.models.constants import SAF_BIOFUEL_TYPES
+
+        biofuel = Mock(code=list(SAF_BIOFUEL_TYPES)[0], compatible_essence=False, compatible_diesel=False)
+
+        result = OperationService.define_sector(biofuel)
+
+        self.assertEqual(result, Operation.CARBUREACTEUR)
+
+    def test_define_sector_returns_none_when_no_sector_matches(self):
+        """Should return None when the biofuel matches no sector."""
+        biofuel = Mock(code="UNKNOWN", compatible_essence=False, compatible_diesel=False)
+
+        result = OperationService.define_sector(biofuel)
+
+        self.assertIsNone(result)
+
+
+class OperationServiceBuildDetailsDataTest(TestCase):
+    """Tests for OperationService.build_details_data()."""
+
+    def test_build_details_data_accepts_dict_like_input(self):
+        """Should build detail payloads from a mapping of lot ids to volumes."""
+        result = OperationService.build_details_data({1: 12.345, 2: 67.891}, {1: 0.5, 2: 1.25})
+
+        self.assertEqual(
+            result,
+            [
+                {"lot_id": 1, "volume": 12.35, "emission_rate_per_mj": 0.5},
+                {"lot_id": 2, "volume": 67.89, "emission_rate_per_mj": 1.25},
+            ],
+        )
+
+    def test_build_details_data_accepts_list_input(self):
+        """Should build detail payloads from a list of lot dictionaries."""
+        result = OperationService.build_details_data(
+            [{"id": 3, "volume": 10.004}, {"id": 4, "volume": 20.006}],
+            {3: 9.9, 4: 8.8},
+        )
+
+        self.assertEqual(
+            result,
+            [
+                {"lot_id": 3, "volume": 10.0, "emission_rate_per_mj": 9.9},
+                {"lot_id": 4, "volume": 20.01, "emission_rate_per_mj": 8.8},
+            ],
+        )

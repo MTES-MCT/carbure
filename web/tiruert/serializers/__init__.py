@@ -12,6 +12,9 @@ from .mac_fossil_fuel import MacFossilFuelSerializer
 from .objective import ObjectiveInputSerializer
 from .objective import ObjectiveOutputSerializer
 from .operation import OperationCorrectionSerializer
+from .operation import OperationExcelImportRequestSerializer
+from .operation import OperationImportGroupSerializer
+from .operation import OperationImportResponseSerializer
 from .operation import OperationInputSerializer
 from .operation import OperationListSerializer
 from .operation import OperationLotSerializer

@@ -27,6 +27,8 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                         "destroy",
                         "export_operations_to_excel",
                         "declare_teneur",
+                        "download_import_template",
+                        "import_operations_from_excel",
                     ],
                     [HasTiruertWriteRights()],
                 ),
