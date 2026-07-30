@@ -7,6 +7,7 @@ import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { getObjectives } from "accounting/pages/teneur/api"
 import { ObjectivesContent } from "accounting/pages/teneur/components/objectives-content"
+import { MacSection } from "accounting/pages/teneur/components/mac-section"
 
 export const Objectives = () => {
   const entity = useEntity()
@@ -42,6 +43,7 @@ export const Objectives = () => {
   return (
     <>
       {topNotice}
+      {selectedEntityId && <MacSection readOnly entityId={selectedEntityId} />}
       <ObjectivesContent objectivesData={objectivesData} readOnly />
     </>
   )

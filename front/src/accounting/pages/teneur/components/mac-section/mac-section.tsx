@@ -9,21 +9,27 @@ import { usePortal } from "common/components/portal"
 import { MacDialog } from "../mac-dialog"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 
-export const MacSection = () => {
+type MacSectionProps = {
+  readOnly?: boolean
+  entityId?: number
+}
+
+export const MacSection = ({ readOnly, entityId }: MacSectionProps = {}) => {
   const entity = useEntity()
   const portal = usePortal()
 
   const { selectedYear, currentDeclarationYear = 0 } =
     useAnnualDeclarationTiruert()
 
-  const readOnly = selectedYear < currentDeclarationYear
+  const isReadOnly = readOnly ?? selectedYear < currentDeclarationYear
+  const selectedEntityId = entityId ?? entity.id
 
   const onAddMac = () => {
     portal((close) => (
       <MacDialog
         onClose={close}
-        readOnly={readOnly}
-        entityId={entity.id}
+        readOnly={isReadOnly}
+        entityId={selectedEntityId}
         year={selectedYear}
       />
     ))
@@ -36,7 +42,7 @@ export const MacSection = () => {
           {t("Mises à consommation")}
         </Title>
         <Button asideX priority="secondary" onClick={onAddMac}>
-          {readOnly ? t("Voir mes MàC") : t("Renseigner mes MàC")}
+          {isReadOnly ? t("Voir mes MàC") : t("Renseigner mes MàC")}
         </Button>
       </Row>
       <p>
@@ -50,7 +56,7 @@ export const MacSection = () => {
           year: selectedYear,
         })}
         linkProps={{
-          href: downloadMacFossilFuel(entity.id, selectedYear),
+          href: downloadMacFossilFuel(selectedEntityId, selectedYear),
         }}
       />
     </Box>
