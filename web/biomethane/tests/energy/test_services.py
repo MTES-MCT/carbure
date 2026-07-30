@@ -1,6 +1,7 @@
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
+from web.biomethane.services.energy.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 
 from biomethane.factories import BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.contract import BiomethaneContractFactory
@@ -8,7 +9,6 @@ from biomethane.factories.energy import BiomethaneEnergyMonthlyReportFactory
 from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
-from biomethane.services.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 from core.models import Entity
 
 

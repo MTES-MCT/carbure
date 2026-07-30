@@ -1,5 +1,5 @@
 from .annual_declaration import BiomethaneAnnualDeclarationService
 from .digestate import BiomethaneDigestateService
-from .energy import BiomethaneEnergyService
+from .energy.energy import BiomethaneEnergyService
 from .contract import BiomethaneContractService
 from .production_unit import BiomethaneProductionUnitService

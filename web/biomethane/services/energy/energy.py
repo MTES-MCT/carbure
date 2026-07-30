@@ -157,6 +157,58 @@ class BiomethaneEnergyService:
         return BiomethaneEnergyService._get_fields_to_clear(instance)
 
 
+class BiomethaneEnergyConsistencyCheckService:
+    """
+    Service to check the consistency of BiomethaneEnergy instances.
+    """
+
+    @staticmethod
+    def get_consistency_warnings(instance):
+        """
+        Analyze if methane injected volume is consistent with the energy types and details.
+        Returns:
+            list: List of error messages if inconsistencies are found, empty list otherwise.
+        """
+        warnings = []
+
+        injected_biomethane_gwh_pcs_per_year = getattr(instance, "injected_biomethane_gwh_pcs_per_year", None)
+        injected_biomethane_pcs_kwh_per_nm3 = getattr(instance, "injected_biomethane_pcs_kwh_per_nm3", None)
+        produced_biogas_nm3_per_year = getattr(instance, "produced_biogas_nm3_per_year", None)
+        injected_biomethane_ch4_rate_percent = getattr(instance, "injected_biomethane_ch4_rate_percent", None)
+        flared_biogas_nm3_per_year = getattr(instance, "flared_biogas_nm3_per_year", 0.0)
+        self_consumed_biogas_nm3 = getattr(instance, "self_consumed_biogas_nm3", 0.0)
+
+        if None not in [
+            injected_biomethane_gwh_pcs_per_year,
+            injected_biomethane_pcs_kwh_per_nm3,
+            produced_biogas_nm3_per_year,
+            injected_biomethane_ch4_rate_percent,
+        ]:
+            biogas_ch4_rate_percent = 55
+            acceptation_threshold = 0.25
+            injected_methane = (
+                (injected_biomethane_gwh_pcs_per_year * 10**6)
+                * injected_biomethane_ch4_rate_percent
+                / (injected_biomethane_pcs_kwh_per_nm3 * 100)
+            )
+            expected_methane = (
+                (produced_biogas_nm3_per_year - flared_biogas_nm3_per_year - self_consumed_biogas_nm3)
+                * biogas_ch4_rate_percent
+                / 100
+            )
+
+            if abs(injected_methane - expected_methane) > acceptation_threshold * expected_methane:
+                warnings.append(
+                    {
+                        "code": "METHANE_VOLUME_INCONSISTENCY",
+                        "level": "warning",
+                        "message": "L'écart entre le volume injecté déclaré et le calcul théorique dépasse la tolérance de 25%.",
+                    }
+                )
+
+        return warnings
+
+
 # Rule configuration: declarative definition of all field clearing rules
 def _build_energy_rules() -> list[FieldClearingRule]:
     """
@@ -202,27 +254,31 @@ def _build_energy_rules() -> list[FieldClearingRule]:
         FieldClearingRule(
             name="no_fossil_for_energy",
             fields=BiomethaneEnergyService.ENERGY_DETAILS_FIELD,
-            condition=lambda ctx: not any(
-                energy_type
-                in [
-                    BiomethaneEnergy.ENERGY_TYPE_FOSSIL,
-                    BiomethaneEnergy.ENERGY_TYPE_OTHER_RENEWABLE,
-                    BiomethaneEnergy.ENERGY_TYPE_OTHER,
-                ]
-                for energy_type in ctx.energy_types
+            condition=lambda ctx: (
+                not any(
+                    energy_type
+                    in [
+                        BiomethaneEnergy.ENERGY_TYPE_FOSSIL,
+                        BiomethaneEnergy.ENERGY_TYPE_OTHER_RENEWABLE,
+                        BiomethaneEnergy.ENERGY_TYPE_OTHER,
+                    ]
+                    for energy_type in ctx.energy_types
+                )
             ),
         ),
         # Energy type conditional fields - only visible if PRODUCED_BIOGAS or PRODUCED_BIOMETHANE
         FieldClearingRule(
             name="no_biogas_or_biomethane_energy_type",
             fields=BiomethaneEnergyService.ENERGY_TYPE_CONDITIONAL_FIELDS,
-            condition=lambda ctx: not any(
-                energy_type
-                in [
-                    BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOGAS,
-                    BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOMETHANE,
-                ]
-                for energy_type in ctx.energy_types
+            condition=lambda ctx: (
+                not any(
+                    energy_type
+                    in [
+                        BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOGAS,
+                        BiomethaneEnergy.ENERGY_TYPE_PRODUCED_BIOMETHANE,
+                    ]
+                    for energy_type in ctx.energy_types
+                )
             ),
         ),
         # Clear ISDND-related fields when unit_type is ISDND and contract tariff_reference is 2011, 2020 or 2021
