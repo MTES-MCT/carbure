@@ -21,6 +21,10 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
 from tiruert.services.balance_filters import apply_operation_detail_filters
+from tiruert.services.energy import (
+    avoided_emissions_tco2_expression,
+    energy_mj_expression,
+)
 
 
 def _get_sector_expression():
@@ -46,9 +50,10 @@ def _get_teneur_sector_expression(sector_expr):
 
 def _get_quantity_expression(unit):
     if unit == "mj":
-        return ExpressionWrapper(
-            F("volume") * F("operation__renewable_energy_share") * F("operation__biofuel__pci_litre"),
-            output_field=FloatField(),
+        return energy_mj_expression(
+            F("volume"),
+            F("operation__renewable_energy_share"),
+            F("operation__biofuel__pci_litre"),
         )
     else:
         return ExpressionWrapper(
@@ -60,13 +65,15 @@ def _get_quantity_expression(unit):
 def _get_avoided_emissions_expression():
     from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-    return ExpressionWrapper(
-        (Value(GHG_REFERENCE_RED_II) - F("emission_rate_per_mj"))
-        * F("lot__biofuel__pci_litre")
-        * F("volume")
-        * F("operation__renewable_energy_share")
-        / Value(1000000.0),
-        output_field=FloatField(),
+    energy_expr = energy_mj_expression(
+        F("volume"),
+        F("operation__renewable_energy_share"),
+        F("lot__biofuel__pci_litre"),
+    )
+    return avoided_emissions_tco2_expression(
+        energy_expr,
+        F("emission_rate_per_mj"),
+        GHG_REFERENCE_RED_II,
     )
 
 

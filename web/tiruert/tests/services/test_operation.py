@@ -573,6 +573,39 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
     @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
+    def test_check_objectives_compliance_applies_renewable_energy_share(
+        self,
+        mock_calculate_target,
+        mock_calculate_balance,
+        mock_get_period_by_year,
+    ):
+        """Should include renewable_energy_share when converting selected lot volumes to MJ."""
+        # With RES=0.5 and 1000L at PCI=10, teneur_to_add is 5000 MJ.
+        # Without RES it would be 10000 MJ and this test would fail.
+        mock_calculate_target.return_value = 7000
+        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
+        mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
+
+        mock_request = Mock()
+        mock_request.entity.id = 1
+        mock_request.GET = QueryDict("")
+
+        data = {
+            "type": Operation.TENEUR,
+            "customs_category": "CONV",
+            "biofuel": Mock(code="ETH", pci_litre=10),
+            "renewable_energy_share": 0.5,
+        }
+
+        selected_lots = [{"id": 1, "volume": 1000}]
+
+        OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id=1, declaration_year=2025)
+
+        mock_calculate_target.assert_called_once_with("CONV", 1)
+
+    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
+    @patch("tiruert.services.operation.BalanceService.calculate_balance")
+    @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_truncates_teneur_to_add_after_total_sum(
         self,
         mock_calculate_target,
@@ -826,6 +859,33 @@ class OperationServiceBulkCheckObjectivesComplianceTest(TestCase):
         OperationService.bulk_check_objectives_compliance(request, 1, entries, declaration_year)
 
         mock_check_teneur_target.assert_called_once_with(request, 1, "CONV", 2000, declaration_year, bulk=True)
+
+    @patch("tiruert.services.operation.OperationService._check_teneur_target")
+    def test_bulk_check_objectives_compliance_applies_renewable_energy_share(self, mock_check_teneur_target):
+        """Should include renewable_energy_share for each entry when aggregating MJ by category."""
+        request = Mock()
+        request.entity.id = 1
+        biofuel_eth = Mock(code="ETH", pci_litre=10)
+
+        entries = [
+            {
+                "customs_category": "CONV",
+                "biofuel": biofuel_eth,
+                "renewable_energy_share": 0.5,
+                "selected_lots": [{"id": 1, "volume": 100}],
+            },
+            {
+                "customs_category": "CONV",
+                "biofuel": biofuel_eth,
+                "renewable_energy_share": 1,
+                "selected_lots": [{"id": 2, "volume": 50}],
+            },
+        ]
+
+        OperationService.bulk_check_objectives_compliance(request, 1, entries, declaration_year=2025)
+
+        # 100L * 10 * 0.5 + 50L * 10 * 1 = 1000 MJ
+        mock_check_teneur_target.assert_called_once_with(request, 1, "CONV", 1000, 2025, bulk=True)
 
 
 class OperationServiceDefineSectorTest(TestCase):

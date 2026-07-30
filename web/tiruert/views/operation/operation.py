@@ -18,6 +18,10 @@ from tiruert.serializers import (
     OperationUpdateSerializer,
 )
 from tiruert.services.declaration_period import DeclarationPeriodService
+from tiruert.services.energy import (
+    avoided_emissions_tco2_expression,
+    energy_mj_expression,
+)
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 from .mixins import ActionMixin
@@ -117,13 +121,14 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             details_queryset.values("operation_id")
             .annotate(
                 total=Sum(
-                    ExpressionWrapper(
-                        (Value(GHG_REFERENCE_RED_II) - F("emission_rate_per_mj"))
-                        * F("lot__biofuel__pci_litre")
-                        * F("volume")
-                        * F("operation__renewable_energy_share")
-                        / Value(1000000.0),
-                        output_field=FloatField(),
+                    avoided_emissions_tco2_expression(
+                        energy_mj_expression(
+                            F("volume"),
+                            F("operation__renewable_energy_share"),
+                            F("lot__biofuel__pci_litre"),
+                        ),
+                        F("emission_rate_per_mj"),
+                        GHG_REFERENCE_RED_II,
                     )
                 )
             )
@@ -179,9 +184,11 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 total_volume_expr * sign_expr,
                 output_field=FloatField(),
             ),
-            "_energy": ExpressionWrapper(
-                total_volume_expr * F("renewable_energy_share") * F("biofuel__pci_litre") * sign_expr,
-                output_field=FloatField(),
+            "_energy": energy_mj_expression(
+                total_volume_expr,
+                F("renewable_energy_share"),
+                F("biofuel__pci_litre"),
+                sign_expr,
             ),
             "_transaction": Case(
                 When(credited_entity_id=entity_id, then=Value("CREDIT")),

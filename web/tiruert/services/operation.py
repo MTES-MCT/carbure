@@ -16,6 +16,7 @@ from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
 from tiruert.services.declaration_period import DeclarationPeriodService
+from tiruert.services.energy import energy_mj
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
 
@@ -193,7 +194,11 @@ class OperationService:
 
         # Convert the teneur to add from liters to MJ
         pci = data["biofuel"].pci_litre
-        teneur_to_add = truncate(sum(lot["volume"] * pci for lot in selected_lots), 0)
+        renewable_energy_share = data.get("renewable_energy_share", 1)
+        teneur_to_add = truncate(
+            sum(energy_mj(lot["volume"], pci, renewable_energy_share) for lot in selected_lots),
+            0,
+        )
 
         OperationService._check_teneur_target(request, entity_id, data["customs_category"], teneur_to_add, declaration_year)
 
@@ -209,8 +214,9 @@ class OperationService:
         teneur_to_add_by_category = defaultdict(float)
         for entry in teneur_entries:
             pci = entry["biofuel"].pci_litre
+            renewable_energy_share = entry.get("renewable_energy_share", 1)
             teneur_to_add_by_category[entry["customs_category"]] += truncate(
-                sum(lot["volume"] * pci for lot in entry["selected_lots"])
+                sum(energy_mj(lot["volume"], pci, renewable_energy_share) for lot in entry["selected_lots"])
             )
 
         for customs_category, teneur_to_add in teneur_to_add_by_category.items():

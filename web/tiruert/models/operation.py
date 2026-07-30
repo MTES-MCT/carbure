@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import MatierePremiere, Pays
 from core.utils import truncate
+from tiruert.services.energy import energy_mj
 
 
 class OperationManager(models.Manager):
@@ -172,7 +173,10 @@ class Operation(models.Model):
         if getattr(self, "_energy", None) is not None:
             return truncate(self._energy, 0)
 
-        return truncate(self.volume_unsigned * self.renewable_energy_share * self.biofuel.pci_litre, 0)  # unsigned
+        return truncate(
+            energy_mj(self.volume_unsigned, self.biofuel.pci_litre, self.renewable_energy_share),
+            0,
+        )  # unsigned
 
     @property
     def avoided_emissions(self):
