@@ -55,7 +55,7 @@ class BalanceSerializersTest(TestCase):
                 "masse_volumique": 0.79,
             },
             "available_balance": 150.0,
-            "quantity": {"credit": 100.0, "debit": 50.0},
+            "volume": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 0.0,
             "declared_teneur": 0.0,
             "pending_operations": 0,
@@ -89,7 +89,7 @@ class BalanceBySectorSerializerTest(TestCase):
         data = {
             "sector": "ESSENCE",
             "available_balance": 150.0,
-            "quantity": {"credit": 100.0, "debit": 50.0},
+            "volume": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 10.0,
             "declared_teneur": 5.0,
             "pending_operations": 3,
@@ -274,8 +274,8 @@ class BalanceSerializationTest(TestCase):
         self.assertEqual(data["customs_category"], "CONV")
         self.assertEqual(data["biofuel"]["code"], "ETH")
         self.assertEqual(data["available_balance"], 150.0)
-        self.assertEqual(data["quantity"]["credit"], 100.0)
-        self.assertEqual(data["quantity"]["debit"], 50.0)
+        self.assertEqual(data["volume"]["credit"], 100.0)
+        self.assertEqual(data["volume"]["debit"], 50.0)
         # Verify initial_balance is calculated and present
         self.assertIn("initial_balance", data)
         self.assertEqual(data["initial_balance"], 100.0)  # 150 - 100 + 50

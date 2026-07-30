@@ -196,7 +196,6 @@ class TeneurServiceEmissionBoundsTest(SimpleTestCase):
         expected_max = (
             200.349 * 70.0 + 150.239 * 60.0 + (normalized_target_volume - (200.349 + 150.239)) * 50.0
         ) / normalized_target_volume
-        print(f"Expected min: {expected_min}, Expected max: {expected_max}")
         self.assertAlmostEqual(min_emission, expected_min)
         self.assertAlmostEqual(max_emission, expected_max)
 

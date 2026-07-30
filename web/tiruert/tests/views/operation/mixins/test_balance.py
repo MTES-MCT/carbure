@@ -300,18 +300,3 @@ class BalanceActionMixinTest(TestCase):
         self.assertIn("volume", lot)
         self.assertNotIn("quantity", lot)
         self.assertEqual(lot["volume"], {"credit": 50.0, "debit": 25.0})
-
-    @patch("tiruert.services.balance.BalanceService.calculate_balance")
-    def test_balance_action_default_grouping_returns_quantity_not_volume(self, mock_calculate_balance):
-        """Default grouping should expose quantity, not volume."""
-        mock_calculate_balance.return_value = self._create_mock_balance_data()
-
-        request = self._create_request()
-
-        response = self.view.balance(request)
-
-        self.assertEqual(response.status_code, 200)
-        balance = response.data["results"][0]
-
-        self.assertIn("quantity", balance)
-        self.assertNotIn("volume", balance)
