@@ -1,7 +1,7 @@
 import { LoaderOverlay, Main } from "common/components/scaffold"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { EmptyStations } from "./empty-stations"
+import { EmptyStations } from "./components/empty-stations"
 import { getStations } from "./api"
 import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
