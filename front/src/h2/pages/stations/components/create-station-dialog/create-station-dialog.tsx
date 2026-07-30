@@ -9,10 +9,8 @@ import {
 } from "../station-form"
 import { Checkbox } from "common/components/inputs2"
 import { useState } from "react"
-import { useMutation } from "common/hooks/async"
-import * as api from "../../api"
 import useEntity from "common/hooks/entity"
-import { useNotify, useNotifyError } from "common/components/notifications"
+import { useCreateStation } from "./create-station-dialog.hooks"
 
 type CreateStationDialogProps = {
   onClose: () => void
@@ -22,20 +20,8 @@ export const CreateStationDialog = ({ onClose }: CreateStationDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
 
-  const notify = useNotify()
-  const notifyError = useNotifyError()
-
   const [confirmed, setConfirmed] = useState(false)
-
-  const createStation = useMutation(api.createStation, {
-    onSuccess: () => {
-      notify(t("La station a bien été créée !"), { variant: "success" })
-      onClose()
-    },
-    onError: (err) => {
-      notifyError(err)
-    },
-  })
+  const createStation = useCreateStation({ onClose })
 
   function onSubmit(form: H2StationFormData | undefined) {
     if (form && confirmed) {
@@ -54,6 +40,7 @@ export const CreateStationDialog = ({ onClose }: CreateStationDialogProps) => {
           <Button
             type="submit"
             disabled={!confirmed}
+            loading={createStation.loading}
             nativeButtonProps={{ form: "station-form" }}
           >
             {t("Inscrire la station")}

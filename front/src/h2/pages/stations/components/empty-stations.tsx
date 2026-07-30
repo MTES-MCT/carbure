@@ -1,11 +1,10 @@
-import { usePortal } from "common/components/portal"
 import { EmptyState } from "common/molecules/empty-state"
 import { useTranslation } from "react-i18next"
-import { CreateStationDialog } from "./create-station-dialog/create-station-dialog"
+import { useCreateStationDialog } from "./create-station-dialog"
 
 export const EmptyStations = () => {
   const { t } = useTranslation()
-  const portal = usePortal()
+  const openCreateStationDialog = useCreateStationDialog()
 
   return (
     <EmptyState
@@ -16,9 +15,7 @@ export const EmptyStations = () => {
       buttonProps={{
         children: t("Inscrire une station"),
         iconId: "ri-add-line",
-        onClick: () => {
-          portal((onClose) => <CreateStationDialog onClose={onClose} />)
-        },
+        onClick: openCreateStationDialog,
       }}
     />
   )
