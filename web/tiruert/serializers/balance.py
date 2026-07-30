@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from core.models import MatierePremiere
-from core.utils import truncate
 from tiruert.models.operation import Operation
 from tiruert.serializers.fields import RoundedFloatField, TruncatedFloatField
 
@@ -30,7 +29,7 @@ class BaseBalanceSerializer(serializers.Serializer):
 
     def get_initial_balance(self, instance) -> float:
         result = instance["available_balance"] - instance["quantity"]["credit"] + instance["quantity"]["debit"]
-        return truncate(result)
+        return round(result, 2)
 
 
 class BalanceSerializer(BaseBalanceSerializer):

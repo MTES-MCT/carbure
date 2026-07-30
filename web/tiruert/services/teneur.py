@@ -70,8 +70,6 @@ class TeneurService:
             computed volumes.
 
         """
-        from tiruert.services.operation import VOLUME_PRECISION
-
         # Sanity checks on inputs
         # Round target volume (L) to 2 decimals, because at the end we return 2 decimals precision
         target_volume = truncate(target_volume)
@@ -236,9 +234,7 @@ class TeneurService:
             # Clean available_volume to 2 decimals
             # Any extra decimals are float conversion artifacts
             available_volume_clean = truncate(available_volume)
-            optimized_volume_clean = round(
-                optimized_volume, VOLUME_PRECISION
-            )  # it's ok to round up (capped with available_volume_clean)
+            optimized_volume_clean = round(optimized_volume, 2)  # it's ok to round up (capped with available_volume_clean)
 
             # Cap optimized volume using values already normalized to business precision,
             # and by the volume still needed to reach the target.

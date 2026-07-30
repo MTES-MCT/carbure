@@ -26,9 +26,6 @@ class OperationServiceErrors:
     LOT_EMISSION_RATE_NOT_FOUND = "LOT_EMISSION_RATE_NOT_FOUND"
 
 
-VOLUME_PRECISION = 2
-
-
 class OperationService:
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
