@@ -19,6 +19,7 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.certificate = MagicMock(
             certificate_id="",
             certificate_type="SYSTEME_NATIONAL",
+            certificate_issuer="",
             status="EXPIRED",
             valid_from=datetime(2026, 1, 31),
             valid_until=datetime(2027, 2, 17),
@@ -26,9 +27,10 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
 
         module_to_patch = "edelivery.ebms.requests.add_update_certificate_request"
-        patched_CertificateStatusConverter = patch(f"{module_to_patch}.CertificateStatusConverter").start()
-        self.patched_to_udb = patched_CertificateStatusConverter.return_value.to_udb
-        self.patched_to_udb.return_value = ""
+        self.patched_CertificateStatusConverter = patch(f"{module_to_patch}.CertificateStatusConverter").start()
+        self.patched_CertificateStatusConverter.return_value.to_udb.return_value = ""
+        self.patched_CertificateIssuerConverter = patch(f"{module_to_patch}.CertificateIssuerConverter").start()
+        self.patched_CertificateIssuerConverter.return_value.to_udb.return_value = ""
 
     def tearDown(self):
         patch.stopall()
@@ -52,6 +54,17 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
         certificate_number_tag = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CERTIFICATE_NUMBER")
         self.assertEqual("SN_UN_2026_0123", certificate_number_tag.text)
+
+    def test_injects_certificate_issuer(self):
+        self.certificate.certificate_issuer = "SOME_ISSUER"
+        patched_to_udb = self.patched_CertificateIssuerConverter.return_value.to_udb
+        patched_to_udb.return_value = "SOME_CERTIFICATE_BODY_NUMBER"
+
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        patched_to_udb.assert_called_with("SOME_ISSUER")
+
+        certificate_body_number_tag = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CERTIFICATE_BODY_NUMBER")
+        self.assertEqual("SOME_CERTIFICATE_BODY_NUMBER", certificate_body_number_tag.text)
 
     def test_injects_issue_date(self):
         self.certificate.valid_from = datetime(2026, 6, 15, tzinfo=timezone.utc)
@@ -86,10 +99,11 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
     def test_injects_converted_status(self):
         self.certificate.status = "VALID"
-        self.patched_to_udb.return_value = "UDB_STATUS"
+        patched_to_udb = self.patched_CertificateStatusConverter.return_value.to_udb
+        patched_to_udb.return_value = "UDB_STATUS"
 
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
-        self.patched_to_udb.assert_called_with("VALID")
+        patched_to_udb.assert_called_with("VALID")
 
         validity_status_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/VALIDITY_STATUS")
         self.assertEqual("UDB_STATUS", validity_status_element.text)
