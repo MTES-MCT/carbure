@@ -10,6 +10,7 @@ from adapters.logger import log_warning
 from core.utils import truncate
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
+from tiruert.services.energy import avoided_emissions_tco2, energy_mj
 
 
 class TeneurServiceErrors:
@@ -69,8 +70,6 @@ class TeneurService:
             computed volumes.
 
         """
-        from tiruert.services.operation import VOLUME_PRECISION
-
         # Sanity checks on inputs
         # Round target volume (L) to 2 decimals, because at the end we return 2 decimals precision
         target_volume = truncate(target_volume)
@@ -235,9 +234,7 @@ class TeneurService:
             # Clean available_volume to 2 decimals
             # Any extra decimals are float conversion artifacts
             available_volume_clean = truncate(available_volume)
-            optimized_volume_clean = round(
-                optimized_volume, VOLUME_PRECISION
-            )  # it's ok to round up (capped with available_volume_clean)
+            optimized_volume_clean = round(optimized_volume, 2)  # it's ok to round up (capped with available_volume_clean)
 
             # Cap optimized volume using values already normalized to business precision,
             # and by the volume still needed to reach the target.
@@ -273,19 +270,18 @@ class TeneurService:
 
         # Sanity checks on inputs
         target_volume = truncate(target_volume)
+        total_volume = truncate(batches_volumes.sum())
 
-        if truncate(batches_volumes.sum()) < target_volume:
+        if total_volume < target_volume:
             raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
 
         emissions_sorter = np.argsort(batches_emissions)
         emissions_inv_sorter = emissions_sorter[::-1]
-        thresh_min = (target_volume < batches_volumes[emissions_sorter].cumsum()).argmax()
-        thresh_max = (target_volume < batches_volumes[emissions_inv_sorter].cumsum()).argmax()
+        cumulative_min = batches_volumes[emissions_sorter].cumsum()
+        cumulative_max = batches_volumes[emissions_inv_sorter].cumsum()
 
-        # Handle case where the target volume is exactly the sum of the batches volumes
-        if target_volume == batches_volumes.sum():
-            thresh_min = len(batches_volumes) - 1
-            thresh_max = len(batches_volumes) - 1
+        thresh_min = min(np.searchsorted(cumulative_min, target_volume, side="left"), len(batches_volumes) - 1)
+        thresh_max = min(np.searchsorted(cumulative_max, target_volume, side="left"), len(batches_volumes) - 1)
 
         min_emissions_rate = (
             np.dot(
@@ -315,7 +311,7 @@ class TeneurService:
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
         pci = data["biofuel"].pci_litre
-        volume_energy = target_volume * pci  # MJ
+        volume_energy = energy_mj(target_volume, pci)  # MJ
         target_emission = GHG_REFERENCE_RED_II - (data["target_emission"] * 1000000 / volume_energy)  # gCO2/MJ emis
 
         selected_lots, fun = TeneurService.optimize_biofuel_blending(
@@ -358,8 +354,8 @@ class TeneurService:
         Convert producted emissions (gCO2/MJ) into avoided emissions (tCO2)
         """
         pci = biofuel.pci_litre
-        volume_energy = volume * pci  # MJ
-        return (GHG_REFERENCE_RED_II - emissions_rate) * volume_energy / 1000000  # tCO2
+        volume_energy = energy_mj(volume, pci)  # MJ
+        return avoided_emissions_tco2(volume_energy, emissions_rate, GHG_REFERENCE_RED_II)  # tCO2
 
     @staticmethod
     def prepare_data(data):

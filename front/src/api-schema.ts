@@ -3005,7 +3005,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve balances grouped by mp category / biofuel or by sector or by depot */
+        /** @description Retrieve balances grouped by mp category / biofuel or by sector */
         get: operations["list_balances"];
         put?: never;
         post?: never;
@@ -3321,7 +3321,7 @@ export interface components {
             readonly initial_balance: number;
             /** Format: double */
             available_balance: number;
-            quantity: components["schemas"]["BalanceQuantity"];
+            volume: components["schemas"]["BalanceVolume"];
             /** Format: double */
             pending_teneur: number;
             /** Format: double */
@@ -3346,28 +3346,18 @@ export interface components {
             /** Format: double */
             masse_volumique: number;
         };
-        BalanceByDepot: {
-            customs_category: string;
-            biofuel: components["schemas"]["BalanceBiofuel"];
-            depots: components["schemas"]["BalanceDepot"][];
-        };
         BalanceBySector: {
             sector: components["schemas"]["ObjectiveSectorCodeEnum"];
             /** Format: double */
             readonly initial_balance: number;
             /** Format: double */
             available_balance: number;
-            quantity: components["schemas"]["BalanceQuantity"];
+            volume: components["schemas"]["BalanceVolume"];
             /** Format: double */
             pending_teneur: number;
             /** Format: double */
             declared_teneur: number;
             pending_operations: number;
-        };
-        BalanceDepot: {
-            id: number;
-            name: string;
-            quantity: components["schemas"]["BalanceQuantity"];
         };
         BalanceQuantity: {
             /**
@@ -3381,7 +3371,19 @@ export interface components {
              */
             debit: number;
         };
-        BalanceResponse: components["schemas"]["Balance"] | components["schemas"]["BalanceByDepot"] | components["schemas"]["BalanceBySector"];
+        BalanceResponse: components["schemas"]["Balance"] | components["schemas"]["BalanceBySector"];
+        BalanceVolume: {
+            /**
+             * Format: double
+             * @default 0
+             */
+            credit: number;
+            /**
+             * Format: double
+             * @default 0
+             */
+            debit: number;
+        };
         BaseUser: {
             /** Format: email */
             readonly email: string;
@@ -5677,9 +5679,9 @@ export interface components {
             validation_date?: string | null;
             durability_period?: string | null;
             /** Format: double */
-            readonly quantity: number;
+            readonly volume: number;
             /** Format: double */
-            readonly quantity_mj: number;
+            readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
@@ -5770,7 +5772,9 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
             /** Format: double */
-            readonly quantity: number;
+            readonly volume: number;
+            /** Format: double */
+            readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
@@ -5848,7 +5852,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["BalanceResponse"][];
-            total_quantity?: number;
+            total_volume?: number;
         };
         PaginatedBiomethaneAdminAnnualDeclarationList: {
             /** @example 123 */
@@ -6036,7 +6040,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["OperationList"][];
-            total_quantity?: number;
+            total_volume?: number;
         };
         PaginatedSafTicketPreviewList: {
             /** @example 123 */
@@ -13563,8 +13567,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -13903,7 +13907,7 @@ export interface operations {
                 from_to?: string;
                 ges_bound_max?: number;
                 ges_bound_min?: number;
-                /** @description Group by sector, lot or depot. */
+                /** @description Group by sector, lot. */
                 group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by;
                 /**
                  * @description * `INCORPORATION` - INCORPORATION
@@ -13939,8 +13943,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -14057,8 +14061,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -14194,8 +14198,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -14839,11 +14843,11 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     ValueMinusdurability_period = "-durability_period",
     ValueMinusfrom_to = "-from_to",
     ValueMinuspending_operations = "-pending_operations",
-    ValueMinusquantity = "-quantity",
     ValueMinussaved_emissions = "-saved_emissions",
     ValueMinussector = "-sector",
     ValueMinusstatus = "-status",
     ValueMinustype = "-type",
+    ValueMinusvolume = "-volume",
     available_balance = "available_balance",
     biofuel = "biofuel",
     created_at = "created_at",
@@ -14852,11 +14856,11 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     durability_period = "durability_period",
     from_to = "from_to",
     pending_operations = "pending_operations",
-    quantity = "quantity",
     saved_emissions = "saved_emissions",
     sector = "sector",
     status = "status",
-    type = "type"
+    type = "type",
+    volume = "volume"
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
     CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
@@ -14874,7 +14878,6 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     VALIDATED = "VALIDATED"
 }
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
-    depot = "depot",
     lot = "lot",
     sector = "sector"
 }

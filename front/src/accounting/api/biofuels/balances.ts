@@ -13,10 +13,7 @@ export const getBalanceFilters = (
 }
 
 export const getBalances = <
-  BalanceType extends
-    | Balance
-    | apiTypes["BalanceBySector"]
-    | apiTypes["BalanceByDepot"] = Balance,
+  BalanceType extends Balance | apiTypes["BalanceBySector"] = Balance,
 >(
   query: QueryParams<"/tiruert/operations/balance/">
 ) => {

@@ -4,6 +4,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, OpenApiType
 from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
+from core.utils import truncate
 
 
 class ExcelExportActionMixin:
@@ -46,8 +47,8 @@ class ExcelExportActionMixin:
                         {"label": "Type Opération", "value": "_operation"},
                         {"label": "Expéditeur", "value": "debited_entity.name"},
                         {"label": "Destinataire", "value": "credited_entity.name"},
-                        {"label": "Quantité (MJ)", "value": "_quantity"},
-                        {"label": "Tonnes CO2 eq. évitées", "value": "avoided_emissions"},
+                        {"label": "Quantité (MJ)", "value": lambda o: truncate(o.quantity, 0)},
+                        {"label": "Tonnes CO2 eq. évitées", "value": lambda o: truncate(o.avoided_emissions)},
                     ],
                 }
             ],

@@ -18,23 +18,27 @@ from tiruert.serializers import (
     OperationUpdateSerializer,
 )
 from tiruert.services.declaration_period import DeclarationPeriodService
+from tiruert.services.energy import (
+    avoided_emissions_tco2_expression,
+    energy_mj_expression,
+)
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 from .mixins import ActionMixin
 
 
 class OperationPagination(MetadataPageNumberPagination):
-    aggregate_fields = {"total_quantity": 0}
+    aggregate_fields = {"total_volume": 0}
 
     def get_extra_metadata(self):
         queryset = getattr(self, "queryset", None)
         if callable(getattr(queryset, "aggregate", None)):
             return queryset.aggregate(
-                total_quantity=Round(
+                total_volume=Round(
                     Coalesce(
                         Sum(
                             ExpressionWrapper(
-                                F("_quantity") * F("renewable_energy_share"),
+                                F("_volume"),
                                 output_field=FloatField(),
                             )
                         ),
@@ -44,13 +48,11 @@ class OperationPagination(MetadataPageNumberPagination):
                 )
             )
 
-        metadata = {"total_quantity": 0}
+        metadata = {"total_volume": 0}
 
         for operation in queryset or []:
-            # _quantity is annotated and signed (positive=credit, negative=debit)
-            quantity = operation._volume * operation.renewable_energy_share
-            metadata["total_quantity"] += quantity
-        metadata["total_quantity"] = round(metadata["total_quantity"], 2)
+            metadata["total_volume"] += operation._volume
+        metadata["total_volume"] = round(metadata["total_volume"], 2)
         return metadata
 
 
@@ -119,13 +121,14 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             details_queryset.values("operation_id")
             .annotate(
                 total=Sum(
-                    ExpressionWrapper(
-                        (Value(GHG_REFERENCE_RED_II) - F("emission_rate_per_mj"))
-                        * F("lot__biofuel__pci_litre")
-                        * F("volume")
-                        * F("operation__renewable_energy_share")
-                        / Value(1000000.0),
-                        output_field=FloatField(),
+                    avoided_emissions_tco2_expression(
+                        energy_mj_expression(
+                            F("volume"),
+                            F("operation__renewable_energy_share"),
+                            F("lot__biofuel__pci_litre"),
+                        ),
+                        F("emission_rate_per_mj"),
+                        GHG_REFERENCE_RED_II,
                     )
                 )
             )
@@ -177,9 +180,15 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 default=Value(None),
                 output_field=CharField(),
             ),
-            "_quantity": ExpressionWrapper(  # faut il * renewable_energy_share ?
+            "_volume": ExpressionWrapper(
                 total_volume_expr * sign_expr,
                 output_field=FloatField(),
+            ),
+            "_energy": energy_mj_expression(
+                total_volume_expr,
+                F("renewable_energy_share"),
+                F("biofuel__pci_litre"),
+                sign_expr,
             ),
             "_transaction": Case(
                 When(credited_entity_id=entity_id, then=Value("CREDIT")),
@@ -188,10 +197,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 output_field=CharField(),
             ),
         }
-
-        # _volume is only needed by non-list actions (retrieve/export), skip it on list queries.
-        if self.action != "list":
-            annotations["_volume"] = ExpressionWrapper(total_volume_expr * sign_expr, output_field=FloatField())
 
         queryset = super().get_queryset().annotate(**annotations)
 

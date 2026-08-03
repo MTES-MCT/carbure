@@ -133,19 +133,19 @@ export const useOperationsBiofuelsColumns = ({
       key: OperationOrder.from_to,
     },
     {
-      key: OperationOrder.quantity,
+      key: OperationOrder.volume,
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       style: {
         minWidth: "140px",
       },
       cell: (item) => {
-        const calculatedQuantity = Math.abs(formatValue(item, item.quantity))
+        const calculatedQuantity = Math.abs(formatValue(item, item.volume))
         const formattedQuantity = formatNumber(calculatedQuantity, {
           fractionDigits: FRACTION_DIGITS_LITERS,
         })
         return displayValueDebitOrCredit(
           formattedQuantity,
-          isSendingOperation(item.quantity),
+          isSendingOperation(item.volume),
           item.status === OperationsStatus.REJECTED
         )
       },
@@ -161,7 +161,7 @@ export const useOperationsBiofuelsColumns = ({
         )
         return displayValueDebitOrCredit(
           formattedAvoidedEmissions,
-          isSendingOperation(item.quantity),
+          isSendingOperation(item.volume),
           item.status === OperationsStatus.REJECTED
         )
       },

@@ -6,6 +6,7 @@ from drf_spectacular.utils import OpenApiTypes, extend_schema
 from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
+from core.utils import truncate
 from tiruert.models import OperationDetail
 
 
@@ -39,9 +40,9 @@ class OperationDetailExcelExportActionMixin:
                     "rows": details,
                     "columns": [
                         {"label": "ID Carbure", "value": "lot.carbure_id"},
-                        {"label": "Volume prélevé (L)", "value": "volume"},
+                        {"label": "Volume prélevé (L)", "value": lambda d: round(d.volume, 2)},
                         {"label": "Taux d'émission (gCO₂/MJ)", "value": "emission_rate_per_mj"},
-                        {"label": "Émissions évitées (tCO₂)", "value": "avoided_emissions"},
+                        {"label": "Émissions évitées (tCO₂)", "value": lambda d: truncate(d.avoided_emissions)},
                         {"label": "Biocarburant", "value": "lot.biofuel.name"},
                         {"label": "Matière première", "value": "lot.feedstock.name"},
                         {"label": "Catégorie", "value": "lot.feedstock.category"},

@@ -9,6 +9,7 @@ from rest_framework.test import APIRequestFactory
 
 from core.models import Biocarburant, DeclarationPeriod, Entity, MatierePremiere
 from core.tests_utils import setup_current_user
+from core.utils import truncate
 from tiruert.models import Operation, OperationDetail
 from tiruert.views.operation.operation import OperationViewSet
 from transactions.factories import CarbureLotFactory
@@ -244,7 +245,7 @@ class OperationViewSetIntegrationTest(TestCase):
                 self.lot1.carbure_id,
                 500,
                 10.5,
-                detail.avoided_emissions,
+                truncate(detail.avoided_emissions),
                 self.lot1.biofuel.name,
                 self.lot1.feedstock.name,
                 self.lot1.feedstock.category,

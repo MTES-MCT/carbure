@@ -10538,11 +10538,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -10551,11 +10551,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -10575,8 +10575,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -10982,8 +10982,7 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
-        by depot
+      description: Retrieve balances grouped by mp category / biofuel or by sector
       parameters:
         - in: query
           name: biofuel
@@ -11069,11 +11068,10 @@ paths:
           schema:
             type: string
             enum:
-              - depot
               - lot
               - sector
             default: ""
-          description: Group by sector, lot or depot.
+          description: Group by sector, lot.
         - in: query
           name: operation
           schema:
@@ -11123,11 +11121,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -11136,11 +11134,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -11160,8 +11158,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -11415,11 +11413,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -11428,11 +11426,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -11452,8 +11450,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -11739,11 +11737,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -11752,11 +11750,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -11776,8 +11774,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -12405,8 +12403,8 @@ components:
         available_balance:
           type: number
           format: double
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
+        volume:
+          $ref: "#/components/schemas/BalanceVolume"
         pending_teneur:
           type: number
           format: double
@@ -12438,9 +12436,9 @@ components:
         - initial_balance
         - pending_operations
         - pending_teneur
-        - quantity
         - saved_emissions
         - sector
+        - volume
     BalanceBiofuel:
       type: object
       properties:
@@ -12463,21 +12461,6 @@ components:
         - masse_volumique
         - pci_litre
         - renewable_energy_share
-    BalanceByDepot:
-      type: object
-      properties:
-        customs_category:
-          type: string
-        biofuel:
-          $ref: "#/components/schemas/BalanceBiofuel"
-        depots:
-          type: array
-          items:
-            $ref: "#/components/schemas/BalanceDepot"
-      required:
-        - biofuel
-        - customs_category
-        - depots
     BalanceBySector:
       type: object
       properties:
@@ -12490,8 +12473,8 @@ components:
         available_balance:
           type: number
           format: double
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
+        volume:
+          $ref: "#/components/schemas/BalanceVolume"
         pending_teneur:
           type: number
           format: double
@@ -12506,21 +12489,8 @@ components:
         - initial_balance
         - pending_operations
         - pending_teneur
-        - quantity
         - sector
-    BalanceDepot:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
-      required:
-        - id
-        - name
-        - quantity
+        - volume
     BalanceQuantity:
       type: object
       properties:
@@ -12535,8 +12505,18 @@ components:
     BalanceResponse:
       oneOf:
         - $ref: "#/components/schemas/Balance"
-        - $ref: "#/components/schemas/BalanceByDepot"
         - $ref: "#/components/schemas/BalanceBySector"
+    BalanceVolume:
+      type: object
+      properties:
+        credit:
+          type: number
+          format: double
+          default: 0
+        debit:
+          type: number
+          format: double
+          default: 0
     BaseUser:
       type: object
       properties:
@@ -17654,11 +17634,11 @@ components:
           type: string
           nullable: true
           maxLength: 6
-        quantity:
+        volume:
           type: number
           format: double
           readOnly: true
-        quantity_mj:
+        energy:
           type: number
           format: double
           readOnly: true
@@ -17677,14 +17657,14 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - energy
         - export_country
         - from_depot
         - id
-        - quantity
-        - quantity_mj
         - sector
         - to_depot
         - type
+        - volume
         - year
     OperationCorrectionRequest:
       type: object
@@ -17920,7 +17900,11 @@ components:
           type: string
           format: date-time
           readOnly: true
-        quantity:
+        volume:
+          type: number
+          format: double
+          readOnly: true
+        energy:
           type: number
           format: double
           readOnly: true
@@ -17939,12 +17923,13 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - energy
         - from_depot
         - id
-        - quantity
         - sector
         - to_depot
         - type
+        - volume
         - year
     OperationLot:
       type: object
@@ -18083,7 +18068,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BalanceResponse"
-        total_quantity:
+        total_volume:
           type: number
     PaginatedBiomethaneAdminAnnualDeclarationList:
       type: object
@@ -18375,7 +18360,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationList"
-        total_quantity:
+        total_volume:
           type: number
     PaginatedSafTicketPreviewList:
       type: object

@@ -13,7 +13,7 @@ export const balance: Balance = {
   sector: OperationSector.ESSENCE,
   initial_balance: 0,
   available_balance: 10000,
-  quantity: { credit: 10000, debit: 0 },
+  volume: { credit: 10000, debit: 0 },
   pending_teneur: 0,
   declared_teneur: 0,
   pending_operations: 0,

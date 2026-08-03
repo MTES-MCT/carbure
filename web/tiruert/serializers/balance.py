@@ -13,16 +13,16 @@ class BalanceBiofuelSerializer(serializers.Serializer):
     masse_volumique = RoundedFloatField()
 
 
-class BalanceQuantitySerializer(serializers.Serializer):
-    credit = RoundedFloatField(default=0.0)
-    debit = RoundedFloatField(default=0.0)
+class BalanceVolumeSerializer(serializers.Serializer):
+    credit = TruncatedFloatField(default=0.0)
+    debit = TruncatedFloatField(default=0.0)
 
 
 class BaseBalanceSerializer(serializers.Serializer):
     sector = serializers.ChoiceField(choices=Operation.SECTOR_CODE_CHOICES)
     initial_balance = serializers.SerializerMethodField()
     available_balance = TruncatedFloatField()
-    quantity = BalanceQuantitySerializer()
+    volume = BalanceVolumeSerializer(source="quantity")  # can be called "volume" because serializer used only by frontend
     pending_teneur = TruncatedFloatField(decimal_places=0)
     declared_teneur = TruncatedFloatField(decimal_places=0)
     pending_operations = serializers.IntegerField()
@@ -47,7 +47,7 @@ class BalanceBySectorSerializer(BaseBalanceSerializer):
 class BalanceLotSerializer(serializers.Serializer):
     lot = serializers.IntegerField()
     available_balance = RoundedFloatField()
-    volume = BalanceQuantitySerializer()
+    volume = BalanceVolumeSerializer()
     emission_rate_per_mj = RoundedFloatField()
 
 
@@ -78,59 +78,14 @@ class BalanceByLotSerializer(serializers.Serializer):
                     "lot": lot_id,
                     "available_balance": value["available_balance"],
                     "volume": {
-                        "credit": value["quantity"]["credit"],
-                        "debit": value["quantity"]["debit"],
+                        "credit": value["volume"]["credit"],
+                        "debit": value["volume"]["debit"],
                     },
                     "emission_rate_per_mj": value["emission_rate_per_mj"],
                 },
             )
 
             # Sum up the available_balance for all lots
-            grouped_balance[group_key]["available_balance"] += value["available_balance"]
-
-        return list(grouped_balance.values())
-
-
-class BalanceDepotSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField()
-    quantity = BalanceQuantitySerializer()
-
-
-class BalanceByDepotSerializer(serializers.Serializer):
-    customs_category = serializers.CharField()
-    biofuel = BalanceBiofuelSerializer()
-    depots = BalanceDepotSerializer(many=True)
-
-    @staticmethod
-    def prepare_data(balance_dict):
-        # Group by customs_category and biofuel, and display balance by depot
-        grouped_balance = {}
-
-        for key, value in balance_dict.items():
-            sector, customs_cat, biofuel, depot = key
-            group_key = (customs_cat, biofuel)
-
-            if group_key not in grouped_balance:
-                grouped_balance[group_key] = {
-                    "customs_category": customs_cat,
-                    "biofuel": value["biofuel"],
-                    "available_balance": 0,
-                    "depots": [],
-                }
-
-            grouped_balance[group_key]["depots"].append(
-                {
-                    "id": depot.id,
-                    "name": depot.name,
-                    "quantity": {
-                        "credit": value["quantity"]["credit"],
-                        "debit": value["quantity"]["debit"],
-                    },
-                },
-            )
-
-            # Sum up the available_balance for all depots
             grouped_balance[group_key]["available_balance"] += value["available_balance"]
 
         return list(grouped_balance.values())

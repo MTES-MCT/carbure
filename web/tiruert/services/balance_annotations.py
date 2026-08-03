@@ -21,6 +21,10 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
 from tiruert.services.balance_filters import apply_operation_detail_filters
+from tiruert.services.energy import (
+    avoided_emissions_tco2_expression,
+    energy_mj_expression,
+)
 
 
 def _get_sector_expression():
@@ -46,32 +50,36 @@ def _get_teneur_sector_expression(sector_expr):
 
 def _get_quantity_expression(unit):
     if unit == "mj":
-        factor_expr = F("operation__biofuel__pci_litre")
+        return energy_mj_expression(
+            F("volume"),
+            F("operation__renewable_energy_share"),
+            F("operation__biofuel__pci_litre"),
+        )
     else:
-        factor_expr = Value(1.0)
-
-    return ExpressionWrapper(
-        F("volume") * F("operation__renewable_energy_share") * factor_expr,
-        output_field=FloatField(),
-    )
+        return ExpressionWrapper(
+            F("volume"),
+            output_field=FloatField(),
+        )
 
 
 def _get_avoided_emissions_expression():
     from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-    return ExpressionWrapper(
-        (Value(GHG_REFERENCE_RED_II) - F("emission_rate_per_mj"))
-        * F("lot__biofuel__pci_litre")
-        * F("volume")
-        * F("operation__renewable_energy_share")
-        / Value(1000000.0),
-        output_field=FloatField(),
+    energy_expr = energy_mj_expression(
+        F("volume"),
+        F("operation__renewable_energy_share"),
+        F("lot__biofuel__pci_litre"),
+    )
+    return avoided_emissions_tco2_expression(
+        energy_expr,
+        F("emission_rate_per_mj"),
+        GHG_REFERENCE_RED_II,
     )
 
 
 def _build_common_context(entity_id, unit, date_from):
-    quantity_expr = _get_quantity_expression("l")
-    teneur_quantity_expr = _get_quantity_expression("mj")
+    quantity_expr = _get_quantity_expression(unit)
+    teneur_energy_expr = _get_quantity_expression("mj")
     avoided_emissions_expr = _get_avoided_emissions_expression()
 
     credit_cond = Q(operation__credited_entity_id=entity_id)
@@ -83,7 +91,7 @@ def _build_common_context(entity_id, unit, date_from):
     return {
         "unit": unit,
         "quantity_expr": quantity_expr,
-        "teneur_quantity_expr": teneur_quantity_expr,
+        "teneur_energy_expr": teneur_energy_expr,
         "avoided_emissions_expr": avoided_emissions_expr,
         "credit_cond": credit_cond,
         "debit_cond": debit_cond,
@@ -156,7 +164,7 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
         )
         .values(*group_fields, "operation_id", "operation__status")
         .annotate(
-            operation_quantity=Sum(context["teneur_quantity_expr"]),
+            operation_energy=Sum(context["teneur_energy_expr"]),
             operation_saved_emissions=Sum(context["avoided_emissions_expr"]),
         )
     )
@@ -173,14 +181,14 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
     for group in operation_groups:
         key = tuple(group[field] for field in group_fields)
         entry = grouped_contributions[key]
-        operation_quantity = int(group["operation_quantity"] or 0)
+        operation_energy = int(group["operation_energy"] or 0)
         operation_saved_emissions = group["operation_saved_emissions"] or 0.0
 
         if group["operation__status"] == Operation.PENDING:
-            entry["pending_teneur"] += operation_quantity
+            entry["pending_teneur"] += operation_energy
             entry["pending_saved_emissions"] += operation_saved_emissions
         elif group["operation__status"] == Operation.DECLARED:
-            entry["declared_teneur"] += operation_quantity
+            entry["declared_teneur"] += operation_energy
             entry["declared_saved_emissions"] += operation_saved_emissions
 
     return grouped_contributions

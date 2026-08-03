@@ -17,14 +17,14 @@ class BalancePaginationTest(TestCase):
 
     def test_balance_pagination_aggregate_fields(self):
         """Test that BalancePagination defines aggregate_fields correctly"""
-        self.assertIn("total_quantity", self.paginator.aggregate_fields)
-        self.assertEqual(self.paginator.aggregate_fields["total_quantity"], 0)
+        self.assertIn("total_volume", self.paginator.aggregate_fields)
+        self.assertEqual(self.paginator.aggregate_fields["total_volume"], 0)
 
     def test_get_extra_metadata_with_empty_queryset(self):
-        """Test that get_extra_metadata returns zero total_quantity for empty queryset"""
+        """Test that get_extra_metadata returns zero total_volume for empty queryset"""
         self.paginator.queryset = []
         metadata = self.paginator.get_extra_metadata()
-        self.assertEqual(metadata["total_quantity"], 0)
+        self.assertEqual(metadata["total_volume"], 0)
 
     def test_get_extra_metadata_sums_available_balance(self):
         """Test that get_extra_metadata correctly sums available_balance from queryset"""
@@ -34,7 +34,7 @@ class BalancePaginationTest(TestCase):
             {"available_balance": 75.0, "quantity": {"credit": 40.0, "debit": 15.0}},
         ]
         metadata = self.paginator.get_extra_metadata()
-        self.assertEqual(metadata["total_quantity"], 325.0)  # 100 + 150 + 75
+        self.assertEqual(metadata["total_volume"], 325.0)  # 100 + 150 + 75
 
     def test_get_extra_metadata_handles_negative_values(self):
         """Test that get_extra_metadata correctly handles negative available_balance"""
@@ -43,7 +43,7 @@ class BalancePaginationTest(TestCase):
             {"available_balance": -50.0, "quantity": {"credit": 75.0, "debit": 30.0}},
         ]
         metadata = self.paginator.get_extra_metadata()
-        self.assertEqual(metadata["total_quantity"], 50.0)  # 100 + (-50)
+        self.assertEqual(metadata["total_volume"], 50.0)  # 100 + (-50)
 
 
 class BalanceActionMixinTest(TestCase):
@@ -140,6 +140,27 @@ class BalanceActionMixinTest(TestCase):
             },
         }
 
+    def _create_mock_balance_by_lot_data(self):
+        """Helper to create mock balance data for lot grouping"""
+        return {
+            ("ESSENCE", "CONV", "ETH", 42): {
+                "sector": "ESSENCE",
+                "customs_category": "CONV",
+                "biofuel": "ETH",
+                "available_balance": 100.0,
+                "volume": {"credit": 50.0, "debit": 25.0},
+                "emission_rate_per_mj": 25.0,
+            },
+            ("ESSENCE", "CONV", "ETH", 43): {
+                "sector": "ESSENCE",
+                "customs_category": "CONV",
+                "biofuel": "ETH",
+                "available_balance": 50.0,
+                "volume": {"credit": 30.0, "debit": 15.0},
+                "emission_rate_per_mj": 26.0,
+            },
+        }
+
     @patch("tiruert.services.balance.BalanceService.calculate_balance")
     def test_balance_action_calls_calculate_balance_service(self, mock_calculate_balance):
         """Test that balance action calls BalanceService.calculate_balance with correct parameters"""
@@ -158,7 +179,6 @@ class BalanceActionMixinTest(TestCase):
     def test_balance_action_serializer_selection(self):
         """Test that balance action selects the correct serializer based on group_by parameter"""
         from tiruert.serializers.balance import (
-            BalanceByDepotSerializer,
             BalanceByLotSerializer,
             BalanceBySectorSerializer,
             BalanceSerializer,
@@ -167,7 +187,6 @@ class BalanceActionMixinTest(TestCase):
         # Test mapping dictionary directly from the balance method logic
         test_cases = [
             ("lot", BalanceByLotSerializer),
-            ("depot", BalanceByDepotSerializer),
             ("sector", BalanceBySectorSerializer),
             (None, BalanceSerializer),  # default when no group_by
         ]
@@ -176,7 +195,6 @@ class BalanceActionMixinTest(TestCase):
             with self.subTest(group_by=group_by):
                 serializer_mapping = {
                     "lot": BalanceByLotSerializer,
-                    "depot": BalanceByDepotSerializer,
                     "sector": BalanceBySectorSerializer,
                 }
                 selected = serializer_mapping.get(group_by, self.view.get_serializer_class())
@@ -261,6 +279,24 @@ class BalanceActionMixinTest(TestCase):
         # Verify pagination structure
         self.assertIn("count", response.data)
         self.assertIn("results", response.data)
-        self.assertIn("total_quantity", response.data)
+        self.assertIn("total_volume", response.data)
         self.assertEqual(response.data["count"], 2)
-        self.assertEqual(response.data["total_quantity"], 250.0)  # 200 + 50
+        self.assertEqual(response.data["total_volume"], 250.0)  # 200 + 50
+
+    @patch("tiruert.services.balance.BalanceService.calculate_balance")
+    def test_balance_action_with_group_by_lot_returns_volume_not_quantity(self, mock_calculate_balance):
+        """Lot grouping should expose volume in nested lot items, not quantity."""
+        mock_calculate_balance.return_value = self._create_mock_balance_by_lot_data()
+
+        request = self._create_request({"group_by": "lot"})
+
+        response = self.view.balance(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        group = response.data["results"][0]
+        lot = group["lots"][0]
+
+        self.assertIn("volume", lot)
+        self.assertNotIn("quantity", lot)
+        self.assertEqual(lot["volume"], {"credit": 50.0, "debit": 25.0})

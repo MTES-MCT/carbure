@@ -16,8 +16,8 @@ export const useOperationDetailFields = (operation?: Operation) => {
     if (!operation) return []
 
     // Determine operation direction: positive quantity = receiving, negative = sending
-    const isReceiver = (operation?.quantity ?? 0) > 0
-    const isSender = (operation?.quantity ?? 0) < 0
+    const isReceiver = (operation?.volume ?? 0) > 0
+    const isSender = (operation?.volume ?? 0) < 0
 
     // Define all possible conditional fields
     const fields = compact([
