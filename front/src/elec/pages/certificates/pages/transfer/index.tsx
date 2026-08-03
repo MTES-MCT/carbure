@@ -49,6 +49,7 @@ export const TransferCertificates = ({
   const location = useLocation()
   const status = useStatus()
   const entity = useEntity()
+  const isElecLiable = entity.is_tiruert_liable && entity.has_elec
 
   const { state, actions, query } = useQueryBuilder<
     TransferCertificatesQueryBuilder["config"]
@@ -136,7 +137,7 @@ export const TransferCertificates = ({
                       total: formatUnit(transferred, ExtendedUnit.MWh),
                     }}
                   />
-                  {!entity.isOperator && (
+                  {!isElecLiable && (
                     <Trans
                       defaults=" et <b>{{balance}} disponibles pour cession</b>"
                       components={{ b: <b /> }}
