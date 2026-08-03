@@ -11,7 +11,7 @@ class H2StationPermissionTest(TestCase, PermissionTestMixin):
             H2StationViewSet,
             [
                 (
-                    ["list", "retrieve"],
+                    ["list", "retrieve", "filters"],
                     [HasHRSRights()],
                 ),
                 (
