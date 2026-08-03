@@ -4440,6 +4440,7 @@ export interface components {
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
+         *     * `IAA` - Issus d'IAA
          * @enum {string}
          */
         CollectionTypeEnum: CollectionTypeEnum;
@@ -14938,7 +14939,8 @@ export enum CertificateTypeEnum {
 }
 export enum CollectionTypeEnum {
     PRIVATE = "PRIVATE",
-    LOCAL = "LOCAL"
+    LOCAL = "LOCAL",
+    IAA = "IAA"
 }
 export enum ComplementaryAidOrganismsEnum {
     ADEME = "ADEME",

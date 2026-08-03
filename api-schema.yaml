@@ -14649,10 +14649,12 @@ components:
       enum:
         - PRIVATE
         - LOCAL
+        - IAA
       type: string
       description: |-
         * `PRIVATE` - Issus de collecteurs privés
         * `LOCAL` - Issus de collectivités locales
+        * `IAA` - Issus d'IAA
     CommentRequest:
       type: object
       properties:
