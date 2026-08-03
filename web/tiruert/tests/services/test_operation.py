@@ -170,6 +170,42 @@ class OperationServiceEmissionRatesTest(OperationServiceTestCase):
 class OperationServiceCreateOperationsTest(OperationServiceTestCase):
     """Test OperationService.create_operations_from_lots() method."""
 
+    @patch("tiruert.services.operation.OperationService.calculate_volume_ethanol_15")
+    @patch("tiruert.services.operation.OperationService.process_ep2_lots")
+    @patch("tiruert.services.operation.OperationService.remove_existing_lots")
+    @patch("tiruert.services.operation.OperationService.filter_fr_delivery_site")
+    @patch("tiruert.services.operation.OperationService.filter_valid_lots")
+    def test_create_operations_from_lots_calls_filter_and_transform_steps(
+        self,
+        mock_filter_valid_lots,
+        mock_filter_fr_delivery_site,
+        mock_remove_existing_lots,
+        mock_process_ep2_lots,
+        mock_calculate_volume_ethanol_15,
+    ):
+        """Should call the 3 lot filters and 2 transformation methods in order."""
+        input_lots = Mock(name="input_lots")
+        lots_after_valid_filter = Mock(name="lots_after_valid_filter")
+        lots_after_fr_filter = Mock(name="lots_after_fr_filter")
+        lot = Mock(name="lot")
+        lots_after_existing_filter = [lot]
+        lots_after_ep2 = [lot]
+        lots_after_ethanol_conversion = []
+
+        mock_filter_valid_lots.return_value = lots_after_valid_filter
+        mock_filter_fr_delivery_site.return_value = lots_after_fr_filter
+        mock_remove_existing_lots.return_value = lots_after_existing_filter
+        mock_process_ep2_lots.return_value = lots_after_ep2
+        mock_calculate_volume_ethanol_15.return_value = lots_after_ethanol_conversion
+
+        OperationService.create_operations_from_lots(input_lots)
+
+        mock_filter_valid_lots.assert_called_once_with(input_lots)
+        mock_filter_fr_delivery_site.assert_called_once_with(lots_after_valid_filter)
+        mock_remove_existing_lots.assert_called_once_with(lots_after_fr_filter)
+        mock_process_ep2_lots.assert_called_once_with(lots_after_existing_filter)
+        mock_calculate_volume_ethanol_15.assert_called_once_with(lots_after_ep2)
+
     def test_create_operations_from_lots_creates_correct_number(self):
         """Should create 4 operations from 5 valid lots (grouped by type/feedstock/biofuel/depot)."""
         OperationService.create_operations_from_lots(self.entity_lots)

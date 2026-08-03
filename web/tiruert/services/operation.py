@@ -291,6 +291,8 @@ class OperationService:
         Groups lots by delivery_type, feedstock category, biofuel and depot,
         then creates one operation per group with associated details.
         """
+
+        # Filter lots to keep only those that are valid for TIRUERT operations
         valid_lots = OperationService.filter_valid_lots(lots)
         valid_lots = OperationService.filter_fr_delivery_site(valid_lots)
         valid_lots = OperationService.remove_existing_lots(valid_lots)
@@ -299,6 +301,8 @@ class OperationService:
             return []
 
         valid_lots = list(valid_lots)
+
+        # Process EP2 lots and calculate ethanol 15° volumes for valid lots
         valid_lots = OperationService.process_ep2_lots(valid_lots)
         valid_lots = OperationService.calculate_volume_ethanol_15(valid_lots)
 
