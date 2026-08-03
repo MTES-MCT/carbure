@@ -61,3 +61,21 @@ class MetadataPageNumberPagination(CustomPageNumberPagination):
         extra_properties = {key: {"type": "number"} for key in self.aggregate_fields.keys()}
         response_schema["properties"].update(extra_properties)
         return response_schema
+
+
+class TotalCountPagination(CustomPageNumberPagination):
+    def paginate_queryset(self, queryset, request, view=None):
+        self.total_count = view.get_queryset().count()
+        return super().paginate_queryset(queryset, request, view=view)
+
+    def get_paginated_response(self, data):
+        response = super().get_paginated_response(data)
+        response.data["total_count"] = self.total_count
+        return response
+
+    def get_paginated_response_schema(self, schema):
+        response_schema = super().get_paginated_response_schema(schema)
+        response_schema["properties"]["total_count"] = {
+            "type": "integer",
+        }
+        return response_schema
