@@ -1,4 +1,5 @@
 import { Cell, Column, Table } from "common/components/table2"
+import { YesNoIndicator } from "common/components/yes-no-indicator"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { H2Station } from "h2/types"
 import { useTranslation } from "react-i18next"
@@ -37,7 +38,9 @@ export const StationTable = ({ stations }: StationTableProps) => {
     },
     {
       header: t("Compatible VP"),
-      cell: (station) => <Cell text={station.has_personal_vehicle_connector} />,
+      cell: (station) => (
+        <YesNoIndicator value={station.has_personal_vehicle_connector} />
+      ),
     },
     {
       header: t("Mis en service le"),
