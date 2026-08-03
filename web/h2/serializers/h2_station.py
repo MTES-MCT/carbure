@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.models.geography import Pays
 from h2.models import H2Station
 from transactions.models.site import Site
 
@@ -27,4 +28,5 @@ class H2StationInputSerializer(serializers.ModelSerializer):
         entity = self.context.get("entity")
         validated_data["created_by"] = entity
         validated_data["site_type"] = Site.H2_REFUELING_STATION
+        validated_data["country"] = Pays.objects.get(code_pays="FR")
         return super().create(validated_data)
