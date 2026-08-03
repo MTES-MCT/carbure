@@ -26,7 +26,7 @@ export const CreateStationDialog = ({ onClose }: CreateStationDialogProps) => {
   function onSubmit(form: H2StationFormData | undefined) {
     if (form && confirmed) {
       const validated = validateStationData(form)
-      if (validated) createStation.execute(validated, entity.id)
+      if (validated) createStation.execute(entity.id, validated)
     }
   }
 

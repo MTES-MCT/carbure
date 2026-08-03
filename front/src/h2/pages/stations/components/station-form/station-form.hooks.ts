@@ -2,6 +2,7 @@ import { useForm } from "common/components/form2"
 import {
   AccessType,
   DistributedPressure,
+  H2Station,
   H2StationInputRequest,
 } from "h2/types"
 
@@ -19,22 +20,21 @@ export type H2StationFormData = {
   commissioning_date: string | undefined
 }
 
-const defaultStationState: H2StationFormData = {
-  name: "",
-  site_siret: undefined,
-  address: undefined,
-  city: undefined,
-  postal_code: undefined,
-  access_type: AccessType.PUBLIC,
-  distributed_pressure: [],
-  has_personal_vehicle_connector: false,
-  storage_capacity: 0,
-  distribution_capacity: 0,
-  commissioning_date: undefined,
-}
-
-export function useStationForm(initialStationState?: H2StationFormData) {
-  return useForm(initialStationState ?? defaultStationState)
+export function useStationForm(station?: H2Station) {
+  return useForm<H2StationFormData>({
+    name: station?.name ?? "",
+    site_siret: station?.site_siret ?? undefined,
+    address: station?.address ?? undefined,
+    city: station?.city ?? undefined,
+    postal_code: station?.postal_code ?? undefined,
+    access_type: station?.access_type ?? AccessType.PUBLIC,
+    distributed_pressure: station?.distributed_pressure ?? [],
+    has_personal_vehicle_connector:
+      station?.has_personal_vehicle_connector ?? false,
+    storage_capacity: station?.storage_capacity ?? undefined,
+    distribution_capacity: station?.distribution_capacity ?? undefined,
+    commissioning_date: station?.commissioning_date ?? undefined,
+  })
 }
 
 export function validateStationData(

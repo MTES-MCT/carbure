@@ -9,21 +9,21 @@ import {
 import { Grid } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
 import { H2StationFormData, useStationForm } from "./station-form.hooks"
-import { AccessType, DistributedPressure } from "h2/types"
+import { AccessType, DistributedPressure, H2Station } from "h2/types"
 import { ToggleSwitch } from "common/components/inputs2/toggle-switch/toggle-switch"
 import { formatNumber } from "common/utils/formatters"
 import { SiretPicker } from "common/molecules/siret-picker"
 import { SearchCompanyPreview } from "companies/types"
 
 type StationFormProps = {
+  station?: H2Station
   onSubmit: (value?: H2StationFormData) => void
-  children?: React.ReactNode
 }
 
-export const StationForm = ({ onSubmit, children }: StationFormProps) => {
+export const StationForm = ({ station, onSubmit }: StationFormProps) => {
   const { t } = useTranslation()
 
-  const form = useStationForm()
+  const form = useStationForm(station)
 
   // PCI H2 = 120 MJ/kg
   const storageCapacityMJ = 120 * (form.value.storage_capacity ?? 0)
@@ -47,7 +47,11 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
         {...form.bind("name")}
       />
 
-      <SiretPicker {...form.bind("site_siret")} onSelect={setCompanyInfo} />
+      <SiretPicker
+        label={t("SIRET de la station")}
+        onSelect={setCompanyInfo}
+        {...form.bind("site_siret")}
+      />
 
       <TextInput
         required
@@ -115,7 +119,6 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
         label={t("Date de mise en service")}
         {...form.bind("commissioning_date")}
       />
-      {children}
     </Form>
   )
 }

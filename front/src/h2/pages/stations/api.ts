@@ -12,11 +12,25 @@ export function getH2Stations(query: H2StationsQuery) {
 }
 
 export function createH2Station(
-  station: H2StationInputRequest,
-  entity_id: number
+  entity_id: number,
+  station: H2StationInputRequest
 ) {
   return api.POST("/h2/stations/", {
     params: { query: { entity_id } },
+    body: station,
+  })
+}
+
+export function updateH2Station(
+  entity_id: number,
+  station_id: number,
+  station: H2StationInputRequest
+) {
+  return api.PATCH("/h2/stations/{id}/", {
+    params: {
+      query: { entity_id },
+      path: { id: station_id },
+    },
     body: station,
   })
 }

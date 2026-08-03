@@ -4,6 +4,7 @@ import { formatDate, formatNumber } from "common/utils/formatters"
 import { H2Station } from "h2/types"
 import { formatAccessType } from "h2/utils/formatters"
 import { useTranslation } from "react-i18next"
+import { useEditStationDialog } from "../edit-station-dialog"
 
 type StationTableProps = {
   loading: boolean
@@ -19,6 +20,8 @@ export const StationTable = ({
   onOrder,
 }: StationTableProps) => {
   const { t } = useTranslation()
+
+  const showStation = useEditStationDialog()
 
   const columns: Column<H2Station>[] = [
     {
@@ -70,6 +73,7 @@ export const StationTable = ({
       rows={stations}
       order={order}
       onOrder={onOrder}
+      onAction={showStation}
     />
   )
 }
