@@ -284,7 +284,7 @@ class OperationService:
 
     @staticmethod
     @transaction.atomic
-    def create_operations_from_lots(lots):
+    def create_operations_from_lots(lots: list[CarbureLot]):
         """
         Create TIRUERT operations from CarbureLots.
 
@@ -304,7 +304,7 @@ class OperationService:
 
         # Process EP2 lots and calculate ethanol 15° volumes for valid lots
         valid_lots = OperationService.process_ep2_lots(valid_lots)
-        valid_lots = OperationService.calculate_volume_ethanol_15(valid_lots)
+        OperationService.calculate_volume_ethanol_15(valid_lots)
 
         # Group validated_lots by delivery_type, feedstock, biofuel and depot
         lots_by_delivery_type = defaultdict(list)
@@ -343,7 +343,7 @@ class OperationService:
             OperationService.create_operation_with_details(operation_data, details_data)
 
     @staticmethod
-    def filter_valid_lots(lots):
+    def filter_valid_lots(lots: list[CarbureLot]):
         """
         Keep only lots compatible with TIRUERT.
 
@@ -355,14 +355,14 @@ class OperationService:
         return lots.filter(lot_status__in=["ACCEPTED", "FROZEN"], delivery_type__in=DELIVERY_TYPES_ACCEPTED)
 
     @staticmethod
-    def filter_fr_delivery_site(lots):
+    def filter_fr_delivery_site(lots: list[CarbureLot]):
         """
         Keep only lots with a delivery site in France, or with no delivery site.
         """
         return lots.filter(Q(carbure_delivery_site__country__code_pays="FR") | Q(carbure_delivery_site__isnull=True))
 
     @staticmethod
-    def remove_existing_lots(lots):
+    def remove_existing_lots(lots: list[CarbureLot]):
         """
         Remove lots that already have an operation to avoid duplicates.
         """
@@ -370,7 +370,7 @@ class OperationService:
         return lots.exclude(id__in=existing_lots)
 
     @staticmethod
-    def process_ep2_lots(lots):
+    def process_ep2_lots(lots: list[CarbureLot]) -> list[CarbureLot]:
         """
         Split EP2 lots into two new lots (not saved to database).
 
@@ -401,22 +401,16 @@ class OperationService:
         return result_lots
 
     @staticmethod
-    def calculate_volume_ethanol_15(lots: list[CarbureLot]) -> list[CarbureLot]:
+    def calculate_volume_ethanol_15(lots: list[CarbureLot]) -> None:
         """
         Calculate the corresponding total volume of ethanol 15° for each lot of ethanol 20°
         """
-        result_lots = []
         conversion_factor = Decimal("0.995")
 
         for lot in lots:
             if lot.biofuel.code == "ETH":
                 volume_decimal = Decimal(str(lot.volume))
                 lot.volume = truncate(float(volume_decimal * conversion_factor))
-                result_lots.append(lot)
-            else:
-                result_lots.append(lot)
-
-        return result_lots
 
     @staticmethod
     def define_sector(biofuel: Biocarburant) -> str:

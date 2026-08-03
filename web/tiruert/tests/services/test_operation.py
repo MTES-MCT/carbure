@@ -187,16 +187,14 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         input_lots = Mock(name="input_lots")
         lots_after_valid_filter = Mock(name="lots_after_valid_filter")
         lots_after_fr_filter = Mock(name="lots_after_fr_filter")
-        lot = Mock(name="lot")
-        lots_after_existing_filter = [lot]
-        lots_after_ep2 = [lot]
-        lots_after_ethanol_conversion = []
+        lots_after_existing_filter = [Mock(name="lot")]
+        lots_after_ep2 = []
 
         mock_filter_valid_lots.return_value = lots_after_valid_filter
         mock_filter_fr_delivery_site.return_value = lots_after_fr_filter
         mock_remove_existing_lots.return_value = lots_after_existing_filter
         mock_process_ep2_lots.return_value = lots_after_ep2
-        mock_calculate_volume_ethanol_15.return_value = lots_after_ethanol_conversion
+        mock_calculate_volume_ethanol_15.return_value = None
 
         OperationService.create_operations_from_lots(input_lots)
 
@@ -731,15 +729,15 @@ class OperationServiceCalculateVolumeEthanol15Test(TestCase):
     """Tests for OperationService.calculate_volume_ethanol_15()."""
 
     def test_calculate_volume_ethanol_15_converts_eth_lot_volume(self):
-        """Should convert ETH lot volume with 0.995 factor and business truncation."""
+        """Should mutate ETH lot volume in place with 0.995 factor and business truncation."""
         lot_eth = Mock()
         lot_eth.biofuel = Mock(code="ETH")
         lot_eth.volume = 1234.567
 
-        result_lots = OperationService.calculate_volume_ethanol_15([lot_eth])
+        result = OperationService.calculate_volume_ethanol_15([lot_eth])
 
-        self.assertEqual(len(result_lots), 1)
-        self.assertEqual(result_lots[0].volume, 1228.39)
+        self.assertIsNone(result)
+        self.assertEqual(lot_eth.volume, 1228.39)
 
     def test_calculate_volume_ethanol_15_keeps_non_eth_lot_unchanged(self):
         """Should keep non-ETH lots untouched."""
@@ -747,11 +745,10 @@ class OperationServiceCalculateVolumeEthanol15Test(TestCase):
         lot_emag.biofuel = Mock(code="EMAG")
         lot_emag.volume = 750.0
 
-        result_lots = OperationService.calculate_volume_ethanol_15([lot_emag])
+        result = OperationService.calculate_volume_ethanol_15([lot_emag])
 
-        self.assertEqual(len(result_lots), 1)
-        self.assertIs(result_lots[0], lot_emag)
-        self.assertEqual(result_lots[0].volume, 750.0)
+        self.assertIsNone(result)
+        self.assertEqual(lot_emag.volume, 750.0)
 
 
 class OperationServiceCreditedEntityFallbackTest(TestCase):
