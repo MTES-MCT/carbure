@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from core.models.fields import JSONChoiceField
@@ -35,6 +36,6 @@ class H2Station(Site):
         verbose_name="Connecteurs compatibles avec les véhicules particuliers", default=False
     )
 
-    storage_capacity = models.IntegerField(verbose_name="Capacité de stockage sur site")
+    storage_capacity = models.IntegerField(verbose_name="Capacité de stockage sur site", validators=[MinValueValidator(1)])
 
-    distribution_capacity = models.IntegerField(verbose_name="Capacité de distribution")
+    distribution_capacity = models.IntegerField(verbose_name="Capacité de distribution", validators=[MinValueValidator(1)])

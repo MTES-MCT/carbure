@@ -83,6 +83,7 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
         required
         label={t("Capacité de stockage sur site")}
         hintText={t("En kg")}
+        min={1}
         {...form.bind("storage_capacity")}
         state="info"
         stateRelatedMessage={t("Soit {{energy}} MJ", {
@@ -94,6 +95,7 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
         required
         label={t("Capacité de distribution")}
         hintText={t("En kg / jour")}
+        min={1}
         {...form.bind("distribution_capacity")}
       />
 
@@ -102,7 +104,6 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
         label={t("Date de mise en service")}
         {...form.bind("commissioning_date")}
       />
-
       {children}
     </Form>
   )
