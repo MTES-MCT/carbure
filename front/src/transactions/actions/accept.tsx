@@ -3,7 +3,7 @@ import i18next from "i18next"
 import { useMatomo } from "matomo"
 import { useTranslation } from "react-i18next"
 import { EntityType, EntityDepot, EntityPreview } from "common/types"
-import { Lot, LotQuery } from "transactions/types"
+import { FuelUsage, Lot, LotQuery } from "transactions/types"
 import Menu from "common/components/menu"
 import { Check, Return } from "common/components/icons"
 import { useMutation, useQuery } from "common/hooks/async"
@@ -23,6 +23,7 @@ import {
   getDeliverySites,
 } from "common/api"
 import Select from "common/components/select"
+import { TextInput } from "common/components/input"
 import { compact } from "common/utils/collection"
 import Form from "common/components/form"
 
@@ -179,8 +180,28 @@ const ReleaseForConsumptionDialog = ({
   const notify = useNotify()
   const matomo = useMatomo()
   const entity = useEntity()
+  const [usage, setUsage] = useState<FuelUsage | undefined>()
+  const [usagePrecision, setUsagePrecision] = useState<string | undefined>()
+  const usageOptions = useMemo(
+    () => [
+      { value: FuelUsage.Road, label: t("Routier (éligible)") },
+      { value: FuelUsage.Heating, label: t("Combustible (non éligible)") },
+      { value: FuelUsage.Agriculture, label: t("Agricole (éligible)") },
+      { value: FuelUsage.Construction, label: t("BTP (éligible)") },
+      { value: FuelUsage.Maritime, label: t("Maritime (éligible)") },
+      { value: FuelUsage.InlandWaterway, label: t("Fluvial (éligible)") },
+      { value: FuelUsage.Rail, label: t("Ferroviaire (éligible)") },
+      { value: FuelUsage.Fishing, label: t("Pêche (non éligible)") },
+      { value: FuelUsage.Other, label: t("Autres (non éligible)") },
+    ],
+    [t]
+  )
 
   const v = variations(selection.length)
+  const requiresPrecision = usage === FuelUsage.Other
+  const canSubmit =
+    usage !== undefined &&
+    (!requiresPrecision || Boolean(usagePrecision?.trim()))
 
   const acceptLots = useMutation(api.acceptReleaseForConsumption, {
     invalidates: [
@@ -231,17 +252,42 @@ const ReleaseForConsumptionDialog = ({
             "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100 ou ED95."
           )}
         </section>
+        <section>
+          <Form id="release-for-consumption">
+            <Select
+              autoFocus
+              required
+              label={t("Usage du carburant")}
+              placeholder={t("Sélectionner un usage")}
+              value={usage}
+              onChange={setUsage}
+              options={usageOptions}
+            />
+
+            {requiresPrecision && (
+              <TextInput
+                required
+                label={`${t("Précisions")} *`}
+                placeholder={t("Préciser l'usage")}
+                value={usagePrecision}
+                onChange={setUsagePrecision}
+              />
+            )}
+          </Form>
+        </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          autoFocus
+          submit="release-for-consumption"
           loading={acceptLots.loading}
+          disabled={!canSubmit}
           variant="success"
           icon={Check}
           label={t("Mise à consommation")}
           action={() => {
+            if (!usage || (requiresPrecision && !usagePrecision?.trim())) return
             matomo.push([
               "trackEvent",
               "lots-accept",
@@ -249,7 +295,7 @@ const ReleaseForConsumptionDialog = ({
               "",
               selection.length,
             ])
-            acceptLots.execute(query, selection)
+            acceptLots.execute(query, selection, usage, usagePrecision?.trim())
           }}
         />
         <Button

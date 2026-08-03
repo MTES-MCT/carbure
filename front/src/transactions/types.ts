@@ -38,6 +38,8 @@ export interface Lot {
   unknown_delivery_site: string | null
   delivery_site_country: Country | null
   delivery_type: DeliveryType
+  usage?: FuelUsage | null
+  usage_precision?: string | null
   lot_status: LotStatus
   correction_status: CorrectionStatus
   volume: number
@@ -233,6 +235,18 @@ export enum DeliveryType {
   Direct = "DIRECT", // livraison directe
   Flushed = "FLUSHED",
   Consumption = "CONSUMPTION",
+}
+
+export enum FuelUsage {
+  Road = "ROAD",
+  Heating = "HEATING",
+  Agriculture = "AGRICULTURE",
+  Construction = "CONSTRUCTION",
+  Maritime = "MARITIME",
+  InlandWaterway = "INLAND_WATERWAY",
+  Rail = "RAIL",
+  Fishing = "FISHING",
+  Other = "OTHER",
 }
 
 export enum TransportDocumentType {
