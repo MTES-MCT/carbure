@@ -14,7 +14,7 @@ export function useCreateStation({ onClose }: { onClose: () => void }) {
   const notify = useNotify()
   const notifyError = useNotifyError()
 
-  return useMutation(api.createStation, {
+  return useMutation(api.createH2Station, {
     invalidates: ["h2-stations"],
     onSuccess: () => {
       notify(t("La station a bien été créée !"), { variant: "success" })
