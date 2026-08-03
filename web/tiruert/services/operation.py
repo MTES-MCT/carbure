@@ -396,6 +396,24 @@ class OperationService:
         return result_lots
 
     @staticmethod
+    def calculate_volume_ethanol_15(lots: list[CarbureLot]) -> list[CarbureLot]:
+        """
+        Calculate the corresponding total volume of ethanol 15° for each lot of ethanol 20°
+        """
+        result_lots = []
+        conversion_factor = Decimal("0.995")
+
+        for lot in lots:
+            if lot.biofuel.code == "ETH":
+                volume_decimal = Decimal(str(lot.volume))
+                lot.volume = truncate(float(volume_decimal * conversion_factor))
+                result_lots.append(lot)
+            else:
+                result_lots.append(lot)
+
+        return result_lots
+
+    @staticmethod
     def define_sector(biofuel: Biocarburant) -> str:
         from saf.models.constants import SAF_BIOFUEL_TYPES
 
