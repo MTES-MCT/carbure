@@ -178,18 +178,81 @@ class LotsFlowTest(TestCase):
         assert stock == 1
 
     def test_accept_rfc(self):
+        """Accept a lot as RFC (Release for Consumption)."""
         lot = self.create_draft(carbure_client_id=self.operator.id)
         lot = self.send_lot(lot)
         assert lot.lot_status == CarbureLot.PENDING
         assert lot.delivery_type == CarbureLot.UNKNOWN
         response = self.client.post(
             reverse("transactions-lots-accept-release-for-consumption"),
-            {"entity_id": self.operator.id, "selection": [lot.id]},
+            {
+                "entity_id": self.operator.id,
+                "selection": [lot.id],
+                "usage": CarbureLot.USAGE_ROAD,
+            },
         )
         assert response.status_code == 200
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.lot_status == CarbureLot.ACCEPTED
         assert lot.delivery_type == CarbureLot.RFC
+        assert lot.usage == CarbureLot.USAGE_ROAD
+        assert lot.usage_precision is None
+
+    def test_accept_rfc_requires_usage(self):
+        """Usage is required to accept a lot as RFC."""
+        lot = self.create_draft(carbure_client_id=self.operator.id)
+        lot = self.send_lot(lot)
+
+        response = self.client.post(
+            reverse("transactions-lots-accept-release-for-consumption"),
+            {"entity_id": self.operator.id, "selection": [lot.id]},
+        )
+
+        assert response.status_code == 400
+        lot.refresh_from_db()
+        assert lot.lot_status == CarbureLot.PENDING
+        assert lot.delivery_type == CarbureLot.UNKNOWN
+
+    def test_accept_rfc_requires_usage_precision_for_other(self):
+        """Usage precision is required when usage is 'other'."""
+        lot = self.create_draft(carbure_client_id=self.operator.id)
+        lot = self.send_lot(lot)
+
+        response = self.client.post(
+            reverse("transactions-lots-accept-release-for-consumption"),
+            {
+                "entity_id": self.operator.id,
+                "selection": [lot.id],
+                "usage": CarbureLot.USAGE_OTHER,
+            },
+        )
+
+        assert response.status_code == 400
+        lot.refresh_from_db()
+        assert lot.lot_status == CarbureLot.PENDING
+        assert lot.delivery_type == CarbureLot.UNKNOWN
+
+    def test_accept_rfc_stores_usage_precision_for_other(self):
+        """Usage precision is stored when usage is 'other'."""
+        lot = self.create_draft(carbure_client_id=self.operator.id)
+        lot = self.send_lot(lot)
+
+        response = self.client.post(
+            reverse("transactions-lots-accept-release-for-consumption"),
+            {
+                "entity_id": self.operator.id,
+                "selection": [lot.id],
+                "usage": CarbureLot.USAGE_OTHER,
+                "usage_precision": "Usage expérimental",
+            },
+        )
+
+        assert response.status_code == 200
+        lot.refresh_from_db()
+        assert lot.lot_status == CarbureLot.ACCEPTED
+        assert lot.delivery_type == CarbureLot.RFC
+        assert lot.usage == CarbureLot.USAGE_OTHER
+        assert lot.usage_precision == "Usage expérimental"
 
     def test_send_rfc(self):
         lot = self.create_draft(unknown_client="CLIENT MAC", delivery_type="RFC", carbure_client_id="")
