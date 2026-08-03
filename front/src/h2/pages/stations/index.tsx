@@ -34,7 +34,7 @@ const StationsPage = () => {
   })
 
   const stations = result?.data?.results ?? []
-  const hasStations = stations.length > 0
+  const hasStations = (result?.data?.total_count ?? 0) > 0
 
   function getH2StationsFilters(filter: H2StationFilter) {
     return api.getH2StationsFilters(filter, query)

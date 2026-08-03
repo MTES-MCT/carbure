@@ -18993,6 +18993,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/H2Station"
+        total_count:
+          type: integer
     PaginatedMacFossilFuelList:
       type: object
       required:

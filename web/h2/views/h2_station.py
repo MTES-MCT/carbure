@@ -2,6 +2,7 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.viewsets import ModelViewSet
 
 from core.filters import FiltersActionFactory
+from core.pagination import TotalCountPagination
 from h2.filters.h2_station import H2StationFilter
 from h2.models import H2Station
 from h2.permissions import HasHRSRights, HasHRSWriteRights
@@ -24,6 +25,7 @@ class H2StationViewSet(FiltersActionFactory(), ModelViewSet):
     serializer_class = H2StationSerializer
     permission_classes = [HasHRSRights]
     filterset_class = H2StationFilter
+    pagination_class = TotalCountPagination
     search_fields = ["name", "site_siret", "city"]
 
     def get_permissions(self):

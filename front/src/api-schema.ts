@@ -6197,6 +6197,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["H2Station"][];
+            total_count?: number;
         };
         PaginatedMacFossilFuelList: {
             /** @example 123 */
