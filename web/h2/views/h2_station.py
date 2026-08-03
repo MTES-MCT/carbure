@@ -1,6 +1,8 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.viewsets import ModelViewSet
 
+from core.filters import FiltersActionFactory
+from h2.filters.h2_station import H2StationFilter
 from h2.models import H2Station
 from h2.permissions import HasHRSRights, HasHRSWriteRights
 from h2.serializers import H2StationInputSerializer, H2StationSerializer
@@ -17,10 +19,12 @@ from h2.serializers import H2StationInputSerializer, H2StationSerializer
         ),
     ]
 )
-class H2StationViewSet(ModelViewSet):
+class H2StationViewSet(FiltersActionFactory(), ModelViewSet):
     queryset = H2Station.objects.all()
     serializer_class = H2StationSerializer
     permission_classes = [HasHRSRights]
+    filterset_class = H2StationFilter
+    search_fields = ["name", "site_siret", "city"]
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
