@@ -46,8 +46,8 @@ const StationsPage = () => {
 
   return (
     <Main>
-      <header>
-        {canWrite && (
+      {canWrite && (
+        <header>
           <Button
             asideX
             size="large"
@@ -56,8 +56,8 @@ const StationsPage = () => {
           >
             {t("Ajouter une station")}
           </Button>
-        )}
-      </header>
+        </header>
+      )}
 
       <Content marginTop={canWrite}>
         <ActionBar>
