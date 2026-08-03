@@ -300,6 +300,7 @@ class OperationService:
 
         valid_lots = list(valid_lots)
         valid_lots = OperationService.process_ep2_lots(valid_lots)
+        valid_lots = OperationService.calculate_volume_ethanol_15(valid_lots)
 
         # Group validated_lots by delivery_type, feedstock, biofuel and depot
         lots_by_delivery_type = defaultdict(list)
