@@ -12,6 +12,7 @@ Business rules (single source of truth, applied in SQL):
 from django.db.models import Case, CharField, F, FloatField, OuterRef, QuerySet, Subquery, Sum, Value, When
 
 from biomethane.models import BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
+from biomethane.services.supply_plan.volume import wet_matter_tonnage_expression
 
 Coeff = BiomethaneFeedstockTariffCoefficient
 
@@ -56,9 +57,8 @@ def compute_tariff_coefficient_proportions(
     )
 
     # 4. Convert each line to wet matter (tMB), then sum total and per-coefficient buckets.
-    wet_tonnage = _wet_matter_tonnage_expression()
     rows = (
-        queryset.annotate(effective_coefficient=effective, wet_matter_tonnage=wet_tonnage)
+        queryset.annotate(effective_coefficient=effective, wet_matter_tonnage=wet_matter_tonnage_expression())
         .filter(wet_matter_tonnage__gt=0)
         .aggregate(
             total=Sum("wet_matter_tonnage"),
@@ -105,26 +105,6 @@ def _annotate_regime(
     ]
     return queryset.annotate(
         regime=Case(*regime_whens, default=Value(None), output_field=CharField()),
-    )
-
-
-def _wet_matter_tonnage_expression():
-    """
-    ORM expression: declared volume converted to wet matter tonnage (tMB).
-
-    - WET: volume is already tMB.
-    - DRY: tMB = tMS / (dry_matter_ratio_percent / 100).
-    - Otherwise: NULL (line excluded from totals).
-    """
-    return Case(
-        When(material_unit=BiomethaneSupplyInput.WET, then=F("volume")),
-        When(
-            material_unit=BiomethaneSupplyInput.DRY,
-            dry_matter_ratio_percent__gt=0,
-            then=F("volume") * 100.0 / F("dry_matter_ratio_percent"),
-        ),
-        default=Value(None),
-        output_field=FloatField(),
     )
 
 
