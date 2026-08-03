@@ -691,6 +691,33 @@ class OperationServiceProcessEP2LotsTest(TestCase):
         self.assertEqual(len(result_lots), 3)
 
 
+class OperationServiceCalculateVolumeEthanol15Test(TestCase):
+    """Tests for OperationService.calculate_volume_ethanol_15()."""
+
+    def test_calculate_volume_ethanol_15_converts_eth_lot_volume(self):
+        """Should convert ETH lot volume with 0.995 factor and business truncation."""
+        lot_eth = Mock()
+        lot_eth.biofuel = Mock(code="ETH")
+        lot_eth.volume = 1234.567
+
+        result_lots = OperationService.calculate_volume_ethanol_15([lot_eth])
+
+        self.assertEqual(len(result_lots), 1)
+        self.assertEqual(result_lots[0].volume, 1228.39)
+
+    def test_calculate_volume_ethanol_15_keeps_non_eth_lot_unchanged(self):
+        """Should keep non-ETH lots untouched."""
+        lot_emag = Mock()
+        lot_emag.biofuel = Mock(code="EMAG")
+        lot_emag.volume = 750.0
+
+        result_lots = OperationService.calculate_volume_ethanol_15([lot_emag])
+
+        self.assertEqual(len(result_lots), 1)
+        self.assertIs(result_lots[0], lot_emag)
+        self.assertEqual(result_lots[0].volume, 750.0)
+
+
 class OperationServiceCreditedEntityFallbackTest(TestCase):
     """Test that credited_entity falls back to carbure_producer then carbure_supplier."""
 
