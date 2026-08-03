@@ -1,0 +1,7 @@
+.yes {
+  color: var(--background-flat-success);
+}
+
+.no {
+  color: var(--background-flat-error);
+}

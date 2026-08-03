@@ -1,4 +1,5 @@
 import { Icon } from "../icon"
+import css from "./yes-no-indicator.module.css"
 
 type YesNoIndicatorProps = {
   value: boolean | null | undefined
@@ -6,7 +7,7 @@ type YesNoIndicatorProps = {
 
 export const YesNoIndicator = ({ value }: YesNoIndicatorProps) =>
   value ? (
-    <Icon name="fr-icon-checkbox-circle-fill" style={{ color: "green" }} />
+    <Icon name="fr-icon-checkbox-circle-fill" className={css.yes} />
   ) : (
-    <Icon name="fr-icon-close-circle-fill" style={{ color: "red" }} />
+    <Icon name="fr-icon-close-circle-fill" className={css.no} />
   )
