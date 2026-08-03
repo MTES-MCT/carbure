@@ -9,8 +9,8 @@ from django.db.models import Case, F, FloatField, Sum, Value, When
 
 from biomethane.services.supply_plan.tariff_coefficient import (
     _percentage,
-    _wet_matter_tonnage_expression,
 )
+from biomethane.services.supply_plan.volume import wet_matter_tonnage_expression
 from feedstocks.models.classification import CATEGORY_PRIMARY_CROPS
 
 
@@ -19,7 +19,7 @@ def compute_primary_crop_proportion(queryset) -> float:
     if not queryset.exists():
         return 0.0
 
-    wet_tonnage = _wet_matter_tonnage_expression()
+    wet_tonnage = wet_matter_tonnage_expression()
     rows = (
         queryset.annotate(wet_matter_tonnage=wet_tonnage)
         .filter(wet_matter_tonnage__gt=0)
