@@ -21,7 +21,7 @@ import { MissingFields } from "biomethane/components/missing-fields"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { DownloadSupplyPlan } from "./components/download-supply-plan"
 import { SupplyPlanTable } from "./components/supply-plan-table"
-import { TariffProportionsAlert } from "./components/tariff-proportions-alert"
+import { SupplyPlanProportionsAlerts } from "./components/supply-plan-proportions-alerts"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
@@ -92,7 +92,7 @@ export const SupplyPlan = () => {
         getFilterOptions={filterOptions.getFilterOptions}
         normalizers={filterOptions.normalizers}
       />
-      <TariffProportionsAlert query={queryBuilder.query} />
+      <SupplyPlanProportionsAlerts query={queryBuilder.query} />
       <SupplyPlanTable
         supplyPlan={supplyPlan}
         queryBuilder={queryBuilder}

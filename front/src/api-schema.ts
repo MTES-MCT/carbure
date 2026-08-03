@@ -4399,6 +4399,7 @@ export interface components {
          *     * `REDCERT` - REDCERT
          *     * `2BS` - 2BS
          *     * `KZR_INIG` - KZR_INIG
+         *     * `CERTIFHY` - CERTIFHY
          * @enum {string}
          */
         CertificateTypeEnum: CertificateTypeEnum;
@@ -4434,6 +4435,7 @@ export interface components {
             group: string;
             category: string;
             subcategory: string;
+            readonly crop_type: components["schemas"]["CropTypeEnum"] | null;
         };
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
@@ -4567,6 +4569,12 @@ export interface components {
             insee_code?: string;
             site_siret?: string;
         };
+        /**
+         * @description * `PRIMARY` - PRIMARY
+         *     * `INTERMEDIATE` - INTERMEDIATE
+         * @enum {string}
+         */
+        CropTypeEnum: CropTypeEnum;
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -6620,6 +6628,12 @@ export interface components {
          */
         TargetTypeEnum: TargetTypeEnum;
         TariffCoefficientProportions: {
+            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"];
+            /** Format: double */
+            readonly primary_crop: number;
+        };
+        /** @description P1 / P2 / P3 / P / Pef shares from the tariff decree referential. */
+        TariffCoefficients: {
             /** Format: double */
             readonly p1: number;
             /** Format: double */
@@ -14919,7 +14933,8 @@ export enum CertificateTypeEnum {
     ISCC = "ISCC",
     REDCERT = "REDCERT",
     Value2BS = "2BS",
-    KZR_INIG = "KZR_INIG"
+    KZR_INIG = "KZR_INIG",
+    CERTIFHY = "CERTIFHY"
 }
 export enum CollectionTypeEnum {
     PRIVATE = "PRIVATE",
@@ -14938,6 +14953,10 @@ export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",
     IN_CORRECTION = "IN_CORRECTION",
     FIXED = "FIXED"
+}
+export enum CropTypeEnum {
+    PRIMARY = "PRIMARY",
+    INTERMEDIATE = "INTERMEDIATE"
 }
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",

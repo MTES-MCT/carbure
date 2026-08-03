@@ -14549,6 +14549,7 @@ components:
         - REDCERT
         - 2BS
         - KZR_INIG
+        - CERTIFHY
       type: string
       description: |-
         * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
@@ -14556,6 +14557,7 @@ components:
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
         * `KZR_INIG` - KZR_INIG
+        * `CERTIFHY` - CERTIFHY
     ChangePasswordError:
       type: object
       properties:
@@ -14633,8 +14635,14 @@ components:
         subcategory:
           type: string
           maxLength: 128
+        crop_type:
+          allOf:
+            - $ref: "#/components/schemas/CropTypeEnum"
+          nullable: true
+          readOnly: true
       required:
         - category
+        - crop_type
         - group
         - subcategory
     CollectionTypeEnum:
@@ -14924,6 +14932,14 @@ components:
           maxLength: 14
       required:
         - name
+    CropTypeEnum:
+      enum:
+        - PRIMARY
+        - INTERMEDIATE
+      type: string
+      description: |-
+        * `PRIMARY` - PRIMARY
+        * `INTERMEDIATE` - INTERMEDIATE
     DeleteCertificateRequest:
       type: object
       properties:
@@ -17086,7 +17102,7 @@ components:
       properties:
         certificate_id:
           type: string
-          maxLength: 64
+          maxLength: 96
         certificate_type:
           $ref: "#/components/schemas/CertificateTypeEnum"
         certificate_holder:
@@ -19834,6 +19850,21 @@ components:
         * `CAP` - Plafond à ne pas dépasser
     TariffCoefficientProportions:
       type: object
+      properties:
+        tariff_coefficients:
+          allOf:
+            - $ref: "#/components/schemas/TariffCoefficients"
+          readOnly: true
+        primary_crop:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - primary_crop
+        - tariff_coefficients
+    TariffCoefficients:
+      type: object
+      description: P1 / P2 / P3 / P / Pef shares from the tariff decree referential.
       properties:
         p1:
           type: number
