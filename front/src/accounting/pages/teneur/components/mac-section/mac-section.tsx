@@ -42,19 +42,31 @@ export const MacSection = ({ readOnly, entityId }: MacSectionProps = {}) => {
           {t("Mises à consommation")}
         </Title>
         <Button asideX priority="secondary" onClick={onAddMac}>
-          {isReadOnly ? t("Voir mes MàC") : t("Renseigner mes MàC")}
+          {entityId
+            ? t("Voir ses MàC")
+            : isReadOnly
+              ? t("Voir mes MàC")
+              : t("Renseigner mes MàC")}
         </Button>
       </Row>
-      <p>
-        {t(
-          "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique."
-        )}
-      </p>
+      {!entityId && (
+        <p>
+          {t(
+            "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique."
+          )}
+        </p>
+      )}
 
       <Download
-        label={t("Télécharger mes mises à consommation {{year}}", {
-          year: selectedYear,
-        })}
+        label={
+          entityId
+            ? t("Télécharger ses mises à consommation {{year}}", {
+                year: selectedYear,
+              })
+            : t("Télécharger mes mises à consommation {{year}}", {
+                year: selectedYear,
+              })
+        }
         linkProps={{
           href: downloadMacFossilFuel(selectedEntityId, selectedYear),
         }}
