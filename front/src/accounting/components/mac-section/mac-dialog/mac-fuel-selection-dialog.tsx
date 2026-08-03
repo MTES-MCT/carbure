@@ -1,11 +1,11 @@
+import { FossilFuel } from "accounting/pages/teneur/types"
 import { Button } from "common/components/button2"
 import Dialog from "common/components/dialog2/dialog"
+import { Notice } from "common/components/notice"
 import Portal from "common/components/portal"
+import { MultiSelect } from "common/components/selects2"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { MultiSelect } from "common/components/selects2"
-import { Notice } from "common/components/notice"
-import { FossilFuel } from "../../types"
 
 type MacFuelSelectionDialogProps = {
   fossilFuels: FossilFuel[]
