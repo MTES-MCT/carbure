@@ -1,9 +1,9 @@
+import { MacFossilFuel } from "accounting/api/mac-fossil-fuel"
+import { FossilFuel } from "accounting/pages/teneur/types"
 import { Column } from "common/components/table2"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { MacFossilFuel } from "../../api"
-import { FossilFuel } from "../../types"
 import css from "./mac-dialog.module.css"
 import { MacInput } from "./mac-input"
 
