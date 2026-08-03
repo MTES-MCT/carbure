@@ -30,27 +30,26 @@ export const StationForm = ({ station, onSubmit }: StationFormProps) => {
 
   function setCompanyInfo(company?: SearchCompanyPreview) {
     if (company) {
-      form.setValue({
-        ...form.value,
-        address: company.registered_address,
-        city: company.registered_city,
-        postal_code: company.registered_zipcode,
-      })
+      form.setField("name", company.name)
+      form.setField("address", company.registered_address)
+      form.setField("city", company.registered_city)
+      form.setField("postal_code", company.registered_zipcode)
     }
   }
 
   return (
     <Form id="station-form" form={form} onSubmit={onSubmit}>
-      <TextInput
-        required
-        label={t("Nom de la station (dans CarbuRe)")}
-        {...form.bind("name")}
-      />
-
       <SiretPicker
+        required
         label={t("SIRET de la station")}
         onSelect={setCompanyInfo}
         {...form.bind("site_siret")}
+      />
+
+      <TextInput
+        required
+        label={t("Nom de la station")}
+        {...form.bind("name")}
       />
 
       <TextInput
