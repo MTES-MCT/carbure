@@ -32,6 +32,7 @@ export const SupplyPlan = () => {
   const { selectedYear, canEditDeclaration } = useAnnualDeclaration()
 
   const { hasSelectedEntity } = useSelectedEntity()
+  const isAdminView = hasSelectedEntity
 
   const { queryBuilder, filterOptions, supplyPlan } =
     useSupplyPlanQuery(selectedYear)
@@ -46,7 +47,7 @@ export const SupplyPlan = () => {
     <>
       <MissingFields />
 
-      {!hasSelectedEntity && (
+      {!isAdminView && (
         <Button
           onClick={() =>
             navigate(
@@ -68,7 +69,7 @@ export const SupplyPlan = () => {
             onChange={queryBuilder.actions.setSearch}
           />
         </ActionBar.Grow>
-        {!hasSelectedEntity && (
+        {!isAdminView && (
           <Button
             onClick={() =>
               navigate(
@@ -92,7 +93,10 @@ export const SupplyPlan = () => {
         getFilterOptions={filterOptions.getFilterOptions}
         normalizers={filterOptions.normalizers}
       />
-      <SupplyPlanProportionsAlerts query={queryBuilder.query} />
+      {isAdminView && (
+        <SupplyPlanProportionsAlerts query={queryBuilder.query} />
+      )}
+
       <SupplyPlanTable
         supplyPlan={supplyPlan}
         queryBuilder={queryBuilder}
