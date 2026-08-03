@@ -15,7 +15,7 @@ class TariffCoefficientsSerializer(serializers.Serializer):
 
 
 class TariffCoefficientProportionsSerializer(serializers.Serializer):
-    tariff_coefficients = TariffCoefficientsSerializer(read_only=True)
+    tariff_coefficients = TariffCoefficientsSerializer(read_only=True, allow_null=True)
     primary_crop = serializers.FloatField(read_only=True)
 
     def to_representation(self, queryset):

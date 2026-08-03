@@ -21,7 +21,7 @@ COEFFICIENTS = (Coeff.P1, Coeff.P2, Coeff.P3, Coeff.P, Coeff.PEF)
 
 def compute_tariff_coefficient_proportions(
     queryset: QuerySet[BiomethaneSupplyInput], tariff_reference: str | None = None
-) -> dict[str, float]:
+) -> dict[str, float] | None:
     """
     Return {"p1": …, "p2": …, "p3": …, "p": …, "pef": …} as % of declared wet matter tonnage (tMB).
 
@@ -30,6 +30,11 @@ def compute_tariff_coefficient_proportions(
 
     Lines without a coefficient still weigh the denominator; they are not assigned to a bucket.
     """
+
+    # If no coefficient referential, return None
+    if not Coeff.objects.exists():
+        return None
+
     if not queryset.exists():
         return _zeros()
 

@@ -19855,6 +19855,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/TariffCoefficients"
           readOnly: true
+          nullable: true
         primary_crop:
           type: number
           format: double

@@ -44,6 +44,10 @@ class TariffCoefficientProportionsTests(TestCase):
     def _inputs(self):
         return self.supply_plan.supply_inputs.all()
 
+    def test_no_coefficient_referential_returns_none(self):
+        Coeff.objects.all().delete()
+        self.assertIsNone(compute_tariff_coefficient_proportions(self._inputs()))
+
     def test_volume_weighted_percentages(self):
         BiomethaneSupplyInputFactory.create(
             supply_plan=self.supply_plan,

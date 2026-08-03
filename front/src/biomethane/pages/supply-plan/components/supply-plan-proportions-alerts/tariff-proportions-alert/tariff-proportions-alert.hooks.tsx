@@ -1,5 +1,4 @@
 import { useMemo } from "react"
-import { useTranslation } from "react-i18next"
 
 import { formatPercentage } from "common/utils/formatters"
 import { TariffReference } from "biomethane/pages/contract/types"
@@ -38,7 +37,6 @@ export const useTariffProportionsAlert = ({
   loading,
   proportions,
 }: UseTariffProportionsAlertParams) => {
-  const { t } = useTranslation()
   const { contractInfos: contract } = useContractProductionUnit()
 
   const visibleCoefficients = useMemo(
@@ -46,25 +44,22 @@ export const useTariffProportionsAlert = ({
     [contract?.tariff_reference]
   )
 
-  const shouldDisplay = visibleCoefficients.length > 0
+  const tariffCoefficients = proportions?.tariff_coefficients
+  // Null means the feedstock tariff coefficient referential is not ready yet.
+  const shouldDisplay =
+    visibleCoefficients.length > 0 && !loading && tariffCoefficients != null
 
   const description = useMemo(() => {
-    if (loading) {
-      return t("Chargement des proportions…")
-    }
-
-    if (!proportions) {
+    if (!tariffCoefficients) {
       return null
     }
 
-    const tariffCoefficients = proportions.tariff_coefficients
-
     return visibleCoefficients
       .map(
-        (key) => `${key} = ${formatPercentage(tariffCoefficients?.[key] ?? 0)}`
+        (key) => `${key} = ${formatPercentage(tariffCoefficients[key] ?? 0)}`
       )
       .join(", ")
-  }, [loading, proportions, visibleCoefficients, t])
+  }, [tariffCoefficients, visibleCoefficients])
 
   return {
     shouldDisplay,

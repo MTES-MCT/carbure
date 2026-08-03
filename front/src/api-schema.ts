@@ -6628,7 +6628,7 @@ export interface components {
          */
         TargetTypeEnum: TargetTypeEnum;
         TariffCoefficientProportions: {
-            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"];
+            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"] | null;
             /** Format: double */
             readonly primary_crop: number;
         };
