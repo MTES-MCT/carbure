@@ -12,6 +12,8 @@ import { H2StationFormData, useStationForm } from "./station-form.hooks"
 import { AccessType, DistributedPressure } from "h2/types"
 import { ToggleSwitch } from "common/components/inputs2/toggle-switch/toggle-switch"
 import { formatNumber } from "common/utils/formatters"
+import { SiretPicker } from "common/molecules/siret-picker"
+import { SearchCompanyPreview } from "companies/types"
 
 type StationFormProps = {
   onSubmit: (value?: H2StationFormData) => void
@@ -26,6 +28,17 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
   // PCI H2 = 120 MJ/kg
   const storageCapacityMJ = 120 * (form.value.storage_capacity ?? 0)
 
+  function setCompanyInfo(company?: SearchCompanyPreview) {
+    if (company) {
+      form.setValue({
+        ...form.value,
+        address: company.registered_address,
+        city: company.registered_city,
+        postal_code: company.registered_zipcode,
+      })
+    }
+  }
+
   return (
     <Form id="station-form" form={form} onSubmit={onSubmit}>
       <TextInput
@@ -34,11 +47,7 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
         {...form.bind("name")}
       />
 
-      <TextInput
-        required
-        label={t("SIRET de la station")}
-        {...form.bind("site_siret")}
-      />
+      <SiretPicker {...form.bind("site_siret")} onSelect={setCompanyInfo} />
 
       <TextInput
         required
@@ -54,6 +63,8 @@ export const StationForm = ({ onSubmit, children }: StationFormProps) => {
           {...form.bind("postal_code")}
         />
       </Grid>
+
+      <TextInput disabled label={t("Pays")} value={t("France")} />
 
       <RadioGroup
         label={t("Nature du site")}
