@@ -7264,11 +7264,77 @@ paths:
       operationId: h2_stations_list
       parameters:
         - in: query
+          name: access_type
+          schema:
+            type: array
+            items:
+              type: string
+              title: Nature d'accès au site
+              enum:
+                - PRIVATE
+                - PUBLIC
+          description: |-
+            * `PUBLIC` - Public
+            * `PRIVATE` - Privé
+          explode: true
+          style: form
+        - in: query
+          name: commissioning_year
+          schema:
+            type: array
+            items:
+              type: number
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: has_personal_vehicle_connector
+          schema:
+            type: array
+            items:
+              type: boolean
+              title: Connecteurs compatibles avec les véhicules particuliers
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -commissioning_date
+                - -distribution_capacity
+                - -name
+                - -site_siret
+                - commissioning_date
+                - distribution_capacity
+                - name
+                - site_siret
+          description: |-
+            Ordre
+
+            * `name` - Name
+            * `-name` - Name (décroissant)
+            * `site_siret` - Site siret
+            * `-site_siret` - Site siret (décroissant)
+            * `distribution_capacity` - Distribution capacity
+            * `-distribution_capacity` - Distribution capacity (décroissant)
+            * `commissioning_date` - Commissioning date
+            * `-commissioning_date` - Commissioning date (décroissant)
+          explode: false
+          style: form
         - name: ordering
           required: false
           in: query
@@ -7466,6 +7532,127 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/h2/stations/filters/:
+    get:
+      operationId: h2_stations_filters_retrieve
+      parameters:
+        - in: query
+          name: access_type
+          schema:
+            type: array
+            items:
+              type: string
+              title: Nature d'accès au site
+              enum:
+                - PRIVATE
+                - PUBLIC
+          description: |-
+            * `PUBLIC` - Public
+            * `PRIVATE` - Privé
+          explode: true
+          style: form
+        - in: query
+          name: commissioning_year
+          schema:
+            type: array
+            items:
+              type: number
+          explode: true
+          style: form
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - access_type
+              - commissioning_year
+              - has_personal_vehicle_connector
+              - order_by
+          description: Filter string to apply
+          required: true
+        - in: query
+          name: has_personal_vehicle_connector
+          schema:
+            type: array
+            items:
+              type: boolean
+              title: Connecteurs compatibles avec les véhicules particuliers
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -commissioning_date
+                - -distribution_capacity
+                - -name
+                - -site_siret
+                - commissioning_date
+                - distribution_capacity
+                - name
+                - site_siret
+          description: |-
+            Ordre
+
+            * `name` - Name
+            * `-name` - Name (décroissant)
+            * `site_siret` - Site siret
+            * `-site_siret` - Site siret (décroissant)
+            * `distribution_capacity` - Distribution capacity
+            * `-distribution_capacity` - Distribution capacity (décroissant)
+            * `commissioning_date` - Commissioning date
+            * `-commissioning_date` - Commissioning date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - h2
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - access_type
+                    - commissioning_year
+                    - has_personal_vehicle_connector
+                    - order_by
+                  summary: Example of filters response.
+          description: ""
   /api/nav-stats:
     get:
       operationId: nav_stats_retrieve
@@ -17459,12 +17646,12 @@ components:
         storage_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de stockage sur site
         distribution_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de distribution
         country:
           type: integer
@@ -17529,12 +17716,12 @@ components:
         storage_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de stockage sur site
         distribution_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de distribution
         country:
           type: integer
@@ -17542,6 +17729,7 @@ components:
           title: Pays
       required:
         - access_type
+        - distributed_pressure
         - distribution_capacity
         - id
         - name
@@ -17593,12 +17781,12 @@ components:
         storage_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de stockage sur site
         distribution_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de distribution
         country:
           type: integer
@@ -17606,6 +17794,7 @@ components:
           title: Pays
       required:
         - access_type
+        - distributed_pressure
         - distribution_capacity
         - name
         - storage_capacity
@@ -19111,12 +19300,12 @@ components:
         storage_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de stockage sur site
         distribution_capacity:
           type: integer
           maximum: 2147483647
-          minimum: -2147483648
+          minimum: 1
           title: Capacité de distribution
         country:
           type: integer

@@ -2222,6 +2222,22 @@ export interface paths {
         patch: operations["h2_stations_partial_update"];
         trace?: never;
     };
+    "/api/h2/stations/filters/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["h2_stations_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/nav-stats": {
         parameters: {
             query?: never;
@@ -3282,7 +3298,7 @@ export interface components {
          *     * `PRIVATE` - Privé
          * @enum {string}
          */
-        AccessTypeEnum: AccessTypeEnum;
+        AccessTypeEnum: PathsApiH2StationsGetParametersQueryAccess_type;
         ActivateAccountRequest: {
             uidb64: string;
             token: string;
@@ -5550,7 +5566,7 @@ export interface components {
         };
         H2StationInput: {
             readonly id: number;
-            distributed_pressure?: components["schemas"]["DistributedPressureEnum"][];
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
             name: string;
             /** SIRET */
             site_siret?: string;
@@ -5579,7 +5595,7 @@ export interface components {
             country?: number | null;
         };
         H2StationInputRequest: {
-            distributed_pressure?: components["schemas"]["DistributedPressureEnum"][];
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
             name: string;
             /** SIRET */
             site_siret?: string;
@@ -11988,8 +12004,32 @@ export interface operations {
     h2_stations_list: {
         parameters: {
             query: {
+                /**
+                 * @description * `PUBLIC` - Public
+                 *     * `PRIVATE` - Privé
+                 */
+                access_type?: PathsApiH2StationsGetParametersQueryAccess_type[];
+                commissioning_year?: number[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /**
+                 * @description * `true` - True
+                 *     * `false` - False
+                 */
+                has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `name` - Name
+                 *     * `-name` - Name (décroissant)
+                 *     * `site_siret` - Site siret
+                 *     * `-site_siret` - Site siret (décroissant)
+                 *     * `distribution_capacity` - Distribution capacity
+                 *     * `-distribution_capacity` - Distribution capacity (décroissant)
+                 *     * `commissioning_date` - Commissioning date
+                 *     * `-commissioning_date` - Commissioning date (décroissant)
+                 */
+                order_by?: PathsApiH2StationsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -12150,6 +12190,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["H2StationInput"];
+                };
+            };
+        };
+    };
+    h2_stations_filters_retrieve: {
+        parameters: {
+            query: {
+                /**
+                 * @description * `PUBLIC` - Public
+                 *     * `PRIVATE` - Privé
+                 */
+                access_type?: PathsApiH2StationsGetParametersQueryAccess_type[];
+                commissioning_year?: number[];
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Filter string to apply */
+                filter: PathsApiH2StationsFiltersGetParametersQueryFilter;
+                /**
+                 * @description * `true` - True
+                 *     * `false` - False
+                 */
+                has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `name` - Name
+                 *     * `-name` - Name (décroissant)
+                 *     * `site_siret` - Site siret
+                 *     * `-site_siret` - Site siret (décroissant)
+                 *     * `distribution_capacity` - Distribution capacity
+                 *     * `-distribution_capacity` - Distribution capacity (décroissant)
+                 *     * `commissioning_date` - Commissioning date
+                 *     * `-commissioning_date` - Commissioning date (décroissant)
+                 */
+                order_by?: PathsApiH2StationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
                 };
             };
         };
@@ -15044,6 +15136,26 @@ export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
     used_in_tiruert = "used_in_tiruert",
     year = "year"
 }
+export enum PathsApiH2StationsGetParametersQueryAccess_type {
+    PRIVATE = "PRIVATE",
+    PUBLIC = "PUBLIC"
+}
+export enum PathsApiH2StationsGetParametersQueryOrder_by {
+    ValueMinuscommissioning_date = "-commissioning_date",
+    ValueMinusdistribution_capacity = "-distribution_capacity",
+    ValueMinusname = "-name",
+    ValueMinussite_siret = "-site_siret",
+    commissioning_date = "commissioning_date",
+    distribution_capacity = "distribution_capacity",
+    name = "name",
+    site_siret = "site_siret"
+}
+export enum PathsApiH2StationsFiltersGetParametersQueryFilter {
+    access_type = "access_type",
+    commissioning_year = "commissioning_year",
+    has_personal_vehicle_connector = "has_personal_vehicle_connector",
+    order_by = "order_by"
+}
 export enum PathsApiResourcesAirportsGetParametersQueryShipping_method {
     TRUCK = "TRUCK",
     BARGE = "BARGE",
@@ -15280,10 +15392,6 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     status = "status",
     type = "type",
     years = "years"
-}
-export enum AccessTypeEnum {
-    PUBLIC = "PUBLIC",
-    PRIVATE = "PRIVATE"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",
