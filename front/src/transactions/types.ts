@@ -353,6 +353,8 @@ export interface StockPayload {
   delivery_type: string | undefined
   carbure_client_id: number | undefined
   unknown_client: string | undefined
+  usage?: FuelUsage
+  usage_precision?: string
 }
 
 export interface TransformETBEPayload {

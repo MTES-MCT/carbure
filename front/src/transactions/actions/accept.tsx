@@ -17,6 +17,7 @@ import { usePortal } from "common/components/portal"
 import useEntity from "common/hooks/entity"
 import Autocomplete from "common/components/autocomplete"
 import * as norm from "common/utils/normalizers"
+import { getFuelUsageOptions } from "transactions/constants/fuel-usage"
 import {
   findBiofuelEntities,
   findMyCertificates,
@@ -182,20 +183,7 @@ const ReleaseForConsumptionDialog = ({
   const entity = useEntity()
   const [usage, setUsage] = useState<FuelUsage | undefined>()
   const [usagePrecision, setUsagePrecision] = useState<string | undefined>()
-  const usageOptions = useMemo(
-    () => [
-      { value: FuelUsage.Road, label: t("Routier (éligible)") },
-      { value: FuelUsage.Heating, label: t("Combustible (non éligible)") },
-      { value: FuelUsage.Agriculture, label: t("Agricole (éligible)") },
-      { value: FuelUsage.Construction, label: t("BTP (éligible)") },
-      { value: FuelUsage.Maritime, label: t("Maritime (éligible)") },
-      { value: FuelUsage.InlandWaterway, label: t("Fluvial (éligible)") },
-      { value: FuelUsage.Rail, label: t("Ferroviaire (éligible)") },
-      { value: FuelUsage.Fishing, label: t("Pêche (non éligible)") },
-      { value: FuelUsage.Other, label: t("Autres (non éligible)") },
-    ],
-    [t]
-  )
+  const usageOptions = useMemo(() => getFuelUsageOptions(t), [t])
 
   const v = variations(selection.length)
   const requiresPrecision = usage === FuelUsage.Other
