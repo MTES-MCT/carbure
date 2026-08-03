@@ -1,7 +1,8 @@
 from django.db import models
 
-from biomethane.models import BiomethaneSupplyPlan
 from core.models import Pays
+
+from .biomethane_supply_plan import BiomethaneSupplyPlan
 
 
 class BiomethaneSupplyInput(models.Model):

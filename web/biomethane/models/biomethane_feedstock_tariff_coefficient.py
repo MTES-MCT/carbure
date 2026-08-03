@@ -1,10 +1,15 @@
 from django.db import models
 
+from .biomethane_supply_input import BiomethaneSupplyInput
+
 
 class BiomethaneFeedstockTariffCoefficient(models.Model):
     """
     Reference data: tariff coefficient (P1, P2, P3, P, Pef) for a feedstock under a given
-    tariff decree regime (extensible granularity, independent of contract TARIFF_RULE groups).
+    tariff decree regime.
+
+    Optional collection_type discriminates conditional primes (e.g. LOCAL → P1, IAA → P2).
+    Empty string means an unconditional rule for that feedstock × regime.
     """
 
     AT_2011 = "AT_2011"
@@ -47,6 +52,15 @@ class BiomethaneFeedstockTariffCoefficient(models.Model):
         max_length=16,
         choices=REGIME_CHOICES,
     )
+    # Empty string = unconditional rule. Not NULL: MySQL UNIQUE cannot enforce
+    # uniqueness of NULL values (NULL is never equal to NULL).
+    collection_type = models.CharField(
+        verbose_name="Type de collecte",
+        max_length=10,
+        choices=BiomethaneSupplyInput.COLLECTION_TYPE_CHOICES,
+        blank=True,
+        default="",
+    )
     coefficient = models.CharField(
         verbose_name="Coefficient",
         max_length=4,
@@ -59,13 +73,14 @@ class BiomethaneFeedstockTariffCoefficient(models.Model):
         verbose_name_plural = "Feedstock tariff coefficients"
         constraints = [
             models.UniqueConstraint(
-                fields=["feedstock", "regime"],
-                name="unique_feedstock_tariff_coefficient_regime",
+                fields=["feedstock", "regime", "collection_type"],
+                name="unique_feedstock_tariff_coefficient_regime_collection",
             ),
         ]
 
     def __str__(self):
-        return f"{self.feedstock} — {self.get_regime_display()} → {self.coefficient}"
+        collection = self.collection_type or "default"
+        return f"{self.feedstock} — {self.get_regime_display()} [{collection}] → {self.coefficient}"
 
     @classmethod
     def regime_for_tariff_reference(cls, tariff_reference):
