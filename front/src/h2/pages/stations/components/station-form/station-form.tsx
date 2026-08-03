@@ -16,11 +16,16 @@ import { SiretPicker } from "common/molecules/siret-picker"
 import { SearchCompanyPreview } from "companies/types"
 
 type StationFormProps = {
+  readOnly?: boolean
   station?: H2Station
   onSubmit: (value?: H2StationFormData) => void
 }
 
-export const StationForm = ({ station, onSubmit }: StationFormProps) => {
+export const StationForm = ({
+  readOnly,
+  station,
+  onSubmit,
+}: StationFormProps) => {
   const { t } = useTranslation()
 
   const form = useStationForm(station)
@@ -41,6 +46,7 @@ export const StationForm = ({ station, onSubmit }: StationFormProps) => {
     <Form id="station-form" form={form} onSubmit={onSubmit}>
       <SiretPicker
         required
+        readOnly={readOnly}
         label={t("SIRET de la station")}
         onSelect={setCompanyInfo}
         {...form.bind("site_siret")}
@@ -48,28 +54,42 @@ export const StationForm = ({ station, onSubmit }: StationFormProps) => {
 
       <TextInput
         required
+        readOnly={readOnly}
         label={t("Nom de la station")}
         {...form.bind("name")}
       />
 
       <TextInput
         required
+        readOnly={readOnly}
         label={t("Adresse de la station (Numéro et rue)")}
         {...form.bind("address")}
       />
 
       <Grid cols={2}>
-        <TextInput required label={t("Ville")} {...form.bind("city")} />
         <TextInput
           required
+          readOnly={readOnly}
+          label={t("Ville")}
+          {...form.bind("city")}
+        />
+        <TextInput
+          required
+          readOnly={readOnly}
           label={t("Code postal")}
           {...form.bind("postal_code")}
         />
       </Grid>
 
-      <TextInput disabled label={t("Pays")} value={t("France")} />
+      <TextInput
+        disabled
+        readOnly={readOnly}
+        label={t("Pays")}
+        value={t("France")}
+      />
 
       <RadioGroup
+        readOnly={readOnly}
         label={t("Nature du site")}
         options={[
           { value: AccessType.PUBLIC, label: t("Public") },
@@ -80,6 +100,7 @@ export const StationForm = ({ station, onSubmit }: StationFormProps) => {
 
       <CheckboxGroup
         required
+        readOnly={readOnly}
         label={t("Pression de l'hydrogène distribué")}
         options={[
           { value: DistributedPressure.Value350, label: t("350 bars") },
@@ -91,10 +112,12 @@ export const StationForm = ({ station, onSubmit }: StationFormProps) => {
       <ToggleSwitch
         label={t("Connecteurs compatibles avec les véhicules particuliers")}
         {...form.bind("has_personal_vehicle_connector")}
+        disabled={readOnly}
       />
 
       <NumberInput
         required
+        readOnly={readOnly}
         label={t("Capacité de stockage sur site")}
         hintText={t("En kg")}
         min={1}
@@ -107,6 +130,7 @@ export const StationForm = ({ station, onSubmit }: StationFormProps) => {
 
       <NumberInput
         required
+        readOnly={readOnly}
         label={t("Capacité de distribution")}
         hintText={t("En kg / jour")}
         min={1}
@@ -115,6 +139,7 @@ export const StationForm = ({ station, onSubmit }: StationFormProps) => {
 
       <DateInput
         required
+        readOnly={readOnly}
         label={t("Date de mise en service")}
         {...form.bind("commissioning_date")}
       />

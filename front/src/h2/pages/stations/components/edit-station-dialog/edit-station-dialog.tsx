@@ -21,7 +21,9 @@ export const EditStationDialog = ({
   onClose,
 }: EditStationDialogProps) => {
   const { t } = useTranslation()
+
   const entity = useEntity()
+  const canWrite = entity.canWrite()
 
   const updateStation = useUpdateStation({ onClose })
   const deleteStation = useDeleteStation({ station, onClose })
@@ -40,26 +42,34 @@ export const EditStationDialog = ({
         onClose={onClose}
         header={
           <Dialog.Title>
-            {t("Éditer la station")} {station.name}
+            {t("Station")} {station.name}
           </Dialog.Title>
         }
         footer={
           <>
-            <Button customPriority="danger" onClick={deleteStation}>
-              {t("Supprimer")}
-            </Button>
+            {canWrite && (
+              <Button customPriority="danger" onClick={deleteStation}>
+                {t("Supprimer")}
+              </Button>
+            )}
 
-            <Button
-              type="submit"
-              loading={updateStation.loading}
-              nativeButtonProps={{ form: "station-form" }}
-            >
-              {t("Sauvegarder")}
-            </Button>
+            {canWrite && (
+              <Button
+                type="submit"
+                loading={updateStation.loading}
+                nativeButtonProps={{ form: "station-form" }}
+              >
+                {t("Sauvegarder")}
+              </Button>
+            )}
           </>
         }
       >
-        <StationForm station={station} onSubmit={onSubmit} />
+        <StationForm
+          readOnly={!canWrite}
+          station={station}
+          onSubmit={onSubmit}
+        />
       </Dialog>
     </Portal>
   )
