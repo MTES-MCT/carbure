@@ -2,6 +2,7 @@ import { Cell, Column, Table } from "common/components/table2"
 import { YesNoIndicator } from "common/components/yes-no-indicator"
 import { formatDate, formatNumber } from "common/utils/formatters"
 import { H2Station } from "h2/types"
+import { formatAccessType } from "h2/utils/formatters"
 import { useTranslation } from "react-i18next"
 
 type StationTableProps = {
@@ -22,12 +23,12 @@ export const StationTable = ({ stations }: StationTableProps) => {
     },
     {
       header: t("Nature du site"),
-      cell: (station) => <Cell text={station.access_type} />,
+      cell: (station) => <Cell text={formatAccessType(station.access_type)} />,
     },
     {
       header: t("Pression (bar)"),
       cell: (station) => (
-        <Cell text={station.distributed_pressure.join(" - ")} />
+        <Cell text={station.distributed_pressure.join(", ")} />
       ),
     },
     {
