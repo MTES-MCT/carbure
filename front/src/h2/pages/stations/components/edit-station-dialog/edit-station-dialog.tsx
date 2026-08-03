@@ -8,7 +8,7 @@ import {
   validateStationData,
 } from "../station-form"
 import useEntity from "common/hooks/entity"
-import { useUpdateStation } from "./edit-station-dialog.hooks"
+import { useDeleteStation, useUpdateStation } from "./edit-station-dialog.hooks"
 import { H2Station } from "h2/types"
 
 type EditStationDialogProps = {
@@ -24,6 +24,7 @@ export const EditStationDialog = ({
   const entity = useEntity()
 
   const updateStation = useUpdateStation({ onClose })
+  const deleteStation = useDeleteStation({ station, onClose })
 
   function onSubmit(form: H2StationFormData | undefined) {
     if (form) {
@@ -43,13 +44,19 @@ export const EditStationDialog = ({
           </Dialog.Title>
         }
         footer={
-          <Button
-            type="submit"
-            loading={updateStation.loading}
-            nativeButtonProps={{ form: "station-form" }}
-          >
-            {t("Sauvegarder")}
-          </Button>
+          <>
+            <Button customPriority="danger" onClick={deleteStation}>
+              {t("Supprimer")}
+            </Button>
+
+            <Button
+              type="submit"
+              loading={updateStation.loading}
+              nativeButtonProps={{ form: "station-form" }}
+            >
+              {t("Sauvegarder")}
+            </Button>
+          </>
         }
       >
         <StationForm station={station} onSubmit={onSubmit} />

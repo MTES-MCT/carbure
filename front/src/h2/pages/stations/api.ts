@@ -35,6 +35,15 @@ export function updateH2Station(
   })
 }
 
+export function deleteH2Station(entity_id: number, station_id: number) {
+  return api.DELETE("/h2/stations/{id}/", {
+    params: {
+      query: { entity_id },
+      path: { id: station_id },
+    },
+  })
+}
+
 export function getH2StationsFilters(
   filter: H2StationFilter,
   query: H2StationsQuery
