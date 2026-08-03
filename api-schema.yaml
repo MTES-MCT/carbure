@@ -14493,6 +14493,7 @@ components:
         - REDCERT
         - 2BS
         - KZR_INIG
+        - CERTIFHY
       type: string
       description: |-
         * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
@@ -14500,6 +14501,7 @@ components:
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
         * `KZR_INIG` - KZR_INIG
+        * `CERTIFHY` - CERTIFHY
     ChangePasswordError:
       type: object
       properties:
@@ -17030,7 +17032,7 @@ components:
       properties:
         certificate_id:
           type: string
-          maxLength: 64
+          maxLength: 96
         certificate_type:
           $ref: "#/components/schemas/CertificateTypeEnum"
         certificate_holder:
