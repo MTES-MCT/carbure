@@ -94,7 +94,11 @@ const useDeleteSupplyInput = () => {
   const producerEntityId = selectedEntityId ?? entity.id
 
   const deleteSupplyInputMutation = useMutation(deleteSupplyInput, {
-    invalidates: ["supply-plan-inputs", annualDeclarationKey],
+    invalidates: [
+      "supply-plan-inputs",
+      "tariff-coefficient-proportions",
+      annualDeclarationKey,
+    ],
     onSuccess: () => {
       notify(t("L'intrant a bien été supprimé."), { variant: "success" })
     },

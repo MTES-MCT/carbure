@@ -39,7 +39,11 @@ export const SupplyInputDialog = ({
   })
 
   const saveSupplyInputMutation = useMutation(saveSupplyInput, {
-    invalidates: ["supply-input", "supply-plan-inputs"],
+    invalidates: [
+      "supply-input",
+      "supply-plan-inputs",
+      "tariff-coefficient-proportions",
+    ],
     onSuccess: () => {
       notify(t("Les détails de l'intrant ont bien été mis à jour."), {
         variant: "success",

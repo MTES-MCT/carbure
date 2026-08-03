@@ -783,6 +783,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/supply-input/tariff-coefficient-proportions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Volume-weighted P1/P2/P3/P/Pef shares for the filtered supply plan inputs. */
+        get: operations["biomethane_supply_input_tariff_coefficient_proportions_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/supply-plan/download-template/": {
         parameters: {
             query?: never;
@@ -4382,6 +4399,7 @@ export interface components {
          *     * `REDCERT` - REDCERT
          *     * `2BS` - 2BS
          *     * `KZR_INIG` - KZR_INIG
+         *     * `CERTIFHY` - CERTIFHY
          * @enum {string}
          */
         CertificateTypeEnum: CertificateTypeEnum;
@@ -4417,10 +4435,12 @@ export interface components {
             group: string;
             category: string;
             subcategory: string;
+            readonly crop_type: components["schemas"]["CropTypeEnum"] | null;
         };
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
+         *     * `IAA` - Issus d'IAA
          * @enum {string}
          */
         CollectionTypeEnum: CollectionTypeEnum;
@@ -4550,6 +4570,12 @@ export interface components {
             insee_code?: string;
             site_siret?: string;
         };
+        /**
+         * @description * `PRIMARY` - PRIMARY
+         *     * `INTERMEDIATE` - INTERMEDIATE
+         * @enum {string}
+         */
+        CropTypeEnum: CropTypeEnum;
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -6602,6 +6628,24 @@ export interface components {
          * @enum {string}
          */
         TargetTypeEnum: TargetTypeEnum;
+        TariffCoefficientProportions: {
+            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"] | null;
+            /** Format: double */
+            readonly primary_crop: number;
+        };
+        /** @description P1 / P2 / P3 / P / Pef shares from the tariff decree referential. */
+        TariffCoefficients: {
+            /** Format: double */
+            readonly p1: number;
+            /** Format: double */
+            readonly p2: number;
+            /** Format: double */
+            readonly p3: number;
+            /** Format: double */
+            readonly p: number;
+            /** Format: double */
+            readonly pef: number;
+        };
         /**
          * @description * `2011` - 2011
          *     * `2020` - 2020
@@ -8590,6 +8634,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    biomethane_supply_input_tariff_coefficient_proportions_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TariffCoefficientProportions"];
                 };
             };
         };
@@ -14864,11 +14934,13 @@ export enum CertificateTypeEnum {
     ISCC = "ISCC",
     REDCERT = "REDCERT",
     Value2BS = "2BS",
-    KZR_INIG = "KZR_INIG"
+    KZR_INIG = "KZR_INIG",
+    CERTIFHY = "CERTIFHY"
 }
 export enum CollectionTypeEnum {
     PRIVATE = "PRIVATE",
-    LOCAL = "LOCAL"
+    LOCAL = "LOCAL",
+    IAA = "IAA"
 }
 export enum ComplementaryAidOrganismsEnum {
     ADEME = "ADEME",
@@ -14883,6 +14955,10 @@ export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",
     IN_CORRECTION = "IN_CORRECTION",
     FIXED = "FIXED"
+}
+export enum CropTypeEnum {
+    PRIMARY = "PRIMARY",
+    INTERMEDIATE = "INTERMEDIATE"
 }
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",

@@ -4,7 +4,9 @@ from django.urls import reverse
 from rest_framework import status
 
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
+from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.factories.production_unit import BiomethaneProductionUnitFactory
+from biomethane.models import BiomethaneFeedstockTariffCoefficient
 from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from core.models import Department, Entity, ExternalAdminRights, MatierePremiere
@@ -87,6 +89,12 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
 
         self.supply_plan = BiomethaneSupplyPlanFactory.create(
             producer=self.producer_entity, year=BiomethaneAnnualDeclarationService.get_current_declaration_year()
+        )
+        BiomethaneContractFactory.create(producer=self.producer_entity, tariff_reference="2011")
+        BiomethaneFeedstockTariffCoefficient.objects.create(
+            feedstock=self.matiere_mais,
+            regime=BiomethaneFeedstockTariffCoefficient.AT_2011,
+            coefficient=BiomethaneFeedstockTariffCoefficient.P2,
         )
 
         self.supply_input = BiomethaneSupplyInputFactory.create(
@@ -272,3 +280,16 @@ class BiomethaneSupplyInputViewSetTests(TestCase):
         response = self.client.get(self.url_base, params)
 
         self.assertEqual(response.status_code, 403)
+
+    def test_tariff_coefficient_proportions_success(self):
+        """Test volume-weighted tariff coefficient proportions for the supply plan."""
+        self.supply_input.volume = 500
+        self.supply_input.save(update_fields=["volume"])
+
+        url = reverse("biomethane-supply-input-tariff-coefficient-proportions")
+        response = self.client.get(url, self.base_params)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["tariff_coefficients"]["p2"], 100.0)
+        self.assertEqual(response.data["tariff_coefficients"]["p1"], 0.0)
+        self.assertEqual(response.data["primary_crop"], 0.0)
