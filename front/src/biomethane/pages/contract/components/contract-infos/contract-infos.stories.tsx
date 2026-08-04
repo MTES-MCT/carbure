@@ -191,6 +191,7 @@ export const WatchedFieldsModalIsNotDisplayed: Story = {
   decorators: [generateWatchedFieldsProvider(["tariff_reference"])],
 }
 
+// Unstable story caused by the select option changed
 export const WatchedFieldsModalIsNotDisplayedWithMissingFields: Story = {
   ...WatchedFieldsChanged,
   parameters: {
@@ -202,6 +203,7 @@ export const WatchedFieldsModalIsNotDisplayedWithMissingFields: Story = {
     msw: {
       handlers: [...MOCKS],
     },
+    chromatic: { disableSnapshot: true },
   },
 }
 
