@@ -235,6 +235,11 @@ hr {
   flex: 1;
 }
 
+[data-center] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .box {
   border: 1px solid var(--border-default-grey);
   padding: var(--spacing-4w);

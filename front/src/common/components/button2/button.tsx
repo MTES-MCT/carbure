@@ -25,6 +25,7 @@ export const Button = forwardRef<
       asideX,
       asideY,
       spread,
+      center,
       loading,
       captive,
       type = "button",
@@ -48,7 +49,7 @@ export const Button = forwardRef<
             ? "tertiary"
             : props.priority
         }
-        {...layout({ asideX, asideY, spread })}
+        {...layout({ asideX, asideY, spread, center })}
         // @ts-ignore couldn't find a better way to manage different cases for button (anchor, button, icon only)
         ref={ref}
         disabled={loading || props.disabled}

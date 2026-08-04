@@ -166,6 +166,7 @@ export interface Layout {
   asideX?: boolean
   asideY?: boolean
   spread?: boolean
+  center?: boolean
 }
 
 export function layout(props: Layout) {
@@ -173,6 +174,7 @@ export function layout(props: Layout) {
     "data-asidex": props.asideX ? true : undefined,
     "data-asidey": props.asideY ? true : undefined,
     "data-spread": props.spread ? true : undefined,
+    "data-center": props.center ? true : undefined,
   }
 }
 
