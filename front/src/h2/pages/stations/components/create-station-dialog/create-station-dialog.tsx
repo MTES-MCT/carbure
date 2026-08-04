@@ -39,7 +39,6 @@ export const CreateStationDialog = ({ onClose }: CreateStationDialogProps) => {
         footer={
           <Button
             type="submit"
-            disabled={!confirmed}
             loading={createStation.loading}
             nativeButtonProps={{ form: "station-form" }}
           >
@@ -47,27 +46,28 @@ export const CreateStationDialog = ({ onClose }: CreateStationDialogProps) => {
           </Button>
         }
       >
-        <StationForm onSubmit={onSubmit} />
-
-        <Checkbox
-          value={confirmed}
-          onChange={setConfirmed}
-          label={
-            <span>
-              <Trans>
-                En cochant cette case, je déclare sur l’honneur que les
-                instruments de mesure de la masse d'H2 sont conformes au{" "}
-                <a
-                  href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000579193"
-                  target="_blank"
-                >
-                  Décret no 2001-387
-                </a>{" "}
-                du 3 mai 2001 relatif au contrôle des instruments de mesure
-              </Trans>
-            </span>
-          }
-        />
+        <StationForm onSubmit={onSubmit}>
+          <Checkbox
+            required
+            value={confirmed}
+            onChange={setConfirmed}
+            label={
+              <span>
+                <Trans>
+                  En cochant cette case, je déclare sur l’honneur que les
+                  instruments de mesure de la masse d'H2 sont conformes au{" "}
+                  <a
+                    href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000579193"
+                    target="_blank"
+                  >
+                    Décret no 2001-387
+                  </a>{" "}
+                  du 3 mai 2001 relatif au contrôle des instruments de mesure
+                </Trans>
+              </span>
+            }
+          />
+        </StationForm>
       </Dialog>
     </Portal>
   )

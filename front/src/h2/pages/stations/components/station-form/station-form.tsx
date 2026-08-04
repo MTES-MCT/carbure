@@ -19,12 +19,14 @@ type StationFormProps = {
   readOnly?: boolean
   station?: H2Station
   onSubmit: (value?: H2StationFormData) => void
+  children?: React.ReactNode
 }
 
 export const StationForm = ({
   readOnly,
   station,
   onSubmit,
+  children,
 }: StationFormProps) => {
   const { t } = useTranslation()
 
@@ -143,6 +145,8 @@ export const StationForm = ({
         label={t("Date de mise en service")}
         {...form.bind("commissioning_date")}
       />
+
+      {children}
     </Form>
   )
 }
