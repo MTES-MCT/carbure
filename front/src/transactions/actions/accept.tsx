@@ -237,7 +237,7 @@ const ReleaseForConsumptionDialog = ({
       <main>
         <section>
           {t(
-            "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100 ou ED95."
+            "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100, ED95 ou HVO100."
           )}
         </section>
         <section>
