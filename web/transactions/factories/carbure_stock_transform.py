@@ -17,6 +17,6 @@ class CarbureStockTransformFactory(factory.django.DjangoModelFactory):
     volume_deducted_from_source = factory.Faker("random_int", min=5000, max=10000)
     volume_destination = factory.Faker("random_int", min=5000, max=10000)
     metadata = {"volume_denaturant": 1000, "volume_etbe_eligible": 1000}
-    entity = factory.Iterator(Entity.objects.all())
-    transformed_by = factory.Iterator(User.objects.all())
+    entity = factory.LazyFunction(lambda: Entity.objects.first())
+    transformed_by = factory.LazyFunction(lambda: User.objects.first())
     transformation_dt = factory.Faker("date_time_this_year")

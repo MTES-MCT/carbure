@@ -1,6 +1,6 @@
 import os
 import tempfile
-from datetime import datetime
+import uuid
 from io import BufferedReader
 
 import xlsxwriter
@@ -216,7 +216,7 @@ def _write_sheet(workbook, sheet_name, fields, header_format):
 
 def generate_annual_export(producer: Entity, year: int) -> BufferedReader:
     """Generate an Excel file with all biomethane data for a producer and a given year."""
-    filename = f"biomethane_export_{year}_{slugify(producer.name)}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    filename = f"biomethane_export_{year}_{slugify(producer.name)}_{uuid.uuid4().hex}.xlsx"
     file_path = os.path.join(tempfile.gettempdir(), filename)
 
     workbook = xlsxwriter.Workbook(file_path)

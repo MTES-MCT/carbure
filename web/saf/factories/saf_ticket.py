@@ -29,10 +29,10 @@ class SafTicketFactory(factory.django.DjangoModelFactory):
     biofuel = factory.Iterator(Biocarburant.objects.all())
     country_of_origin = factory.Iterator(Pays.objects.all())
 
-    supplier = factory.Iterator(Entity.objects.filter(entity_type=Entity.OPERATOR))
-    client = factory.Iterator(Entity.objects.filter(entity_type=Entity.OPERATOR))
+    supplier = factory.LazyFunction(lambda: Entity.objects.filter(entity_type=Entity.OPERATOR).first())
+    client = factory.LazyFunction(lambda: Entity.objects.filter(entity_type=Entity.OPERATOR).first())
 
-    carbure_producer = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))
+    carbure_producer = factory.LazyFunction(lambda: Entity.objects.filter(entity_type=Entity.PRODUCER).first())
     unknown_producer = factory.Faker("company")
 
     carbure_production_site = factory.LazyFunction(lambda: ProductionSite.objects.first())

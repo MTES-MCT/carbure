@@ -31,7 +31,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     country_of_origin = factory.Iterator(Pays.objects.all())
 
     # production data
-    carbure_producer = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))
+    carbure_producer = factory.LazyFunction(lambda: Entity.objects.filter(entity_type=Entity.PRODUCER).first())
     unknown_producer = factory.Faker("company")
     carbure_production_site = RandomInstanceOf(ProductionSite)
     unknown_production_site = factory.Faker("company")
@@ -42,7 +42,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     production_site_double_counting_certificate = factory.Faker("lexify", text="????????????")
 
     # delivery data
-    carbure_supplier = factory.Iterator(Entity.objects.all())
+    carbure_supplier = factory.LazyFunction(lambda: Entity.objects.first())
     unknown_supplier = factory.Faker("company")
     supplier_certificate = factory.Faker("lexify", text="????????????")
     supplier_certificate_type = factory.Faker("lexify", text="????????????")
@@ -51,7 +51,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     vendor_certificate = None
     vendor_certificate_type = None
 
-    carbure_client = factory.Iterator(Entity.objects.all())
+    carbure_client = factory.LazyFunction(lambda: Entity.objects.first())
     unknown_client = factory.Faker("company")
 
     dispatch_date = factory.Faker("date_this_year")
@@ -112,7 +112,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     ghg_reference_red_ii = factory.Faker("random_number", digits=1)
     ghg_reduction_red_ii = factory.Faker("random_number", digits=1)
 
-    added_by = factory.Iterator(Entity.objects.all())
+    added_by = factory.LazyFunction(lambda: Entity.objects.first())
     parent_lot = None
     parent_stock = None
 

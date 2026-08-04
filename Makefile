@@ -33,6 +33,9 @@ open:
 test-backend:
 	$(django_cmd) test --keepdb $(module)
 
+test-backend-parallel:
+	$(django_cmd) test --keepdb --parallel auto $(module)
+
 test-frontend:
 	$(npm_cmd) test
 

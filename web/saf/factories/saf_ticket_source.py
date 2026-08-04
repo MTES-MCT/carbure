@@ -15,7 +15,7 @@ class SafTicketSourceFactory(factory.django.DjangoModelFactory):
 
     carbure_id = factory.Faker("lexify")
     created_at = factory.Faker("date_time_this_year")
-    added_by = factory.Iterator(Entity.objects.all())
+    added_by = factory.LazyFunction(lambda: Entity.objects.first())
 
     year = datetime.today().year
     delivery_period = factory.LazyAttribute(lambda obj: obj.year * 100 + random.randint(1, 12))
@@ -27,7 +27,7 @@ class SafTicketSourceFactory(factory.django.DjangoModelFactory):
     biofuel = factory.Iterator(Biocarburant.objects.all())
     country_of_origin = factory.Iterator(Pays.objects.all())
 
-    carbure_producer = factory.Iterator(Entity.objects.filter(entity_type=Entity.PRODUCER))
+    carbure_producer = factory.LazyFunction(lambda: Entity.objects.filter(entity_type=Entity.PRODUCER).first())
     unknown_producer = factory.Faker("company")
 
     carbure_production_site = factory.LazyFunction(lambda: ProductionSite.objects.first())
