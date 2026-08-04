@@ -10,7 +10,7 @@ from core.carburetypes import CarbureError
 from core.models import CarbureLot, CarbureStock, Entity, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
 from transactions.factories.certificate import GenericCertificateFactory
-from transactions.models import YearConfig
+from transactions.models import Depot, YearConfig
 
 
 class LotsFlowTest(TestCase):
@@ -255,10 +255,14 @@ class LotsFlowTest(TestCase):
         assert lot.usage_precision == "Usage expérimental"
 
     def test_send_rfc(self):
+        efpe = Depot.objects.filter(site_type=Depot.EFPE).first()
+        assert efpe is not None
+
         lot = self.create_draft(
             unknown_client="CLIENT MAC",
             delivery_type="RFC",
             carbure_client_id="",
+            carbure_delivery_site_depot_id=efpe.depot_id,
             usage=CarbureLot.USAGE_ROAD,
         )
         assert lot.usage == CarbureLot.USAGE_ROAD
