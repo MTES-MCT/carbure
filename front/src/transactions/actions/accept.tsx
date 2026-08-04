@@ -255,7 +255,7 @@ const ReleaseForConsumptionDialog = ({
             {requiresPrecision && (
               <TextInput
                 required
-                label={`${t("Précisions")} *`}
+                label={`${t("Précisions")}`}
                 placeholder={t("Préciser l'usage")}
                 value={usagePrecision}
                 onChange={setUsagePrecision}

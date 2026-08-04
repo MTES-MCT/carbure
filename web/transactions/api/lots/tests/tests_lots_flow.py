@@ -196,7 +196,7 @@ class LotsFlowTest(TestCase):
         assert lot.lot_status == CarbureLot.ACCEPTED
         assert lot.delivery_type == CarbureLot.RFC
         assert lot.usage == CarbureLot.USAGE_ROAD
-        assert lot.usage_precision is None
+        assert lot.usage_precision == ""
 
     def test_accept_rfc_requires_usage(self):
         """Usage is required to accept a lot as RFC."""
@@ -255,7 +255,12 @@ class LotsFlowTest(TestCase):
         assert lot.usage_precision == "Usage expérimental"
 
     def test_send_rfc(self):
-        lot = self.create_draft(unknown_client="CLIENT MAC", delivery_type="RFC", carbure_client_id="")
+        lot = self.create_draft(
+            unknown_client="CLIENT MAC",
+            delivery_type="RFC",
+            carbure_client_id="",
+            usage=CarbureLot.USAGE_ROAD,
+        )
         lot = self.send_lot(lot)
         assert lot.lot_status == CarbureLot.ACCEPTED
         assert lot.delivery_type == CarbureLot.RFC
