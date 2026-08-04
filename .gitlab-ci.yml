@@ -41,7 +41,7 @@ check-backend:
     - export REDIS_URL=redis://redis:6379
     - uv run ruff check
     - uv run ruff format --check
-    - TEST=1 uv run python web/manage.py test web --parallel auto
+    - TEST=1 uv run python web/manage.py test web --parallel 2
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_AUTO_MERGE_ENABLED == "true"
       when: never
@@ -89,6 +89,7 @@ pass:
         - .cache/pip/
         - .venv/
   before_script:
+    - apt-get update -qq && apt-get install -y -qq default-mysql-client
     - pip install uv
     - uv sync --frozen
   rules:
