@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import useEntity from "common/hooks/entity"
-import { DeliveryType, Lot, LotError } from "transactions/types"
+import { DeliveryType, FuelUsage, Lot, LotError } from "transactions/types"
 import {
   Entity,
   Biofuel,
@@ -114,6 +114,15 @@ export function useLotForm(
       value.delivery_type = undefined
     }
 
+    if (value.delivery_type !== DeliveryType.RFC) {
+      value.usage = undefined
+      value.usage_precision = undefined
+    }
+
+    if (value.usage !== FuelUsage.Other) {
+      value.usage_precision = undefined
+    }
+
     // update GES summary
     const total = computeGHGTotal(value)
     const reduction = computeGHGReduction(total, GHG_REFERENCE)
@@ -169,6 +178,8 @@ const BATCH_DELIVERY = [
   "supplier_certificate",
   "client",
   "delivery_type",
+  "usage",
+  "usage_precision",
   "delivery_site",
   "delivery_site_country",
   "delivery_date",
@@ -263,6 +274,8 @@ export const defaultLot = {
   vendor_certificate: undefined as string | undefined,
   client: undefined as EntityPreview | string | undefined,
   delivery_type: undefined as DeliveryType | undefined,
+  usage: undefined as FuelUsage | undefined,
+  usage_precision: undefined as string | undefined,
   delivery_site: undefined as Depot | string | undefined,
   delivery_site_country: undefined as Country | undefined,
   delivery_date: undefined as string | undefined,
@@ -321,6 +334,8 @@ export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => ({
   client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
   delivery_type:
     lot?.delivery_type === "UNKNOWN" ? undefined : lot?.delivery_type,
+  usage: (lot?.usage as FuelUsage | "") || undefined,
+  usage_precision: lot?.usage_precision || undefined,
   delivery_site:
     lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
   delivery_site_country: lot?.delivery_site_country ?? undefined,
@@ -411,6 +426,8 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
 
     // delivery
     delivery_type: lot.delivery_type,
+    usage: lot.usage,
+    usage_precision: lot.usage_precision,
     delivery_date: lot.delivery_date,
     carbure_client_id: lot.client instanceof Object ? lot.client.id : undefined,
     unknown_client: typeof lot.client === "string" ? lot.client : undefined,
@@ -471,8 +488,27 @@ export function hasChange(
   lot: Lot | undefined,
   entity: Entity
 ) {
-  const formPayload = lotFormToPayload(form)
-  const lotPayload = lotFormToPayload(lotToFormValue(lot, entity))
+  const normalizeUsagePayload = (
+    payload: ReturnType<typeof lotFormToPayload>
+  ) => {
+    const normalized = { ...payload }
+
+    if (normalized.delivery_type !== DeliveryType.RFC) {
+      normalized.usage = undefined
+      normalized.usage_precision = undefined
+    }
+
+    if (normalized.usage !== FuelUsage.Other) {
+      normalized.usage_precision = undefined
+    }
+
+    return normalized
+  }
+
+  const formPayload = normalizeUsagePayload(lotFormToPayload(form))
+  const lotPayload = normalizeUsagePayload(
+    lotFormToPayload(lotToFormValue(lot, entity))
+  )
   return matches(formPayload, lotPayload)
 }
 
@@ -545,7 +581,9 @@ const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
   DELIVERY_DATE_VALIDITY: ["delivery_date"],
   MISSING_PRODUCTION_INFO: ["production_site"],
   INVALID_CERTIFICATE: ["supplier_certificate"],
-  MISSING_DELIVERY_TYPE: ["delivery_type"]
+  MISSING_DELIVERY_TYPE: ["delivery_type"],
+  MISSING_USAGE: ["usage"],
+  MISSING_USAGE_PRECISION: ["usage_precision"]
 }
 
 export default LotForm

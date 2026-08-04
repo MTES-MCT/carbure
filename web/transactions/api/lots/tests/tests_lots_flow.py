@@ -261,6 +261,8 @@ class LotsFlowTest(TestCase):
             carbure_client_id="",
             usage=CarbureLot.USAGE_ROAD,
         )
+        assert lot.usage == CarbureLot.USAGE_ROAD
+        assert lot.usage_precision == ""
         lot = self.send_lot(lot)
         assert lot.lot_status == CarbureLot.ACCEPTED
         assert lot.delivery_type == CarbureLot.RFC

@@ -61,6 +61,8 @@ class LotForm(forms.Form):
     vendor_certificate = forms.CharField(required=False)
     vendor_certificate_type = forms.CharField(required=False)
     delivery_type = forms.CharField(required=False)
+    usage = forms.CharField(required=False)
+    usage_precision = forms.CharField(required=False)
     delivery_date = forms.DateField(required=False)
     carbure_client_id = forms.ModelChoiceField(queryset=ENTITIES, required=False)
     unknown_client = forms.CharField(required=False)

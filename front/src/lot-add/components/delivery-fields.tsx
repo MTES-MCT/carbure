@@ -2,10 +2,16 @@ import { useTranslation } from "react-i18next"
 import useEntity, { EntityManager } from "common/hooks/entity"
 import { Fieldset, useBind, useFormContext } from "common/components/form"
 import Autocomplete, { AutocompleteProps } from "common/components/autocomplete"
-import { DateInput, DateInputProps, TextInput } from "common/components/input"
+import {
+  DateInput,
+  DateInputProps,
+  TextInput,
+  TextInputProps,
+} from "common/components/input"
 import { UserCheck } from "common/components/icons"
 import * as api from "common/api"
 import * as norm from "common/utils/normalizers"
+import { getFuelUsageOptions } from "transactions/constants/fuel-usage"
 import {
   isExternalDelivery,
   isLotClient,
@@ -17,7 +23,7 @@ import {
 import { LotStatus } from "transactions/types"
 import { Country, Depot, EntityPreview } from "common/types"
 import Select, { SelectProps } from "common/components/select"
-import { DeliveryType } from "transactions/types"
+import { DeliveryType, FuelUsage } from "transactions/types"
 import { compact, uniqueBy } from "common/utils/collection"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 
@@ -34,6 +40,8 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
       <MyCertificateField {...props} />
       <ClientField {...props} />
       <DeliveryTypeField {...props} />
+      <UsageField {...props} />
+      <UsagePrecisionField {...props} />
       <DeliverySiteField {...props} />
       <DeliverySiteCountryField {...props} />
       <DeliveryDateField {...props} />
@@ -279,6 +287,48 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
       getOptions={api.findDepots}
       normalize={norm.normalizeDepotOrUnknown}
       {...bound}
+      {...props}
+    />
+  )
+}
+
+export const UsageField = (props: SelectProps<FuelUsage>) => {
+  const { t } = useTranslation()
+  const { value, bind } = useFormContext<LotFormValue>()
+
+  if (value.delivery_type !== DeliveryType.RFC) {
+    return null
+  }
+
+  return (
+    <Select
+      required
+      label={t("Usage du carburant")}
+      placeholder={t("Sélectionner un usage")}
+      options={getFuelUsageOptions(t)}
+      {...bind("usage")}
+      {...props}
+    />
+  )
+}
+
+export const UsagePrecisionField = (props: TextInputProps) => {
+  const { t } = useTranslation()
+  const { value, bind } = useFormContext<LotFormValue>()
+
+  if (
+    value.delivery_type !== DeliveryType.RFC ||
+    value.usage !== FuelUsage.Other
+  ) {
+    return null
+  }
+
+  return (
+    <TextInput
+      required
+      label={`${t("Précisions")}`}
+      placeholder={t("Préciser l'usage")}
+      {...bind("usage_precision")}
       {...props}
     />
   )

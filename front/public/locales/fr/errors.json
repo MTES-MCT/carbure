@@ -88,5 +88,7 @@
   "DELIVERY_DATE_VALIDITY": "La date de livraison du lot est antérieure à la date de réception su stock dont il est issu.",
   "MISSING_PRODUCTION_INFO": "Les informations de production ne sont pas renseignées",
   "INVALID_CERTIFICATE": "Le certificat du fournisseur est expiré ou pas encore actif à la date de livraison donnée",
-  "MISSING_DELIVERY_TYPE": "Le type de livraison est absent"
+  "MISSING_DELIVERY_TYPE": "Le type de livraison est absent",
+  "MISSING_USAGE": "L'usage du lot est absent",
+  "MISSING_USAGE_PRECISION": "La précision de l'usage du lot est absente"
 }
