@@ -26,7 +26,7 @@ export function updateH2Station(
   station_id: number,
   station: H2StationInputRequest
 ) {
-  return api.PATCH("/h2/stations/{id}/", {
+  return api.PUT("/h2/stations/{id}/", {
     params: {
       query: { entity_id },
       path: { id: station_id },
