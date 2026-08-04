@@ -41,7 +41,7 @@ export const StationTable = ({
     {
       header: t("Pression (bar)"),
       cell: (station) => (
-        <Cell text={station.distributed_pressure.join(", ")} />
+        <Cell text={station.distributed_pressure.join(" - ")} />
       ),
     },
     {
