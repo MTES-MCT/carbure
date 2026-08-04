@@ -38,8 +38,13 @@ class EntityListActionTest(TestCase):
         self.airline2 = EntityFactory.create(name="Airline 2", entity_type=Entity.AIRLINE)
         self.cpo1 = EntityFactory.create(name="CPO 1", entity_type=Entity.CPO)
         self.cpo2 = EntityFactory.create(name="CPO 2", entity_type=Entity.CPO)
-        self.operator_elec = EntityFactory.create(name="Operator Elec", entity_type=Entity.OPERATOR, has_elec=True)
+        self.operator_elec = EntityFactory.create(
+            name="Operator Elec", entity_type=Entity.OPERATOR, has_elec=True, is_tiruert_liable=True
+        )
         self.operator_no_elec = EntityFactory.create(name="Operator No Elec", entity_type=Entity.OPERATOR, has_elec=False)
+        self.producer_elec = EntityFactory.create(
+            name="Producer Elec", entity_type=Entity.PRODUCER, has_elec=True, is_tiruert_liable=True
+        )
         self.producer1 = EntityFactory.create(name="Producer 1", entity_type=Entity.PRODUCER)
         self.producer2 = EntityFactory.create(name="Producer 2", entity_type=Entity.PRODUCER)
         self.trader = EntityFactory.create(name="Trader", entity_type=Entity.TRADER)
@@ -84,7 +89,7 @@ class EntityListActionTest(TestCase):
         entities_data = response.json()
 
         # Should return all created entities
-        self.assertEqual(len(entities_data), 14)
+        self.assertEqual(len(entities_data), 15)
 
     def test_list_with_airline_right_filters_airlines_only(self):
         """Test that AIRLINE filter returns only airlines"""
@@ -96,19 +101,19 @@ class EntityListActionTest(TestCase):
         # Should return only airlines
         expect_entities(self, [self.airline1, self.airline2], entities_data)
 
-    def test_list_with_elec_right_filters_cpo_and_operators_with_elec(self):
-        """Test that ELEC filter returns CPO and OPERATOR with has_elec=True"""
+    def test_list_with_elec_right_filters_cpo_and_liable_entities_with_elec(self):
+        """Test that ELEC filter returns CPO and liable entities with has_elec=True."""
         setup_current_user(self, "elec_admin@test.com", "Elec Admin", "test", [(self.ext_admin_elec, "RW")], True)
         response = self.client.get(reverse("entity-list") + f"?entity_id={self.ext_admin_elec.id}")
 
         entities_data = response.json()
 
-        # Should return CPO and OPERATOR with has_elec=True
-        expected_entities = [self.cpo1, self.cpo2, self.operator_elec]
+        # Should return CPO and all liable entities with has_elec=True
+        expected_entities = [self.cpo1, self.cpo2, self.operator_elec, self.producer_elec]
         expect_entities(self, expected_entities, entities_data)
 
-    def test_list_with_transferred_elec_right_filters_cpo_and_all_operators(self):
-        """Test that TRANSFERRED_ELEC filter returns CPO and all OPERATORs"""
+    def test_list_with_transferred_elec_right_filters_cpo_and_liable_entities_with_elec(self):
+        """Test that TRANSFERRED_ELEC filter returns CPO and liable entities with has_elec=True."""
         setup_current_user(
             self,
             "transferred_elec_admin@test.com",
@@ -120,8 +125,8 @@ class EntityListActionTest(TestCase):
         response = self.client.get(reverse("entity-list") + f"?entity_id={self.ext_admin_transferred_elec.id}")
 
         entities_data = response.json()
-        # Should return CPO and all OPERATORs (with or without elec)
-        expected_entities = [self.cpo1, self.cpo2, self.operator_elec, self.operator_no_elec]
+        # Should return CPO and all liable entities with has_elec=True
+        expected_entities = [self.cpo1, self.cpo2, self.operator_elec, self.producer_elec]
         expect_entities(self, expected_entities, entities_data)
 
     def test_list_with_double_counting_right_filters_producers_only(self):
@@ -139,7 +144,7 @@ class EntityListActionTest(TestCase):
         entities_data = response.json()
 
         # Should return only producers
-        expected_entities = [self.producer1, self.producer2]
+        expected_entities = [self.producer1, self.producer2, self.producer_elec]
         expect_entities(self, expected_entities, entities_data)
 
     def test_list_with_query_param_q_filters_by_name(self):

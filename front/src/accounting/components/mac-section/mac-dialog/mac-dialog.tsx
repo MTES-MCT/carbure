@@ -1,16 +1,18 @@
+import {
+  getMacFossilFuels,
+  replaceMacFossilFuels,
+} from "accounting/api/mac-fossil-fuel"
 import { Button } from "common/components/button2"
 import Dialog from "common/components/dialog2/dialog"
-import Portal from "common/components/portal"
-import { usePortal } from "common/components/portal"
+import { Notice } from "common/components/notice"
+import { usePortal, Portal } from "common/components/portal"
 import { Table } from "common/components/table2"
-import { useTranslation } from "react-i18next"
-import css from "./mac-dialog.module.css"
 import { findFossilFuels } from "common/api"
 import { useMutation, useQuery } from "common/hooks/async"
-import { getMacFossilFuels, replaceMacFossilFuels } from "../../api"
-import { MacFuelSelectionDialog } from "./mac-fuel-selection-dialog"
+import { useTranslation } from "react-i18next"
+import css from "./mac-dialog.module.css"
 import { useMacDialogDraft, useMacTable } from "./mac-dialog.hooks"
-import { Notice } from "common/components/notice"
+import { MacFuelSelectionDialog } from "./mac-fuel-selection-dialog"
 
 type MacDialogProps = {
   onClose: () => void
@@ -94,7 +96,7 @@ export const MacDialog = ({
         onClose={onClose}
         header={
           <Dialog.Title>
-            {t("Renseigner mes mises à consommation") + ` (${year})`}
+            {t("Mises à consommation") + ` (${year})`}
           </Dialog.Title>
         }
         footer={

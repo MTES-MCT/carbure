@@ -28,6 +28,6 @@ from elec.permissions import HasCpoRights
 @permission_classes([HasCpoRights])
 def get_clients(request, *args, **kwargs):
     query = request.query_params.get("query")
-    entities = Entity.objects.filter(entity_type=Entity.OPERATOR, has_elec=True, name__icontains=query).order_by("name")
+    entities = Entity.objects.filter(is_tiruert_liable=True, has_elec=True, name__icontains=query).order_by("name")
     serializer = EntityPreviewSerializer(entities, many=True)
     return Response(serializer.data)

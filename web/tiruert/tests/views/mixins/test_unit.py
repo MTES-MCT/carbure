@@ -58,8 +58,8 @@ class UnitMixinTest(TestCase):
 
         self.assertEqual(request.unit, "kg")
 
-    def test_initialize_request_with_entity_preference(self):
-        """Unit should be extracted from entity preference."""
+    def test_initialize_request_ignores_entity_preference(self):
+        """Entity preferred unit is no longer used when request unit is absent."""
         entity = Mock(spec=Entity)
         entity.preferred_unit = "MJ"
 
@@ -68,19 +68,7 @@ class UnitMixinTest(TestCase):
 
         request = self.view.initialize_request(request)
 
-        self.assertEqual(request.unit, "mj")
-
-    def test_initialize_request_parameter_over_entity_preference(self):
-        """Request parameter should have priority over entity preference."""
-        entity = Mock(spec=Entity)
-        entity.preferred_unit = "MJ"
-
-        request = self.factory.get("/test/?unit=KG")
-        request.entity = entity
-
-        request = self.view.initialize_request(request)
-
-        self.assertEqual(request.unit, "kg")
+        self.assertEqual(request.unit, "l")
 
     def test_initialize_request_default_to_liters(self):
         """Unit should default to 'l'."""

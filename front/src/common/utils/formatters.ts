@@ -66,6 +66,11 @@ export const floorNumber = (num: number, fractionDigits = 2) => {
   return Math.floor(num * factor) / factor
 }
 
+export const truncateNumber = (num: number, fractionDigits = 2) => {
+  const factor = Math.pow(10, fractionDigits)
+  return Math.trunc(num * factor) / factor
+}
+
 export function formatPercentage(num: number) {
   return formatNumber(num) + "%"
 }
@@ -210,3 +215,6 @@ export const CONVERSIONS = {
     mbToBytes: (value: number) => value * 1000000,
   },
 }
+
+export const getStepFromFractionDigits = (fractionDigits: number) =>
+  Math.pow(10, -fractionDigits)

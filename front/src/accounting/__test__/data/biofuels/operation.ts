@@ -1,14 +1,15 @@
 import { Operation, OperationSector, OperationType } from "accounting/types"
 import { country } from "common/__test__/data"
-import { CategoryEnum, Unit } from "common/types"
+import { CategoryEnum } from "common/types"
+import { balanceBiofuel } from "../balances"
 
 export const operationCredit: Operation = {
   id: 1,
-  year: 2021,
+  year: 2025,
   type: OperationType.TRANSFERT,
   sector: OperationSector.ESSENCE,
   customs_category: CategoryEnum.CONV,
-  biofuel: "ETH",
+  biofuel: balanceBiofuel,
   renewable_energy_share: 1,
   credited_entity: {
     id: 1,
@@ -28,18 +29,17 @@ export const operationCredit: Operation = {
   },
   _entity: "Entity 1",
   _depot: "Depot 1",
-  quantity: 1000,
+  volume: 1000,
   quantity_renewable: 1000,
-  unit: Unit.l,
   export_country: country,
   created_at: "2021-01-01T00:00:00Z",
-  quantity_mj: 27000,
+  energy: 27000,
   avoided_emissions: 100,
 }
 
 export const operationDebit: Operation = {
   ...operationCredit,
-  quantity: -1000,
+  volume: -1000,
   quantity_renewable: -1000,
-  quantity_mj: -27000,
+  energy: -27000,
 }

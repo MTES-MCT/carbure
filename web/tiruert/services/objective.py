@@ -8,6 +8,7 @@ from tiruert.models.elec_operation import ElecOperation
 from tiruert.services.balance import BalanceService
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.elec_balance import ElecBalanceService
+from tiruert.services.energy import tco2_from_mj
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 
@@ -217,11 +218,11 @@ class ObjectiveService:
     @staticmethod
     def apply_ghg_conversion(value):
         # Convert MJ to tCO2 using the GHG reference for RED II
-        return value * GHG_REFERENCE_RED_II / 1_000_000  # tCO2
+        return tco2_from_mj(value, GHG_REFERENCE_RED_II)  # tCO2
 
     @staticmethod
     def apply_elec_ghg_conversion(value):
-        return value * ElecOperation.EMISSION_RATE_PER_MJ / 1e6  # tCO2
+        return tco2_from_mj(value, ElecOperation.EMISSION_RATE_PER_MJ)  # tCO2
 
     @staticmethod
     def calculate_global_objective(objective_per_sector, elec_category, objectives, energy_basis):

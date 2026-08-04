@@ -7,7 +7,7 @@ from django.test import TestCase
 from biomethane.factories.contract import BiomethaneContractFactory
 from biomethane.models import BiomethaneContract
 from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
-from core.models import Department, Entity, ExternalAdminRights
+from core.models import Department, Entity, ExternalAdminRights, Pays
 from edelivery.ebms.ntr import NationalTradeRegister
 from entity.factories.entity import EntityFactory
 from entity.models import EntityScope
@@ -63,6 +63,18 @@ class EntityTest(TestCase):
         patched_filter.assert_called_with(registered_country__code_pays="FR", registration_id="123456789")
         patched_last.assert_called()
         self.assertEqual(12345, result.id)
+
+    @patch("core.models.entity.NationalTradeRegister")
+    def test_produces_ntr_id_from_entity_data(self, patched_NTR):
+        patched_NTR.return_value.id.return_value = "SOME_NTR_ID"
+
+        france = Pays(code_pays="FR")
+        entity = Entity(registered_country=france, registration_id="123456789")
+        patched_NTR.assert_not_called()
+
+        ntr_id = entity.ntr_id()
+        patched_NTR.assert_called_with("FR", "123456789")
+        self.assertEqual("SOME_NTR_ID", ntr_id)
 
     def test_get_managing_external_admins_returns_none_when_no_production_unit(self):
         """Sans unité de production, on ne récupère aucun admin."""

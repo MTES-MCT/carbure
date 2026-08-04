@@ -1,15 +1,16 @@
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
 import { useNavigate, useSearchParams } from "react-router-dom"
-import Form, { useForm } from "common/components/form"
-import { Lock, Return, UserCheck } from "common/components/icons"
-import { TextInput } from "common/components/input"
-import { Container } from "./login"
+import { Form, useForm } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
+import { Content, DialogContainer, Section } from "auth/layouts/container"
 import { useNotify } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
 import { useEffect } from "react"
 import { HttpError } from "common/services/api-fetch"
+import { Text } from "common/components/text"
+import { ROUTE_URLS } from "common/utils/routes"
 
 const OTP = () => {
   const { t } = useTranslation()
@@ -24,7 +25,7 @@ const OTP = () => {
 
     onSuccess: () => {
       notify(t("Vous êtes connecté !"), { variant: "success" })
-      navigate("/")
+      navigate(ROUTE_URLS.HOME)
     },
 
     onError: (error) => {
@@ -55,59 +56,53 @@ const OTP = () => {
   }, [searchParams, execVerifyOTP])
 
   return (
-    <Container>
-      <section>
-        <p>
-          {t(
-            "Un code à 6 chiffres vient d'être envoyé à l'adresse email spécifiée, veuillez l'entrer dans le champ ci-dessous pour confirmer votre connexion :"
-          )}
-        </p>
-      </section>
+    <DialogContainer
+      onClose={() => navigate(ROUTE_URLS.AUTH.LOGIN)}
+      title={t("Code de connexion")}
+    >
+      <Content>
+        <Section>
+          <Text>
+            {t(
+              "Un code à 6 chiffres vient d'être envoyé à l'adresse email spécifiée, veuillez l'entrer dans le champ ci-dessous pour confirmer votre connexion :"
+            )}
+          </Text>
 
-      <section>
-        <Form id="otp" onSubmit={() => verifyOTP.execute(value.otp!)}>
-          <TextInput
-            autoFocus
-            variant="solid"
-            icon={Lock}
-            label={t("Code reçu par email")}
-            {...bind("otp")}
-          />
-        </Form>
-      </section>
+          <Form id="otp" onSubmit={() => verifyOTP.execute(value.otp!)}>
+            <TextInput
+              autoFocus
+              label={t("Code reçu par email")}
+              {...bind("otp")}
+              required
+            />
+          </Form>
+        </Section>
 
-      <section>
-        <p>
-          {t(
-            "Notez qu'il vous faudra peut-être patienter quelques minutes avant que l'email n'arrive dans votre boite de réception."
-          )}
-        </p>
+        <Section>
+          <Text>
+            {t(
+              "Notez qu'il vous faudra peut-être patienter quelques minutes avant que l'email n'arrive dans votre boite de réception."
+            )}
+          </Text>
+          <Button
+            customPriority="link"
+            onClick={() => requestOTP.execute()}
+            center
+          >
+            {t("Renvoyer le code à l'adresse indiquée")}
+          </Button>
+        </Section>
+
         <Button
-          variant="link"
-          label={t("Renvoyer le code à l'adresse indiquée")}
-          action={() => requestOTP.execute()}
-        />
-      </section>
-
-      <footer>
-        <Button
-          center
           loading={verifyOTP.loading}
-          disabled={!value.otp}
-          variant="primary"
-          icon={UserCheck}
-          submit="otp"
-          label={t("Se connecter au compte")}
-        />
-        <Button
-          center
-          variant="secondary"
-          icon={Return}
-          label={t("Annuler")}
-          action={() => navigate("/")}
-        />
-      </footer>
-    </Container>
+          type="submit"
+          nativeButtonProps={{ form: "otp" }}
+          asideX
+        >
+          {t("Se connecter au compte")}
+        </Button>
+      </Content>
+    </DialogContainer>
   )
 }
 

@@ -1,14 +1,19 @@
 from datetime import datetime
 
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.models import Pays
+from core.models.lot import CarbureLot
 from core.serializers import CountrySerializer
+from core.utils import check_file_size_and_extension
 from tiruert.models import Operation, OperationDetail
-from tiruert.serializers.fields import RoundedFloatField
+from tiruert.serializers.balance import BalanceBiofuelSerializer
+from tiruert.serializers.fields import CachedPrimaryKeyRelatedField, TruncatedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
+from tiruert.services.operation_excel_template import get_tiruert_operator_queryset
 
 
 class OperationDepotSerializer(serializers.Serializer):
@@ -29,28 +34,21 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     details = OperationDetailSerializer(many=True, required=False)
     sector = serializers.CharField(source="_sector", read_only=True)
     type = serializers.CharField(source="_type", read_only=True)
-    biofuel = serializers.CharField(source="biofuel.code", read_only=True)
-    quantity = serializers.SerializerMethodField()
-    unit = serializers.SerializerMethodField()
-    renewable_energy_share = serializers.FloatField()
+    biofuel = BalanceBiofuelSerializer(read_only=True)
+    volume = serializers.SerializerMethodField()
+    energy = serializers.SerializerMethodField()
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
     year = serializers.IntegerField(source="declaration_year", read_only=True)
 
-    def get_volume_l(self, instance) -> float:
-        return instance.volume_l
+    def get_volume(self, instance) -> float:
+        return instance.volume
 
-    def get_quantity(self, instance) -> float:
-        unit = self.context.get("unit")
-        return instance.quantity(unit=unit)
-
-    def get_unit(self, instance) -> str:
-        return self.context.get("unit")
+    def get_energy(self, instance) -> float:
+        return instance.energy
 
     def get_avoided_emissions(self, instance) -> float:
-        if getattr(instance, "_avoided_emissions", None) is not None:
-            return round(instance._avoided_emissions, 2)
         return instance.avoided_emissions
 
     def get_fields(self):
@@ -61,8 +59,9 @@ class BaseOperationSerializer(serializers.ModelSerializer):
 
 
 class OperationListSerializer(BaseOperationSerializer):
-    quantity = RoundedFloatField(source="_quantity", read_only=True)
-    avoided_emissions = RoundedFloatField(source="_avoided_emissions", read_only=True)
+    volume = TruncatedFloatField(source="_volume", read_only=True)
+    energy = TruncatedFloatField(source="_energy", read_only=True, decimal_places=0)
+    avoided_emissions = TruncatedFloatField(source="_avoided_emissions", read_only=True)
 
     class Meta:
         model = Operation
@@ -83,8 +82,8 @@ class OperationListSerializer(BaseOperationSerializer):
             "_depot",
             "export_country",
             "created_at",
-            "quantity",
-            "unit",
+            "volume",
+            "energy",
             "details",
             "avoided_emissions",
             "year",
@@ -114,24 +113,83 @@ class OperationSerializer(BaseOperationSerializer):
             "created_at",
             "validation_date",
             "durability_period",
-            "quantity",
-            "quantity_mj",
+            "volume",
+            "energy",
             "avoided_emissions",
-            "unit",
             "details",
             "year",
         ]
 
-    quantity_mj = serializers.SerializerMethodField()
     export_country = CountrySerializer(read_only=True)
-
-    def get_quantity_mj(self, instance) -> float:
-        return instance.quantity(unit="mj", force=True)
 
 
 class OperationLotSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     volume = serializers.FloatField()
+
+
+class OperationExcelImportRequestSerializer(serializers.Serializer):
+    file = serializers.FileField()
+    mode = serializers.ChoiceField(choices=["validate", "create"], default="validate")
+
+    def validate_file(self, value):
+        return check_file_size_and_extension(value, max_size_mb=10, extensions=[".xlsx", ".xls"])
+
+
+class OperationImportGroupSerializer(serializers.Serializer):
+    operation_id = serializers.IntegerField(allow_null=True)
+    status = serializers.CharField()
+    type = serializers.CharField()
+    sector = serializers.CharField()
+    customs_category = serializers.CharField()
+    biofuel = serializers.CharField()
+    debited_entity = OperationEntitySerializer()
+    credited_entity = OperationEntitySerializer(allow_null=True)
+    lot_count = serializers.IntegerField()
+    total_volume = serializers.FloatField()
+    rows = serializers.ListField(child=serializers.IntegerField())
+
+
+class OperationImportResponseSerializer(serializers.Serializer):
+    mode = serializers.ChoiceField(choices=["validate", "create"])
+    operations = OperationImportGroupSerializer(many=True)
+
+
+class OperationExcelRowSerializer(serializers.Serializer):
+    # lot_id/credited_entity are resolved from a cache (see OperationExcelImportService._build_lookup_caches)
+    # passed via the serializer context, to avoid one DB query per row when validating with many=True.
+    lot_id = CachedPrimaryKeyRelatedField(
+        queryset=CarbureLot.objects.select_related("biofuel", "feedstock"),
+        cache_key="lot_cache",
+        error_messages={"does_not_exist": _("Id de lot invalide")},
+    )
+    volume = serializers.FloatField()
+    operation_type = serializers.CharField()
+    credited_entity = CachedPrimaryKeyRelatedField(
+        queryset=get_tiruert_operator_queryset(),
+        cache_key="credited_entity_cache",
+        required=False,
+        allow_null=True,
+        error_messages={"does_not_exist": _("Destinataire inconu")},
+    )
+
+    def validate_volume(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(_("La valeur du volume doit être supérieure à zéro."))
+        return value
+
+    def validate_operation_type(self, value):
+        normalized = str(value or "").strip().upper()
+        if normalized not in [Operation.TRANSFERT, Operation.TENEUR]:
+            raise serializers.ValidationError(_("Le type d'opération doit être 'TRANSFERT' ou 'TENEUR'."))
+        return normalized
+
+    def validate(self, attrs):
+        if attrs.get("operation_type") == Operation.TRANSFERT and not attrs.get("credited_entity"):
+            raise serializers.ValidationError(
+                {"credited_entity": _("Destinataire requis pour les opérations de type TRANSFERT.")}
+            )
+        return attrs
 
 
 class OperationInputSerializer(serializers.ModelSerializer):
@@ -178,12 +236,11 @@ class OperationInputSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             request = self.context.get("request")
             entity_id = request.entity.id
-            unit = request.unit
             selected_lots = validated_data.pop("lots")
             declaration_year = self.context.get("declaration_year")
 
             OperationService.perform_checks_before_create(
-                request, entity_id, selected_lots, validated_data, unit, declaration_year
+                request, entity_id, selected_lots, validated_data, declaration_year
             )
 
             # Fetch emission rates from the oldest OperationDetail for each lot
@@ -192,24 +249,9 @@ class OperationInputSerializer(serializers.ModelSerializer):
 
             OperationService.define_operation_status(validated_data)
 
-            # Create the operation
-            operation = Operation.objects.create(**validated_data)
+            detail_operations_data = OperationService.build_details_data(selected_lots, emissions_by_lot)
 
-            # Create the details using server-side emission rates
-            detail_operations_data = []
-            for lot in selected_lots:
-                detail_operations_data.append(
-                    {
-                        "operation": operation,
-                        "lot_id": lot["id"],
-                        "volume": lot["volume"],
-                        "emission_rate_per_mj": emissions_by_lot[lot["id"]],
-                    }
-                )
-
-            OperationDetail.objects.bulk_create(
-                [OperationDetail(**data) for data in detail_operations_data],
-            )
+            operation = OperationService.create_operation_with_details(validated_data, detail_operations_data)
 
             return operation
 

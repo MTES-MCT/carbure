@@ -21,6 +21,10 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
 from tiruert.services.balance_filters import apply_operation_detail_filters
+from tiruert.services.energy import (
+    avoided_emissions_tco2_expression,
+    energy_mj_expression,
+)
 
 
 def _get_sector_expression():
@@ -46,35 +50,36 @@ def _get_teneur_sector_expression(sector_expr):
 
 def _get_quantity_expression(unit):
     if unit == "mj":
-        factor_expr = F("operation__biofuel__pci_litre")
-    elif unit == "gj":
-        factor_expr = ExpressionWrapper(F("operation__biofuel__pci_litre") * Value(0.001), output_field=FloatField())
-    elif unit == "kg":
-        factor_expr = F("operation__biofuel__masse_volumique")
+        return energy_mj_expression(
+            F("volume"),
+            F("operation__renewable_energy_share"),
+            F("operation__biofuel__pci_litre"),
+        )
     else:
-        factor_expr = Value(1.0)
-
-    return ExpressionWrapper(
-        F("volume") * F("operation__renewable_energy_share") * factor_expr,
-        output_field=FloatField(),
-    )
+        return ExpressionWrapper(
+            F("volume"),
+            output_field=FloatField(),
+        )
 
 
 def _get_avoided_emissions_expression():
     from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-    return ExpressionWrapper(
-        (Value(GHG_REFERENCE_RED_II) - F("emission_rate_per_mj"))
-        * F("lot__biofuel__pci_litre")
-        * F("volume")
-        * F("operation__renewable_energy_share")
-        / Value(1000000.0),
-        output_field=FloatField(),
+    energy_expr = energy_mj_expression(
+        F("volume"),
+        F("operation__renewable_energy_share"),
+        F("lot__biofuel__pci_litre"),
+    )
+    return avoided_emissions_tco2_expression(
+        energy_expr,
+        F("emission_rate_per_mj"),
+        GHG_REFERENCE_RED_II,
     )
 
 
 def _build_common_context(entity_id, unit, date_from):
     quantity_expr = _get_quantity_expression(unit)
+    teneur_energy_expr = _get_quantity_expression("mj")
     avoided_emissions_expr = _get_avoided_emissions_expression()
 
     credit_cond = Q(operation__credited_entity_id=entity_id)
@@ -84,7 +89,9 @@ def _build_common_context(entity_id, unit, date_from):
     date_cond = Q() if date_from is None else Q(operation__created_at__gte=date_from)
 
     return {
+        "unit": unit,
         "quantity_expr": quantity_expr,
+        "teneur_energy_expr": teneur_energy_expr,
         "avoided_emissions_expr": avoided_emissions_expr,
         "credit_cond": credit_cond,
         "debit_cond": debit_cond,
@@ -146,91 +153,73 @@ def _build_base_aggregations(context, include_ghg=False):
     return aggregations
 
 
-def _build_teneur_aggregations(context):
-    return {
-        "pending_teneur": Sum(
-            Case(
-                When(
-                    context["process_cond"]
-                    & context["date_cond"]
-                    & Q(operation__type=Operation.TENEUR)
-                    & Q(operation__status=Operation.PENDING),
-                    then=context["quantity_expr"],
-                ),
-                default=Value(0.0),
-                output_field=FloatField(),
-            )
-        ),
-        "declared_teneur": Sum(
-            Case(
-                When(
-                    context["process_cond"]
-                    & context["date_cond"]
-                    & Q(operation__type=Operation.TENEUR)
-                    & Q(operation__status=Operation.DECLARED),
-                    then=context["quantity_expr"],
-                ),
-                default=Value(0.0),
-                output_field=FloatField(),
-            )
-        ),
-        "pending_saved_emissions": Sum(
-            Case(
-                When(
-                    context["process_cond"]
-                    & context["date_cond"]
-                    & Q(operation__type=Operation.TENEUR)
-                    & Q(operation__status=Operation.PENDING),
-                    then=context["avoided_emissions_expr"],
-                ),
-                default=Value(0.0),
-                output_field=FloatField(),
-            )
-        ),
-        "declared_saved_emissions": Sum(
-            Case(
-                When(
-                    context["process_cond"]
-                    & context["date_cond"]
-                    & Q(operation__type=Operation.TENEUR)
-                    & Q(operation__status=Operation.DECLARED),
-                    then=context["avoided_emissions_expr"],
-                ),
-                default=Value(0.0),
-                output_field=FloatField(),
-            )
-        ),
-    }
+def _get_teneur_operation_contributions(details_qs, context, group_annotations, group_fields):
+    operation_groups = (
+        details_qs.annotate(**group_annotations)
+        .filter(
+            context["process_cond"]
+            & context["date_cond"]
+            & Q(operation__type=Operation.TENEUR)
+            & Q(operation__status__in=[Operation.PENDING, Operation.DECLARED])
+        )
+        .values(*group_fields, "operation_id", "operation__status")
+        .annotate(
+            operation_energy=Sum(context["teneur_energy_expr"]),
+            operation_saved_emissions=Sum(context["avoided_emissions_expr"]),
+        )
+    )
+
+    grouped_contributions = defaultdict(
+        lambda: {
+            "pending_teneur": 0,
+            "declared_teneur": 0,
+            "pending_saved_emissions": 0.0,
+            "declared_saved_emissions": 0.0,
+        }
+    )
+
+    for group in operation_groups:
+        key = tuple(group[field] for field in group_fields)
+        entry = grouped_contributions[key]
+        operation_energy = int(group["operation_energy"] or 0)
+        operation_saved_emissions = group["operation_saved_emissions"] or 0.0
+
+        if group["operation__status"] == Operation.PENDING:
+            entry["pending_teneur"] += operation_energy
+            entry["pending_saved_emissions"] += operation_saved_emissions
+        elif group["operation__status"] == Operation.DECLARED:
+            entry["declared_teneur"] += operation_energy
+            entry["declared_saved_emissions"] += operation_saved_emissions
+
+    return grouped_contributions
 
 
 def _calculate_default_grouping(balance, details_qs, context):
     sector_expr = _get_sector_expression()
+    group_fields = ("group_sector", "group_customs_category", "group_biofuel_id")
+    group_annotations = {
+        "group_sector": sector_expr,
+        "group_customs_category": F("operation__customs_category"),
+        "group_biofuel_id": F("operation__biofuel_id"),
+    }
 
     # Aggregate all non-teneur balance metrics (including GHG min/max) by sector/category/biofuel.
     base_groups = list(
-        details_qs.annotate(
-            group_sector=sector_expr,
-            group_customs_category=F("operation__customs_category"),
-            group_biofuel_id=F("operation__biofuel_id"),
-        )
-        .values("group_sector", "group_customs_category", "group_biofuel_id")
+        details_qs.annotate(**group_annotations)
+        .values(*group_fields)
         .annotate(**_build_base_aggregations(context, include_ghg=True))
     )
 
-    # Aggregate teneur-specific metrics separately, but keep the natural sector for default grouping.
-    teneur_groups = list(
-        details_qs.annotate(
-            group_sector=sector_expr,
-            group_customs_category=F("operation__customs_category"),
-            group_biofuel_id=F("operation__biofuel_id"),
-        )
-        .values("group_sector", "group_customs_category", "group_biofuel_id")
-        .annotate(**_build_teneur_aggregations(context))
+    # Aggregate teneur metrics by operation first, then sum operation-level contributions by output group.
+    teneur_groups = _get_teneur_operation_contributions(
+        details_qs,
+        context,
+        group_annotations=group_annotations,
+        group_fields=group_fields,
     )
 
-    biofuel_ids = {
-        group["group_biofuel_id"] for group in base_groups + teneur_groups if group["group_biofuel_id"] is not None
-    }
+    biofuel_ids = {group["group_biofuel_id"] for group in base_groups if group["group_biofuel_id"] is not None}
+    biofuel_ids.update(group_biofuel_id for _, _, group_biofuel_id in teneur_groups if group_biofuel_id is not None)
     biofuels_by_id = Biocarburant.objects.in_bulk(biofuel_ids)
 
     for group in base_groups:
@@ -250,14 +239,14 @@ def _calculate_default_grouping(balance, details_qs, context):
         entry["ghg_reduction_min"] = group["ghg_reduction_min"]
         entry["ghg_reduction_max"] = group["ghg_reduction_max"]
 
-    for group in teneur_groups:
-        biofuel = biofuels_by_id.get(group["group_biofuel_id"])
+    for (group_sector, group_customs_category, group_biofuel_id), group in teneur_groups.items():
+        biofuel = biofuels_by_id.get(group_biofuel_id)
         biofuel_code = biofuel.code if biofuel else None
-        key = (group["group_sector"], group["group_customs_category"], biofuel_code)
+        key = (group_sector, group_customs_category, biofuel_code)
 
         entry = balance[key]
-        entry["sector"] = group["group_sector"]
-        entry["customs_category"] = group["group_customs_category"]
+        entry["sector"] = group_sector
+        entry["customs_category"] = group_customs_category
         entry["biofuel"] = biofuel
         entry["pending_teneur"] = group["pending_teneur"] or 0.0
         entry["declared_teneur"] = group["declared_teneur"] or 0.0
@@ -269,10 +258,14 @@ def _calculate_category_grouping(balance, details_qs, context):
     category_groups = (
         details_qs.annotate(group_key=F("operation__customs_category"))
         .values("group_key")
-        .annotate(
-            **_build_base_aggregations(context),
-            **_build_teneur_aggregations(context),
-        )
+        .annotate(**_build_base_aggregations(context))
+    )
+
+    teneur_groups = _get_teneur_operation_contributions(
+        details_qs,
+        context,
+        group_annotations={"group_key": F("operation__customs_category")},
+        group_fields=("group_key",),
     )
 
     for group in category_groups:
@@ -283,11 +276,15 @@ def _calculate_category_grouping(balance, details_qs, context):
         entry["quantity"]["debit"] = group["quantity_debit"] or 0.0
         entry["available_balance"] = group["available_balance"] or 0.0
         entry["saved_emissions"] = group["saved_emissions"] or 0.0
+        entry["pending_operations"] = group["pending_operations"] or 0
+
+    for (group_key,), group in teneur_groups.items():
+        entry = balance[group_key]
+        entry["customs_category"] = group_key
         entry["pending_teneur"] = group["pending_teneur"] or 0.0
         entry["declared_teneur"] = group["declared_teneur"] or 0.0
         entry["pending_saved_emissions"] = group["pending_saved_emissions"] or 0.0
         entry["declared_saved_emissions"] = group["declared_saved_emissions"] or 0.0
-        entry["pending_operations"] = group["pending_operations"] or 0
 
 
 def _calculate_sector_grouping(balance, details_qs, context):
@@ -308,12 +305,14 @@ def _calculate_sector_grouping(balance, details_qs, context):
         entry["saved_emissions"] = group["saved_emissions"] or 0.0
         entry["pending_operations"] = group["pending_operations"] or 0
 
-    teneur_groups = (
-        details_qs.annotate(group_key=teneur_sector_expr).values("group_key").annotate(**_build_teneur_aggregations(context))
+    teneur_groups = _get_teneur_operation_contributions(
+        details_qs,
+        context,
+        group_annotations={"group_key": teneur_sector_expr},
+        group_fields=("group_key",),
     )
 
-    for group in teneur_groups:
-        key = group["group_key"]
+    for (key,), group in teneur_groups.items():
         entry = balance[key]
         entry["sector"] = key
         entry["pending_teneur"] = group["pending_teneur"] or 0.0

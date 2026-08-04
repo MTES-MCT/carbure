@@ -14,7 +14,7 @@ from core.models import Entity
 
 class ToggleElecError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
-    NOT_OPERATOR = "NOT_OPERATOR"
+    NOT_TIRUERT_LIABLE = "NOT_TIRUERT_LIABLE"
 
 
 class ToggleElecSerializer(serializers.Serializer):
@@ -66,8 +66,8 @@ class ToggleElecActionMixin:
         serializer.is_valid(raise_exception=True)
         has_elec = serializer.validated_data.get("has_elec", False)
 
-        if entity.entity_type != Entity.OPERATOR:
-            return Response({"message": ToggleElecError.NOT_OPERATOR}, status=status.HTTP_400_BAD_REQUEST)
+        if not entity.is_tiruert_liable:
+            return Response({"message": ToggleElecError.NOT_TIRUERT_LIABLE}, status=status.HTTP_400_BAD_REQUEST)
 
         entity.has_elec = has_elec
         entity.save()

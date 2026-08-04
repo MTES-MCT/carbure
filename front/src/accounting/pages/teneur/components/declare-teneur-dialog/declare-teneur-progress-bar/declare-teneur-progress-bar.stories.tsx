@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { expect, within } from "@storybook/test"
-import {
-  DeclareTeneurProgressBar,
-  DeclareTeneurProgressBarList,
-} from "./declare-teneur-progress-bar"
+import { DeclareTeneurProgressBarList } from "./declare-teneur-progress-bar"
 import {
   defaultCategoryObjective,
   defaultSectorObjectives,
@@ -32,7 +29,7 @@ export const CappedCategoryAndSector: Story = {
   args: {
     categoryObjective: defaultCategoryObjective,
     sectorObjective: defaultSectorObjectives[0],
-    quantity: 0,
+    quantityMj: 0,
     targetType: TargetType.CAP,
   },
 }
@@ -41,7 +38,7 @@ export const WithDeclaredQuantity: Story = {
   args: {
     categoryObjective: defaultCategoryObjective,
     sectorObjective: defaultSectorObjectives[0],
-    quantity: 50,
+    quantityMj: 50_000,
     targetType: TargetType.CAP,
   },
 }
@@ -53,7 +50,7 @@ export const ObjectivizedCategory: Story = {
       target_type: TargetType.REACH,
     },
     sectorObjective: defaultSectorObjectives[0],
-    quantity: 10,
+    quantityMj: 10_000,
     targetType: TargetType.REACH,
   },
 }
@@ -61,7 +58,7 @@ export const ObjectivizedCategory: Story = {
 export const SectorOnly: Story = {
   args: {
     sectorObjective: defaultSectorObjectives[0],
-    quantity: 20,
+    quantityMj: 20_000,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -72,18 +69,5 @@ export const SectorOnly: Story = {
     await expect(
       canvas.queryByText(/Quantité restante jusqu.*plafond/i)
     ).not.toBeInTheDocument()
-  },
-}
-
-export const ProgressBarWithoutRemaining: StoryObj<
-  typeof DeclareTeneurProgressBar
-> = {
-  render: (args) => <DeclareTeneurProgressBar {...args} />,
-  args: {
-    teneurDeclared: 20,
-    pendingTeneur: 10,
-    target: 150,
-    quantity: 5,
-    label: "Objectif global",
   },
 }

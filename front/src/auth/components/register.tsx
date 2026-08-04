@@ -1,14 +1,27 @@
-import Button from "common/components/button"
+import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import Form, { useForm } from "common/components/form"
-import { Mail, Lock, Return, UserAdd, User } from "common/components/icons"
-import { TextInput } from "common/components/input"
+import { Form, useForm } from "common/components/form2"
+import { TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
-import { Container } from "auth/layouts/container"
+import {
+  Container,
+  Content,
+  DialogContainer,
+  DialogContainerSpacing,
+  Section,
+} from "auth/layouts/container"
 import { Title } from "common/components/title"
+import {
+  PasswordInput,
+  usePasswordValidation,
+} from "auth/components/password-input"
+import { ActivateRequest } from "./activate"
+import { Text } from "common/components/text"
+import { ROUTE_URLS } from "common/utils/routes"
+import HashRoute from "common/components/hash-route"
 
 type RegisterForm = {
   email?: string
@@ -32,7 +45,7 @@ export const Register = () => {
   const register = useMutation(api.register, {
     onSuccess: () => {
       notify(t("Le compte a bien été créé !"), { variant: "success" })
-      navigate("../register-pending")
+      navigate(ROUTE_URLS.AUTH.REGISTER_PENDING)
     },
 
     onError: (error) => {
@@ -40,94 +53,76 @@ export const Register = () => {
     },
   })
 
-  const isPassOk = value.password === value.repeatPassword
+  const { isValid } = usePasswordValidation(
+    value.password,
+    value.repeatPassword
+  )
+
+  const handleRegister = () => {
+    if (!isValid) return
+
+    register.execute(
+      value.email!,
+      value.name!,
+      value.password!,
+      value.repeatPassword!
+    )
+  }
 
   return (
     <Container>
-      {/* <section>
-        <Switcher />
-      </section> */}
       <Title is="h1" as="h3" style={{ textAlign: "center" }}>
         {t("Inscription")}
       </Title>
-      <section>
-        <Form
-          id="register"
-          onSubmit={() =>
-            register.execute(
-              value.email!,
-              value.name!,
-              value.password!,
-              value.repeatPassword!
-            )
-          }
-        >
+
+      <Content>
+        <Form id="register" gap="sm" onSubmit={handleRegister}>
           <TextInput
             autoFocus
-            variant="solid"
-            icon={Mail}
             type="email"
             label={t("Adresse email")}
             {...bind("email")}
             required
           />
           <TextInput
-            variant="solid"
             placeholder="Jean-François CHAMPOLLION"
-            icon={User}
             label={t("Nom")}
             {...bind("name")}
             required
           />
-          <TextInput
-            variant="solid"
-            icon={Lock}
-            type="password"
+          <PasswordInput
             label={t("Mot de passe")}
             {...bind("password")}
+            autoComplete="new-password"
             required
           />
-          <TextInput
-            variant="solid"
-            icon={Lock}
-            type="password"
+          <PasswordInput
             label={t("Répéter le mot de passe")}
             {...bind("repeatPassword")}
+            confirm={value.password}
+            autoComplete="new-password"
             required
-            error={!isPassOk ? t("Les mots de passe ne correspondent pas") : undefined} // prettier-ignore
-          />
-          <Button
-            variant="link"
-            label={t("Je n'ai pas reçu le lien d'activation")}
-            to="../activate-request"
           />
         </Form>
-      </section>
 
-      <footer>
         <Button
+          customPriority="link"
+          linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}
           center
+        >
+          {t("Je n'ai pas reçu le lien d'activation")}
+        </Button>
+        <Button
           loading={register.loading}
-          disabled={
-            !isPassOk ||
-            !value.email ||
-            !value.name ||
-            !value.password ||
-            !value.repeatPassword
-          }
-          variant="primary"
-          icon={UserAdd}
-          submit="register"
-          label={t("Créer un nouveau compte")}
-        />
-        <Button
-          center
-          variant="secondary"
-          icon={Return}
-          label={t("Annuler")}
-          action={() => navigate("/")}
-        />
-      </footer>
+          type="submit"
+          nativeButtonProps={{ form: "register" }}
+          asideX
+        >
+          {t("Créer un nouveau compte")}
+        </Button>
+      </Content>
+      <HashRoute path="pending" element={<RegisterPending />} />
+      <HashRoute path="activate-request" element={<ActivateRequest />} />
     </Container>
   )
 }
@@ -137,24 +132,21 @@ export const RegisterPending = () => {
   const navigate = useNavigate()
 
   return (
-    <Container>
-      <section>
-        <p>
-          {t(
-            "Votre demande d'inscription a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra d'activer votre compte afin de pouvoir vous connecter."
-          )}
-        </p>
-      </section>
-
-      <footer>
-        <Button
-          center
-          variant="secondary"
-          icon={Return}
-          label={t("Retour")}
-          action={() => navigate("/")}
-        />
-      </footer>
-    </Container>
+    <DialogContainer
+      onClose={() => navigate(-1)}
+      title={t("Votre compte a bien été créé")}
+      success
+    >
+      <Content>
+        <Section>
+          <Text>
+            {t(
+              "Votre demande d'inscription a bien été envoyée. Vous recevrez un email sous peu contenant un lien qui vous permettra d'activer votre compte afin de pouvoir vous connecter."
+            )}
+          </Text>
+          <DialogContainerSpacing />
+        </Section>
+      </Content>
+    </DialogContainer>
   )
 }

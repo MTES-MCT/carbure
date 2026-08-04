@@ -19,12 +19,13 @@ from biomethane.serializers.supply_plan.supply_input import (
     BiomethaneSupplyInputExportSerializer,
     BiomethaneSupplyInputSerializer,
 )
+from biomethane.serializers.supply_plan.tariff_coefficient_proportions import TariffCoefficientProportionsSerializer
 from biomethane.services.supply_plan.volume import annotate_volume_tmb, wet_matter_tonnage_expression
 from biomethane.views.mixins import ListWithObjectPermissionsMixin
 from core.filters import FiltersActionFactory
 from core.pagination import MetadataPageNumberPagination
 
-from .mixins import ExcelExportActionMixin
+from .mixins import ExcelExportActionMixin, TariffCoefficientProportionsActionMixin
 
 
 class BiomethaneSupplyInputPagination(MetadataPageNumberPagination):
@@ -72,6 +73,7 @@ class BiomethaneSupplyInputViewSet(
     ListModelMixin,
     RetrieveModelMixin,
     ExcelExportActionMixin,
+    TariffCoefficientProportionsActionMixin,
     FiltersActionFactory(),
 ):
     queryset = BiomethaneSupplyInput.objects.all()
@@ -120,4 +122,6 @@ class BiomethaneSupplyInputViewSet(
             return BiomethaneSupplyInputCreateSerializer
         elif self.action == "export_supply_plan_to_excel":
             return BiomethaneSupplyInputExportSerializer
+        elif self.action == "tariff_coefficient_proportions":
+            return TariffCoefficientProportionsSerializer
         return BiomethaneSupplyInputSerializer

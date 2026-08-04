@@ -935,14 +935,14 @@ def send_mail(request, subject, message, from_email, recipient_list, html_messag
         user = request.user if request else None
         is_called_from_command = request is None
 
-        if user or is_called_from_command:
-            if user and user.email in recipient_list:
+        if user is not None and user.is_authenticated:
+            if user.email in recipient_list:
                 recipient_list = [user.email]
             else:
                 recipient_list = ["carbure@beta.gouv.fr"]
-        else:
-            # If user not authenticated, we are in registration process we keep recipient_list
-            pass
+        elif is_called_from_command:
+            recipient_list = ["carbure@beta.gouv.fr"]
+        # else: (AnonymousUser) — keep recipient_list
 
         subject = f"[TEST] {subject}"
         kwargs["cc"] = None

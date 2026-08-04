@@ -109,7 +109,7 @@ const CompanyOptions = () => {
         </>
       )}
 
-      {entity.isOperator && (
+      {entity.is_tiruert_liable && (
         <Checkbox
           disabled={!canModify}
           label={t("Ma société accepte des volumes d'electricité")}

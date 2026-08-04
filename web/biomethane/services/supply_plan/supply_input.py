@@ -10,6 +10,7 @@ Each rule is a dict with:
 
 # Code of feedstock for which volume, material_unit and dry_matter_ratio_percent are optional.
 from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
+from feedstocks.models.classification import INTERMEDIATE
 
 BIOGAZ_CAPTE_ISDND_FEEDSTOCK_CODE = "BIOGAZ-CAPTE-DUNE-ISDND"
 
@@ -33,14 +34,17 @@ def _feedstock_is_not_biogaz_capte_isdnd(feedstock, data):
     return getattr(feedstock, "code", None) != BIOGAZ_CAPTE_ISDND_FEEDSTOCK_CODE
 
 
+def _feedstock_is_intermediate_crop(feedstock, data):
+    """True if the feedstock classification is an intermediate crop (None-safe)."""
+    classification = getattr(feedstock, "classification", None)
+    return getattr(classification, "crop_type", None) == INTERMEDIATE
+
+
 # When condition(feedstock, data) is True, the field is required; otherwise it is set to None.
 FEEDSTOCK_FIELD_RULES = (
     {
         "field": "type_cive",
-        "condition": lambda feedstock, data: (
-            getattr(getattr(feedstock, "classification", None), "category", None)
-            == "Biomasse agricole - Cultures intermédiaires"
-        ),
+        "condition": _feedstock_is_intermediate_crop,
         "error_message": "Le champ type de CIVE est requis pour cette matière première.",
     },
     {

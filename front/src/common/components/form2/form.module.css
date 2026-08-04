@@ -1,7 +1,14 @@
 .form {
   display: flex;
   flex-direction: column;
+}
+
+.form--gap-md {
   gap: var(--spacing-3w);
+}
+
+.form--gap-sm {
+  gap: var(--spacing-2w);
 }
 
 .columns {

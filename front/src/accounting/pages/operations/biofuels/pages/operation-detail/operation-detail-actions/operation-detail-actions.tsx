@@ -8,7 +8,7 @@ import {
   useAcceptOperation,
   useDeleteOperation,
   useRejectOperation,
-  useValidateDraftTransfer,
+  useValidateDraftOperation,
 } from "./operation-detail-actions.hooks"
 import { useMemo } from "react"
 import { getOperationValidationButtonText } from "./operation-detail-actions.utils"
@@ -16,6 +16,8 @@ import {
   isReceivingOperation,
   isSendingOperation,
 } from "../../../operations.utils"
+import * as api from "accounting/api/biofuels/operations"
+import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export const OperationDetailActions = ({
   operation,
@@ -27,6 +29,7 @@ export const OperationDetailActions = ({
   const entity = useEntity()
   const { t } = useTranslation()
   const { canUpdateBiofuelOperation } = useAccountingPermissions()
+  const { selectedEntityId } = useSelectedEntity()
 
   const { execute: deleteOperation, loading: deleteOperationLoading } =
     useDeleteOperation({
@@ -43,7 +46,8 @@ export const OperationDetailActions = ({
   const {
     execute: validateDraftTransfer,
     loading: validateDraftTransferLoading,
-  } = useValidateDraftTransfer({
+  } = useValidateDraftOperation({
+    operation,
     onSuccess: closeDialog,
   })
 
@@ -54,12 +58,29 @@ export const OperationDetailActions = ({
     })
 
   const buttonsComponent = useMemo(() => {
-    if (!operation || !canUpdateBiofuelOperation) return []
+    if (!operation) return []
 
-    const buttons: React.ReactNode[] = []
+    const buttons: React.ReactNode[] = [
+      <Button
+        key="export"
+        iconId="fr-icon-download-fill"
+        priority="secondary"
+        onClick={() =>
+          api.downloadOperationDetails(
+            entity.id,
+            operation.id,
+            selectedEntityId
+          )
+        }
+      >
+        {t("Exporter")}
+      </Button>,
+    ]
+
+    if (!canUpdateBiofuelOperation || entity.isAdmin) return buttons
 
     if (
-      isReceivingOperation(operation.quantity) &&
+      isReceivingOperation(operation.volume) &&
       operation.type === OperationType.TRANSFERT &&
       operation?.status === OperationsStatus.PENDING
     ) {
@@ -89,7 +110,7 @@ export const OperationDetailActions = ({
     }
 
     if (
-      isSendingOperation(operation.quantity) &&
+      isSendingOperation(operation.volume) &&
       [OperationsStatus.PENDING, OperationsStatus.DRAFT].includes(
         operation.status!
       )
@@ -135,6 +156,7 @@ export const OperationDetailActions = ({
     acceptOperationLoading,
     t,
     canUpdateBiofuelOperation,
+    selectedEntityId,
   ])
 
   if (!operation || !canUpdateBiofuelOperation || entity.isAdmin) return null

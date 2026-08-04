@@ -1,2 +1,3 @@
 from .excel_import import ExcelImportActionMixin
 from .excel_export import ExcelExportActionMixin
+from .tariff_coefficient_proportions import TariffCoefficientProportionsActionMixin

@@ -1,3 +1,4 @@
+import os
 from datetime import date, datetime
 from io import BufferedReader
 from typing import Any, Callable, Iterable, TypedDict
@@ -58,11 +59,19 @@ def export_to_excel(
 
 
 def ExcelResponse(file: BufferedReader):
-    data = file.read()
-    ctype = "application/vnd.ms-excel"
-    response = HttpResponse(content=data, content_type=ctype)
-    response["Content-Disposition"] = f'attachment; filename="{file.name.replace("/tmp/", "")}"'
-    return response
+    file_path = file.name
+    try:
+        data = file.read()
+        ctype = "application/vnd.ms-excel"
+        response = HttpResponse(content=data, content_type=ctype)
+        response["Content-Disposition"] = f'attachment; filename="{os.path.basename(file_path)}"'
+        return response
+    finally:
+        file.close()
+        try:
+            os.unlink(file_path)
+        except OSError:
+            pass
 
 
 # resolve the value for the given column and row

@@ -16,6 +16,7 @@ export interface FormProps<T> {
     value: T | undefined,
     e?: React.FormEvent<HTMLFormElement>
   ) => void
+  gap?: "sm" | "md"
 }
 
 export function Form<T>({
@@ -27,12 +28,18 @@ export function Form<T>({
   children,
   onSubmit,
   novalidate,
+  gap = "md",
 }: FormProps<T>) {
   return (
     <FormContext.Provider value={form}>
       <form
         id={id}
-        className={cl(css.form, variant && css[variant], className)}
+        className={cl(
+          css.form,
+          variant && css[variant],
+          gap && css[`form--gap-${gap}`],
+          className
+        )}
         style={style}
         noValidate={novalidate}
         onSubmit={(e) => {

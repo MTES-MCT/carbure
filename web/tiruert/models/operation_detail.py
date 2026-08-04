@@ -1,5 +1,7 @@
 from django.db import models
 
+from tiruert.services.energy import avoided_emissions_tco2, energy_mj
+
 
 class OperationDetailsManager(models.Manager):
     def get_queryset(self):
@@ -27,17 +29,25 @@ class OperationDetail(models.Model):
     emission_rate_per_mj = models.FloatField(default=0.0)  # gC02/MJ réellement utilisés pour la création du lot
 
     @property
+    def energy(self):
+        """Returns the energy used for lot creation in MJ, no rounded."""
+        renewable_energy_share = getattr(self.operation, "renewable_energy_share", 1)
+        return energy_mj(
+            self.volume,
+            self.lot.biofuel.pci_litre,
+            renewable_energy_share,
+        )
+
+    @property
     def avoided_emissions(self):
+        """Return the saved emissions in tCO2, no rounded."""
         from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
-        renewable_energy_share = getattr(self.operation, "renewable_energy_share", 1)
-        lot_energy = (
-            self.lot.biofuel.pci_litre * self.volume * renewable_energy_share
-        )  # (MJ) energie du lot utilisée pour la création du lot
-
-        return (
-            (GHG_REFERENCE_RED_II - self.emission_rate_per_mj) * lot_energy / 1000000
-        )  # (tCO2) émissions évitées pour la création du lot
+        return avoided_emissions_tco2(
+            self.energy,
+            self.emission_rate_per_mj,
+            GHG_REFERENCE_RED_II,
+        )
 
     class Meta:
         db_table = "tiruert_operation_details"

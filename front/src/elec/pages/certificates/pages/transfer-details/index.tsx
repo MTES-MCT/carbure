@@ -25,6 +25,7 @@ export const TransferCertificateDetails = () => {
   const transferID = parseInt(match?.params.id ?? "")
 
   const entity = useEntity()
+  const isElecLiable = entity.is_tiruert_liable && entity.has_elec
 
   const transferResponse = useQuery(getTransferCertificateDetails, {
     key: "transfer-certificate-details",
@@ -58,17 +59,16 @@ export const TransferCertificateDetails = () => {
               <CancelTransferCertificate id={transferID} />
             )}
 
-            {entity.isOperator && isPending && (
+            {isElecLiable && isPending && (
               <RejectTransferCertificate id={transferID} />
             )}
 
-            {entity.isOperator &&
-              (isPending || (isAccepted && !isDeclared)) && (
-                <AcceptTransferCertificate
-                  id={transferID}
-                  alreadyAccepted={isAccepted}
-                />
-              )}
+            {isElecLiable && (isPending || (isAccepted && !isDeclared)) && (
+              <AcceptTransferCertificate
+                id={transferID}
+                alreadyAccepted={isAccepted}
+              />
+            )}
           </>
         }
       >

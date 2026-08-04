@@ -55,6 +55,10 @@ export const getSupplyPlanInputCollectionTypeOptions = () => {
       value: BiomethaneSupplyInputCollectionType.LOCAL,
       label: i18next.t("Issus de collectivités locales"),
     },
+    {
+      value: BiomethaneSupplyInputCollectionType.IAA,
+      label: i18next.t("Issus de résidus d'IAA"),
+    },
   ]
 }
 

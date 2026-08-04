@@ -35,7 +35,7 @@ const fillFirstStep = async (canvasElement: HTMLElement) => {
     value: "50",
   })
   await waitFor(() => {
-    within(canvasElement).getByText("2 500 litres")
+    within(canvasElement).getByText("250 000 litres")
   })
 }
 

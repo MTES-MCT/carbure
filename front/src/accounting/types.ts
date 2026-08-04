@@ -18,7 +18,6 @@ import {
   PathsApiTiruertElecOperationsGetParametersQueryOrder_by as ElecOperationOrder,
   PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
   ElecOperationTypeEnum as CreateElecOperationType,
-  PathsApiTiruertOperationsGetParametersQueryUnit as OperationUnit,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -28,6 +27,11 @@ type ExtraOperationData = {
 }
 export type Operation = apiTypes["Operation"] & ExtraOperationData
 export type OperationList = apiTypes["OperationList"] & ExtraOperationData
+
+export type OperationImportGroup = apiTypes["OperationImportGroup"]
+export type OperationImportResponse = apiTypes["OperationImportResponse"]
+export type OperationExcelImportRequest =
+  apiTypes["OperationExcelImportRequestRequest"]
 
 export type Balance = apiTypes["Balance"]
 
@@ -57,7 +61,6 @@ export {
   BalancesGroupBy,
   OperationOrder,
   ElecOperationOrder,
-  OperationUnit,
 }
 
 /** BALANCES */

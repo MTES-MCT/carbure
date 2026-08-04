@@ -41,11 +41,4 @@ class ExcelExportActionMixin:
             ],
             column_width=15,
         )
-        try:
-            return ExcelResponse(excel_file)
-        finally:
-            excel_file.close()
-            try:
-                os.unlink(file_path)
-            except OSError:
-                pass
+        return ExcelResponse(excel_file)

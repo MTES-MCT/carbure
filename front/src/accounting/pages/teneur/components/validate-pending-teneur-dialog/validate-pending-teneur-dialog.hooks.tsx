@@ -1,25 +1,22 @@
 import { Balance, ElecBalance } from "accounting/types"
 import { formatSector } from "accounting/utils/formatters"
 import { Column, Cell } from "common/components/table2"
-import { CONVERSIONS, floorNumber, formatNumber } from "common/utils/formatters"
 import { useTranslation } from "react-i18next"
 import { SectorObjective } from "../../types"
+import {
+  formatObjectiveGJ,
+  formatObjectiveGJFromMj,
+} from "../../utils/objectives"
+import { energyFromLiters } from "../../utils/liters"
 
-const HeaderWithSup = ({ children }: { children: React.ReactNode }) => (
-  <span>
-    {children}
-    <sup>*</sup>
-  </span>
-)
+const formatElecBalanceGj = (valueMj: number) =>
+  formatObjectiveGJFromMj(valueMj)
 
-// Format all values in the table to GJ
-const formatValue = (value: number) =>
-  formatNumber(CONVERSIONS.energy.MJ_TO_GJ(value), {
-    fractionDigits: 0,
-  })
+const formatBiofuelBalanceGj = (liters: number, pciLitre?: number) => {
+  if (!pciLitre) return "-"
 
-const floorValue = (value: number) =>
-  floorNumber(CONVERSIONS.energy.MJ_TO_GJ(value), 0)
+  return formatObjectiveGJ(energyFromLiters(liters, pciLitre).gj)
+}
 
 export const useBiofuelTeneurColumns = () => {
   const { t } = useTranslation()
@@ -33,25 +30,37 @@ export const useBiofuelTeneurColumns = () => {
       cell: (item) => item.customs_category,
     },
     {
-      header: <HeaderWithSup>{t("Solde initial")}</HeaderWithSup>,
+      header: `${t("Solde initial")} (GJ)`,
       cell: (item) => (
         <Cell
-          text={formatNumber(
-            floorValue(item.available_balance + item.pending_teneur),
-            {
-              fractionDigits: 0,
-            }
+          text={formatBiofuelBalanceGj(
+            item.available_balance + item.pending_teneur,
+            item.biofuel?.pci_litre
           )}
         />
       ),
     },
     {
-      header: <HeaderWithSup>{t("Teneur à valider")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatValue(item.pending_teneur)} />,
+      header: `${t("Teneur à valider")} (GJ)`,
+      cell: (item) => (
+        <Cell
+          text={formatBiofuelBalanceGj(
+            item.pending_teneur,
+            item.biofuel?.pci_litre
+          )}
+        />
+      ),
     },
     {
-      header: <HeaderWithSup>{t("Solde final")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatValue(item.available_balance)} />,
+      header: `${t("Solde final")} (GJ)`,
+      cell: (item) => (
+        <Cell
+          text={formatBiofuelBalanceGj(
+            item.available_balance,
+            item.biofuel?.pci_litre
+          )}
+        />
+      ),
     },
   ]
 
@@ -66,23 +75,21 @@ export const useBiofuelTeneurSectorColumns = () => {
       cell: (item) => <Cell text={formatSector(item.code)} />,
     },
     {
-      header: <HeaderWithSup>{t("Avancement initial")}</HeaderWithSup>,
+      header: `${t("Avancement initial")} (GJ)`,
       cell: (item) => (
-        <Cell
-          text={formatNumber(item.teneur_declared, {
-            fractionDigits: 0,
-          })}
-        />
+        <Cell text={formatObjectiveGJ(item.progress.teneur_declared)} />
       ),
     },
     {
-      header: <HeaderWithSup>{t("Teneur à valider")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatNumber(item.pending_teneur)} />,
+      header: `${t("Teneur à valider")} (GJ)`,
+      cell: (item) => (
+        <Cell text={formatObjectiveGJ(item.progress.pending_teneur)} />
+      ),
     },
     {
-      header: <HeaderWithSup>{t("Avancement final")}</HeaderWithSup>,
+      header: `${t("Avancement final")} (GJ)`,
       cell: (item) => (
-        <Cell text={formatNumber(item.teneur_declared + item.pending_teneur)} />
+        <Cell text={formatObjectiveGJ(item.progress.total_teneur_declared)} />
       ),
     },
   ]
@@ -98,26 +105,24 @@ export const useElecTeneurColumns = () => {
       cell: (item) => <Cell text={formatSector(item.sector)} />,
     },
     {
-      header: <HeaderWithSup>{t("Solde initial")}</HeaderWithSup>,
+      header: `${t("Solde initial")} (GJ)`,
       cell: (item) => (
         <Cell
-          text={formatNumber(
-            floorValue(item.available_balance) +
-              floorValue(item.pending_teneur),
-            {
-              fractionDigits: 0,
-            }
+          text={formatElecBalanceGj(
+            item.available_balance + item.pending_teneur
           )}
         />
       ),
     },
     {
-      header: <HeaderWithSup>{t("Teneur à valider")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatValue(item.pending_teneur)} />,
+      header: `${t("Teneur à valider")} (GJ)`,
+      cell: (item) => <Cell text={formatElecBalanceGj(item.pending_teneur)} />,
     },
     {
-      header: <HeaderWithSup>{t("Solde final")}</HeaderWithSup>,
-      cell: (item) => <Cell text={formatValue(item.available_balance)} />,
+      header: `${t("Solde final")} (GJ)`,
+      cell: (item) => (
+        <Cell text={formatElecBalanceGj(item.available_balance)} />
+      ),
     },
   ]
 

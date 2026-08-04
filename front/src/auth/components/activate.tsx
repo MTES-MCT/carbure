@@ -2,25 +2,28 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import {
   createSearchParams,
+  useLocation,
   useNavigate,
   useSearchParams,
 } from "react-router-dom"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
-import Form, { useForm } from "common/components/form"
-import { TextInput } from "common/components/input"
-import {
-  Loader,
-  Mail,
-  Refresh,
-  Return,
-  UserCheck,
-} from "common/components/icons"
-import Button from "common/components/button"
-import { Container } from "./login"
+import { TextInput } from "common/components/inputs2"
+
+import { Button } from "common/components/button2"
 
 import * as api from "../api"
-import css from "./auth.module.css"
+import { LoaderLine } from "common/components/icon"
+import { Form, useForm } from "common/components/form2"
+import {
+  Container,
+  Content,
+  DialogContainer,
+  FooterAuth,
+  Section,
+} from "auth/layouts/container"
+import { Text } from "common/components/text"
+import { addQueryParams, ROUTE_URLS } from "common/utils/routes"
 
 export const Activate = () => {
   const { t } = useTranslation()
@@ -39,12 +42,12 @@ export const Activate = () => {
   const isError = activate.status === "error"
 
   const activatedMessage = isUserInvited
-    ? t(
-        "Votre compte a bien été activé, vous pouvez maintenant définir votre mot de passe."
-      )
-    : t(
-        "Votre compte a bien été activé, vous pouvez maintenant vous connecter sur CarbuRe."
-      )
+    ? t("Vous pouvez maintenant définir votre mot de passe.")
+    : t("Vous pouvez maintenant vous connecter sur CarbuRe.")
+
+  const title = isSuccess
+    ? t("Votre compte a bien été activé")
+    : t("Une erreur s'est produite lors de l'activation de votre compte")
 
   const userInvitedSearchParams = createSearchParams({
     uidb64: uidb64 || "",
@@ -52,61 +55,66 @@ export const Activate = () => {
   })
 
   return (
-    <Container>
-      <section>
-        {activate.loading && <Loader size={48} className={css.loader} />}
-        {isSuccess && <p>{activatedMessage}</p>}
-        {isError && (
-          <p style={{ color: "var(--red-dark)" }}>
-            {t(
-              "Une erreur s'est produite lors de l'activation de votre compte, merci de recommencer le processus d'inscription."
-            )}
-          </p>
-        )}
-      </section>
-
-      <footer>
-        {isUserInvited && (
-          <Button
-            center
-            variant="primary"
-            icon={UserCheck}
-            label={t("Définir mon mot de passe")}
-            to={{
-              pathname: "../reset-password",
-              search: userInvitedSearchParams.toString(),
-            }}
-          />
-        )}
-        {isSuccess && !isUserInvited && (
-          <Button
-            center
-            variant="primary"
-            icon={UserCheck}
-            label={t("Se connecter")}
-            action={() => navigate("../login")}
-          />
-        )}
-        {isError && !isUserInvited && (
-          <Button
-            center
-            variant="warning"
-            icon={Refresh}
-            label={t("Réessayer de s'inscrire")}
-            action={() => navigate("../register")}
-          />
-        )}
-      </footer>
+    <Container success={isSuccess} title={title}>
+      <Content>
+        <Section>
+          {activate.loading && <LoaderLine style={{ fontSize: "48px" }} />}
+          {isSuccess && (
+            <Section>
+              <Text>{activatedMessage}</Text>
+            </Section>
+          )}
+          {isError && (
+            <Section>
+              <Text>
+                {t("Merci de recommencer le processus d'inscription.")}
+              </Text>
+            </Section>
+          )}
+        </Section>
+        <FooterAuth asideX>
+          {isUserInvited && (
+            <Button
+              linkProps={{
+                to: addQueryParams(
+                  ROUTE_URLS.AUTH.RESET_PASSWORD,
+                  Object.fromEntries(userInvitedSearchParams.entries())
+                ),
+              }}
+            >
+              {t("Définir mon mot de passe")}
+            </Button>
+          )}
+          {isSuccess && !isUserInvited && (
+            <Button onClick={() => navigate(ROUTE_URLS.AUTH.LOGIN)}>
+              {t("Se connecter")}
+            </Button>
+          )}
+          {isError && !isUserInvited && (
+            <Button onClick={() => navigate(ROUTE_URLS.AUTH.REGISTER)}>
+              {t("Réessayer de s'inscrire")}
+            </Button>
+          )}
+        </FooterAuth>
+      </Content>
     </Container>
   )
+}
+
+type ActivateRequestForm = {
+  email?: string
 }
 
 export const ActivateRequest = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
+  const location = useLocation()
+  const email = (location.state as ActivateRequestForm | null)?.email
 
-  const { value, bind } = useForm({ email: "" as string | undefined })
+  const { value, bind } = useForm<ActivateRequestForm>({
+    email: email ?? "",
+  })
 
   const requestActivationLink = useMutation(api.requestActivateAccount, {
     onSuccess: () => {
@@ -116,7 +124,7 @@ export const ActivateRequest = () => {
         ),
         { variant: "success" }
       )
-      navigate("../register-pending")
+      navigate(ROUTE_URLS.AUTH.REGISTER_PENDING)
     },
 
     onError: () => {
@@ -125,50 +133,39 @@ export const ActivateRequest = () => {
   })
 
   return (
-    <Container>
-      <section>
-        <p>
+    <DialogContainer
+      onClose={() => navigate(ROUTE_URLS.AUTH.REGISTER)}
+      title={t("Renvoyer le lien d’activation")}
+    >
+      <Content>
+        <Section>
           {t(
             "Veuillez renseigner votre adresse email afin que nous vous envoyions le lien qui vous permettra d'activer votre compte."
           )}
-        </p>
-      </section>
 
-      <section>
-        <Form
-          id="activate-request"
-          onSubmit={() => requestActivationLink.execute(value.email!)}
-        >
-          <TextInput
-            autoFocus
-            variant="solid"
-            icon={Mail}
-            type="email"
-            label={t("Adresse email du compte")}
-            {...bind("email")}
-          />
-        </Form>
-      </section>
-
-      <footer>
+          <Form
+            id="activate-request"
+            onSubmit={() => requestActivationLink.execute(value.email!)}
+          >
+            <TextInput
+              autoFocus
+              type="email"
+              label={t("Adresse email du compte")}
+              {...bind("email")}
+              required
+            />
+          </Form>
+        </Section>
         <Button
-          center
           loading={requestActivationLink.loading}
-          disabled={!value.email}
-          variant="primary"
-          icon={Refresh}
-          label={t("Renvoyer le lien d'activation")}
-          submit="activate-request"
-        />
-        <Button
-          center
-          variant="secondary"
-          icon={Return}
-          label={t("Annuler")}
-          action={() => navigate("../register")}
-        />
-      </footer>
-    </Container>
+          type="submit"
+          nativeButtonProps={{ form: "activate-request" }}
+          asideX
+        >
+          {t("Renvoyer le lien d'activation")}
+        </Button>
+      </Content>
+    </DialogContainer>
   )
 }
 
@@ -181,7 +178,7 @@ export function useToken() {
 
   useEffect(() => {
     if (uidb64 === undefined || token === undefined) {
-      navigate("/")
+      navigate(ROUTE_URLS.HOME)
     }
   }, [uidb64, token, navigate])
 
