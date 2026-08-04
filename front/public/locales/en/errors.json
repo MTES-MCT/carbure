@@ -88,6 +88,7 @@
   "UNKNOWN_CERTIFICATE": "The supplier certificate is unknown",
   "INVALID_CERTIFICATE": "The supplier certificate is expired or not yet active for this delivery date",
   "MISSING_DELIVERY_TYPE": "Delivery type is missing",
+  "MAC_NOT_EFPE": "Release for consumption of 100% biofuels (B100, ED95, HVO100) is only allowed from an EFPE depot.",
   "MISSING_USAGE": "Batch usage is missing",
   "MISSING_USAGE_PRECISION": "Batch usage precision is missing"
 }
