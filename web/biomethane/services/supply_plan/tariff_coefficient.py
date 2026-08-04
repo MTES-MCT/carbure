@@ -6,12 +6,11 @@ Business rules (single source of truth, applied in SQL):
 - Coefficient comes from BiomethaneFeedstockTariffCoefficient
   (feedstock × tariff regime × collection_type).
 - Regime is derived from the producer contract tariff_reference.
-- collection_type is matched exactly: supply-input NULL maps to referential ""
-  (unconditional rule). No matching row means no coefficient (still in denominator).
+- collection_type is matched exactly against the referential ("" = unconditional rule).
+  No matching row means no coefficient (still in denominator).
 """
 
 from django.db.models import Case, CharField, F, FloatField, OuterRef, QuerySet, Subquery, Sum, Value, When
-from django.db.models.functions import Coalesce
 
 from biomethane.models import BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
 from biomethane.services.supply_plan.volume import wet_matter_tonnage_expression
@@ -47,10 +46,8 @@ def compute_tariff_coefficient_proportions(
     queryset = _annotate_regime(queryset, tariff_reference)
 
     # 2. Referential lookup: feedstock × regime × collection_type.
-    #    Supply-input NULL → "" to match unconditional referential rows.
     rows = (
-        queryset.annotate(collection_key=Coalesce("collection_type", Value("")))
-        .annotate(
+        queryset.annotate(
             effective_coefficient=_effective_coefficient_subquery(),
             wet_matter_tonnage=wet_matter_tonnage_expression(),
         )
@@ -79,12 +76,12 @@ def compute_tariff_coefficient_proportions(
 
 
 def _effective_coefficient_subquery():
-    """Resolve coefficient for feedstock × regime × collection_key ("" = unconditional)."""
+    """Resolve coefficient for feedstock × regime × collection_type ("" = unconditional)."""
     return Subquery(
         Coeff.objects.filter(
             feedstock_id=OuterRef("feedstock_id"),
             regime=OuterRef("regime"),
-            collection_type=OuterRef("collection_key"),
+            collection_type=OuterRef("collection_type"),
         ).values("coefficient")[:1],
         output_field=CharField(),
     )

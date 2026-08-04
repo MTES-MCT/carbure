@@ -191,12 +191,12 @@ class TariffCoefficientProportionsTests(TestCase):
 
         self.assertEqual(result["p"], 100.0)
 
-    def test_null_collection_type_matches_unconditional_referential_row(self):
-        """Supply-input NULL maps to referential "" (unconditional rule)."""
+    def test_empty_collection_type_matches_unconditional_referential_row(self):
+        """Supply-input "" maps to referential "" (unconditional rule)."""
         BiomethaneSupplyInputFactory.create(
             supply_plan=self.supply_plan,
             feedstock=self.feedstock_p1,
-            collection_type=None,
+            collection_type="",
             volume=100,
             material_unit=BiomethaneSupplyInput.WET,
         )
@@ -231,7 +231,7 @@ class TariffCoefficientProportionsTests(TestCase):
         BiomethaneSupplyInputFactory.create(
             supply_plan=self.supply_plan,
             feedstock=self.feedstock_huiles,
-            collection_type=None,
+            collection_type="",
             volume=100,
             material_unit=BiomethaneSupplyInput.WET,
         )
