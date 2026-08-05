@@ -129,6 +129,7 @@ INSTALLED_APPS = [
     "anonymization",
     "feedstocks",
     "h2",
+    "traceability",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
