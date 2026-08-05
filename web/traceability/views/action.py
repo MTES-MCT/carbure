@@ -1,16 +1,18 @@
 from django.db.models import Q
 from rest_framework import viewsets
 
+from core.filters import FiltersActionFactory
 from core.permissions import HasEntityReadRights, HasEntityWriteRights
+from traceability.filters import ActionFilter
 from traceability.models import Action
-from traceability.serializers import ActionSerializer
-from traceability.serializers.action import ActionInputSerializer
+from traceability.serializers import ActionInputSerializer, ActionSerializer
 
 
-class ActionViewset(viewsets.ModelViewSet):
+class ActionViewset(FiltersActionFactory(), viewsets.ModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     permission_classes = [HasEntityReadRights]
+    filterset_class = ActionFilter
     search_fields = ["pos_id"]
 
     def get_permissions(self):

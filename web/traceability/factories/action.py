@@ -20,6 +20,7 @@ class ActionFactory(factory.django.DjangoModelFactory):
     holder = factory.SubFactory(EntityFactory, entity_type=Entity.HRS)
     industry = fuzzy.FuzzyChoice(Action.INDUSTRIES, getter=lambda x: x[0])
     type = fuzzy.FuzzyChoice(Action.TYPES, getter=lambda x: x[0])
+    working_date = factory.Faker("date_between", start_date="-2y", end_date="today")
     parent = None
     material = factory.SubFactory(MaterialFactory)
     quantity = factory.Faker("pydecimal", left_digits=4, right_digits=3, positive=True)

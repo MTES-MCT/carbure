@@ -12524,6 +12524,460 @@ paths:
               schema:
                 $ref: "#/components/schemas/TokenRefresh"
           description: ""
+  /api/traceability/actions/:
+    get:
+      operationId: traceability_actions_list
+      parameters:
+        - in: query
+          name: holder
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: industry
+          schema:
+            type: array
+            items:
+              type: string
+              title: Filière
+              enum:
+                - H2
+          description: "* `H2` - Hydrogène"
+          explode: true
+          style: form
+        - in: query
+          name: material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -holder
+                - -material
+                - -pos_id
+                - -quantity
+                - -shipping_distance
+                - -site
+                - -working_date
+                - holder
+                - material
+                - pos_id
+                - quantity
+                - shipping_distance
+                - site
+                - working_date
+          description: |-
+            Ordre
+
+            * `pos_id` - Pos id
+            * `-pos_id` - Pos id (décroissant)
+            * `holder` - Holder
+            * `-holder` - Holder (décroissant)
+            * `material` - Material
+            * `-material` - Material (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `site` - Site
+            * `-site` - Site (décroissant)
+            * `shipping_distance` - Shipping distance
+            * `-shipping_distance` - Shipping distance (décroissant)
+            * `working_date` - Working date
+            * `-working_date` - Working date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: shipping_method
+          schema:
+            type: array
+            items:
+              type: string
+              title: Mode de transport
+              enum:
+                - PIPELINE
+                - RAILROAD
+                - ROAD
+                - SEA
+          description: |-
+            * `ROAD` - Transport routier
+            * `PIPELINE` - Pipeline
+            * `RAILROAD` - Rail
+            * `SEA` - Transport maritime
+          explode: true
+          style: form
+        - in: query
+          name: site
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              type: string
+              title: Type d'action
+              enum:
+                - INIT
+          description: "* `INIT` - INIT"
+          explode: true
+          style: form
+        - in: query
+          name: working_year
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+      tags:
+        - traceability
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedActionList"
+          description: ""
+    post:
+      operationId: traceability_actions_create
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionInput"
+          description: ""
+  /api/traceability/actions/{id}/:
+    get:
+      operationId: traceability_actions_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action.
+          required: true
+      tags:
+        - traceability
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Action"
+          description: ""
+    put:
+      operationId: traceability_actions_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action.
+          required: true
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionInput"
+          description: ""
+    patch:
+      operationId: traceability_actions_partial_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action.
+          required: true
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedActionInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedActionInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedActionInputRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionInput"
+          description: ""
+    delete:
+      operationId: traceability_actions_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action.
+          required: true
+      tags:
+        - traceability
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/traceability/actions/filters/:
+    get:
+      operationId: traceability_actions_filters_retrieve
+      parameters:
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - holder
+              - industry
+              - material
+              - order_by
+              - shipping_method
+              - site
+              - type
+              - working_year
+          description: Filter string to apply
+          required: true
+        - in: query
+          name: holder
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: industry
+          schema:
+            type: array
+            items:
+              type: string
+              title: Filière
+              enum:
+                - H2
+          description: "* `H2` - Hydrogène"
+          explode: true
+          style: form
+        - in: query
+          name: material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -holder
+                - -material
+                - -pos_id
+                - -quantity
+                - -shipping_distance
+                - -site
+                - -working_date
+                - holder
+                - material
+                - pos_id
+                - quantity
+                - shipping_distance
+                - site
+                - working_date
+          description: |-
+            Ordre
+
+            * `pos_id` - Pos id
+            * `-pos_id` - Pos id (décroissant)
+            * `holder` - Holder
+            * `-holder` - Holder (décroissant)
+            * `material` - Material
+            * `-material` - Material (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `site` - Site
+            * `-site` - Site (décroissant)
+            * `shipping_distance` - Shipping distance
+            * `-shipping_distance` - Shipping distance (décroissant)
+            * `working_date` - Working date
+            * `-working_date` - Working date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: shipping_method
+          schema:
+            type: array
+            items:
+              type: string
+              title: Mode de transport
+              enum:
+                - PIPELINE
+                - RAILROAD
+                - ROAD
+                - SEA
+          description: |-
+            * `ROAD` - Transport routier
+            * `PIPELINE` - Pipeline
+            * `RAILROAD` - Rail
+            * `SEA` - Transport maritime
+          explode: true
+          style: form
+        - in: query
+          name: site
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              type: string
+              title: Type d'action
+              enum:
+                - INIT
+          description: "* `INIT` - INIT"
+          explode: true
+          style: form
+        - in: query
+          name: working_year
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+      tags:
+        - traceability
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - holder
+                    - industry
+                    - material
+                    - order_by
+                    - shipping_method
+                  summary: Example of filters response.
+          description: ""
   /api/user/:
     get:
       operationId: user_retrieve
@@ -12620,6 +13074,275 @@ components:
       description: |-
         * `PUBLIC` - Public
         * `PRIVATE` - Privé
+    Action:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        pos_id:
+          type: string
+          title: N° de POS
+          maxLength: 48
+        industry:
+          allOf:
+            - $ref: "#/components/schemas/IndustryEnum"
+          title: Filière
+        type:
+          allOf:
+            - $ref: "#/components/schemas/ActionTypeEnum"
+          title: Type d'action
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          title: Quantité de matière
+        shipping_date:
+          type: string
+          format: date
+          title: Date d'expédition
+        shipping_distance:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Distance de livraison
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          title: Mode de transport
+        working_date:
+          type: string
+          format: date
+          title: Date de référence
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        holder:
+          type: integer
+          title: Entité détentrice de la quantité de l'action
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        material:
+          type: integer
+          title: Matière
+        site:
+          type: integer
+      required:
+        - holder
+        - id
+        - industry
+        - material
+        - pos_id
+        - quantity
+        - shipping_date
+        - shipping_distance
+        - shipping_method
+        - site
+        - status
+        - type
+        - working_date
+    ActionInput:
+      type: object
+      properties:
+        pos_id:
+          type: string
+          title: N° de POS
+          maxLength: 48
+        industry:
+          allOf:
+            - $ref: "#/components/schemas/IndustryEnum"
+          title: Filière
+        type:
+          allOf:
+            - $ref: "#/components/schemas/ActionTypeEnum"
+          title: Type d'action
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          title: Quantité de matière
+        shipping_date:
+          type: string
+          format: date
+          title: Date d'expédition
+        shipping_distance:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Distance de livraison
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          title: Mode de transport
+        working_date:
+          type: string
+          format: date
+          title: Date de référence
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        holder:
+          type: integer
+          title: Entité détentrice de la quantité de l'action
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        material:
+          type: integer
+          title: Matière
+        site:
+          type: integer
+      required:
+        - holder
+        - industry
+        - material
+        - pos_id
+        - quantity
+        - shipping_date
+        - shipping_distance
+        - shipping_method
+        - site
+        - type
+        - working_date
+    ActionInputRequest:
+      type: object
+      properties:
+        pos_id:
+          type: string
+          minLength: 1
+          title: N° de POS
+          maxLength: 48
+        industry:
+          allOf:
+            - $ref: "#/components/schemas/IndustryEnum"
+          title: Filière
+        type:
+          allOf:
+            - $ref: "#/components/schemas/ActionTypeEnum"
+          title: Type d'action
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          title: Quantité de matière
+        shipping_date:
+          type: string
+          format: date
+          title: Date d'expédition
+        shipping_distance:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Distance de livraison
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          title: Mode de transport
+        working_date:
+          type: string
+          format: date
+          title: Date de référence
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        holder:
+          type: integer
+          title: Entité détentrice de la quantité de l'action
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        material:
+          type: integer
+          title: Matière
+        site:
+          type: integer
+      required:
+        - holder
+        - industry
+        - material
+        - pos_id
+        - quantity
+        - shipping_date
+        - shipping_distance
+        - shipping_method
+        - site
+        - type
+        - working_date
+    ActionShippingMethodEnum:
+      enum:
+        - ROAD
+        - PIPELINE
+        - RAILROAD
+        - SEA
+      type: string
+      description: |-
+        * `ROAD` - Transport routier
+        * `PIPELINE` - Pipeline
+        * `RAILROAD` - Rail
+        * `SEA` - Transport maritime
+    ActionTypeEnum:
+      enum:
+        - INIT
+      type: string
+      description: "* `INIT` - INIT"
     ActivateAccountRequest:
       type: object
       properties:
@@ -17824,6 +18547,11 @@ components:
 
         * `DECLARATION_PERIODIC_CONTROLS` - Déclaration (avec contrôles
         périodiques)
+    IndustryEnum:
+      enum:
+        - H2
+      type: string
+      description: "* `H2` - Hydrogène"
     InstallationCategoryEnum:
       enum:
         - INSTALLATION_CATEGORY_1
@@ -18706,6 +19434,29 @@ components:
         * `OWN` - Propre
         * `THIRD_PARTY` - Tiers
         * `PROCESSING` - Processing
+    PaginatedActionList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Action"
     PaginatedBalanceResponseList:
       type: object
       required:
@@ -19098,6 +19849,76 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedActionInputRequest:
+      type: object
+      properties:
+        pos_id:
+          type: string
+          minLength: 1
+          title: N° de POS
+          maxLength: 48
+        industry:
+          allOf:
+            - $ref: "#/components/schemas/IndustryEnum"
+          title: Filière
+        type:
+          allOf:
+            - $ref: "#/components/schemas/ActionTypeEnum"
+          title: Type d'action
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          title: Quantité de matière
+        shipping_date:
+          type: string
+          format: date
+          title: Date d'expédition
+        shipping_distance:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          title: Distance de livraison
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          title: Mode de transport
+        working_date:
+          type: string
+          format: date
+          title: Date de référence
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        holder:
+          type: integer
+          title: Entité détentrice de la quantité de l'action
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        material:
+          type: integer
+          title: Matière
+        site:
+          type: integer
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
@@ -19750,6 +20571,30 @@ components:
         - assigned_volume
         - id
         - total_volume
+    SafShippingMethodEnum:
+      enum:
+        - TRUCK
+        - BARGE
+        - TRAIN
+        - SHIP
+        - PIPELINE
+        - PIPELINE_DMM
+        - PIPELINE_LHP
+        - PIPELINE_ODC
+        - PIPELINE_SPMR
+        - PIPELINE_SPSE
+      type: string
+      description: |-
+        * `TRUCK` - Routier
+        * `BARGE` - Barge
+        * `TRAIN` - Train
+        * `SHIP` - Bateau
+        * `PIPELINE` - Oléoduc
+        * `PIPELINE_DMM` - Oléoduc DMM
+        * `PIPELINE_LHP` - Oléoduc LHP
+        * `PIPELINE_ODC` - Oléoduc ODC
+        * `PIPELINE_SPMR` - Oléoduc SPMR
+        * `PIPELINE_SPSE` - Oléoduc SPSE
     SafTicket:
       type: object
       properties:
@@ -19889,7 +20734,7 @@ components:
           readOnly: true
         shipping_method:
           allOf:
-            - $ref: "#/components/schemas/ShippingMethodEnum"
+            - $ref: "#/components/schemas/SafShippingMethodEnum"
           nullable: true
         child_ticket_sources:
           type: array
@@ -20147,7 +20992,7 @@ components:
           nullable: true
         shipping_method:
           allOf:
-            - $ref: "#/components/schemas/ShippingMethodEnum"
+            - $ref: "#/components/schemas/SafShippingMethodEnum"
           nullable: true
         has_intermediary_depot:
           type: boolean
@@ -20186,7 +21031,7 @@ components:
           nullable: true
         shipping_method:
           allOf:
-            - $ref: "#/components/schemas/ShippingMethodEnum"
+            - $ref: "#/components/schemas/SafShippingMethodEnum"
           nullable: true
         has_intermediary_depot:
           type: boolean
@@ -20225,7 +21070,7 @@ components:
           nullable: true
         shipping_method:
           allOf:
-            - $ref: "#/components/schemas/ShippingMethodEnum"
+            - $ref: "#/components/schemas/SafShippingMethodEnum"
           nullable: true
         has_intermediary_depot:
           type: boolean
@@ -20336,30 +21181,6 @@ components:
           minLength: 1
       required:
         - certificate_id
-    ShippingMethodEnum:
-      enum:
-        - TRUCK
-        - BARGE
-        - TRAIN
-        - SHIP
-        - PIPELINE
-        - PIPELINE_DMM
-        - PIPELINE_LHP
-        - PIPELINE_ODC
-        - PIPELINE_SPMR
-        - PIPELINE_SPSE
-      type: string
-      description: |-
-        * `TRUCK` - Routier
-        * `BARGE` - Barge
-        * `TRAIN` - Train
-        * `SHIP` - Bateau
-        * `PIPELINE` - Oléoduc
-        * `PIPELINE_DMM` - Oléoduc DMM
-        * `PIPELINE_LHP` - Oléoduc LHP
-        * `PIPELINE_ODC` - Oléoduc ODC
-        * `PIPELINE_SPMR` - Oléoduc SPMR
-        * `PIPELINE_SPSE` - Oléoduc SPSE
     SimulationInputRequest:
       type: object
       properties:

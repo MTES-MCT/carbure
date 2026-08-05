@@ -3238,6 +3238,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/traceability/actions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["traceability_actions_list"];
+        put?: never;
+        post: operations["traceability_actions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["traceability_actions_retrieve"];
+        put: operations["traceability_actions_update"];
+        post?: never;
+        delete: operations["traceability_actions_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["traceability_actions_partial_update"];
+        trace?: never;
+    };
+    "/api/traceability/actions/filters/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["traceability_actions_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user/": {
         parameters: {
             query?: never;
@@ -3299,6 +3347,153 @@ export interface components {
          * @enum {string}
          */
         AccessTypeEnum: PathsApiH2StationsGetParametersQueryAccess_type;
+        Action: {
+            readonly id: number;
+            readonly status: string;
+            /** N° de POS */
+            pos_id: string;
+            /** Filière */
+            industry: components["schemas"]["IndustryEnum"];
+            /** Type d'action */
+            type: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date: string;
+            /** Distance de livraison */
+            shipping_distance: number;
+            /** Mode de transport */
+            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Entité détentrice de la quantité de l'action */
+            holder: number;
+            /** Action parente */
+            parent?: number | null;
+            /** Matière */
+            material: number;
+            site: number;
+        };
+        ActionInput: {
+            /** N° de POS */
+            pos_id: string;
+            /** Filière */
+            industry: components["schemas"]["IndustryEnum"];
+            /** Type d'action */
+            type: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date: string;
+            /** Distance de livraison */
+            shipping_distance: number;
+            /** Mode de transport */
+            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Entité détentrice de la quantité de l'action */
+            holder: number;
+            /** Action parente */
+            parent?: number | null;
+            /** Matière */
+            material: number;
+            site: number;
+        };
+        ActionInputRequest: {
+            /** N° de POS */
+            pos_id: string;
+            /** Filière */
+            industry: components["schemas"]["IndustryEnum"];
+            /** Type d'action */
+            type: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date: string;
+            /** Distance de livraison */
+            shipping_distance: number;
+            /** Mode de transport */
+            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Entité détentrice de la quantité de l'action */
+            holder: number;
+            /** Action parente */
+            parent?: number | null;
+            /** Matière */
+            material: number;
+            site: number;
+        };
+        /**
+         * @description * `ROAD` - Transport routier
+         *     * `PIPELINE` - Pipeline
+         *     * `RAILROAD` - Rail
+         *     * `SEA` - Transport maritime
+         * @enum {string}
+         */
+        ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
+        /**
+         * @description * `INIT` - INIT
+         * @enum {string}
+         */
+        ActionTypeEnum: PathsApiTraceabilityActionsGetParametersQueryType;
         ActivateAccountRequest: {
             uidb64: string;
             token: string;
@@ -5639,6 +5834,11 @@ export interface components {
          */
         IcpeRegimeEnum: IcpeRegimeEnum;
         /**
+         * @description * `H2` - Hydrogène
+         * @enum {string}
+         */
+        IndustryEnum: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+        /**
          * @description * `INSTALLATION_CATEGORY_1` - Méthanisation en digesteur de produits ou déchets non dangereux, hors matières résultant du traitement des eaux usées urbaines ou industrielles
          *     * `INSTALLATION_CATEGORY_2` - Méthanisation en digesteur de produits ou déchets non dangereux, y compris des matières résultant du traitement des eaux usées urbaines ou industrielles
          *     * `INSTALLATION_CATEGORY_3` - Installations de stockage de déchets non dangereux à partir de déchets ménagers et assimilés
@@ -6012,6 +6212,21 @@ export interface components {
          * @enum {string}
          */
         OwnershipTypeEnum: OwnershipTypeEnum;
+        PaginatedActionList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Action"][];
+        };
         PaginatedBalanceResponseList: {
             /** @example 123 */
             count: number;
@@ -6263,6 +6478,50 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
+        };
+        PatchedActionInputRequest: {
+            /** N° de POS */
+            pos_id?: string;
+            /** Filière */
+            industry?: components["schemas"]["IndustryEnum"];
+            /** Type d'action */
+            type?: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity?: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date?: string;
+            /** Distance de livraison */
+            shipping_distance?: number;
+            /** Mode de transport */
+            shipping_method?: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date?: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Entité détentrice de la quantité de l'action */
+            holder?: number;
+            /** Action parente */
+            parent?: number | null;
+            /** Matière */
+            material?: number;
+            site?: number;
         };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -6536,6 +6795,20 @@ export interface components {
             /** Format: double */
             assigned_volume: number;
         };
+        /**
+         * @description * `TRUCK` - Routier
+         *     * `BARGE` - Barge
+         *     * `TRAIN` - Train
+         *     * `SHIP` - Bateau
+         *     * `PIPELINE` - Oléoduc
+         *     * `PIPELINE_DMM` - Oléoduc DMM
+         *     * `PIPELINE_LHP` - Oléoduc LHP
+         *     * `PIPELINE_ODC` - Oléoduc ODC
+         *     * `PIPELINE_SPMR` - Oléoduc SPMR
+         *     * `PIPELINE_SPSE` - Oléoduc SPSE
+         * @enum {string}
+         */
+        SafShippingMethodEnum: PathsApiResourcesAirportsGetParametersQueryShipping_method;
         SafTicket: {
             readonly id: number;
             carbure_id?: string | null;
@@ -6590,7 +6863,7 @@ export interface components {
             ghg_total?: number;
             client_comment?: string | null;
             readonly parent_ticket_source: components["schemas"]["SafRelatedTicketSource"];
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             readonly child_ticket_sources: components["schemas"]["SafRelatedTicketSource"][];
             origin_lot?: components["schemas"]["SafParentLot"];
             origin_lot_site?: components["schemas"]["Site"];
@@ -6677,7 +6950,7 @@ export interface components {
             assignment_period: number;
             reception_airport?: number | null;
             consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -6692,7 +6965,7 @@ export interface components {
             assignment_period: number;
             reception_airport?: number | null;
             consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -6707,7 +6980,7 @@ export interface components {
             assignment_period: number;
             reception_airport?: number | null;
             consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -6742,20 +7015,6 @@ export interface components {
         SetDefaultCertificateRequest: {
             certificate_id: string;
         };
-        /**
-         * @description * `TRUCK` - Routier
-         *     * `BARGE` - Barge
-         *     * `TRAIN` - Train
-         *     * `SHIP` - Bateau
-         *     * `PIPELINE` - Oléoduc
-         *     * `PIPELINE_DMM` - Oléoduc DMM
-         *     * `PIPELINE_LHP` - Oléoduc LHP
-         *     * `PIPELINE_ODC` - Oléoduc ODC
-         *     * `PIPELINE_SPMR` - Oléoduc SPMR
-         *     * `PIPELINE_SPSE` - Oléoduc SPSE
-         * @enum {string}
-         */
-        ShippingMethodEnum: PathsApiResourcesAirportsGetParametersQueryShipping_method;
         SimulationInputRequest: {
             customs_category: components["schemas"]["MPCategoriesEnum"];
             biofuel: number | null;
@@ -14931,6 +15190,252 @@ export interface operations {
             };
         };
     };
+    traceability_actions_list: {
+        parameters: {
+            query?: {
+                holder?: string[];
+                /** @description * `H2` - Hydrogène */
+                industry?: PathsApiTraceabilityActionsGetParametersQueryIndustry[];
+                material?: string[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `pos_id` - Pos id
+                 *     * `-pos_id` - Pos id (décroissant)
+                 *     * `holder` - Holder
+                 *     * `-holder` - Holder (décroissant)
+                 *     * `material` - Material
+                 *     * `-material` - Material (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `site` - Site
+                 *     * `-site` - Site (décroissant)
+                 *     * `shipping_distance` - Shipping distance
+                 *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `working_date` - Working date
+                 *     * `-working_date` - Working date (décroissant)
+                 */
+                order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ROAD` - Transport routier
+                 *     * `PIPELINE` - Pipeline
+                 *     * `RAILROAD` - Rail
+                 *     * `SEA` - Transport maritime
+                 */
+                shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
+                site?: string[];
+                /** @description * `INIT` - INIT */
+                type?: PathsApiTraceabilityActionsGetParametersQueryType[];
+                working_year?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedActionList"];
+                };
+            };
+        };
+    };
+    traceability_actions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionInputRequest"];
+                "multipart/form-data": components["schemas"]["ActionInputRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionInput"];
+                };
+            };
+        };
+    };
+    traceability_actions_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"];
+                };
+            };
+        };
+    };
+    traceability_actions_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionInputRequest"];
+                "multipart/form-data": components["schemas"]["ActionInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionInput"];
+                };
+            };
+        };
+    };
+    traceability_actions_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    traceability_actions_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedActionInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedActionInputRequest"];
+                "multipart/form-data": components["schemas"]["PatchedActionInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionInput"];
+                };
+            };
+        };
+    };
+    traceability_actions_filters_retrieve: {
+        parameters: {
+            query: {
+                /** @description Filter string to apply */
+                filter: PathsApiTraceabilityActionsFiltersGetParametersQueryFilter;
+                holder?: string[];
+                /** @description * `H2` - Hydrogène */
+                industry?: PathsApiTraceabilityActionsGetParametersQueryIndustry[];
+                material?: string[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `pos_id` - Pos id
+                 *     * `-pos_id` - Pos id (décroissant)
+                 *     * `holder` - Holder
+                 *     * `-holder` - Holder (décroissant)
+                 *     * `material` - Material
+                 *     * `-material` - Material (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `site` - Site
+                 *     * `-site` - Site (décroissant)
+                 *     * `shipping_distance` - Shipping distance
+                 *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `working_date` - Working date
+                 *     * `-working_date` - Working date (décroissant)
+                 */
+                order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ROAD` - Transport routier
+                 *     * `PIPELINE` - Pipeline
+                 *     * `RAILROAD` - Rail
+                 *     * `SEA` - Transport maritime
+                 */
+                shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
+                site?: string[];
+                /** @description * `INIT` - INIT */
+                type?: PathsApiTraceabilityActionsGetParametersQueryType[];
+                working_year?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
     user_retrieve: {
         parameters: {
             query?: never;
@@ -15408,6 +15913,44 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     status = "status",
     type = "type",
     years = "years"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
+    H2 = "H2"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
+    ValueMinusholder = "-holder",
+    ValueMinusmaterial = "-material",
+    ValueMinuspos_id = "-pos_id",
+    ValueMinusquantity = "-quantity",
+    ValueMinusshipping_distance = "-shipping_distance",
+    ValueMinussite = "-site",
+    ValueMinusworking_date = "-working_date",
+    holder = "holder",
+    material = "material",
+    pos_id = "pos_id",
+    quantity = "quantity",
+    shipping_distance = "shipping_distance",
+    site = "site",
+    working_date = "working_date"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryShipping_method {
+    PIPELINE = "PIPELINE",
+    RAILROAD = "RAILROAD",
+    ROAD = "ROAD",
+    SEA = "SEA"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryType {
+    INIT = "INIT"
+}
+export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
+    holder = "holder",
+    industry = "industry",
+    material = "material",
+    order_by = "order_by",
+    shipping_method = "shipping_method",
+    site = "site",
+    type = "type",
+    working_year = "working_year"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",

@@ -40,6 +40,8 @@ class Action(models.Model):
     )
 
     material = models.ForeignKey("traceability.Material", on_delete=models.PROTECT, verbose_name="Matière")
+
+    # Quantity in MJ
     quantity = models.DecimalField(verbose_name="Quantité de matière", max_digits=13, decimal_places=3)
 
     site = models.ForeignKey("transactions.Site", on_delete=models.PROTECT, verbose_name="Site")
@@ -53,6 +55,8 @@ class Action(models.Model):
     SEA = "SEA"
     SHIPPING_METHODS = [(ROAD, "Transport routier"), (PIPELINE, "Pipeline"), (RAILROAD, "Rail"), (SEA, "Transport maritime")]
     shipping_method = models.CharField(verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16)
+
+    working_date = models.DateField(verbose_name="Date de référence")
 
     ei = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     ep = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
