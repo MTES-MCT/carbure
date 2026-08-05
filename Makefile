@@ -1,5 +1,5 @@
 .PHONY: \
-	up down restart logs-django_cmd open \
+	up down restart logs-django_cmd open restart-backend restart-frontend \
 	test-backend test-frontend \
 	makemigrations migrate ipython \
 	lint-fix translate translate-missing \

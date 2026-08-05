@@ -16,7 +16,7 @@ class ActionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Action
 
-    pos_id = factory.Sequence(lambda n: f"POS-{n:06d}")
+    pos_id = factory.Faker("lexify", text="POS-????????????")
     holder = factory.SubFactory(EntityFactory, entity_type=Entity.HRS)
     industry = fuzzy.FuzzyChoice(Action.INDUSTRIES, getter=lambda x: x[0])
     type = fuzzy.FuzzyChoice(Action.TYPES, getter=lambda x: x[0])
