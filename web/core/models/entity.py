@@ -30,6 +30,7 @@ class Entity(models.Model):
     SAF_TRADER = "SAF Trader"
     BIOMETHANE_PRODUCER = "Producteur de biométhane"
     BIOMETHANE_PROVIDER = "Fournisseur de biométhane"
+    HRS = "HRS"
     ENTITY_TYPES = (
         (PRODUCER, "Producteur"),
         (OPERATOR, "Opérateur"),
@@ -44,6 +45,7 @@ class Entity(models.Model):
         (SAF_TRADER, "Trader de SAF"),
         (BIOMETHANE_PRODUCER, "Producteur de biométhane"),
         (BIOMETHANE_PROVIDER, "Fournisseur de biométhane"),
+        (HRS, "Distributeur d'hydrogène pour la mobilité"),
     )
     UNIT_CHOICE = (("l", "litres"), ("kg", "kg"), ("MJ", "MJ"))
 

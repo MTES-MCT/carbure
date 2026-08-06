@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next"
 import { getCertificates } from "settings/api/certificates"
 import { Grid } from "common/components/scaffold"
+import { useMemo } from "react"
 
 interface CompanyFormProps {
   onSubmitForm: (formEntity: CompanyRegistrationFormValue | undefined) => void
@@ -22,6 +23,19 @@ interface CompanyFormProps {
   isForeignCompany?: boolean
   formId?: string
 }
+
+// ALLOWED_ENTITY_TYPES is used to filter the entity types that can be selected in the company form. It excludes certain entity types that are not relevant for the form.
+const ALLOWED_ENTITY_TYPES = [
+  EntityType.Producer,
+  EntityType.Airline,
+  EntityType.CPO,
+  EntityType.Operator,
+  EntityType.Trader,
+  EntityType.Auditor,
+  EntityType.PowerOrHeatProducer,
+  EntityType.HRS,
+]
+
 export const CompanyForm = ({
   onSubmitForm,
   company,
@@ -30,6 +44,14 @@ export const CompanyForm = ({
 }: CompanyFormProps) => {
   const { t } = useTranslation()
   const companyForm = useCompanyForm(company)
+  const entityTypes = useMemo(
+    () =>
+      ALLOWED_ENTITY_TYPES.map((type) => ({
+        value: type,
+        label: getEntityTypeLabel(type),
+      })),
+    []
+  )
 
   return (
     <Form form={companyForm} id={formId} onSubmit={onSubmitForm}>
@@ -110,36 +132,7 @@ export const CompanyForm = ({
         label={t("Type d'activité")}
         placeholder={t("Précisez le type d'activité")}
         {...companyForm.bind("entity_type")}
-        options={[
-          {
-            value: EntityType.Producer,
-            label: getEntityTypeLabel(EntityType.Producer),
-          },
-          {
-            value: EntityType.Airline,
-            label: getEntityTypeLabel(EntityType.Airline),
-          },
-          {
-            value: EntityType.CPO,
-            label: getEntityTypeLabel(EntityType.CPO),
-          },
-          {
-            value: EntityType.Operator,
-            label: getEntityTypeLabel(EntityType.Operator),
-          },
-          {
-            value: EntityType.Trader,
-            label: getEntityTypeLabel(EntityType.Trader),
-          },
-          {
-            value: EntityType.Auditor,
-            label: getEntityTypeLabel(EntityType.Auditor),
-          },
-          {
-            value: EntityType.PowerOrHeatProducer,
-            label: getEntityTypeLabel(EntityType.PowerOrHeatProducer),
-          },
-        ]}
+        options={entityTypes}
       />
       {companyForm.value?.entity_type &&
         ![EntityType.Airline, EntityType.CPO].includes(
