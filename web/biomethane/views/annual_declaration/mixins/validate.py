@@ -1,3 +1,4 @@
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -32,7 +33,10 @@ class ValidateActionMixin:
 
                 declaration.status = BiomethaneAnnualDeclaration.DECLARED
 
-                declaration.save(update_fields=["status", "is_open"])
+                declaration.submission_date = timezone.now()
+
+                declaration.save(update_fields=["status", "is_open", "submission_date"])
+
                 return Response(status=status.HTTP_200_OK)
 
             return Response(status=status.HTTP_400_BAD_REQUEST)
