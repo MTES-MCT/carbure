@@ -23,7 +23,8 @@ import { useMatomo } from "matomo"
 import Select from "common/components/select"
 import { formatNumber } from "common/utils/formatters"
 import { getDeliveryTypes } from "lot-add/components/delivery-fields"
-import { getFuelUsageOptions } from "transactions/constants/fuel-usage"
+import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
+import { normalizeUsageFields } from "transactions/utils/usage-fields"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -70,14 +71,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
           form.delivery_type = undefined
         }
 
-        if (form.delivery_type !== DeliveryType.RFC) {
-          form.usage = undefined
-          form.usage_precision = undefined
-        }
-
-        if (form.usage !== FuelUsage.Other) {
-          form.usage_precision = undefined
-        }
+        Object.assign(form, normalizeUsageFields(form))
 
         return form
       },
@@ -92,8 +86,6 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
     !showUsageField ||
     (value.usage !== undefined &&
       (!showUsagePrecisionField || Boolean(value.usage_precision?.trim())))
-
-  const usageOptions = getFuelUsageOptions(t)
 
   const splitStock = useMutation(api.splitStock, {
     invalidates: ["snapshot", "stock-details"],
@@ -166,15 +158,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
                 options={deliveryTypes}
               />
             )}
-            {showUsageField && (
-              <Select
-                required
-                label={t("Usage du carburant")}
-                placeholder={t("Sélectionner un usage")}
-                {...bind("usage")}
-                options={usageOptions}
-              />
-            )}
+            {showUsageField && <FuelUsageSelect required {...bind("usage")} />}
             {showUsagePrecisionField && (
               <TextInput
                 required

@@ -11,7 +11,7 @@ import {
 import { UserCheck } from "common/components/icons"
 import * as api from "common/api"
 import * as norm from "common/utils/normalizers"
-import { getFuelUsageOptions } from "transactions/constants/fuel-usage"
+import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
 import {
   isExternalDelivery,
   isLotClient,
@@ -293,23 +293,13 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
 }
 
 export const UsageField = (props: SelectProps<FuelUsage>) => {
-  const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
 
   if (value.delivery_type !== DeliveryType.RFC) {
     return null
   }
 
-  return (
-    <Select
-      required
-      label={t("Usage du carburant")}
-      placeholder={t("Sélectionner un usage")}
-      options={getFuelUsageOptions(t)}
-      {...bind("usage")}
-      {...props}
-    />
-  )
+  return <FuelUsageSelect required {...bind("usage")} {...props} />
 }
 
 export const UsagePrecisionField = (props: TextInputProps) => {

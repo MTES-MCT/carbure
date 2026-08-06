@@ -20,6 +20,8 @@ import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { LotCertificates } from "transaction-details/types"
 import { matches } from "common/utils/collection"
 import { roundNumber } from "common/utils/formatters"
+import { applyNormalizers } from "common/utils/functions"
+import { normalizeUsageFields } from "transactions/utils/usage-fields"
 
 export interface LotFormProps {
   readOnly?: boolean
@@ -114,14 +116,7 @@ export function useLotForm(
       value.delivery_type = undefined
     }
 
-    if (value.delivery_type !== DeliveryType.RFC) {
-      value.usage = undefined
-      value.usage_precision = undefined
-    }
-
-    if (value.usage !== FuelUsage.Other) {
-      value.usage_precision = undefined
-    }
+    Object.assign(value, normalizeLotFormValue(value))
 
     // update GES summary
     const total = computeGHGTotal(value)
@@ -303,67 +298,78 @@ export const defaultLot = {
 
 export type LotFormValue = typeof defaultLot
 
+function normalizeLotFormValue<T extends Partial<LotFormValue>>(value: T): T {
+  return applyNormalizers(value, normalizeUsageFields)
+}
+
 type LotToFormValue = (lot: Lot | undefined, entity: Entity, certificates?: LotCertificates) => LotFormValue // prettier-ignore
-export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => ({
-  lot,
-  certificates,
+export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => {
+  const formValue: LotFormValue = {
+    lot,
+    certificates,
 
-  transport_document_reference: lot?.transport_document_reference ?? undefined,
-  volume: lot?.volume ?? undefined,
-  weight: lot?.weight ?? undefined,
-  lhv_amount: lot?.lhv_amount ?? undefined,
-  unit: entity.preferred_unit ?? undefined,
-  biofuel: lot?.biofuel ?? undefined,
-  feedstock: lot?.feedstock ?? undefined,
-  country_of_origin: lot?.country_of_origin ?? undefined,
-  free_field: lot?.free_field?.replace("\n", ", ") ?? undefined,
+    transport_document_reference:
+      lot?.transport_document_reference ?? undefined,
+    volume: lot?.volume ?? undefined,
+    weight: lot?.weight ?? undefined,
+    lhv_amount: lot?.lhv_amount ?? undefined,
+    unit: entity.preferred_unit ?? undefined,
+    biofuel: lot?.biofuel ?? undefined,
+    feedstock: lot?.feedstock ?? undefined,
+    country_of_origin: lot?.country_of_origin ?? undefined,
+    free_field: lot?.free_field?.replace("\n", ", ") ?? undefined,
 
-  producer: lot?.carbure_producer ?? lot?.unknown_producer ?? undefined,
-  production_site:
-    lot?.carbure_production_site ?? lot?.unknown_production_site ?? undefined,
-  production_country: lot?.production_country ?? undefined,
-  production_site_certificate: lot?.production_site_certificate ?? undefined,
-  production_site_commissioning_date:
-    lot?.production_site_commissioning_date ?? undefined,
-  production_site_double_counting_certificate:
-    lot?.production_site_double_counting_certificate ?? undefined,
+    producer: lot?.carbure_producer ?? lot?.unknown_producer ?? undefined,
+    production_site:
+      lot?.carbure_production_site ?? lot?.unknown_production_site ?? undefined,
+    production_country: lot?.production_country ?? undefined,
+    production_site_certificate: lot?.production_site_certificate ?? undefined,
+    production_site_commissioning_date:
+      lot?.production_site_commissioning_date ?? undefined,
+    production_site_double_counting_certificate:
+      lot?.production_site_double_counting_certificate ?? undefined,
 
-  supplier: lot?.carbure_supplier ?? lot?.unknown_supplier ?? undefined,
-  supplier_certificate: lot?.supplier_certificate ?? undefined,
-  vendor_certificate: lot?.vendor_certificate ?? undefined,
-  client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
-  delivery_type:
-    lot?.delivery_type === "UNKNOWN" ? undefined : lot?.delivery_type,
-  usage: (lot?.usage as FuelUsage | "") || undefined,
-  usage_precision: lot?.usage_precision || undefined,
-  delivery_site:
-    lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
-  delivery_site_country: lot?.delivery_site_country ?? undefined,
-  delivery_date: lot?.delivery_date ?? undefined,
+    supplier: lot?.carbure_supplier ?? lot?.unknown_supplier ?? undefined,
+    supplier_certificate: lot?.supplier_certificate ?? undefined,
+    vendor_certificate: lot?.vendor_certificate ?? undefined,
+    client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
+    delivery_type:
+      lot?.delivery_type === "UNKNOWN" ? undefined : lot?.delivery_type,
+    usage: lot?.usage ?? undefined,
+    usage_precision: lot?.usage_precision ?? undefined,
+    delivery_site:
+      lot?.carbure_delivery_site ?? lot?.unknown_delivery_site ?? undefined,
+    delivery_site_country: lot?.delivery_site_country ?? undefined,
+    delivery_date: lot?.delivery_date ?? undefined,
 
-  eec: lot?.eec ? roundNumber(lot.eec) : 0,
-  el: lot?.el ? roundNumber(lot.el) : 0,
-  ep: lot?.ep ? roundNumber(lot.ep) : 0,
-  etd: lot?.etd ? roundNumber(lot.etd) : 0,
-  eu: lot?.eu ? roundNumber(lot.eu) : 0,
+    eec: lot?.eec ? roundNumber(lot.eec) : 0,
+    el: lot?.el ? roundNumber(lot.el) : 0,
+    ep: lot?.ep ? roundNumber(lot.ep) : 0,
+    etd: lot?.etd ? roundNumber(lot.etd) : 0,
+    eu: lot?.eu ? roundNumber(lot.eu) : 0,
 
-  esca: lot?.esca ? roundNumber(lot.esca) : 0,
-  eccs: lot?.eccs ? roundNumber(lot.eccs) : 0,
-  eccr: lot?.eccr ? roundNumber(lot.eccr) : 0,
-  eee: lot?.eee ? roundNumber(lot.eee) : 0,
+    esca: lot?.esca ? roundNumber(lot.esca) : 0,
+    eccs: lot?.eccs ? roundNumber(lot.eccs) : 0,
+    eccr: lot?.eccr ? roundNumber(lot.eccr) : 0,
+    eee: lot?.eee ? roundNumber(lot.eee) : 0,
 
-  ghg_total: lot?.ghg_total ?? 0,
-  ghg_reduction: lot?.ghg_reduction ?? 0,
-  ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? 0,
+    ghg_total: lot?.ghg_total ?? 0,
+    ghg_reduction: lot?.ghg_reduction ?? 0,
+    ghg_reduction_red_ii: lot?.ghg_reduction_red_ii ?? 0,
 
-  emission_electricity: lot?.emission_electricity ?? 0,
-  emission_heat: lot?.emission_heat ?? 0,
-  total_reduction_electricity: lot?.total_reduction_electricity ?? 0,
-  total_reduction_heat: lot?.total_reduction_heat ?? 0,
-})
+    emission_electricity: lot?.emission_electricity ?? 0,
+    emission_heat: lot?.emission_heat ?? 0,
+    total_reduction_electricity: lot?.total_reduction_electricity ?? 0,
+    total_reduction_heat: lot?.total_reduction_heat ?? 0,
+  }
+
+  return normalizeLotFormValue(formValue)
+}
 
 export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
   if (lot === undefined) return {}
+
+  lot = normalizeLotFormValue(lot)
 
   const unit = lot.unit ?? "l"
 
@@ -488,28 +494,10 @@ export function hasChange(
   lot: Lot | undefined,
   entity: Entity
 ) {
-  const normalizeUsagePayload = (
-    payload: ReturnType<typeof lotFormToPayload>
-  ) => {
-    const normalized = { ...payload }
-
-    if (normalized.delivery_type !== DeliveryType.RFC) {
-      normalized.usage = undefined
-      normalized.usage_precision = undefined
-    }
-
-    if (normalized.usage !== FuelUsage.Other) {
-      normalized.usage_precision = undefined
-    }
-
-    return normalized
-  }
-
-  const formPayload = normalizeUsagePayload(lotFormToPayload(form))
-  const lotPayload = normalizeUsagePayload(
+  return matches(
+    lotFormToPayload(form),
     lotFormToPayload(lotToFormValue(lot, entity))
   )
-  return matches(formPayload, lotPayload)
 }
 
 // prettier-ignore

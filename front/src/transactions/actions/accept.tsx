@@ -17,7 +17,7 @@ import { usePortal } from "common/components/portal"
 import useEntity from "common/hooks/entity"
 import Autocomplete from "common/components/autocomplete"
 import * as norm from "common/utils/normalizers"
-import { getFuelUsageOptions } from "transactions/constants/fuel-usage"
+import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
 import {
   findBiofuelEntities,
   findMyCertificates,
@@ -183,7 +183,6 @@ const ReleaseForConsumptionDialog = ({
   const entity = useEntity()
   const [usage, setUsage] = useState<FuelUsage | undefined>()
   const [usagePrecision, setUsagePrecision] = useState<string | undefined>()
-  const usageOptions = useMemo(() => getFuelUsageOptions(t), [t])
 
   const v = variations(selection.length)
   const requiresPrecision = usage === FuelUsage.Other
@@ -242,14 +241,11 @@ const ReleaseForConsumptionDialog = ({
         </section>
         <section>
           <Form id="release-for-consumption">
-            <Select
+            <FuelUsageSelect
               autoFocus
               required
-              label={t("Usage du carburant")}
-              placeholder={t("Sélectionner un usage")}
               value={usage}
               onChange={setUsage}
-              options={usageOptions}
             />
 
             {requiresPrecision && (
